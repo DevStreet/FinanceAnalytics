@@ -59,6 +59,99 @@
   </servlet-mapping>
   <!--end of HTTP push support-->
 
+  <!-- Jolokia - jmx bridge -->
+  <servlet>
+    <servlet-name>jolokia-agent</servlet-name>
+    <servlet-class>org.jolokia.http.AgentServlet</servlet-class>
+    <init-param>
+      <description>
+        Class names (comma separated) of RequestDispatcher used in addition
+        to the LocalRequestDispatcher
+      </description>
+      <param-name>dispatcherClasses</param-name>
+      <param-value>org.jolokia.jsr160.Jsr160RequestDispatcher</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Debugging state after startup. Can be changed via
+        the Config MBean during runtime
+      </description>
+      <param-name>debug</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Entries to keep in the history. Can be changed during
+        runtime via the config MBean
+      </description>
+      <param-name>historyMaxEntries</param-name>
+      <param-value>10</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Maximum number of entries to keed in the local
+        debug history if switched on. Can be change via
+        the config MBean during runtime.
+      </description>
+      <param-name>debugMaxEntries</param-name>
+      <param-value>100</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Maximum depth when traversing bean properties.
+        If set to 0, depth checking is disabled
+      </description>
+      <param-name>maxDepth</param-name>
+      <param-value>15</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Maximum size of collections returned when
+        serializing to JSON. When set to 0, not
+        collections are truncated.
+      </description>
+      <param-name>maxCollectionSize</param-name>
+      <param-value>1000</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Maximum number of objects which is traversed
+        when serializing a single response. Use this
+        as airbag to avoid boosting your memory and
+        network traffic. Nevertheless, when set to 0
+        not limit is used.
+      </description>
+      <param-name>maxObjects</param-name>
+      <param-value>0</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>jolokia-agent</servlet-name>
+    <url-pattern>/admin/jmx/*</url-pattern>
+  </servlet-mapping>
+  <!-- end of Jolokia - jmx bridge -->
+
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>AdminRealm</realm-name>
+  </login-config>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Admin Access</web-resource-name>
+      <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <security-role>
+    <role-name>admin</role-name>
+  </security-role>
+
   <!-- Ehcache shutdown hook -->
   <listener>
     <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>

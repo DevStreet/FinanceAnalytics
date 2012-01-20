@@ -16,9 +16,10 @@
         <dependency name="og-engine" rev="latest.integration" />
         <dependency name="og-util" rev="latest.integration" />
         
-        <dependency org="org.eclipse" name="jetty" rev="7.0.1+" conf="*->jsp,servlets,start"/>
+        <dependency org="org.eclipse" name="jetty" rev="7.0.1+" conf="*->jsp,servlets,start,security"/>
         <dependency org="org.springframework" name="spring" rev="3.0.4" conf="*->orm,web,context"/>
         <dependency org="org.cometd" name="cometd-java" rev="1.0.1" conf="*->server,client"/>
+        <dependency org="org.jolokia" name="jolokia" rev="1.0.1" conf="*->default" />
         
         <dependency org="org.junit" name="junit" rev="4.8.2" />
     </dependencies>
