@@ -36,12 +36,14 @@ public class InterestRateFutureSecurity extends FutureSecurity {
   @PropertyDefinition(validate = "notNull")
   private ExternalId _underlyingId;
 
-  InterestRateFutureSecurity() { //For builder
+  /**
+   * Creates an empty instance.
+   */
+  protected InterestRateFutureSecurity() {
     super();
   }
 
-  public InterestRateFutureSecurity(Expiry expiry, String tradingExchange, String settlementExchange, Currency currency, double unitAmount,
-      ExternalId underlyingIdentifier) {
+  public InterestRateFutureSecurity(Expiry expiry, String tradingExchange, String settlementExchange, Currency currency, double unitAmount, ExternalId underlyingIdentifier) {
     super(expiry, tradingExchange, settlementExchange, currency, unitAmount);
     setUnderlyingId(underlyingIdentifier);
   }

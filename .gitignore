@@ -9,9 +9,7 @@ projects/Aldwych
 projects/Fudge-Java/
 projects/Fudge-Defn/
 projects/Fudge-Proto/
-projects/OG-Bloomberg/
 projects/OG-Excel/
-projects/OG-Integration/
 projects/OG-Production/
 projects/CharterhouseStreet/
 projects/GreshamStreet/
@@ -38,3 +36,6 @@ output-long/
 test-output/
 /install/
 /build/
+LOCAL_STASH
+*.iws
+*.ids

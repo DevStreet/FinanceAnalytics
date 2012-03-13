@@ -38,6 +38,8 @@ import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecu
 import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
 import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
+import com.opengamma.financial.sensitivities.SecurityEntryData;
+import com.opengamma.master.security.RawSecurity;
 
 /**
  * Function to classify positions by asset class.  Note that this bins all types of options together.
@@ -45,6 +47,7 @@ import com.opengamma.financial.security.swap.SwapSecurity;
  * @author jim
  */
 public class AssetClassAggregationFunction implements AggregationFunction<String> {
+  
   /* package */static final String FX_OPTIONS = "FX Options";
   /* package */static final String NONDELIVERABLE_FX_OPTIONS = "Non-deliverable FX Options";
   /* package */static final String FX_BARRIER_OPTIONS = "FX Barrier Options";
@@ -58,7 +61,7 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
   /* package */static final String EQUITY_BARRIER_OPTIONS = "Equity Barrier Options";
   /* package */static final String EQUITY_VARIANCE_SWAPS = "Equity Variance Swaps";
   /* package */static final String SWAPTIONS = "Swaptions";
-  /* package */static final String IRFUTURE_OPTIONS = "IRFuture Options";
+  /* package */static final String IRFUTURE_OPTIONS = "IR Future Options";
   /* package */static final String EQUITY_INDEX_DIVIDEND_FUTURE_OPTIONS = "Equity Index Dividend Future Options";
   /* package */static final String SWAPS = "Swaps";
   /* package */static final String FX_FORWARDS = "FX Forwards";
@@ -208,6 +211,11 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
 
       });
     } else {
+      if (security instanceof RawSecurity && security.getSecurityType().equals(SecurityEntryData.EXTERNAL_SENSITIVITIES_SECURITY_TYPE)) {
+        if (security.getAttributes().containsKey("Security Type")) {
+          return security.getAttributes().get("Security Type");
+        }
+      }
       return UNKNOWN;
     }
   }
@@ -228,7 +236,17 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
 
   @Override
   public int compare(String assetClass1, String assetClass2) {
-    return ALL_CATEGORIES.indexOf(assetClass2) - ALL_CATEGORIES.indexOf(assetClass1);
+    if (!ALL_CATEGORIES.contains(assetClass1)) {
+      if (!ALL_CATEGORIES.contains(assetClass2)) {
+        return assetClass1.compareTo(assetClass2);
+      } else {
+        return -1;
+      }
+    } else if (!ALL_CATEGORIES.contains(assetClass2)) {
+      return 1;
+    } else {
+      return ALL_CATEGORIES.indexOf(assetClass2) - ALL_CATEGORIES.indexOf(assetClass1);
+    }
   }
   
   public Comparator<Position> getPositionComparator() {

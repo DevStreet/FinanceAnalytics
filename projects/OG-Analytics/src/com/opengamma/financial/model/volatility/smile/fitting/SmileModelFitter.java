@@ -29,11 +29,11 @@ import com.opengamma.math.statistics.leastsquare.NonLinearLeastSquare;
  */
 public abstract class SmileModelFitter<T extends SmileModelData> {
   private static final MatrixAlgebra MA = new OGMatrixAlgebra();
-  private static final NonLinearLeastSquare SOLVER = new NonLinearLeastSquare(DecompositionFactory.SV_COLT, MA, 1e-6);
+  private static final NonLinearLeastSquare SOLVER = new NonLinearLeastSquare(DecompositionFactory.SV_COLT, MA, 1e-12);
   private static final Function1D<DoubleMatrix1D, Boolean> UNCONSTRAINED = new Function1D<DoubleMatrix1D, Boolean>() {
     @Override
     public Boolean evaluate(final DoubleMatrix1D x) {
-      return false;
+      return true;
     }
   };
 
@@ -100,7 +100,7 @@ public abstract class SmileModelFitter<T extends SmileModelData> {
     final NonLinearTransformFunction transFunc = new NonLinearTransformFunction(getModelValueFunction(), getModelJacobianFunction(), transform);
 
     final LeastSquareResults solRes = SOLVER.solve(_marketValues, _errors, transFunc.getFittingFunction(), transFunc.getFittingJacobian(),
-        transform.transform(start), getConstraintFunction(transform));
+        transform.transform(start), getConstraintFunction(transform), getMaximumStep());
     return new LeastSquareResultsWithTransform(solRes, transform);
   }
 
@@ -129,13 +129,17 @@ public abstract class SmileModelFitter<T extends SmileModelData> {
     };
   }
 
+  protected DoubleMatrix1D getMaximumStep() {
+    return null;
+  }
+
   protected abstract NonLinearParameterTransforms getTransform(final DoubleMatrix1D start);
 
   protected abstract NonLinearParameterTransforms getTransform(final DoubleMatrix1D start, final BitSet fixed);
 
   protected abstract T toSmileModelData(final DoubleMatrix1D modelParameters);
 
-  protected Function1D<DoubleMatrix1D, Boolean> getConstraintFunction(final  NonLinearParameterTransforms t) {
+  protected Function1D<DoubleMatrix1D, Boolean> getConstraintFunction(@SuppressWarnings("unused") final NonLinearParameterTransforms t) {
     return UNCONSTRAINED;
   }
 

@@ -6,8 +6,6 @@
 package com.opengamma.web.security;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,9 +44,11 @@ import com.opengamma.financial.security.option.EquityOptionSecurity;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
 import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.FixedInterestRateLeg;
+import com.opengamma.financial.security.swap.FixedVarianceSwapLeg;
 import com.opengamma.financial.security.swap.FloatingGearingIRLeg;
 import com.opengamma.financial.security.swap.FloatingInterestRateLeg;
 import com.opengamma.financial.security.swap.FloatingSpreadIRLeg;
+import com.opengamma.financial.security.swap.FloatingVarianceSwapLeg;
 import com.opengamma.financial.security.swap.SwapLegVisitor;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.financial.sensitivities.FactorExposureData;
@@ -65,8 +65,6 @@ import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 import com.opengamma.web.AbstractPerRequestWebResource;
 import com.opengamma.web.WebHomeUris;
-
-import freemarker.template.SimpleHash;
 
 /**
  * Abstract base class for RESTful security resources.
@@ -198,6 +196,7 @@ public abstract class AbstractWebSecurityResource extends AbstractPerRequestWebR
       SecurityEntryData securityEntryData = OpenGammaFudgeContext.getInstance().fromFudgeMsg(SecurityEntryData.class, msg.getMessage());
 
       out.put("securityEntryData", securityEntryData);
+      out.put("securityAttributes", security.getAttributes());
       RawSecurity underlyingRawSecurity = (RawSecurity) getSecurity(securityEntryData.getFactorSetId());
       if (underlyingRawSecurity != null) {
         FudgeMsgEnvelope factorIdMsg = OpenGammaFudgeContext.getInstance().deserialize(underlyingRawSecurity.getRawData());
@@ -231,27 +230,42 @@ public abstract class AbstractWebSecurityResource extends AbstractPerRequestWebR
                                      exposure.getFactorName(),
                                      exposure.getNode(),
                                      priceHTS != null ? priceHTS.getUniqueId() : null,
+                                     priceHTS != null ? priceHTS.getTimeSeries().getLatestValue() : null,
                                      exposureHTS != null ? exposureHTS.getUniqueId() : null,
-                                     convexityHTS != null ? convexityHTS.getUniqueId() : null));
+                                     exposureHTS != null ? exposureHTS.getTimeSeries().getLatestValue() : null,
+                                     convexityHTS != null ? convexityHTS.getUniqueId() : null,
+                                     convexityHTS != null ? convexityHTS.getTimeSeries().getLatestValue() : null));
     }
     return results;
   }
   
+  /**
+   * Container for a row of a displayed factor.
+   */
   public class FactorExposure {
     private final String _factorType;
     private final String _factorName;
     private final String _node;
     private final UniqueId _priceTsId;
+    private final Double _lastPrice;
     private final UniqueId _exposureTsId;
+    private final Double _lastExposure;
     private final UniqueId _convexityTsId;
+    private final Double _lastConvexity;
     
-    public FactorExposure(String factorType, String factorName, String node, UniqueId priceTsId, UniqueId exposureTsId, UniqueId convexityTsId) {
+    public FactorExposure(String factorType, String factorName, String node, 
+                          UniqueId priceTsId, Double lastPrice, 
+                          UniqueId exposureTsId, Double lastExposure,
+                          UniqueId convexityTsId, Double lastConvexity) {
       _factorType = factorType;
       _factorName = factorName;
       _node = node;
       _priceTsId = priceTsId;
+      _lastPrice = lastPrice;
       _exposureTsId = exposureTsId;
+      _lastExposure = lastExposure;
       _convexityTsId = convexityTsId;
+      _lastConvexity = lastConvexity;
     }
     
     public String getFactorType() {
@@ -270,19 +284,27 @@ public abstract class AbstractWebSecurityResource extends AbstractPerRequestWebR
       return _priceTsId;
     }
     
+    public Double getLastPrice() {
+      return _lastPrice;
+    }
+    
     public UniqueId getExposureTsId() {
       return _exposureTsId;
+    }
+    
+    public Double getLastExposure() {
+      return _lastExposure;
     }
     
     public UniqueId getConvexityTsId() {
       return _convexityTsId;
     }
+    
+    public Double getLastConvexity() {
+      return _lastConvexity;
+    }
   }
   
-  private void addExposureTimeSeriesIdMaps(FlexiBean out, Collection<FactorExposureData> factorExposureDataList) {
-
-  }
-
   private void addUnderlyingSecurity(FlexiBean out, ExternalId externalId) {
     Security underlyingSec = getSecurity(externalId);
     if (underlyingSec != null) {
@@ -449,6 +471,16 @@ public abstract class AbstractWebSecurityResource extends AbstractPerRequestWebR
     @Override
     public String visitFloatingGearingIRLeg(FloatingGearingIRLeg swapLeg) {
       return "FloatingGearingInterestRateLeg";
+    }
+
+    @Override
+    public String visitFixedVarianceSwapLeg(FixedVarianceSwapLeg swapLeg) {
+      return "FixedVarianceLeg";
+    }
+
+    @Override
+    public String visitFloatingVarianceSwapLeg(FloatingVarianceSwapLeg swapLeg) {
+      return "FloatingVarianceLeg";
     }
   }
   

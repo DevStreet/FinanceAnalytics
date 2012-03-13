@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.Test;
 
 import com.opengamma.util.tuple.Triple;
@@ -47,19 +48,27 @@ public abstract class AbstractDbUpgradeTest extends DbTest {
        * System.out.println(comparison.getFirst() + " found:");
        * System.out.println(comparison.getThird());
        */
+      int diff = StringUtils.indexOfDifference(comparison.getSecond(), comparison.getThird());
+      if (diff >= 0) {
+        System.err.println("Difference at " + diff);
+        System.err.println("Upgraded --->..." + StringUtils.substring(comparison.getSecond(), diff - 200, diff) +
+            "<-!!!->" + StringUtils.substring(comparison.getSecond(), diff, diff + 200) + "...");
+        System.err.println(" Created --->..." + StringUtils.substring(comparison.getThird(), diff - 200, diff) +
+            "<-!!!->" + StringUtils.substring(comparison.getThird(), diff, diff + 200) + "...");
+      }
       assertEquals(getDatabaseType() + ": " + comparison.getFirst(), comparison.getSecond(), comparison.getThird());
     }
   }
 
   @Override
-  public void tablesCreatedOrUpgraded(final String version) {
+  public void tablesCreatedOrUpgraded(final String version, final String prefix) {
     final Map<String, String> versionSchemas = getVersionSchemas();
-    if (versionSchemas.containsKey(version)) {
+    if (versionSchemas.containsKey(prefix+"_"+version)) {
       // if we've already done the full schema, then we want to test that this upgrade has given us the same (but defer the comparison)
-      _comparisons.add(new Triple<String, String, String>(version, versionSchemas.get(version), getDbTool().describeDatabase()));
+      _comparisons.add(new Triple<String, String, String>(prefix+"_"+version, versionSchemas.get(prefix+"_"+version), getDbTool().describeDatabase(prefix)));
     } else {
       // tests are run with most recent full schema first, so we can store that as a reference
-      versionSchemas.put(version, getDbTool().describeDatabase());
+      versionSchemas.put(prefix+"_"+version, getDbTool().describeDatabase(prefix));
     }
   }
 

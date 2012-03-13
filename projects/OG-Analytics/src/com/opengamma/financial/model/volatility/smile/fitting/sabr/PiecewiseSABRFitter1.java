@@ -30,7 +30,7 @@ public class PiecewiseSABRFitter1 {
   private final WeightingFunction _weightingFunction;
 
   public PiecewiseSABRFitter1() {
-    this(0.5, LinearWeightingFunction.getInstance());
+    this(0.9, LinearWeightingFunction.getInstance());
   }
 
   public PiecewiseSABRFitter1(final double defaultBeta, final WeightingFunction weightingFunction) {
@@ -49,12 +49,25 @@ public class PiecewiseSABRFitter1 {
     validateStrikes(strikes);
 
     double averageVol = 0;
+    double averageVol2 = 0;
     for (int i = 0; i < n; i++) {
-      averageVol += impliedVols[i];
+      final double vol = impliedVols[i];
+      averageVol += vol;
+      averageVol2 += vol * vol;
     }
+    averageVol2 = Math.sqrt((averageVol2 - averageVol / n) / (n - 1));
     averageVol /= n;
-    final double approxAlpha = averageVol * Math.pow(forward, 1 - _defaultBeta);
-    DoubleMatrix1D start = new DoubleMatrix1D(approxAlpha, _defaultBeta, 0.0, 0.3);
+
+    DoubleMatrix1D start;
+
+    //almost flat surface
+    if (averageVol2 / averageVol < 0.01) {
+      start = new DoubleMatrix1D(averageVol, 1.0, 0.0, 0.0);
+    } else {
+      final double approxAlpha = averageVol * Math.pow(forward, 1 - _defaultBeta);
+      start = new DoubleMatrix1D(approxAlpha, _defaultBeta, 0.0, 0.3);
+    }
+
     final SABRFormulaData[] modelParams = new SABRFormulaData[n - 2];
 
     double[] errors = new double[n];

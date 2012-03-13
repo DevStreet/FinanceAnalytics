@@ -18,15 +18,17 @@ import com.opengamma.engine.function.config.ParameterizedFunctionConfiguration;
 import com.opengamma.engine.function.config.RepositoryConfiguration;
 import com.opengamma.engine.function.config.RepositoryConfigurationSource;
 import com.opengamma.engine.function.config.SimpleRepositoryConfigurationSource;
+import com.opengamma.engine.function.config.StaticFunctionConfiguration;
 import com.opengamma.financial.analytics.ircurve.YieldCurveDefinition;
 import com.opengamma.financial.analytics.ircurve.YieldCurveInterpolatingFunction;
 import com.opengamma.financial.analytics.ircurve.YieldCurveMarketDataFunction;
 import com.opengamma.financial.analytics.ircurve.YieldCurveSpecificationFunction;
-import com.opengamma.financial.analytics.model.volatility.local.DummyFXForwardCurveFunction;
-import com.opengamma.financial.analytics.model.volatility.local.ForwardCurveFromFXForwardFunction;
+import com.opengamma.financial.analytics.model.curve.forward.FXForwardCurveFromYieldCurveDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.curve.forward.FXForwardCurveFromYieldCurveFunction;
+import com.opengamma.financial.analytics.model.curve.future.FuturePriceCurveFunction;
+import com.opengamma.financial.analytics.volatility.cube.BloombergSwaptionVolatilityCubeInstrumentProvider;
 import com.opengamma.financial.analytics.volatility.cube.BloombergVolatilityCubeDefinitionSource;
 import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeFunction;
-import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeInstrumentProvider;
 import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeMarketDataFunction;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.master.config.ConfigDocument;
@@ -94,6 +96,8 @@ public class DemoCurveFunctionConfiguration extends SingletonFactoryBean<Reposit
     s_logger.info("Added swaption vol cube to repository configuration");
     addFXForwardCurveFunction(configs);
     s_logger.info("Added FX forward curve to repository configuration");
+    addFutureCurveFunction(configs);
+    s_logger.info("Added future curve to repository configuration");
     return new RepositoryConfiguration(configs);
   }
 
@@ -101,7 +105,7 @@ public class DemoCurveFunctionConfiguration extends SingletonFactoryBean<Reposit
     //These need to be replaced with meaningful cube defns
     addVolatilityCubeFunction(configs, "USD", "BLOOMBERG");
 
-    Set<Currency> volCubeCurrencies = VolatilityCubeInstrumentProvider.BLOOMBERG.getAllCurrencies();
+    Set<Currency> volCubeCurrencies = BloombergSwaptionVolatilityCubeInstrumentProvider.BLOOMBERG.getAllCurrencies();
     for (Currency currency : volCubeCurrencies) {
       addVolatilityCubeFunction(configs, currency.getCode(), BloombergVolatilityCubeDefinitionSource.DEFINITION_NAME);
     }
@@ -113,11 +117,14 @@ public class DemoCurveFunctionConfiguration extends SingletonFactoryBean<Reposit
     configs.add(new ParameterizedFunctionConfiguration(YieldCurveSpecificationFunction.class.getName(), Arrays.asList(currency, curveName)));
   }
 
-  private void addFXForwardCurveFunction(List<FunctionConfiguration> configs) {
-    configs.add(new ParameterizedFunctionConfiguration(DummyFXForwardCurveFunction.class.getName(), Arrays.asList("DEFAULT", "EUR", "USD")));
-    //configs.add(new ParameterizedFunctionConfiguration(ForwardCurveFromFXForwardFunction.class.getName(), Arrays.asList("DEFAULT", "DEFAULT", "DEFAULT")));
+  private void addFXForwardCurveFunction(final List<FunctionConfiguration> configs) {
+    configs.add(new StaticFunctionConfiguration(FXForwardCurveFromYieldCurveFunction.class.getName()));
+    configs.add(new ParameterizedFunctionConfiguration(FXForwardCurveFromYieldCurveDefaultPropertiesFunction.class.getName(), Arrays.asList("FUNDING-FUNDING", "FUNDING", "FUNDING")));
   }
   
+  private void addFutureCurveFunction(final List<FunctionConfiguration> configs) {
+    configs.add(new StaticFunctionConfiguration(FuturePriceCurveFunction.class.getName()));
+  }
   private void addVolatilityCubeFunction(List<FunctionConfiguration> configs, String... parameters) {
     addVolatilityCubeFunction(configs, Arrays.asList(parameters));
   }

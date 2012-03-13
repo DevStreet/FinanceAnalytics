@@ -32,11 +32,11 @@ import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
+import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.volatility.fittedresults.HestonFittedSurfaces;
-import com.opengamma.financial.analytics.volatility.surface.FuturePriceCurveData;
-import com.opengamma.financial.analytics.volatility.surface.RawVolatilitySurfaceDataFunction;
 import com.opengamma.financial.model.volatility.smile.fitting.HestonModelFitter;
 import com.opengamma.financial.model.volatility.smile.function.HestonVolatilityFunction;
+import com.opengamma.math.curve.NodalDoublesCurve;
 import com.opengamma.math.interpolation.FlatExtrapolator1D;
 import com.opengamma.math.interpolation.GridInterpolator2D;
 import com.opengamma.math.interpolation.Interpolator1DFactory;
@@ -78,13 +78,13 @@ public class HestonFourierIRFutureSurfaceFittingFunction extends AbstractFunctio
   public void init(final FunctionCompilationContext context) {
     final ComputationTargetSpecification currencyTargetSpec = new ComputationTargetSpecification(_currency);
     final ValueProperties surfaceProperties = ValueProperties.with(ValuePropertyNames.SURFACE, _definitionName)
-        .with(RawVolatilitySurfaceDataFunction.PROPERTY_SURFACE_INSTRUMENT_TYPE, "IR_FUTURE_OPTION").get();
+        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.IR_FUTURE_OPTION).get();
     final ValueProperties futurePriceProperties = ValueProperties.with(ValuePropertyNames.CURVE, _definitionName)
-        .with(RawVolatilitySurfaceDataFunction.PROPERTY_SURFACE_INSTRUMENT_TYPE, "IR_FUTURE_PRICE").get();
+        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, "IR_FUTURE_PRICE").get();
     _surfaceRequirement = new ValueRequirement(ValueRequirementNames.STANDARD_VOLATILITY_SURFACE_DATA, currencyTargetSpec, surfaceProperties);
     _futurePriceRequirement = new ValueRequirement(ValueRequirementNames.FUTURE_PRICE_CURVE_DATA, currencyTargetSpec, futurePriceProperties);
     final ValueProperties resultProperties = createValueProperties().with(ValuePropertyNames.CURRENCY, _currency.getCode()).with(ValuePropertyNames.SURFACE, _definitionName)
-        .with(RawVolatilitySurfaceDataFunction.PROPERTY_SURFACE_INSTRUMENT_TYPE, "IR_FUTURE_OPTION").get();
+        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.IR_FUTURE_OPTION).get();
     _resultSpecification = new ValueSpecification(ValueRequirementNames.HESTON_SURFACES, currencyTargetSpec, resultProperties);
   }
 
@@ -96,13 +96,11 @@ public class HestonFourierIRFutureSurfaceFittingFunction extends AbstractFunctio
     }
     @SuppressWarnings("unchecked")
     final VolatilitySurfaceData<Double, Double> volatilitySurfaceData = (VolatilitySurfaceData<Double, Double>) objectSurfaceData;
-    //TODO transform data to Map<Double, Map<Double, Double>> here
     final Object objectFuturePriceData = inputs.getValue(_futurePriceRequirement);
     if (objectFuturePriceData == null) {
       throw new OpenGammaRuntimeException("Could not get futures price data");
     }
-    @SuppressWarnings("unchecked")
-    final FuturePriceCurveData<Double> futurePriceData = (FuturePriceCurveData<Double>) objectFuturePriceData;
+    final NodalDoublesCurve futurePriceData = (NodalDoublesCurve) objectFuturePriceData;
     //assumes that the sorting is first x, then y
     if (volatilitySurfaceData.size() == 0) {
       throw new OpenGammaRuntimeException("Interest rate future option volatility surface definition name=" + _definitionName + " contains no data");
@@ -123,7 +121,7 @@ public class HestonFourierIRFutureSurfaceFittingFunction extends AbstractFunctio
       final DoubleArrayList strikesList = new DoubleArrayList(n);
       final DoubleArrayList sigmaList = new DoubleArrayList(n);
       final DoubleArrayList errorsList = new DoubleArrayList(n);
-      final Double futurePrice = futurePriceData.getFuturePrice(t);
+      final Double futurePrice = futurePriceData.getYValue(t);
       if (strip.size() > 4 && futurePrice != null) {
         final double forward = 1 - futurePrice;
         for (final ObjectsPair<Double, Double> value : strip) {

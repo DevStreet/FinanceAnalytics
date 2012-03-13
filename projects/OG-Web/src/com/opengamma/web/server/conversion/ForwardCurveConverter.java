@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.model.interestrate.curve.ForwardCurve;
+import com.opengamma.math.curve.FunctionalDoublesCurve;
 import com.opengamma.math.curve.InterpolatedDoublesCurve;
 
 /**
@@ -32,12 +33,26 @@ public class ForwardCurveConverter implements ResultConverter<ForwardCurve> {
       }
       result.put("summary", data);
       if (mode == ConversionMode.FULL) {
-        List<Double[]> detailedData = getData((InterpolatedDoublesCurve) value.getForwardCurve());
+        List<Double[]> detailedData = getData(interpolatedCurve);
         result.put("detailed", detailedData);
       }
       return result;
     }
-    result.put("summary", "Can only display InterpolatedDoublesCurve");
+    if (value.getForwardCurve() instanceof FunctionalDoublesCurve) {
+      FunctionalDoublesCurve functionalCurve = (FunctionalDoublesCurve) value.getForwardCurve();
+      List<Double[]> data = new ArrayList<Double[]>();
+      for (int i = 0; i < 30; i++) {
+        double x = i;
+        data.add(new Double[] {x, functionalCurve.getYValue(x)});
+      }
+      result.put("summary", data);
+      if (mode == ConversionMode.FULL) {
+        List<Double[]> detailedData = getData(functionalCurve);
+        result.put("detailed", detailedData);
+      }
+      return result;
+    }
+    result.put("summary", "Can only display InterpolatedDoublesCurve or FunctionalDoublesCurve");
     return result;
   }
 
@@ -83,6 +98,16 @@ public class ForwardCurveConverter implements ResultConverter<ForwardCurve> {
     for (int i = 0; i < 100; i++) {      
       detailedData.add(new Double[]{x, detailedCurve.getYValue(x)});
       x += eps;
+    }
+    return detailedData;
+  }
+  
+  private List<Double[]> getData(FunctionalDoublesCurve detailedCurve) {
+    List<Double[]> detailedData = new ArrayList<Double[]>();
+        
+    for (int i = 0; i < 100; i++) {
+      double x = 3 * i / 10.;
+      detailedData.add(new Double[]{x, detailedCurve.getYValue(x)});
     }
     return detailedData;
   }

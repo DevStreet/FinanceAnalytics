@@ -28,6 +28,7 @@ import com.opengamma.util.time.DateUtils;
  * Tests related to the construction of OIS swaps.
  */
 public class SwapFixedOISSimplifiedDefinitionTest {
+
   private static final int EUR_SETTLEMENT_DAYS = 2;
   private static final BusinessDayConvention EUR_BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean EUR_IS_EOM = true;
@@ -48,13 +49,13 @@ public class SwapFixedOISSimplifiedDefinitionTest {
   // Swap EONIA 3M
   private static final Period EUR_SWAP_3M_TENOR = Period.ofMonths(3);
   private static final SwapFixedOISSimplifiedDefinition EONIA_SWAP_3M_DEFINITION = SwapFixedOISSimplifiedDefinition.from(SPOT_DATE, EUR_SWAP_3M_TENOR, EUR_SWAP_3M_TENOR, NOTIONAL, EUR_OIS,
-      FIXED_RATE, IS_PAYER, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_IS_EOM);
+      FIXED_RATE, IS_PAYER, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_DAY_COUNT, EUR_IS_EOM);
 
   // Swap EONIA 3Y
   private static final Period EUR_SWAP_3Y_TENOR = Period.ofYears(3);
   private static final Period EUR_COUPON_TENOR = Period.ofMonths(12);
   private static final SwapFixedOISSimplifiedDefinition EONIA_SWAP_3Y_DEFINITION = SwapFixedOISSimplifiedDefinition.from(SPOT_DATE, EUR_SWAP_3Y_TENOR, EUR_COUPON_TENOR, NOTIONAL, EUR_OIS, FIXED_RATE,
-      IS_PAYER, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_IS_EOM);
+      IS_PAYER, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_DAY_COUNT, EUR_IS_EOM);
 
   @Test
   public void construction3M() {

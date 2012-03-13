@@ -32,16 +32,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="module" module-name="OG-LiveData" exported="" />
     <orderEntry type="module" module-name="OG-Core" exported="" />
+    <orderEntry type="module" module-name="OG-Util" />
+    <orderEntry type="module" module-name="OG-Security" />
     <orderEntry type="module-library">
-      <library name="config">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/config" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
       <library name="IvyIDEA-OG-Engine-default">
         <CLASSES>
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/net.sourceforge.ehcache/ehcache/jars/ehcache-core-1.7.2.jar!/" />

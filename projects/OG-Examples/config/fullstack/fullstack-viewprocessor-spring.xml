@@ -2,9 +2,11 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+  <!-- This config file is called from fullstack.ini via SpringViewProcessorComponentFactory -->
+
   <!-- ================================================================== -->
   <!-- Expose component infrastructure -->
-  <bean class="com.opengamma.component.factory.ComponentRepositoryBeanPostProcessor" />
+  <bean class="com.opengamma.component.spring.ComponentRepositoryBeanPostProcessor" />
 
   <!-- ================================================================== -->
   <bean id="mainUserPrincipal" class="com.opengamma.examples.server.MockUserFactoryBean" />
@@ -140,7 +142,7 @@
   <bean id="mainViewProcessor" class="com.opengamma.engine.view.ViewProcessorFactoryBean">
     <property name="name" value="main" />
     <property name="viewDefinitionRepository" ref="combinedViewDefinitionRepository" />
-    <property name="liveMarketDataSourceRegistry" ref="standardLiveMarketDataSourceRegistry" />
+    <property name="namedMarketDataSpecificationRepository" ref="simulatedNamedMarketDataSpecificationRepository" />
     <property name="securitySource" ref="combinedSecuritySource" />
     <property name="positionSource" ref="combinedPositionSource" />
     <property name="computationTargetResolver" ref="mainComputationTargetResolver" />

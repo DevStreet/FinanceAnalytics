@@ -14,6 +14,7 @@ import com.opengamma.math.rootfinding.BisectionSingleRootFinder;
 import com.opengamma.math.rootfinding.BracketRoot;
 import com.opengamma.math.statistics.distribution.NormalDistribution;
 import com.opengamma.math.statistics.distribution.ProbabilityDistribution;
+import com.opengamma.util.CompareUtils;
 
 /**
  * This <b>SHOULD</b> be the repository for Black formulas - i.e. the price, common greeks (delta, gamma, vega) and implied volatility. Other
@@ -58,6 +59,7 @@ public abstract class BlackFormulaRepository {
     return sign * (forward * NORMAL.getCDF(sign * d1) - strike * NORMAL.getCDF(sign * d2));
 
   }
+
 
   public static double price(final SimpleOptionData data, final double lognormalVol) {
     return data.getDiscountFactor() * price(data.getForward(), data.getStrike(), data.getTimeToExpiry(), lognormalVol, data.isCall());
@@ -202,6 +204,7 @@ public abstract class BlackFormulaRepository {
    * @param lognormalVol The log-normal volatility
    * @return The forward vega
    */
+  @ExternalFunction
   public static double vega(final double forward, final double strike, final double timeToExpiry, final double lognormalVol) {
     final double rootT = Math.sqrt(timeToExpiry);
     final double sigmaRootT = lognormalVol * rootT;
@@ -231,6 +234,7 @@ public abstract class BlackFormulaRepository {
    * @param lognormalVol The log-normal volatility
    * @return The forward vanna
    */
+  @ExternalFunction
   public static double vanna(final double forward, final double strike, final double timeToExpiry, final double lognormalVol) {
     if (forward == 0.0 || strike == 0.0) {
       return 0.0;
@@ -255,6 +259,7 @@ public abstract class BlackFormulaRepository {
    * @param lognormalVol The log-normal volatility
    * @return The forward vomma
    */
+  @ExternalFunction
   public static double vomma(final double forward, final double strike, final double timeToExpiry, final double lognormalVol) {
     if (forward == 0.0 || strike == 0.0) {
       return 0.0;
@@ -280,11 +285,13 @@ public abstract class BlackFormulaRepository {
    * @param isCall  True for calls, false for puts
    * @return log-normal (Black) implied volatility
    */
+  @ExternalFunction
   public static double impliedVolatility(final double price, final double forward, final double strike, final double timeToExpiry, final boolean isCall) {
-
     final double intrinsicPrice = Math.max(0, (isCall ? 1 : -1) * (forward - strike));
     Validate.isTrue(strike > 0, "Cannot find an implied volatility when strike is zero as there is no optionality");
-    Validate.isTrue(price >= intrinsicPrice, "option price (" + price + ") less than intrinsic value (" + intrinsicPrice + ")");
+    if (!CompareUtils.closeEquals(price, intrinsicPrice, 1e-12)) {
+      Validate.isTrue(price >= intrinsicPrice, "option price (" + price + ") less than intrinsic value (" + intrinsicPrice + ")");
+    }
     if (isCall) {
       Validate.isTrue(price < forward, "call price must be less than forward");
     } else {
@@ -454,6 +461,7 @@ public abstract class BlackFormulaRepository {
    * @param volatility The volatility.
    * @return The strike.
    */
+  @ExternalFunction
   public static double impliedStrike(final double delta, final boolean isCall, final double forward, final double time, final double volatility) {
     Validate.isTrue(delta > -1 && delta < 1, "Delta out of range");
     Validate.isTrue(isCall ^ (delta < 0), "Delta incompatible with call/put: " + isCall + ", " + delta);

@@ -56,6 +56,7 @@ public final class ValueRequirementNames {
   public static final String FAIR_VALUE = "FairValue";
   public static final String POSITION_FAIR_VALUE = "PositionFairValue";
   public static final String VALUE_FAIR_VALUE = "ValueFairValue";
+  public static final String MARK = "Mark";
   
   // Greeks Names:
   public static final String DELTA = "Delta";
@@ -288,6 +289,10 @@ public final class ValueRequirementNames {
   public static final String BOND_COUPON_PAYMENT_TIMES = "Bond Coupon Payment Times";
   
   public static final String YIELD_CURVE_NODE_SENSITIVITIES = "Yield Curve Node Sensitivities";
+  public static final String EXTERNAL_SENSITIVITIES = "External Sensitivities";
+  public static final String CREDIT_SENSITIVITIES = "Credit Sensitivities";
+  public static final String DV01 = "DV01";
+  public static final String CS01 = "CS01";
 
   //SABR fitted surface parameters
   public static final String SABR_SURFACES = "SABR Surfaces";
@@ -335,5 +340,10 @@ public final class ValueRequirementNames {
   public static final String LOCAL_VOLATILITY_VEGA = "Forward Vega (LV)";
   public static final String LOCAL_VOLATILITY_VANNA = "Forward Vanna (LV)";
   public static final String LOCAL_VOLATILITY_VOMMA = "Forward Vomma (LV)";
+  public static final String LOCAL_VOLATILITY_GRID_PRICE = "Price (LV)";
+  public static final String BLACK_VOLATILITY_GRID_PRICE = "Black Price";
+  public static final String LOCAL_VOLATILITY_GRID_IMPLIED_VOL = "Implied Vol (LV Black Equivalent)";
+  
+  public static final String LOCAL_VOLATILITY_FOREX_PV_QUOTES = "Forex PV Quotes";
   //CSON
 }
