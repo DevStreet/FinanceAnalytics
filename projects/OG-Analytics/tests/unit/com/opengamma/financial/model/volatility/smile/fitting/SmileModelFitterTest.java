@@ -5,8 +5,8 @@
  */
 package com.opengamma.financial.model.volatility.smile.fitting;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -75,7 +75,7 @@ public abstract class SmileModelFitterTest<T extends SmileModelData> {
 
     _errors = new double[n];
     _cleanVols = model.getVolatilityFunction(F, strikes, TIME_TO_EXPIRY).evaluate(data);
-    Arrays.fill(_errors, 0.0001); //1bps error
+    Arrays.fill(_errors, 1e-4);
     for (int i = 0; i < n; i++) {
       _noisyVols[i] = _cleanVols[i] + UNIFORM.nextDouble() * _errors[i];
     }
@@ -94,16 +94,30 @@ public abstract class SmileModelFitterTest<T extends SmileModelData> {
     Validate.isTrue(fixed.length == nStartPoints);
     for (int trys = 0; trys < nStartPoints; trys++) {
       final LeastSquareResultsWithTransform results = _fitter.solve(new DoubleMatrix1D(start[trys]), fixed[trys]);
-      final double[] res = results.getModelParameters().getData();
+      DoubleMatrix1D res = toStandardForm(results.getModelParameters());
+
+      //debug
+      T fittedModel = _fitter.toSmileModelData(res);
+      fittedModel.toString();
 
       assertEquals(0.0, results.getChiSq(), _chiSqEps);
-      final int n = res.length;
+
+      final int n = res.getNumberOfElements();
       T data = getModelData();
       assertEquals(data.getNumberOfparameters(), n);
       for (int i = 0; i < n; i++) {
-        assertEquals(data.getParameter(i), res[i], _paramValueEps);
+        assertEquals(data.getParameter(i), res.getEntry(i), _paramValueEps);
       }
     }
+  }
+
+  /**
+   * Convert the fitted parameters to standard form - useful if there is degeneracy in the solution
+   * @param from
+   * @return
+   */
+  public DoubleMatrix1D toStandardForm(DoubleMatrix1D from) {
+    return from;
   }
 
   @Test
@@ -116,14 +130,14 @@ public abstract class SmileModelFitterTest<T extends SmileModelData> {
     Validate.isTrue(fixed.length == nStartPoints);
     for (int trys = 0; trys < nStartPoints; trys++) {
       final LeastSquareResultsWithTransform results = _fitter.solve(new DoubleMatrix1D(start[trys]), fixed[trys]);
-      final double[] res = results.getModelParameters().getData();
+      DoubleMatrix1D res = toStandardForm(results.getModelParameters());
       final double eps = 1e-2;
       assertTrue(results.getChiSq() < 7);
-      final int n = res.length;
+      final int n = res.getNumberOfElements();
       T data = getModelData();
       assertEquals(data.getNumberOfparameters(), n);
       for (int i = 0; i < n; i++) {
-        assertEquals(data.getParameter(i), res[i], eps);
+        assertEquals(data.getParameter(i), res.getEntry(i), eps);
       }
     }
   }
@@ -185,11 +199,11 @@ public abstract class SmileModelFitterTest<T extends SmileModelData> {
     //    System.out.println("model Jac: " + jacFunc.evaluate(best.getParameters()));
     //    System.out.println("fit invJac: " + best.getInverseJacobian());
     //    System.out.println("best" + this.toString() + best.toString());
-    assertTrue(best.getChiSq() < 24000, "chi square"); //average error 31.6% - not a good fit, but the data is horrible
+    assertTrue("chi square", best.getChiSq() < 24000); //average error 31.6% - not a good fit, but the data is horrible
   }
 
   @Test
-  // (enabled = false)
+  //(enabled = false)
   public void testJacobian() {
 
     T data = getModelData();
@@ -205,7 +219,7 @@ public abstract class SmileModelFitterTest<T extends SmileModelData> {
   }
 
   @Test
-  // (enabled = false)
+  //(enabled = false)
   public void testRandomJacobian() {
     for (int i = 0; i < 10; i++) {
       double[] temp = getRandomStartValues();
@@ -234,16 +248,16 @@ public abstract class SmileModelFitterTest<T extends SmileModelData> {
     final int rows = jacFD.getNumberOfRows();
     final int cols = jacFD.getNumberOfColumns();
 
-    assertEquals(_cleanVols.length, rows, "incorrect rows in FD matrix");
-    assertEquals(n, cols, "incorrect columns in FD matrix");
-    assertEquals(rows, jac.getNumberOfRows(), "incorrect rows in matrix");
-    assertEquals(cols, jac.getNumberOfColumns(), "incorrect columns in matrix");
+    assertEquals("incorrect rows in FD matrix", _cleanVols.length, rows);
+    assertEquals("incorrect columns in FD matrix", n, cols);
+    assertEquals("incorrect rows in matrix", rows, jac.getNumberOfRows());
+    assertEquals("incorrect columns in matrix", cols, jac.getNumberOfColumns());
 
     //  System.out.println(jac);
     //   System.out.println(jacFD);
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        assertEquals(jacFD.getEntry(i, j), jac.getEntry(i, j), 2e-2, "row: " + i + ", column: " + j);
+        assertEquals("row: " + i + ", column: " + j, jacFD.getEntry(i, j), jac.getEntry(i, j), 2e-2);
       }
     }
   }

@@ -6,13 +6,11 @@
 package com.opengamma.engine.view;
 
 import com.opengamma.DataNotFoundException;
-import com.opengamma.engine.marketdata.live.LiveMarketDataSourceRegistry;
-import com.opengamma.engine.marketdata.spec.LiveMarketDataSpecification;
+import com.opengamma.engine.marketdata.NamedMarketDataSpecificationRepository;
 import com.opengamma.engine.view.calc.EngineResourceManager;
 import com.opengamma.engine.view.calc.ViewCycle;
 import com.opengamma.engine.view.client.ViewClient;
 import com.opengamma.id.UniqueId;
-import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.util.PublicAPI;
 
@@ -26,15 +24,18 @@ import com.opengamma.util.PublicAPI;
  * execute a new one.
  */
 @PublicAPI
-public interface ViewProcessor extends UniqueIdentifiable {
-  
+public interface ViewProcessor {
+
   /**
-   * Gets the unique identifier of the view processor
+   * Gets the the name of the view processor.
+   * <p>
+   * The name can be used to identify the view processor.
+   * It should be unique, although this is not guaranteed.
    * 
-   * @return the identifier, not null
+   * @return the name, not null
    */
-  UniqueId getUniqueId();
-  
+  String getName();
+
   /** 
    * Gets this view processor's view definition repository containing the {@link ViewDefinition}s available for
    * computation.
@@ -43,6 +44,14 @@ public interface ViewProcessor extends UniqueIdentifiable {
    */
   ViewDefinitionRepository getViewDefinitionRepository();
   
+  /** 
+   * Gets this view processor's market data provider repository containing named, pre-built market data specifications
+   * which are available for use by clients.
+   * 
+   * @return the view definition repository, not null
+   */
+  NamedMarketDataSpecificationRepository getNamedMarketDataSpecificationRepository();
+
   //------------------------------------------------------------------------- 
   /**
    * Gets a view process by unique identifier.
@@ -54,15 +63,6 @@ public interface ViewProcessor extends UniqueIdentifiable {
    */
   ViewProcess getViewProcess(UniqueId viewProcessId);
 
-  /** 
-   * Gets this view processor's live market data source registry containing the DataSource available for
-   * use with {@link LiveMarketDataSpecification}.
-   * 
-   * @return the view definition repository, not null
-   */
-  LiveMarketDataSourceRegistry getLiveMarketDataSourceRegistry();
-  
-  
   //-------------------------------------------------------------------------
   /**
    * Creates a {@link ViewClient}
@@ -71,7 +71,7 @@ public interface ViewProcessor extends UniqueIdentifiable {
    * @return a new view client, not null
    */
   ViewClient createViewClient(UserPrincipal clientUser);
-  
+
   /**
    * Gets a {@link ViewClient} by unique identifier.
    * 
@@ -81,7 +81,7 @@ public interface ViewProcessor extends UniqueIdentifiable {
    * @throws DataNotFoundException if there is no view with that unique identifier
    */
   ViewClient getViewClient(UniqueId clientId);
-  
+
   //-------------------------------------------------------------------------
   /**
    * Gets the resource manager for view cycles.
@@ -89,5 +89,5 @@ public interface ViewProcessor extends UniqueIdentifiable {
    * @return the resource manager for view cycles, not null
    */
   EngineResourceManager<? extends ViewCycle> getViewCycleManager();
-  
+
 }

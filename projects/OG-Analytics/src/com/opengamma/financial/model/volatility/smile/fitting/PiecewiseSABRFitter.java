@@ -23,7 +23,7 @@ import com.opengamma.math.statistics.leastsquare.LeastSquareResultsWithTransform
  */
 public class PiecewiseSABRFitter {
   private static final SABRHaganVolatilityFunction MODEL = new SABRHaganVolatilityFunction();
-  private static final double DEFAULT_BETA = 0.5;
+  private static final double DEFAULT_BETA = 0.9;
   private static final Logger LOGGER = LoggerFactory.getLogger(PiecewiseSABRFitter.class);
 
   private final SABRFormulaData[] _modelParams;
@@ -45,25 +45,38 @@ public class PiecewiseSABRFitter {
     _strikes = strikes;
     _n = n;
 
-    double avVol = 0;
+    double averageVol = 0;
+    double averageVol2 = 0;
     for (int i = 0; i < n; i++) {
-      avVol += impliedVols[i];
+      double vol = impliedVols[i];
+      averageVol += vol;
+      averageVol2 += vol * vol;
     }
-    avVol /= n;
-    double appoxAlpha = avVol * Math.pow(forward, 1 - DEFAULT_BETA);
-    DoubleMatrix1D start = new DoubleMatrix1D(appoxAlpha, DEFAULT_BETA, 0.0, 0.3);
+    averageVol2 = Math.sqrt((averageVol2 - averageVol / n) / (n - 1));
+    averageVol /= n;
+
+    DoubleMatrix1D start;
+
+    //almost flat surface
+    if (averageVol2 / averageVol < 0.01) {
+      start = new DoubleMatrix1D(averageVol, 1.0, 0.0, 0.0);
+    } else {
+      final double approxAlpha = averageVol * Math.pow(forward, 1 - DEFAULT_BETA);
+      start = new DoubleMatrix1D(approxAlpha, DEFAULT_BETA, 0.0, 0.3);
+    }
+
     _modelParams = new SABRFormulaData[n - 2];
 
     double[] errors = new double[n];
     Arrays.fill(errors, 0.0001); //1bps
-    SmileModelFitter<SABRFormulaData> globalFitter = new SABRModelFitter(forward, strikes, timeToExpiry, impliedVols, errors, MODEL);
-    BitSet fixed = new BitSet();
+    final SmileModelFitter<SABRFormulaData> globalFitter = new SABRModelFitter(forward, strikes, timeToExpiry, impliedVols, errors, MODEL);
+    final BitSet fixed = new BitSet();
     if (n == 3) {
       fixed.set(1); //fixed beta
     }
 
     //do a global fit first
-    LeastSquareResultsWithTransform gRes = globalFitter.solve(start, fixed);
+    final LeastSquareResultsWithTransform gRes = globalFitter.solve(start, fixed);
 
     if (n == 3) {
       if (gRes.getChiSq() / n > 1.0) {
@@ -81,9 +94,9 @@ public class PiecewiseSABRFitter {
       for (int i = 0; i < n - 2; i++) {
         tStrikes = Arrays.copyOfRange(strikes, i, i + 3);
         tVols = Arrays.copyOfRange(impliedVols, i, i + 3);
-        SmileModelFitter<SABRFormulaData> fitter =
+        final SmileModelFitter<SABRFormulaData> fitter =
           new SABRModelFitter(forward, tStrikes, timeToExpiry, tVols, errors, MODEL);
-        LeastSquareResultsWithTransform lRes = fitter.solve(start, fixed);
+        final LeastSquareResultsWithTransform lRes = fitter.solve(start, fixed);
         if (lRes.getChiSq() > 3.0) {
           LOGGER.warn("chi^2 on SABR fit " + i + " is " + lRes.getChiSq());
         }
@@ -91,7 +104,6 @@ public class PiecewiseSABRFitter {
       }
 
     }
-
   }
 
   private void validateStrikes(final double[] strikes) {
@@ -102,13 +114,13 @@ public class PiecewiseSABRFitter {
   }
 
   public double getVol(final double strike) {
-    int index = getLowerBoundIndex(strike);
+    final int index = getLowerBoundIndex(strike);
     if (index == 0) {
-      SABRFormulaData p = _modelParams[0];
+      final SABRFormulaData p = _modelParams[0];
       return MODEL.getVolatility(_forward, strike, _expiry, p.getAlpha(), p.getBeta(), p.getRho(), p.getNu());
     }
     if (index >= _n - 2) {
-      SABRFormulaData p = _modelParams[_n - 3];
+      final SABRFormulaData p = _modelParams[_n - 3];
       return MODEL.getVolatility(_forward, strike, _expiry, p.getAlpha(), p.getBeta(), p.getRho(), p.getNu());
     }
     final SABRFormulaData p1 = _modelParams[index - 1];
@@ -128,16 +140,16 @@ public class PiecewiseSABRFitter {
     return new Function1D<Double, Double>() {
 
       @Override
-      public Double evaluate(Double x) {
+      public Double evaluate(final Double x) {
         return getVol(x);
       }
     };
   }
 
   private double getWeight(final double strike, final int index) {
-    return (_strikes[index + 1] - strike) / (_strikes[index + 1] - _strikes[index]);
+    final double y = (_strikes[index + 1] - strike) / (_strikes[index + 1] - _strikes[index]);
     //double cos = Math.cos(Math.PI / 2 * (strike - _strikes[index]) / (_strikes[index + 1] - _strikes[index]));
-    //return cos * cos;
+    return 0.5 * (Math.sin(Math.PI * (y - 0.5)) + 1);
   }
 
   private int getLowerBoundIndex(final double strike) {

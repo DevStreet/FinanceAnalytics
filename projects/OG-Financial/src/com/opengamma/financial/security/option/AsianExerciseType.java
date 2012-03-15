@@ -28,6 +28,10 @@ public class AsianExerciseType extends ExerciseType {
    */
   public AsianExerciseType() {
   }
+  
+  public String getName() {
+    return "Asian";
+  }
 
   //-------------------------------------------------------------------------
   @Override
@@ -93,7 +97,7 @@ public class AsianExerciseType extends ExerciseType {
     /**
      * The meta-properties.
      */
-    private final Map<String, MetaProperty<Object>> _map = new DirectMetaPropertyMap(
+    private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
       this, (DirectMetaPropertyMap) super.metaPropertyMap());
 
     /**
@@ -113,8 +117,8 @@ public class AsianExerciseType extends ExerciseType {
     }
 
     @Override
-    public Map<String, MetaProperty<Object>> metaPropertyMap() {
-      return _map;
+    public Map<String, MetaProperty<?>> metaPropertyMap() {
+      return _metaPropertyMap$;
     }
 
     //-----------------------------------------------------------------------

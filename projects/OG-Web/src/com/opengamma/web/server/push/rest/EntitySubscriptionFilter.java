@@ -5,25 +5,25 @@
  */
 package com.opengamma.web.server.push.rest;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.id.UniqueId;
 import com.opengamma.web.server.push.ConnectionManager;
 import com.opengamma.web.server.push.LongPollingServlet;
-import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MultivaluedMap;
-import java.security.Principal;
-import java.util.List;
 
 /**
  * Jersey filter that sets up subscriptions for entities returned from REST methods.  When the entity changes
@@ -100,29 +100,13 @@ public class EntitySubscriptionFilter implements ResourceFilter {
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
       // TODO check the response status, only subscribe if successful
       // TODO don't subscribe if specific version was requested - probably need @NoSubscribe annotation on sub-resource methods for versions
-      ExtendedUriInfo uriInfo = _httpContext.getUriInfo();
-      MultivaluedMap<String,String> pathParameters = uriInfo.getPathParameters();
-      MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-      String url = _servletRequest.getRequestURI();
-
-      List<String> clientIds = queryParameters.get(LongPollingServlet.CLIENT_ID);
-      if (clientIds == null || clientIds.size() != 1) {
-        // don't subscribe if there's no client ID
+      String clientId = FilterUtils.getClientId(request, _httpContext);
+      // don't subscribe if there's no client ID
+      if (clientId == null) {
         return response;
       }
-      String clientId = clientIds.get(0);
-
-      Principal userPrincipal = _httpContext.getRequest().getUserPrincipal();
-      String userId;
-      if (userPrincipal == null) {
-        // TODO reinstate this if / when we have user logons
-        /*s_logger.debug("No user principal, not subscribing, url: {}", url);
-        return response;*/
-        userId = null;
-      } else {
-        userId = userPrincipal.getName();
-      }
-      subscribe(userId, clientId, url, pathParameters);
+      String userId = FilterUtils.getUserId(_httpContext);
+      subscribe(userId, clientId, _servletRequest.getRequestURI(), _httpContext.getUriInfo().getPathParameters());
       return response;
     }
 

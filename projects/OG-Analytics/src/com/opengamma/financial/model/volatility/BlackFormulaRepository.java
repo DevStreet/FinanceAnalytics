@@ -14,6 +14,7 @@ import com.opengamma.math.rootfinding.BisectionSingleRootFinder;
 import com.opengamma.math.rootfinding.BracketRoot;
 import com.opengamma.math.statistics.distribution.NormalDistribution;
 import com.opengamma.math.statistics.distribution.ProbabilityDistribution;
+import com.opengamma.util.CompareUtils;
 
 /**
  * This <b>SHOULD</b> be the repository for Black formulas - i.e. the price, common greeks (delta, gamma, vega) and implied volatility. Other
@@ -59,6 +60,7 @@ public abstract class BlackFormulaRepository {
 
   }
 
+
   public static double price(final SimpleOptionData data, final double lognormalVol) {
     return data.getDiscountFactor() * price(data.getForward(), data.getStrike(), data.getTimeToExpiry(), lognormalVol, data.isCall());
   }
@@ -95,7 +97,7 @@ public abstract class BlackFormulaRepository {
 
     final int sign = isCall ? 1 : -1;
     final double d1 = sign * NORMAL.getInverseCDF(sign * forwardDelta);
-    return forward * Math.exp(-d1 * lognormalVol * Math.sqrt(timeToExpiry) + lognormalVol * lognormalVol * timeToExpiry);
+    return forward * Math.exp(-d1 * lognormalVol * Math.sqrt(timeToExpiry) + 0.5 * lognormalVol * lognormalVol * timeToExpiry);
   }
 
   /**
@@ -152,7 +154,6 @@ public abstract class BlackFormulaRepository {
    * @param strike The Strike
    * @param timeToExpiry The time-to-expiry
    * @param lognormalVol The log-normal volatility
-   * @param isCall true for call
    * @return The forward gamma
    */
   @ExternalFunction
@@ -180,7 +181,6 @@ public abstract class BlackFormulaRepository {
    * @param strike The Strike
    * @param timeToExpiry The time-to-expiry
    * @param lognormalVol The log-normal volatility
-   * @param isCall true for call
    * @return The dual gamma
    */
   @ExternalFunction
@@ -204,6 +204,7 @@ public abstract class BlackFormulaRepository {
    * @param lognormalVol The log-normal volatility
    * @return The forward vega
    */
+  @ExternalFunction
   public static double vega(final double forward, final double strike, final double timeToExpiry, final double lognormalVol) {
     final double rootT = Math.sqrt(timeToExpiry);
     final double sigmaRootT = lognormalVol * rootT;
@@ -226,14 +227,14 @@ public abstract class BlackFormulaRepository {
   }
 
   /**
-   * The driftless vanna of an option, i.e.second order derivative of the option value, once to the underlying spot price and once to volatility.
-   * divide by the the numeraire)
+   * The driftless vanna of an option, i.e. second order derivative of the option value, once to the underlying spot price and once to volatility.
    * @param forward The forward value of the underlying
    * @param strike The Strike
    * @param timeToExpiry The time-to-expiry
    * @param lognormalVol The log-normal volatility
    * @return The forward vanna
    */
+  @ExternalFunction
   public static double vanna(final double forward, final double strike, final double timeToExpiry, final double lognormalVol) {
     if (forward == 0.0 || strike == 0.0) {
       return 0.0;
@@ -251,14 +252,14 @@ public abstract class BlackFormulaRepository {
   }
 
   /**
-   * The driftless vanna of an option, i.e.second order derivative of the option value, once to the underlying spot price and once to volatility.
-   * divide by the the numeraire)
+   * The driftless vomma of an option, i.e. second order derivative of the option forward price with respect to the implied volatility.
    * @param forward The forward value of the underlying
    * @param strike The Strike
    * @param timeToExpiry The time-to-expiry
    * @param lognormalVol The log-normal volatility
-   * @return The forward vanna
+   * @return The forward vomma
    */
+  @ExternalFunction
   public static double vomma(final double forward, final double strike, final double timeToExpiry, final double lognormalVol) {
     if (forward == 0.0 || strike == 0.0) {
       return 0.0;
@@ -284,11 +285,13 @@ public abstract class BlackFormulaRepository {
    * @param isCall  True for calls, false for puts
    * @return log-normal (Black) implied volatility
    */
+  @ExternalFunction
   public static double impliedVolatility(final double price, final double forward, final double strike, final double timeToExpiry, final boolean isCall) {
-
     final double intrinsicPrice = Math.max(0, (isCall ? 1 : -1) * (forward - strike));
     Validate.isTrue(strike > 0, "Cannot find an implied volatility when strike is zero as there is no optionality");
-    Validate.isTrue(price >= intrinsicPrice, "option price (" + price + ") less than intrinsic value (" + intrinsicPrice + ")");
+    if (!CompareUtils.closeEquals(price, intrinsicPrice, 1e-12)) {
+      Validate.isTrue(price >= intrinsicPrice, "option price (" + price + ") less than intrinsic value (" + intrinsicPrice + ")");
+    }
     if (isCall) {
       Validate.isTrue(price < forward, "call price must be less than forward");
     } else {
@@ -307,7 +310,7 @@ public abstract class BlackFormulaRepository {
       final double[] temp = bracketRoot(price, forward, strike, timeToExpiry, isCall, sigma, 0.1);
       lowerSigma = temp[0];
       upperSigma = temp[1];
-    } catch (MathException e) {
+    } catch (final MathException e) {
       throw new IllegalArgumentException(e.toString() + " No implied Volatility for this price. [price: " + price + ", forward: " + forward + ", strike: " +
           strike + ", timeToExpiry: " + timeToExpiry + ", " + (isCall ? "Call" : "put"));
     }
@@ -384,7 +387,7 @@ public abstract class BlackFormulaRepository {
   public static double impliedVolatility(final SimpleOptionData[] data, final double price) {
     Validate.notEmpty(data, "no option data given");
     double intrinsicPrice = 0.0;
-    for (SimpleOptionData option : data) {
+    for (final SimpleOptionData option : data) {
       intrinsicPrice += Math.max(0, (option.isCall() ? 1 : -1) * option.getDiscountFactor() * (option.getForward() - option.getStrike()));
     }
     Validate.isTrue(price >= intrinsicPrice, "option price (" + price + ") less than intrinsic value (" + intrinsicPrice
@@ -399,7 +402,7 @@ public abstract class BlackFormulaRepository {
 
     double modelPrice = 0.0;
     double vega = 0.0;
-    for (SimpleOptionData option : data) {
+    for (final SimpleOptionData option : data) {
       modelPrice += price(option, sigma);
       vega += vega(option, sigma);
     }
@@ -421,7 +424,7 @@ public abstract class BlackFormulaRepository {
 
       modelPrice = 0.0;
       vega = 0.0;
-      for (SimpleOptionData option : data) {
+      for (final SimpleOptionData option : data) {
         modelPrice += price(option, sigma);
         vega += vega(option, sigma);
       }
@@ -449,11 +452,30 @@ public abstract class BlackFormulaRepository {
     return sigma;
   }
 
+  /**
+   * Computes the implied strike from delta and volatility in the Black formula.
+   * @param delta The option delta
+   * @param isCall The call (true) / put (false) flag.
+   * @param forward The forward.
+   * @param time The time to expiration.
+   * @param volatility The volatility.
+   * @return The strike.
+   */
+  @ExternalFunction
+  public static double impliedStrike(final double delta, final boolean isCall, final double forward, final double time, final double volatility) {
+    Validate.isTrue(delta > -1 && delta < 1, "Delta out of range");
+    Validate.isTrue(isCall ^ (delta < 0), "Delta incompatible with call/put: " + isCall + ", " + delta);
+    Validate.isTrue(forward > 0, "Forward negative");
+    final double omega = (isCall ? 1.0 : -1.0);
+    final double strike = forward * Math.exp(-volatility * Math.sqrt(time) * omega * NORMAL.getInverseCDF(omega * delta) + volatility * volatility * time / 2);
+    return strike;
+  }
+
   private static double[] priceAndVega(final double forward, final double strike, final double timeToExpiry, final double lognormalVol, final boolean isCall) {
 
     final double rootT = Math.sqrt(timeToExpiry);
     final double sigmaRootT = lognormalVol * rootT;
-    double[] res = new double[2];
+    final double[] res = new double[2];
 
     if (Math.abs(forward - strike) < SMALL) {
       res[0] = forward * (2 * NORMAL.getCDF(sigmaRootT / 2) - 1);

@@ -8,7 +8,9 @@ package com.opengamma.engine.view.calc;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -25,12 +27,17 @@ import com.google.common.collect.Sets;
 import com.opengamma.DataNotFoundException;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.change.ChangeListener;
+import com.opengamma.engine.ComputationTarget;
+import com.opengamma.engine.depgraph.DependencyGraph;
 import com.opengamma.engine.marketdata.MarketDataListener;
 import com.opengamma.engine.marketdata.MarketDataProvider;
 import com.opengamma.engine.marketdata.MarketDataSnapshot;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
 import com.opengamma.engine.marketdata.spec.MarketDataSpecification;
 import com.opengamma.engine.value.ValueRequirement;
+import com.opengamma.engine.value.ValueSpecification;
+import com.opengamma.engine.view.CycleInfo;
+import com.opengamma.engine.view.SimpleCycleInfo;
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.engine.view.ViewProcessContext;
@@ -56,6 +63,7 @@ import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.TerminatableJob;
 import com.opengamma.util.monitor.OperationTimer;
+
 
 /**
  * The job which schedules and executes computation cycles for a view process.
@@ -242,9 +250,12 @@ public class ViewComputationJob extends TerminatableJob implements MarketDataLis
     }
 
     VersionCorrection versionCorrection = getResolvedVersionCorrection();
-    CompiledViewDefinitionWithGraphsImpl compiledViewDefinition;
+    final CompiledViewDefinitionWithGraphsImpl compiledViewDefinition;
     try {
       compiledViewDefinition = getCompiledViewDefinition(compilationValuationTime, versionCorrection);
+      if (isTerminated()) {
+        return; //[PLAT-1904]
+      }
     } catch (Exception e) {
       String message = MessageFormat.format("Error obtaining compiled view definition {0} for time {1} at version-correction {2}",
           getViewProcess().getDefinitionId(), compilationValuationTime, versionCorrection);
@@ -277,6 +288,30 @@ public class ViewComputationJob extends TerminatableJob implements MarketDataLis
 
     if (_executeCycles) {
       try {
+        final SingleComputationCycle singleComputationCycle = cycleReference.get();
+        final Set<String> configurationNames = singleComputationCycle.getAllCalculationConfigurationNames();
+        
+        final HashMap<String, Collection<ComputationTarget>> configToComputationTargets = new HashMap<String, Collection<ComputationTarget>>();
+        for (String configName : configurationNames) {
+          DependencyGraph dependencyGraph = singleComputationCycle.getExecutableDependencyGraph(configName);
+          configToComputationTargets.put(configName, dependencyGraph.getAllComputationTargets());
+        }
+        
+        final HashMap<String, Map<ValueSpecification, Set<ValueRequirement>>> configToTerminalOutputs = new HashMap<String, Map<ValueSpecification, Set<ValueRequirement>>>();
+        for (String configName : configurationNames) {
+          DependencyGraph dependencyGraph = singleComputationCycle.getExecutableDependencyGraph(configName);
+          configToTerminalOutputs.put(configName, dependencyGraph.getTerminalOutputs());
+        }
+        
+        cycleInitiated(new SimpleCycleInfo(
+            marketDataSnapshot.getUniqueId(),
+            compiledViewDefinition.getViewDefinition().getUniqueId(),
+            versionCorrection,
+            executionOptions.getValuationTime(),
+            configurationNames,
+            configToComputationTargets,
+            configToTerminalOutputs
+        ));
         executeViewCycle(cycleType, cycleReference, marketDataSnapshot, getViewProcess().getCalcJobResultExecutorService());
       } catch (InterruptedException e) {
         // Execution interrupted - don't propagate as failure
@@ -323,7 +358,16 @@ public class ViewComputationJob extends TerminatableJob implements MarketDataLis
     }
   }
 
+  private void cycleInitiated(CycleInfo cycleInfo) {
+    try {
+      getViewProcess().cycleInitiated(cycleInfo);
+    } catch (Exception e) {
+      s_logger.error("Error notifying view process " + getViewProcess() + " of view cycle initiation", e);
+    }
+  }
+
   private void cycleFragmentCompleted(ViewComputationResultModel result) {
+
     try {
       getViewProcess().cycleFragmentCompleted(result, getViewDefinition());
     } catch (Exception e) {
@@ -550,6 +594,10 @@ public class ViewComputationJob extends TerminatableJob implements MarketDataLis
       MarketDataAvailabilityProvider availabilityProvider = getMarketDataProvider().getAvailabilityProvider();
       ViewCompilationServices compilationServices = getProcessContext().asCompilationServices(availabilityProvider);
       compiledViewDefinition = ViewDefinitionCompiler.compile(_viewDefinition, compilationServices, valuationTime, versionCorrection);
+      
+      if (isTerminated()) {
+        return compiledViewDefinition; //[PLAT-1904] If we can't terminate the compilation at least avoid doing the subscribe etc.
+      }
     } catch (Exception e) {
       String message = MessageFormat.format("Error compiling view definition {0} for time {1}", getViewProcess().getDefinitionId(), valuationTime);
       viewDefinitionCompilationFailed(valuationTime, new OpenGammaRuntimeException(message, e));
@@ -664,7 +712,11 @@ public class ViewComputationJob extends TerminatableJob implements MarketDataLis
 
   private void setMarketDataProvider(MarketDataSpecification marketDataSpec) {
     _marketDataProvider = getProcessContext().getMarketDataProviderResolver().resolve(marketDataSpec);
-    _marketDataProvider.addListener(this);
+    if (_marketDataProvider == null) {
+      s_logger.error("Couldn't resolve {}", marketDataSpec);
+    } else {
+      _marketDataProvider.addListener(this);
+    }
   }
 
   private void setMarketDataSubscriptions(final Set<ValueRequirement> requiredSubscriptions) {

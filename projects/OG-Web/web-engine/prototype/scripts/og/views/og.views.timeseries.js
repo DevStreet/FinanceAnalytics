@@ -7,39 +7,25 @@ $.register_module({
     dependencies: [
         'og.api.rest',
         'og.api.text',
-        'og.common.masthead.menu',
         'og.common.routes',
-        'og.common.search_results.core',
         'og.common.util.history',
         'og.common.util.ui.dialog',
-        'og.common.util.ui.message',
-        'og.common.util.ui.toolbar',
-        'og.views.common.layout',
-        'og.views.common.state',
-        'og.views.common.default_details'
+        'og.common.util.ui.toolbar'
     ],
     obj: function () {
-        var api = og.api,
-            common = og.common,
-            details = common.details,
-            history = common.util.history,
-            masthead = common.masthead,
-            routes = common.routes,
-            search, layout,
-            ui = common.util.ui,
-            module = this,
+        var api = og.api, common = og.common, details = common.details, history = common.util.history,
+            routes = common.routes, ui = common.util.ui, module = this, view,
             page_name = module.name.split('.').pop(),
-            filter_rule_str = '/identifier:?/data_source:?/data_provider:?/data_field:?/observation_time:?',
-            check_state = og.views.common.state.check.partial('/' + page_name),
-            view,
             toolbar_buttons = {
                 'new': function () {
                     ui.dialog({
                         type: 'input',
                         title: 'Add New Timeseries',
+                        width: 400, height: 480,
                         fields: [
                             {type: 'select', name: 'Scheme Type', id: 'scheme',
                                 options: [
+                                    {name: 'ActivFeed Ticker', value: 'ACTIVFEED_TICKER'},
                                     {name: 'Bloomberg Ticker', value: 'BLOOMBERG_TICKER'},
                                     {name: 'Bloomberg Ticker/Coupon/Maturity', value: 'BLOOMBERG_TCM'},
                                     {name: 'Bloomberg BUID', value: 'BLOOMBERG_BUID'},
@@ -60,12 +46,12 @@ $.register_module({
                                 $(this).dialog('close');
                                 api.rest.timeseries.put({
                                     handler: function (result) {
-                                        var args = routes.current().args, rule = module.rules.load_item;
-                                        if (result.error) return ui.dialog({type: 'error', message: result.message});
+                                        var args = routes.current().args, rule = view.rules.load_item;
+                                        if (result.error) return view.error(result.message);
                                         view.search(args);
                                         if (result.meta.id)
                                             return routes.go(routes.hash(rule, args, {add: {id: result.meta.id}}));
-                                        routes.go(routes.hash(module.rules.load, args));
+                                        routes.go(routes.hash(view.rules.load, args));
                                     },
                                     scheme_type: ui.dialog({return_field_value: 'scheme'}),
                                     data_provider: ui.dialog({return_field_value: 'provider'}),
@@ -74,7 +60,8 @@ $.register_module({
                                     end: ui.dialog({return_field_value: 'end'}) || '',
                                     identifier: ui.dialog({return_field_value: 'identifiers'})
                                 });
-                            }
+                            },
+                            'Cancel': function () {$(this).dialog('close');}
                         }
                     })
                 },
@@ -82,23 +69,92 @@ $.register_module({
                     ui.dialog({
                         type: 'confirm',
                         title: 'Delete timeseries?',
+                        width: 400, height: 190,
                         message: 'Are you sure you want to permanently delete this timeseries?',
                         buttons: {
                             'Delete': function () {
                                 api.rest.timeseries.del({
                                     handler: function (result) {
-                                        var args = routes.current().args, rule = module.rules.load;
                                         ui.dialog({type: 'confirm', action: 'close'});
-                                        if (result.error) return ui.dialog({type: 'error', message: result.message});
-                                        routes.go(routes.hash(rule, args));
+                                        if (result.error) return view.error(result.message);
+                                        routes.go(routes.hash(view.rules.load, routes.current().args));
                                     }, id: routes.current().args.id
                                 });
-                            }
+                            },
+                            'Cancel': function () {$(this).dialog('close');}
                         }
                     })
                 }
             },
-            options = {
+            details_page = function (args, config) {
+                var show_loading = !(config || {}).hide_loading, rest_options;
+                view.layout.inner.options.south.onclose = null;
+                view.layout.inner.close('south');
+                rest_options = {
+                    dependencies: view.dependencies,
+                    update: view.update,
+                    id: args.id,
+                    cache_for: 10000,
+                    loading: function () {if (show_loading) view.notify({0: 'loading...', 3000: 'still loading...'});}
+                };
+                $.when(api.rest.timeseries.get(rest_options), api.text({module: module.name}))
+                    .then(function (result, template) {
+                        if (result.error) return view.notify(null), view.error(result.message);
+                        var json = result.data, $html, json_id = json.identifiers, title,
+                            error_html = '\
+                                <section class="OG-box og-box-glass og-box-error OG-shadow-light">\
+                                    This time series has been deleted\
+                                </section>\
+                            ';
+                        // check if any of the following scheme types are in json.identifiers, in
+                        // reverse order of preference, delimiting if multiple, then assign to title
+                        ['ISIN', 'SEDOL1', 'CUSIP', 'BLOOMBERG_BUID', 'BLOOMBERG_TICKER'].forEach(function (val) {
+                            title = (function (type) {
+                                return json.identifiers.reduce(function (acc, val) {
+                                    return val.scheme === type ?
+                                        acc ? acc + ', ' + val.value : type.lang() + ' - ' + val.value
+                                            : acc;
+                                }, '')
+                            }(val)) || title;
+                        });
+                        json.template_data.title = title || json.template_data.name;
+                        $html = $.tmpl(template, json.template_data);
+                        history.put({
+                            name: title + ' (' + json.template_data.data_field + ')',
+                            item: 'history.' + page_name + '.recent',
+                            value: routes.current().hash
+                        });
+                        $('.OG-layout-admin-details-center .ui-layout-header').html($html.find('> header'));
+                        $('.OG-layout-admin-details-center .ui-layout-content').html($html.find('> section'));
+                        ui.toolbar(view.options.toolbar.active);
+                        if (json.template_data && json.template_data.deleted) {
+                            $('.OG-layout-admin-details-north').html(error_html);
+                            view.layout.inner.sizePane('north', '0');
+                            view.layout.inner.open('north');
+                            $('.OG-tools .og-js-delete').addClass('OG-disabled').unbind();
+                        } else {
+                            view.layout.inner.close('north');
+                            $('.OG-layout-admin-details-north').empty();
+                        }
+                        // Identifiers
+                        $('.OG-layout-admin-details-center .og-js-identifiers').html(
+                            json_id.reduce(function (acc, cur) {
+                                return acc + '<tr><td><span>'+  cur.scheme +'<span></td><td>'+ cur.value +
+                                    '</td></tr>';
+                            }, '')
+                        );
+                        // Plot
+                        common.gadgets.timeseries({
+                            selector: '.OG-timeseries .og-plots',
+                            id: result.data.template_data.object_id
+                        });
+                        if (show_loading) view.notify(null);
+                        setTimeout(view.layout.inner.resizeAll);
+                    });
+            };
+        return view = $.extend(view = new og.views.common.Core(page_name), {
+            details: details_page,
+            options: {
                 slickgrid: {
                     'selector': '.OG-js-search', 'page_type': page_name,
                     'columns': [
@@ -155,114 +211,7 @@ $.register_module({
                     }
                 }
             },
-            default_details = og.views.common.default_details.partial(page_name, 'Time Series', options),
-            details_page = function (args) {
-                layout.inner.options.south.onclose = null;
-                layout.inner.close('south');
-                api.rest.timeseries.get({
-                    dependencies: ['id'],
-                    handler: function (result) {
-                        if (result.error) return alert(result.message);
-                        var json = result.data;
-                        api.text({module: module.name, handler: function (template) {
-                            var $html, error_html, json_id = json.identifiers, title, header, content;
-                            error_html = '\
-                                <section class="OG-box og-box-glass og-box-error OG-shadow-light">\
-                                    This time series has been deleted\
-                                </section>\
-                            ';
-                            // check if any of the following scheme types are in json.identifiers, in
-                            // reverse order of preference, delimiting if multiple, then assign to title
-                            ['ISIN', 'SEDOL1', 'CUSIP', 'BLOOMBERG_BUID', 'BLOOMBERG_TICKER'].forEach(function (val) {
-                                title = (function (type) {
-                                    return json.identifiers.reduce(function (acc, val) {
-                                        if (val.scheme === type) acc = acc
-                                            ? acc + ', ' + val.value
-                                            : type.lang() + ' - ' + val.value;
-                                        return acc
-                                    }, '')
-                                }(val)) || title;
-                            });
-                            $html = $.tmpl(template, $.extend(json.template_data, {
-                                title: title || json.template_data.object_id
-                            }));
-                            history.put({
-                                name: title + ' (' + json.template_data.data_field + ')',
-                                item: 'history.' + page_name + '.recent',
-                                value: routes.current().hash
-                            });
-                            // Initial html setup
-                            header = $.outer($html.find('> header')[0]);
-                            content = $.outer($html.find('> section')[0]);
-                            $('.ui-layout-inner-center .ui-layout-header').html(header);
-                            $('.ui-layout-inner-center .ui-layout-content').html(content);
-                            ui.toolbar(options.toolbar.active);
-                            if (json.template_data && json.template_data.deleted) {
-                                $('.ui-layout-inner-north').html(error_html);
-                                layout.inner.sizePane('north', '0');
-                                layout.inner.open('north');
-                                $('.OG-tools .og-js-delete').addClass('OG-disabled').unbind();
-                            } else {
-                                layout.inner.close('north');
-                                $('.ui-layout-inner-north').empty();
-                            }
-                            // Identifiers
-                            $('.ui-layout-inner-center .og-js-identifiers').html(
-                                json_id.reduce(function (acc, cur) {
-                                    return acc + '<tr><td><span>'+  cur.scheme +'<span></td><td>'+ cur.value +'</td></tr>'
-                                }, '')
-                            );
-                            // Plot
-                            common.gadgets.timeseries({
-                                selector: '.OG-timeseries .og-plots',
-                                id: result.data.template_data.object_id
-                            });
-                            ui.message({location: '.ui-layout-inner-center', destroy: true});
-                            setTimeout(layout.inner.resizeAll);
-                        }});
-                    },
-                    id: args.id,
-                    cache_for: 10000,
-                    loading: function () {
-                        ui.message({
-                            location: '.ui-layout-inner-center',
-                            message: {0: 'loading...', 3000: 'still loading...'}
-                        });
-                    }
-                });
-            };
-        module.rules = {
-            load: {route: '/' + page_name + '/' + filter_rule_str, method: module.name + '.load'},
-            load_filter: {
-                route: '/' + page_name + '/filter:/:id?' + filter_rule_str, method: module.name + '.load_filter'
-            },
-            load_item: {route: '/' + page_name + '/:id' + filter_rule_str, method: module.name + '.load_item'}
-        };
-        return view = {
-            load: function (args) {
-                layout = og.views.common.layout;
-                check_state({args: args, conditions: [
-                    {new_page: function (args) {view.search(args), masthead.menu.set_tab(page_name);}}
-                ]});
-                if (!args.id) default_details();
-            },
-            load_filter: function (args) {
-                check_state({args: args, conditions: [{new_value: 'id', method: function (args) {
-                    view[args.id ? 'load_item' : 'load'](args);
-                }}]});
-                search.filter(args);
-            },
-            load_item: function (args) {
-                check_state({args: args, conditions: [{new_page: view.load}]});
-                view.details(args);
-            },
-            search: function (args) {
-                if (!search) search = common.search_results.core();
-                search.load($.extend(options.slickgrid, {url: args}));
-            },
-            details: details_page,
-            init: function () {for (var rule in module.rules) routes.add(module.rules[rule]);},
-            rules: module.rules
-        };
+            rules: view.rules(['data_field', 'data_provider', 'data_source', 'identifier', 'observation_time'])
+        });
     }
 });

@@ -21,31 +21,32 @@ $.register_module({
                 // listen to all clicks that bubble up and capture their titles
                 // overwrite href with new filter values
                 $('a[href]').live('click', function (e) {
-                    var anchor = $(e.target), current, parsed, rule, page, add, href;
-                    title = anchor.attr('title');
-                    if (!anchor.is('.og-js-live-anchor')) return;
-                    page = (parsed = routes.parse(anchor.attr('href'))).page.slice(1);
-                    current = routes.current();
-                    if (current.page !== parsed.page) return;
-                    if (!og.views[page].filters || !og.views[page].filters.length) return;
-                    add = og.views[page].filters.reduce(function (acc, val) {
-                        return (acc[val] = current.args[val]), acc;
-                    }, {});
+                    var $anchor = $(this), current, parsed, rule, view, href;
+                    title = $anchor.attr('title');
+                    if (!$anchor.is('.og-js-live-anchor')) return;
+                    view = og.views[(parsed = routes.parse($anchor.attr('href'))).page.slice(1)];
+                    if (!view.filter_params.length || (current = routes.current()).page !== parsed.page) return;
                     rule = parsed.args.id ? 'load_item' : 'load';
-                    href = routes.prefix() + routes.hash(og.views[page].rules[rule], parsed.args, {add: add});
-                    anchor.attr('href', href);
+                    href = routes.prefix() + routes.hash(view.rules[rule], parsed.args, {
+                        add: view.filter_params
+                            .reduce(function (acc, val) {return (acc[val] = current.args[val]), acc;}, {})
+                    });
+                    $anchor.attr('href', href);
                 });
-                $(window).bind('hashchange', function () {
+                $(window).on('hashchange', function () {
                     routes.handler();
                     set_title(title || routes.current().hash);
                     title = null;
                 });
+                // escape key will break long-polling, so prevent the default action
+                $(window).on('keydown', function (e) {if (e.keyCode === $.ui.keyCode.ESCAPE) e.preventDefault();});
                 $(function () { // in addition to binding hash change events to window, also fire it onload
                     var common = og.views.common;
                     $('.OG-js-loading').hide();
-                    $('.ui-layout-container').show();
-                    common.layout = /^.*\/analytics\.ftl$/.test(window.location.href) ? common.layout.analytics()
-                        : common.layout['default']();
+                    if (!/^.*\/analytics2\.ftl$/.test(window.location.href)) {
+                        common.layout = /^.*\/analytics\.ftl$/.test(window.location.href) ? common.layout.analytics()
+                            : common.layout.admin();
+                    } else common.layout.analytics2();
                     routes.handler();
                     set_title(routes.current().hash);
                 });
@@ -61,13 +62,13 @@ $.register_module({
                 return hash(rule, modified_params);
             },
             post_add: function (compiled) { // add optional debug param to all rules that don't ask for it
-                if (!~compiled.rules.keyvals.map(function (val) {return val.name;}).indexOf('debug'))
+                if (!~compiled.rules.keyvals.pluck('name').indexOf('debug'))
                     compiled.rules.keyvals.push({name: 'debug', required: false});
                 return compiled;
             },
             pre_dispatch: function (parsed) { // if the debug param exists, use it to set API debug mode
                 if (parsed.length && parsed[0].args.debug) og.dev.debug = parsed[0].args.debug === 'true';
-                og.api.rest.clean();
+                if (og.api.rest) og.api.rest.clean();
                 return parsed;
             }
         });

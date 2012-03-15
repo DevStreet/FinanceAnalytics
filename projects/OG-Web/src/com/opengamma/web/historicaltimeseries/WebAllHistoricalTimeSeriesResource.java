@@ -53,6 +53,9 @@ import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeries;
 import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
 import com.opengamma.web.WebPaging;
+import com.opengamma.web.server.push.rest.MasterType;
+import com.opengamma.web.server.push.rest.Subscribe;
+import com.opengamma.web.server.push.rest.SubscribeMaster;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
 /**
@@ -78,6 +81,7 @@ public class WebAllHistoricalTimeSeriesResource extends AbstractWebHistoricalTim
   //-------------------------------------------------------------------------
   @GET
   @Produces(MediaType.TEXT_HTML)
+  @SubscribeMaster(MasterType.TIME_SERIES)
   public String getHTML(
       @QueryParam("pgIdx") Integer pgIdx,
       @QueryParam("pgNum") Integer pgNum,
@@ -96,6 +100,7 @@ public class WebAllHistoricalTimeSeriesResource extends AbstractWebHistoricalTim
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @SubscribeMaster(MasterType.TIME_SERIES)
   public String getJSON(
       @QueryParam("pgIdx") Integer pgIdx,
       @QueryParam("pgNum") Integer pgNum,
@@ -322,7 +327,7 @@ public class WebAllHistoricalTimeSeriesResource extends AbstractWebHistoricalTim
 
   //-------------------------------------------------------------------------
   @Path("{timeseriesId}")
-  public WebHistoricalTimeSeriesResource findSeries(@PathParam("timeseriesId") String idStr) {
+  public WebHistoricalTimeSeriesResource findSeries(@Subscribe @PathParam("timeseriesId") String idStr) {
     
     data().setUriHistoricalTimeSeriesId(idStr);
     UniqueId oid = UniqueId.parse(idStr);

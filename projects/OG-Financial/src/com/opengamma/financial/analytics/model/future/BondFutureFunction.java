@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.analytics.model.future;
@@ -27,12 +27,13 @@ import com.opengamma.financial.analytics.conversion.BondFutureSecurityConverter;
 import com.opengamma.financial.analytics.conversion.BondSecurityConverter;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.instrument.future.BondFutureDefinition;
+import com.opengamma.financial.interestrate.future.derivative.BondFuture;
 import com.opengamma.financial.security.future.BondFutureSecurity;
 
 /**
- * 
- * @param <T> The type of data that the calculator needs
- */
+*
+* @param <T> The type of data that the calculator needs
+*/
 public abstract class BondFutureFunction<T> extends AbstractFunction.NonCompiledInvoker {
   private final String _creditCurveName;
   private final String _riskFreeCurveName;
@@ -61,12 +62,11 @@ public abstract class BondFutureFunction<T> extends AbstractFunction.NonCompiled
     final BondFutureSecurity security = (BondFutureSecurity) target.getSecurity();
     final BondFutureDefinition definition = (BondFutureDefinition) security.accept(_visitor);
     final Double referencePrice = 0.0; // TODO Futures Refactor
-    final com.opengamma.financial.interestrate.future.definition.BondFuture bondFuture = definition.toDerivative(date, referencePrice, _creditCurveName, _riskFreeCurveName);
+    final BondFuture bondFuture = definition.toDerivative(date, referencePrice, _creditCurveName, _riskFreeCurveName);
     return calculate(security, bondFuture, getData(inputs, target), target);
   }
 
-  protected abstract Set<ComputedValue> calculate(com.opengamma.financial.security.future.BondFutureSecurity security,
-      com.opengamma.financial.interestrate.future.definition.BondFuture bondFuture, T data, ComputationTarget target);
+  protected abstract Set<ComputedValue> calculate(com.opengamma.financial.security.future.BondFutureSecurity security, BondFuture bondFuture, T data, ComputationTarget target);
 
   protected abstract T getData(FunctionInputs inputs, ComputationTarget target);
 

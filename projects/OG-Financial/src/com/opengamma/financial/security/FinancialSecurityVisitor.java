@@ -14,15 +14,16 @@ import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
-import com.opengamma.financial.security.fx.FXSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
 import com.opengamma.financial.security.option.EquityOptionSecurity;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
+import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
 import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
@@ -51,23 +52,27 @@ public interface FinancialSecurityVisitor<T> {
   T visitEquityOptionSecurity(EquityOptionSecurity security);
 
   T visitEquityBarrierOptionSecurity(EquityBarrierOptionSecurity security);
-  
+
   T visitFXOptionSecurity(FXOptionSecurity security);
-  
+
   T visitNonDeliverableFXOptionSecurity(NonDeliverableFXOptionSecurity security);
 
   T visitSwaptionSecurity(SwaptionSecurity security);
 
+  //  T visitInterestRateFutureSecurity(InterestRateFutureSecurity security);
+
   T visitIRFutureOptionSecurity(IRFutureOptionSecurity security);
-  
+
   T visitEquityIndexDividendFutureOptionSecurity(EquityIndexDividendFutureOptionSecurity security);
 
   T visitFXBarrierOptionSecurity(FXBarrierOptionSecurity security);
 
-  T visitFXSecurity(FXSecurity security);
+  T visitFXDigitalOptionSecurity(FXDigitalOptionSecurity security);
+
+  T visitNonDeliverableFXDigitalOptionSecurity(NonDeliverableFXDigitalOptionSecurity security);
 
   T visitFXForwardSecurity(FXForwardSecurity security);
-  
+
   T visitNonDeliverableFXForwardSecurity(NonDeliverableFXForwardSecurity security);
 
   T visitCapFloorSecurity(CapFloorSecurity security);

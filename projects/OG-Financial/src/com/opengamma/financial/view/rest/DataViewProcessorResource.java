@@ -24,20 +24,23 @@ import javax.ws.rs.core.UriInfo;
 
 import org.fudgemsg.FudgeContext;
 
+import com.opengamma.engine.marketdata.snapshot.MarketDataSnapshotter;
 import com.opengamma.engine.view.ViewProcess;
 import com.opengamma.engine.view.ViewProcessor;
 import com.opengamma.engine.view.client.ViewClient;
+import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeDefinitionSource;
+import com.opengamma.financial.marketdatasnapshot.MarketDataSnapshotterImpl;
 import com.opengamma.financial.rest.AbstractRestfulJmsResultPublisherExpiryJob;
 import com.opengamma.id.UniqueId;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.transport.jaxrs.FudgeRest;
 import com.opengamma.util.jms.JmsConnector;
+import com.opengamma.util.rest.AbstractDataResource;
 
 /**
  * RESTful resource for a {@link ViewProcessor}.
  */
-@Path("/data/viewProcessors/{viewProcessorId}")
-public class DataViewProcessorResource {
+public class DataViewProcessorResource extends AbstractDataResource {
 
   /**
    * The period after which, if a view client has not been accessed, it may be shut down.
@@ -46,17 +49,22 @@ public class DataViewProcessorResource {
 
   //CSOFF: just constants
   public static final String PATH_DEFINITION_REPOSITORY = "definitions";
-  public static final String PATH_LIVE_DATA_SOURCE_REGISTRY = "liveDataSourceRegistry";
-  public static final String PATH_UNIQUE_ID = "id";
+  public static final String PATH_NAMED_MARKET_DATA_SPEC_REPOSITORY = "namedMarketDataSpecRepository";
+  public static final String PATH_NAME = "name";
   public static final String PATH_CLIENTS = "clients";
   public static final String PATH_PROCESSES = "processes";
   public static final String PATH_CYCLES = "cycles";
+  public static final String PATH_SNAPSHOTTER = "marketDataSnapshotter";
   //CSON: just constants
 
   /**
    * The view processor.
    */
   private final ViewProcessor _viewProcessor;
+  /**
+   * The volatility cube definition.
+   */
+  private final VolatilityCubeDefinitionSource _volatilityCubeDefinitionSource;
   /**
    * The connection factory.
    */
@@ -68,6 +76,7 @@ public class DataViewProcessorResource {
   /**
    * The stale view client expiry job. 
    */
+  @SuppressWarnings("unused")
   private final AbstractRestfulJmsResultPublisherExpiryJob<DataViewClientResource> _expiryJob;
   /**
    * The cycle manager.
@@ -81,13 +90,16 @@ public class DataViewProcessorResource {
   /**
    * Creates an instance.
    * 
-   * @param viewProcessor  the view processor
-   * @param jmsConnector  the JMS connector
-   * @param fudgeContext  the Fudge context
+   * @param viewProcessor  the view processor, not null
+   * @param volatilityCubeDefinitionSource  the volatility cube, not null
+   * @param jmsConnector  the JMS connector, not null
+   * @param fudgeContext  the Fudge context, not null
    * @param scheduler  the scheduler, not null
    */
-  public DataViewProcessorResource(ViewProcessor viewProcessor, JmsConnector jmsConnector, FudgeContext fudgeContext, ScheduledExecutorService scheduler) {
+  public DataViewProcessorResource(ViewProcessor viewProcessor, VolatilityCubeDefinitionSource volatilityCubeDefinitionSource,
+      JmsConnector jmsConnector, FudgeContext fudgeContext, ScheduledExecutorService scheduler) {
     _viewProcessor = viewProcessor;
+    _volatilityCubeDefinitionSource = volatilityCubeDefinitionSource;
     _jmsConnector = jmsConnector;
     _scheduler = scheduler;
     _expiryJob = new AbstractRestfulJmsResultPublisherExpiryJob<DataViewClientResource>(VIEW_CLIENT_TIMEOUT_MILLIS, scheduler) {
@@ -108,9 +120,9 @@ public class DataViewProcessorResource {
 
   //-------------------------------------------------------------------------
   @GET
-  @Path(PATH_UNIQUE_ID)
-  public Response getUniqueId() {
-    return Response.ok(_viewProcessor.getUniqueId()).build();
+  @Path(PATH_NAME)
+  public Response getName() {
+    return responseOk(_viewProcessor.getName());
   }
 
   @Path(PATH_DEFINITION_REPOSITORY)
@@ -118,11 +130,17 @@ public class DataViewProcessorResource {
     return new DataViewDefinitionRepositoryResource(_viewProcessor.getViewDefinitionRepository());
   }
   
-  @Path(PATH_LIVE_DATA_SOURCE_REGISTRY)
-  public LiveMarketDataSourceRegistryResource getLiveMarketDataSourceRegistry() {
-    return new LiveMarketDataSourceRegistryResource(_viewProcessor.getLiveMarketDataSourceRegistry());
+  @Path(PATH_NAMED_MARKET_DATA_SPEC_REPOSITORY)
+  public DataNamedMarketDataSpecificationRepositoryResource getLiveMarketDataSourceRegistry() {
+    return new DataNamedMarketDataSpecificationRepositoryResource(_viewProcessor.getNamedMarketDataSpecificationRepository());
   }
 
+  @Path(PATH_SNAPSHOTTER)
+  public DataMarketDataSnapshotterResource getMarketDataSnapshotterImpl() {
+    MarketDataSnapshotter snp = new MarketDataSnapshotterImpl(_volatilityCubeDefinitionSource);
+    return new DataMarketDataSnapshotterResource(_viewProcessor, snp);
+  }
+  
   //-------------------------------------------------------------------------
   @Path(PATH_PROCESSES + "/{viewProcessId}")
   public DataViewProcessResource getViewProcess(@PathParam("viewProcessId") String viewProcessId) {
@@ -153,7 +171,8 @@ public class DataViewProcessorResource {
     // through the REST API should be accessed again through the same API, potentially many times.  
     DataViewClientResource viewClientResource = createViewClientResource(client, viewProcessorUri);
     _createdViewClients.put(client.getUniqueId(), viewClientResource);
-    return Response.created(uriClient(uriInfo.getRequestUri(), client.getUniqueId())).build();
+    URI createdUri = uriClient(uriInfo.getRequestUri(), client.getUniqueId());
+    return responseCreated(createdUri);
   }
 
   //-------------------------------------------------------------------------
@@ -175,7 +194,7 @@ public class DataViewProcessorResource {
   }
 
   private URI getViewProcessorUri(UriInfo uriInfo) {
-    return UriBuilder.fromUri(uriInfo.getMatchedURIs().get(1)).build();
+    return uriInfo.getBaseUri().resolve(UriBuilder.fromUri(uriInfo.getMatchedURIs().get(1)).build());
   }
 
   private DataViewCycleManagerResource getOrCreateDataViewCycleManagerResource(URI viewProcessorUri) {
@@ -196,7 +215,7 @@ public class DataViewProcessorResource {
 
   private DataViewClientResource createViewClientResource(ViewClient viewClient, URI viewProcessorUri) {
     DataViewCycleManagerResource cycleManagerResource = getOrCreateDataViewCycleManagerResource(viewProcessorUri);
-    return new DataViewClientResource(viewClient, cycleManagerResource, _jmsConnector);
+    return new DataViewClientResource(viewClient, cycleManagerResource, _jmsConnector, _scheduler);
   }
 
 }

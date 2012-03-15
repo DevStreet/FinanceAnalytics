@@ -20,13 +20,17 @@ public class CombinedMarketDataProviderFactory implements MarketDataProviderFact
   public CombinedMarketDataProviderFactory() {
   }
   
+  public CombinedMarketDataProviderFactory(MarketDataProviderResolver underlyingResolver) {
+    setUnderlying(underlyingResolver);
+  }
+  
   @Override
   public MarketDataProvider create(MarketDataSpecification marketDataSpec) {
     ArgumentChecker.notNullInjected(_underlying, "underlying");
     CombinedMarketDataSpecification combinedMarketDataSpec = (CombinedMarketDataSpecification) marketDataSpec;
-    MarketDataProvider preffered = getUnderlying().resolve(combinedMarketDataSpec.getPrefferedSpecification());
+    MarketDataProvider preferred = getUnderlying().resolve(combinedMarketDataSpec.getPreferredSpecification());
     MarketDataProvider fallBack = getUnderlying().resolve(combinedMarketDataSpec.getFallbackSpecification());
-    return new CombinedMarketDataProvider(preffered, fallBack);
+    return new CombinedMarketDataProvider(preferred, fallBack);
   }
   
   //-------------------------------------------------------------------------
@@ -38,5 +42,4 @@ public class CombinedMarketDataProviderFactory implements MarketDataProviderFact
     _underlying = underlying;
   }
   
-
 }

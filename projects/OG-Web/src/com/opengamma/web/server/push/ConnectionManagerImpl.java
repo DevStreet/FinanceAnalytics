@@ -5,6 +5,11 @@
  */
 package com.opengamma.web.server.push;
 
+import java.util.Map;
+import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.google.common.base.Objects;
 import com.opengamma.DataNotFoundException;
 import com.opengamma.core.change.ChangeManager;
@@ -12,17 +17,12 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.web.server.push.rest.MasterType;
 
-import java.util.Map;
-import java.util.Timer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * {@link ConnectionManager} implementation that creates an instance of {@link ClientConnection} for each
  * client.  It creates {@link Timer} tasks for each connection that closes them and cleans up if they are idle
  * for too long.  This class is thread safe.
  */
-/* package */ class ConnectionManagerImpl implements ConnectionManager {
+public class ConnectionManagerImpl implements ConnectionManager {
 
   /** Period for the periodic tasks that check whether the client connections have been idle for too long */
   private static final long DEFAULT_TIMEOUT_CHECK_PERIOD = 60000;
@@ -93,8 +93,8 @@ import java.util.concurrent.atomic.AtomicLong;
   public String clientConnected(String userId) {
     // TODO check args
     String clientId = Long.toString(_clientConnectionId.getAndIncrement());
-    LongPollingUpdateListener updateListener = _longPollingConnectionManager.handshake(userId, clientId);
     ConnectionTimeoutTask timeoutTask = new ConnectionTimeoutTask(this, userId, clientId, _timeout);
+    LongPollingUpdateListener updateListener = _longPollingConnectionManager.handshake(userId, clientId, timeoutTask);
     ClientConnection connection = new ClientConnection(userId, clientId, updateListener, _viewportFactory, timeoutTask);
     _changeManager.addChangeListener(connection);
     _masterChangeManager.addChangeListener(connection);

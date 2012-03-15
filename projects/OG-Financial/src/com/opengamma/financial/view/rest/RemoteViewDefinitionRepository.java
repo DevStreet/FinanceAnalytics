@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.ws.rs.core.UriBuilder;
 
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.change.BasicChangeManager;
 import com.opengamma.core.change.ChangeManager;
 import com.opengamma.engine.view.ViewDefinition;
@@ -19,8 +18,7 @@ import com.opengamma.engine.view.ViewDefinitionRepository;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.util.rest.FudgeRestClient;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import com.opengamma.util.rest.UniformInterfaceException404NotFound;
 
 /**
  * Remote implementation of {@link ViewDefinitionRepository}.
@@ -41,43 +39,32 @@ public class RemoteViewDefinitionRepository implements ViewDefinitionRepository 
   @Override
   public Set<ObjectId> getDefinitionIds() {
     final URI uri = UriBuilder.fromUri(_baseUri).segment(DataViewDefinitionRepositoryResource.PATH_VIEWDEFINITION_GETIDS).build();
-    return _client.access(uri).get((Set.class));
+    return _client.accessFudge(uri).get(Set.class);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Map<UniqueId, String> getDefinitionEntries() {
-    return _client.access(_baseUri).get((Map.class));
+    return _client.accessFudge(_baseUri).get(Map.class);
   }
   
   @Override
   public ViewDefinition getDefinition(UniqueId definitionId) {
     final URI uri = DataViewDefinitionRepositoryResource.uriDefinitionId(_baseUri, definitionId);
     try {
-      return _client.access(uri).get(ViewDefinition.class);
-    } catch (UniformInterfaceException e) {
-      // Translate 404s to a null return. Otherwise rethrow the underlying exception.
-      if (e.getResponse().getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) {
-        return null;
-      } else {
-        throw new OpenGammaRuntimeException("Underlying transport exception", e);
-      }
+      return _client.accessFudge(uri).get(ViewDefinition.class);
+    } catch (UniformInterfaceException404NotFound ex) {
+      return null;
     }
   }
   
   @Override
   public ViewDefinition getDefinition(String definitionName) {
     URI uri = DataViewDefinitionRepositoryResource.uriDefinitionName(_baseUri, definitionName);
-    
     try {      
-      return _client.access(uri).get(ViewDefinition.class);
-    } catch (UniformInterfaceException e) {
-      // Translate 404s to a null return. Otherwise rethrow the underlying exception.
-      if (e.getResponse().getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) {
-        return null;
-      } else {
-        throw new OpenGammaRuntimeException("Underlying transport exception", e);
-      }
+      return _client.accessFudge(uri).get(ViewDefinition.class);
+    } catch (UniformInterfaceException404NotFound ex) {
+      return null;
     }
 
   }

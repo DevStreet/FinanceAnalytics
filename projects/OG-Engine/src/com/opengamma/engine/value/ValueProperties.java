@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -155,7 +156,7 @@ public abstract class ValueProperties implements Serializable, Comparable<ValueP
       propertyName = ValueRequirement.getInterned(propertyName);
       final Set<String> previous = _properties.put(propertyName, Collections.singleton(propertyValue));
       if (previous != null) {
-        if (previous.isEmpty()) {
+        if (previous.isEmpty() || previous.contains(propertyValue)) {
           _properties.put(propertyName, previous);
         } else {
           final Set<String> replacement = new HashSet<String>(previous);
@@ -176,15 +177,14 @@ public abstract class ValueProperties implements Serializable, Comparable<ValueP
     public Builder with(String propertyName, final Collection<String> propertyValues) {
       ArgumentChecker.notNull(propertyName, "propertyName");
       ArgumentChecker.notNull(propertyValues, "propertyValues");
-      final Set<String> values = new HashSet<String>(propertyValues);
-      if (values.isEmpty()) {
+      if (propertyValues.isEmpty()) {
         throw new IllegalArgumentException("propertyValues must contain at least one element");
       }
-      if (values.contains(null)) {
+      if (propertyValues.contains(null)) {
         throw new IllegalArgumentException("propertyValues cannot contain null");
       }
-      propertyName = propertyName.intern();
-      final Set<String> previous = _properties.put(propertyName, Collections.unmodifiableSet(values));
+      propertyName = ValueRequirement.getInterned(propertyName);
+      final Set<String> previous = _properties.put(propertyName, getUnmodifiableSet(propertyValues));
       if (previous != null) {
         if (previous.isEmpty()) {
           _properties.put(propertyName, previous);
@@ -200,7 +200,7 @@ public abstract class ValueProperties implements Serializable, Comparable<ValueP
     @Override
     public Builder withAny(final String propertyName) {
       ArgumentChecker.notNull(propertyName, "propertyName");
-      _properties.put(propertyName.intern(), Collections.<String>emptySet());
+      _properties.put(ValueRequirement.getInterned(propertyName), Collections.<String>emptySet());
       return this;
     }
 
@@ -235,15 +235,38 @@ public abstract class ValueProperties implements Serializable, Comparable<ValueP
             _properties.put(optionalProperty, Collections.<String>emptySet());
           }
         }
-        return new ValuePropertiesImpl(new HashMap<String, Set<String>>(_properties), new HashSet<String>(_optional));
+        return new ValuePropertiesImpl(getSmallMap(_properties), getUnmodifiableSet(_optional));
       } else {
         if (_properties.isEmpty()) {
           return EMPTY;
         }
-        return new ValuePropertiesImpl(new HashMap<String, Set<String>>(_properties), Collections.<String>emptySet());
+        return new ValuePropertiesImpl(getSmallMap(_properties), Collections.<String>emptySet());
       }
     }
-
+    
+    private Set<String> getUnmodifiableSet(final Collection<String> values) {
+      switch (values.size()) {
+        case 0:
+          return Collections.emptySet();
+        case 1:
+          return Collections.singleton(values.iterator().next());
+        default:
+          return Collections.unmodifiableSet((values instanceof Set) ? (Set<String>) values : new HashSet<String>(values));
+      }
+    }
+    
+    private static <K, V> Map<K, V> getSmallMap(Map<K, V> map) {
+      switch (map.size()) {
+        case 0:
+          return Collections.emptyMap();
+        case 1:
+          for (Entry<K, V> entry : map.entrySet()) {
+            return Collections.singletonMap(entry.getKey(), entry.getValue());
+          }
+        default:
+          return new HashMap<K, V>(map);
+      }
+    }
   }
 
   /**
@@ -263,6 +286,14 @@ public abstract class ValueProperties implements Serializable, Comparable<ValueP
      * The optional properties.
      */
     private final Set<String> _optional;
+    /**
+     * Hashcode of the property set.
+     */
+    private volatile int _hashCode;
+    /**
+     * Indicates whether the hash-code is valid.
+     */
+    private volatile boolean _hashCodeValid;
 
     /**
      * Creates an instance.
@@ -521,7 +552,14 @@ public abstract class ValueProperties implements Serializable, Comparable<ValueP
 
     @Override
     public int hashCode() {
-      return _properties.hashCode();
+      if (_hashCodeValid) {
+        return _hashCode;
+      } else {
+        final int hashCode = _properties.hashCode() ^ _optional.hashCode();
+        _hashCode = hashCode;
+        _hashCodeValid = true;
+        return hashCode;
+      }
     }
 
     @Override

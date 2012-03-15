@@ -7,6 +7,7 @@ package com.opengamma.web;
 
 import java.net.URI;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,8 +17,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.joda.beans.impl.flexi.FlexiBean;
 
-import com.opengamma.web.batch.WebBatchData;
-import com.opengamma.web.batch.WebBatchUris;
 import com.opengamma.web.config.WebConfigData;
 import com.opengamma.web.config.WebConfigUris;
 import com.opengamma.web.exchange.WebExchangeData;
@@ -50,19 +49,22 @@ public class WebHomeResource extends AbstractWebResource {
   //-------------------------------------------------------------------------
   @GET
   @Produces(MediaType.TEXT_HTML)
-  public String get(@Context UriInfo uriInfo) {
-    FlexiBean out = createRootData(uriInfo);
-    return getFreemarker().build("home.ftl", out);
+  public String get(@Context ServletContext servletContext, @Context UriInfo uriInfo) {
+    FreemarkerOutputter freemarker = new FreemarkerOutputter(servletContext);
+    FlexiBean out = freemarker.createRootData();
+    out = createRootData(out, uriInfo);
+    return freemarker.build("home.ftl", out);
   }
 
   //-------------------------------------------------------------------------
   /**
    * Creates the output root data.
+   * 
+   * @param out  the root data to populate, not null
    * @param uriInfo  the URI information, not null
    * @return the output root data, not null
    */
-  protected FlexiBean createRootData(UriInfo uriInfo) {
-    FlexiBean out = getFreemarker().createRootData();
+  protected FlexiBean createRootData(FlexiBean out, UriInfo uriInfo) {
     out.put("uris", new WebHomeUris(uriInfo));
     
     WebPortfoliosData portfolioData = new WebPortfoliosData();
@@ -96,10 +98,6 @@ public class WebHomeResource extends AbstractWebResource {
     WebConfigData configData = new WebConfigData();
     configData.setUriInfo(uriInfo);
     out.put("configUris", new WebConfigUris(configData));
-    
-    WebBatchData batchData = new WebBatchData();
-    batchData.setUriInfo(uriInfo);
-    out.put("batchUris", new WebBatchUris(batchData));
     
     return out;
   }

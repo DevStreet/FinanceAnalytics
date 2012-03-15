@@ -80,7 +80,7 @@ public class VolatilitySurfaceTest {
     assertArrayEquals(other.getSurface().getXData(), underlying.getXData());
     assertArrayEquals(other.getSurface().getYData(), underlying.getYData());
     assertArrayEquals(other.getSurface().getZData(), underlying.getZData());
-    
+
     other = VOL.withConstantMultiplicativeShift(0);
     assertFalse(other.equals(VOL));
     other = VOL.withConstantMultiplicativeShift(2);

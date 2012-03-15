@@ -20,7 +20,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -28,12 +30,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.engine.ComputationTargetResolver;
-import com.opengamma.engine.fudgemsg.DependencyGraphFudgeBuilder;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.resolver.CompiledFunctionResolver;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
@@ -41,6 +43,7 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.Cancelable;
+import com.opengamma.util.tuple.Pair;
 
 /**
  * Builds a dependency graph that describes how to calculate values that will satisfy a given
@@ -48,9 +51,6 @@ import com.opengamma.util.Cancelable;
  * complete the graph it is only safe for a single calling thread to call any of the public
  * methods at any one time. If multiple threads are to attempt to add targets to the graph
  * concurrently, it is possible to synchronize on the builder instance.
- * <p>
- * This is an alternative algorithm to that used in {@link DependencyGraphFudgeBuilder}. It is a
- * work in progress and cannot be relied on to build accurate graphs at the moment.
  */
 public final class DependencyGraphBuilder {
 
@@ -217,6 +217,21 @@ public final class DependencyGraphBuilder {
   }
 
   /**
+   * Wrapper for a hash map implementation that exposes the underlying entry so that the actual
+   * key value can be used.
+   */
+  private static final class MapEx<K, V> extends HashedMap {
+
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("unchecked")
+    public Map.Entry<K, V> getHashEntry(final K key) {
+      return getEntry(key);
+    }
+
+  }
+
+  /**
    * Algorithm state. A context object is used by a single job thread. Objects referenced by the context may be shared with other
    * contexts however. The root context from which all per-thread contexts are cloned is not used by any builder thread. The
    * synchronization on the collation methods only is therefore sufficient.
@@ -232,10 +247,10 @@ public final class DependencyGraphBuilder {
     private FunctionCompilationContext _compilationContext;
 
     // The resolve task is ref-counted once for the map (it is being used as a set)
-    private final Map<ValueRequirement, Map<ResolveTask, ResolveTask>> _requirements;
+    private final ConcurrentMap<ValueRequirement, Map<ResolveTask, ResolveTask>> _requirements;
 
     // The resolve task is NOT ref-counted (it is only used for parent comparisons), but the value producer is
-    private final Map<ValueSpecification, Map<ResolveTask, ResolvedValueProducer>> _specifications;
+    private final ConcurrentMap<ValueSpecification, MapEx<ResolveTask, ResolvedValueProducer>> _specifications;
 
     // This data is per-thread
 
@@ -244,8 +259,8 @@ public final class DependencyGraphBuilder {
 
     private GraphBuildingContext() {
       s_loggerContext.info("Created new context");
-      _requirements = new HashMap<ValueRequirement, Map<ResolveTask, ResolveTask>>();
-      _specifications = new HashMap<ValueSpecification, Map<ResolveTask, ResolvedValueProducer>>();
+      _requirements = new ConcurrentHashMap<ValueRequirement, Map<ResolveTask, ResolveTask>>();
+      _specifications = new ConcurrentHashMap<ValueSpecification, MapEx<ResolveTask, ResolvedValueProducer>>();
     }
 
     private GraphBuildingContext(final GraphBuildingContext copyFrom) {
@@ -425,14 +440,17 @@ public final class DependencyGraphBuilder {
         };
       }
       RequirementResolver resolver = null;
-      for (ResolveTask task : getTasksResolving(requirement)) {
-        if ((dependent == null) || !dependent.hasParent(task)) {
-          if (resolver == null) {
-            resolver = new RequirementResolver(requirement, dependent);
+      final ResolveTask[] tasks = getTasksResolving(requirement);
+      if (tasks != null) {
+        for (ResolveTask task : tasks) {
+          if ((dependent == null) || !dependent.hasParent(task)) {
+            if (resolver == null) {
+              resolver = new RequirementResolver(requirement, dependent);
+            }
+            resolver.addTask(this, task);
           }
-          resolver.addTask(this, task);
+          task.release(this);
         }
-        task.release(this);
       }
       if (resolver != null) {
         resolver.start(this);
@@ -446,15 +464,15 @@ public final class DependencyGraphBuilder {
     private ResolveTask getOrCreateTaskResolving(final ValueRequirement valueRequirement, final ResolveTask parentTask) {
       ResolveTask newTask = new ResolveTask(valueRequirement, parentTask);
       ResolveTask task;
-      synchronized (_requirements) {
-        Map<ResolveTask, ResolveTask> tasks = _requirements.get(valueRequirement);
-        // Review 2012-01-03 Andrew -- We don't really want a map. The test for similar tasks is a subset operation. We
-        // should use a structure that allows us to test quickly whether there are any existing tasks whose parent
-        // requirement set is a subset of this tasks parent requirement set.
-        if (tasks == null) {
-          tasks = new HashMap<ResolveTask, ResolveTask>();
-          _requirements.put(valueRequirement, tasks);
+      Map<ResolveTask, ResolveTask> tasks = _requirements.get(valueRequirement);
+      if (tasks == null) {
+        tasks = new HashMap<ResolveTask, ResolveTask>();
+        final Map<ResolveTask, ResolveTask> existing = _requirements.putIfAbsent(valueRequirement, tasks);
+        if (existing != null) {
+          tasks = existing;
         }
+      }
+      synchronized (tasks) {
         task = tasks.get(newTask);
         if (task == null) {
           newTask.addRef();
@@ -473,40 +491,48 @@ public final class DependencyGraphBuilder {
       }
     }
 
-    private Set<ResolveTask> getTasksResolving(final ValueRequirement valueRequirement) {
-      final Set<ResolveTask> result;
-      synchronized (_requirements) {
-        final Map<ResolveTask, ResolveTask> tasks = _requirements.get(valueRequirement);
-        if (tasks == null) {
-          return Collections.emptySet();
-        }
-        result = new HashSet<ResolveTask>(tasks.keySet());
-        for (ResolveTask task : result) {
+    private ResolveTask[] getTasksResolving(final ValueRequirement valueRequirement) {
+      final ResolveTask[] result;
+      final Map<ResolveTask, ResolveTask> tasks = _requirements.get(valueRequirement);
+      if (tasks == null) {
+        return null;
+      }
+      synchronized (tasks) {
+        result = new ResolveTask[tasks.size()];
+        int i = 0;
+        for (ResolveTask task : tasks.keySet()) {
+          result[i++] = task;
           task.addRef();
         }
       }
       return result;
     }
 
-    public Map<ResolveTask, ResolvedValueProducer> getTasksProducing(final ValueSpecification valueSpecification) {
-      final Map<ResolveTask, ResolvedValueProducer> result;
-      synchronized (_specifications) {
-        final Map<ResolveTask, ResolvedValueProducer> tasks = _specifications.get(valueSpecification);
-        if (tasks == null) {
-          return Collections.emptyMap();
-        }
-        result = new HashMap<ResolveTask, ResolvedValueProducer>(tasks);
-        for (Map.Entry<ResolveTask, ResolvedValueProducer> task : result.entrySet()) {
+    @SuppressWarnings("unchecked")
+    public Pair<ResolveTask[], ResolvedValueProducer[]> getTasksProducing(final ValueSpecification valueSpecification) {
+      final ResolveTask[] resultTasks;
+      final ResolvedValueProducer[] resultProducers;
+      final MapEx<ResolveTask, ResolvedValueProducer> tasks = _specifications.get(valueSpecification);
+      if (tasks == null) {
+        return null;
+      }
+      synchronized (tasks) {
+        resultTasks = new ResolveTask[tasks.size()];
+        resultProducers = new ResolvedValueProducer[tasks.size()];
+        int i = 0;
+        for (Map.Entry<ResolveTask, ResolvedValueProducer> task : (Set<Map.Entry<ResolveTask, ResolvedValueProducer>>) tasks.entrySet()) {
           // Don't ref-count the tasks; they're just used for parent comparisons
+          resultTasks[i] = task.getKey();
+          resultProducers[i++] = task.getValue();
           task.getValue().addRef();
         }
       }
-      return result;
+      return Pair.of(resultTasks, resultProducers);
     }
 
     public void discardTask(final ResolveTask task) {
-      synchronized (_requirements) {
-        final Map<ResolveTask, ResolveTask> tasks = _requirements.get(task.getValueRequirement());
+      final Map<ResolveTask, ResolveTask> tasks = _requirements.get(task.getValueRequirement());
+      synchronized (tasks) {
         if (tasks.remove(task) == null) {
           // Wasn't in the set
           return;
@@ -518,27 +544,29 @@ public final class DependencyGraphBuilder {
     public ResolvedValueProducer declareTaskProducing(final ValueSpecification valueSpecification, final ResolveTask task, final ResolvedValueProducer producer) {
       ResolvedValueProducer discard = null;
       ResolvedValueProducer result = null;
-      synchronized (_specifications) {
-        Map<ResolveTask, ResolvedValueProducer> tasks = _specifications.get(valueSpecification);
-        if (tasks == null) {
-          tasks = new HashMap<ResolveTask, ResolvedValueProducer>();
-          _specifications.put(valueSpecification, tasks);
+      MapEx<ResolveTask, ResolvedValueProducer> tasks = _specifications.get(valueSpecification);
+      if (tasks == null) {
+        tasks = new MapEx<ResolveTask, ResolvedValueProducer>();
+        final MapEx<ResolveTask, ResolvedValueProducer> existing = _specifications.putIfAbsent(valueSpecification, tasks);
+        if (existing != null) {
+          tasks = existing;
         }
+      }
+      synchronized (tasks) {
         if (!tasks.isEmpty()) {
-          // The loop below is nasty, but the map won't return its "actual" key and value when we just do a "get"
-          for (Map.Entry<ResolveTask, ResolvedValueProducer> resolveTask : tasks.entrySet()) {
+          final Map.Entry<ResolveTask, ResolvedValueProducer> resolveTask = tasks.getHashEntry(task);
+          if (resolveTask != null) {
             if (resolveTask.getKey() == task) {
               // Replace an earlier attempt from this task with the new producer
               discard = resolveTask.getValue();
               producer.addRef();
               resolveTask.setValue(producer);
               result = producer;
-              break;
-            } else if (task.equals(resolveTask.getKey())) {
+            } else {
               // An equivalent task is doing the work
               result = resolveTask.getValue();
-              break;
             }
+            result.addRef();
           }
         }
         if (result == null) {
@@ -546,20 +574,20 @@ public final class DependencyGraphBuilder {
           producer.addRef();
           tasks.put(task, producer);
           result = producer;
+          result.addRef();
         }
       }
       if (discard != null) {
         discard.release(this);
       }
-      result.addRef();
       return result;
     }
 
     public void discardTaskProducing(final ValueSpecification valueSpecification, final ResolveTask task) {
       final ResolvedValueProducer producer;
-      synchronized (_specifications) {
-        final Map<ResolveTask, ResolvedValueProducer> tasks = _specifications.get(valueSpecification);
-        producer = tasks.remove(task);
+      final MapEx<ResolveTask, ResolvedValueProducer> tasks = _specifications.get(valueSpecification);
+      synchronized (tasks) {
+        producer = (ResolvedValueProducer) tasks.remove(task);
         if (producer == null) {
           // Wasn't in the set
           return;
@@ -568,12 +596,13 @@ public final class DependencyGraphBuilder {
       producer.release(this);
     }
 
-    private boolean abortLoops() {
+    @SuppressWarnings("unchecked")
+    private void abortLoops() {
       s_loggerBuilder.debug("Checking for active tasks to abort");
       List<ResolveTask> activeTasks = null;
-      synchronized (_specifications) {
-        for (Map<ResolveTask, ResolvedValueProducer> tasks : _specifications.values()) {
-          for (ResolveTask task : tasks.keySet()) {
+      for (MapEx<ResolveTask, ResolvedValueProducer> tasks : _specifications.values()) {
+        synchronized (tasks) {
+          for (ResolveTask task : (Set<ResolveTask>) tasks.keySet()) {
             if (task.isActive()) {
               if (activeTasks == null) {
                 activeTasks = new LinkedList<ResolveTask>();
@@ -590,11 +619,9 @@ public final class DependencyGraphBuilder {
           cancelled += task.cancelLoopMembers(this, visited);
         }
         s_loggerContext.info("Cancelled {} looped tasks", cancelled);
-        return cancelled > 0;
       } else {
         s_loggerContext.debug("No looped tasks");
       }
-      return false;
     }
 
     // Collation
@@ -636,54 +663,31 @@ public final class DependencyGraphBuilder {
       if (!s_loggerContext.isInfoEnabled()) {
         return;
       }
-      //final List<ResolveTask> discards = new ArrayList<ResolveTask>();
-      synchronized (_requirements) {
-        int count = 0;
-        for (Map.Entry<ValueRequirement, Map<ResolveTask, ResolveTask>> requirements : _requirements.entrySet()) {
-          final Map<ResolveTask, ResolveTask> entries = requirements.getValue();
-          if (!entries.isEmpty()) {
-            /*boolean allFinished = true;
-            for (ResolveTask task : entries.keySet()) {
-              if (!task.isFinished()) {
-                allFinished = false;
-                break;
-              }
-            }
-            if (allFinished) {
-              discards.addAll(entries.keySet());
-              entries.clear();
-            } else {*/
-            count += entries.size();
-            //}
-          }
-        }
-        s_loggerContext.info("Requirements cache = {} tasks for {} requirements", count, _requirements.size());
-        /*s_loggerContext.info("Discarding {} finished tasks", discards.size());
-        for (ResolveTask discard : discards) {
-          discard.release(this);
-        }*/
-      }
-      synchronized (_specifications) {
-        int count = 0;
-        for (Map<ResolveTask, ResolvedValueProducer> entries : _specifications.values()) {
+      int count = 0;
+      for (Map.Entry<ValueRequirement, Map<ResolveTask, ResolveTask>> requirements : _requirements.entrySet()) {
+        final Map<ResolveTask, ResolveTask> entries = requirements.getValue();
+        synchronized (entries) {
           count += entries.size();
         }
-        s_loggerContext.info("Specifications cache = {} tasks for {} specifications", count, _specifications.size());
       }
+      s_loggerContext.info("Requirements cache = {} tasks for {} requirements", count, _requirements.size());
+      count = 0;
+      for (MapEx<ResolveTask, ResolvedValueProducer> entries : _specifications.values()) {
+        synchronized (entries) {
+          count += entries.size();
+        }
+      }
+      s_loggerContext.info("Specifications cache = {} tasks for {} specifications", count, _specifications.size());
       //final Runtime rt = Runtime.getRuntime();
       //rt.gc();
       //s_loggerContext.info("Used memory = {}M", (double) (rt.totalMemory() - rt.freeMemory()) / 1e6);
     }
 
     private void discardIntermediateState() {
-      synchronized (_requirements) {
-        s_loggerContext.debug("Discarding intermediate state {} requirements", _requirements.size());
-        _requirements.clear();
-      }
-      synchronized (_specifications) {
-        s_loggerContext.debug("Discarding intermediate state {} specifications", _specifications.size());
-        _specifications.clear();
-      }
+      s_loggerContext.debug("Discarding intermediate state {} requirements", _requirements.size());
+      _requirements.clear();
+      s_loggerContext.debug("Discarding intermediate state {} specifications", _specifications.size());
+      _specifications.clear();
     }
 
   };
@@ -692,6 +696,7 @@ public final class DependencyGraphBuilder {
   private final AtomicInteger _activeJobCount = new AtomicInteger();
   private final Set<Job> _activeJobs = new HashSet<Job>();
   private final Queue<ContextRunnable> _runQueue = new ConcurrentLinkedQueue<ContextRunnable>();
+  private final Object _buildCompleteLock = new Object();
   private final GraphBuildingContext _context = new GraphBuildingContext();
   private final AtomicLong _completedSteps = new AtomicLong();
   private final AtomicLong _scheduledSteps = new AtomicLong();
@@ -978,53 +983,57 @@ public final class DependencyGraphBuilder {
       boolean jobsLeftToRun;
       int completed = 0;
       do {
+        s_loggerBuilder.info("Build fraction = {}", estimateBuildFraction());
+        // Create a new context for each logical block so that an exception from the build won't leave us with
+        // an inconsistent context.
+        final GraphBuildingContext context = new GraphBuildingContext(getContext());
         do {
-          s_loggerBuilder.info("Build fraction = {}", estimateBuildFraction());
-          // Create a new context for each logical block so that an exception from the build won't leave us with
-          // an inconsistent context.
-          final GraphBuildingContext context = new GraphBuildingContext(getContext());
-          do {
-            try {
-              jobsLeftToRun = buildGraph(context);
-              completed++;
-              /*if ((completed % 500) == 0) {
-                s_loggerBuilder.info("Build fraction = {}", estimateBuildFraction());
-              }*/
-            } catch (Throwable t) {
-              s_loggerBuilder.warn("Graph builder exception", t);
-              _context.exception(t);
-              jobsLeftToRun = false;
-            }
-          } while (!_poison && jobsLeftToRun);
-          s_loggerBuilder.debug("Merging thread context");
-          getContext().mergeThreadContext(context);
-          s_loggerBuilder.debug("Building job stopping");
-          int activeJobs = _activeJobCount.decrementAndGet();
-          // Watch for late arrivals in the run queue; they might have seen the old value
-          // of activeJobs and not started anything.
-          while (!_runQueue.isEmpty() && (activeJobs < getMaxAdditionalThreads()) && !_poison) {
-            if (_activeJobCount.compareAndSet(activeJobs, activeJobs + 1)) {
-              s_loggerBuilder.debug("Building job resuming");
-              // Note the log messages may go from "resuming" to stopped if the poison arrives between
-              // the check above and the check below. This might look odd, but what the hey - they're
-              // only DEBUG level messages.
-              jobsLeftToRun = true;
-              break;
-            }
-            activeJobs = _activeJobCount.get();
+          try {
+            jobsLeftToRun = buildGraph(context);
+            completed++;
+            /*if ((completed % 500) == 0) {
+              s_loggerBuilder.info("Build fraction = {}", estimateBuildFraction());
+            }*/
+          } catch (Throwable t) {
+            s_loggerBuilder.warn("Graph builder exception", t);
+            _context.exception(t);
+            jobsLeftToRun = false;
           }
         } while (!_poison && jobsLeftToRun);
-        synchronized (_activeJobs) {
-          _activeJobs.remove(this);
-          if (!_activeJobs.isEmpty() || !_runQueue.isEmpty()) {
-            // Stopping because there are active jobs; skip the "abortLoop" stage
+        s_loggerBuilder.debug("Merging thread context");
+        getContext().mergeThreadContext(context);
+        s_loggerBuilder.debug("Building job stopping");
+        int activeJobs = _activeJobCount.decrementAndGet();
+        // Watch for late arrivals in the run queue; they might have seen the old value
+        // of activeJobs and not started anything.
+        while (!_runQueue.isEmpty() && (activeJobs < getMaxAdditionalThreads()) && !_poison) {
+          if (_activeJobCount.compareAndSet(activeJobs, activeJobs + 1)) {
+            s_loggerBuilder.debug("Building job resuming");
+            // Note the log messages may go from "resuming" to stopped if the poison arrives between
+            // the check above and the check below. This might look odd, but what the hey - they're
+            // only DEBUG level messages.
+            jobsLeftToRun = true;
             break;
           }
+          activeJobs = _activeJobCount.get();
         }
-        // Any tasks that are still active have created a reciprocal loop disjoint from the runnable
-        // graph of tasks. Aborting them at this point is easier and possibly more efficient than
-        // the overhead of trying to stop the loops forming in the first place.
-      } while (!_poison && getContext().abortLoops());
+      } while (!_poison && jobsLeftToRun);
+      synchronized (_buildCompleteLock) {
+        final boolean abortLoops;
+        synchronized (_activeJobs) {
+          _activeJobs.remove(this);
+          abortLoops = _activeJobs.isEmpty() && _runQueue.isEmpty();
+        }
+        if (abortLoops) {
+          // Any tasks that are still active have created a reciprocal loop disjoint from the runnable
+          // graph of tasks. Aborting them at this point is easier and possibly more efficient than
+          // the overhead of trying to stop the loops forming in the first place.
+          getContext().abortLoops();
+          // If any loops were aborted, new jobs will go onto the run queue, and possibly a new active
+          // job started (this one is officially dead but could be restarted using logic similar to
+          // above to update the activeJobCount and activeJobs set).
+        }
+      }
       s_loggerBuilder.info("Building job {} stopped after {} operations", _objectId, completed);
     }
 
@@ -1065,23 +1074,11 @@ public final class DependencyGraphBuilder {
    * @return true if the graph has been built, false if it is outstanding
    */
   public boolean isGraphBuilt() {
-    do {
+    synchronized (_buildCompleteLock) {
       synchronized (_activeJobs) {
-        if (!_activeJobs.isEmpty()) {
-          // One or more active jobs, so can't be built yet
-          return false;
-        }
-        if (!_runQueue.isEmpty()) {
-          // No active jobs, but there are jobs on the run queue
-          return false;
-        }
+        return _activeJobs.isEmpty() && _runQueue.isEmpty();
       }
-      // Any tasks that are still active have created a reciprocal loop disjoint from the runnable
-      // graph of tasks. Aborting them at this point is easier and possibly more efficient than
-      // the overhead of trying to stop the loops forming in the first place.
-    } while (getContext().abortLoops());
-    // No active tasks to restart so must have finished
-    return true;
+    }
   }
 
   /**
@@ -1188,15 +1185,9 @@ public final class DependencyGraphBuilder {
         }
         job.run();
         synchronized (_activeJobs) {
-          if (_activeJobs.isEmpty()) {
-            // We're done and there are no other jobs
-            break;
-          } else {
-            // There are other jobs still running ...
-            if (!_runQueue.isEmpty()) {
-              // ... and stuff in the queue
-              continue;
-            }
+          if (!_runQueue.isEmpty()) {
+            // more jobs in the queue so keep going
+            continue;
           }
         }
         if (allowBackgroundContinuation) {

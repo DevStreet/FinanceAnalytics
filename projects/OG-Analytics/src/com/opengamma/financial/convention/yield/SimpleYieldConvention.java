@@ -8,6 +8,8 @@ package com.opengamma.financial.convention.yield;
 import java.io.Serializable;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * A simple yield convention.
@@ -55,9 +57,17 @@ public class SimpleYieldConvention implements YieldConvention, Serializable {
    */
   public static final YieldConvention US_BOND = new SimpleYieldConvention("US Treasury"); //TODO better name
   /**
+   * Bund (German government-issued bond) yield convention
+   */
+  public static final YieldConvention GERMAN_BOND = new SimpleYieldConvention("GERMAN BONDS");
+  /**
    * US short duration T-bill.
    */
   public static final YieldConvention DISCOUNT = new SimpleYieldConvention("DISCOUNT");
+  /**
+   * Bill convention (in particular for Germany, United Kingdom, Belgium)
+   */
+  public static final YieldConvention INTERESTATMTY = new SimpleYieldConvention("INTEREST@MTY");
   /**
    * Some bonds have this code.
    */
@@ -82,5 +92,10 @@ public class SimpleYieldConvention implements YieldConvention, Serializable {
     return _name;
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+  }
+  
   //REVIEW emcleod 28-1-2011 Is the lack of hashCode() and equals() deliberate?
 }

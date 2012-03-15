@@ -5,20 +5,20 @@
  */
 package com.opengamma.web.server.push;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import com.opengamma.core.change.ChangeEvent;
 import com.opengamma.core.change.ChangeListener;
 import com.opengamma.core.change.ChangeProvider;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.web.server.push.rest.MasterType;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 /**
  * Dispatches notifications to listeners when data changes in a master.
  */
-/* package */ class MasterChangeManager {
+public class MasterChangeManager {
 
   /** Listeners for changes in data in a master */
   private final Set<MasterChangeListener> _listeners = new CopyOnWriteArraySet<MasterChangeListener>();

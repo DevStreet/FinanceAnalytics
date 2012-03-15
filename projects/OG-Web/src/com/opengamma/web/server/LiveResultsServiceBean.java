@@ -5,19 +5,17 @@
  */
 package com.opengamma.web.server;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import javax.servlet.ServletContext;
 
 import org.cometd.Bayeux;
 import org.fudgemsg.FudgeContext;
-import org.springframework.web.context.ServletContextAware;
 
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.view.ViewProcessor;
-import com.opengamma.financial.aggregation.AggregationFunction;
+import com.opengamma.financial.aggregation.PortfolioAggregationFunctions;
 import com.opengamma.financial.view.ManageableViewDefinitionRepository;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotMaster;
@@ -27,9 +25,8 @@ import com.opengamma.master.position.PositionMaster;
 /**
  * Spring helper for {@link LiveResultsService}.
  */
-public class LiveResultsServiceBean implements ServletContextAware {
-  
-  private ServletContext _servletContext;
+public class LiveResultsServiceBean {
+
   private Bayeux _bayeux;
   private ViewProcessor _viewProcessor;
   private PositionSource _positionSource;
@@ -37,16 +34,16 @@ public class LiveResultsServiceBean implements ServletContextAware {
   private PortfolioMaster _userPortfolioMaster;
   private PositionMaster _userPositionMaster;
   private ManageableViewDefinitionRepository _userViewDefinitionRepository;
-  private List<AggregationFunction<?>> _portfolioAggregators;
+  private PortfolioAggregationFunctions _portfolioAggregators;
   private MarketDataSnapshotMaster _snapshotMaster;
   private UserPrincipal _user;
   private ExecutorService _executorService;
   private FudgeContext _fudgeContext;
   private LiveResultsService _liveResultsService;
-  
+
   public LiveResultsServiceBean() {
   }
-  
+
   public void setViewProcessor(ViewProcessor viewProcessor) {
     _viewProcessor = viewProcessor;
   }
@@ -95,11 +92,11 @@ public class LiveResultsServiceBean implements ServletContextAware {
     _userViewDefinitionRepository = userViewDefinitionRepository;
   }
 
-  public List<AggregationFunction<?>> getPortfolioAggregators() {
+  public PortfolioAggregationFunctions getPortfolioAggregators() {
     return _portfolioAggregators;
   }
 
-  public void setPortfolioAggregators(List<AggregationFunction<?>> portfolioAggregators) {
+  public void setPortfolioAggregators(PortfolioAggregationFunctions portfolioAggregators) {
     _portfolioAggregators = portfolioAggregators;
   }
 
@@ -119,11 +116,6 @@ public class LiveResultsServiceBean implements ServletContextAware {
     _user = user;
   }
 
-  @Override
-  public void setServletContext(final ServletContext servletContext) {
-    _servletContext = servletContext;
-  }
-  
   protected void setBayeux(final Bayeux bayeux) {
     _bayeux = bayeux;
   }
@@ -152,9 +144,31 @@ public class LiveResultsServiceBean implements ServletContextAware {
     return _liveResultsService;
   }
 
-  public void afterPropertiesSet() {
-    setBayeux((Bayeux) _servletContext.getAttribute(Bayeux.ATTRIBUTE));
-    
+  //-------------------------------------------------------------------------
+  /**
+   * Initialises the service.
+   * 
+   * @param servletContext  the servlet context, not null
+   */
+  public void init(ServletContext servletContext) {
+    setBayeux((Bayeux) servletContext.getAttribute(Bayeux.ATTRIBUTE));
+    init();
+  }
+
+  /**
+   * Initializes the service.
+   * 
+   * @param bayeux  the bayeux instance, not null
+   */
+  public void init(Bayeux bayeux) {
+    setBayeux(bayeux);
+    init();
+  }
+
+  /**
+   * Initializes the service, where the Bayeux instance must be set.
+   */
+  protected void init() {
     if (getViewProcessor() == null) {
       throw new IllegalStateException("View processor not set");
     }
@@ -167,12 +181,12 @@ public class LiveResultsServiceBean implements ServletContextAware {
     // TODO this is a hack at the moment; there should be a life cycle method on the bean from the container that we start and stop the service from ...
     _liveResultsService = createLiveResultsService();
   }
-  
-  public LiveResultsService createLiveResultsService() {
+
+  protected LiveResultsService createLiveResultsService() {
     return new LiveResultsService(getBayeux(), getViewProcessor(), getPositionSource(), getSecuritySource(),
         getUserPortfolioMaster(), getUserPositionMaster(), getUserViewDefinitionRepository(), getSnapshotMaster(),
-        getUser(), getExecutorService(), getFudgeContext(), getViewProcessor().getLiveMarketDataSourceRegistry(),
+        getUser(), getExecutorService(), getFudgeContext(), getViewProcessor().getNamedMarketDataSpecificationRepository(),
         getPortfolioAggregators());
   }
- 
+
 }

@@ -18,23 +18,16 @@ import javax.time.calendar.LocalDate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.Resource;
 
 import au.com.bytecode.opencsv.CSVReader;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
 
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundleWithDates;
 import com.opengamma.id.ExternalIdWithDates;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoDocument;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
-import com.opengamma.masterdb.historicaltimeseries.DbHistoricalTimeSeriesMaster;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.PlatformConfigUtils;
-import com.opengamma.util.PlatformConfigUtils.RunMode;
 import com.opengamma.util.time.DateUtils;
 import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.timeseries.localdate.MapLocalDateDoubleTimeSeries;
@@ -46,38 +39,46 @@ import com.opengamma.util.tuple.Pair;
  * <identification-scheme>, <identifier-value>, <datafield>, <value>
  */
 public class SimulatedHistoricalDataGenerator {
-  private static final String OG_DATA_PROVIDER = "OG_DATA_PROVIDER";
 
-  private static final String OG_DATA_SOURCE = "OG_DATA_SOURCE";
+  /**
+   * OG Simulated data provider name
+   */
+  public static final String OG_DATA_PROVIDER = "OG_DATA_PROVIDER";
+
+  /**
+   * OG Simulated data source name
+   */
+  public static final String OG_DATA_SOURCE = "OG_DATA_SOURCE";
 
   private static final Logger s_logger = LoggerFactory.getLogger(SimulatedHistoricalDataGenerator.class);
   
-  private final DbHistoricalTimeSeriesMaster _htsMaster;
+  private final HistoricalTimeSeriesMaster _htsMaster;
   private Map<Pair<ExternalId, String>, Double> _initialValues = new HashMap<Pair<ExternalId, String>, Double>();
 
   private static final int NUM_FIELDS = 4;
   private static final double SCALING_FACTOR = 0.005; // i.e. 0.5% * 1SD
   private static final int TS_LENGTH = 2; // length of timeseries in years
   
-  public SimulatedHistoricalDataGenerator(DbHistoricalTimeSeriesMaster htsMaster, Resource initialValuesFile) {
+  public SimulatedHistoricalDataGenerator(HistoricalTimeSeriesMaster htsMaster) {
     ArgumentChecker.notNull(htsMaster, "htsMaster");
-    ArgumentChecker.notNull(initialValuesFile, "initialValuesFile");
     _htsMaster = htsMaster;
-    readInitialValues(initialValuesFile);
+    readInitialValues(_initialValues);
   }
-  
-  public void readInitialValues(Resource initialValuesFile) {
+
+  private static void readInitialValues(Map<Pair<ExternalId, String>, Double> initialValues) {
     try {
-      CSVReader reader = new CSVReader(new BufferedReader(new InputStreamReader(initialValuesFile.getInputStream())));
+      CSVReader reader = new CSVReader(new BufferedReader(new InputStreamReader(SimulatedHistoricalDataGenerator.class.getResourceAsStream("historical-data.csv"))));
       // Read header row
       @SuppressWarnings("unused")
       String[] headers = reader.readNext();
       String[] line;
-      int lineNum = 1;
+      int lineNum = 0;
       while ((line = reader.readNext()) != null) {
         lineNum++;
-        if (line.length != NUM_FIELDS) {
-          s_logger.error("Not enough fields in CSV on line " + lineNum);
+        if ((line.length == 0) || line[0].startsWith("#")) {
+          s_logger.debug("Empty line on {}", lineNum);
+        } else if (line.length != NUM_FIELDS) {
+          s_logger.error("Invalid number of fields ({}) in CSV on line {}", line.length, lineNum);
         } else {
           String scheme = line[0];
           String identifier = line[1];
@@ -85,7 +86,7 @@ public class SimulatedHistoricalDataGenerator {
           String valueStr = line[3];
           Double value = Double.parseDouble(valueStr);
           ExternalId id = ExternalId.of(scheme, identifier);
-          _initialValues.put(Pair.of(id, fieldName), value);
+          initialValues.put(Pair.of(id, fieldName), value);
         }
       }
     } catch (FileNotFoundException e) {
@@ -94,7 +95,8 @@ public class SimulatedHistoricalDataGenerator {
       e.printStackTrace();
     }    
   }
-  
+
+  //-------------------------------------------------------------------------
   public void run() {
     Random random = new Random(); // noMarket need for SecureRandom here..
     StringBuilder buf = new StringBuilder("loading ").append(_initialValues.size()).append(" timeseries");
@@ -118,12 +120,14 @@ public class SimulatedHistoricalDataGenerator {
     }
     s_logger.info(buf.toString());
   }
-  
+
   private LocalDateDoubleTimeSeries getHistoricalDataPoints(Random random, Double startValue, int tsLength) {
     MapLocalDateDoubleTimeSeries result = new MapLocalDateDoubleTimeSeries();
     LocalDate date = DateUtils.previousWeekDay(LocalDate.now().minusYears(tsLength));
+    double currentValue = startValue;
     do {
-      result.putDataPoint(date, wiggleValue(random, startValue));
+      currentValue = wiggleValue(random, currentValue);
+      result.putDataPoint(date, currentValue);
       date = DateUtils.nextWeekDay(date);
     } while (date.isBefore(LocalDate.now()));
     return result;
@@ -134,43 +138,5 @@ public class SimulatedHistoricalDataGenerator {
     //s_logger.warn("wiggleValue = {}", result);
     return result;
   }
-  
-  //-------------------------------------------------------------------------
-  /**
-   * Sets up and loads the database.
-   * <p>
-   * This loader requires a Spring configuration file that defines the security,
-   * position and portfolio masters, together with an instance of this bean
-   * under the name "simulatedHistoricalDataGenerator".
-   * 
-   * @param args  the arguments, unused
-   */
-  public static void main(String[] args) {  // CSIGNORE
-    try {
-      LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-      JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(lc);
-      lc.reset(); 
-      configurator.doConfigure("src/com/opengamma/examples/server/logback.xml");
-      
-      // Set the run mode to EXAMPLE so we use the HSQLDB example database.
-      PlatformConfigUtils.configureSystemProperties(RunMode.EXAMPLE);
-      System.out.println("Starting connections");
-      AbstractApplicationContext appContext = new ClassPathXmlApplicationContext("demoPortfolioLoader.xml");
-      appContext.start();
-      
-      try {
-        SimulatedHistoricalDataGenerator loader = appContext.getBean("simulatedHistoricalDataGenerator", SimulatedHistoricalDataGenerator.class);
-        System.out.println("Loading data");
-        loader.run();
-      } finally {
-        appContext.close();
-      }
-      System.out.println("Finished");
-      
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-    System.exit(0);
-  }
+
 }

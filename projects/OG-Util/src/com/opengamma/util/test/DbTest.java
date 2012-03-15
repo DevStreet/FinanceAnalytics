@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -114,6 +115,11 @@ public abstract class DbTest implements TableCreationCallback {
   @AfterMethod
   public void tearDown() throws Exception {
     _dbtool.resetTestCatalog(); // avoids locking issues with Derby
+  }
+
+  @AfterClass
+  public void tearDownClass() throws Exception {
+    _dbtool.close();
   }
 
   @AfterSuite
@@ -219,7 +225,7 @@ public abstract class DbTest implements TableCreationCallback {
   }
 
   public DataSourceTransactionManager getTransactionManager() {
-    return getDbTool().getTransactionManager();
+    return new DataSourceTransactionManager(getDbTool().getDataSource());
   }
 
   public DbConnector getDbConnector() {
@@ -230,7 +236,7 @@ public abstract class DbTest implements TableCreationCallback {
     DbConnectorFactoryBean factory = new DbConnectorFactoryBean();
     factory.setName("DbTest");
     factory.setDialect(dbDialect);
-    factory.setDataSource(getTransactionManager().getDataSource());
+    factory.setDataSource(getDbTool().getDataSource());
     factory.setTransactionIsolationLevelName("ISOLATION_READ_COMMITTED");
     factory.setTransactionPropagationBehaviorName("PROPAGATION_REQUIRED");
     return factory.createObject();
@@ -250,7 +256,7 @@ public abstract class DbTest implements TableCreationCallback {
    * Override this if you wish to do something with the database while it is in its "upgrading" state - e.g. populate with test data
    * at a particular version to test the data transformations on the next version upgrades.
    */
-  public void tablesCreatedOrUpgraded(final String version) {
+  public void tablesCreatedOrUpgraded(final String version, final String prefix) {
     // No action 
   }
 

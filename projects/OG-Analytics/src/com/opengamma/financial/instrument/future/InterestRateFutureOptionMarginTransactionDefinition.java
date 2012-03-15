@@ -12,8 +12,8 @@ import org.apache.commons.lang.Validate;
 
 import com.opengamma.financial.instrument.InstrumentDefinitionVisitor;
 import com.opengamma.financial.instrument.InstrumentDefinitionWithData;
-import com.opengamma.financial.interestrate.future.definition.InterestRateFutureOptionMarginSecurity;
-import com.opengamma.financial.interestrate.future.definition.InterestRateFutureOptionMarginTransaction;
+import com.opengamma.financial.interestrate.future.derivative.InterestRateFutureOptionMarginSecurity;
+import com.opengamma.financial.interestrate.future.derivative.InterestRateFutureOptionMarginTransaction;
 
 /**
  * Description of transaction on an interest rate future option security with daily margining process (LIFFE and Eurex type).
@@ -91,6 +91,9 @@ public class InterestRateFutureOptionMarginTransactionDefinition implements Inst
   }
 
   @Override
+  /**
+   * The lastMarginPrice is the last closing price used for margining. It is usually the official closing price of the previous business day.
+   */
   public InterestRateFutureOptionMarginTransaction toDerivative(ZonedDateTime date, Double lastMarginPrice, String... yieldCurveNames) {
     Validate.notNull(date, "date");
     Validate.notNull(yieldCurveNames, "yield curve names");

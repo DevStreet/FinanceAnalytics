@@ -6,24 +6,26 @@
 
 package com.opengamma.masterdb.security.hibernate.cash;
 
+import java.util.Map;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.joda.beans.BeanDefinition;
-import org.joda.beans.PropertyDefinition;
-
-import com.opengamma.financial.security.cash.CashSecurity;
-import com.opengamma.masterdb.security.hibernate.CurrencyBean;
-import com.opengamma.masterdb.security.hibernate.ExternalIdBean;
-import com.opengamma.masterdb.security.hibernate.SecurityBean;
-import com.opengamma.masterdb.security.hibernate.ZonedDateTimeBean;
-import java.util.Map;
 import org.joda.beans.BeanBuilder;
+import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
 import org.joda.beans.MetaProperty;
 import org.joda.beans.Property;
+import org.joda.beans.PropertyDefinition;
 import org.joda.beans.impl.direct.DirectBeanBuilder;
 import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
+
+import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.masterdb.security.hibernate.CurrencyBean;
+import com.opengamma.masterdb.security.hibernate.DayCountBean;
+import com.opengamma.masterdb.security.hibernate.ExternalIdBean;
+import com.opengamma.masterdb.security.hibernate.SecurityBean;
+import com.opengamma.masterdb.security.hibernate.ZonedDateTimeBean;
 
 /**
  * A bean representation of {@link CashSecurity}.
@@ -35,7 +37,11 @@ public class CashSecurityBean extends SecurityBean {
   @PropertyDefinition
   private ExternalIdBean _region;
   @PropertyDefinition
+  private ZonedDateTimeBean _start;
+  @PropertyDefinition
   private ZonedDateTimeBean _maturity;
+  @PropertyDefinition
+  private DayCountBean _dayCount;
   @PropertyDefinition
   private double _rate;
   @PropertyDefinition
@@ -51,7 +57,9 @@ public class CashSecurityBean extends SecurityBean {
       .append(getId(), cash.getId())
       .append(getCurrency(), cash.getCurrency())
       .append(getRegion(), cash.getRegion())
+      .append(getStart(), cash.getStart())
       .append(getMaturity(), cash.getMaturity())
+      .append(getDayCount(), cash.getDayCount())
       .append(getRate(), cash.getRate())
       .append(getAmount(), cash.getAmount()).isEquals();
   }
@@ -61,7 +69,9 @@ public class CashSecurityBean extends SecurityBean {
     return new HashCodeBuilder()
       .append(getCurrency())
       .append(getRegion())
+      .append(getStart())
       .append(getMaturity())
+      .append(getDayCount())
       .append(getRate())
       .append(getAmount())
       .toHashCode();
@@ -91,8 +101,12 @@ public class CashSecurityBean extends SecurityBean {
         return getCurrency();
       case -934795532:  // region
         return getRegion();
+      case 109757538:  // start
+        return getStart();
       case 313843601:  // maturity
         return getMaturity();
+      case 1905311443:  // dayCount
+        return getDayCount();
       case 3493088:  // rate
         return getRate();
       case -1413853096:  // amount
@@ -110,8 +124,14 @@ public class CashSecurityBean extends SecurityBean {
       case -934795532:  // region
         setRegion((ExternalIdBean) newValue);
         return;
+      case 109757538:  // start
+        setStart((ZonedDateTimeBean) newValue);
+        return;
       case 313843601:  // maturity
         setMaturity((ZonedDateTimeBean) newValue);
+        return;
+      case 1905311443:  // dayCount
+        setDayCount((DayCountBean) newValue);
         return;
       case 3493088:  // rate
         setRate((Double) newValue);
@@ -175,6 +195,31 @@ public class CashSecurityBean extends SecurityBean {
 
   //-----------------------------------------------------------------------
   /**
+   * Gets the start.
+   * @return the value of the property
+   */
+  public ZonedDateTimeBean getStart() {
+    return _start;
+  }
+
+  /**
+   * Sets the start.
+   * @param start  the new value of the property
+   */
+  public void setStart(ZonedDateTimeBean start) {
+    this._start = start;
+  }
+
+  /**
+   * Gets the the {@code start} property.
+   * @return the property, not null
+   */
+  public final Property<ZonedDateTimeBean> start() {
+    return metaBean().start().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * Gets the maturity.
    * @return the value of the property
    */
@@ -196,6 +241,31 @@ public class CashSecurityBean extends SecurityBean {
    */
   public final Property<ZonedDateTimeBean> maturity() {
     return metaBean().maturity().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the dayCount.
+   * @return the value of the property
+   */
+  public DayCountBean getDayCount() {
+    return _dayCount;
+  }
+
+  /**
+   * Sets the dayCount.
+   * @param dayCount  the new value of the property
+   */
+  public void setDayCount(DayCountBean dayCount) {
+    this._dayCount = dayCount;
+  }
+
+  /**
+   * Gets the the {@code dayCount} property.
+   * @return the property, not null
+   */
+  public final Property<DayCountBean> dayCount() {
+    return metaBean().dayCount().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
@@ -269,10 +339,20 @@ public class CashSecurityBean extends SecurityBean {
     private final MetaProperty<ExternalIdBean> _region = DirectMetaProperty.ofReadWrite(
         this, "region", CashSecurityBean.class, ExternalIdBean.class);
     /**
+     * The meta-property for the {@code start} property.
+     */
+    private final MetaProperty<ZonedDateTimeBean> _start = DirectMetaProperty.ofReadWrite(
+        this, "start", CashSecurityBean.class, ZonedDateTimeBean.class);
+    /**
      * The meta-property for the {@code maturity} property.
      */
     private final MetaProperty<ZonedDateTimeBean> _maturity = DirectMetaProperty.ofReadWrite(
         this, "maturity", CashSecurityBean.class, ZonedDateTimeBean.class);
+    /**
+     * The meta-property for the {@code dayCount} property.
+     */
+    private final MetaProperty<DayCountBean> _dayCount = DirectMetaProperty.ofReadWrite(
+        this, "dayCount", CashSecurityBean.class, DayCountBean.class);
     /**
      * The meta-property for the {@code rate} property.
      */
@@ -286,11 +366,13 @@ public class CashSecurityBean extends SecurityBean {
     /**
      * The meta-properties.
      */
-    private final Map<String, MetaProperty<Object>> _map = new DirectMetaPropertyMap(
+    private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
       this, (DirectMetaPropertyMap) super.metaPropertyMap(),
         "currency",
         "region",
+        "start",
         "maturity",
+        "dayCount",
         "rate",
         "amount");
 
@@ -307,8 +389,12 @@ public class CashSecurityBean extends SecurityBean {
           return _currency;
         case -934795532:  // region
           return _region;
+        case 109757538:  // start
+          return _start;
         case 313843601:  // maturity
           return _maturity;
+        case 1905311443:  // dayCount
+          return _dayCount;
         case 3493088:  // rate
           return _rate;
         case -1413853096:  // amount
@@ -328,8 +414,8 @@ public class CashSecurityBean extends SecurityBean {
     }
 
     @Override
-    public Map<String, MetaProperty<Object>> metaPropertyMap() {
-      return _map;
+    public Map<String, MetaProperty<?>> metaPropertyMap() {
+      return _metaPropertyMap$;
     }
 
     //-----------------------------------------------------------------------
@@ -350,11 +436,27 @@ public class CashSecurityBean extends SecurityBean {
     }
 
     /**
+     * The meta-property for the {@code start} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<ZonedDateTimeBean> start() {
+      return _start;
+    }
+
+    /**
      * The meta-property for the {@code maturity} property.
      * @return the meta-property, not null
      */
     public final MetaProperty<ZonedDateTimeBean> maturity() {
       return _maturity;
+    }
+
+    /**
+     * The meta-property for the {@code dayCount} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<DayCountBean> dayCount() {
+      return _dayCount;
     }
 
     /**

@@ -1,4 +1,5 @@
 <#escape x as x?html>
+<#setting number_format="0.#####">
 {
     "template_data": {
     <#switch security.securityType>
@@ -212,18 +213,18 @@
       <#case "FX_FORWARD">
         "forwardDate":"${security.forwardDate.toLocalDate()} - ${security.forwardDate.zone}",
         "region":"${security.regionId.scheme}-${security.regionId.value}",
-        "underlyingId":"${security.underlyingId.scheme}-${security.underlyingId.value}",
-        <#if underlyingSecurity??>
-              "underlyingName":"${underlyingSecurity.name}",
-              "underlyingOid":"${underlyingSecurity.uniqueId.objectId}",
-        </#if>
-      <#break>
-      <#case "FX">
-        "payAmount":"${security.payAmount}",
         "payCurrency":"${security.payCurrency}",
-        "receiveAmount":"${security.receiveAmount}",
+        "payAmount":"${security.payAmount}",
         "receiveCurrency":"${security.receiveCurrency}",
+        "receiveAmount":"${security.receiveAmount}",
+      <#break>
+      <#case "NON_DELIVERABLE_FX_FORWARD">
+        "forwardDate":"${security.forwardDate.toLocalDate()} - ${security.forwardDate.zone}",
         "region":"${security.regionId.scheme}-${security.regionId.value}",
+        "payCurrency":"${security.payCurrency}",
+        "payAmount":"${security.payAmount}",
+        "receiveCurrency":"${security.receiveCurrency}",
+        "receiveAmount":"${security.receiveAmount}",
       <#break>
       <#case "FX_BARRIER_OPTION">
         "barrierDirection":"${security.barrierDirection}",
@@ -247,8 +248,29 @@
         "putAmount":"${security.putAmount}",
         "putCurrency":"${security.putCurrency}",
         "settlementDate":"${security.settlementDate.toLocalDate()} - ${security.settlementDate.zone}",
+        "exerciseType":"${security.exerciseType.name}",
       <#break>
       <#case "NONDELIVERABLE_FX_OPTION">
+        "callAmount":"${security.callAmount}",
+        "callCurrency":"${security.callCurrency}",
+        "expiry":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
+        "isLong":"${security.long?string?upper_case}",
+        "putAmount":"${security.putAmount}",
+        "putCurrency":"${security.putCurrency}",
+        "settlementDate":"${security.settlementDate.toLocalDate()} - ${security.settlementDate.zone}",
+        "deliveryCurrency":"${security.deliveryCurrency}",
+        "exerciseType":"${security.exerciseType.name}",
+      <#break>
+      <#case "FX_DIGITAL_OPTION">
+        "callAmount":"${security.callAmount}",
+        "callCurrency":"${security.callCurrency}",
+        "expiry":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
+        "isLong":"${security.long?string?upper_case}",
+        "putAmount":"${security.putAmount}",
+        "putCurrency":"${security.putCurrency}",
+        "settlementDate":"${security.settlementDate.toLocalDate()} - ${security.settlementDate.zone}",
+      <#break>
+      <#case "NONDELIVERABLE_FX_DIGITAL_OPTION">
         "callAmount":"${security.callAmount}",
         "callCurrency":"${security.callCurrency}",
         "expiry":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
@@ -287,7 +309,7 @@
       <#break>
       <#case "IRFUTURE_OPTION">
         "currency":"${security.currency}",
-        "exchange":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
+       	"exchange":"${security.exchange}",
         "exerciseType":"${customRenderer.printExerciseType(security.exerciseType)}",
         "expiry":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
         "isMargined":"${security.margined?string?upper_case}",
@@ -303,7 +325,7 @@
       <#break>
        <#case "EQUITY_INDEX_FUTURE_OPTION">
         "currency":"${security.currency}",
-        "exchange":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
+       	"exchange":"${security.exchange}",
         "exerciseType":"${customRenderer.printExerciseType(security.exerciseType)}",
         "expiry":"${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}",
         "isMargined":"${security.margined?string?upper_case}",
@@ -388,6 +410,57 @@
         "regionId":"${security.regionId.scheme} - ${security.regionId.value}",
         "observationFrequency":"${security.observationFrequency.conventionName}",
       <#break>  
+      <#case "EXTERNAL_SENSITIVITIES_SECURITY">
+        "id":"${securityEntryData.id}",
+        "currency":"${securityEntryData.currency}",
+        "maturityDate":"${securityEntryData.maturityDate}",
+        "factorSetId":"${securityEntryData.factorSetId}",
+        <#if securityAttributes??>
+          "attributes":{
+            <#list securityAttributes?keys as key>
+              <#assign value = securityAttributes[key]>
+                "${key}" : "${value}"
+              <#if key_has_next>,</#if>
+            </#list>
+          },
+        </#if>
+        <#if factorExposuresList??>
+          "factors":[
+            <#list factorExposuresList as factorExposure>
+              {
+                "factorType":"${factorExposure.factorType}",
+                "factorName":"${factorExposure.factorName}",
+                "node":"${factorExposure.node}",
+                "priceTsId":"${factorExposure.priceTsId}",
+                "lastPrice":"${factorExposure.lastPrice}",
+                "exposureTsId":"${factorExposure.exposureTsId}",
+                "lastExposure":"${factorExposure.lastExposure}",
+                "convexityTsId":"${factorExposure.convexityTsId}",
+                "lastConvexity":"${factorExposure.lastConvexity}"   
+              }
+              <#if factorExposure_has_next>,</#if>
+            </#list>
+          ],
+        </#if>
+      <#break>
+      <#case "EXTERNAL_SENSITIVITY_RISK_FACTORS">
+        "factors":[
+          <#list factorExposuresList as factorExposure>
+            {
+              "factorType":"${factorExposure.factorType}",
+              "factorName":"${factorExposure.factorName}",
+              "node":"${factorExposure.node}",
+              "priceTsId":"${factorExposure.priceTsId}",
+              "lastPrice":"${factorExposure.lastPrice}",
+              "exposureTsId":"${factorExposure.exposureTsId}",
+              "lastExposure":"${factorExposure.lastExposure}",
+              "convexityTsId":"${factorExposure.convexityTsId}",
+              "lastConvexity":"${factorExposure.lastConvexity}"   
+            }
+            <#if factorExposure_has_next>,</#if>
+          </#list>
+        ],
+      <#break>
     </#switch>
     "name": "${security.name}",
     "object_id": "${security.uniqueId.objectId}",

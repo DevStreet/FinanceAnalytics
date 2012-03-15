@@ -94,6 +94,8 @@ public final class FixedIncomeInstrumentCurveExposureHelper {
     switch (type) {
       case SWAP_FIXED_IBOR:
         return new String[] {fundingCurveName, forwardCurveName };
+      case SWAP_FIXED_IBOR_WITH_SPREAD:
+        return new String[] {fundingCurveName, forwardCurveName };
       case SWAP_IBOR_IBOR:
         return new String[] {fundingCurveName, forwardCurveName, forwardCurveName };
       case CASH:
@@ -111,17 +113,12 @@ public final class FixedIncomeInstrumentCurveExposureHelper {
       case SWAP_CMS_CMS:
         return new String[] {fundingCurveName, forwardCurveName };
       case BOND_FUTURE:
-        return new String[] {fundingCurveName, fundingCurveName};
+        return new String[] {fundingCurveName, fundingCurveName };
+      case SWAP_FIXED_OIS:
+        return new String[] {fundingCurveName, fundingCurveName };
       default:
         throw new OpenGammaRuntimeException("Could not find " + type + " in security instrument list");
     }
-  }
-
-  public static ValueProperties.Builder valuePropertiesForSecurity(final FinancialSecurity security, final ValueProperties.Builder properties) {
-    final Currency ccy = FinancialSecurityUtils.getCurrency(security);
-    // REVIEW 2011-11-25 andrew -- Curve currency makes sense, but is adding the currency wise here? Are we always generating monetary values?
-    properties.with(ValuePropertyNames.CURVE_CURRENCY, ccy.getCode()).with(ValuePropertyNames.CURRENCY, ccy.getCode());
-    return properties;
   }
 
   /**

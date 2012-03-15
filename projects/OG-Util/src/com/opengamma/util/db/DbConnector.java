@@ -5,6 +5,10 @@
  */
 package com.opengamma.util.db;
 
+
+import static com.opengamma.util.db.HibernateDbUtils.fixSQLExceptionCause;
+
+import java.io.Closeable;
 import java.sql.Timestamp;
 
 import javax.sql.DataSource;
@@ -12,13 +16,21 @@ import javax.time.Instant;
 import javax.time.TimeSource;
 
 import org.hibernate.SessionFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.opengamma.util.ArgumentChecker;
+import com.opengamma.util.ReflectionUtils;
 import com.opengamma.util.time.DateUtils;
+
 
 /**
  * Connector used to access SQL databases.
@@ -29,7 +41,7 @@ import com.opengamma.util.time.DateUtils;
  * <p>
  * This class is usually configured using the associated factory bean.
  */
-public class DbConnector {
+public class DbConnector implements Closeable {
 
   static {
     DateUtils.initTimeZone();
@@ -149,6 +161,25 @@ public class DbConnector {
     return _hibernateTemplate;
   }
 
+  /**
+   * Gets the simple Hibernate transaction template.
+   * 
+   * @return the Hibernate transaction template, not null
+   */
+  public HibernateTransactionTemplate getHibernateTransactionTemplate() {
+    return new HibernateTransactionTemplate();
+  }
+
+  /**
+   * Gets the retrying Hibernate transaction template.
+   * 
+   * @param retries how many maximum retires should be tried
+   * @return the retrying Hibernate transaction template, not null
+   */
+  public HibernateTransactionTemplateRetrying getHibernateTransactionTemplateRetrying(int retries) {
+    return new HibernateTransactionTemplateRetrying(retries);
+  }
+
   //-------------------------------------------------------------------------
   /**
    * Gets the transaction manager.
@@ -170,6 +201,17 @@ public class DbConnector {
    */
   public TransactionTemplate getTransactionTemplate() {
     return _transactionTemplate;
+  }
+
+
+  /**
+   * Gets the retrying transaction template.
+   * <p>
+   * @param retries how many maximum retires should be tried
+   * @return the retrying transaction template
+   */
+  public TransactionTemplateRetrying getTransactionTemplateRetrying(int retries) {
+    return new TransactionTemplateRetrying(retries);
   }
 
   //-------------------------------------------------------------------------
@@ -200,6 +242,15 @@ public class DbConnector {
   }
 
   //-------------------------------------------------------------------------
+  @Override
+  public void close() {
+    ReflectionUtils.close(getDataSource());
+    ReflectionUtils.close(getTransactionManager());
+    ReflectionUtils.close(getHibernateSessionFactory());
+    getDialect().close();
+  }
+
+  //-------------------------------------------------------------------------
   /**
    * Returns a description of this object suitable for debugging.
    * 
@@ -208,6 +259,97 @@ public class DbConnector {
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[" + _name + "]";
+  }
+
+  //-------------------------------------------------------------------------
+  /**
+   * The retrying template.
+   */
+  public class TransactionTemplateRetrying {
+    private final int _retries;
+    private final TransactionTemplate _transactionTemplate;
+
+    TransactionTemplateRetrying(int retries) {
+      _retries = retries;
+      _transactionTemplate = getTransactionTemplate();
+    }
+
+    public <T> T execute(TransactionCallback<T> action) throws TransactionException {
+      // retry to handle concurrent conflicting inserts into unique content tables
+      for (int retry = 0; true; retry++) {
+        try {
+          return _transactionTemplate.execute(action);
+        } catch (DataIntegrityViolationException ex) {
+          if (retry == _retries) {
+            throw ex;
+          }
+        } catch (DataAccessException ex) {
+          throw fixSQLExceptionCause(ex);
+        }
+      }
+    }
+  }
+
+  /**
+   * The standard template.
+   */
+  public class HibernateTransactionTemplate {
+    private final TransactionTemplate _transactionTemplate;
+    private final HibernateTemplate _hibernateTemplate;
+
+    HibernateTransactionTemplate() {
+      _transactionTemplate = getTransactionTemplate();
+      _hibernateTemplate = getHibernateTemplate();
+    }
+
+    public <T> T execute(final HibernateCallback<T> action) throws TransactionException {
+      try {
+        return _transactionTemplate.execute(new TransactionCallback<T>() {
+          @Override
+          public T doInTransaction(TransactionStatus status) {
+            return _hibernateTemplate.execute(action);
+          }
+        });
+      } catch (DataAccessException ex) {
+        throw fixSQLExceptionCause(ex);
+      }
+    }
+  }
+
+  /**
+   * The retrying template.
+   */
+  public class HibernateTransactionTemplateRetrying {
+    private final int _retries;
+    private final TransactionTemplate _transactionTemplate;
+    private final HibernateTemplate _hibernateTemplate;
+
+    HibernateTransactionTemplateRetrying(int retries) {
+      _retries = retries;
+      _transactionTemplate = getTransactionTemplate();
+      _hibernateTemplate = getHibernateTemplate();
+      _hibernateTemplate.setAllowCreate(false);
+    }
+
+    public <T> T execute(final HibernateCallback<T> action) throws TransactionException {
+      // retry to handle concurrent conflicting inserts into unique content tables
+      for (int retry = 0; true; retry++) {
+        try {
+          return _transactionTemplate.execute(new TransactionCallback<T>() {
+            @Override
+            public T doInTransaction(TransactionStatus status) {
+              return _hibernateTemplate.execute(action);
+            }
+          });
+        } catch (DataIntegrityViolationException ex) {
+          if (retry == _retries) {
+            throw ex;
+          }
+        } catch (DataAccessException ex) {
+          throw fixSQLExceptionCause(ex);
+        }
+      }
+    }
   }
 
 }

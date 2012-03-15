@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -78,20 +77,33 @@ public class UriEndPointDescriptionProvider implements EndPointDescriptionProvid
   }
 
   /**
-   * 
+   * Validation service to extract a URI that can be contacted. E.g. if the remote description publishes a
+   * number of alternative ones for failover/redundancy purposes.
    */
   public static final class Validater {
 
-    private final ExecutorService _executor = Executors.newCachedThreadPool();
     private final Client _client = Client.create();
+    private final ExecutorService _executor;
+    private final URI _baseURI;
 
-    private Validater() {
-      _client.setReadTimeout(5000);
+    private Validater(final ExecutorService executorService, final URI baseURI) {
+      _executor = executorService;
+      _baseURI = baseURI;
+      _client.setReadTimeout(10000);
+    }
+
+    private boolean validateType(final FudgeMsg endPoint) {
+      for (FudgeField typeField : endPoint.getAllByName(TYPE_KEY)) {
+        if (TYPE_VALUE.equals(typeField.getValue())) {
+          return true;
+        }
+      }
+      return false;
     }
 
     public URI getAccessibleURI(final FudgeMsg endPoint) {
       ArgumentChecker.notNull(endPoint, "endPoint");
-      if (!TYPE_VALUE.equals(endPoint.getString(TYPE_KEY))) {
+      if (!validateType(endPoint)) {
         throw new IllegalArgumentException("End point is not a REST target - " + endPoint);
       }
       final BlockingQueue<URI> result = new LinkedBlockingQueue<URI>();
@@ -100,7 +112,8 @@ public class UriEndPointDescriptionProvider implements EndPointDescriptionProvid
           @Override
           public void run() {
             try {
-              final URI uri = new URI(endPoint.getFieldValue(String.class, uriField));
+              final String uriString = endPoint.getFieldValue(String.class, uriField);
+              final URI uri = (_baseURI != null) ? _baseURI.resolve(uriString) : new URI(uriString);
               final int status = _client.resource(uri).head().getStatus();
               s_logger.debug("{} returned {}", uri, status);
               switch (status) {
@@ -118,7 +131,7 @@ public class UriEndPointDescriptionProvider implements EndPointDescriptionProvid
       }
       final URI uri;
       try {
-        uri = result.poll(5000, TimeUnit.MILLISECONDS);
+        uri = result.poll(10000, TimeUnit.MILLISECONDS);
       } catch (InterruptedException ex) {
         throw new OpenGammaRuntimeException("Interrupted", ex);
       }
@@ -136,17 +149,54 @@ public class UriEndPointDescriptionProvider implements EndPointDescriptionProvid
 
   }
 
-  public static Validater validater() {
-    return new Validater();
+  /**
+   * Creates a new validater.
+   * 
+   * @param executorService the executor to use for parallel resolution of targets
+   * @param baseURI the base URL that the original end point was described by (e.g. if it contains a relative reference)
+   * @return the validater
+   */
+  public static Validater validater(final ExecutorService executorService, final URI baseURI) {
+    return new Validater(executorService, baseURI);
   }
 
-  public static URI getAccessibleURI(final FudgeMsg endPoint) {
-    return validater().getAccessibleURI(endPoint);
+  /**
+   * Extracts a URI from a description message that responds to a http request.
+   * 
+   * @param executorService the executor to use for parallel resolution of targets
+   * @param baseURI the base URI that the original end point was described by (e.g. if it contains a relative reference)
+   * @param endPoint the end point description message
+   * @return a URI that responds, or null if there is none
+   */
+  public static URI getAccessibleURI(final ExecutorService executorService, final URI baseURI, final FudgeMsg endPoint) {
+    return validater(executorService, baseURI).getAccessibleURI(endPoint);
   }
 
-  public static URI getAccessibleURI(final FudgeContext fudgeContext, final EndPointDescriptionProvider endPointProvider) {
+  /**
+   * Extracts a URI from a description message provider.
+   * 
+   * @param executorService the executor to use for parallel resolution of targets
+   * @param fudgeContext the Fudge context to use for working with the end point description message
+   * @param baseURI the base URI that the original end point was described by (e.g. if it contains a relative reference)
+   * @param endPointProvider the end point description provider
+   * @return a URI that responds, or null if there is none
+   */
+  public static URI getAccessibleURI(final ExecutorService executorService, final FudgeContext fudgeContext, final URI baseURI, final EndPointDescriptionProvider endPointProvider) {
     ArgumentChecker.notNull(endPointProvider, "endPointProvider");
-    return getAccessibleURI(endPointProvider.getEndPointDescription(fudgeContext));
+    return getAccessibleURI(executorService, baseURI, endPointProvider.getEndPointDescription(fudgeContext));
+  }
+
+  /**
+   * Extracts a URI from a description message provider that operates over the network.
+   * 
+   * @param executorService the executor to use for parallel resolution of targets
+   * @param fudgeContext the Fudge context to use for working with the end point description message
+   * @param endPointProvider the end point description provider
+   * @return a URI that responds, or null if there is none
+   */
+  public static URI getAccessibleURI(final ExecutorService executorService, final FudgeContext fudgeContext, final RemoteEndPointDescriptionProvider endPointProvider) {
+    ArgumentChecker.notNull(endPointProvider, "endPointProvider");
+    return getAccessibleURI(executorService, fudgeContext, endPointProvider.getUri(), endPointProvider);
   }
 
 }

@@ -17,17 +17,17 @@ import com.opengamma.engine.function.CompiledFunctionService;
 import com.opengamma.engine.function.resolver.DefaultFunctionResolver;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.DummyOverrideOperationCompiler;
+import com.opengamma.engine.marketdata.NamedMarketDataSpecificationRepository;
 import com.opengamma.engine.marketdata.OverrideOperationCompiler;
-import com.opengamma.engine.marketdata.live.LiveMarketDataSourceRegistry;
 import com.opengamma.engine.marketdata.resolver.MarketDataProviderResolver;
 import com.opengamma.engine.view.cache.ViewComputationCacheSource;
 import com.opengamma.engine.view.calc.DependencyGraphExecutorFactory;
+import com.opengamma.engine.view.calc.ViewResultListenerFactory;
 import com.opengamma.engine.view.calc.stats.DiscardingGraphStatisticsGathererProvider;
 import com.opengamma.engine.view.calc.stats.GraphExecutorStatisticsGathererProvider;
 import com.opengamma.engine.view.calcnode.JobDispatcher;
 import com.opengamma.engine.view.calcnode.ViewProcessorQueryReceiver;
 import com.opengamma.engine.view.permission.ViewPermissionProvider;
-import com.opengamma.id.UniqueId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.SingletonFactoryBean;
 import com.opengamma.util.ehcache.EHCacheUtils;
@@ -37,13 +37,11 @@ import com.opengamma.util.ehcache.EHCacheUtils;
  */
 public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor> {
 
-  private static final String VIEW_PROCESSOR_ID_SCHEME = "Vp";
-  
   private static final Logger s_logger = LoggerFactory.getLogger(ViewProcessorFactoryBean.class);
-  
-  private Long _id;
+
+  private String _name;
   private ViewDefinitionRepository _viewDefinitionRepository;
-  private LiveMarketDataSourceRegistry _liveMarketDataSourceRegistry;
+  private NamedMarketDataSpecificationRepository _namedMarketDataSpecificationRepository;
   private SecuritySource _securitySource;
   private PositionSource _positionSource;
   private CachingComputationTargetResolver _computationTargetResolver;
@@ -57,14 +55,15 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
   private GraphExecutorStatisticsGathererProvider _graphExecutionStatistics = new DiscardingGraphStatisticsGathererProvider();
   private ViewPermissionProvider _viewPermissionProvider;
   private OverrideOperationCompiler _overrideOperationCompiler = new DummyOverrideOperationCompiler();
-  
+  private ViewResultListenerFactory _batchViewClientFactory;
+
   //-------------------------------------------------------------------------
-  public Long getId() {
-    return _id;
+  public String getName() {
+    return _name;
   }
 
-  public void setId(Long id) {
-    _id = id;
+  public void setName(String name) {
+    _name = name;
   }
 
   public ViewDefinitionRepository getViewDefinitionRepository() {
@@ -75,12 +74,12 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
     _viewDefinitionRepository = viewDefinitionRepository;
   }
   
-  public LiveMarketDataSourceRegistry getLiveMarketDataSourceRegistry() {
-    return _liveMarketDataSourceRegistry;
+  public NamedMarketDataSpecificationRepository getNamedMarketDataSpecificationRepository() {
+    return _namedMarketDataSpecificationRepository;
   }
 
-  public void setLiveMarketDataSourceRegistry(LiveMarketDataSourceRegistry liveMarketDataSourceRegistry) {
-    _liveMarketDataSourceRegistry = liveMarketDataSourceRegistry;
+  public void setNamedMarketDataSpecificationRepository(NamedMarketDataSpecificationRepository namedMarketDataSpecificationRepository) {
+    _namedMarketDataSpecificationRepository = namedMarketDataSpecificationRepository;
   }
 
   public SecuritySource getSecuritySource() {
@@ -190,9 +189,9 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
   //-------------------------------------------------------------------------
   protected void checkInjectedInputs() {
     s_logger.debug("Checking injected inputs.");
-    ArgumentChecker.notNullInjected(_id, "id");
+    ArgumentChecker.notNullInjected(_name, "id");
     ArgumentChecker.notNullInjected(getViewDefinitionRepository(), "viewDefinitionRepository");
-    ArgumentChecker.notNullInjected(getLiveMarketDataSourceRegistry(), "liveMarketDataSourceRegistry");
+    ArgumentChecker.notNullInjected(getNamedMarketDataSpecificationRepository(), "namedMarketDataSpecificationRepository");
     ArgumentChecker.notNullInjected(getFunctionCompilationService(), "functionCompilationService");
     if (getFunctionResolver() == null) {
       setFunctionResolver(new DefaultFunctionResolver(getFunctionCompilationService()));
@@ -213,9 +212,9 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
   public ViewProcessor createObject() {
     checkInjectedInputs();
     return new ViewProcessorImpl(
-        UniqueId.of(VIEW_PROCESSOR_ID_SCHEME, getId().toString()),
+        getName(),
         getViewDefinitionRepository(),
-        getLiveMarketDataSourceRegistry(),
+        getNamedMarketDataSpecificationRepository(),
         getSecuritySource(),
         getPositionSource(),
         getComputationTargetResolver(),
@@ -228,7 +227,15 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
         getDependencyGraphExecutorFactory(),
         getGraphExecutionStatistics(),
         getViewPermissionProvider(),
-        getOverrideOperationCompiler());
+        getOverrideOperationCompiler(),
+        getViewResultListenerFactory());
   }
 
+  public void setViewResultListenerFactory(ViewResultListenerFactory viewResultListenerFactory) {
+    _batchViewClientFactory = viewResultListenerFactory;
+  }
+
+  public ViewResultListenerFactory getViewResultListenerFactory() {
+    return _batchViewClientFactory;
+  }
 }

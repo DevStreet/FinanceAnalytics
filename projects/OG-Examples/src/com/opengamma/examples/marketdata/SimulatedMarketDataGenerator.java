@@ -15,6 +15,7 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.Lifecycle;
 import org.springframework.core.io.Resource;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -29,18 +30,20 @@ import com.opengamma.util.tuple.Pair;
  * <identification-scheme>, <identifier-value>, <requirement-name>, <value>
  * typically, for last price, you'd use "Market_Value" @see MarketDataRequirementNames
  */
-public class SimulatedMarketDataGenerator implements Runnable {
+public class SimulatedMarketDataGenerator implements Runnable, Lifecycle {
+
   private static final Logger s_logger = LoggerFactory.getLogger(SimulatedMarketDataGenerator.class);
+  private static final int NUM_FIELDS = 4;
+  private static final double SCALING_FACTOR = 0.005; // i.e. 0.5% * 1SD
+  private static final int MAX_MILLIS_BETWEEN_TICKS = 50;
+
   private MarketDataInjector _marketDataInjector;
   private Map<Pair<ExternalId, String>, Object> _initialValues = new HashMap<Pair<ExternalId, String>, Object>();
   @SuppressWarnings("unchecked")
   private Pair<ExternalId, String>[] _identifiers = new Pair[0];
-
-  private static final int NUM_FIELDS = 4;
-  private static final double SCALING_FACTOR = 0.005; // i.e. 0.5% * 1SD
-  private static final int MAX_MILLIS_BETWEEN_TICKS = 50;
   private Thread _backgroundUpdateThread;
-  
+  private volatile boolean _running;
+
   public SimulatedMarketDataGenerator(MarketDataInjector marketDataInjector, Resource initialValuesFile) {
     _marketDataInjector = marketDataInjector;
     readInitialValues(initialValuesFile);
@@ -56,6 +59,9 @@ public class SimulatedMarketDataGenerator implements Runnable {
       int lineNum = 1;
       while ((line = reader.readNext()) != null) {
         lineNum++;
+        if (line.length > 0 && line[0].startsWith("#")) {
+          continue;
+        }
         if (line.length != NUM_FIELDS) {
           s_logger.error("Not enough fields in CSV on line " + lineNum);
         } else {
@@ -78,20 +84,22 @@ public class SimulatedMarketDataGenerator implements Runnable {
     }    
   }
   
+  @Override
   public void start() {
+    _running = true;
     _backgroundUpdateThread = new Thread(this);
     _backgroundUpdateThread.start();
   }
   
   public void run() {
-    boolean running = true;
     Random random = new Random(); // no need for SecureRandom here..
-    while (running) {      
+    while (_running) {      
       Pair<ExternalId, String> idFieldPair = _identifiers[random.nextInt(_identifiers.length)];
       Object initialValue = _initialValues.get(idFieldPair);
       if (initialValue instanceof Double) {
         double value = wiggleValue(random, (Double) initialValue);
         _marketDataInjector.addValue(idFieldPair.getFirst(), idFieldPair.getSecond(), value);  
+        _initialValues.put(idFieldPair, value);
       } else {
         // in case we support non-scalars at some point.
         _marketDataInjector.addValue(idFieldPair.getFirst(), idFieldPair.getSecond(), initialValue);
@@ -104,10 +112,24 @@ public class SimulatedMarketDataGenerator implements Runnable {
       }
     }
   }
-  
+
   private double wiggleValue(Random random, double value) {
     double result = value + (random.nextGaussian() * (value * SCALING_FACTOR));
     //s_logger.warn("wiggleValue = {}", result);
     return result;
   }
+
+  /**
+   * Stops the generator.
+   */
+  @Override
+  public void stop() {
+    _running = false;
+  }
+
+  @Override
+  public boolean isRunning() {
+    return _running;
+  }
+
 }

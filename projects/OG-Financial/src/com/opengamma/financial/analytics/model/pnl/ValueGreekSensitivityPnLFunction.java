@@ -36,14 +36,17 @@ import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.OpenGammaExecutionContext;
 import com.opengamma.financial.analytics.greeks.AvailableValueGreeks;
 import com.opengamma.financial.analytics.model.riskfactor.option.UnderlyingTimeSeriesProvider;
-import com.opengamma.financial.analytics.timeseries.sampling.TimeSeriesSamplingFunction;
-import com.opengamma.financial.analytics.timeseries.sampling.TimeSeriesSamplingFunctionFactory;
+import com.opengamma.financial.convention.calendar.Calendar;
+import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
 import com.opengamma.financial.greeks.Greek;
 import com.opengamma.financial.pnl.SensitivityAndReturnDataBundle;
 import com.opengamma.financial.pnl.SensitivityPnLCalculator;
 import com.opengamma.financial.pnl.UnderlyingType;
+import com.opengamma.financial.schedule.HolidayDateRemovalFunction;
 import com.opengamma.financial.schedule.Schedule;
 import com.opengamma.financial.schedule.ScheduleCalculatorFactory;
+import com.opengamma.financial.schedule.TimeSeriesSamplingFunction;
+import com.opengamma.financial.schedule.TimeSeriesSamplingFunctionFactory;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.option.EquityOptionSecurity;
 import com.opengamma.financial.sensitivity.Sensitivity;
@@ -52,6 +55,7 @@ import com.opengamma.financial.sensitivity.ValueGreekSensitivity;
 import com.opengamma.financial.timeseries.returns.TimeSeriesReturnCalculator;
 import com.opengamma.financial.timeseries.returns.TimeSeriesReturnCalculatorFactory;
 import com.opengamma.util.timeseries.DoubleTimeSeries;
+import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 
 /**
  * Computes a Profit and Loss time series for a position based on value greeks.
@@ -61,6 +65,8 @@ import com.opengamma.util.timeseries.DoubleTimeSeries;
  * 
  */
 public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompiledInvoker {
+  private static final HolidayDateRemovalFunction HOLIDAY_REMOVER = HolidayDateRemovalFunction.getInstance();
+  private static final Calendar WEEKEND_CALENDAR = new MondayToFridayCalendar("Weekend");
   private static final Greek GREEK = Greek.DELTA;
   private static final String REQUIREMENT_NAME = ValueRequirementNames.VALUE_DELTA; //TODO remove hard-coding
   private static final SensitivityPnLCalculator PNL_CALCULATOR = new SensitivityPnLCalculator();
@@ -74,8 +80,8 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
   @Override
   public Set<ComputedValue> execute(final FunctionExecutionContext executionContext, final FunctionInputs inputs, final ComputationTarget target, final Set<ValueRequirement> desiredValues) {
     String currency = null;
-    for (ComputedValue value : inputs.getAllValues()) {
-      String newCurrency = value.getSpecification().getProperty(ValuePropertyNames.CURRENCY);
+    for (final ComputedValue value : inputs.getAllValues()) {
+      final String newCurrency = value.getSpecification().getProperty(ValuePropertyNames.CURRENCY);
       if (newCurrency != null) {
         if (currency != null && !currency.equals(newCurrency)) {
           return null;
@@ -106,27 +112,27 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
     final Map<UnderlyingType, DoubleTimeSeries<?>> tsReturns = new HashMap<UnderlyingType, DoubleTimeSeries<?>>();
     final Period samplingPeriod = getSamplingPeriod(samplingPeriodName);
     final LocalDate startDate = now.minus(samplingPeriod);
-    final Schedule scheduleCalculator = getScheduleCalculator(scheduleCalculatorName);     
+    final Schedule scheduleCalculator = getScheduleCalculator(scheduleCalculatorName);
     final TimeSeriesSamplingFunction samplingFunction = getSamplingFunction(samplingFunctionName);
     final TimeSeriesReturnCalculator returnCalculator = getTimeSeriesReturnCalculator(returnCalculatorName);
-    final LocalDate[] schedule = scheduleCalculator.getSchedule(startDate, now, true, false); //REVIEW emcleod should "fromEnd" be hard-coded? 
+    final LocalDate[] schedule = HOLIDAY_REMOVER.getStrippedSchedule(scheduleCalculator.getSchedule(startDate, now, true, false), WEEKEND_CALENDAR); //REVIEW emcleod should "fromEnd" be hard-coded?
     for (final UnderlyingType underlyingType : valueGreek.getUnderlyingGreek().getUnderlying().getUnderlyings()) {
       if (underlyingType != UnderlyingType.SPOT_PRICE) {
         throw new OpenGammaRuntimeException("Have hard-coded to only use delta; should not have anything with " + underlyingType + " as the underlying type");
       }
-      final DoubleTimeSeries<?> timeSeries = underlyingTimeSeriesProvider.getSeries(GREEK, security, startDate, now);
-      final DoubleTimeSeries<?> sampledTS = samplingFunction.getSampledTimeSeries(timeSeries, schedule);      
+      final LocalDateDoubleTimeSeries timeSeries = underlyingTimeSeriesProvider.getSeries(GREEK, security, startDate, now);
+      final LocalDateDoubleTimeSeries sampledTS = samplingFunction.getSampledTimeSeries(timeSeries, schedule).toLocalDateDoubleTimeSeries();
       tsReturns.put(underlyingType, returnCalculator.evaluate(sampledTS));
     }
     dataBundleArray[0] = new SensitivityAndReturnDataBundle(sensitivity, value, tsReturns);
     final DoubleTimeSeries<?> result = PNL_CALCULATOR.evaluate(dataBundleArray);
     final ValueProperties properties = createValueProperties()
-      .with(ValuePropertyNames.CURRENCY, currency)
-      .with(ValuePropertyNames.SAMPLING_PERIOD, samplingPeriodName.iterator().next())
-      .with(ValuePropertyNames.SCHEDULE_CALCULATOR, scheduleCalculatorName.iterator().next())
-      .with(ValuePropertyNames.SAMPLING_FUNCTION, samplingFunctionName.iterator().next())
-      .with(ValuePropertyNames.RETURN_CALCULATOR, returnCalculatorName.iterator().next())
-      .get();
+        .with(ValuePropertyNames.CURRENCY, currency)
+        .with(ValuePropertyNames.SAMPLING_PERIOD, samplingPeriodName.iterator().next())
+        .with(ValuePropertyNames.SCHEDULE_CALCULATOR, scheduleCalculatorName.iterator().next())
+        .with(ValuePropertyNames.SAMPLING_FUNCTION, samplingFunctionName.iterator().next())
+        .with(ValuePropertyNames.RETURN_CALCULATOR, returnCalculatorName.iterator().next())
+        .get();
     final ValueRequirement resultRequirements = new ValueRequirement(ValueRequirementNames.PNL_SERIES, position, properties);
     final ValueSpecification resultSpecification = new ValueSpecification(resultRequirements, getUniqueId());
     final ComputedValue resultValue = new ComputedValue(resultSpecification, result);
@@ -160,7 +166,7 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
     if (returnCalculatorName == null || returnCalculatorName.isEmpty() || returnCalculatorName.size() != 1) {
       return null;
     }
-    final Set<ValueRequirement> requirements = new HashSet<ValueRequirement>();    
+    final Set<ValueRequirement> requirements = new HashSet<ValueRequirement>();
     requirements.add(new ValueRequirement(REQUIREMENT_NAME, target.getPosition()));
     return requirements;
   }
@@ -172,16 +178,16 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
     }
     final Set<ValueSpecification> results = new HashSet<ValueSpecification>();
     final ValueProperties properties = createValueProperties()
-      .withAny(ValuePropertyNames.CURRENCY)
-      .withAny(ValuePropertyNames.SAMPLING_PERIOD)
-      .withAny(ValuePropertyNames.SCHEDULE_CALCULATOR)
-      .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
-      .withAny(ValuePropertyNames.RETURN_CALCULATOR).get();
+        .withAny(ValuePropertyNames.CURRENCY)
+        .withAny(ValuePropertyNames.SAMPLING_PERIOD)
+        .withAny(ValuePropertyNames.SCHEDULE_CALCULATOR)
+        .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
+        .withAny(ValuePropertyNames.RETURN_CALCULATOR).get();
     results.add(new ValueSpecification(new ValueRequirement(ValueRequirementNames.PNL_SERIES, target.getPosition(), properties), getUniqueId()));
     return results;
   }
 
-  
+
   @Override
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target,
       final Map<ValueSpecification, ValueRequirement> inputs) {
@@ -189,8 +195,8 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
       return null;
     }
     String currency = null;
-    for (ValueSpecification spec : inputs.keySet()) {
-      String newCurrency = spec.getProperty(ValuePropertyNames.CURRENCY);
+    for (final ValueSpecification spec : inputs.keySet()) {
+      final String newCurrency = spec.getProperty(ValuePropertyNames.CURRENCY);
       if (newCurrency != null) {
         if (currency != null && !currency.equals(newCurrency)) {
           return null;
@@ -199,28 +205,28 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
       }
     }
     final ValueProperties properties = createValueProperties()
-      .with(ValuePropertyNames.CURRENCY, currency)
-      .withAny(ValuePropertyNames.SAMPLING_PERIOD)
-      .withAny(ValuePropertyNames.SCHEDULE_CALCULATOR)
-      .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
-      .withAny(ValuePropertyNames.RETURN_CALCULATOR).get();
+        .with(ValuePropertyNames.CURRENCY, currency)
+        .withAny(ValuePropertyNames.SAMPLING_PERIOD)
+        .withAny(ValuePropertyNames.SCHEDULE_CALCULATOR)
+        .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
+        .withAny(ValuePropertyNames.RETURN_CALCULATOR).get();
     final Set<ValueSpecification> results = new HashSet<ValueSpecification>();
     results.add(new ValueSpecification(new ValueRequirement(ValueRequirementNames.PNL_SERIES, target.getPosition(), properties), getUniqueId()));
     return results;
   }
-  
+
   @Override
   public ComputationTargetType getTargetType() {
     return ComputationTargetType.POSITION;
   }
-  
+
   private Period getSamplingPeriod(final Set<String> samplingPeriodNames) {
     if (samplingPeriodNames == null || samplingPeriodNames.isEmpty() || samplingPeriodNames.size() != 1) {
       throw new OpenGammaRuntimeException("Missing or non-unique sampling period name: " + samplingPeriodNames);
-    }  
+    }
     return Period.parse(samplingPeriodNames.iterator().next());
   }
-  
+
   private Schedule getScheduleCalculator(final Set<String> scheduleCalculatorNames) {
     if (scheduleCalculatorNames == null || scheduleCalculatorNames.isEmpty() || scheduleCalculatorNames.size() != 1) {
       throw new OpenGammaRuntimeException("Missing or non-unique schedule calculator name: " + scheduleCalculatorNames);
@@ -234,7 +240,7 @@ public class ValueGreekSensitivityPnLFunction extends AbstractFunction.NonCompil
     }
     return TimeSeriesSamplingFunctionFactory.getFunction(samplingFunctionNames.iterator().next());
   }
-  
+
   private TimeSeriesReturnCalculator getTimeSeriesReturnCalculator(final Set<String> calculatorNames) {
     if (calculatorNames == null || calculatorNames.isEmpty() || calculatorNames.size() != 1) {
       throw new OpenGammaRuntimeException("Missing or non-unique return calculator name: " + calculatorNames);

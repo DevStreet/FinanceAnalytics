@@ -5,6 +5,8 @@
  */
 package com.opengamma.financial.model.option.definition;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 
@@ -206,7 +208,7 @@ public class SABRInterestRateParameters implements VolatilityModel<double[]> {
    * @param maturity Tenor.
    * @param strike The strike.
    * @param forward The forward.
-   * @return The volatility and its derivative. An array with [0] the volatility, [1] Derivative w.r.t the forward, [2] the derivative w.r.t the strike, 
+   * @return The volatility and its derivative. An array with [0] the volatility, [1] Derivative w.r.t the forward, [2] the derivative w.r.t the strike,
    * [3] the derivative w.r.t. to alpha, [4] the derivative w.r.t. to rho, [5] the derivative w.r.t. to nu.
    */
   public double[] getVolatilityAdjoint(final double expiryTime, final double maturity, final double strike, final double forward) {
@@ -215,7 +217,11 @@ public class SABRInterestRateParameters implements VolatilityModel<double[]> {
     final DoublesPair expiryMaturity = new DoublesPair(expiryTime, maturity);
     final SABRFormulaData data = new SABRFormulaData(getAlpha(expiryMaturity), getBeta(expiryMaturity), getRho(expiryMaturity), getNu(expiryMaturity));
     final EuropeanVanillaOption option = new EuropeanVanillaOption(strike, expiryTime, true);
-    return sabrHaganFunction.getVolatilityAdjointOld(option, forward, data);
+    final double[] temp = sabrHaganFunction.getVolatilityAdjoint(option, forward, data); // The beta sensitivity is in [4].
+    final double[] result = Arrays.copyOfRange(temp, 0, 6);
+    result[4] = temp[5];
+    result[5] = temp[6];
+    return result;
   }
 
   @Override

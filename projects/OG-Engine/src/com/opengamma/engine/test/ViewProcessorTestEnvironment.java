@@ -28,7 +28,7 @@ import com.opengamma.engine.function.resolver.DefaultFunctionResolver;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.InMemoryLKVMarketDataProvider;
 import com.opengamma.engine.marketdata.MarketDataProvider;
-import com.opengamma.engine.marketdata.live.DefaultLiveMarketDataSourceRegistry;
+import com.opengamma.engine.marketdata.InMemoryNamedMarketDataSpecificationRepository;
 import com.opengamma.engine.marketdata.resolver.MarketDataProviderResolver;
 import com.opengamma.engine.marketdata.resolver.SingleMarketDataProviderResolver;
 import com.opengamma.engine.value.ValueRequirement;
@@ -44,6 +44,7 @@ import com.opengamma.engine.view.cache.InMemoryViewComputationCacheSource;
 import com.opengamma.engine.view.calc.DependencyGraphExecutorFactory;
 import com.opengamma.engine.view.calc.SingleNodeExecutorFactory;
 import com.opengamma.engine.view.calc.ViewComputationJob;
+import com.opengamma.engine.view.calc.ViewResultListenerFactory;
 import com.opengamma.engine.view.calcnode.CalculationJobResult;
 import com.opengamma.engine.view.calcnode.JobDispatcher;
 import com.opengamma.engine.view.calcnode.LocalCalculationNode;
@@ -94,10 +95,11 @@ public class ViewProcessorTestEnvironment {
   private FunctionResolver _functionResolver;
   private CachingComputationTargetResolver _cachingComputationTargetResolver;
   private ViewDefinitionRepository _viewDefinitionRepository;
+  private ViewResultListenerFactory _viewResultListenerFactory;
 
   public void init() {
     ViewProcessorFactoryBean vpFactBean = new ViewProcessorFactoryBean();
-    vpFactBean.setId(0L);
+    vpFactBean.setName("test");
 
     FudgeContext fudgeContext = OpenGammaFudgeContext.getInstance();
     PositionSource positionSource = getPositionSource() != null ? getPositionSource() : generatePositionSource();
@@ -126,7 +128,7 @@ public class ViewProcessorTestEnvironment {
     vpFactBean.setComputationTargetResolver(generateCachingComputationTargetResolver(positionSource, securitySource));
     vpFactBean.setViewDefinitionRepository(viewDefinitionRepository);
     vpFactBean.setViewPermissionProvider(new DefaultViewPermissionProvider());
-    vpFactBean.setLiveMarketDataSourceRegistry(new DefaultLiveMarketDataSourceRegistry());
+    vpFactBean.setNamedMarketDataSpecificationRepository(new InMemoryNamedMarketDataSpecificationRepository());
     _viewDefinitionRepository = viewDefinitionRepository;
 
     ViewProcessorQueryReceiver calcNodeQueryReceiver = new ViewProcessorQueryReceiver();
@@ -144,7 +146,7 @@ public class ViewProcessorTestEnvironment {
     LocalNodeJobInvoker jobInvoker = new LocalNodeJobInvoker(localCalcNode);
     vpFactBean.setComputationJobDispatcher(new JobDispatcher(jobInvoker));
     vpFactBean.setFunctionResolver(generateFunctionResolver(compiledFunctions));
-    
+    vpFactBean.setViewResultListenerFactory(_viewResultListenerFactory);
     _viewProcessor = (ViewProcessorImpl) vpFactBean.createObject();
   }
   
@@ -197,6 +199,10 @@ public class ViewProcessorTestEnvironment {
     _viewDefinitionRepository = viewDefinitionRepository;
   }
   
+  public void setViewResultListenerFactory(ViewResultListenerFactory viewResultListenerFactory) {
+    _viewResultListenerFactory = viewResultListenerFactory;
+  }
+
   private ViewDefinitionRepository generateViewDefinitionRepository() {
     MockViewDefinitionRepository repository = new MockViewDefinitionRepository();
     ViewDefinition defaultDefinition = getViewDefinition() != null ? getViewDefinition() : generateViewDefinition();

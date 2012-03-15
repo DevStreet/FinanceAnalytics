@@ -19,27 +19,34 @@ import org.testng.annotations.BeforeMethod;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.opengamma.core.config.ConfigSource;
+import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.config.impl.InMemoryConfigMaster;
 import com.opengamma.master.config.impl.MasterConfigSource;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
+import com.opengamma.master.historicaltimeseries.impl.DefaultHistoricalTimeSeriesResolver;
+import com.opengamma.master.historicaltimeseries.impl.DefaultHistoricalTimeSeriesSelector;
 import com.opengamma.master.historicaltimeseries.impl.InMemoryHistoricalTimeSeriesMaster;
+import com.opengamma.master.historicaltimeseries.impl.MasterHistoricalTimeSeriesSource;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityLoader;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.impl.InMemorySecurityMaster;
+import com.opengamma.web.FreemarkerOutputter;
 import com.opengamma.web.MockUriInfo;
 import com.opengamma.web.WebResourceTestUtils;
+
+import freemarker.template.Configuration;
 
 /**
  * 
  */
 public abstract class AbstractWebSecurityResourceTestCase {
 
-  protected HistoricalTimeSeriesMaster _htsMaster;
-  protected ConfigSource _cfgSource;
+  protected HistoricalTimeSeriesSource _htsSource;
   protected SecurityMaster _secMaster;
   protected SecurityLoader _secLoader;
   protected WebSecuritiesResource _webSecuritiesResource;
@@ -63,14 +70,20 @@ public abstract class AbstractWebSecurityResourceTestCase {
       }
     };
     
-    _htsMaster = new InMemoryHistoricalTimeSeriesMaster();
-    _cfgSource = new MasterConfigSource(new InMemoryConfigMaster());
+    HistoricalTimeSeriesMaster htsMaster = new InMemoryHistoricalTimeSeriesMaster();
+    ConfigSource cfgSource = new MasterConfigSource(new InMemoryConfigMaster());
+    HistoricalTimeSeriesResolver htsResolver = new DefaultHistoricalTimeSeriesResolver(new DefaultHistoricalTimeSeriesSelector(cfgSource), htsMaster);
+    _htsSource = new MasterHistoricalTimeSeriesSource(htsMaster, htsResolver);
     
     addSecurity(WebResourceTestUtils.getEquitySecurity());
     addSecurity(WebResourceTestUtils.getBondFutureSecurity());
         
-    _webSecuritiesResource = new WebSecuritiesResource(_secMaster, _secLoader, _htsMaster, _cfgSource);
-    _webSecuritiesResource.setServletContext(new MockServletContext("/web-engine", new FileSystemResourceLoader()));
+    _webSecuritiesResource = new WebSecuritiesResource(_secMaster, _secLoader, _htsSource);
+    MockServletContext sc = new MockServletContext("/web-engine", new FileSystemResourceLoader());
+    Configuration cfg = FreemarkerOutputter.createConfiguration();
+    cfg.setServletContextForTemplateLoading(sc, "WEB-INF/pages");
+    FreemarkerOutputter.init(sc, cfg);
+    _webSecuritiesResource.setServletContext(sc);
     _webSecuritiesResource.setUriInfo(_uriInfo);
     
   }

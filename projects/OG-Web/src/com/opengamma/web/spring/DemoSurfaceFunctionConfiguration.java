@@ -18,7 +18,10 @@ import com.opengamma.engine.function.config.FunctionConfiguration;
 import com.opengamma.engine.function.config.ParameterizedFunctionConfiguration;
 import com.opengamma.engine.function.config.RepositoryConfiguration;
 import com.opengamma.engine.function.config.RepositoryConfigurationSource;
-import com.opengamma.financial.analytics.model.forex.ForexVolatilitySurfaceFunction;
+import com.opengamma.engine.function.config.SimpleRepositoryConfigurationSource;
+import com.opengamma.engine.function.config.StaticFunctionConfiguration;
+import com.opengamma.financial.analytics.model.volatility.surface.ForexCallDeltaVolatilitySurfaceFunction;
+import com.opengamma.financial.analytics.model.volatility.surface.ForexStrangleRiskReversalVolatilitySurfaceFunction;
 import com.opengamma.financial.analytics.volatility.surface.ConfigDBFuturePriceCurveDefinitionSource;
 import com.opengamma.financial.analytics.volatility.surface.ConfigDBFuturePriceCurveSpecificationSource;
 import com.opengamma.financial.analytics.volatility.surface.ConfigDBVolatilitySurfaceDefinitionSource;
@@ -27,14 +30,13 @@ import com.opengamma.financial.analytics.volatility.surface.EquityOptionVolatili
 import com.opengamma.financial.analytics.volatility.surface.FuturePriceCurveDefinition;
 import com.opengamma.financial.analytics.volatility.surface.FuturePriceCurveSpecification;
 import com.opengamma.financial.analytics.volatility.surface.Grid2DInterpolatedVolatilitySurfaceFunction;
-import com.opengamma.financial.analytics.volatility.surface.IRFutureOptionVolatilitySurfaceAndFuturePriceDataFunction;
-import com.opengamma.financial.analytics.volatility.surface.RawVolatilitySurfaceDataFunction;
+import com.opengamma.financial.analytics.volatility.surface.IRFutureOptionVolatilitySurfaceDataFunction;
+import com.opengamma.financial.analytics.volatility.surface.RawFXVolatilitySurfaceDataFunction;
+import com.opengamma.financial.analytics.volatility.surface.RawIRFutureOptionVolatilitySurfaceDataFunction;
 import com.opengamma.financial.analytics.volatility.surface.VolatilitySurfaceDefinition;
 import com.opengamma.financial.analytics.volatility.surface.VolatilitySurfaceSpecification;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.impl.MasterConfigSource;
-import com.opengamma.util.PlatformConfigUtils;
-import com.opengamma.util.PlatformConfigUtils.RunMode;
 import com.opengamma.util.SingletonFactoryBean;
 
 /**
@@ -63,15 +65,19 @@ public class DemoSurfaceFunctionConfiguration extends SingletonFactoryBean<Repos
   
   public RepositoryConfiguration constructRepositoryConfiguration() {
     final List<FunctionConfiguration> configs = new ArrayList<FunctionConfiguration>();
-    addConfigFor(configs, RawVolatilitySurfaceDataFunction.class.getName(), new String[] {"DEFAULT", "SWAPTION", "DEFAULT"});
-    addConfigFor(configs, IRFutureOptionVolatilitySurfaceAndFuturePriceDataFunction.class.getName(), new String[] {"DEFAULT", "DEFAULT", "IR_FUTURE_OPTION", "IR_FUTURE_PRICE"});
-    addConfigFor(configs, RawVolatilitySurfaceDataFunction.class.getName(), new String[] {"DEFAULT", "IR_FUTURE_OPTION", "DEFAULT"});
-    addConfigFor(configs, RawVolatilitySurfaceDataFunction.class.getName(), new String[] {"DEFAULT", "FX_VANILLA_OPTION", "DEFAULT"});
+    addConfigFor(configs, RawIRFutureOptionVolatilitySurfaceDataFunction.class.getName());    
+    addConfigFor(configs, RawFXVolatilitySurfaceDataFunction.class.getName());
+    addConfigFor(configs, IRFutureOptionVolatilitySurfaceDataFunction.class.getName());
     addConfigFor(configs, EquityOptionVolatilitySurfaceDataFunction.class.getName(), new String[] {"DEFAULT", "EQUITY_OPTION", "DEFAULT"});
     addConfigFor(configs, Grid2DInterpolatedVolatilitySurfaceFunction.class.getName(), new String[] {"DEFAULT", "EQUITY_OPTION", "DoubleQuadratic", "FlatExtrapolator", "FlatExtrapolator", 
       "DoubleQuadratic", "FlatExtrapolator", "FlatExtrapolator"});
-    configs.add(new ParameterizedFunctionConfiguration(ForexVolatilitySurfaceFunction.class.getName(), Arrays.asList("DEFAULT", "DEFAULT")));
+    configs.add(new StaticFunctionConfiguration(ForexStrangleRiskReversalVolatilitySurfaceFunction.class.getName()));
+    configs.add(new StaticFunctionConfiguration(ForexCallDeltaVolatilitySurfaceFunction.class.getName()));
     return new RepositoryConfiguration(configs);
+  }
+  
+  private void addConfigFor(final List<FunctionConfiguration> configurations, final String className) {
+    configurations.add(new StaticFunctionConfiguration(className));
   }
   
   private void addConfigFor(List<FunctionConfiguration> configurations, String className, String[] params) {
@@ -82,39 +88,34 @@ public class DemoSurfaceFunctionConfiguration extends SingletonFactoryBean<Repos
         throw new OpenGammaRuntimeException("Not enough parameters for " + className);        
       }
       configurations.add(new ParameterizedFunctionConfiguration(className, Arrays.asList(params)));
-      return;
-    }
-    if (className.equals(IRFutureOptionVolatilitySurfaceAndFuturePriceDataFunction.class.getName())) {
-      if (params.length != 4) {
-        s_logger.error("Not enough parameters for " + className);
-        s_logger.error(Arrays.asList(params).toString());
-        throw new OpenGammaRuntimeException("Not enough parameters for " + className);
-      }
-      if (checkForDefinitionAndSpecification(params[0], params[1], params[2], params[3])) {
-        configurations.add(new ParameterizedFunctionConfiguration(className, Arrays.asList(params)));
-        return;
-      }
-    } else {
+      return;   
+    } else if (className.equals(EquityOptionVolatilitySurfaceDataFunction.class.getName())) {
       if (params.length != 3) {
         s_logger.error("Not enough parameters for " + className);
         s_logger.error(Arrays.asList(params).toString());
         throw new OpenGammaRuntimeException("Not enough parameters for " + className);
       }
-      if (checkForDefinitionAndSpecification(params[0], params[1], params[2])) {
-        configurations.add(new ParameterizedFunctionConfiguration(className, Arrays.asList(params)));
-        return;
+      configurations.add(new ParameterizedFunctionConfiguration(className, Arrays.asList(params)));
+      return;
+    } else {
+      if (params.length != 2) {
+        s_logger.error("Not enough parameters for " + className);
+        s_logger.error(Arrays.asList(params).toString());
+        throw new OpenGammaRuntimeException("Not enough parameters for " + className);
       }
+      configurations.add(new ParameterizedFunctionConfiguration(className, Arrays.asList(params)));
+      return;
     }
     // Handle if it doesn't work and check system run mode so we don't bark warnings if not necessary.
-    RunMode runMode = RunMode.valueOf(System.getProperty(PlatformConfigUtils.RUN_MODE_PROPERTY_NAME).toUpperCase());
-    switch (runMode) {
-      case EXAMPLE:
-        s_logger.debug("Not adding function for " + className + " with parameters " + Arrays.asList(params));
-        break;
-      default:
-        s_logger.warn("Not adding function for " + className + " with parameters " + Arrays.asList(params));
-        break;
-    }
+//    RunMode runMode = RunMode.valueOf(System.getProperty(PlatformConfigUtils.RUN_MODE_PROPERTY_NAME).toUpperCase());
+//    switch (runMode) {
+//      case EXAMPLE:
+//        s_logger.debug("Not adding function for " + className + " with parameters " + Arrays.asList(params));
+//        break;
+//      default:
+//        s_logger.warn("Not adding function for " + className + " with parameters " + Arrays.asList(params));
+//        break;
+//    }
   }
   
   public boolean checkForDefinitionAndSpecification(String definitionName, String specificationName, String volSurfaceInstrumentType, String priceCurveInstrumentType) {
@@ -140,17 +141,10 @@ public class DemoSurfaceFunctionConfiguration extends SingletonFactoryBean<Repos
     }
     return false;
   }
-  
 
+  //-------------------------------------------------------------------------
   public RepositoryConfigurationSource constructRepositoryConfigurationSource() {
-    return new RepositoryConfigurationSource() {
-      private final RepositoryConfiguration _config = constructRepositoryConfiguration();
-
-      @Override
-      public RepositoryConfiguration getRepositoryConfiguration() {
-        return _config;
-      }
-    };
+    return new SimpleRepositoryConfigurationSource(constructRepositoryConfiguration());
   }
 
   @Override

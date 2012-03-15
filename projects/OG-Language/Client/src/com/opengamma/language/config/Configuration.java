@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.transport.jaxrs.RestTarget;
 import com.opengamma.transport.jaxrs.UriEndPointDescriptionProvider;
 import com.opengamma.util.ArgumentChecker;
 
@@ -28,15 +27,17 @@ public final class Configuration {
 
   private final FudgeContext _fudgeContext;
   private final FudgeMsg _configuration;
+  private final UriEndPointDescriptionProvider.Validater _uriValidater;
   private boolean _failOnInvalidURI;
   private boolean _failOnMissingConfiguration;
-  private UriEndPointDescriptionProvider.Validater _uriValidater;
 
-  protected Configuration(final FudgeContext fudgeContext, final FudgeMsg configuration) {
+  protected Configuration(final FudgeContext fudgeContext, final FudgeMsg configuration, final UriEndPointDescriptionProvider.Validater uriValidater) {
     ArgumentChecker.notNull(fudgeContext, "fudgeContext");
     ArgumentChecker.notNull(configuration, "configuration");
+    ArgumentChecker.notNull(uriValidater, "uriValidater");
     _fudgeContext = fudgeContext;
     _configuration = configuration;
+    _uriValidater = uriValidater;
   }
 
   public FudgeContext getFudgeContext() {
@@ -64,9 +65,6 @@ public final class Configuration {
   }
 
   protected UriEndPointDescriptionProvider.Validater getURIValidater() {
-    if (_uriValidater == null) {
-      _uriValidater = UriEndPointDescriptionProvider.validater();
-    }
     return _uriValidater;
   }
 
@@ -100,7 +98,7 @@ public final class Configuration {
       s_logger.warn("No sub-configuration {}", entry);
       return missingConfiguration(entry);
     }
-    return new Configuration(getFudgeContext(), submsg);
+    return new Configuration(getFudgeContext(), submsg, getURIValidater());
   }
 
   /**
@@ -122,20 +120,6 @@ public final class Configuration {
       return invalidUrl(entry);
     }
     return uri;
-  }
-
-  /**
-   * Returns a REST end point as a {@link RestTarget}
-   * 
-   * @param entry configuration item name
-   * @return the RestTarget, or null if there is none or it is inaccessible (and passive failure is allowed)
-   */
-  public RestTarget getRestTargetConfiguration(final String entry) {
-    final URI uri = getURIConfiguration(entry);
-    if (uri == null) {
-      return null;
-    }
-    return new RestTarget(uri);
   }
 
   // TODO: JMS configuration

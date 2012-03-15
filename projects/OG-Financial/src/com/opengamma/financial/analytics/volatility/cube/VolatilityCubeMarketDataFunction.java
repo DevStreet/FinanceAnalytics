@@ -17,6 +17,7 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
 import com.opengamma.core.marketdatasnapshot.VolatilityPoint;
+import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.ComputationTargetType;
@@ -32,7 +33,6 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.UniqueId;
-import com.opengamma.livedata.normalization.MarketDataRequirementNames;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.ObjectsPair;
@@ -44,7 +44,7 @@ import com.opengamma.util.tuple.Triple;
  */
 public class VolatilityCubeMarketDataFunction extends AbstractFunction {
 
-  private static final VolatilityCubeInstrumentProvider INSTRUMENT_PROVIDER = VolatilityCubeInstrumentProvider.BLOOMBERG;
+  private static final BloombergSwaptionVolatilityCubeInstrumentProvider INSTRUMENT_PROVIDER = BloombergSwaptionVolatilityCubeInstrumentProvider.BLOOMBERG;
 
   private ValueSpecification _marketDataResult;
   private Set<ValueSpecification> _results;

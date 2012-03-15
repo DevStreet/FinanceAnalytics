@@ -138,7 +138,7 @@ public class SwaptionPhysicalFixedIborLMMDDMethod implements PricingMethod {
     }
     double bK = -cfaMod0;
     double bM = (b0 + bK) / 2.0d;
-    double meanReversionImpact = (Math.exp(2.0d * amr * timeToExpiry) - 1.0d) / (2.0d * amr);
+    double meanReversionImpact = Math.abs(amr) < 1.0E-6 ? timeToExpiry : (Math.exp(2.0d * amr * timeToExpiry) - 1.0d) / (2.0d * amr); // To handle 0 mean reversion.
     double[] rate0Ratio = new double[nbCF - 1];
     double[][] mu0 = new double[nbCF - 1][nbFactor];
     for (int loopcf = 0; loopcf < nbCF - 1; loopcf++) {
@@ -779,7 +779,7 @@ public class SwaptionPhysicalFixedIborLMMDDMethod implements PricingMethod {
     for (int loopcf = 0; loopcf < cfe.getNumberOfPayments(); loopcf++) {
       InterestRateCurveSensitivity sensiCfe = cfeCurveSensi.get(cfe.getNthPayment(loopcf).getPaymentTime());
       if (!(sensiCfe == null)) { // There is some sensitivity to that cfe.
-        sensitivity = sensitivity.add(sensiCfe.multiply(-multFact * cfaInitBar[loopcf]));
+        sensitivity = sensitivity.plus(sensiCfe.multiply(-multFact * cfaInitBar[loopcf]));
       }
     }
     return sensitivity;

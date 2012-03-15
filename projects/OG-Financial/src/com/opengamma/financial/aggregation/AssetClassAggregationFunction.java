@@ -25,18 +25,21 @@ import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
-import com.opengamma.financial.security.fx.FXSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
 import com.opengamma.financial.security.option.EquityOptionSecurity;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
+import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
 import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
+import com.opengamma.financial.sensitivities.SecurityEntryData;
+import com.opengamma.master.security.RawSecurity;
 
 /**
  * Function to classify positions by asset class.  Note that this bins all types of options together.
@@ -44,6 +47,7 @@ import com.opengamma.financial.security.swap.SwapSecurity;
  * @author jim
  */
 public class AssetClassAggregationFunction implements AggregationFunction<String> {
+  
   /* package */static final String FX_OPTIONS = "FX Options";
   /* package */static final String NONDELIVERABLE_FX_OPTIONS = "Non-deliverable FX Options";
   /* package */static final String FX_BARRIER_OPTIONS = "FX Barrier Options";
@@ -57,11 +61,12 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
   /* package */static final String EQUITY_BARRIER_OPTIONS = "Equity Barrier Options";
   /* package */static final String EQUITY_VARIANCE_SWAPS = "Equity Variance Swaps";
   /* package */static final String SWAPTIONS = "Swaptions";
-  /* package */static final String IRFUTURE_OPTIONS = "IRFuture Options";
+  /* package */static final String IRFUTURE_OPTIONS = "IR Future Options";
   /* package */static final String EQUITY_INDEX_DIVIDEND_FUTURE_OPTIONS = "Equity Index Dividend Future Options";
   /* package */static final String SWAPS = "Swaps";
-  /* package */static final String FX = "FX";
   /* package */static final String FX_FORWARDS = "FX Forwards";
+  /* package */static final String FX_DIGITAL_OPTIONS = "FX Digital Options";
+  /* package */static final String NONDELIVERABLE_FX_DIGITAL_OPTIONS = "Non-deliverable FX Digital Options";
   /* package */static final String NONDELIVERABLE_FX_FORWARDS = "Non-deliverable FX Forwards";
   /* package */static final String CAP_FLOOR = "Cap/Floor";
   /* package */static final String CAP_FLOOR_CMS_SPREAD = "Cap/Floor CMS Spread";
@@ -70,11 +75,13 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
   
   private final Comparator<Position> _comparator = new SimplePositionComparator();
   
-  /* package */static final List<String> ALL_CATEGORIES = Arrays.asList(FX_OPTIONS, NONDELIVERABLE_FX_FORWARDS, FX_BARRIER_OPTIONS, BONDS, CASH, EQUITIES, 
+  /* package */static final List<String> ALL_CATEGORIES = Arrays.asList(FX_OPTIONS, NONDELIVERABLE_FX_FORWARDS, FX_BARRIER_OPTIONS, FX_DIGITAL_OPTIONS, 
+                                                       NONDELIVERABLE_FX_DIGITAL_OPTIONS, FX_FORWARDS, NONDELIVERABLE_FX_FORWARDS, BONDS, CASH, EQUITIES, 
                                                        FRAS, FUTURES, EQUITY_INDEX_OPTIONS, EQUITY_OPTIONS, EQUITY_BARRIER_OPTIONS, 
                                                        EQUITY_VARIANCE_SWAPS, SWAPTIONS, IRFUTURE_OPTIONS, EQUITY_INDEX_DIVIDEND_FUTURE_OPTIONS, 
-                                                       SWAPS, FX, FX_FORWARDS, NONDELIVERABLE_FX_FORWARDS, CAP_FLOOR, CAP_FLOOR_CMS_SPREAD, 
+                                                       SWAPS, CAP_FLOOR, CAP_FLOOR_CMS_SPREAD, 
                                                        UNKNOWN);
+
   private boolean _includeEmptyCategories;
   
   public AssetClassAggregationFunction() {
@@ -168,8 +175,13 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
         }
 
         @Override
-        public String visitFXSecurity(final FXSecurity security) {
-          return FX;
+        public String visitFXDigitalOptionSecurity(final FXDigitalOptionSecurity security) {
+          return FX_DIGITAL_OPTIONS;
+        }
+        
+        @Override
+        public String visitNonDeliverableFXDigitalOptionSecurity(final NonDeliverableFXDigitalOptionSecurity security) {
+          return NONDELIVERABLE_FX_DIGITAL_OPTIONS;
         }
 
         @Override
@@ -199,6 +211,11 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
 
       });
     } else {
+      if (security instanceof RawSecurity && security.getSecurityType().equals(SecurityEntryData.EXTERNAL_SENSITIVITIES_SECURITY_TYPE)) {
+        if (security.getAttributes().containsKey("Security Type")) {
+          return security.getAttributes().get("Security Type");
+        }
+      }
       return UNKNOWN;
     }
   }
@@ -219,7 +236,17 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
 
   @Override
   public int compare(String assetClass1, String assetClass2) {
-    return ALL_CATEGORIES.indexOf(assetClass2) - ALL_CATEGORIES.indexOf(assetClass1);
+    if (!ALL_CATEGORIES.contains(assetClass1)) {
+      if (!ALL_CATEGORIES.contains(assetClass2)) {
+        return assetClass1.compareTo(assetClass2);
+      } else {
+        return -1;
+      }
+    } else if (!ALL_CATEGORIES.contains(assetClass2)) {
+      return 1;
+    } else {
+      return ALL_CATEGORIES.indexOf(assetClass2) - ALL_CATEGORIES.indexOf(assetClass1);
+    }
   }
   
   public Comparator<Position> getPositionComparator() {

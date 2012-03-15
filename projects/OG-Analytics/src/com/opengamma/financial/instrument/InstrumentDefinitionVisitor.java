@@ -8,10 +8,13 @@ package com.opengamma.financial.instrument;
 import com.opengamma.financial.forex.definition.ForexDefinition;
 import com.opengamma.financial.forex.definition.ForexNonDeliverableForwardDefinition;
 import com.opengamma.financial.forex.definition.ForexNonDeliverableOptionDefinition;
+import com.opengamma.financial.forex.definition.ForexOptionDigitalDefinition;
 import com.opengamma.financial.forex.definition.ForexOptionSingleBarrierDefinition;
 import com.opengamma.financial.forex.definition.ForexOptionVanillaDefinition;
 import com.opengamma.financial.forex.definition.ForexSwapDefinition;
 import com.opengamma.financial.instrument.annuity.AnnuityDefinition;
+import com.opengamma.financial.instrument.bond.BillSecurityDefinition;
+import com.opengamma.financial.instrument.bond.BillTransactionDefinition;
 import com.opengamma.financial.instrument.bond.BondCapitalIndexedSecurityDefinition;
 import com.opengamma.financial.instrument.bond.BondCapitalIndexedTransactionDefinition;
 import com.opengamma.financial.instrument.bond.BondFixedSecurityDefinition;
@@ -20,10 +23,11 @@ import com.opengamma.financial.instrument.bond.BondIborSecurityDefinition;
 import com.opengamma.financial.instrument.bond.BondIborTransactionDefinition;
 import com.opengamma.financial.instrument.cash.CashDefinition;
 import com.opengamma.financial.instrument.cash.DepositCounterpartDefinition;
-import com.opengamma.financial.instrument.cash.DepositDefinition;
 import com.opengamma.financial.instrument.cash.DepositIborDefinition;
 import com.opengamma.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.financial.instrument.future.BondFutureDefinition;
+import com.opengamma.financial.instrument.future.FederalFundsFutureSecurityDefinition;
+import com.opengamma.financial.instrument.future.FederalFundsFutureTransactionDefinition;
 import com.opengamma.financial.instrument.future.InterestRateFutureDefinition;
 import com.opengamma.financial.instrument.future.InterestRateFutureOptionMarginSecurityDefinition;
 import com.opengamma.financial.instrument.future.InterestRateFutureOptionMarginTransactionDefinition;
@@ -81,13 +85,17 @@ public interface InstrumentDefinitionVisitor<T, U> {
 
   U visitBondIborSecurityDefinition(BondIborSecurityDefinition bond);
 
+  U visitBillSecurityDefinition(BillSecurityDefinition bill, T data);
+
+  U visitBillSecurityDefinition(BillSecurityDefinition bill);
+
+  U visitBillTransactionDefinition(BillTransactionDefinition bill, T data);
+
+  U visitBillTransactionDefinition(BillTransactionDefinition bill);
+
   U visitCashDefinition(CashDefinition cash, T data);
 
   U visitCashDefinition(CashDefinition cash);
-
-  U visitDepositDefinition(DepositDefinition deposit, T data);
-
-  U visitDepositDefinition(DepositDefinition deposit);
 
   U visitDepositIborDefinition(DepositIborDefinition deposit, T data);
 
@@ -104,6 +112,14 @@ public interface InstrumentDefinitionVisitor<T, U> {
   U visitInterestRateFutureSecurityDefinition(InterestRateFutureDefinition future, T data);
 
   U visitInterestRateFutureSecurityDefinition(InterestRateFutureDefinition future);
+
+  U visitFederalFundsFutureSecurityDefinition(FederalFundsFutureSecurityDefinition future, T data);
+
+  U visitFederalFundsFutureSecurityDefinition(FederalFundsFutureSecurityDefinition future);
+
+  U visitFederalFundsFutureTransactionDefinition(FederalFundsFutureTransactionDefinition future, T data);
+
+  U visitFederalFundsFutureTransactionDefinition(FederalFundsFutureTransactionDefinition future);
 
   U visitInterestRateFutureOptionPremiumSecurityDefinition(InterestRateFutureOptionPremiumSecurityDefinition future, T data);
 
@@ -238,5 +254,9 @@ public interface InstrumentDefinitionVisitor<T, U> {
   U visitForexNonDeliverableOptionDefinition(ForexNonDeliverableOptionDefinition ndo, T data);
 
   U visitForexNonDeliverableOptionDefinition(ForexNonDeliverableOptionDefinition ndo);
+
+  U visitForexOptionDigitalDefinition(ForexOptionDigitalDefinition fx, T data);
+
+  U visitForexOptionDigitalDefinition(ForexOptionDigitalDefinition fx);
 
 }

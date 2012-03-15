@@ -213,6 +213,17 @@ public abstract class AbstractLiveDataServer implements Lifecycle {
   protected abstract boolean snapshotOnSubscriptionStartRequired(Subscription subscription);
   
   /**
+   * In some cases a subscription with  no data may indicate that a snapshot will have no data
+   * 
+   * @param distributior The currently active distributor for the security being snapshotted 
+   * @return true if an empty subscription indicates that the snapshot result would be empty
+   */
+  protected boolean canSatisfySnapshotFromEmptySubscription(MarketDataDistributor distributior) {
+    //NOTE simon 28/11/2011: Only in the case of requiring a snapshot is it safe to use an empty snapshot from a subscription, since in the other case we may still be waiting for values
+    return snapshotOnSubscriptionStartRequired(distributior.getSubscription());
+  }
+  
+  /**
    * Is the server connected to underlying market data API?
    */
   public enum ConnectionStatus {
@@ -255,7 +266,7 @@ public abstract class AbstractLiveDataServer implements Lifecycle {
     }
   }
   
-  private void verifyConnectionOk() {
+  protected void verifyConnectionOk() {
     if (getConnectionStatus() == ConnectionStatus.NOT_CONNECTED) {
       throw new IllegalStateException("Connection to market data API down");
     }
@@ -526,29 +537,28 @@ public abstract class AbstractLiveDataServer implements Lifecycle {
     Collection<String> snapshotsToActuallyDo = new ArrayList<String>();
     Map<String, LiveDataSpecification> securityUniqueId2LiveDataSpecificationFromClient = new HashMap<String, LiveDataSpecification>(); 
     
+    Map<LiveDataSpecification, DistributionSpecification> resolved = getDistributionSpecificationResolver().resolve(liveDataSpecificationsFromClient);
     for (LiveDataSpecification liveDataSpecificationFromClient : liveDataSpecificationsFromClient) {
-      DistributionSpecification distributionSpec = getDistributionSpecificationResolver()
-        .resolve(liveDataSpecificationFromClient);
+      DistributionSpecification distributionSpec = resolved.get(liveDataSpecificationFromClient);
       LiveDataSpecification fullyQualifiedSpec = distributionSpec.getFullyQualifiedLiveDataSpecification();
       
       MarketDataDistributor currentlyActiveDistributor = getMarketDataDistributor(distributionSpec);
       if (currentlyActiveDistributor != null) {
         if (currentlyActiveDistributor.getSnapshot() != null) {
           //NOTE simon 28/11/2011: We presume that all the fields were provided in one go, all or nothing.
-          s_logger.info("Able to satisfy {} from existing LKV", liveDataSpecificationFromClient);
+          s_logger.debug("Able to satisfy {} from existing LKV", liveDataSpecificationFromClient);
           LiveDataValueUpdateBean snapshot = currentlyActiveDistributor.getSnapshot();
           responses.add(getSnapshotResponse(liveDataSpecificationFromClient, snapshot));
           continue;
-        } else if (snapshotOnSubscriptionStartRequired(currentlyActiveDistributor.getSubscription())) {
-          //BBG-91 - don't requery when an existing subscription indicates that the snapshot will fail
-          //NOTE simon 28/11/2011: Only in the case of requiring a snapshot is it safe to use an empty snapshot from a subscription, since in the other case we may still be waiting for values  
-          s_logger.info("Able to satisfy failed snapshot {} from existing LKV", liveDataSpecificationFromClient);
+        } else if (canSatisfySnapshotFromEmptySubscription(currentlyActiveDistributor)) {
+          //BBG-91 - don't requery when an existing subscription indicates that the snapshot will fail  
+          s_logger.debug("Able to satisfy failed snapshot {} from existing LKV", liveDataSpecificationFromClient);
           responses.add(getErrorResponse(liveDataSpecificationFromClient, LiveDataSubscriptionResult.INTERNAL_ERROR,
               "Existing subscription for " + currentlyActiveDistributor.getDistributionSpec().getMarketDataId()
                   + " failed to retrieve a snapshot.  Perhaps requeried fields are unavailable."));
           continue;
         } else {
-          s_logger.info("Can't use existing subscription to satisfy {} from existing LKV", liveDataSpecificationFromClient);
+          s_logger.debug("Can't use existing subscription to satisfy {} from existing LKV", liveDataSpecificationFromClient);
         }
       }
       
@@ -565,7 +575,7 @@ public abstract class AbstractLiveDataServer implements Lifecycle {
       securityUniqueId2LiveDataSpecificationFromClient.put(securityUniqueId, liveDataSpecificationFromClient);      
     }
 
-    s_logger.info("Need to actually snapshot {}", snapshotsToActuallyDo);
+    s_logger.debug("Need to actually snapshot {}", snapshotsToActuallyDo);
     Map<String, FudgeMsg> snapshots = doSnapshot(snapshotsToActuallyDo);
     for (Map.Entry<String, FudgeMsg> snapshotEntry : snapshots.entrySet()) {
       String securityUniqueId = snapshotEntry.getKey();
@@ -573,8 +583,7 @@ public abstract class AbstractLiveDataServer implements Lifecycle {
       
       LiveDataSpecification liveDataSpecFromClient = securityUniqueId2LiveDataSpecificationFromClient.get(securityUniqueId);
       
-      DistributionSpecification distributionSpec = getDistributionSpecificationResolver()
-        .resolve(liveDataSpecFromClient);
+      DistributionSpecification distributionSpec = resolved.get(liveDataSpecFromClient);
       FudgeMsg normalizedMsg = distributionSpec.getNormalizedMessage(msg, securityUniqueId);
       if (normalizedMsg == null) {
         responses.add(getErrorResponse(

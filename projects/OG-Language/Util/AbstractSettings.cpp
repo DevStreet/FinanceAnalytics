@@ -22,7 +22,7 @@ LOGGING(com.opengamma.language.util.AbstractSettings);
 /// Attempts to open a file named by the concatenation of the three path components.
 ///
 /// @param[in] pszSettingsLocation the name of the file within the config folder, e.g. &lt;company name&lt;/&lt;product&gt;,
-///            with no leading slash
+///			with no leading slash
 /// @param[in] pszBase the location of the config folder, with a leading slash if not the empty string, and no trailing slash
 /// @param[in] pszConfig the config folder name with leading and trailing slash
 /// @return the opened file handle or NULL if not found
@@ -142,6 +142,25 @@ CAbstractSettings::~CAbstractSettings () {
 	}
 }
 
+/// Removes an entry from the cache
+///
+/// @param[in] pszKey key to search for, never NULL
+void CAbstractSettings::CacheRemove (const TCHAR *pszKey) const {
+	struct _setting *pCache = m_pCache;
+	struct _setting **ppPrevious = &m_pCache;
+	while (pCache) {
+		if (!_tcsicmp (pszKey, pCache->pszKey)) {
+			*ppPrevious = pCache->pNext;
+			free (pCache->pszKey);
+			free (pCache->pszValue);
+			free (pCache);
+			return;
+		}
+		pCache = pCache->pNext;
+		ppPrevious = &pCache->pNext;
+	}
+}
+
 /// Fetches an entry from the cache
 ///
 /// @param[in] pszKey the key to search for, never NULL
@@ -234,6 +253,74 @@ PCTSTR CAbstractSettings::RegistryGet (HKEY hkey, PCTSTR pszKey) const {
 		}
 	}
 	return NULL;
+}
+
+/// Writes a value to the registry.
+///
+/// @param[in] hkey key containing the values
+/// @param[in] pszKey the key value to update, never NULL
+/// @param[in] pszValue the value to write, or NULL to remove the value
+/// @return TRUE if successful, FALSE if there was a problem
+BOOL CAbstractSettings::RegistrySet (HKEY hkey, PCTSTR pszKey, PCTSTR pszValue) {
+	HRESULT hr;
+	if (pszValue) {
+		hr = RegSetValueEx (hkey, pszKey, 0, REG_SZ, (const BYTE*)pszValue, (_tcslen (pszValue) + 1) * sizeof (TCHAR));
+		CacheReplace (pszKey, pszValue);
+	} else {
+		hr = RegDeleteValue (hkey, pszKey);
+		CacheRemove (pszKey);
+	}
+	return SUCCEEDED (hr);
+}
+
+/// Writes a value to the registry.
+///
+/// @param[in] pszBase base address under HKLM or HKCU, never NULL
+/// @param[in] pszKey the key value to update, never NULL
+/// @param[in] pszValue the value to write, or NULL to remove the value
+/// @return TRUE if successful, FALSE if there was a problem
+BOOL CAbstractSettings::RegistrySet (PCTSTR pszBase, PCTSTR pszKey, PCTSTR pszValue) {
+	HKEY hkeyGlobal = NULL, hkeyLocal = NULL;
+	HRESULT hr;
+	if ((hr = RegOpenKeyEx (HKEY_LOCAL_MACHINE, pszBase, 0, KEY_WRITE, &hkeyGlobal)) != ERROR_SUCCESS) {
+		LOGWARN (TEXT ("Couldn't find machine global configuration settings, error ") << hr);
+	}
+	if ((hr = RegOpenKeyEx (HKEY_CURRENT_USER, pszBase, 0, KEY_WRITE, &hkeyLocal)) != ERROR_SUCCESS) {
+		LOGWARN (TEXT ("Couldn't find user local configuration settings, error ") << hr);
+	}
+	BOOL bResult;
+	if (hkeyGlobal) {
+		bResult = RegistrySet (hkeyGlobal, pszKey, pszValue);
+	} else if (hkeyLocal) {
+		bResult = RegistrySet (hkeyLocal, pszKey, pszValue);
+	} else {
+		LOGERROR (TEXT ("Couldn't open global or local registry keys"));
+		bResult = FALSE;
+	}
+	if (hkeyGlobal) RegCloseKey (hkeyGlobal);
+	if (hkeyLocal) RegCloseKey (hkeyLocal);
+	return bResult;
+}
+
+/// Writes a value to the registry.
+///
+/// @param[in] pszKey the key value to update, never NULL
+/// @param[in] pszValue the value to write, or NULL to remove the value
+/// @return TRUE if successful, FALSE if there was a problem
+BOOL CAbstractSettings::RegistrySet (PCTSTR pszKey, PCTSTR pszValue) {
+	TCHAR szSettingsLocation[256];
+	if (!GetSettingsLocation (szSettingsLocation, sizeof (szSettingsLocation))) {
+		LOGWARN (TEXT ("Couldn't get settings location, error ") << GetLastError ());
+		return FALSE;
+	}
+	TCHAR szBase[312];
+	StringCbPrintf (szBase, sizeof (szBase), TEXT ("SOFTWARE\\%s"), szSettingsLocation);
+	BOOL bResult = RegistrySet (szBase, pszKey, pszValue);
+#ifdef _WIN64
+	StringCbPrintf (szBase, sizeof (szBase), TEXT ("SOFTWARE\\Wow6432Node\\%s"), szSettingsLocation);
+	bResult &= RegistrySet (szBase, pszKey, pszValue);
+#endif /* ifdef _WIN64 */
+	return bResult;
 }
 
 /// Enumerates the keys and values in the registry, populating the cache. Note that this
@@ -356,6 +443,20 @@ const TCHAR *CAbstractSettings::Get (const TCHAR *pszKey, const CAbstractSetting
 int CAbstractSettings::Get (const TCHAR *pszKey, int nDefault) const {
 	const TCHAR * pszValue = Get (pszKey);
 	return pszValue ? _tstoi (pszValue) : nDefault;
+}
+
+/// Updates or deletes a setting.
+///
+/// @param[in] pszKey the key to update, never NULL
+/// @param[in] pszValue the value to write, or NULL to delete
+/// @return TRUE if successful, or FALSE if there was a problem
+bool CAbstractSettings::Set (const TCHAR *pszKey, const TCHAR *pszValue) {
+#ifdef _WIN32
+	return RegistrySet (pszKey, pszValue) ? true : false;
+#else /* ifdef _WIN32 */
+	TODO (TEXT ("Not implemented"));
+	return false;
+#endif /* ifdef _WIN32 */
 }
 
 /// Enumerates setting keys and values that start with a given prefix. The enumerator receives

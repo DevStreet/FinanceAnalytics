@@ -7,6 +7,7 @@ package com.opengamma.master.security;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -147,6 +148,11 @@ public class ManageableSecurityLink extends AbstractLink<Security> implements Se
     ObjectId objectId = getObjectId();
     ExternalIdBundle bundle = getExternalId();
     if (security != null) {
+      // Try to retrieve the security's assigned name
+      String name = security.getName();
+      if (StringUtils.isNotBlank(name)) {
+        return name;
+      }      
       bundle = security.getExternalIdBundle();
     }
     if (bundle != null && bundle.size() > 0) {
@@ -307,7 +313,7 @@ public class ManageableSecurityLink extends AbstractLink<Security> implements Se
     /**
      * The meta-properties.
      */
-    private final Map<String, MetaProperty<Object>> _map = new DirectMetaPropertyMap(
+    private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
       this, (DirectMetaPropertyMap) super.metaPropertyMap());
 
     /**
@@ -327,8 +333,8 @@ public class ManageableSecurityLink extends AbstractLink<Security> implements Se
     }
 
     @Override
-    public Map<String, MetaProperty<Object>> metaPropertyMap() {
-      return _map;
+    public Map<String, MetaProperty<?>> metaPropertyMap() {
+      return _metaPropertyMap$;
     }
 
     //-----------------------------------------------------------------------

@@ -5,10 +5,22 @@
  */
 package com.opengamma.masterdb.batch;
 
+import com.opengamma.batch.domain.CalculationConfiguration;
+import com.opengamma.batch.domain.ComputeHost;
+import com.opengamma.batch.domain.ComputeNode;
+import com.opengamma.batch.domain.FunctionUniqueId;
+import com.opengamma.batch.domain.HbComputationTargetSpecification;
+import com.opengamma.batch.domain.LiveDataField;
+import com.opengamma.batch.domain.MarketData;
+import com.opengamma.batch.domain.MarketDataValue;
+import com.opengamma.batch.domain.RiskRun;
+import com.opengamma.batch.domain.RiskRunProperty;
+import com.opengamma.batch.domain.RiskValueRequirement;
+import com.opengamma.batch.domain.RiskValueSpecification;
 import com.opengamma.util.db.HibernateMappingFiles;
 
 /**
- * DbBatchMaster configuration. 
+ * DbBatchWriter configuration.
  */
 public class HibernateBatchDbFiles implements HibernateMappingFiles {
 
@@ -19,18 +31,13 @@ public class HibernateBatchDbFiles implements HibernateMappingFiles {
       ComputeHost.class,
       ComputeNode.class,
       LiveDataField.class,
-      LiveDataSnapshot.class,
-      LiveDataSnapshotEntry.class,
-      ObservationDateTime.class,
-      ObservationTime.class,
-      OpenGammaVersion.class,
+      MarketData.class,
+      MarketDataValue.class,
       RiskRun.class,
-      RiskValueName.class,
       RiskValueRequirement.class,
       RiskValueSpecification.class,
       FunctionUniqueId.class,
-      ComputationTarget.class,
-      RiskValue.class,
+      HbComputationTargetSpecification.class,
       RiskRunProperty.class
     };
   }

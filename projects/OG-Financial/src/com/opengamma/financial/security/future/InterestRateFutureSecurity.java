@@ -36,12 +36,14 @@ public class InterestRateFutureSecurity extends FutureSecurity {
   @PropertyDefinition(validate = "notNull")
   private ExternalId _underlyingId;
 
-  InterestRateFutureSecurity() { //For builder
+  /**
+   * Creates an empty instance.
+   */
+  protected InterestRateFutureSecurity() {
     super();
   }
 
-  public InterestRateFutureSecurity(Expiry expiry, String tradingExchange, String settlementExchange, Currency currency, double unitAmount,
-      ExternalId underlyingIdentifier) {
+  public InterestRateFutureSecurity(Expiry expiry, String tradingExchange, String settlementExchange, Currency currency, double unitAmount, ExternalId underlyingIdentifier) {
     super(expiry, tradingExchange, settlementExchange, currency, unitAmount);
     setUnderlyingId(underlyingIdentifier);
   }
@@ -159,7 +161,7 @@ public class InterestRateFutureSecurity extends FutureSecurity {
     /**
      * The meta-properties.
      */
-    private final Map<String, MetaProperty<Object>> _map = new DirectMetaPropertyMap(
+    private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
       this, (DirectMetaPropertyMap) super.metaPropertyMap(),
         "underlyingId");
 
@@ -189,8 +191,8 @@ public class InterestRateFutureSecurity extends FutureSecurity {
     }
 
     @Override
-    public Map<String, MetaProperty<Object>> metaPropertyMap() {
-      return _map;
+    public Map<String, MetaProperty<?>> metaPropertyMap() {
+      return _metaPropertyMap$;
     }
 
     //-----------------------------------------------------------------------

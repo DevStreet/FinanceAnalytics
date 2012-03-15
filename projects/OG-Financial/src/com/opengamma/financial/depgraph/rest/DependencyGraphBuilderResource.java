@@ -37,11 +37,17 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.view.ViewCalculationConfiguration;
 import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.id.UniqueId;
+import com.opengamma.util.rest.AbstractDataResource;
 
 /**
- * 
+ * Expose a simple dependency graph building service over the network for debugging/diagnostic purposes.
+ * This is intended to be simple to access using hand written URLs - there is not currently a corresponding
+ * programatic interface to the service this provides.
+ * <p>
+ * For example to find out why a graph building configuration can't satisfy a requirement, a URL such
+ * as "/value/Present Value/SECURITY/SecDb~1234" will return the failure trace (or the graph if successful).
  */
-public final class DependencyGraphBuilderResource {
+public final class DependencyGraphBuilderResource extends AbstractDataResource {
 
   private final DependencyGraphBuilderResourceContextBean _builderContext;
   private final FudgeContext _fudgeContext;
@@ -161,13 +167,14 @@ public final class DependencyGraphBuilderResource {
     // TODO: allow transformation rules
     builder.setFunctionResolver(new DefaultCompiledFunctionResolver(context, rules));
     builder.setMarketDataAvailabilityProvider(getBuilderContext().getMarketDataProviderResolver().resolve(getMarketData()).getAvailabilityProvider());
-    final FudgeSerializer serializer = new FudgeSerializer(getFudgeContext());
-    final ResolutionFailureGatherer<MutableFudgeMsg> failures = new ResolutionFailureGatherer<MutableFudgeMsg>(new ResolutionFailureFudgeBuilder.Visitor(serializer));
+    final FudgeContext fudgeContext = getFudgeContext();
+    final ResolutionFailureGatherer<MutableFudgeMsg> failures = new ResolutionFailureGatherer<MutableFudgeMsg>(new ResolutionFailureFudgeBuilder.Visitor(getFudgeContext()));
     builder.setResolutionFailureVisitor(failures);
     builder.setTargetResolver(getBuilderContext().getComputationTargetResolver());
     for (ValueRequirement requirement : getRequirements()) {
       builder.addTarget(requirement);
     }
+    final FudgeSerializer serializer = new FudgeSerializer(fudgeContext);
     final MutableFudgeMsg result = serializer.newMessage();
     final DependencyGraph graph = builder.getDependencyGraph();
     serializer.addToMessage(result, "dependencyGraph", null, graph);
@@ -184,6 +191,7 @@ public final class DependencyGraphBuilderResource {
     for (MutableFudgeMsg failure : failures.getResults()) {
       result.add("failure", failure);
     }
+    serializer.addToMessage(result, "mapping", null, builder.getValueRequirementMapping());
     return new FudgeMsgEnvelope(result);
   }
 

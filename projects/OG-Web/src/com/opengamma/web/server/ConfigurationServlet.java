@@ -8,6 +8,7 @@ package com.opengamma.web.server;
 import java.io.IOException;
 
 import javax.servlet.GenericServlet;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -27,15 +28,21 @@ public class ConfigurationServlet extends GenericServlet {
 
   @Override
   public void init() throws ServletException {
-    // Grab Spring's ApplicationContent
-    ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-
-    // Trigger service initialization
-    try {
-      ((LiveResultsServiceBean) context.getBean("webInterfaceBean")).afterPropertiesSet();
-    } catch (BeansException e) {
-      throw new RuntimeException("Could not obtain webInterfaceBean", e);      
+    ServletContext servletContext = getServletContext();
+    
+    // try Spring
+    ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    if (context != null) {
+      try {
+        ((LiveResultsServiceBean) context.getBean("webInterfaceBean")).init(servletContext);
+        return;
+      } catch (BeansException ex) {
+        // ignore
+      }
     }
+    
+    // failed
+    throw new RuntimeException("Could not obtain LiveResultsServiceBean to initialize cometd");
   }
 
   @Override

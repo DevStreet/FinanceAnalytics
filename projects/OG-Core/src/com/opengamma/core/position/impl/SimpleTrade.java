@@ -177,6 +177,10 @@ public class SimpleTrade extends DirectBean
     _tradeDate = copyFrom.getTradeDate();
     _tradeTime = copyFrom.getTradeTime();
     _parentPositionId = copyFrom.getParentPositionId();
+    _premium = copyFrom.getPremium();
+    _premiumCurrency = copyFrom.getPremiumCurrency();
+    _premiumDate = copyFrom.getPremiumDate();
+    _premiumTime = copyFrom.getPremiumTime();
     _securityLink = new SimpleSecurityLink(copyFrom.getSecurityLink());
     setAttributes(copyFrom.getAttributes());
   }
@@ -769,7 +773,7 @@ public class SimpleTrade extends DirectBean
     /**
      * The meta-properties.
      */
-    private final Map<String, MetaProperty<Object>> _map = new DirectMetaPropertyMap(
+    private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
         this, null,
         "uniqueId",
         "parentPositionId",
@@ -832,8 +836,8 @@ public class SimpleTrade extends DirectBean
     }
 
     @Override
-    public Map<String, MetaProperty<Object>> metaPropertyMap() {
-      return _map;
+    public Map<String, MetaProperty<?>> metaPropertyMap() {
+      return _metaPropertyMap$;
     }
 
     //-----------------------------------------------------------------------

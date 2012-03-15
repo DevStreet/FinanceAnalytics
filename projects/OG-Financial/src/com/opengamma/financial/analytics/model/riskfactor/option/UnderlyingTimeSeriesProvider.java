@@ -9,9 +9,9 @@ import javax.time.calendar.LocalDate;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
-import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesFields;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.security.SecuritySource;
+import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.financial.greeks.AbstractGreekVisitor;
 import com.opengamma.financial.greeks.Greek;
 import com.opengamma.financial.security.FinancialSecurity;
@@ -25,15 +25,16 @@ import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
-import com.opengamma.financial.security.fx.FXSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
 import com.opengamma.financial.security.option.EquityOptionSecurity;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
+import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
 import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
@@ -49,9 +50,8 @@ public class UnderlyingTimeSeriesProvider {
   private final HistoricalTimeSeriesSource _timeSeriesSource;
   private final String _resolutionKey;
   private final UnderlyingFinancialSecurityVisitor _securityVisitor;
-  
-  public UnderlyingTimeSeriesProvider(final HistoricalTimeSeriesSource timeSeriesSource, final String resolutionKey, 
-      final SecuritySource securitySource) {
+
+  public UnderlyingTimeSeriesProvider(final HistoricalTimeSeriesSource timeSeriesSource, final String resolutionKey, final SecuritySource securitySource) {
     ArgumentChecker.notNull(timeSeriesSource, "time series source");
     ArgumentChecker.notNull(resolutionKey, "resolution key");
     ArgumentChecker.notNull(securitySource, "security source");
@@ -59,11 +59,11 @@ public class UnderlyingTimeSeriesProvider {
     _resolutionKey = resolutionKey;
     _securityVisitor = new UnderlyingFinancialSecurityVisitor(securitySource);
   }
-  
+
   public LocalDateDoubleTimeSeries getSeries(final Greek greek, final FinancialSecurity security) {
     return getSeries(greek, security, null, null);
   }
-  
+
   public LocalDateDoubleTimeSeries getSeries(final Greek greek, final FinancialSecurity security, final LocalDate startDate, final LocalDate endDate) {
     final String fieldName = greek.accept(FIELD_VISITOR);
     final ExternalIdBundle underlyingId = security.accept(_securityVisitor);
@@ -73,25 +73,27 @@ public class UnderlyingTimeSeriesProvider {
     }
     return hts.getTimeSeries();
   }
-  
+
   private static class FieldGreekVisitor extends AbstractGreekVisitor<String> {
-    
+
+    @Override
     public String visitDelta() {
-      return HistoricalTimeSeriesFields.LAST_PRICE;
+      return MarketDataRequirementNames.MARKET_VALUE;
     }
-    
+
+    @Override
     public String visitGamma() {
-      return HistoricalTimeSeriesFields.LAST_PRICE;
+      return MarketDataRequirementNames.MARKET_VALUE;
     }
   }
 
   private class UnderlyingFinancialSecurityVisitor implements FinancialSecurityVisitor<ExternalIdBundle> {
     private final SecuritySource _securitySource;
-    
+
     public UnderlyingFinancialSecurityVisitor(final SecuritySource securitySource) {
       _securitySource = securitySource;
     }
-    
+
     @Override
     public ExternalIdBundle visitBondSecurity(final BondSecurity security) {
       throw new UnsupportedOperationException("This visitor does not support BondSecurity");
@@ -148,9 +150,19 @@ public class UnderlyingTimeSeriesProvider {
     }
 
     @Override
+    public ExternalIdBundle visitFXDigitalOptionSecurity(final FXDigitalOptionSecurity security) {
+      throw new UnsupportedOperationException("This visitor does not support FXDigitalOptionSecurity");
+    }
+
+    @Override
     public ExternalIdBundle visitSwaptionSecurity(final SwaptionSecurity security) {
       throw new UnsupportedOperationException("This visitor does not support SwaptionSecurity");
     }
+
+    //    @Override
+    //    public ExternalIdBundle visitInterestRateFutureSecurity(final InterestRateFutureSecurity security) {
+    //      throw new UnsupportedOperationException("This visitor does not support InterestRateFutureSecurity");
+    //    }
 
     @Override
     public ExternalIdBundle visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
@@ -165,11 +177,6 @@ public class UnderlyingTimeSeriesProvider {
     @Override
     public ExternalIdBundle visitFXBarrierOptionSecurity(final FXBarrierOptionSecurity security) {
       throw new UnsupportedOperationException("This visitor does not support FXBarrierOptionSecurity");
-    }
-
-    @Override
-    public ExternalIdBundle visitFXSecurity(final FXSecurity security) {
-      throw new UnsupportedOperationException("This visitor does not support FXSecurity");
     }
 
     @Override
@@ -196,6 +203,11 @@ public class UnderlyingTimeSeriesProvider {
     public ExternalIdBundle visitEquityVarianceSwapSecurity(final EquityVarianceSwapSecurity security) {
       throw new UnsupportedOperationException("This visitor does not support EquityVarianceSwapSecurity");
     }
-    
+
+    @Override
+    public ExternalIdBundle visitNonDeliverableFXDigitalOptionSecurity(NonDeliverableFXDigitalOptionSecurity security) {
+      throw new UnsupportedOperationException("This visitor does not support NonDeliverableFXDigitalOptionSecurity");
+    }
+
   }
 }

@@ -28,6 +28,8 @@ import javax.time.calendar.TimeProvider;
 import javax.time.calendar.TimeZone;
 import javax.time.calendar.ZonedDateTime;
 
+import com.opengamma.financial.security.swap.FixedVarianceSwapLeg;
+import com.opengamma.financial.security.swap.FloatingVarianceSwapLeg;
 import org.apache.commons.lang.RandomStringUtils;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.JodaBeanUtils;
@@ -68,7 +70,6 @@ import com.opengamma.financial.security.future.InterestRateFutureSecurity;
 import com.opengamma.financial.security.future.MetalFutureSecurity;
 import com.opengamma.financial.security.future.StockFutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
-import com.opengamma.financial.security.fx.FXSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.option.AmericanExerciseType;
 import com.opengamma.financial.security.option.AsianExerciseType;
@@ -86,6 +87,7 @@ import com.opengamma.financial.security.option.EuropeanExerciseType;
 import com.opengamma.financial.security.option.ExerciseType;
 import com.opengamma.financial.security.option.ExtremeSpreadPayoffStyle;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
+import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.financial.security.option.FadeInPayoffStyle;
 import com.opengamma.financial.security.option.FixedStrikeLookbackPayoffStyle;
@@ -443,6 +445,8 @@ public abstract class SecurityTestCase implements SecurityTestCaseMethods {
         values.addAll(permuteTestObjects(FloatingGearingIRLeg.class));
         values.addAll(permuteTestObjects(FixedInterestRateLeg.class));
         values.addAll(permuteTestObjects(FloatingInterestRateLeg.class));
+        values.addAll(permuteTestObjects(FixedVarianceSwapLeg.class));
+        values.addAll(permuteTestObjects(FloatingVarianceSwapLeg.class));
       }
     });
     s_dataProviders.put(Region.class, new TestDataProvider<Region>() {
@@ -564,7 +568,7 @@ public abstract class SecurityTestCase implements SecurityTestCaseMethods {
   private static <T extends ManageableSecurity> Collection<T> permuteTestSecurities(final Class<T> clazz) {
     intializeClass(clazz);
     MetaBean mb = JodaBeanUtils.metaBean(clazz);
-    List<MetaProperty<Object>> mps = new ArrayList<MetaProperty<Object>>(mb.metaPropertyMap().values());
+    List<MetaProperty<?>> mps = new ArrayList<MetaProperty<?>>(mb.metaPropertyMap().values());
     
     // find the longest set of available data
     final List<?>[] parameterValues = new List<?>[mps.size()];
@@ -823,10 +827,11 @@ public abstract class SecurityTestCase implements SecurityTestCaseMethods {
   public void testEquityIndexOptionSecurity() {
     assertSecurities(EquityIndexOptionSecurity.class);
   }
+  
   @Override
   @Test
-  public void testFXSecurity() {
-    assertSecurities(FXSecurity.class);
+  public void testFXDigitalOptionSecurity() {
+    assertSecurities(FXDigitalOptionSecurity.class);
   }
 
   @Override
