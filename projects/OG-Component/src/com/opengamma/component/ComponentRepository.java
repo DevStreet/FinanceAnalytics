@@ -551,6 +551,10 @@ public class ComponentRepository implements Lifecycle, ServletContextAware {
    */
   @Override
   public void start() {
+    Status status = _status.get();
+    if (status == Status.STARTING) {
+      return;  // nothing to start in this thread
+    }
     checkStatus(Status.CREATING);
     _status.set(Status.STARTING);
     try {
