@@ -21,7 +21,6 @@
 <listEntry value="com.opengamma.transport.jms"/>
 <listEntry value="com.opengamma.transport.socket"/>
 <listEntry value="com.opengamma.util"/>
-<listEntry value="com.opengamma.util.component"/>
 <listEntry value="com.opengamma.util.db"/>
 <listEntry value="com.opengamma.util.fudgemsg"/>
 <listEntry value="com.opengamma.util.i18n"/>
@@ -34,6 +33,7 @@
 <listEntry value="com.opengamma.util.timeseries"/>
 <listEntry value="com.opengamma.util.timeseries.object"/>
 <listEntry value="com.opengamma.util.tuple"/>
+<listEntry value="com.opengamma.core"/>
 <listEntry value="com.opengamma.core.change"/>
 <listEntry value="com.opengamma.core.config"/>
 <listEntry value="com.opengamma.core.config.impl"/>

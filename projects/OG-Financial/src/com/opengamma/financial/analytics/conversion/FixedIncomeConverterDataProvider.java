@@ -12,6 +12,17 @@ import javax.time.calendar.ZonedDateTime;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.instrument.annuity.AnnuityCapFloorCMSDefinition;
+import com.opengamma.analytics.financial.instrument.annuity.AnnuityCapFloorCMSSpreadDefinition;
+import com.opengamma.analytics.financial.instrument.annuity.AnnuityCapFloorIborDefinition;
+import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
+import com.opengamma.analytics.financial.instrument.future.BondFutureDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureOptionMarginTransactionDefinition;
+import com.opengamma.analytics.financial.instrument.swap.SwapDefinition;
+import com.opengamma.analytics.financial.instrument.swap.SwapFixedOISSimplifiedDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.security.Security;
@@ -19,17 +30,6 @@ import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.financial.analytics.fixedincome.InterestRateInstrumentType;
 import com.opengamma.financial.convention.ConventionBundle;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.instrument.annuity.AnnuityCapFloorCMSDefinition;
-import com.opengamma.financial.instrument.annuity.AnnuityCapFloorCMSSpreadDefinition;
-import com.opengamma.financial.instrument.annuity.AnnuityCapFloorIborDefinition;
-import com.opengamma.financial.instrument.fra.ForwardRateAgreementDefinition;
-import com.opengamma.financial.instrument.future.BondFutureDefinition;
-import com.opengamma.financial.instrument.future.InterestRateFutureDefinition;
-import com.opengamma.financial.instrument.future.InterestRateFutureOptionMarginTransactionDefinition;
-import com.opengamma.financial.instrument.swap.SwapDefinition;
-import com.opengamma.financial.instrument.swap.SwapFixedOISSimplifiedDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
@@ -60,7 +60,7 @@ public class FixedIncomeConverterDataProvider {
     _conventionSource = conventionSource;
   }
 
-  public InstrumentDerivative convert(final Security security, final InstrumentDefinition<?> definition, final ZonedDateTime now, final String[] curveNames, 
+  public InstrumentDerivative convert(final Security security, final InstrumentDefinition<?> definition, final ZonedDateTime now, final String[] curveNames,
       final HistoricalTimeSeriesSource dataSource) {
     if (definition == null) {
       throw new OpenGammaRuntimeException("Definition to convert was null for security " + security);
@@ -194,7 +194,8 @@ public class FixedIncomeConverterDataProvider {
   public InstrumentDerivative convert(final CapFloorSecurity security, final AnnuityCapFloorCMSDefinition definition, final ZonedDateTime now, final String[] curveNames,
       final HistoricalTimeSeriesSource dataSource) {
     final ExternalId id = security.getUnderlyingId();
-    final LocalDate startDate = DateUtils.previousWeekDay(now.toLocalDate().minusDays(7));
+    final ZonedDateTime capStartDate = security.getStartDate();
+    final LocalDate startDate = capStartDate.toLocalDate().minusDays(7); // To catch first fixing. SwapSecurity does not have this date.
     final DoubleTimeSeries<ZonedDateTime> indexTS = getIndexTimeSeries(getIndexIdBundle(id), startDate, now, true, dataSource);
     return definition.toDerivative(now, indexTS, curveNames);
   }
@@ -212,7 +213,8 @@ public class FixedIncomeConverterDataProvider {
       final HistoricalTimeSeriesSource dataSource) {
     final ExternalId longId = security.getLongId();
     final ExternalId shortId = security.getShortId();
-    final LocalDate startDate = DateUtils.previousWeekDay(now.toLocalDate().minusDays(7));
+    final ZonedDateTime capStartDate = security.getStartDate();
+    final LocalDate startDate = capStartDate.toLocalDate().minusDays(7); // To catch first fixing. SwapSecurity does not have this date.
     final DoubleTimeSeries<ZonedDateTime> indexLongTS = getIndexTimeSeries(getIndexIdBundle(longId), startDate, now, true, dataSource);
     final DoubleTimeSeries<ZonedDateTime> indexShortTS = getIndexTimeSeries(getIndexIdBundle(shortId), startDate, now, true, dataSource);
     final DoubleTimeSeries<ZonedDateTime> indexSpreadTS = indexLongTS.subtract(indexShortTS);

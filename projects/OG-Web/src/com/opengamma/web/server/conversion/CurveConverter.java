@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.opengamma.analytics.math.curve.DoublesCurve;
+import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
+import com.opengamma.analytics.math.curve.NodalDoublesCurve;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.math.curve.DoublesCurve;
-import com.opengamma.math.curve.InterpolatedDoublesCurve;
-import com.opengamma.math.curve.NodalDoublesCurve;
 
 /**
  * 
@@ -44,7 +44,6 @@ public class CurveConverter implements ResultConverter<DoublesCurve> {
       final double[] xData = nodalCurve.getXDataAsPrimitive();
       final double[] yData = nodalCurve.getYDataAsPrimitive();      
       for (int i = 0; i < xData.length; i++) {
-        double x = i;
         data.add(new Double[] {xData[i], yData[i]});
       }
       result.put("summary", data);

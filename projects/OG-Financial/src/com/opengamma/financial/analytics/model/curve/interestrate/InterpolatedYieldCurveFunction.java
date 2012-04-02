@@ -14,8 +14,19 @@ import javax.time.calendar.Clock;
 import javax.time.calendar.TimeZone;
 import javax.time.calendar.ZonedDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.LastTimeCalculator;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
+import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolatorFactory;
+import com.opengamma.analytics.math.interpolation.Interpolator1D;
+import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
@@ -43,29 +54,17 @@ import com.opengamma.financial.analytics.fixedincome.FixedIncomeInstrumentCurveE
 import com.opengamma.financial.analytics.ircurve.FixedIncomeStripWithSecurity;
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationWithSecurities;
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunctionHelper;
+import com.opengamma.financial.analytics.model.InterpolatedCurveAndSurfaceProperties;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.LastTimeCalculator;
-import com.opengamma.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.id.ExternalId;
-import com.opengamma.math.curve.InterpolatedDoublesCurve;
-import com.opengamma.math.interpolation.CombinedInterpolatorExtrapolatorFactory;
-import com.opengamma.math.interpolation.Interpolator1D;
-import com.opengamma.math.interpolation.Interpolator1DFactory;
 import com.opengamma.util.money.Currency;
 
 /**
  * 
  */
 public class InterpolatedYieldCurveFunction extends AbstractFunction {
-  /** String representing the calculation method  */
-  public static final String CALCULATION_METHOD_NAME = "Interpolated";
-  /** String labelling the left extrapolator for the curve */
-  public static final String LEFT_EXTRAPOLATOR_NAME = "LeftExtrapolator";
-  /** String labelling the right extrapolator for the curve */
-  public static final String RIGHT_EXTRAPOLATOR_NAME = "RightExtrapolator";
+  private static final Logger s_logger = LoggerFactory.getLogger(InterpolatedYieldCurveFunction.class);
   private static final LastTimeCalculator LAST_DATE_CALCULATOR = LastTimeCalculator.getInstance();
 
   @Override
@@ -87,8 +86,8 @@ public class InterpolatedYieldCurveFunction extends AbstractFunction {
         final HistoricalTimeSeriesSource dataSource = OpenGammaExecutionContext.getHistoricalTimeSeriesSource(executionContext);
         final ValueRequirement desiredValue = desiredValues.iterator().next();
         final String curveName = desiredValue.getConstraint(ValuePropertyNames.CURVE);
-        final String leftExtrapolatorName = desiredValue.getConstraint(LEFT_EXTRAPOLATOR_NAME);
-        final String rightExtrapolatorName = desiredValue.getConstraint(RIGHT_EXTRAPOLATOR_NAME);
+        final String leftExtrapolatorName = desiredValue.getConstraint(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME);
+        final String rightExtrapolatorName = desiredValue.getConstraint(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME);
         final ValueProperties inputProperties = ValueProperties.builder()
             .with(ValuePropertyNames.CURVE, curveName).get();
         final Object specificationObject = inputs.getValue(new ValueRequirement(ValueRequirementNames.YIELD_CURVE_SPEC, target.toSpecification(), inputProperties));
@@ -126,9 +125,9 @@ public class InterpolatedYieldCurveFunction extends AbstractFunction {
         final InterpolatedDoublesCurve curve = InterpolatedDoublesCurve.from(times, yields, interpolator);
         final ValueProperties properties = createValueProperties()
             .with(ValuePropertyNames.CURVE, curveName)
-            .with(LEFT_EXTRAPOLATOR_NAME, leftExtrapolatorName)
-            .with(RIGHT_EXTRAPOLATOR_NAME, rightExtrapolatorName)
-            .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, CALCULATION_METHOD_NAME).get();
+            .with(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME, leftExtrapolatorName)
+            .with(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME, rightExtrapolatorName)
+            .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, InterpolatedCurveAndSurfaceProperties.CALCULATION_METHOD_NAME).get();
         final ValueSpecification result = new ValueSpecification(ValueRequirementNames.YIELD_CURVE, target.toSpecification(), properties);
         return Collections.singleton(new ComputedValue(result, new YieldCurve(curve)));
       }
@@ -148,26 +147,28 @@ public class InterpolatedYieldCurveFunction extends AbstractFunction {
 
       @Override
       public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
-        @SuppressWarnings("synthetic-access")
         final ValueProperties properties = createValueProperties()
-        .withAny(ValuePropertyNames.CURVE)
-        .withAny(LEFT_EXTRAPOLATOR_NAME)
-        .withAny(RIGHT_EXTRAPOLATOR_NAME)
-        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, CALCULATION_METHOD_NAME).get();
+            .withAny(ValuePropertyNames.CURVE)
+            .withAny(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME)
+            .withAny(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME)
+            .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, InterpolatedCurveAndSurfaceProperties.CALCULATION_METHOD_NAME)
+            .get();
         return Collections.singleton(new ValueSpecification(ValueRequirementNames.YIELD_CURVE, target.toSpecification(), properties));
       }
 
       @Override
       public Set<ValueRequirement> getRequirements(final FunctionCompilationContext context, final ComputationTarget target, final ValueRequirement desiredValue) {
-        final Set<String> curveNames = desiredValue.getConstraints().getValues(ValuePropertyNames.CURVE);
+        final ValueProperties constraints = desiredValue.getConstraints();
+        final Set<String> curveNames = constraints.getValues(ValuePropertyNames.CURVE);
         if (curveNames == null || curveNames.size() != 1) {
-          throw new OpenGammaRuntimeException("Can only get a single curve; asked for " + curveNames);
+          s_logger.error("Could not get curve name from constraints {}", constraints);
+          return null;
         }
-        final Set<String> leftInterpolatorNames = desiredValue.getConstraints().getValues(LEFT_EXTRAPOLATOR_NAME);
+        final Set<String> leftInterpolatorNames = constraints.getValues(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME);
         if (leftInterpolatorNames == null || leftInterpolatorNames.size() != 1) {
           return null;
         }
-        final Set<String> rightInterpolatorNames = desiredValue.getConstraints().getValues(RIGHT_EXTRAPOLATOR_NAME);
+        final Set<String> rightInterpolatorNames = constraints.getValues(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME);
         if (rightInterpolatorNames == null || rightInterpolatorNames.size() != 1) {
           return null;
         }

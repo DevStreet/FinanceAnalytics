@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.model.option.definition.SmileDeltaParameter;
+import com.opengamma.analytics.financial.model.option.definition.SmileDeltaTermStructureParameter;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceData;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
@@ -35,8 +37,6 @@ import com.opengamma.financial.analytics.volatility.surface.DefaultVolatilitySur
 import com.opengamma.financial.analytics.volatility.surface.SurfacePropertyNames;
 import com.opengamma.financial.analytics.volatility.surface.SurfaceQuoteType;
 import com.opengamma.financial.analytics.volatility.surface.VolatilitySurfaceShiftFunction;
-import com.opengamma.financial.model.option.definition.SmileDeltaParameter;
-import com.opengamma.financial.model.option.definition.SmileDeltaTermStructureParameter;
 import com.opengamma.util.money.UnorderedCurrencyPair;
 import com.opengamma.util.time.Tenor;
 
@@ -114,10 +114,7 @@ public class ForexCallDeltaVolatilitySurfaceFunction extends AbstractFunction.No
     if (target.getType() != ComputationTargetType.PRIMITIVE) {
       return false;
     }
-    if (UnorderedCurrencyPair.OBJECT_SCHEME.equals(target.getUniqueId().getScheme())) {
-      return true;
-    }
-    return false;
+    return UnorderedCurrencyPair.OBJECT_SCHEME.equals(target.getUniqueId().getScheme());
   }
 
   @Override
@@ -141,7 +138,7 @@ public class ForexCallDeltaVolatilitySurfaceFunction extends AbstractFunction.No
         resultProperties.with(VolatilitySurfaceShiftFunction.SHIFT, shifts.iterator().next());
       }
     }
-    return Collections.<ValueSpecification>singleton(new ValueSpecification(ValueRequirementNames.STANDARD_VOLATILITY_SURFACE_DATA, target.toSpecification(), resultProperties.get()));
+    return Collections.singleton(new ValueSpecification(ValueRequirementNames.STANDARD_VOLATILITY_SURFACE_DATA, target.toSpecification(), resultProperties.get()));
   }
 
   private double getTime(final Tenor tenor) {

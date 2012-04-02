@@ -670,23 +670,20 @@ public class DbTool extends Task {
 
   public void createTables(String database, Map<Integer, Pair<File, File>> dbScripts, String catalog, String schema, final TableCreationCallback callback) {
     int highestVersion = Collections.max(dbScripts.keySet());
-    if (getTargetVersion() == null) {      
-      setTargetVersion(highestVersion);
-    }
-    if (getCreateVersion() == null) {
-      setCreateVersion(getTargetVersion());
-    }
-    createTables(database, dbScripts, highestVersion, catalog, schema, callback);
+    int targetVersion = getTargetVersion() == null ? highestVersion : getTargetVersion();
+    int createVersion = getCreateVersion() == null ? targetVersion : getCreateVersion();    
+    createTables(database, dbScripts, highestVersion, targetVersion, createVersion, catalog, schema, callback);
   }
 
-  public void createTables(String database, Map<Integer, Pair<File, File>> dbScripts, int version, String catalog, String schema, final TableCreationCallback callback) {
+  public void createTables(String database, Map<Integer, Pair<File, File>> dbScripts, int version, int targetVersion, int createVersion, String catalog, String schema,
+      final TableCreationCallback callback) {
     if (version < 1) {
-      throw new IllegalArgumentException("Invalid creation or target version (" + getCreateVersion() + "/" + getTargetVersion() + ")");
+      throw new IllegalArgumentException("Invalid creation or target version (" + createVersion + "/" + targetVersion + ")");
     }
 
-    if (getTargetVersion() >= version) {
+    if (targetVersion >= version) {
       final File createScript = dbScripts.get(version).getFirst();
-      if (getCreateVersion() >= version && createScript.exists()) {
+      if (createVersion >= version && createScript.exists()) {
         s_logger.info("Creating DB version " + version);
         s_logger.info("Executing create script " + createScript);
         executeCreateScript(catalog, schema, createScript);
@@ -694,7 +691,7 @@ public class DbTool extends Task {
           callback.tablesCreatedOrUpgraded(Integer.toString(version), database);
         }
       } else {
-        createTables(database, dbScripts, version - 1, catalog, schema, callback);
+        createTables(database, dbScripts, version - 1, targetVersion, createVersion, catalog, schema, callback);
         final File migrateScript = dbScripts.get(version).getSecond();
         if (migrateScript.exists()) {
           s_logger.info("Upgrading to DB version " + version);
@@ -706,7 +703,7 @@ public class DbTool extends Task {
         }
       }
     } else {
-      createTables(database, dbScripts, version - 1, catalog, schema, callback);
+      createTables(database, dbScripts, version - 1, targetVersion, createVersion, catalog, schema, callback);
     }
 
   }
@@ -757,25 +754,25 @@ public class DbTool extends Task {
     }
 
     if (_clear) {
-      System.out.println("Clearing tables...");
+      s_logger.info("Clearing tables...");
       initialize();
       clearTables(_catalog, _schema);
     }
 
     if (_drop) {
-      System.out.println("Dropping schema...");
+      s_logger.info("Dropping schema...");
       initialize();
       dropSchema(_catalog, _schema);
     }
 
     if (_create) {
-      System.out.println("Creating schema...");
+      s_logger.info("Creating schema...");
       initialize();
       createSchema(_catalog, _schema);
     }
 
     if (_createTables) {
-      System.out.println("Creating tables...");
+      s_logger.info("Creating tables...");
       initialize();
       createTables(_catalog, null, null);
       shutdown(_catalog);
@@ -785,7 +782,7 @@ public class DbTool extends Task {
       TestProperties.setBaseDir(_testPropertiesDir);
 
       for (String dbType : TestProperties.getDatabaseTypes(_testDbType)) {
-        System.out.println("Creating " + dbType + " test database...");
+        s_logger.info("Creating " + dbType + " test database...");
 
         String dbUrl = TestProperties.getDbHost(dbType);
         String user = TestProperties.getDbUsername(dbType);
@@ -803,7 +800,7 @@ public class DbTool extends Task {
       }
     }
 
-    System.out.println("All tasks succeeded.");
+    s_logger.info("All tasks succeeded.");
   }
 
   public static void usage(Options options) {
@@ -864,7 +861,7 @@ public class DbTool extends Task {
     try {
       tool.execute();
     } catch (BuildException e) {
-      System.out.println(e.getMessage());
+      s_logger.info(e.getMessage());
       usage(options);
       System.exit(-1);
     }

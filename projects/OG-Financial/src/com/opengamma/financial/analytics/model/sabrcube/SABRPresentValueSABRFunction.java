@@ -15,6 +15,11 @@ import javax.time.calendar.ZonedDateTime;
 import org.apache.commons.lang.NotImplementedException;
 
 import com.google.common.collect.Sets;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivityDataBundle;
+import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivitySABRCalculator;
+import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.security.Security;
 import com.opengamma.engine.ComputationTarget;
@@ -34,11 +39,6 @@ import com.opengamma.financial.analytics.DoubleLabelledMatrix2D;
 import com.opengamma.financial.analytics.conversion.SwapSecurityUtils;
 import com.opengamma.financial.analytics.fixedincome.InterestRateInstrumentType;
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunction;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.PresentValueSABRSensitivityDataBundle;
-import com.opengamma.financial.interestrate.PresentValueSABRSensitivitySABRCalculator;
-import com.opengamma.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.financial.security.FinancialSecurityVisitor;
@@ -46,6 +46,9 @@ import com.opengamma.financial.security.bond.BondSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.financial.security.deposit.ContinuousZeroDepositSecurity;
+import com.opengamma.financial.security.deposit.PeriodicZeroDepositSecurity;
+import com.opengamma.financial.security.deposit.SimpleZeroDepositSecurity;
 import com.opengamma.financial.security.equity.EquitySecurity;
 import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
@@ -208,11 +211,6 @@ public class SABRPresentValueSABRFunction extends SABRFunction {
           new Object[] {_formatter.format(swapMaturityYears)}, new double[][] {new double[] {entry.getValue()}});
     }
 
-    //    @Override
-    //    public DoubleLabelledMatrix2D visitInterestRateFutureSecurity(InterestRateFutureSecurity security) {
-    //      return null;
-    //    }
-
     @Override
     public DoubleLabelledMatrix2D visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
       return null;
@@ -272,6 +270,21 @@ public class SABRPresentValueSABRFunction extends SABRFunction {
 
     @Override
     public DoubleLabelledMatrix2D visitNonDeliverableFXDigitalOptionSecurity(final NonDeliverableFXDigitalOptionSecurity security) {
+      return null;
+    }
+
+    @Override
+    public DoubleLabelledMatrix2D visitSimpleZeroDepositSecurity(final SimpleZeroDepositSecurity security) {
+      return null;
+    }
+
+    @Override
+    public DoubleLabelledMatrix2D visitPeriodicZeroDepositSecurity(final PeriodicZeroDepositSecurity security) {
+      return null;
+    }
+
+    @Override
+    public DoubleLabelledMatrix2D visitContinuousZeroDepositSecurity(final ContinuousZeroDepositSecurity security) {
       return null;
     }
 

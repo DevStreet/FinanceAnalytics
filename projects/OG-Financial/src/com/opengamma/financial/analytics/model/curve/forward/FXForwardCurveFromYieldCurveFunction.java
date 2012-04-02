@@ -10,6 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurveYieldImplied;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.core.security.SecurityUtils;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
@@ -24,9 +27,6 @@ import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.financial.model.interestrate.curve.ForwardCurve;
-import com.opengamma.financial.model.interestrate.curve.ForwardCurveYieldImplied;
-import com.opengamma.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.financial.security.fx.FXUtils;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.money.Currency;
@@ -148,10 +148,15 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
     if (fxForwardCurveNames == null || fxForwardCurveNames.size() != 1) {
       throw new OpenGammaRuntimeException("Null or non-unique FX forward curve names: " + fxForwardCurveNames);
     }
-    final ExternalId spotIdentifier = SecurityUtils.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
-    final Object spotObject = inputs.getValue(new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, spotIdentifier));
+    ExternalId spotIdentifier = SecurityUtils.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
+    Object spotObject = inputs.getValue(new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, spotIdentifier));
     if (spotObject == null) {
-      throw new OpenGammaRuntimeException("Could not get spot");
+      // TODO: this is a hack; don't hard code the bbg ticker reference - use the convention bundle perhaps
+      spotIdentifier = ExternalId.of(SecurityUtils.OG_SYNTHETIC_TICKER, payCurrency.getCode() + receiveCurrency.getCode());
+      spotObject = inputs.getValue(new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, spotIdentifier));
+      if (spotObject == null) {
+        throw new OpenGammaRuntimeException("Could not get spot");
+      }
     }
     final double spot = (Double) spotObject;
     final YieldCurve payCurve = (YieldCurve) payCurveObject;

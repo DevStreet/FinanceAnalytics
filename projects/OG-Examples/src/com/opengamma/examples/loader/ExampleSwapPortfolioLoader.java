@@ -5,8 +5,8 @@
  */
 package com.opengamma.examples.loader;
 
-import static com.opengamma.financial.portfolio.loader.PortfolioLoaderHelper.getWithException;
-import static com.opengamma.financial.portfolio.loader.PortfolioLoaderHelper.normaliseHeaders;
+import static com.opengamma.examples.loader.PortfolioLoaderHelper.getWithException;
+import static com.opengamma.examples.loader.PortfolioLoaderHelper.normaliseHeaders;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class ExampleSwapPortfolioLoader extends AbstractExampleTool {
   /**
    * The name of the portfolio.
    */
-  public static final String PORTFOLIO_NAME = "Example Swap Portfolio";
+  public static final String PORTFOLIO_NAME = "Swap Portfolio";
   
   /**
    * The scheme used for an identifier which is added to each swap created from the CSV file

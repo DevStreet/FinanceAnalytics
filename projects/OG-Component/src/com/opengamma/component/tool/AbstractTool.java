@@ -15,6 +15,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -27,12 +28,12 @@ import com.opengamma.util.ArgumentChecker;
 /**
  * Abstract class for command line tools.
  * <p>
- * The command line tools generally require access to key parts of the infrastructure.
- * These are provided via {@link ToolContext} which is setup and closed by this class
- * using {@link ComponentManager}. Normally the file is named {@code toolcontext.ini}.
+ * The command line tools generally require access to key parts of the infrastructure. These are provided via {@link ToolContext} which is setup and closed by this class using {@link ComponentManager}
+ * . Normally the file is named {@code toolcontext.ini}.
  */
 public abstract class AbstractTool {
-
+  
+  private static final Logger s_logger = LoggerFactory.getLogger(AbstractTool.class);
   /**
    * Default logback file.
    */
@@ -57,7 +58,7 @@ public abstract class AbstractTool {
   /**
    * Initializes the tool statically.
    * 
-   * @param logbackResource  the logback resource location, not null
+   * @param logbackResource the logback resource location, not null
    * @return true if successful
    */
   public static final boolean init(String logbackResource) {
@@ -94,7 +95,7 @@ public abstract class AbstractTool {
    * l/logback - the logback configuration, default tool-logback.xml<br />
    * h/help - prints the help tool<br />
    * 
-   * @param args  the command-line arguments, not null
+   * @param args the command-line arguments, not null
    * @return true if successful, false otherwise
    */
   public boolean initAndRun(String[] args) {
@@ -109,14 +110,14 @@ public abstract class AbstractTool {
    * l/logback - the logback configuration, default tool-logback.xml<br />
    * h/help - prints the help tool<br />
    * 
-   * @param args  the command-line arguments, not null
-   * @param defaultConfigResource  the default configuration resource location, null if mandatory on command line
-   * @param defaultLogbackResource  the default logback resource, null to use tool-logback.xml as the default
+   * @param args the command-line arguments, not null
+   * @param defaultConfigResource the default configuration resource location, null if mandatory on command line
+   * @param defaultLogbackResource the default logback resource, null to use tool-logback.xml as the default
    * @return true if successful, false otherwise
    */
   public boolean initAndRun(String[] args, String defaultConfigResource, String defaultLogbackResource) {
     ArgumentChecker.notNull(args, "args");
-    
+
     Options options = createOptions(defaultConfigResource == null);
     CommandLineParser parser = new PosixParser();
     CommandLine line;
@@ -141,20 +142,19 @@ public abstract class AbstractTool {
   /**
    * Runs the tool.
    * <p>
-   * This starts the tool context and calls {@link #run(ToolContext)}.
-   * This will catch exceptions and print a stack trace.
-   *
-   * @param configResource  the config resource location, not null
+   * This starts the tool context and calls {@link #run(ToolContext)}. This will catch exceptions and print a stack trace.
+   * 
+   * @param configResource the config resource location, not null
    * @return true if successful
    */
   public final boolean run(String configResource) {
     try {
       ArgumentChecker.notNull(configResource, "configResourceLocation");
-      System.out.println("Starting " + getClass().getSimpleName());
+      s_logger.info("Starting " + getClass().getSimpleName());
       ToolContext toolContext = ToolContextUtils.getToolContext(configResource);
-      System.out.println("Running " + getClass().getSimpleName());
+      s_logger.info("Running " + getClass().getSimpleName());
       run(toolContext);
-      System.out.println("Finished " + getClass().getSimpleName());
+      s_logger.info("Finished " + getClass().getSimpleName());
       return true;
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -171,7 +171,7 @@ public abstract class AbstractTool {
    * <p>
    * This will catch not handle exceptions, but will convert checked exceptions to unchecked.
    * 
-   * @param toolContext  the tool context, not null
+   * @param toolContext the tool context, not null
    * @throws RuntimeException if an error occurs
    */
   public final void run(ToolContext toolContext) {
@@ -216,10 +216,9 @@ public abstract class AbstractTool {
   /**
    * Creates the command line options.
    * <p>
-   * Subclasses may override this and add their own parameters.
-   * The base class defined the options h/help, c/config, l/logback.
+   * Subclasses may override this and add their own parameters. The base class defined the options h/help, c/config, l/logback.
    * 
-   * @param mandatoryConfigResource  whether the config resource is mandatory
+   * @param mandatoryConfigResource whether the config resource is mandatory
    * @return the set of command line options, not null
    */
   protected Options createOptions(boolean mandatoryConfigResource) {
@@ -248,10 +247,14 @@ public abstract class AbstractTool {
     return option;
   }
 
+  protected Class<?> getEntryPointClass() {
+    return getClass();
+  }
+
   private void usage(Options options) {
     HelpFormatter formatter = new HelpFormatter();
     formatter.setWidth(120);
-    formatter.printHelp("java " + getClass().getName(), options, true);
+    formatter.printHelp("java " + getEntryPointClass().getName(), options, true);
   }
 
 }

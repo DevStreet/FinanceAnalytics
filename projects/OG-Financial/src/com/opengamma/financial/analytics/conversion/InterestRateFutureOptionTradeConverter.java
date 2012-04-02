@@ -10,12 +10,12 @@ import javax.time.calendar.ZonedDateTime;
 
 import org.apache.commons.lang.Validate;
 
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureOptionMarginSecurityDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureOptionMarginTransactionDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureOptionPremiumSecurityDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureOptionPremiumTransactionDefinition;
 import com.opengamma.core.position.Trade;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.instrument.future.InterestRateFutureOptionMarginSecurityDefinition;
-import com.opengamma.financial.instrument.future.InterestRateFutureOptionMarginTransactionDefinition;
-import com.opengamma.financial.instrument.future.InterestRateFutureOptionPremiumSecurityDefinition;
-import com.opengamma.financial.instrument.future.InterestRateFutureOptionPremiumTransactionDefinition;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
 
 /**
@@ -33,7 +33,7 @@ public class InterestRateFutureOptionTradeConverter {
     Validate.notNull(trade, "trade");
     Validate.isTrue(trade.getSecurity() instanceof IRFutureOptionSecurity, "Can only handle trades with security type IRFutureOptionSecurity");
     final Object securityDefinition = _securityConverter.convert((IRFutureOptionSecurity) trade.getSecurity());
-    final int quantity = trade.getQuantity().intValue();
+    final int quantity = 1; // trade.getQuantity().intValue(); TODO: correct when position/trade dilemma is solved.
     //TODO trade time or premium time?
     //    final ZonedDateTime tradeDate = ZonedDateTime.of(trade.getPremiumDate().atTime(trade.getPremiumTime()),
     //        TimeZone.UTC); //TODO get the real time zone

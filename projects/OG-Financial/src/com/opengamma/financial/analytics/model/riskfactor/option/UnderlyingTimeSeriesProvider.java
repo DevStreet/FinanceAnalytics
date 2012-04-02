@@ -8,18 +8,21 @@ package com.opengamma.financial.analytics.model.riskfactor.option;
 import javax.time.calendar.LocalDate;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.greeks.AbstractGreekVisitor;
+import com.opengamma.analytics.financial.greeks.Greek;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.core.value.MarketDataRequirementNames;
-import com.opengamma.financial.greeks.AbstractGreekVisitor;
-import com.opengamma.financial.greeks.Greek;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.FinancialSecurityVisitor;
 import com.opengamma.financial.security.bond.BondSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.financial.security.deposit.ContinuousZeroDepositSecurity;
+import com.opengamma.financial.security.deposit.PeriodicZeroDepositSecurity;
+import com.opengamma.financial.security.deposit.SimpleZeroDepositSecurity;
 import com.opengamma.financial.security.equity.EquitySecurity;
 import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
@@ -75,6 +78,9 @@ public class UnderlyingTimeSeriesProvider {
   }
 
   private static class FieldGreekVisitor extends AbstractGreekVisitor<String> {
+
+    public FieldGreekVisitor() {
+    }
 
     @Override
     public String visitDelta() {
@@ -159,11 +165,6 @@ public class UnderlyingTimeSeriesProvider {
       throw new UnsupportedOperationException("This visitor does not support SwaptionSecurity");
     }
 
-    //    @Override
-    //    public ExternalIdBundle visitInterestRateFutureSecurity(final InterestRateFutureSecurity security) {
-    //      throw new UnsupportedOperationException("This visitor does not support InterestRateFutureSecurity");
-    //    }
-
     @Override
     public ExternalIdBundle visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
       throw new UnsupportedOperationException("This visitor does not support IRFutureOptionSecurity");
@@ -205,8 +206,23 @@ public class UnderlyingTimeSeriesProvider {
     }
 
     @Override
-    public ExternalIdBundle visitNonDeliverableFXDigitalOptionSecurity(NonDeliverableFXDigitalOptionSecurity security) {
+    public ExternalIdBundle visitNonDeliverableFXDigitalOptionSecurity(final NonDeliverableFXDigitalOptionSecurity security) {
       throw new UnsupportedOperationException("This visitor does not support NonDeliverableFXDigitalOptionSecurity");
+    }
+
+    @Override
+    public ExternalIdBundle visitSimpleZeroDepositSecurity(final SimpleZeroDepositSecurity security) {
+      throw new UnsupportedOperationException("This visitor does not support SimpleZeroDepositSecurity");
+    }
+
+    @Override
+    public ExternalIdBundle visitPeriodicZeroDepositSecurity(final PeriodicZeroDepositSecurity security) {
+      throw new UnsupportedOperationException("This visitor does not support PeriodicZeroDepositSecurity");
+    }
+
+    @Override
+    public ExternalIdBundle visitContinuousZeroDepositSecurity(final ContinuousZeroDepositSecurity security) {
+      throw new UnsupportedOperationException("This visitor does not support ContinuousZeroDepositSecurity");
     }
 
   }

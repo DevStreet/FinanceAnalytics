@@ -14,6 +14,21 @@ import javax.time.calendar.Clock;
 import javax.time.calendar.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.InstrumentSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueCurveSensitivitySABRCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueNodeSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
+import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateParameters;
+import com.opengamma.analytics.financial.model.volatility.smile.function.SABRFormulaData;
+import com.opengamma.analytics.financial.model.volatility.smile.function.VolatilityFunctionFactory;
+import com.opengamma.analytics.financial.model.volatility.smile.function.VolatilityFunctionProvider;
+import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.surface.InterpolatedDoublesSurface;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.position.Trade;
@@ -40,30 +55,15 @@ import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecifica
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunction;
 import com.opengamma.financial.analytics.model.FunctionUtils;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
+import com.opengamma.financial.analytics.model.InterpolatedCurveAndSurfaceProperties;
 import com.opengamma.financial.analytics.model.YieldCurveNodeSensitivitiesHelper;
-import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveFunction;
 import com.opengamma.financial.analytics.model.curve.interestrate.MarketInstrumentImpliedYieldCurveFunction;
 import com.opengamma.financial.analytics.volatility.fittedresults.SABRFittedSurfaces;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.convention.daycount.DayCount;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.InstrumentSensitivityCalculator;
-import com.opengamma.financial.interestrate.PresentValueCurveSensitivitySABRCalculator;
-import com.opengamma.financial.interestrate.PresentValueNodeSensitivityCalculator;
-import com.opengamma.financial.interestrate.YieldCurveBundle;
-import com.opengamma.financial.model.interestrate.curve.YieldAndDiscountCurve;
-import com.opengamma.financial.model.option.definition.SABRInterestRateDataBundle;
-import com.opengamma.financial.model.option.definition.SABRInterestRateParameters;
-import com.opengamma.financial.model.volatility.smile.function.SABRFormulaData;
-import com.opengamma.financial.model.volatility.smile.function.VolatilityFunctionFactory;
-import com.opengamma.financial.model.volatility.smile.function.VolatilityFunctionProvider;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
-import com.opengamma.math.matrix.DoubleMatrix1D;
-import com.opengamma.math.matrix.DoubleMatrix2D;
-import com.opengamma.math.surface.InterpolatedDoublesSurface;
 import com.opengamma.util.money.Currency;
 
 /**
@@ -116,7 +116,7 @@ public class InterestRateFutureOptionYieldCurveNodeSensitivitiesFunction extends
     final InstrumentDerivative derivative = _dataConverter.convert(security, definition, now, new String[] {fundingCurveName, forwardCurveName}, dataSource);
     final SABRInterestRateDataBundle bundle = new SABRInterestRateDataBundle(getModelParameters(target, inputs, surfaceName),
         getYieldCurves(target, inputs, forwardCurveName, fundingCurveName, calculationMethod));
-    if (calculationMethod.equals(InterpolatedYieldCurveFunction.CALCULATION_METHOD_NAME)) {
+    if (calculationMethod.equals(InterpolatedCurveAndSurfaceProperties.CALCULATION_METHOD_NAME)) {
       final DoubleMatrix1D sensitivities = CALCULATOR.calculateFromSimpleInterpolatedCurve(derivative, bundle, NSC);
       return YieldCurveNodeSensitivitiesHelper.getInstrumentLabelledSensitivitiesForCurve(curveName, bundle, sensitivities, curveSpec,
           getResultSpec(target, currency, curveName, surfaceName, forwardCurveName, fundingCurveName, calculationMethod));
@@ -196,7 +196,7 @@ public class InterestRateFutureOptionYieldCurveNodeSensitivitiesFunction extends
     if (forwardCurveName.equals(fundingCurveName)) {
       requirements.add(getCurveRequirement(target, curveName, null, null, calculationMethod));
       requirements.add(getCurveSpecRequirement(target, curveName));
-      if (!calculationMethod.equals(InterpolatedYieldCurveFunction.CALCULATION_METHOD_NAME)) {
+      if (!calculationMethod.equals(InterpolatedCurveAndSurfaceProperties.CALCULATION_METHOD_NAME)) {
         requirements.add(getJacobianRequirement(target, calculationMethod));
         if (calculationMethod.equals(MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING)) {
           requirements.add(getCouponSensitivityRequirement(target, null, null));
@@ -207,7 +207,7 @@ public class InterestRateFutureOptionYieldCurveNodeSensitivitiesFunction extends
     requirements.add(getCurveRequirement(target, forwardCurveName, forwardCurveName, fundingCurveName, calculationMethod));
     requirements.add(getCurveRequirement(target, fundingCurveName, forwardCurveName, fundingCurveName, calculationMethod));
     requirements.add(getCurveSpecRequirement(target, curveName));
-    if (!calculationMethod.equals(InterpolatedYieldCurveFunction.CALCULATION_METHOD_NAME)) {
+    if (!calculationMethod.equals(InterpolatedCurveAndSurfaceProperties.CALCULATION_METHOD_NAME)) {
       requirements.add(getJacobianRequirement(target, forwardCurveName, fundingCurveName, calculationMethod));
       if (calculationMethod.equals(MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING)) {
         requirements.add(getCouponSensitivityRequirement(target, forwardCurveName, fundingCurveName));
