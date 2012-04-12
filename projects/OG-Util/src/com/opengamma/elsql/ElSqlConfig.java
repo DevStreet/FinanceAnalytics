@@ -6,6 +6,7 @@
 package com.opengamma.elsql;
 
 import com.opengamma.OpenGammaRuntimeException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Configuration to allow details of the substitutions to be replaced.
@@ -23,7 +24,7 @@ public class ElSqlConfig {
   /**
    * A constant for the config needed for Postgres.
    */
-  public static final ElSqlConfig POSTGRES = new ElSqlConfig("Postgres");
+  public static final ElSqlConfig POSTGRES = new PostgresElSqlConfig();
   /**
    * A constant for the config needed for HSQL.
    */
@@ -32,6 +33,10 @@ public class ElSqlConfig {
    * A constant for the config needed for MySQL.
    */
   public static final ElSqlConfig MYSQL = new MySqlElSqlConfig();
+  /**
+   * A constant for the config needed for SQL Server 2008.
+   */
+  public static final ElSqlConfig SQL_SERVER_2008 = new SqlServer2008ElSqlConfig();
   /**
    * A constant for the config needed for Vertica.
    */
@@ -107,6 +112,22 @@ public class ElSqlConfig {
 
   //-------------------------------------------------------------------------
   /**
+   * Alters the supplied SQL to add paging, such as OFFSET-FETCH.
+   * <p>
+   * The default implementation calls {@link #getPaging(int, int)}.
+   * <p>
+   * The returned SQL must be end in a space if non-empty.
+   * 
+   * @param selectToPage  the SELECT statement to page, not null
+   * @param offset  the OFFSET amount, zero to start from the beginning
+   * @param fetchLimit  the FETCH/LIMIT amount, zero to fetch all
+   * @return the updated SELECT, not null
+   */
+  public String addPaging(String selectToPage, int offset, int fetchLimit) {
+    return selectToPage + getPaging(offset, fetchLimit);
+  }
+
+  /**
    * Gets the paging SQL, such as OFFSET-FETCH.
    * <p>
    * The default implementation uses 'FETCH FIRST n ROWS ONLY' or
@@ -115,16 +136,16 @@ public class ElSqlConfig {
    * <p>
    * The returned SQL must be end in a space if non-empty.
    * 
-   * @param offset  the OFFSET amount
-   * @param fetchLimit  the FETCH/LIMIT amount
+   * @param offset  the OFFSET amount, zero to start from the beginning
+   * @param fetchLimit  the FETCH/LIMIT amount, zero to fetch all
    * @return the SQL to use, not null
    */
   public String getPaging(int offset, int fetchLimit) {
-    if (fetchLimit == 0 || fetchLimit == Integer.MAX_VALUE) {
-      if (offset > 0) {
-        return "OFFSET " + offset + " ROWS ";
-      }
+    if (fetchLimit == 0 && offset == 0) {
       return "";
+    }
+    if (fetchLimit == 0) {
+      return "OFFSET " + offset + " ROWS ";
     }
     if (offset == 0) {
       return "FETCH FIRST " + fetchLimit + " ROWS ONLY ";
@@ -136,6 +157,29 @@ public class ElSqlConfig {
   @Override
   public String toString() {
     return "ElSqlConfig[" + _name + "]";
+  }
+
+  //-------------------------------------------------------------------------
+  /**
+   * Class for Postgres.
+   */
+  private static class PostgresElSqlConfig extends ElSqlConfig {
+    public PostgresElSqlConfig() {
+      super("Postgres");
+    }
+//    @Override
+//    public String addPaging(String selectToPage, int offset, int fetchLimit) {
+//      if (fetchLimit == 0 && offset == 0) {
+//        return selectToPage;
+//      }
+//      int start = offset + 1;
+//      int end = offset + fetchLimit;
+//      String columns = StringUtils.substringBetween(selectToPage, "SELECT ", " FROM ");
+//      String from = StringUtils.substringBetween(selectToPage, " FROM ", " ORDER BY ");
+//      String order = StringUtils.substringAfterLast(selectToPage, " ORDER BY ");
+//      String inner = "SELECT " + columns + ", ROW_NUMBER() OVER (ORDER BY " + order.trim() + ") AS ROW_NUM FROM " + from;
+//      return "SELECT * FROM (" + inner + ") AS ROW_TABLE WHERE ROW_NUM >= " + start + " AND ROW_NUM <= " + end;
+//    }
   }
 
   //-------------------------------------------------------------------------
@@ -162,11 +206,11 @@ public class ElSqlConfig {
     }
     @Override
     public String getPaging(int offset, int fetchLimit) {
-      if (fetchLimit == 0 || fetchLimit == Integer.MAX_VALUE) {
-        if (offset > 0) {
-          return "OFFSET " + offset + " ";
-        }
+      if (fetchLimit == 0 && offset == 0) {
         return "";
+      }
+      if (fetchLimit == 0) {
+        return "OFFSET " + offset + " ";
       }
       if (offset == 0) {
         return "LIMIT " + fetchLimit + " ";
@@ -177,24 +221,28 @@ public class ElSqlConfig {
 
   //-------------------------------------------------------------------------
   /**
-   * Class for SQL Server 2008.
+   * Class for SQL server 2008.
    */
   private static class SqlServer2008ElSqlConfig extends ElSqlConfig {
     public SqlServer2008ElSqlConfig() {
       super("SqlServer2008");
     }
     @Override
+    public String addPaging(String selectToPage, int offset, int fetchLimit) {
+      if (fetchLimit == 0 && offset == 0) {
+        return selectToPage;
+      }
+      int start = offset + 1;
+      int end = offset + fetchLimit;
+      String columns = StringUtils.substringBetween(selectToPage, "SELECT ", " FROM ");
+      String from = StringUtils.substringBetween(selectToPage, " FROM ", " ORDER BY ");
+      String order = StringUtils.substringAfterLast(selectToPage, " ORDER BY ");
+      String inner = "SELECT " + columns + ", ROW_NUMBER() OVER (ORDER BY " + order.trim() + ") AS ROW_NUM FROM " + from;
+      return "SELECT * FROM (" + inner + ") AS ROW_TABLE WHERE ROW_NUM >= " + start + " AND ROW_NUM <= " + end;
+    }
+    @Override
     public String getPaging(int offset, int fetchLimit) {
-      if (fetchLimit == 0 || fetchLimit == Integer.MAX_VALUE) {
-        if (offset > 0) {
-          throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
-        }
-        return "";
-      }
-      if (offset == 0) {
-        throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
-      }
-      throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
+      throw new UnsupportedOperationException();
     }
   }
 
