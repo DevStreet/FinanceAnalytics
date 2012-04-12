@@ -5,6 +5,8 @@
  */
 package com.opengamma.elsql;
 
+import com.opengamma.OpenGammaRuntimeException;
+
 /**
  * Configuration to allow details of the substitutions to be replaced.
  * <p>
@@ -37,7 +39,7 @@ public class ElSqlConfig {
   /**
    * A constant for the config needed for SQL Server.
    */
-  public static final ElSqlConfig SQLSERVER = new ElSqlConfig("SQLServer");
+  public static final ElSqlConfig SQLSERVER = new SqlServer2008ElSqlConfig();
 
   /**
    * The descriptive name.
@@ -170,6 +172,29 @@ public class ElSqlConfig {
         return "LIMIT " + fetchLimit + " ";
       }
       return "LIMIT " + fetchLimit + " OFFSET " + offset + " ";
+    }
+  }
+
+  //-------------------------------------------------------------------------
+  /**
+   * Class for SQL Server 2008.
+   */
+  private static class SqlServer2008ElSqlConfig extends ElSqlConfig {
+    public SqlServer2008ElSqlConfig() {
+      super("SqlServer2008");
+    }
+    @Override
+    public String getPaging(int offset, int fetchLimit) {
+      if (fetchLimit == 0 || fetchLimit == Integer.MAX_VALUE) {
+        if (offset > 0) {
+          throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
+        }
+        return "";
+      }
+      if (offset == 0) {
+        throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
+      }
+      throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
     }
   }
 

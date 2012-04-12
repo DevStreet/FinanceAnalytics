@@ -7,28 +7,30 @@ package com.opengamma.util.db;
 
 import java.sql.Driver;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.elsql.ElSqlConfig;
+import com.opengamma.util.paging.PagingRequest;
 
 /**
  * Database dialect for SQL Server databases.
  * <p>
  * This contains any SQL Server specific SQL.
  */
-public class SQLServerDbDialect extends DbDialect {
+public class SqlServer2008DbDialect extends DbDialect {
 
   /**
    * Helper can be treated as a singleton.
    */
-  public static final SQLServerDbDialect INSTANCE = new SQLServerDbDialect();
+  public static final SqlServer2008DbDialect INSTANCE = new SqlServer2008DbDialect();
 
   /**
    * Restrictive constructor.
    */
-  public SQLServerDbDialect() {
+  public SqlServer2008DbDialect() {
   }
 
   //-------------------------------------------------------------------------
@@ -48,6 +50,25 @@ public class SQLServerDbDialect extends DbDialect {
   }
 
   //-------------------------------------------------------------------------
+  @Override
+  public String sqlApplyPaging(final String sqlSelectFromWhere, final String sqlOrderBy, final PagingRequest paging) {
+    String result;
+    if (paging == null || paging.equals(PagingRequest.ALL) || paging.equals(PagingRequest.NONE)) {
+      result = sqlSelectFromWhere + sqlOrderBy;
+    }
+    // HACK: Since the SELECT and WHERE clauses are presented to us as a single string, 
+    // we have to insert the TOP clause using string manipulation
+    if (paging.getFirstItem() == 0) {
+      result = StringUtils.replaceOnce(sqlSelectFromWhere, "SELECT", "SELECT TOP " + paging.getPagingSize()) + " " + sqlOrderBy;
+    } else {
+//      result = sqlSelectFromWhere + sqlOrderBy +
+//          "OFFSET " + paging.getFirstItem() + " ROWS " +
+//          "FETCH NEXT " + paging.getPagingSize() + " ROWS ONLY ";
+      throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
+    }
+    return result;
+  }
+
   @Override
   public String sqlNextSequenceValueSelect(final String sequenceName) {
     return "EXECUTE nextval_" + sequenceName;
