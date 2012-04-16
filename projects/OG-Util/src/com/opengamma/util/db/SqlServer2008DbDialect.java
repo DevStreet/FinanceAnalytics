@@ -52,21 +52,24 @@ public class SqlServer2008DbDialect extends DbDialect {
   //-------------------------------------------------------------------------
   @Override
   public String sqlApplyPaging(final String sqlSelectFromWhere, final String sqlOrderBy, final PagingRequest paging) {
-    String result;
+
     if (paging == null || paging.equals(PagingRequest.ALL) || paging.equals(PagingRequest.NONE)) {
-      result = sqlSelectFromWhere + sqlOrderBy;
+      return sqlSelectFromWhere + sqlOrderBy;
     }
-    // HACK: Since the SELECT and WHERE clauses are presented to us as a single string, 
-    // we have to insert the TOP clause using string manipulation
-    if (paging.getFirstItem() == 0) {
-      result = StringUtils.replaceOnce(sqlSelectFromWhere, "SELECT", "SELECT TOP " + paging.getPagingSize()) + " " + sqlOrderBy;
-    } else {
-//      result = sqlSelectFromWhere + sqlOrderBy +
-//          "OFFSET " + paging.getFirstItem() + " ROWS " +
-//          "FETCH NEXT " + paging.getPagingSize() + " ROWS ONLY ";
-      throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
-    }
-    return result;
+    return ElSqlConfig.SQL_SERVER_2008.addPaging(sqlSelectFromWhere, paging.getFirstItem(), paging.getPagingSize()) +
+        sqlOrderBy;
+    
+//    // HACK: Since the SELECT and WHERE clauses are presented to us as a single string, 
+//    // we have to insert the TOP clause using string manipulation
+//    if (paging.getFirstItem() == 0) {
+//      result = StringUtils.replaceOnce(sqlSelectFromWhere, "SELECT", "SELECT TOP " + paging.getPagingSize()) + " " + sqlOrderBy;
+//    } else {
+////      result = sqlSelectFromWhere + sqlOrderBy +
+////          "OFFSET " + paging.getFirstItem() + " ROWS " +
+////          "FETCH NEXT " + paging.getPagingSize() + " ROWS ONLY ";
+//      throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
+//    }
+//    return result;
   }
 
   @Override
