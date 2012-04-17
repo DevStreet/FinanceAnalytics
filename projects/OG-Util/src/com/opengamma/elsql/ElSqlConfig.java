@@ -5,6 +5,7 @@
  */
 package com.opengamma.elsql;
 
+import com.opengamma.OpenGammaRuntimeException;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -40,6 +41,10 @@ public class ElSqlConfig {
    * A constant for the config needed for Vertica.
    */
   public static final ElSqlConfig VERTICA = new ElSqlConfig("Vertica");
+  /**
+   * A constant for the config needed for SQL Server.
+   */
+  public static final ElSqlConfig SQLSERVER = new SqlServer2008ElSqlConfig();
 
   /**
    * The descriptive name.

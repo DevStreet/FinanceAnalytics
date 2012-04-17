@@ -2,6 +2,7 @@
 
 -- ==========================================================================
 @NAME(GetCosts)
+<<<<<<< HEAD
   @PAGING(:paging_offset,:paging_fetch)
     SELECT
       configuration,
@@ -18,11 +19,10 @@
     ORDER BY
       version_instant DESC
 
-
 -- ==========================================================================
 @NAME(InsertCosts)
   INSERT INTO eng_functioncosts
-    (configuration, function, version_instant, invocation_cost, data_input_cost, data_output_cost)
+    (configuration, function_name, version_instant, invocation_cost, data_input_cost, data_output_cost)
   VALUES
     (:configuration, :function, :version_instant, :invocation_cost, :data_input_cost, :data_output_cost)
 
