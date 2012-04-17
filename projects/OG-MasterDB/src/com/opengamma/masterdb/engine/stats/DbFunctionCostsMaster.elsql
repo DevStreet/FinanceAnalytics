@@ -2,7 +2,6 @@
 
 -- ==========================================================================
 @NAME(GetCosts)
-<<<<<<< HEAD
   @PAGING(:paging_offset,:paging_fetch)
     SELECT
       configuration,
