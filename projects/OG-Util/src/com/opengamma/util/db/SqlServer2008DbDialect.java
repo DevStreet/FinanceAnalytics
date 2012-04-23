@@ -7,7 +7,6 @@ package com.opengamma.util.db;
 
 import java.sql.Driver;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 
@@ -58,23 +57,16 @@ public class SqlServer2008DbDialect extends DbDialect {
     }
     return ElSqlConfig.SQL_SERVER_2008.addPaging(sqlSelectFromWhere, paging.getFirstItem(), paging.getPagingSize()) +
         sqlOrderBy;
-    
-//    // HACK: Since the SELECT and WHERE clauses are presented to us as a single string, 
-//    // we have to insert the TOP clause using string manipulation
-//    if (paging.getFirstItem() == 0) {
-//      result = StringUtils.replaceOnce(sqlSelectFromWhere, "SELECT", "SELECT TOP " + paging.getPagingSize()) + " " + sqlOrderBy;
-//    } else {
-////      result = sqlSelectFromWhere + sqlOrderBy +
-////          "OFFSET " + paging.getFirstItem() + " ROWS " +
-////          "FETCH NEXT " + paging.getPagingSize() + " ROWS ONLY ";
-//      throw new OpenGammaRuntimeException("Paging not yet supported in SQL Server 2008");
-//    }
-//    return result;
+
   }
 
   @Override
   public String sqlNextSequenceValueSelect(final String sequenceName) {
-    return "EXECUTE nextval_" + sequenceName;
+//    return "EXECUTE nextval_" + sequenceName;
+    return 
+        "DECLARE @NewSeqValue INT; SET NOCOUNT ON; INSERT INTO " + sequenceName + 
+        " (SeqVal) VALUES ('a'); SET @NewSeqValue = scope_identity(); DELETE FROM " + sequenceName +
+        " WITH (READPAST); SELECT nextval = @NewSeqValue";
   }
 
   @Override
