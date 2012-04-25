@@ -27,45 +27,57 @@ public abstract class SmileInterpolatorTestCase {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullStrikes() {
+
     getSmileInterpolator().getVolatilityFunction(FORWARD, null, EXPIRY, VOLS);
+
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullVols() {
+
     getSmileInterpolator().getVolatilityFunction(FORWARD, STRIKES, EXPIRY, null);
+
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testWrongLengthVols() {
+
     getSmileInterpolator().getVolatilityFunction(FORWARD, STRIKES, EXPIRY, Arrays.copyOfRange(VOLS, 0, VOLS.length - 1));
+
   }
 
   @Test
   public void smileTest() {
+    final long startTime = System.nanoTime();
     final GeneralSmileInterpolator interpolator = getSmileInterpolator();
     final Function1D<Double, Double> smile = interpolator.getVolatilityFunction(FORWARD, STRIKES, EXPIRY, VOLS);
-
     final int n = STRIKES.length;
     for (int i = 0; i < n; i++) {
       final double k = STRIKES[i];
       final double vol = smile.evaluate(k);
       assertEquals(VOLS[i], vol, 1e-6);
     }
+    final long endTime = System.nanoTime();
+    System.out.println("smileTest time: " + (endTime - startTime) / 1e6 + "ms");
   }
 
   @Test
   public void flatTest() {
     final int n = STRIKES.length;
+    final double flatVol = 0.11;
     final double[] vols = new double[n];
-    Arrays.fill(vols, 0.2);
+    Arrays.fill(vols, flatVol);
+    final long startTime = System.nanoTime();
     final GeneralSmileInterpolator interpolator = getSmileInterpolator();
     final Function1D<Double, Double> smile = interpolator.getVolatilityFunction(FORWARD, STRIKES, EXPIRY, vols);
 
     for (int i = 0; i < 200; i++) {
       final double k = 700 + 1300 * i / 199.;
       final double vol = smile.evaluate(k);
-      assertEquals(0.2, vol, 1e-8);
+      assertEquals(flatVol, vol, 1e-8);
     }
+    final long endTime = System.nanoTime();
+    System.out.println("flat time: " + (endTime - startTime) / 1e6 + "ms");
   }
 
   @Test
@@ -90,8 +102,8 @@ public abstract class SmileInterpolatorTestCase {
   //**********************************************************************************************
 
   @Test
-  (enabled = false)
-  public void printSmileTest() {
+      (enabled = false)
+      public void printSmileTest() {
 
     final GeneralSmileInterpolator interpolator = getSmileInterpolator();
     final Function1D<Double, Double> smile = interpolator.getVolatilityFunction(FORWARD, STRIKES, EXPIRY, VOLS);
@@ -104,8 +116,8 @@ public abstract class SmileInterpolatorTestCase {
   }
 
   @Test
-  (enabled = false)
-  public void bumpTest() {
+      (enabled = false)
+      public void bumpTest() {
     final GeneralSmileInterpolator interpolator = getSmileInterpolator();
     final double bump = 1e-3;
     final int index = 1;
@@ -126,8 +138,8 @@ public abstract class SmileInterpolatorTestCase {
     final int n = STRIKES.length;
     final double[] vols = new double[n];
     Arrays.fill(vols, 0.2);
-    final double bump = 1e-3;
-    final int index = 0;
+    double bump = 1e-3;
+    int index = 0;
     vols[index] += bump;
 
     final Function1D<Double, Double> smile = interpolator.getVolatilityFunction(FORWARD, STRIKES, EXPIRY, vols);
