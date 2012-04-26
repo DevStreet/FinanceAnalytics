@@ -36,6 +36,8 @@ public class SqlServer2008DbDialect extends DbDialect {
   @Override
   public Class<? extends Driver> getJDBCDriverClass() {
     return com.microsoft.sqlserver.jdbc.SQLServerDriver.class;
+    // Alternative, open-source driver (LGPLed)
+    // return net.sourceforge.jtds.jdbc.Driver.class;
   }
 
   @Override
@@ -45,7 +47,7 @@ public class SqlServer2008DbDialect extends DbDialect {
 
   @Override
   protected ElSqlConfig createElSqlConfig() {
-    return ElSqlConfig.SQLSERVER;
+    return ElSqlConfig.SQL_SERVER_2008;
   }
 
   //-------------------------------------------------------------------------
@@ -62,16 +64,15 @@ public class SqlServer2008DbDialect extends DbDialect {
 
   @Override
   public String sqlNextSequenceValueSelect(final String sequenceName) {
-//    return "EXECUTE nextval_" + sequenceName;
     return 
         "DECLARE @NewSeqValue INT; SET NOCOUNT ON; INSERT INTO " + sequenceName + 
         " (SeqVal) VALUES ('a'); SET @NewSeqValue = scope_identity(); DELETE FROM " + sequenceName +
-        " WITH (READPAST); SELECT nextval = @NewSeqValue";
+        " WITH (READPAST); SELECT nextval = @NewSeqValue; SET NOCOUNT OFF";
   }
 
   @Override
   public String sqlNextSequenceValueInline(final String sequenceName) {
-    throw new OpenGammaRuntimeException("sqlNextSequenceValueInline not available for the SQL Server 2008 dialect");
+    throw new OpenGammaRuntimeException("sqlNextSequenceValueInline is not currently supported in the SQL Server 2008 dialect");
   }
 
 }
