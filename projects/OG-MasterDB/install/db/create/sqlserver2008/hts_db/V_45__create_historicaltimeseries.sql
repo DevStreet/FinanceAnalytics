@@ -28,15 +28,6 @@ CREATE TABLE hts_master_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_hts_master_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO hts_master_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM hts_master_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 -- CREATE SEQUENCE hts_idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
@@ -44,15 +35,6 @@ CREATE TABLE hts_idkey_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_hts_idkey_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO hts_idkey_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM hts_idkey_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 -- CREATE SEQUENCE hts_doc2idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
@@ -60,15 +42,6 @@ CREATE TABLE hts_doc2idkey_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_hts_doc2idkey_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO hts_doc2idkey_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM hts_doc2idkey_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 -- CREATE SEQUENCE hts_dimension_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
@@ -77,16 +50,6 @@ CREATE TABLE hts_dimension_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_hts_dimension_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO hts_dimension_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM hts_dimension_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE hts_name (
     id bigint NOT NULL,

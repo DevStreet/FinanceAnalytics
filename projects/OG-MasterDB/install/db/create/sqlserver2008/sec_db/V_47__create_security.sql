@@ -19,15 +19,6 @@ CREATE TABLE sec_security_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_sec_security_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO sec_security_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM sec_security_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 -- CREATE SEQUENCE sec_idkey_seq
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
@@ -36,16 +27,6 @@ CREATE TABLE sec_idkey_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_sec_idkey_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO sec_idkey_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM sec_idkey_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE sec_security (
     id bigint NOT NULL,
@@ -789,16 +770,6 @@ CREATE TABLE sec_security_attr_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_sec_security_attr_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO sec_security_attr_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM sec_security_attr_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE sec_security_attribute (
     id bigint not null,

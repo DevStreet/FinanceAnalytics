@@ -20,16 +20,6 @@ CREATE TABLE snp_snapshot_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_snp_snapshot_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO snp_snapshot_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM snp_snapshot_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE snp_snapshot (
     id bigint NOT NULL,

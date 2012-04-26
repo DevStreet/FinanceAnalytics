@@ -18,15 +18,6 @@ CREATE TABLE pos_master_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_pos_master_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO pos_master_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM pos_master_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 -- CREATE SEQUENCE pos_idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
@@ -35,16 +26,6 @@ CREATE TABLE pos_idkey_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_pos_idkey_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO pos_idkey_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM pos_idkey_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE pos_position (
     id bigint NOT NULL,
@@ -102,15 +83,6 @@ CREATE TABLE pos_trade_attr_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_pos_trade_attr_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO pos_trade_attr_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM pos_trade_attr_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 
 CREATE TABLE pos_trade_attribute (

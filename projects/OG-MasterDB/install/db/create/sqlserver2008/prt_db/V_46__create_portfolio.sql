@@ -19,16 +19,6 @@ CREATE TABLE prt_master_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_prt_master_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO prt_master_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM prt_master_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE prt_portfolio (
     id bigint NOT NULL,
@@ -96,16 +86,6 @@ CREATE TABLE prt_portfolio_attr_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_prt_portfolio_attr_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO prt_portfolio_attr_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM prt_portfolio_attr_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE prt_portfolio_attribute (
     id bigint not null,

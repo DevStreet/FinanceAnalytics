@@ -20,15 +20,6 @@ CREATE TABLE hol_holiday_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_hol_holiday_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO hol_holiday_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM hol_holiday_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 
 CREATE TABLE hol_holiday (
     id bigint NOT NULL,
@@ -93,16 +84,6 @@ CREATE TABLE exg_exchange_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_exg_exchange_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO exg_exchange_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM exg_exchange_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 -- CREATE SEQUENCE exg_idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
@@ -111,16 +92,6 @@ CREATE TABLE exg_idkey_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_exg_idkey_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO exg_idkey_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM exg_idkey_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 CREATE TABLE exg_exchange (
     id bigint NOT NULL,

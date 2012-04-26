@@ -14,16 +14,6 @@ CREATE TABLE rsk_batch_seq (
   SeqID INT identity(1,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
-CREATE PROCEDURE nextval_rsk_batch_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO rsk_batch_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM rsk_batch_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
-
 
 create table rsk_compute_host (
 	id bigint not null,

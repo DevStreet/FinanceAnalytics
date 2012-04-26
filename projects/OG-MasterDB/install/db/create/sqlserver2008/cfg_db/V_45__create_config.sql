@@ -9,15 +9,6 @@
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby/HSQL, not accepted by Postgresql
 -- CREATE SEQUENCE cfg_config_seq
-CREATE PROCEDURE nextval_cfg_config_seq AS
-BEGIN
-  DECLARE @NewSeqValue INT
-  SET NOCOUNT ON
-  INSERT INTO cfg_config_seq (SeqVal) VALUES ('a')
-  SET @NewSeqValue = scope_identity()
-  DELETE FROM cfg_config_seq WITH (READPAST)
-  RETURN @NewSeqValue
-END
 CREATE table cfg_config_seq (
   SeqID int identity(1,1) primary key,
   SeqVal varchar(1)
