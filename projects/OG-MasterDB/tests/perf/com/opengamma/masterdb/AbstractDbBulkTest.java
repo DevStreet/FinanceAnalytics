@@ -10,6 +10,7 @@ import static org.apache.commons.lang.StringUtils.join;
 
 import java.io.*;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -33,6 +34,8 @@ public abstract class AbstractDbBulkTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractDbBulkTest.class);
 
+  private static final int CHUNK = 1000;
+
   final protected Random _random = new Random();
 
   public AbstractDbBulkTest(String databaseType, String databaseVersion) {
@@ -41,19 +44,33 @@ public abstract class AbstractDbBulkTest extends DbTest {
   }
 
 
+  protected String milliIntervalToString(long interval) {
+    String unit = "milliseconds";
+    if (interval > 1000) {
+      interval /= 1000.0;
+      unit = "seconds";
+      if (interval > 60) {
+        interval /= 60;
+        unit = "minutes";
+      }
+    }
+    return interval + " " + unit;
+  }
+
   protected String nanosecondsIntervalToString(long interval) {
     String unit = "nanoseconds";
     if (interval > 1000) {
       interval /= 1000.0;
       unit = "microseconds";
-    }
-    if (interval > 1000) {
-      interval /= 1000.0;
-      unit = "miliseconds";
-    }
-    if (interval > 1000) {
-      interval /= 1000.0;
-      unit = "seconds";
+      if (interval > 1000) {
+        interval /= 1000.0;
+        unit = "miliseconds";
+        if (interval > 1000) {
+          interval /= 1000.0;
+          unit = "seconds";
+        }
+      }
+
     }
     return interval + " " + unit;
   }
@@ -83,20 +100,39 @@ public abstract class AbstractDbBulkTest extends DbTest {
 
   abstract protected void seed(int count);
 
+  private void seedChunk(int count) {
+    s_logger.warn("Starting seeding {} records at {}", count, new Date());
+    final long start = System.currentTimeMillis();
+    for (int c = 1; c <= count; c += CHUNK) {
+      final long intraStart = System.currentTimeMillis();
+      seed(Math.min(CHUNK, count - c + 1));
+      final long intraEnd = System.currentTimeMillis();
+      s_logger.warn("CHUNK {} of {}. Seeding {} chunk took {} (You need to wait aprox {})", new Object[]{1 + (c / CHUNK), count / CHUNK, CHUNK, milliIntervalToString(intraEnd - intraStart), milliIntervalToString((count - c) * (intraEnd - start) / c)});
+    }
+    final long end = System.currentTimeMillis();
+    s_logger.warn("Seeding {} records finished at {}. It took {}", new Object[]{count, new Date(), milliIntervalToString(end - start)});
+  }
+
 
   @AfterSuite
   public static void closeAfterSuite() {
     DbMasterTestUtils.closeAfterSuite();
+
+
   }
 
   public void testOperations(int steps, int seedIncrement, int initSeedCount) {
 
     long count = 0;
-    seed(initSeedCount);
-    count += initSeedCount;
-
     final long[] start = new long[1];
     final long[] end = new long[1];
+    start[0] = System.nanoTime();
+    s_logger.warn("INITIAL SEED: {}", initSeedCount);
+    seedChunk(initSeedCount);
+    s_logger.warn("\n\n\n\n\n\n\n");
+    end[0] = System.nanoTime();
+
+    count += initSeedCount;
 
     for (final Method m : getClass().getMethods()) {
       if (m.isAnnotationPresent(Operation.class)) {
@@ -106,7 +142,9 @@ public abstract class AbstractDbBulkTest extends DbTest {
         final List<Pair<Long, Double>> operatonMasurments = newArrayList();
         final Object self = this;
 
-        for (int i = 0; i < steps; i++) {
+        long veryStart = System.currentTimeMillis();
+
+        for (int i = 1; i <= steps; i++) {
           System.gc();
           final long finalCount = count;
           getDbConnector().getTransactionTemplate().execute(new TransactionCallback<Void>() {
@@ -125,8 +163,10 @@ public abstract class AbstractDbBulkTest extends DbTest {
               return null;
             }
           });
-          seed(seedIncrement);
+          seedChunk(seedIncrement);
           count += seedIncrement;
+          long innerEnd = System.currentTimeMillis();
+          s_logger.warn("Step: {} of {} took {}. You will need to wait aprox. {}", new Object[]{i, steps, nanosecondsIntervalToString(end[0] - start[0]), milliIntervalToString((steps - i) * (innerEnd - veryStart) / (i))});
         }
         dump(operatonMasurments, getDatabaseType(), getClass().getName(), m.getName());
       }

@@ -7,9 +7,7 @@ package com.opengamma.masterdb;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.time.Instant;
 import javax.time.TimeSource;
@@ -24,14 +22,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-import com.opengamma.core.marketdatasnapshot.MarketDataValueSpecification;
-import com.opengamma.core.marketdatasnapshot.ValueSnapshot;
-import com.opengamma.core.marketdatasnapshot.YieldCurveKey;
-import com.opengamma.core.marketdatasnapshot.YieldCurveSnapshot;
-import com.opengamma.core.marketdatasnapshot.impl.ManageableMarketDataSnapshot;
-import com.opengamma.core.marketdatasnapshot.impl.ManageableUnstructuredMarketDataSnapshot;
 import com.opengamma.elsql.ElSqlBundle;
-import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotDocument;
 import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotSearchRequest;
 import com.opengamma.masterdb.marketdatasnapshot.DbMarketDataSnapshotMaster;
 import com.opengamma.util.db.DbMapSqlParameterSource;
@@ -66,7 +57,7 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
     _version2Instant = now.minusSeconds(50);
   }
 
-  @Operation(batchSize = 1)
+  @Operation(batchSize = 100)
   public void search() {
     MarketDataSnapshotSearchRequest request = new MarketDataSnapshotSearchRequest();
     _master.search(request);
@@ -76,7 +67,7 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
 
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 100, 1);
+    testOperations(100, 1000, 1000000);
   }
 
   @AfterMethod
@@ -89,39 +80,32 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
 
   @Override
   protected void seed(int count) {
-
-    final int CHUNK = 1000;
-
     ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbMarketDataSnapshotMaster.class);
 
-    for (int c = 0; c < count; c += CHUNK) {
+    final List<DbMapSqlParameterSource> records = newArrayList();
 
+    for (int i = 0; i < count; i++) {
 
-      final List<DbMapSqlParameterSource> records = newArrayList();
-      
-      for (int i = 0; i < Math.min(CHUNK, count - c); i++) {
+      byte[] bytes = randomBytes(100);
 
-        byte[] bytes = randomBytes(100);
+      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource().addValue("doc_id", ++recordId)
+        .addValue("doc_oid", recordId)
+        .addTimestamp("ver_from_instant", Instant.now())
+        .addTimestampNullFuture("ver_to_instant", null)
+        .addTimestamp("corr_from_instant", Instant.now())
+        .addTimestampNullFuture("corr_to_instant", null)
+        .addValue("name", randomString(20))
+        .addValue("detail", new SqlLobValue(bytes, getDbConnector().getDialect().getLobHandler()), Types.BLOB);
 
-        final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource().addValue("doc_id", ++recordId)
-          .addValue("doc_oid", recordId)
-          .addTimestamp("ver_from_instant", Instant.now())
-          .addTimestampNullFuture("ver_to_instant", null)
-          .addTimestamp("corr_from_instant", Instant.now())
-          .addTimestampNullFuture("corr_to_instant", null)
-          .addValue("name", randomString(20))
-          .addValue("detail", new SqlLobValue(bytes, getDbConnector().getDialect().getLobHandler()), Types.BLOB);
+      records.add(docArgs);
 
-        records.add(docArgs);
-
-      }
-
-      final String sqlDoc = bundle.getSql("Insert");
-      
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        sqlDoc,
-        records.toArray(new DbMapSqlParameterSource[records.size()])
-      );      
     }
+
+    final String sqlDoc = bundle.getSql("Insert");
+
+    getDbConnector().getJdbcTemplate().batchUpdate(
+      sqlDoc,
+      records.toArray(new DbMapSqlParameterSource[records.size()])
+    );
   }
 }

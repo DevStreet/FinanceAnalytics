@@ -55,7 +55,7 @@ public class DbConfigMasterBulkTest extends AbstractDbBulkTest {
   }
 
 
-  @Operation(batchSize = 1)
+  @Operation(batchSize = 100)
   public void search() {
     ConfigSearchRequest request = new ConfigSearchRequest();
     request.setType(ViewDefinition.class);
@@ -66,7 +66,7 @@ public class DbConfigMasterBulkTest extends AbstractDbBulkTest {
 
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 100, 1);
+    testOperations(100, 1000, 1000000);
   }
 
   @AfterMethod
@@ -80,40 +80,33 @@ public class DbConfigMasterBulkTest extends AbstractDbBulkTest {
   @Override
   protected void seed(int count) {
 
-    final int CHUNK = 1000;
+    SqlParameterSource[] records = new SqlParameterSource[count];
 
-    for (int c = 0; c < count; c += CHUNK) {
+    for (int i = 0; i < count; i++) {
 
-      SqlParameterSource[] records = new SqlParameterSource[Math.min(CHUNK, count - c)];
+      byte[] bytes = randomBytes(512);
 
-      for (int i = 0; i < records.length; i++) {
+      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
+        .addValue("doc_id", ++recordId)
+        .addValue("doc_oid", _random.nextInt())
+        .addTimestamp("ver_from_instant", Instant.now())
+        .addTimestampNullFuture("ver_to_instant", null)
+        .addTimestamp("corr_from_instant", Instant.now())
+        .addTimestampNullFuture("corr_to_instant", null)
+        .addValue("name", randomString(20))
+        .addValue("config_type", randomString(20))
+        .addValue("config", new SqlLobValue(bytes, getDbConnector().getDialect().getLobHandler()), Types.BLOB);
 
-        byte[] bytes = randomBytes(512);
-
-        final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
-          .addValue("doc_id", ++recordId)
-          .addValue("doc_oid", _random.nextInt())
-          .addTimestamp("ver_from_instant", Instant.now())
-          .addTimestampNullFuture("ver_to_instant", null)
-          .addTimestamp("corr_from_instant", Instant.now())
-          .addTimestampNullFuture("corr_to_instant", null)
-          .addValue("name", randomString(20))
-          .addValue("config_type", randomString(20))
-          .addValue("config", new SqlLobValue(bytes, getDbConnector().getDialect().getLobHandler()), Types.BLOB);
-
-        records[i] = docArgs;
-
-      }
-
-      final String sqlDoc = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbConfigMaster.class).getSql("Insert");
-      
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        sqlDoc,
-        records
-      );
+      records[i] = docArgs;
 
     }
+
+    final String sqlDoc = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbConfigMaster.class).getSql("Insert");
+
+    getDbConnector().getJdbcTemplate().batchUpdate(
+      sqlDoc,
+      records
+    );
+
   }
-
-
 }

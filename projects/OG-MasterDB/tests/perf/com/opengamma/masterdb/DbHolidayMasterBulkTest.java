@@ -61,63 +61,57 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
   @Override
   protected void seed(int count) {
 
-    final int CHUNK = 1000;
+    LinkedList<Object[]> holidays = new LinkedList<Object[]>();
+    LinkedList<Object[]> dates = new LinkedList<Object[]>();
 
-    for (int c = 0; c < count; c += CHUNK) {
+    for (int i = 0; i < count; i++) {
 
-      LinkedList<Object[]> holidays = new LinkedList<Object[]>();
-      LinkedList<Object[]> dates = new LinkedList<Object[]>();
+      holidays.add(new Object[]{
+        ++holidayId, // id 
+        _random.nextInt(), // oid
+        DbDateUtils.toSqlTimestamp(Instant.now()), // ver_from_instant
+        DbDateUtils.MAX_SQL_TIMESTAMP, // ver_from_instant
+        DbDateUtils.toSqlTimestamp(Instant.now()), // corr_from_instant
+        DbDateUtils.MAX_SQL_TIMESTAMP,  // corr_to_instant
+        randomString(20), // name
+        "BANK", // hol_type
+        "provider_scheme", // provider_scheme
+        "provider_value ", // provider_value
+        "region_scheme", // region_scheme
+        "region_value", // region_value
+        "exchange_scheme", // exchange_scheme
+        "exchange_value", // exchange_value
+        "USD"// currency_iso      
+      });
 
-      for (int i = 0; i < Math.min(CHUNK, count - c); i++) {
-
-        holidays.add(new Object[]{
-          ++holidayId, // id 
-          _random.nextInt(), // oid
-          DbDateUtils.toSqlTimestamp(Instant.now()), // ver_from_instant
-          DbDateUtils.MAX_SQL_TIMESTAMP, // ver_from_instant
-          DbDateUtils.toSqlTimestamp(Instant.now()), // corr_from_instant
-          DbDateUtils.MAX_SQL_TIMESTAMP,  // corr_to_instant
-          randomString(20), // name
-          "BANK", // hol_type
-          "provider_scheme", // provider_scheme
-          "provider_value ", // provider_value
-          "region_scheme", // region_scheme
-          "region_value", // region_value
-          "exchange_scheme", // exchange_scheme
-          "exchange_value", // exchange_value
-          "USD"// currency_iso      
-        });
-
-        dates.add(new Object[]{
-          holidayId, // holiday_id 
-          DbDateUtils.toSqlDate(LocalDate.now()), // hol_date                
-        });
-      }
-
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        "INSERT INTO hol_holiday" +
-          "  (id, oid, ver_from_instant, ver_to_instant, corr_from_instant, corr_to_instant, name, hol_type," +
-          "   provider_scheme, provider_value, region_scheme, region_value, exchange_scheme, exchange_value, currency_iso)" +
-          "VALUES" +
-          "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-
-        holidays
-      );
-
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        "INSERT INTO hol_date" +
-          "    (holiday_id, hol_date)" +
-          "VALUES" +
-          "    (?, ?)",
-
-        dates
-      );
-
-
+      dates.add(new Object[]{
+        holidayId, // holiday_id 
+        DbDateUtils.toSqlDate(LocalDate.now()), // hol_date                
+      });
     }
+
+    getDbConnector().getJdbcTemplate().batchUpdate(
+      "INSERT INTO hol_holiday" +
+        "  (id, oid, ver_from_instant, ver_to_instant, corr_from_instant, corr_to_instant, name, hol_type," +
+        "   provider_scheme, provider_value, region_scheme, region_value, exchange_scheme, exchange_value, currency_iso)" +
+        "VALUES" +
+        "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+
+      holidays
+    );
+
+    getDbConnector().getJdbcTemplate().batchUpdate(
+      "INSERT INTO hol_date" +
+        "    (holiday_id, hol_date)" +
+        "VALUES" +
+        "    (?, ?)",
+
+      dates
+    );
+
   }
 
-  @Operation(batchSize = 1)
+  @Operation(batchSize = 100)
   public void search() {
     HolidaySearchRequest request = new HolidaySearchRequest();
     _master.search(request);
@@ -127,7 +121,7 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
 
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 100, 1);
+    testOperations(100, 1000, 1000000);
   }
 
 

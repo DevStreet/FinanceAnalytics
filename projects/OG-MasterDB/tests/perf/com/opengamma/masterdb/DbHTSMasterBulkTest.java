@@ -6,8 +6,10 @@
 package com.opengamma.masterdb;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.time.Instant;
 import javax.time.TimeSource;
@@ -21,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.Lists;
 import com.opengamma.elsql.ElSqlBundle;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundleWithDates;
@@ -31,7 +34,9 @@ import com.opengamma.masterdb.historicaltimeseries.DbHistoricalTimeSeriesMaster;
 import com.opengamma.masterdb.historicaltimeseries.NamedDimensionDbTable;
 import com.opengamma.util.db.DbDateUtils;
 import com.opengamma.util.db.DbMapSqlParameterSource;
+import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.tuple.Pair;
 
 /**
  * Base tests for DbSecurityMasterWorker via DbSecurityMaster.
@@ -43,6 +48,8 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
   protected DbHistoricalTimeSeriesMaster _master;
   protected Instant _version1Instant;
   protected Instant _version2Instant;
+
+  ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbHistoricalTimeSeriesMaster.class);
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public DbHTSMasterBulkTest(String databaseType, String databaseVersion) {
@@ -65,6 +72,7 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
   @Operation(batchSize = 1)
   public void search() {
     HistoricalTimeSeriesInfoSearchRequest request = new HistoricalTimeSeriesInfoSearchRequest();
+    request.setPagingRequest(PagingRequest.FIRST_PAGE);
     _master.search(request);
     request.setName("dummy");
     _master.search(request);
@@ -72,7 +80,7 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
 
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 100, 1);
+    testOperations(100, 1000, 1000000);
   }
 
   @AfterMethod
@@ -81,96 +89,111 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
     super.tearDown();
   }
 
+  private static Set<Pair<String, String>> idKeySet = null;
+
+  private void seedOnce() {
+    if (idKeySet == null) {
+      idKeySet = newHashSet();
+      final List<DbMapSqlParameterSource> idKeyList = newArrayList();
+
+      for (ExternalId id : Lists.newArrayList(ExternalId.of("SchemeX", "a"), ExternalId.of("SchemeX", "b"), ExternalId.of("SchemeX", "c"))) {
+        // select avoids creating unecessary id, but id may still not be used
+        if (!idKeySet.contains(Pair.of(id.getScheme().getName(), id.getValue()))) {
+          idKeySet.add(Pair.of(id.getScheme().getName(), id.getValue()));
+          final long idKeyId = nextId("exg_idkey_seq");
+          final DbMapSqlParameterSource idkeyArgs = new DbMapSqlParameterSource()
+            .addValue("idkey_id", idKeyId)
+            .addValue("key_scheme", id.getScheme().getName())
+            .addValue("key_value", id.getValue());
+          idKeyList.add(idkeyArgs);
+        }
+      }
+
+      if (idKeyList.size() > 0) {
+        final String sqlIdKey = bundle.getSql("InsertIdKey");
+
+        getDbConnector().getJdbcTemplate().batchUpdate(
+          sqlIdKey,
+          idKeyList.toArray(new DbMapSqlParameterSource[idKeyList.size()])
+        );
+      }
+    }
+  }
+
   @Override
   protected void seed(int count) {
 
-    final int CHUNK = 1000;
+    seedOnce();
 
-    ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbHistoricalTimeSeriesMaster.class);
     NamedDimensionDbTable nameTable = new NamedDimensionDbTable(getDbConnector(), "name", "hts_name", "hts_dimension_seq");
     NamedDimensionDbTable dataFieldTable = new NamedDimensionDbTable(getDbConnector(), "data_field", "hts_data_field", "hts_dimension_seq");
     NamedDimensionDbTable observationTimeTable = new NamedDimensionDbTable(getDbConnector(), "observation_time", "hts_observation_time", "hts_dimension_seq");
     NamedDimensionDbTable dataSourceTable = new NamedDimensionDbTable(getDbConnector(), "data_source", "hts_data_source", "hts_dimension_seq");
     NamedDimensionDbTable dataProviderTable = new NamedDimensionDbTable(getDbConnector(), "data_provider", "hts_data_provider", "hts_dimension_seq");
 
-    for (int c = 0; c < count; c += CHUNK) {
+
+    final List<DbMapSqlParameterSource> records = newArrayList();
+    // the arguments for inserting into the idkey tables
+    final List<DbMapSqlParameterSource> assocList = newArrayList();
+
+    for (int i = 0; i < count; i++) {
 
 
-      final List<DbMapSqlParameterSource> records = newArrayList();
-      // the arguments for inserting into the idkey tables
-      final List<DbMapSqlParameterSource> assocList = newArrayList();
-      final List<DbMapSqlParameterSource> idKeyList = newArrayList();
+      final long docId = nextId("hts_master_seq");
 
-      for (int i = 0; i < Math.min(CHUNK, count - c); i++) {
+      // the arguments for inserting into the table
+      ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
 
+      info.setName("Added");
+      info.setDataField("DF");
+      info.setDataSource("DS");
+      info.setDataProvider("DP");
+      info.setObservationTime("OT");
+            
+      info.setExternalIdBundle(ExternalIdBundleWithDates.of(
+        ExternalIdWithDates.of(ExternalId.of("SchemeX", "a"), LocalDate.now(), LocalDate.now().plusMonths(4)),
+        ExternalIdWithDates.of(ExternalId.of("SchemeX", "b"), LocalDate.now(), LocalDate.now().plusMonths(4)),
+        ExternalIdWithDates.of(ExternalId.of("SchemeX", "c"), LocalDate.now(), LocalDate.now().plusMonths(4))
+      ));
 
-        final long docId = nextId("hts_master_seq");
+      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
+        .addValue("doc_id", docId)
+        .addValue("doc_oid", docId)
+        .addTimestamp("ver_from_instant", Instant.now())
+        .addTimestampNullFuture("ver_to_instant", null)
+        .addTimestamp("corr_from_instant", Instant.now())
+        .addTimestampNullFuture("corr_to_instant", null)
+        .addValue("name_id", nameTable.ensure(info.getName()))
+        .addValue("data_field_id", dataFieldTable.ensure(info.getDataField()))
+        .addValue("data_source_id", dataSourceTable.ensure(info.getDataSource()))
+        .addValue("data_provider_id", dataProviderTable.ensure(info.getDataProvider()))
+        .addValue("observation_time_id", observationTimeTable.ensure(info.getObservationTime()));
 
-        // the arguments for inserting into the table
-        ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
+      records.add(docArgs);
 
-        info.setName("Added");
-        info.setDataField("DF");
-        info.setDataSource("DS");
-        info.setDataProvider("DP");
-        info.setObservationTime("OT");
-        info.setExternalIdBundle(ExternalIdBundleWithDates.of(ExternalIdWithDates.of(ExternalId.of("Scheme", randomString(6)), LocalDate.now(), LocalDate.now().plusMonths(4))));
-
-        final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
+      for (ExternalIdWithDates id : info.getExternalIdBundle()) {
+        final DbMapSqlParameterSource assocArgs = new DbMapSqlParameterSource()
           .addValue("doc_id", docId)
-          .addValue("doc_oid", docId)
-          .addTimestamp("ver_from_instant", Instant.now())
-          .addTimestampNullFuture("ver_to_instant", null)
-          .addTimestamp("corr_from_instant", Instant.now())
-          .addTimestampNullFuture("corr_to_instant", null)
-          .addValue("name_id", nameTable.ensure(info.getName()))
-          .addValue("data_field_id", dataFieldTable.ensure(info.getDataField()))
-          .addValue("data_source_id", dataSourceTable.ensure(info.getDataSource()))
-          .addValue("data_provider_id", dataProviderTable.ensure(info.getDataProvider()))
-          .addValue("observation_time_id", observationTimeTable.ensure(info.getObservationTime()));
-
-        records.add(docArgs);
-
-        final String sqlSelectIdKey = bundle.getSql("SelectIdKey");
-
-        for (ExternalIdWithDates id : info.getExternalIdBundle()) {
-          final DbMapSqlParameterSource assocArgs = new DbMapSqlParameterSource()
-            .addValue("doc_id", docId)
-            .addValue("key_scheme", id.getExternalId().getScheme().getName())
-            .addValue("key_value", id.getExternalId().getValue())
-            .addValue("valid_from", DbDateUtils.toSqlDateNullFarPast(id.getValidFrom()))
-            .addValue("valid_to", DbDateUtils.toSqlDateNullFarFuture(id.getValidTo()));
-          assocList.add(assocArgs);
-          if (getDbConnector().getJdbcTemplate().queryForList(sqlSelectIdKey, assocArgs).isEmpty()) {
-            // select avoids creating unecessary id, but id may still not be used
-            final long idKeyId = nextId("hts_idkey_seq");
-            final DbMapSqlParameterSource idkeyArgs = new DbMapSqlParameterSource()
-              .addValue("idkey_id", idKeyId)
-              .addValue("key_scheme", id.getExternalId().getScheme().getName())
-              .addValue("key_value", id.getExternalId().getValue());
-            idKeyList.add(idkeyArgs);
-          }
-        }
-
+          .addValue("key_scheme", id.getExternalId().getScheme().getName())
+          .addValue("key_value", id.getExternalId().getValue())
+          .addValue("valid_from", DbDateUtils.toSqlDateNullFarPast(id.getValidFrom()))
+          .addValue("valid_to", DbDateUtils.toSqlDateNullFarFuture(id.getValidTo()));
+        assocList.add(assocArgs);
       }
 
-      final String sqlDoc = bundle.getSql("Insert");
-      final String sqlIdKey = bundle.getSql("InsertIdKey");
-      final String sqlDoc2IdKey = bundle.getSql("InsertDoc2IdKey");
-
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        sqlDoc,
-        records.toArray(new DbMapSqlParameterSource[records.size()])
-      );
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        sqlIdKey,
-        idKeyList.toArray(new DbMapSqlParameterSource[idKeyList.size()])
-      );
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        sqlDoc2IdKey,
-        assocList.toArray(new DbMapSqlParameterSource[assocList.size()])
-      );
     }
+
+    final String sqlDoc = bundle.getSql("Insert");
+    final String sqlDoc2IdKey = bundle.getSql("InsertDoc2IdKey");
+
+    getDbConnector().getJdbcTemplate().batchUpdate(
+      sqlDoc,
+      records.toArray(new DbMapSqlParameterSource[records.size()])
+    );    
+    getDbConnector().getJdbcTemplate().batchUpdate(
+      sqlDoc2IdKey,
+      assocList.toArray(new DbMapSqlParameterSource[assocList.size()])
+    );
   }
 
 }

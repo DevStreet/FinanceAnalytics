@@ -27,7 +27,9 @@ import com.opengamma.elsql.ElSqlBundle;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.DocumentVisibility;
+import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
+import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
 import com.opengamma.masterdb.portfolio.DbPortfolioMaster;
 import com.opengamma.util.db.DbMapSqlParameterSource;
@@ -37,16 +39,16 @@ import com.opengamma.util.test.DbTest;
 /**
  * Base tests for DbSecurityMasterWorker via DbSecurityMaster.
  */
-public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
+public class DbPortfolioMasterBulkTest2 extends AbstractDbBulkTest {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(DbPortfolioMasterBulkTest.class);
+  private static final Logger s_logger = LoggerFactory.getLogger(DbPortfolioMasterBulkTest2.class);
 
   protected DbPortfolioMaster _master;
   protected Instant _version1Instant;
   protected Instant _version2Instant;
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
-  public DbPortfolioMasterBulkTest(String databaseType, String databaseVersion) {
+  public DbPortfolioMasterBulkTest2(String databaseType, String databaseVersion) {
     super(databaseType, databaseVersion);
     s_logger.info("running testcases for {}", databaseType);
   }
@@ -70,6 +72,16 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
     _master.search(request);
     request.setDepth(3);
     _master.search(request);
+  }
+
+  @Operation(batchSize = 10)
+  public void insert() {  
+    PortfolioDocument doc = new PortfolioDocument();
+    ManageablePortfolioNode rootNode = createPortfolioTree(2, 3, 12);
+    ManageablePortfolio portfolio = new ManageablePortfolio("Test");
+    portfolio.setRootNode(rootNode);
+    doc.setPortfolio(portfolio);
+    _master.add(doc);    
   }
 
   @Test(groups = {"perftest"})

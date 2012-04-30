@@ -59,7 +59,7 @@ public class DbSecurityMasterWorkerBulkTest extends AbstractDbBulkTest {
     _version2Instant = now.minusSeconds(50);
   }
 
-  @Operation(batchSize = 1)
+  @Operation(batchSize = 100)
   public void search() {
     SecuritySearchRequest request = new SecuritySearchRequest();
     _master.search(request);
