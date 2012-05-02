@@ -74,7 +74,7 @@ import com.opengamma.financial.analytics.model.bond.BondZSpreadPresentValueSensi
 import com.opengamma.financial.analytics.model.bond.BondZSpreadPresentValueSensitivityFromMarketCleanPriceFunction;
 import com.opengamma.financial.analytics.model.bond.NelsonSiegelSvenssonBondCurveFunction;
 import com.opengamma.financial.analytics.model.curve.forward.FXForwardCurveValuePropertyNames;
-import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveDefaults;
 import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveFunction;
 import com.opengamma.financial.analytics.model.curve.interestrate.MarketInstrumentImpliedYieldCurveFunction;
 import com.opengamma.financial.analytics.model.equity.futures.EquityFutureYieldCurveNodeSensitivityFunction;
@@ -157,9 +157,11 @@ import com.opengamma.financial.analytics.model.future.InterestRateFuturePV01Func
 import com.opengamma.financial.analytics.model.future.InterestRateFuturePresentValueFunction;
 import com.opengamma.financial.analytics.model.future.InterestRateFutureYieldCurveNodeSensitivitiesFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackGammaFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPV01Function;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPresentValueFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackVolatilitySensitivityFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionDefaultValuesFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionPresentValueFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionSABRSensitivitiesFunction;
@@ -435,7 +437,7 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addValueFunctions(functionConfigs);
 
     functionConfigs.add(functionConfiguration(SecurityMarketPriceFunction.class));
-    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SECURITY_IMPLIED_VOLATLITY);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SECURITY_IMPLIED_VOLATILITY);
 
     // options
     functionConfigs.add(functionConfiguration(BlackScholesMertonModelFunction.class));
@@ -535,7 +537,7 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_Z_SPREAD_SENSITIVITY);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.CONVEXITY);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.MACAULAY_DURATION);
-    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SECURITY_IMPLIED_VOLATLITY);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SECURITY_IMPLIED_VOLATILITY);
 
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.GROSS_BASIS);
     addSummingFunction(functionConfigs, ValueRequirementNames.GROSS_BASIS);
@@ -1119,8 +1121,10 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackPresentValueFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackVolatilitySensitivityFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackPV01Function.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackGammaFunction.class));
     functionConfigs.add(new ParameterizedFunctionConfiguration(InterestRateFutureOptionBlackDefaultPropertiesFunction.class.getName(),
-        Arrays.asList("FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue", "USD", "EUR")));
+        Arrays.asList("FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue", "USD", "EUR")));  // TODO Change FORWARD_3M to FUTURES once available in db
     functionConfigs.add(functionConfiguration(SwaptionBlackPresentValueFunction.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackVolatilitySensitivityFunction.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackPV01Function.class));
@@ -1139,7 +1143,7 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(InterpolatedYieldCurveFunction.class));
     final String leftExtrapolatorName = Interpolator1DFactory.LINEAR_EXTRAPOLATOR;
     final String rightExtrapolatorName = Interpolator1DFactory.FLAT_EXTRAPOLATOR;
-    functionConfigs.add(functionConfiguration(InterpolatedYieldCurveDefaultPropertiesFunction.class, leftExtrapolatorName, rightExtrapolatorName, "USD", "EUR", "DKK", "AUD", "MYR"));
+    functionConfigs.add(functionConfiguration(InterpolatedYieldCurveDefaults.class, leftExtrapolatorName, rightExtrapolatorName, "USD", "EUR", "DKK", "AUD", "MYR"));
     functionConfigs.add(functionConfiguration(MarketInstrumentImpliedYieldCurveFunction.class, MarketInstrumentImpliedYieldCurveFunction.PAR_RATE_STRING));
     functionConfigs.add(functionConfiguration(MarketInstrumentImpliedYieldCurveFunction.class, MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING));
     functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunction.class, "PresentValue", "FORWARD_3M", "FUNDING", "AUD", "USD", "CAD"));

@@ -109,7 +109,14 @@ public final class ValueRequirementNames {
    * Curve property metadata. 
    */
   public static final String YIELD_CURVE_SPEC = "YieldCurveSpec";
-
+  /**
+   * The raw FX forward and spot market data that is used in curve construction
+   */
+  public static final String FX_FORWARD_CURVE_MARKET_DATA = "FXForwardCurveMarketData";
+  /** 
+   * FX forward curve property metadata
+   */
+  public static final String FX_FORWARD_CURVE_SPEC = "FXForwardCurveSpec";
   ///// Surfaces
 
   /**
@@ -237,7 +244,7 @@ public final class ValueRequirementNames {
   /**
    * The implied volatility of a security.
    */
-  public static final String SECURITY_IMPLIED_VOLATLITY = "Security Implied Volatility";
+  public static final String SECURITY_IMPLIED_VOLATILITY = "Security Implied Volatility";
   /**
    * Generic valuation of a security, for example it might be FAIR_VALUE or PRESENT_VALUE depending on the asset class.
    */
