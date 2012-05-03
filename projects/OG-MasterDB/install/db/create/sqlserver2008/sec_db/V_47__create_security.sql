@@ -306,7 +306,7 @@ CREATE TABLE sec_swaption (
     is_payer BIT NOT NULL,
     currency_id bigint NOT NULL,
     option_exercise_type VARCHAR(32),
-    settlement_date TIMESTAMP,
+    settlement_date DATETIME,
     settlement_zone VARCHAR(50),
     notional double precision,
     PRIMARY KEY (id),
