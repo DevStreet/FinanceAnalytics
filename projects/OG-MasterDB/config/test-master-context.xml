@@ -25,9 +25,9 @@
     <property name="username" value="${hsqldb.jdbc.username}"/>
     <property name="password" value="${hsqldb.jdbc.password}"/>
     <property name="poolName" value="FinancialTestsHSQL"/>
-    <property name="partitionCount" value="1"/>
+    <property name="partitionCount" value="2"/>
     <property name="acquireIncrement" value="1"/>
-    <property name="maxConnectionsPerPartition" value="1"/>
+    <property name="maxConnectionsPerPartition" value="20"/>
     <property name="acquireRetryAttempts" value="2"/>
     <property name="acquireRetryDelayInMs" value="2000"/>
   </bean>
@@ -92,9 +92,9 @@
     <property name="username" value="${postgres.jdbc.username}"/>
     <property name="password" value="${postgres.jdbc.password}"/>
     <property name="poolName" value="FinancialTestsPostgres"/>
-    <property name="partitionCount" value="1"/>
+    <property name="partitionCount" value="2"/>
     <property name="acquireIncrement" value="1"/>
-    <property name="maxConnectionsPerPartition" value="1"/>
+    <property name="maxConnectionsPerPartition" value="20"/>
     <property name="acquireRetryAttempts" value="2"/>
     <property name="acquireRetryDelayInMs" value="2000"/>
   </bean>
