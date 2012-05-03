@@ -27,7 +27,9 @@ import com.opengamma.elsql.ElSqlBundle;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.DocumentVisibility;
+import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
+import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
 import com.opengamma.masterdb.portfolio.DbPortfolioMaster;
 import com.opengamma.util.db.DbMapSqlParameterSource;
@@ -63,6 +65,11 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
     _version2Instant = now.minusSeconds(50);
   }
 
+  @Override
+  protected AbstractDbMaster getMaster() {
+    return _master;
+  }
+
   @Operation(batchSize = 10)
   public void search() {
     PortfolioSearchRequest request = new PortfolioSearchRequest();
@@ -72,9 +79,19 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
     _master.search(request);
   }
 
+  @Operation(batchSize = 10)
+  public void insert() {
+    PortfolioDocument doc = new PortfolioDocument();
+    ManageablePortfolioNode rootNode = createPortfolioTree(2, 3, 12);
+    ManageablePortfolio portfolio = new ManageablePortfolio("Test");
+    portfolio.setRootNode(rootNode);
+    doc.setPortfolio(portfolio);
+    _master.add(doc);
+  }
+
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 1000, 0);
+    testOperations(100, 100, 0);
   }
 
   @AfterMethod

@@ -7,7 +7,9 @@ package com.opengamma.masterdb;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.time.Instant;
 import javax.time.TimeSource;
@@ -22,7 +24,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
+import com.opengamma.core.marketdatasnapshot.MarketDataValueSpecification;
+import com.opengamma.core.marketdatasnapshot.ValueSnapshot;
+import com.opengamma.core.marketdatasnapshot.YieldCurveKey;
+import com.opengamma.core.marketdatasnapshot.YieldCurveSnapshot;
+import com.opengamma.core.marketdatasnapshot.impl.ManageableMarketDataSnapshot;
+import com.opengamma.core.marketdatasnapshot.impl.ManageableUnstructuredMarketDataSnapshot;
 import com.opengamma.elsql.ElSqlBundle;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotDocument;
 import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotSearchRequest;
 import com.opengamma.masterdb.marketdatasnapshot.DbMarketDataSnapshotMaster;
 import com.opengamma.util.db.DbMapSqlParameterSource;
@@ -57,6 +66,11 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
     _version2Instant = now.minusSeconds(50);
   }
 
+  @Override
+  protected AbstractDbMaster getMaster() {
+    return _master;
+  }
+
   @Operation(batchSize = 100)
   public void search() {
     MarketDataSnapshotSearchRequest request = new MarketDataSnapshotSearchRequest();
@@ -65,9 +79,22 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
     _master.search(request);
   }
 
+  @Operation(batchSize = 100)
+  public void insert() {
+    ManageableMarketDataSnapshot marketDataSnapshot = new ManageableMarketDataSnapshot();
+    marketDataSnapshot.setName("Test");
+    HashMap<YieldCurveKey, YieldCurveSnapshot> yieldCurves = new HashMap<YieldCurveKey, YieldCurveSnapshot>();
+    ManageableUnstructuredMarketDataSnapshot globalValues = new ManageableUnstructuredMarketDataSnapshot();
+    globalValues.setValues(new HashMap<MarketDataValueSpecification, Map<String, ValueSnapshot>>());
+    marketDataSnapshot.setGlobalValues(globalValues);
+    marketDataSnapshot.setYieldCurves(yieldCurves);
+    MarketDataSnapshotDocument doc = new MarketDataSnapshotDocument(marketDataSnapshot);
+    _master.add(doc);
+  }
+
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 1000, 1000000);
+    testOperations(100, 100, 0);
   }
 
   @AfterMethod
@@ -76,7 +103,6 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
     super.tearDown();
   }
 
-  private int recordId = 1;
 
   @Override
   protected void seed(int count) {
@@ -87,9 +113,11 @@ public class DbMarketDataSnapshotMasterBulkTest extends AbstractDbBulkTest {
     for (int i = 0; i < count; i++) {
 
       byte[] bytes = randomBytes(100);
+      
+      final long docId = nextId("snp_snapshot_seq");
 
-      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource().addValue("doc_id", ++recordId)
-        .addValue("doc_oid", recordId)
+      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource().addValue("doc_id", docId)
+        .addValue("doc_oid", docId)
         .addTimestamp("ver_from_instant", Instant.now())
         .addTimestampNullFuture("ver_to_instant", null)
         .addTimestamp("corr_from_instant", Instant.now())

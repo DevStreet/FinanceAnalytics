@@ -19,13 +19,13 @@
       dbtype = _ref[_i];
       _results.push((function() {
         var _j, _len2, _ref2, _results2;
-        _ref2 = ['com.opengamma.masterdb.DbConfigMasterBulkTest', 'com.opengamma.masterdb.DbExhangeMasterBulkTest', 'com.opengamma.masterdb.DbHolidayMasterBulkTest', 'com.opengamma.masterdb.DbHTSMasterBulkTest', 'com.opengamma.masterdb.DbMarketDataSnapshotMasterBulkTest', 'com.opengamma.masterdb.DbPortfolioMasterBulkTest', 'com.opengamma.masterdb.DbPortfolioMasterBulkTest2', 'com.opengamma.masterdb.DbPositionMasterBulkTest', 'com.opengamma.masterdb.DbSecurityMasterWorkerBulkTest'];
+        _ref2 = ['DbConfigMasterBulkTest', 'DbExhangeMasterBulkTest', 'DbHolidayMasterBulkTest', 'DbHTSMasterBulkTest', 'DbMarketDataSnapshotMasterBulkTest', 'DbPortfolioMasterBulkTest', 'DbPositionMasterBulkTest', 'DbSecurityMasterWorkerBulkTest'];
         _results2 = [];
         for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
           master = _ref2[_j];
           _results2.push((function() {
             var _k, _len3, _ref3, _results3;
-            _ref3 = ['search', 'insert'];
+            _ref3 = ['correct', 'get', 'insert', 'remove', 'search', 'update'];
             _results3 = [];
             for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
               operation = _ref3[_k];
@@ -52,19 +52,19 @@
         d = _ref[_i];
         try {
           require([d], function(s) {
-            var color;
+            var batchSize, color;
             color = palette.shift();
             operation = s.operation;
             dbtype = s.dbtype;
             master = s.master;
-            chart.addSeries(charts.line_series("" + dbtype + ":" + master + " " + operation + " per second", s.data, color, color), false);
+            batchSize = s.batchSize;
+            chart.addSeries(charts.line_series("" + dbtype + ":" + master + " " + operation + " (" + batchSize + ")", s.data, color, color), false);
             return chart.redraw();
           });
         } catch (error) {
           "just carry on";
         }
       }
-      chart.redraw();
       return chart;
     });
   });

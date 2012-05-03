@@ -27,6 +27,7 @@ import com.opengamma.id.IdUtils;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.ManageableTrade;
+import com.opengamma.master.position.PositionDocument;
 import com.opengamma.master.position.PositionSearchRequest;
 import com.opengamma.masterdb.position.DbPositionMaster;
 import com.opengamma.util.db.DbMapSqlParameterSource;
@@ -62,6 +63,10 @@ public class DbPositionMasterBulkTest extends AbstractDbBulkTest {
     _version2Instant = now.minusSeconds(50);
   }
 
+  @Override
+  protected AbstractDbMaster getMaster() {
+    return _master;
+  }
 
   @Operation(batchSize = 100)
   public void search() {
@@ -71,9 +76,17 @@ public class DbPositionMasterBulkTest extends AbstractDbBulkTest {
     _master.search(request);
   }
 
+  @Operation(batchSize = 10)
+  public void insert() {
+    ManageablePosition position = new ManageablePosition(BigDecimal.TEN, ExternalId.of("A", "B"));
+    PositionDocument doc = new PositionDocument();
+    doc.setPosition(position);
+    _master.add(doc);
+  }
+
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 1000, 1000000);
+    testOperations(100, 100, 0);
   }
 
   @AfterMethod

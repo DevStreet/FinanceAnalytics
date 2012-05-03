@@ -5,7 +5,7 @@
  */
 package com.opengamma.masterdb;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 
 import javax.time.Instant;
 import javax.time.TimeSource;
@@ -19,9 +19,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
+import com.opengamma.master.holiday.HolidayDocument;
 import com.opengamma.master.holiday.HolidaySearchRequest;
+import com.opengamma.master.holiday.ManageableHoliday;
 import com.opengamma.masterdb.holiday.DbHolidayMaster;
-import com.opengamma.util.db.DbDateUtils;
+import com.opengamma.util.money.Currency;
 import com.opengamma.util.test.DbTest;
 
 
@@ -30,8 +32,6 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
   private static final Logger s_logger = LoggerFactory.getLogger(DbHolidayMasterBulkTest.class);
 
   protected DbHolidayMaster _master;
-  protected Instant _version1Instant;
-  protected Instant _version2Instant;
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public DbHolidayMasterBulkTest(String databaseType, String databaseVersion) {
@@ -47,67 +47,27 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
     _master = (DbHolidayMaster) context.getBean(getDatabaseType() + "DbHolidayMaster");
     Instant now = Instant.now();
     _master.setTimeSource(TimeSource.fixed(now));
-    _version1Instant = now.minusSeconds(100);
-    _version2Instant = now.minusSeconds(50);
   }
 
+  @Override
+  protected AbstractDbMaster getMaster() {
+    return _master;
+  }
 
   protected void seed() {
     throw new RuntimeException("dummy - not used really");
   }
 
-  private int holidayId = 1;
-
   @Override
   protected void seed(int count) {
 
-    LinkedList<Object[]> holidays = new LinkedList<Object[]>();
-    LinkedList<Object[]> dates = new LinkedList<Object[]>();
-
     for (int i = 0; i < count; i++) {
 
-      holidays.add(new Object[]{
-        ++holidayId, // id 
-        _random.nextInt(), // oid
-        DbDateUtils.toSqlTimestamp(Instant.now()), // ver_from_instant
-        DbDateUtils.MAX_SQL_TIMESTAMP, // ver_from_instant
-        DbDateUtils.toSqlTimestamp(Instant.now()), // corr_from_instant
-        DbDateUtils.MAX_SQL_TIMESTAMP,  // corr_to_instant
-        randomString(20), // name
-        "BANK", // hol_type
-        "provider_scheme", // provider_scheme
-        "provider_value ", // provider_value
-        "region_scheme", // region_scheme
-        "region_value", // region_value
-        "exchange_scheme", // exchange_scheme
-        "exchange_value", // exchange_value
-        "USD"// currency_iso      
-      });
-
-      dates.add(new Object[]{
-        holidayId, // holiday_id 
-        DbDateUtils.toSqlDate(LocalDate.now()), // hol_date                
-      });
+      ManageableHoliday holiday = new ManageableHoliday(Currency.USD, Arrays.asList(LocalDate.of(2010, 6, 9)));
+      HolidayDocument doc = new HolidayDocument(holiday);
+      doc.setName(randomString(20));
+      _master.add(doc);
     }
-
-    getDbConnector().getJdbcTemplate().batchUpdate(
-      "INSERT INTO hol_holiday" +
-        "  (id, oid, ver_from_instant, ver_to_instant, corr_from_instant, corr_to_instant, name, hol_type," +
-        "   provider_scheme, provider_value, region_scheme, region_value, exchange_scheme, exchange_value, currency_iso)" +
-        "VALUES" +
-        "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-
-      holidays
-    );
-
-    getDbConnector().getJdbcTemplate().batchUpdate(
-      "INSERT INTO hol_date" +
-        "    (holiday_id, hol_date)" +
-        "VALUES" +
-        "    (?, ?)",
-
-      dates
-    );
 
   }
 
@@ -119,9 +79,16 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
     _master.search(request);
   }
 
+  @Operation(batchSize = 100)
+  public void insert() {
+    ManageableHoliday holiday = new ManageableHoliday(Currency.USD, Arrays.asList(LocalDate.of(2010, 6, 9)));
+    HolidayDocument doc = new HolidayDocument(holiday);
+    _master.add(doc);
+  }
+
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 1000, 1000000);
+    testOperations(100, 100, 0);
   }
 
 

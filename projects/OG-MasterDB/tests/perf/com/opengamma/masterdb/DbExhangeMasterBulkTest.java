@@ -10,6 +10,7 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.time.Instant;
 import javax.time.TimeSource;
@@ -26,9 +27,15 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
+import com.opengamma.DataNotFoundException;
 import com.opengamma.elsql.ElSqlBundle;
 import com.opengamma.id.ExternalId;
+import com.opengamma.id.ExternalIdBundle;
+import com.opengamma.id.UniqueId;
+import com.opengamma.master.config.ConfigDocument;
+import com.opengamma.master.exchange.ExchangeDocument;
 import com.opengamma.master.exchange.ExchangeSearchRequest;
+import com.opengamma.master.exchange.ManageableExchange;
 import com.opengamma.masterdb.exchange.DbExchangeMaster;
 import com.opengamma.util.db.DbMapSqlParameterSource;
 import com.opengamma.util.test.DbTest;
@@ -40,9 +47,8 @@ public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
   private static final Logger s_logger = LoggerFactory.getLogger(DbExhangeMasterBulkTest.class);
 
   protected DbExchangeMaster _master;
-  protected Instant _version1Instant;
-  protected Instant _version2Instant;
 
+  private UniqueId lastInsertedDocumentUid;
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public DbExhangeMasterBulkTest(String databaseType, String databaseVersion) {
@@ -58,10 +64,12 @@ public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
     _master = (DbExchangeMaster) context.getBean(getDatabaseType() + "DbExchangeMaster");
     Instant now = Instant.now();
     _master.setTimeSource(TimeSource.fixed(now));
-    _version1Instant = now.minusSeconds(100);
-    _version2Instant = now.minusSeconds(50);
   }
 
+  @Override
+  protected AbstractDbMaster getMaster() {
+    return _master;
+  }
 
   @Operation(batchSize = 100)
   public void search() {
@@ -70,9 +78,61 @@ public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
     _master.search(request);
   }
 
+  private static final ExternalIdBundle BUNDLE = ExternalIdBundle.of("A", "B");
+  private static final ExternalIdBundle REGION = ExternalIdBundle.of("C", "D");
+
+  @Operation(batchSize = 100)
+  public ExchangeDocument add() {
+    ManageableExchange exchange = new ManageableExchange(BUNDLE, "Test", REGION, null);
+    ExchangeDocument doc = new ExchangeDocument(exchange);
+    return _master.add(doc);
+  }
+
+  @Operation(batchSize = 100)
+  public void get() {
+    _master.get(lastInsertedDocumentUid);
+  }
+
+  @Operation(batchSize = 100)
+  public void remove() {
+    try {
+      _master.remove(randomUniqueId());
+    } catch (DataNotFoundException e) {
+      // this is expected for random uid most of the time
+    }
+  }
+
+  @Operation(batchSize = 100)
+  public void correct() {   
+    ManageableExchange exchange = new ManageableExchange(BUNDLE, "Test", REGION, null);
+    exchange.setUniqueId(lastInsertedDocumentUid);
+    ExchangeDocument doc = new ExchangeDocument(exchange);
+    doc.setUniqueId(lastInsertedDocumentUid);
+    doc.setVersionFromInstant(Instant.now());
+    doc.setVersionToInstant(null);
+    doc.setCorrectionFromInstant(Instant.now());
+    doc.setCorrectionToInstant(null);
+    ExchangeDocument corrected = _master.correct(doc);
+    lastInsertedDocumentUid = corrected.getUniqueId();
+  }
+
+  @Operation(batchSize = 100)
+  public void update() {
+    ManageableExchange exchange = new ManageableExchange(BUNDLE, "Test", REGION, null);
+    exchange.setUniqueId(lastInsertedDocumentUid);
+    ExchangeDocument doc = new ExchangeDocument(exchange);
+    doc.setUniqueId(lastInsertedDocumentUid);
+    doc.setVersionFromInstant(Instant.now());
+    doc.setVersionToInstant(null);
+    doc.setCorrectionFromInstant(Instant.now());
+    doc.setCorrectionToInstant(null);
+    ExchangeDocument updated = _master.update(doc);
+    lastInsertedDocumentUid = updated.getUniqueId();
+  }
+
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 1000, 1000000);
+    testOperations(100, 100, 1);
   }
 
   @AfterMethod
@@ -81,84 +141,13 @@ public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
     super.tearDown();
   }
 
-  private int recordId = 1;
-
-  private final static Set<Pair<String, String>> idKeySet = newHashSet();
 
   @Override
   protected void seed(int count) {
-
-    ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbExchangeMaster.class);
-
-    final List<DbMapSqlParameterSource> idKeyList = newArrayList();
-
-    for (ExternalId id : Lists.newArrayList(ExternalId.of("SchemeX", "a"), ExternalId.of("SchemeX", "b"), ExternalId.of("SchemeX", "c"))) {
-      // select avoids creating unecessary id, but id may still not be used
-      if (!idKeySet.contains(Pair.of(id.getScheme().getName(), id.getValue()))) {
-        idKeySet.add(Pair.of(id.getScheme().getName(), id.getValue()));
-        final long idKeyId = nextId("exg_idkey_seq");
-        final DbMapSqlParameterSource idkeyArgs = new DbMapSqlParameterSource()
-          .addValue("idkey_id", idKeyId)
-          .addValue("key_scheme", id.getScheme().getName())
-          .addValue("key_value", id.getValue());
-        idKeyList.add(idkeyArgs);
-      }
-    }
-
-    if (idKeyList.size() > 0) {
-      final String sqlIdKey = bundle.getSql("InsertIdKey");
-
-      getDbConnector().getJdbcTemplate().batchUpdate(
-        sqlIdKey,
-        idKeyList.toArray(new DbMapSqlParameterSource[idKeyList.size()])
-      );
-    }
-
-
-    final List<DbMapSqlParameterSource> records = newArrayList();
-    // the arguments for inserting into the idkey tables
-    final List<DbMapSqlParameterSource> assocList = newArrayList();
-
-
-    for (int i = 0; i < count; i++) {
-
-      byte[] bytes = randomBytes(512);
-
-      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
-        .addValue("doc_id", ++recordId)
-        .addValue("doc_oid", _random.nextInt())
-        .addTimestamp("ver_from_instant", Instant.now())
-        .addTimestampNullFuture("ver_to_instant", null)
-        .addTimestamp("corr_from_instant", Instant.now())
-        .addTimestampNullFuture("corr_to_instant", null)
-        .addValue("name", randomString(20))
-        .addValue("time_zone", TimeZone.of("UTC").getID())
-        .addValue("detail", new SqlLobValue(bytes, getDbConnector().getDialect().getLobHandler()), Types.BLOB);
-
-      records.add(docArgs);
-
-      for (ExternalId id : Lists.newArrayList(ExternalId.of("SchemeX", "a"), ExternalId.of("SchemeX", "b"), ExternalId.of("SchemeX", "c"))) {
-        final DbMapSqlParameterSource assocArgs = new DbMapSqlParameterSource()
-          .addValue("doc_id", recordId)
-          .addValue("key_scheme", id.getScheme().getName())
-          .addValue("key_value", id.getValue());
-        assocList.add(assocArgs);
-
-      }
-    }
-
-    final String sqlDoc = bundle.getSql("Insert");
-
-    final String sqlDoc2IdKey = bundle.getSql("InsertDoc2IdKey");
-
-    getDbConnector().getJdbcTemplate().batchUpdate(
-      sqlDoc,
-      records.toArray(new DbMapSqlParameterSource[records.size()])
-    );
-    getDbConnector().getJdbcTemplate().batchUpdate(
-      sqlDoc2IdKey,
-      assocList.toArray(new DbMapSqlParameterSource[assocList.size()])
-    );
+    for (int i = 0; i < count; i++) {      
+      ExchangeDocument document = add();
+      lastInsertedDocumentUid = document.getUniqueId();
+    }    
   }
 
 }

@@ -8,17 +8,16 @@ flatten = (arr) ->
 #deps = for dbtype in ['hsqldb', 'postgres']
 deps = for dbtype in ['postgres']
           for master in [
-            'com.opengamma.masterdb.DbConfigMasterBulkTest',
-            'com.opengamma.masterdb.DbExhangeMasterBulkTest',
-            'com.opengamma.masterdb.DbHolidayMasterBulkTest',
-            'com.opengamma.masterdb.DbHTSMasterBulkTest',
-            'com.opengamma.masterdb.DbMarketDataSnapshotMasterBulkTest',
-            'com.opengamma.masterdb.DbPortfolioMasterBulkTest',
-            'com.opengamma.masterdb.DbPortfolioMasterBulkTest2',
-            'com.opengamma.masterdb.DbPositionMasterBulkTest',
-            'com.opengamma.masterdb.DbSecurityMasterWorkerBulkTest']
+            'DbConfigMasterBulkTest',
+            'DbExhangeMasterBulkTest',
+            'DbHolidayMasterBulkTest',
+            'DbHTSMasterBulkTest',
+            'DbMarketDataSnapshotMasterBulkTest',
+            'DbPortfolioMasterBulkTest',
+            'DbPositionMasterBulkTest',
+            'DbSecurityMasterWorkerBulkTest']
                        
-            for operation in ['search', 'insert']
+            for operation in ['correct', 'get', 'insert', 'remove', 'search', 'update']
               "app/#{dbtype}_#{master}_#{operation}"
 
 require ['app/theme', 'jquery', 'underscore', 'app/charts'], (theme, $, _, charts) ->
@@ -36,11 +35,11 @@ require ['app/theme', 'jquery', 'underscore', 'app/charts'], (theme, $, _, chart
           operation = s.operation
           dbtype = s.dbtype
           master = s.master
-          chart.addSeries(charts.line_series("#{dbtype}:#{master} #{operation} per second", s.data, color, color), false)   
+          batchSize = s.batchSize
+          chart.addSeries(charts.line_series("#{dbtype}:#{master} #{operation} (#{batchSize})", s.data, color, color), false)   
           chart.redraw()
       catch error
         "just carry on"
           
-    chart.redraw()
       
     chart
