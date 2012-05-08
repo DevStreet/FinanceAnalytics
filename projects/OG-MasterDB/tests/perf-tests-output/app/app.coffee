@@ -5,20 +5,6 @@ flatten = (arr) ->
     else
       xs.concat [el]), []
 
-#deps = for dbtype in ['hsqldb', 'postgres']
-deps = for dbtype in ['postgres']
-          for master in [
-            'DbConfigMasterBulkTest',
-            'DbExhangeMasterBulkTest',
-            'DbHolidayMasterBulkTest',
-            'DbHTSMasterBulkTest',
-            'DbMarketDataSnapshotMasterBulkTest',
-            'DbPortfolioMasterBulkTest',
-            'DbPositionMasterBulkTest',
-            'DbSecurityMasterWorkerBulkTest']
-                       
-            for operation in ['correct', 'get', 'insert', 'remove', 'search', 'update']
-              "app/#{dbtype}_#{master}_#{operation}"
 
 require ['app/theme', 'jquery', 'underscore', 'app/charts'], (theme, $, _, charts) ->
   $ ->    
@@ -34,7 +20,7 @@ require ['app/theme', 'jquery', 'underscore', 'app/charts'], (theme, $, _, chart
         'DbPositionMasterBulkTest',
         'DbSecurityMasterWorkerBulkTest']
           
-        palette = generateColors(8)
+        palette = generateColors(10)
         palette.shift() # ommit white
         palette.shift() # ommit black
         
@@ -42,7 +28,7 @@ require ['app/theme', 'jquery', 'underscore', 'app/charts'], (theme, $, _, chart
         $('body').append(chart_div)
         chart = charts.time_series_chart('Operations per second on '+master, master)
                   
-        for operation in ['correct', 'get', 'insert', 'remove', 'search', 'update']
+        for operation in ['correct', 'get', 'add', 'remove', 'search', 'update']
           benchmark = "app/#{dbtype}_#{master}_#{operation}"
           ((c, p) ->
             try                                                                                                                           

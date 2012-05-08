@@ -19,6 +19,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
+import com.opengamma.DataNotFoundException;
+import com.opengamma.id.UniqueId;
 import com.opengamma.master.holiday.HolidayDocument;
 import com.opengamma.master.holiday.HolidaySearchRequest;
 import com.opengamma.master.holiday.ManageableHoliday;
@@ -32,6 +34,8 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
   private static final Logger s_logger = LoggerFactory.getLogger(DbHolidayMasterBulkTest.class);
 
   protected DbHolidayMaster _master;
+
+  private UniqueId lastInsertedDocumentUid;
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public DbHolidayMasterBulkTest(String databaseType, String databaseVersion) {
@@ -58,17 +62,12 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
     throw new RuntimeException("dummy - not used really");
   }
 
+
   @Override
   protected void seed(int count) {
-
     for (int i = 0; i < count; i++) {
-
-      ManageableHoliday holiday = new ManageableHoliday(Currency.USD, Arrays.asList(LocalDate.of(2010, 6, 9)));
-      HolidayDocument doc = new HolidayDocument(holiday);
-      doc.setName(randomString(20));
-      _master.add(doc);
+      lastInsertedDocumentUid = add().getUniqueId();
     }
-
   }
 
   @Operation(batchSize = 100)
@@ -80,15 +79,47 @@ public class DbHolidayMasterBulkTest extends AbstractDbBulkTest {
   }
 
   @Operation(batchSize = 100)
-  public void insert() {
+  public HolidayDocument add() {
     ManageableHoliday holiday = new ManageableHoliday(Currency.USD, Arrays.asList(LocalDate.of(2010, 6, 9)));
     HolidayDocument doc = new HolidayDocument(holiday);
-    _master.add(doc);
+    return _master.add(doc);
+  }
+
+  @Operation(batchSize = 100)
+  public void get() {
+    _master.get(lastInsertedDocumentUid);
+  }
+
+  @Operation(batchSize = 100)
+  public void remove() {
+    try {
+      _master.remove(randomUniqueId());
+    } catch (DataNotFoundException e) {
+      // this is expected for random uid most of the time
+    }
+  }
+
+  @Operation(batchSize = 100)
+  public void correct() {
+    ManageableHoliday holiday = new ManageableHoliday(Currency.USD, Arrays.asList(LocalDate.of(2010, 6, 9)));
+    holiday.setUniqueId(lastInsertedDocumentUid);
+    HolidayDocument doc = new HolidayDocument(holiday);
+    HolidayDocument corrected = _master.correct(doc);
+    lastInsertedDocumentUid = corrected.getUniqueId();
+  }
+
+  @Operation(batchSize = 100)
+  public void update() {
+    ManageableHoliday holiday = new ManageableHoliday(Currency.USD, Arrays.asList(LocalDate.of(2010, 6, 9)));
+    holiday.setUniqueId(lastInsertedDocumentUid);
+    HolidayDocument doc = new HolidayDocument(holiday);
+    HolidayDocument updated = _master.update(doc);
+    lastInsertedDocumentUid = updated.getUniqueId();
   }
 
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 100, 0);
+    testOperations(100, 100, 1);
   }
 
 

@@ -30,7 +30,6 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigSearchRequest;
 import com.opengamma.masterdb.config.DbConfigMaster;
-import com.opengamma.util.db.DbDateUtils;
 import com.opengamma.util.db.DbMapSqlParameterSource;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 import com.opengamma.util.test.DbTest;
@@ -62,7 +61,7 @@ public class DbConfigMasterBulkTest extends AbstractDbBulkTest {
     ConfigurableApplicationContext context = DbMasterTestUtils.getContext(getDatabaseType());
     _master = (DbConfigMaster) context.getBean(getDatabaseType() + "DbConfigMaster");
     _now = Instant.now();
-    _master.setTimeSource(TimeSource.fixed(_now));    
+    _master.setTimeSource(TimeSource.fixed(_now));
   }
 
   @Override
@@ -71,7 +70,7 @@ public class DbConfigMasterBulkTest extends AbstractDbBulkTest {
   }
 
   @Operation(batchSize = 100)
-  public void insert() {
+  public void add() {
     ConfigDocument<ExternalId> doc = new ConfigDocument<ExternalId>(ExternalId.class);
     doc.setName("TestConfig" + randomString(100));
     doc.setValue(ExternalId.of("A" + randomString(100), "B" + randomString(100)));
@@ -123,7 +122,7 @@ public class DbConfigMasterBulkTest extends AbstractDbBulkTest {
     doc.setName("TestConfig" + randomString(100));
     doc.setValue(ExternalId.of("A" + randomString(100), "B" + randomString(100)));
     doc.setUniqueId(lastInsertedDocumentUid);
-    ConfigDocument updated =_master.update(doc);
+    ConfigDocument updated = _master.update(doc);
     lastInsertedDocumentUid = updated.getUniqueId();
   }
 

@@ -189,7 +189,7 @@ public abstract class AbstractDbBulkTest extends DbTest {
   }
 
   public void testOperations(int steps, int seedIncrement, int initSeedCount) {
-    
+
     String operationOnly = System.getProperty("operation");
 
     long count = 0;
@@ -210,7 +210,7 @@ public abstract class AbstractDbBulkTest extends DbTest {
         Operation operation = m.getAnnotation(Operation.class);
         final int batchSize = operation.batchSize();
         final List<Pair<Long, Double>> operatonMasurments = newArrayList();
-        
+
         Map<String, Object> meta = newHashMap();
         meta.put("batchSize", batchSize);
         meta.put("preseed", initSeedCount);
@@ -260,7 +260,7 @@ public abstract class AbstractDbBulkTest extends DbTest {
       String name = methodsWithMeta.getKey().getName();
       List<Pair<Long, Double>> operatonMasurments = methodsWithMeta.getValue().getSecond();
       Map<String, Object> meta = methodsWithMeta.getValue().getFirst();
-      dump(operatonMasurments, getDatabaseType(), getClass().getName().replace(getClass().getPackage().getName()+".", "") , name, meta);
+      dump(operatonMasurments, getDatabaseType(), getClass().getName().replace(getClass().getPackage().getName() + ".", ""), name, meta);
     }
   }
 

@@ -17,10 +17,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
+import com.opengamma.DataNotFoundException;
 import com.opengamma.elsql.ElSqlBundle;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundleWithDates;
 import com.opengamma.id.ExternalIdWithDates;
+import com.opengamma.id.UniqueId;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoDocument;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchRequest;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
@@ -36,8 +38,6 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
   private static final Logger s_logger = LoggerFactory.getLogger(DbHTSMasterBulkTest.class);
 
   protected DbHistoricalTimeSeriesMaster _master;
-  protected Instant _version1Instant;
-  protected Instant _version2Instant;
 
   ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbHistoricalTimeSeriesMaster.class);
 
@@ -55,13 +55,23 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
     _master = (DbHistoricalTimeSeriesMaster) context.getBean(getDatabaseType() + "DbHistoricalTimeSeriesMaster");
     Instant now = Instant.now();
     _master.setTimeSource(TimeSource.fixed(now));
-    _version1Instant = now.minusSeconds(100);
-    _version2Instant = now.minusSeconds(50);
   }
 
   @Override
   protected AbstractDbMaster getMaster() {
     return _master;
+  }
+
+
+  @Test(groups = {"perftest"})
+  public void testOperations() {
+    testOperations(100, 100, 1);
+  }
+
+  @AfterMethod
+  public void tearDown() throws Exception {
+    _master = null;
+    super.tearDown();
   }
 
   @Operation(batchSize = 1)
@@ -74,45 +84,74 @@ public class DbHTSMasterBulkTest extends AbstractDbBulkTest {
   }
 
   @Operation(batchSize = 100)
-  public void insert() {
+  public HistoricalTimeSeriesInfoDocument add() {
     ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
     info.setName("Added");
     info.setDataField("DF");
     info.setDataSource("DS");
     info.setDataProvider("DP");
     info.setObservationTime("OT");
-    ExternalIdWithDates id = ExternalIdWithDates.of(ExternalId.of("A", "B"+randomString(100)), LocalDate.of(2011, 6, 30), null);
+    ExternalIdWithDates id = ExternalIdWithDates.of(ExternalId.of("A", "B" + randomString(100)), LocalDate.of(2011, 6, 30), null);
     ExternalIdBundleWithDates bundle = ExternalIdBundleWithDates.of(id);
     info.setExternalIdBundle(bundle);
     HistoricalTimeSeriesInfoDocument doc = new HistoricalTimeSeriesInfoDocument(info);
-    _master.add(doc);
+    return _master.add(doc);
   }
 
-  @Test(groups = {"perftest"})
-  public void testOperations() {
-    testOperations(100, 100, 0);
+  private UniqueId lastInsertedDocumentUid;
+
+  @Operation(batchSize = 100)
+  public void get() {
+    _master.get(lastInsertedDocumentUid);
   }
 
-  @AfterMethod
-  public void tearDown() throws Exception {
-    _master = null;
-    super.tearDown();
+  @Operation(batchSize = 100)
+  public void remove() {
+    try {
+      _master.remove(randomUniqueId());
+    } catch (DataNotFoundException e) {
+      // this is expected for random uid most of the time
+    }
+  }
+
+  @Operation(batchSize = 100)
+  public void correct() {
+    ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
+    info.setUniqueId(lastInsertedDocumentUid);
+    info.setName("Corrected");
+    info.setDataField("DF");
+    info.setDataSource("DS");
+    info.setDataProvider("DP");
+    info.setObservationTime("OT");
+    ExternalIdWithDates id = ExternalIdWithDates.of(ExternalId.of("A", "B"), LocalDate.of(2011, 6, 30), null);
+    ExternalIdBundleWithDates bundle = ExternalIdBundleWithDates.of(id);
+    info.setExternalIdBundle(bundle);
+    HistoricalTimeSeriesInfoDocument input = new HistoricalTimeSeriesInfoDocument(info);
+    HistoricalTimeSeriesInfoDocument corrected = _master.correct(input);
+    lastInsertedDocumentUid = corrected.getUniqueId();
+  }
+
+  @Operation(batchSize = 100)
+  public void update() {
+    ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
+    info.setUniqueId(lastInsertedDocumentUid);
+    info.setName("Updated");
+    info.setDataField("DF");
+    info.setDataSource("DS");
+    info.setDataProvider("DP");
+    info.setObservationTime("OT");
+    ExternalIdWithDates id = ExternalIdWithDates.of(ExternalId.of("A", "B"), LocalDate.of(2011, 6, 30), null);
+    ExternalIdBundleWithDates bundle = ExternalIdBundleWithDates.of(id);
+    info.setExternalIdBundle(bundle);
+    HistoricalTimeSeriesInfoDocument input = new HistoricalTimeSeriesInfoDocument(info);
+    HistoricalTimeSeriesInfoDocument updated = _master.update(input);
+    lastInsertedDocumentUid = updated.getUniqueId();
   }
 
   @Override
   protected void seed(int count) {
     for (int i = 0; i < count; i++) {
-      ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
-      info.setName("Added");
-      info.setDataField("DF");
-      info.setDataSource("DS");
-      info.setDataProvider("DP");
-      info.setObservationTime("OT");
-      ExternalIdWithDates id = ExternalIdWithDates.of(ExternalId.of(randomString(5), randomString(100)), LocalDate.of(2011, 6, 30), null);
-      ExternalIdBundleWithDates bundle = ExternalIdBundleWithDates.of(id);
-      info.setExternalIdBundle(bundle);
-      HistoricalTimeSeriesInfoDocument doc = new HistoricalTimeSeriesInfoDocument(info);
-      _master.add(doc);      
+      lastInsertedDocumentUid = add().getUniqueId();
     }
   }
 

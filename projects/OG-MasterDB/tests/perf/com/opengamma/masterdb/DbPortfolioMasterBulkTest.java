@@ -5,9 +5,9 @@
  */
 package com.opengamma.masterdb;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.time.Instant;
@@ -22,11 +22,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.Lists;
-import com.opengamma.elsql.ElSqlBundle;
+import com.opengamma.DataNotFoundException;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
-import com.opengamma.master.DocumentVisibility;
 import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.portfolio.PortfolioDocument;
@@ -44,8 +42,6 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
   private static final Logger s_logger = LoggerFactory.getLogger(DbPortfolioMasterBulkTest.class);
 
   protected DbPortfolioMaster _master;
-  protected Instant _version1Instant;
-  protected Instant _version2Instant;
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public DbPortfolioMasterBulkTest(String databaseType, String databaseVersion) {
@@ -61,9 +57,9 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
     _master = (DbPortfolioMaster) context.getBean(getDatabaseType() + "DbPortfolioMaster");
     Instant now = Instant.now();
     _master.setTimeSource(TimeSource.fixed(now));
-    _version1Instant = now.minusSeconds(100);
-    _version2Instant = now.minusSeconds(50);
   }
+
+  private PortfolioDocument lastInsertedDocument;
 
   @Override
   protected AbstractDbMaster getMaster() {
@@ -80,18 +76,51 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
   }
 
   @Operation(batchSize = 10)
-  public void insert() {
+  public PortfolioDocument add() {
     PortfolioDocument doc = new PortfolioDocument();
     ManageablePortfolioNode rootNode = createPortfolioTree(2, 3, 12);
     ManageablePortfolio portfolio = new ManageablePortfolio("Test");
     portfolio.setRootNode(rootNode);
     doc.setPortfolio(portfolio);
-    _master.add(doc);
+    return _master.add(doc);
+  }
+
+  @Operation(batchSize = 100)
+  public void get() {
+    _master.get(lastInsertedDocument.getUniqueId());
+  }
+
+  @Operation(batchSize = 100)
+  public void remove() {
+    try {
+      _master.remove(randomUniqueId());
+    } catch (DataNotFoundException e) {
+      // this is expected for random uid most of the time
+    }
+  }
+
+  @Operation(batchSize = 100)
+  public void correct() {
+    PortfolioDocument input = new PortfolioDocument(lastInsertedDocument.getPortfolio());
+    lastInsertedDocument = _master.correct(input);
+  }
+
+  @Operation(batchSize = 100)
+  public void update() {
+    PortfolioDocument input = new PortfolioDocument(lastInsertedDocument.getPortfolio());
+    lastInsertedDocument = _master.update(input);
+  }
+
+  @Override
+  protected void seed(int count) {
+    for (int i = 0; i < count; i++) {
+      lastInsertedDocument = add();
+    }
   }
 
   @Test(groups = {"perftest"})
   public void testOperations() {
-    testOperations(100, 100, 0);
+    testOperations(100, 100, 1);
   }
 
   @AfterMethod
@@ -101,75 +130,75 @@ public class DbPortfolioMasterBulkTest extends AbstractDbBulkTest {
   }
 
 
-  @Override
-  protected void seed(int count) {
-
-
-    ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbPortfolioMaster.class);
-
-
-    final List<DbMapSqlParameterSource> records = newArrayList();
-
-    // the arguments for inserting into the node table
-    final List<DbMapSqlParameterSource> nodeList = new ArrayList<DbMapSqlParameterSource>(256);
-    final List<DbMapSqlParameterSource> posList = new ArrayList<DbMapSqlParameterSource>(256);
-    // the arguments for inserting into the portifolio_attribute table
-    final List<DbMapSqlParameterSource> prtAttrList = Lists.newArrayList();
-
-    for (int i = 0; i < count; i++) {
-
-
-      final Long portfolioId = nextId("prt_master_seq");
-      final Long portfolioOid = portfolioId;
-      final UniqueId portfolioUid = UniqueId.of("Scheme", Long.toString(portfolioOid), "0");
-
-      ManageablePortfolioNode rootNode = createPortfolioTree(2, 2, 5);
-
-      // the arguments for inserting into the portfolio table
-      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
-        .addValue("portfolio_id", portfolioId)
-        .addValue("portfolio_oid", portfolioOid)
-        .addTimestamp("ver_from_instant", Instant.now())
-        .addTimestampNullFuture("ver_to_instant", null)
-        .addTimestamp("corr_from_instant", Instant.now())
-        .addTimestampNullFuture("corr_to_instant", null)
-        .addValue("name", StringUtils.defaultString(randomString(20)))
-        .addValue("visibility", DocumentVisibility.VISIBLE.getVisibilityLevel());
-
-
-      insertBuildArgs(portfolioUid, null, rootNode, portfolioId, portfolioOid, null, null, new AtomicInteger(1), 0, nodeList, posList);
-
-
-      for (Map.Entry<String, String> entry : new HashMap<String, String>() {{
-        put("attr1", "val1");
-        put("attr2", "val2");
-      }}.entrySet()) {
-        final long prtAttrId = nextId("prt_portfolio_attr_seq");
-        final DbMapSqlParameterSource posAttrArgs = new DbMapSqlParameterSource()
-          .addValue("attr_id", prtAttrId)
-          .addValue("portfolio_id", portfolioId)
-          .addValue("portfolio_oid", portfolioOid)
-          .addValue("key", entry.getKey())
-          .addValue("value", entry.getValue());
-        prtAttrList.add(posAttrArgs);
-      }
-
-      records.add(docArgs);
-
-    }
-
-    final String sqlDoc = bundle.getSql("Insert");
-    final String sqlNode = bundle.getSql("InsertNode");
-    final String sqlPosition = bundle.getSql("InsertPosition");
-    final String sqlAttributes = bundle.getSql("InsertAttribute");
-
-    getDbConnector().getJdbcTemplate().batchUpdate(sqlDoc, records.toArray(new DbMapSqlParameterSource[records.size()]));
-    getDbConnector().getJdbcTemplate().batchUpdate(sqlNode, nodeList.toArray(new DbMapSqlParameterSource[nodeList.size()]));
-    getDbConnector().getJdbcTemplate().batchUpdate(sqlPosition, posList.toArray(new DbMapSqlParameterSource[posList.size()]));
-    getDbConnector().getJdbcTemplate().batchUpdate(sqlAttributes, prtAttrList.toArray(new DbMapSqlParameterSource[prtAttrList.size()]));
-
-
-  }
+//  @Override
+//  protected void seed(int count) {
+//
+//
+//    ElSqlBundle bundle = ElSqlBundle.of(getDbConnector().getDialect().getElSqlConfig(), DbPortfolioMaster.class);
+//
+//
+//    final List<DbMapSqlParameterSource> records = newArrayList();
+//
+//    // the arguments for inserting into the node table
+//    final List<DbMapSqlParameterSource> nodeList = new ArrayList<DbMapSqlParameterSource>(256);
+//    final List<DbMapSqlParameterSource> posList = new ArrayList<DbMapSqlParameterSource>(256);
+//    // the arguments for inserting into the portifolio_attribute table
+//    final List<DbMapSqlParameterSource> prtAttrList = Lists.newArrayList();
+//
+//    for (int i = 0; i < count; i++) {
+//
+//
+//      final Long portfolioId = nextId("prt_master_seq");
+//      final Long portfolioOid = portfolioId;
+//      final UniqueId portfolioUid = UniqueId.of("Scheme", Long.toString(portfolioOid), "0");
+//
+//      ManageablePortfolioNode rootNode = createPortfolioTree(2, 2, 5);
+//
+//      // the arguments for inserting into the portfolio table
+//      final DbMapSqlParameterSource docArgs = new DbMapSqlParameterSource()
+//        .addValue("portfolio_id", portfolioId)
+//        .addValue("portfolio_oid", portfolioOid)
+//        .addTimestamp("ver_from_instant", Instant.now())
+//        .addTimestampNullFuture("ver_to_instant", null)
+//        .addTimestamp("corr_from_instant", Instant.now())
+//        .addTimestampNullFuture("corr_to_instant", null)
+//        .addValue("name", StringUtils.defaultString(randomString(20)))
+//        .addValue("visibility", DocumentVisibility.VISIBLE.getVisibilityLevel());
+//
+//
+//      insertBuildArgs(portfolioUid, null, rootNode, portfolioId, portfolioOid, null, null, new AtomicInteger(1), 0, nodeList, posList);
+//
+//
+//      for (Map.Entry<String, String> entry : new HashMap<String, String>() {{
+//        put("attr1", "val1");
+//        put("attr2", "val2");
+//      }}.entrySet()) {
+//        final long prtAttrId = nextId("prt_portfolio_attr_seq");
+//        final DbMapSqlParameterSource posAttrArgs = new DbMapSqlParameterSource()
+//          .addValue("attr_id", prtAttrId)
+//          .addValue("portfolio_id", portfolioId)
+//          .addValue("portfolio_oid", portfolioOid)
+//          .addValue("key", entry.getKey())
+//          .addValue("value", entry.getValue());
+//        prtAttrList.add(posAttrArgs);
+//      }
+//
+//      records.add(docArgs);
+//
+//    }
+//
+//    final String sqlDoc = bundle.getSql("Insert");
+//    final String sqlNode = bundle.getSql("InsertNode");
+//    final String sqlPosition = bundle.getSql("InsertPosition");
+//    final String sqlAttributes = bundle.getSql("InsertAttribute");
+//
+//    getDbConnector().getJdbcTemplate().batchUpdate(sqlDoc, records.toArray(new DbMapSqlParameterSource[records.size()]));
+//    getDbConnector().getJdbcTemplate().batchUpdate(sqlNode, nodeList.toArray(new DbMapSqlParameterSource[nodeList.size()]));
+//    getDbConnector().getJdbcTemplate().batchUpdate(sqlPosition, posList.toArray(new DbMapSqlParameterSource[posList.size()]));
+//    getDbConnector().getJdbcTemplate().batchUpdate(sqlAttributes, prtAttrList.toArray(new DbMapSqlParameterSource[prtAttrList.size()]));
+//
+//
+//  }
 
   /**
    * Recursively create the arguments to insert into the tree existing nodes.

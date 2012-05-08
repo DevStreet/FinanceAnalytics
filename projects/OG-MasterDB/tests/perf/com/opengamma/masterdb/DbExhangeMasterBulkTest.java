@@ -5,41 +5,25 @@
  */
 package com.opengamma.masterdb;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
-
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.time.Instant;
 import javax.time.TimeSource;
-import javax.time.calendar.TimeZone;
 
-import org.hsqldb.types.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.jdbc.core.support.SqlLobValue;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.Lists;
 import com.opengamma.DataNotFoundException;
-import com.opengamma.elsql.ElSqlBundle;
-import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.UniqueId;
-import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.exchange.ExchangeDocument;
 import com.opengamma.master.exchange.ExchangeSearchRequest;
 import com.opengamma.master.exchange.ManageableExchange;
 import com.opengamma.masterdb.exchange.DbExchangeMaster;
-import com.opengamma.util.db.DbMapSqlParameterSource;
 import com.opengamma.util.test.DbTest;
-import com.opengamma.util.tuple.Pair;
 
 
 public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
@@ -103,7 +87,7 @@ public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
   }
 
   @Operation(batchSize = 100)
-  public void correct() {   
+  public void correct() {
     ManageableExchange exchange = new ManageableExchange(BUNDLE, "Test", REGION, null);
     exchange.setUniqueId(lastInsertedDocumentUid);
     ExchangeDocument doc = new ExchangeDocument(exchange);
@@ -144,10 +128,10 @@ public class DbExhangeMasterBulkTest extends AbstractDbBulkTest {
 
   @Override
   protected void seed(int count) {
-    for (int i = 0; i < count; i++) {      
+    for (int i = 0; i < count; i++) {
       ExchangeDocument document = add();
       lastInsertedDocumentUid = document.getUniqueId();
-    }    
+    }
   }
 
 }
