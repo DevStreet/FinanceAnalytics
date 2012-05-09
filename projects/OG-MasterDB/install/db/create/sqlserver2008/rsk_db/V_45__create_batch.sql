@@ -11,7 +11,7 @@ INSERT INTO rsk_schema_version (version_key, version_value) VALUES ('schema_patc
 -- CREATE SEQUENCE rsk_batch_seq
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
 CREATE TABLE rsk_batch_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
@@ -116,10 +116,10 @@ create table rsk_run (
        
     live_data_snapshot_id bigint not null,
     
-    create_instant DATETIME not null,
-    start_instant DATETIME not null,       -- can be different from create_instant if is run is restarted
-    end_instant	DATETIME,
-    valuation_time DATETIME not null,
+    create_instant DATETIME2 not null,
+    start_instant DATETIME2 not null,       -- can be different from create_instant if is run is restarted
+    end_instant	DATETIME2,
+    valuation_time DATETIME2 not null,
     num_restarts int not null,
     complete bit not null,
 
@@ -209,7 +209,7 @@ create table rsk_value (
     run_id bigint not null,             	       -- shortcut
     value double precision not null,
     name varchar(255),
-    eval_instant DATETIME not null,
+    eval_instant DATETIME2 not null,
     compute_node_id bigint not null,
     
     primary key (id),
@@ -253,7 +253,7 @@ create table rsk_failure (
     function_unique_id bigint not null,
     computation_target_id bigint not null,
     run_id bigint not null,             	       -- shortcut
-    eval_instant DATETIME not null,
+    eval_instant DATETIME2 not null,
     compute_node_id bigint not null,
     
     primary key (id),

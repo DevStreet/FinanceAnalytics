@@ -16,17 +16,17 @@ INSERT INTO prt_schema_version (version_key, version_value) VALUES ('schema_patc
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby, not accepted by Postgresql
 CREATE TABLE prt_master_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE prt_portfolio (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant DATETIME NOT NULL,
-    ver_to_instant DATETIME NOT NULL,
-    corr_from_instant DATETIME NOT NULL,
-    corr_to_instant DATETIME NOT NULL,
+    ver_from_instant DATETIME2 NOT NULL,
+    ver_to_instant DATETIME2 NOT NULL,
+    corr_from_instant DATETIME2 NOT NULL,
+    corr_to_instant DATETIME2 NOT NULL,
     name varchar(255) NOT NULL,
     uname AS UPPER(name),
     visibility smallint NOT NULL,
@@ -83,7 +83,7 @@ CREATE INDEX ix_prt_position_node_id ON prt_position(node_id);
 -- CREATE SEQUENCE prt_portfolio_attr_seq
 --    start with 1000 increment by 1 no cycle;
 CREATE TABLE prt_portfolio_attr_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 

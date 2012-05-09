@@ -15,7 +15,7 @@ INSERT INTO pos_schema_version (version_key, version_value) VALUES ('schema_patc
 -- CREATE SEQUENCE pos_master_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 CREATE TABLE pos_master_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
@@ -23,17 +23,17 @@ CREATE TABLE pos_master_seq (
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby, not accepted by Postgresql
 CREATE TABLE pos_idkey_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE pos_position (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant DATETIME NOT NULL,
-    ver_to_instant DATETIME NOT NULL,
-    corr_from_instant DATETIME NOT NULL,
-    corr_to_instant DATETIME NOT NULL,
+    ver_from_instant DATETIME2 NOT NULL,
+    ver_to_instant DATETIME2 NOT NULL,
+    corr_from_instant DATETIME2 NOT NULL,
+    corr_to_instant DATETIME2 NOT NULL,
     provider_scheme varchar(255),
     provider_value varchar(255),
     quantity decimal(31,8) NOT NULL,
@@ -80,7 +80,7 @@ CREATE INDEX ix_pos_trade_position_oid ON pos_trade(position_oid);
 -- CREATE SEQUENCE pos_trade_attr_seq
 --    start with 1000 increment by 1 no cycle;
 CREATE TABLE pos_trade_attr_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 

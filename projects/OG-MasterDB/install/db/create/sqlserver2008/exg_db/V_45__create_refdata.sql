@@ -17,17 +17,17 @@ INSERT INTO hol_schema_version (version_key, version_value) VALUES ('schema_patc
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby/HSQL, not accepted by Postgresql
 CREATE TABLE hol_holiday_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE hol_holiday (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant DATETIME NOT NULL,
-    ver_to_instant DATETIME NOT NULL,
-    corr_from_instant DATETIME NOT NULL,
-    corr_to_instant DATETIME NOT NULL,
+    ver_from_instant DATETIME2 NOT NULL,
+    ver_to_instant DATETIME2 NOT NULL,
+    corr_from_instant DATETIME2 NOT NULL,
+    corr_to_instant DATETIME2 NOT NULL,
     name varchar(255) NOT NULL,
     uname AS UPPER(name),
     provider_scheme varchar(255),
@@ -81,7 +81,7 @@ INSERT INTO exg_schema_version (version_key, version_value) VALUES ('schema_patc
 -- CREATE SEQUENCE exg_exchange_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 CREATE TABLE exg_exchange_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
@@ -89,17 +89,17 @@ CREATE TABLE exg_exchange_seq (
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby/HSQL, not accepted by Postgresql
 CREATE TABLE exg_idkey_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE exg_exchange (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant DATETIME NOT NULL,
-    ver_to_instant DATETIME NOT NULL,
-    corr_from_instant DATETIME NOT NULL,
-    corr_to_instant DATETIME NOT NULL,
+    ver_from_instant DATETIME2 NOT NULL,
+    ver_to_instant DATETIME2 NOT NULL,
+    corr_from_instant DATETIME2 NOT NULL,
+    corr_to_instant DATETIME2 NOT NULL,
     name varchar(255) NOT NULL,
     uname AS UPPER(name),
     time_zone varchar(255),

@@ -10,7 +10,7 @@
 -- "as bigint" required by Derby/HSQL, not accepted by Postgresql
 -- CREATE SEQUENCE cfg_config_seq
 CREATE table cfg_config_seq (
-  SeqID int identity(1,1) primary key,
+  SeqID int identity(1000,1) primary key,
   SeqVal varchar(1)
 )
 
@@ -23,10 +23,10 @@ INSERT INTO cfg_schema_version (version_key, version_value) VALUES ('schema_patc
 CREATE TABLE cfg_config (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant datetime NOT NULL,
-    ver_to_instant datetime NOT NULL,
-    corr_from_instant datetime NOT NULL,
-    corr_to_instant datetime NOT NULL,
+    ver_from_instant datetime2 NOT NULL,
+    ver_to_instant datetime2 NOT NULL,
+    corr_from_instant datetime2 NOT NULL,
+    corr_to_instant datetime2 NOT NULL,
     name varchar(255) NOT NULL,
     uname AS UPPER(name),
     config_type varchar(255) NOT NULL,

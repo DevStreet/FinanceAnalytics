@@ -25,21 +25,21 @@ INSERT INTO hts_schema_version (version_key, version_value) VALUES ('schema_patc
 -- CREATE SEQUENCE hts_master_seq
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
 CREATE TABLE hts_master_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 -- CREATE SEQUENCE hts_idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 CREATE TABLE hts_idkey_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 -- CREATE SEQUENCE hts_doc2idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 CREATE TABLE hts_doc2idkey_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
@@ -47,7 +47,7 @@ CREATE TABLE hts_doc2idkey_seq (
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby, not accepted by Postgresql
 CREATE TABLE hts_dimension_seq (
-  SeqID INT identity(1,1) PRIMARY KEY,
+  SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
@@ -89,10 +89,10 @@ CREATE UNIQUE INDEX ix_hts_observation_time_name ON hts_observation_time(name);
 CREATE TABLE hts_document (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant DATETIME NOT NULL,
-    ver_to_instant DATETIME NOT NULL,
-    corr_from_instant DATETIME NOT NULL,
-    corr_to_instant DATETIME NOT NULL,
+    ver_from_instant DATETIME2 NOT NULL,
+    ver_to_instant DATETIME2 NOT NULL,
+    corr_from_instant DATETIME2 NOT NULL,
+    corr_to_instant DATETIME2 NOT NULL,
     name_id bigint NOT NULL,
     data_field_id bigint NOT NULL,
     data_source_id bigint NOT NULL,
@@ -146,8 +146,8 @@ CREATE INDEX ix_hts_doc2idkey_idkey ON hts_doc2idkey(idkey_id, valid_from, valid
 CREATE TABLE hts_point (
     doc_oid bigint NOT NULL,
     point_date date NOT NULL,
-    ver_instant DATETIME NOT NULL,
-    corr_instant DATETIME NOT NULL,
+    ver_instant DATETIME2 NOT NULL,
+    corr_instant DATETIME2 NOT NULL,
     point_value double precision,
     PRIMARY KEY (doc_oid, point_date, ver_instant, corr_instant)
 );
