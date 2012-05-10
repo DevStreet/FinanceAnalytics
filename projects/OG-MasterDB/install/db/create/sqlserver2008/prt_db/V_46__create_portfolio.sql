@@ -14,20 +14,20 @@ INSERT INTO prt_schema_version (version_key, version_value) VALUES ('schema_patc
 
 -- CREATE SEQUENCE prt_master_seq
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
--- "as bigint" required by Derby, not accepted by Postgresql
+-- "as BIGINT" required by Derby, not accepted by Postgresql
 CREATE TABLE prt_master_seq (
   SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE prt_portfolio (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    ver_from_instant DATETIME2 NOT NULL,
-    ver_to_instant DATETIME2 NOT NULL,
-    corr_from_instant DATETIME2 NOT NULL,
-    corr_to_instant DATETIME2 NOT NULL,
-    name varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     uname AS UPPER(name),
     visibility smallint NOT NULL,
     PRIMARY KEY (id),
@@ -45,16 +45,16 @@ CREATE INDEX ix_prt_portfolio_nameu ON prt_portfolio(uname);
 CREATE INDEX ix_prt_portfolio_visibility ON prt_portfolio(visibility);
 
 CREATE TABLE prt_node (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    portfolio_id bigint NOT NULL,
-    portfolio_oid bigint NOT NULL,
-    parent_node_id bigint,
-    parent_node_oid bigint,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    portfolio_id BIGINT NOT NULL,
+    portfolio_oid BIGINT NOT NULL,
+    parent_node_id BIGINT,
+    parent_node_oid BIGINT,
     depth int,
-    tree_left bigint NOT NULL,
-    tree_right bigint NOT NULL,
-    name varchar(255),
+    tree_left BIGINT NOT NULL,
+    tree_right BIGINT NOT NULL,
+    name VARCHAR(255),
     PRIMARY KEY (id),
     CONSTRAINT prt_fk_node2node FOREIGN KEY (oid) REFERENCES prt_node (id),
     CONSTRAINT prt_fk_node2portfolio FOREIGN KEY (portfolio_id) REFERENCES prt_portfolio (id),
@@ -72,9 +72,9 @@ CREATE INDEX ix_prt_node_parent_node_oid ON prt_node(parent_node_oid);
 CREATE INDEX ix_prt_node_depth ON prt_node(depth);
 
 CREATE TABLE prt_position (
-    node_id bigint NOT NULL,
-    key_scheme varchar(255) NOT NULL,
-    key_value varchar(255) NOT NULL,
+    node_id BIGINT NOT NULL,
+    key_scheme VARCHAR(255) NOT NULL,
+    key_value VARCHAR(255) NOT NULL,
     CONSTRAINT prt_fk_pos2node FOREIGN KEY (node_id) REFERENCES prt_node (id)
 );
 -- prt_position is fully dependent of prt_portfolio
@@ -88,11 +88,11 @@ CREATE TABLE prt_portfolio_attr_seq (
 )
 
 CREATE TABLE prt_portfolio_attribute (
-    id bigint not null,
-    portfolio_id bigint not null,
-    portfolio_oid bigint not null,
-    attr_key varchar(255) not null,
-    attr_value varchar(255) not null,
+    id BIGINT not null,
+    portfolio_id BIGINT not null,
+    portfolio_oid BIGINT not null,
+    attr_key VARCHAR(255) not null,
+    attr_value VARCHAR(255) not null,
     primary key (id),
     constraint prt_fk_prtattr2portfolio foreign key (portfolio_id) references prt_portfolio (id),
     constraint prt_chk_uq_prt_attribute unique (portfolio_id, attr_key, attr_value)

@@ -15,29 +15,29 @@ INSERT INTO hol_schema_version (version_key, version_value) VALUES ('schema_patc
 
 -- CREATE SEQUENCE hol_holiday_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
--- "as bigint" required by Derby/HSQL, not accepted by Postgresql
+-- "as BIGINT" required by Derby/HSQL, not accepted by Postgresql
 CREATE TABLE hol_holiday_seq (
   SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE hol_holiday (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    ver_from_instant DATETIME2 NOT NULL,
-    ver_to_instant DATETIME2 NOT NULL,
-    corr_from_instant DATETIME2 NOT NULL,
-    corr_to_instant DATETIME2 NOT NULL,
-    name varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     uname AS UPPER(name),
-    provider_scheme varchar(255),
-    provider_value varchar(255),
-    hol_type varchar(255) NOT NULL,
-    region_scheme varchar(255),
-    region_value varchar(255),
-    exchange_scheme varchar(255),
-    exchange_value varchar(255),
-    currency_iso varchar(255),
+    provider_scheme VARCHAR(255),
+    provider_value VARCHAR(255),
+    hol_type VARCHAR(255) NOT NULL,
+    region_scheme VARCHAR(255),
+    region_value VARCHAR(255),
+    exchange_scheme VARCHAR(255),
+    exchange_value VARCHAR(255),
+    currency_iso VARCHAR(255),
     PRIMARY KEY (id),
     CONSTRAINT hol_chk_holiday_ver_order CHECK (ver_from_instant <= ver_to_instant),
     CONSTRAINT hol_chk_holiday_corr_order CHECK (corr_from_instant <= corr_to_instant)
@@ -59,7 +59,7 @@ CREATE INDEX ix_hol_holiday_exchange_value ON hol_holiday(exchange_value);
 CREATE INDEX ix_hol_holiday_currency_iso ON hol_holiday(currency_iso);
 
 CREATE TABLE hol_date (
-    holiday_id bigint NOT NULL,
+    holiday_id BIGINT NOT NULL,
     hol_date date NOT NULL,
     CONSTRAINT hol_fk_date2hol FOREIGN KEY (holiday_id) REFERENCES hol_holiday (id)
 );
@@ -87,22 +87,22 @@ CREATE TABLE exg_exchange_seq (
 
 -- CREATE SEQUENCE exg_idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
--- "as bigint" required by Derby/HSQL, not accepted by Postgresql
+-- "as BIGINT" required by Derby/HSQL, not accepted by Postgresql
 CREATE TABLE exg_idkey_seq (
   SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE exg_exchange (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    ver_from_instant DATETIME2 NOT NULL,
-    ver_to_instant DATETIME2 NOT NULL,
-    corr_from_instant DATETIME2 NOT NULL,
-    corr_to_instant DATETIME2 NOT NULL,
-    name varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     uname AS UPPER(name),
-    time_zone varchar(255),
+    time_zone VARCHAR(255),
     detail IMAGE NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT exg_chk_exchange_ver_order CHECK (ver_from_instant <= ver_to_instant),
@@ -117,16 +117,16 @@ CREATE INDEX ix_exg_exchange_name ON exg_exchange(name);
 CREATE INDEX ix_exg_exchange_nameu ON exg_exchange(uname);
 
 CREATE TABLE exg_idkey (
-    id bigint NOT NULL,
-    key_scheme varchar(255) NOT NULL,
-    key_value varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    key_scheme VARCHAR(255) NOT NULL,
+    key_value VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT exg_chk_idkey UNIQUE (key_scheme, key_value)
 );
 
 CREATE TABLE exg_exchange2idkey (
-    exchange_id bigint NOT NULL,
-    idkey_id bigint NOT NULL,
+    exchange_id BIGINT NOT NULL,
+    idkey_id BIGINT NOT NULL,
     PRIMARY KEY (exchange_id, idkey_id),
     CONSTRAINT exg_fk_exgidkey2exg FOREIGN KEY (exchange_id) REFERENCES exg_exchange (id),
     CONSTRAINT exg_fk_exgidkey2idkey FOREIGN KEY (idkey_id) REFERENCES exg_idkey (id)

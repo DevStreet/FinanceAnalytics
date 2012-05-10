@@ -21,22 +21,22 @@ CREATE TABLE pos_master_seq (
 
 -- CREATE SEQUENCE pos_idkey_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
--- "as bigint" required by Derby, not accepted by Postgresql
+-- "as BIGINT" required by Derby, not accepted by Postgresql
 CREATE TABLE pos_idkey_seq (
   SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE pos_position (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    ver_from_instant DATETIME2 NOT NULL,
-    ver_to_instant DATETIME2 NOT NULL,
-    corr_from_instant DATETIME2 NOT NULL,
-    corr_to_instant DATETIME2 NOT NULL,
-    provider_scheme varchar(255),
-    provider_value varchar(255),
-    quantity decimal(31,8) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
+    provider_scheme VARCHAR(255),
+    provider_value VARCHAR(255),
+    quantity DECIMAL(31,8) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT pos_fk_posi2posi FOREIGN KEY (oid) REFERENCES pos_position (id),
     CONSTRAINT pos_chk_posi_ver_order CHECK (ver_from_instant <= ver_to_instant),
@@ -50,20 +50,20 @@ CREATE INDEX ix_pos_position_corr_to_instant ON pos_position(corr_to_instant);
 CREATE INDEX ix_pos_position_quantity ON pos_position(quantity);
 
 CREATE TABLE pos_trade (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    position_id bigint NOT NULL,
-    position_oid bigint NOT NULL,
-    quantity decimal(31,8) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    position_id BIGINT NOT NULL,
+    position_oid BIGINT NOT NULL,
+    quantity DECIMAL(31,8) NOT NULL,
     trade_date date NOT NULL,
     trade_time time null,
     zone_offset int null,
-    cparty_scheme varchar(255) NOT NULL,
-    cparty_value varchar(255) NOT NULL,
-    provider_scheme varchar(255),
-    provider_value varchar(255),
+    cparty_scheme VARCHAR(255) NOT NULL,
+    cparty_value VARCHAR(255) NOT NULL,
+    provider_scheme VARCHAR(255),
+    provider_value VARCHAR(255),
     premium_value double precision,
-    premium_currency varchar(255),
+    premium_currency VARCHAR(255),
     premium_date date,
     premium_time time,
     premium_zone_offset int,
@@ -86,11 +86,11 @@ CREATE TABLE pos_trade_attr_seq (
 
 
 CREATE TABLE pos_trade_attribute (
-    id bigint NOT NULL,
-    trade_id bigint NOT NULL,
-    trade_oid bigint NOT NULL,
-    attr_key varchar(255) NOT NULL,
-    attr_value varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    trade_id BIGINT NOT NULL,
+    trade_oid BIGINT NOT NULL,
+    attr_key VARCHAR(255) NOT NULL,
+    attr_value VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT pos_fk_tradeattr2trade FOREIGN KEY (trade_id) REFERENCES pos_trade (id),
     CONSTRAINT pos_chk_uq_trade_attribute UNIQUE (trade_id, attr_key, attr_value)
@@ -101,11 +101,11 @@ CREATE INDEX ix_pos_trade_attr_trade_oid ON pos_trade_attribute(trade_oid);
 CREATE INDEX ix_pos_trade_attr_key ON pos_trade_attribute(attr_key);
 
 CREATE TABLE pos_attribute (
-    id bigint NOT NULL,
-    position_id bigint NOT NULL,
-    position_oid bigint NOT NULL,
-    attr_key varchar(255) NOT NULL,
-    attr_value varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    position_id BIGINT NOT NULL,
+    position_oid BIGINT NOT NULL,
+    attr_key VARCHAR(255) NOT NULL,
+    attr_value VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT pos_fk_posattr2pos FOREIGN KEY (position_id) REFERENCES pos_position (id),
     CONSTRAINT pos_chk_uq_pos_attribute UNIQUE (position_id, attr_key, attr_value)
@@ -116,16 +116,16 @@ CREATE INDEX ix_pos_attr_position_oid ON pos_attribute(position_oid);
 CREATE INDEX ix_pos_attr_key ON pos_attribute(attr_key);
 
 CREATE TABLE pos_idkey (
-    id bigint NOT NULL,
-    key_scheme varchar(255) NOT NULL,
-    key_value varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    key_scheme VARCHAR(255) NOT NULL,
+    key_value VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT pos_chk_idkey UNIQUE (key_scheme, key_value)
 );
 
 CREATE TABLE pos_position2idkey (
-    position_id bigint NOT NULL,
-    idkey_id bigint NOT NULL,
+    position_id BIGINT NOT NULL,
+    idkey_id BIGINT NOT NULL,
     PRIMARY KEY (position_id, idkey_id),
     CONSTRAINT pos_fk_posidkey2pos FOREIGN KEY (position_id) REFERENCES pos_position (id),
     CONSTRAINT pos_fk_posidkey2idkey FOREIGN KEY (idkey_id) REFERENCES pos_idkey (id)
@@ -133,8 +133,8 @@ CREATE TABLE pos_position2idkey (
 CREATE INDEX ix_pos_pos2idkey_idkey ON pos_position2idkey(idkey_id);
 
 CREATE TABLE pos_trade2idkey (
-    trade_id bigint NOT NULL,
-    idkey_id bigint NOT NULL,
+    trade_id BIGINT NOT NULL,
+    idkey_id BIGINT NOT NULL,
     PRIMARY KEY (trade_id, idkey_id),
     CONSTRAINT pos_fk_tradeidkey2trade FOREIGN KEY (trade_id) REFERENCES pos_trade (id),
     CONSTRAINT pos_fk_tradeidkey2idkey FOREIGN KEY (idkey_id) REFERENCES pos_idkey (id)

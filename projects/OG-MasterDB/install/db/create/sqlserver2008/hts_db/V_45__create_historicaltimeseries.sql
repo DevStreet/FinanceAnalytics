@@ -89,10 +89,10 @@ CREATE UNIQUE INDEX ix_hts_observation_time_name ON hts_observation_time(name);
 CREATE TABLE hts_document (
     id bigint NOT NULL,
     oid bigint NOT NULL,
-    ver_from_instant DATETIME2 NOT NULL,
-    ver_to_instant DATETIME2 NOT NULL,
-    corr_from_instant DATETIME2 NOT NULL,
-    corr_to_instant DATETIME2 NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
     name_id bigint NOT NULL,
     data_field_id bigint NOT NULL,
     data_source_id bigint NOT NULL,
@@ -146,8 +146,8 @@ CREATE INDEX ix_hts_doc2idkey_idkey ON hts_doc2idkey(idkey_id, valid_from, valid
 CREATE TABLE hts_point (
     doc_oid bigint NOT NULL,
     point_date date NOT NULL,
-    ver_instant DATETIME2 NOT NULL,
-    corr_instant DATETIME2 NOT NULL,
+    ver_instant DATETIME2(6) NOT NULL,
+    corr_instant DATETIME2(6) NOT NULL,
     point_value double precision,
     PRIMARY KEY (doc_oid, point_date, ver_instant, corr_instant)
 );

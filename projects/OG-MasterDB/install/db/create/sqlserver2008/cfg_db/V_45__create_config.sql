@@ -7,11 +7,11 @@
 -- with only the end instant being changed on the old row
 
 --     START WITH 1000 INCREMENT BY 1 NO CYCLE;
--- "as bigint" required by Derby/HSQL, not accepted by Postgresql
+-- "as BIGINT" required by Derby/HSQL, not accepted by Postgresql
 -- CREATE SEQUENCE cfg_config_seq
 CREATE table cfg_config_seq (
   SeqID int identity(1000,1) primary key,
-  SeqVal varchar(1)
+  SeqVal VARCHAR(1)
 )
 
 CREATE TABLE cfg_schema_version (
@@ -21,16 +21,16 @@ CREATE TABLE cfg_schema_version (
 INSERT INTO cfg_schema_version (version_key, version_value) VALUES ('schema_patch', '45');
 
 CREATE TABLE cfg_config (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    ver_from_instant datetime2 NOT NULL,
-    ver_to_instant datetime2 NOT NULL,
-    corr_from_instant datetime2 NOT NULL,
-    corr_to_instant datetime2 NOT NULL,
-    name varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     uname AS UPPER(name),
-    config_type varchar(255) NOT NULL,
-    config image NOT NULL,
+    config_type VARCHAR(255) NOT NULL,
+    config IMAGE NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT cfg_chk_config_ver_order CHECK (ver_from_instant <= ver_to_instant),
     CONSTRAINT cfg_chk_config_corr_order CHECK (corr_from_instant <= corr_to_instant),

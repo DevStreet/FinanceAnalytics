@@ -15,22 +15,22 @@ INSERT INTO snp_schema_version (version_key, version_value) VALUES ('schema_patc
 
 -- CREATE SEQUENCE snp_snapshot_seq
 --    START WITH 1000 INCREMENT BY 1 NO CYCLE;
--- "as bigint" required by Derby/HSQL, not accepted by Postgresql
+-- "as BIGINT" required by Derby/HSQL, not accepted by Postgresql
 CREATE TABLE snp_snapshot_seq (
   SeqID INT identity(1000,1) PRIMARY KEY,
   SeqVal VARCHAR(1)
 )
 
 CREATE TABLE snp_snapshot (
-    id bigint NOT NULL,
-    oid bigint NOT NULL,
-    ver_from_instant DATETIME2 NOT NULL,
-    ver_to_instant DATETIME2 NOT NULL,
-    corr_from_instant DATETIME2 NOT NULL,
-    corr_to_instant DATETIME2 NOT NULL,
-    name varchar(255) NOT NULL,
+    id BIGINT NOT NULL,
+    oid BIGINT NOT NULL,
+    ver_from_instant DATETIME2(6) NOT NULL,
+    ver_to_instant DATETIME2(6) NOT NULL,
+    corr_from_instant DATETIME2(6) NOT NULL,
+    corr_to_instant DATETIME2(6) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     uname AS UPPER(name),
-    time_zone varchar(255),
+    time_zone VARCHAR(255),
     detail IMAGE NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT snp_chk_snapshot_ver_order CHECK (ver_from_instant <= ver_to_instant),

@@ -16,8 +16,8 @@ CREATE TABLE rsk_batch_seq (
 )
 
 create table rsk_compute_host (
-	id bigint not null,
-	host_name varchar(255) not null,
+	id BIGINT not null,
+	host_name VARCHAR(255) not null,
 	
 	primary key (id),
 	
@@ -25,9 +25,9 @@ create table rsk_compute_host (
 );
 
 create table rsk_compute_node (
-	id bigint not null,
-	compute_host_id bigint not null,
-	node_name varchar(255) not null,
+	id BIGINT not null,
+	compute_host_id BIGINT not null,
+	node_name VARCHAR(255) not null,
 	
 	primary key (id),
 	
@@ -39,20 +39,20 @@ create table rsk_compute_node (
 
 
 create table rsk_computation_target (
-	id bigint not null,
-	type varchar(255) not null,	
+	id BIGINT not null,
+	type VARCHAR(255) not null,	
     
-    id_scheme varchar(255) not null,
-    id_value varchar(255) not null,
-    id_version varchar(255) null,
+    id_scheme VARCHAR(255) not null,
+    id_value VARCHAR(255) not null,
+    id_version VARCHAR(255) null,
 	primary key (id),
 		    
 	constraint rsk_chk_uq_computation_target unique (type, id_scheme, id_value, id_version)
 );
 
 create table rsk_function_unique_id (
-	id bigint not null,
-	unique_id varchar(255) not null,
+	id BIGINT not null,
+	unique_id VARCHAR(255) not null,
 	
 	primary key (id),
 	
@@ -64,20 +64,20 @@ create table rsk_function_unique_id (
 -------------------------------------
 
 create table rsk_live_data_snapshot (
-	id bigint not null,
-    base_uid_scheme  varchar(255) not null,
-    base_uid_value   varchar(255) not null,
-    base_uid_version varchar(255),
+	id BIGINT not null,
+    base_uid_scheme  VARCHAR(255) not null,
+    base_uid_value   VARCHAR(255) not null,
+    base_uid_version VARCHAR(255),
 	primary key (id),
 
 	constraint rsk_chk_uq_base_uid unique (base_uid_scheme, base_uid_value, base_uid_version)
 );
 
 create table rsk_live_data_snapshot_entry (
-	id bigint not null,
-	snapshot_id bigint not null,
-	computation_target_id bigint not null,
-    name  varchar(255) not null,
+	id BIGINT not null,
+	snapshot_id BIGINT not null,
+	computation_target_id BIGINT not null,
+    name  VARCHAR(255) not null,
 	value double precision,
 
 	primary key (id),
@@ -91,10 +91,10 @@ create table rsk_live_data_snapshot_entry (
 );
 
 create table rsk_live_data_snapshot_entry_insertion (
-	id bigint not null,
-	snapshot_id bigint not null,
-	computation_target_id bigint not null,
-    name  varchar(255) not null,
+	id BIGINT not null,
+	snapshot_id BIGINT not null,
+	computation_target_id BIGINT not null,
+    name  VARCHAR(255) not null,
 	value double precision,
 
 	primary key (id)
@@ -107,19 +107,19 @@ create table rsk_live_data_snapshot_entry_insertion (
 
 
 create table rsk_run (
-    id bigint not null,
+    id BIGINT not null,
     
-    version_correction varchar(255) not null,
+    version_correction VARCHAR(255) not null,
     viewdef_scheme      VARCHAR(255) NOT NULL,
     viewdef_value       VARCHAR(255) NOT NULL,
     viewdef_version     VARCHAR(255),
        
-    live_data_snapshot_id bigint not null,
+    live_data_snapshot_id BIGINT not null,
     
-    create_instant DATETIME2 not null,
-    start_instant DATETIME2 not null,       -- can be different from create_instant if is run is restarted
-    end_instant	DATETIME2,
-    valuation_time DATETIME2 not null,
+    create_instant DATETIME2(6) not null,
+    start_instant DATETIME2(6) not null,       -- can be different from create_instant if is run is restarted
+    end_instant	DATETIME2(6),
+    valuation_time DATETIME2(6) not null,
     num_restarts int not null,
     complete bit not null,
 
@@ -132,9 +132,9 @@ create table rsk_run (
 );
 
 create table rsk_calculation_configuration (
-	id bigint not null,
-	run_id bigint not null,
-	name varchar(255) not null,
+	id BIGINT not null,
+	run_id BIGINT not null,
+	name VARCHAR(255) not null,
 	
 	primary key (id),
 	
@@ -150,10 +150,10 @@ create table rsk_calculation_configuration (
 -- 	- PositionMasterTime = 20100615170000
 --  - GlobalRandomSeed = 54321
 create table rsk_run_property (		
-	id bigint not null,
-	run_id bigint not null,
-	property_key varchar(255) not null,
-	property_value varchar(2000) not null,		    -- varchar(255) not enough
+	id BIGINT not null,
+	run_id BIGINT not null,
+	property_key VARCHAR(255) not null,
+	property_value VARCHAR(2000) not null,		    -- varchar(255) not enough
 	
 	primary key (id),
 
@@ -163,10 +163,10 @@ create table rsk_run_property (
 
 
 create table rsk_run_status (
-    id bigint not null, 
-    calculation_configuration_id bigint not null,
-    computation_target_id bigint not null,
-    status varchar(255) not null,
+    id BIGINT not null, 
+    calculation_configuration_id BIGINT not null,
+    computation_target_id BIGINT not null,
+    status VARCHAR(255) not null,
 
     constraint rsk_fk_run_status2calc_conf
         foreign key (calculation_configuration_id) references rsk_calculation_configuration (id),
@@ -182,8 +182,8 @@ create table rsk_run_status (
 -------------------------------------
 
 create table rsk_value_specification (
-    id bigint not null,
-    synthetic_form varchar(1024) not null,
+    id BIGINT not null,
+    synthetic_form VARCHAR(1024) not null,
 
     primary key (id),
 
@@ -191,9 +191,9 @@ create table rsk_value_specification (
 );
 
 create table rsk_value_requirement (
-    id bigint not null,
-    synthetic_form varchar(1024) not null,
-    specification_id bigint not null,
+    id BIGINT not null,
+    synthetic_form VARCHAR(1024) not null,
+    specification_id BIGINT not null,
 
     primary key (id),
 
@@ -201,16 +201,16 @@ create table rsk_value_requirement (
 );
 
 create table rsk_value (
-    id bigint not null,
-    calculation_configuration_id bigint not null,
-    value_specification_id bigint not null,
-    function_unique_id bigint not null,
-    computation_target_id bigint not null,        
-    run_id bigint not null,             	       -- shortcut
+    id BIGINT not null,
+    calculation_configuration_id BIGINT not null,
+    value_specification_id BIGINT not null,
+    function_unique_id BIGINT not null,
+    computation_target_id BIGINT not null,        
+    run_id BIGINT not null,             	       -- shortcut
     value double precision not null,
-    name varchar(255),
-    eval_instant DATETIME2 not null,
-    compute_node_id bigint not null,
+    name VARCHAR(255),
+    eval_instant DATETIME2(6) not null,
+    compute_node_id BIGINT not null,
     
     primary key (id),
     
@@ -233,11 +233,11 @@ create table rsk_value (
 
 
 create table rsk_compute_failure (			
-    id bigint not null,
-    function_id varchar(255) not null,
-    exception_class varchar(255) not null,
-    exception_msg varchar(255) not null,                  
-    stack_trace varchar(2000) not null,         -- first 2000 chars. not including msg
+    id BIGINT not null,
+    function_id VARCHAR(255) not null,
+    exception_class VARCHAR(255) not null,
+    exception_msg VARCHAR(255) not null,                  
+    stack_trace VARCHAR(2000) not null,         -- first 2000 chars. not including msg
     
     primary key (id),
     
@@ -246,15 +246,15 @@ create table rsk_compute_failure (
 
 -- how to aggregate risk failures?
 create table rsk_failure (			
-    id bigint not null,
-    calculation_configuration_id bigint not null,
-    name varchar(255),
-    value_specification_id bigint not null,
-    function_unique_id bigint not null,
-    computation_target_id bigint not null,
-    run_id bigint not null,             	       -- shortcut
-    eval_instant DATETIME2 not null,
-    compute_node_id bigint not null,
+    id BIGINT not null,
+    calculation_configuration_id BIGINT not null,
+    name VARCHAR(255),
+    value_specification_id BIGINT not null,
+    function_unique_id BIGINT not null,
+    computation_target_id BIGINT not null,
+    run_id BIGINT not null,             	       -- shortcut
+    eval_instant DATETIME2(6) not null,
+    compute_node_id BIGINT not null,
     
     primary key (id),
     
@@ -275,9 +275,9 @@ create table rsk_failure (
 );    
 
 create table rsk_failure_reason (
-   id bigint not null,
-   rsk_failure_id bigint not null,
-   compute_failure_id bigint not null,
+   id BIGINT not null,
+   rsk_failure_id BIGINT not null,
+   compute_failure_id BIGINT not null,
    
    primary key (id),
    
