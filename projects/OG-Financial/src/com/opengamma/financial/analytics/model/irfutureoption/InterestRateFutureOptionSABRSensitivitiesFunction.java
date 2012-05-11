@@ -11,6 +11,10 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivityDataBundle;
+import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivitySABRCalculator;
+import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionInputs;
@@ -22,17 +26,13 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.DoubleLabelledMatrix2D;
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunction;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.PresentValueSABRSensitivityDataBundle;
-import com.opengamma.financial.interestrate.PresentValueSABRSensitivitySABRCalculator;
-import com.opengamma.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.util.tuple.DoublesPair;
 
 /**
  *
  */
-public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestRateFutureOptionFunction {
+public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestRateFutureOptionSABRFunction {
   private static final PresentValueSABRSensitivitySABRCalculator CALCULATOR = PresentValueSABRSensitivitySABRCalculator.getInstance();
   private final String _valueRequirementName;
 

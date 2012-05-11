@@ -4,27 +4,16 @@
     <h1>{{html name}}</h1>
     <div class="OG-js-header-links"></div>
   </header>
-  <section style="width: 800px">
+  <section>
     <div class="OG-details-content OG-js-details-panel">
-      <section>
-        <table class="OG-table">
-          <col style="width: 40%" />
-          <col style="width: 60%" />
-            <thead>
-            <tr>
-              <th><span>Identifiers</span></th><th>&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody class="og-js-identifiers"></tbody>
-        </table>
-      </section>
+      <section class="og-js-identifiers"></section>
       <section>
         <table class="OG-table">
           <col style="width: 40%" />
           <col style="width: 60%" />
           <thead>
             <tr>
-              <th><span>${securityType}</span></th><th>&nbsp;</th>
+              <th><span><em>${securityType}</em></span></th><th>&nbsp;</th>
             </tr>
           </thead>
           <tbody>
@@ -37,7 +26,7 @@
           </tbody>
         </table>
       </section>
-      <section class="OG-timeseries-gadget"></section>
+      <section class="OG-timeseries-container"></section>
     </div>
   </section>
 </article>

@@ -16,8 +16,21 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.InstrumentSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueCurveSensitivityBlackCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueNodeSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.model.option.definition.YieldCurveWithBlackCubeBundle;
+import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurface;
+import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.surface.InterpolatedDoublesSurface;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.position.impl.SimpleTrade;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
@@ -45,22 +58,11 @@ import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.model.InterpolatedCurveAndSurfaceProperties;
 import com.opengamma.financial.analytics.model.YieldCurveNodeSensitivitiesHelper;
 import com.opengamma.financial.analytics.model.curve.interestrate.MarketInstrumentImpliedYieldCurveFunction;
-import com.opengamma.financial.analytics.model.forex.ForexOptionBlackFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackFunction;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.InstrumentSensitivityCalculator;
-import com.opengamma.financial.interestrate.PresentValueCurveSensitivityBlackCalculator;
-import com.opengamma.financial.interestrate.PresentValueNodeSensitivityCalculator;
-import com.opengamma.financial.interestrate.YieldCurveBundle;
-import com.opengamma.financial.model.interestrate.curve.YieldAndDiscountCurve;
-import com.opengamma.financial.model.option.definition.YieldCurveWithBlackCubeBundle;
-import com.opengamma.financial.model.volatility.surface.VolatilitySurface;
 import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
-import com.opengamma.math.matrix.DoubleMatrix1D;
-import com.opengamma.math.matrix.DoubleMatrix2D;
-import com.opengamma.math.surface.InterpolatedDoublesSurface;
+import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.util.money.Currency;
 
 /**
@@ -97,6 +99,7 @@ public class InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction ex
     final String curveName = desiredValue.getConstraint(ValuePropertyNames.CURVE);
     final String curveCalculationMethod = desiredValue.getConstraint(ValuePropertyNames.CURVE_CALCULATION_METHOD);
     final String surfaceName = desiredValue.getConstraint(ValuePropertyNames.SURFACE);
+    final String surfaceNameWithPrefix = surfaceName + "_" + getFutureOptionPrefix(target); // To enable standard and midcurve options to share the same default name
     final Object forwardCurveObject = inputs.getValue(YieldCurveFunction.getCurveRequirement(currency, forwardCurveName, forwardCurveName, fundingCurveName, curveCalculationMethod));
     if (forwardCurveObject == null) {
       throw new OpenGammaRuntimeException("Could not get forward curve");
@@ -105,7 +108,7 @@ public class InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction ex
     if (fundingCurveObject == null) {
       throw new OpenGammaRuntimeException("Could not get funding curve");
     }
-    final Object volatilitySurfaceObject = inputs.getValue(getVolatilityRequirement(surfaceName, currency));
+    final Object volatilitySurfaceObject = inputs.getValue(getVolatilityRequirement(surfaceNameWithPrefix, currency));
     if (volatilitySurfaceObject == null) {
       throw new OpenGammaRuntimeException("Could not get volatility surface");
     }
@@ -201,7 +204,7 @@ public class InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction ex
       s_logger.error("Did not specify a curve to which this instrument is sensitive; asked for {}, {} and {} are allowed", new String[] {curveName, forwardCurveName, fundingCurveName});
       return null;
     }
-    final String surfaceName = surfaceNames.iterator().next();
+    final String surfaceName = surfaceNames.iterator().next()  + "_" + getFutureOptionPrefix(target);
     final String curveCalculationMethod = curveCalculationMethods.iterator().next();
     final Set<ValueRequirement> requirements = Sets.newHashSetWithExpectedSize(4);
     final Currency currency = FinancialSecurityUtils.getCurrency(target.getTrade().getSecurity());
@@ -263,5 +266,18 @@ public class InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction ex
     final ValueProperties.Builder properties = ValueProperties.builder()
         .with(ValuePropertyNames.CURVE, curveName);
     return new ValueRequirement(ValueRequirementNames.YIELD_CURVE_SPEC, ComputationTargetType.PRIMITIVE, currency.getUniqueId(), properties.get());
+  }
+  
+  /** The volatility surface name is constructed from the given name and the futureOption prefix  
+  TODO REFACTOR LOGIC to permit other schemes and future options */
+  private String getFutureOptionPrefix(final ComputationTarget target) {
+    final ExternalIdBundle secId = target.getTrade().getSecurity().getExternalIdBundle();
+    final String ticker = secId.getValue(ExternalSchemes.BLOOMBERG_TICKER);
+    if (ticker != null) {
+      final String prefix = ticker.substring(0, 2);
+      return prefix;
+    } else {
+      throw new OpenGammaRuntimeException("Could not determine whether option was Standard (OPT) or MidCurve (MIDCURVE).");
+    }
   }
 }

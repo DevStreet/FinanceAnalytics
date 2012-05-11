@@ -6,6 +6,7 @@
 package com.opengamma.financial.analytics.model.volatility.surface;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -19,6 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.model.option.definition.SmileDeltaParameter;
+import com.opengamma.analytics.financial.model.option.definition.SmileDeltaTermStructureParameter;
+import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolatorFactory;
+import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceData;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
@@ -33,13 +38,12 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
+import com.opengamma.financial.analytics.model.InterpolatedCurveAndSurfaceProperties;
 import com.opengamma.financial.analytics.volatility.surface.BloombergFXOptionVolatilitySurfaceInstrumentProvider.FXVolQuoteType;
 import com.opengamma.financial.analytics.volatility.surface.DefaultVolatilitySurfaceShiftFunction;
 import com.opengamma.financial.analytics.volatility.surface.SurfacePropertyNames;
 import com.opengamma.financial.analytics.volatility.surface.SurfaceQuoteType;
 import com.opengamma.financial.analytics.volatility.surface.VolatilitySurfaceShiftFunction;
-import com.opengamma.financial.model.option.definition.SmileDeltaParameter;
-import com.opengamma.financial.model.option.definition.SmileDeltaTermStructureParameter;
 import com.opengamma.util.money.UnorderedCurrencyPair;
 import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.ObjectsPair;
@@ -49,11 +53,19 @@ import com.opengamma.util.tuple.Pair;
  * 
  */
 public class ForexStrangleRiskReversalVolatilitySurfaceFunction extends AbstractFunction.NonCompiledInvoker {
+  /**
+   * 
+   */
+  private static final SmileDeltaParameter[] EMPTY_ARRAY = new SmileDeltaParameter[0];
   private static final Logger s_logger = LoggerFactory.getLogger(ForexStrangleRiskReversalVolatilitySurfaceFunction.class);
 
   @Override
   public Set<ComputedValue> execute(final FunctionExecutionContext executionContext, final FunctionInputs inputs, final ComputationTarget target, final Set<ValueRequirement> desiredValues) {
-    final String surfaceName = desiredValues.iterator().next().getConstraint(ValuePropertyNames.SURFACE);
+    final ValueRequirement desiredValue = desiredValues.iterator().next();
+    final String surfaceName = desiredValue.getConstraint(ValuePropertyNames.SURFACE);
+    final String interpolatorName = desiredValue.getConstraint(InterpolatedCurveAndSurfaceProperties.X_INTERPOLATOR_NAME);
+    final String leftExtrapolatorName = desiredValue.getConstraint(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME);
+    final String rightExtrapolatorName = desiredValue.getConstraint(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME);
     final ValueRequirement surfaceRequirement = getDataRequirement(surfaceName, target);
     final Object volatilitySurfaceObject = inputs.getValue(getDataRequirement(surfaceName, target));
     if (volatilitySurfaceObject == null) {
@@ -65,10 +77,9 @@ public class ForexStrangleRiskReversalVolatilitySurfaceFunction extends Abstract
     Arrays.sort(tenors);
     final Pair<Number, FXVolQuoteType>[] quotes = fxVolatilitySurface.getYs();
     final Number[] deltaValues = getDeltaValues(quotes);
-    final int nPoints = tenors.length;
-    final SmileDeltaParameter[] smile = new SmileDeltaParameter[nPoints];
+    final ObjectArrayList<SmileDeltaParameter> smile = new ObjectArrayList<SmileDeltaParameter>();
     final int nSmileValues = deltaValues.length - 1;
-    final Set<String> shifts = desiredValues.iterator().next().getConstraints().getValues(VolatilitySurfaceShiftFunction.SHIFT);
+    final Set<String> shifts = desiredValue.getConstraints().getValues(VolatilitySurfaceShiftFunction.SHIFT);
     final double shiftMultiplier;
     if ((shifts != null) && (shifts.size() == 1)) {
       final String shift = shifts.iterator().next();
@@ -77,41 +88,48 @@ public class ForexStrangleRiskReversalVolatilitySurfaceFunction extends Abstract
       // No shift requested
       shiftMultiplier = 1;
     }
-    for (int i = 0; i < tenors.length; i++) {
-      final Tenor tenor = tenors[i];
+    for (final Tenor tenor : tenors) {
       final double t = getTime(tenor);
       Double atm = fxVolatilitySurface.getVolatility(tenor, ObjectsPair.of(deltaValues[0], FXVolQuoteType.ATM));
-      if (atm == null) {
-        throw new OpenGammaRuntimeException("Could not get ATM volatility data for surface");
-      }
-      if (shiftMultiplier != 1) {
-        atm = atm * shiftMultiplier;
-      }
-      final DoubleArrayList deltas = new DoubleArrayList();
-      final DoubleArrayList riskReversals = new DoubleArrayList();
-      final DoubleArrayList butterflies = new DoubleArrayList();
-      for (int j = 0; j < nSmileValues; j++) {
-        final Number delta = deltaValues[j + 1];
-        if (delta != null) {
-          Double rr = fxVolatilitySurface.getVolatility(tenor, ObjectsPair.of(delta, FXVolQuoteType.RISK_REVERSAL));
-          Double butterfly = fxVolatilitySurface.getVolatility(tenor, ObjectsPair.of(delta, FXVolQuoteType.BUTTERFLY));
-          if (rr != null && butterfly != null) {
-            rr = rr * shiftMultiplier;
-            butterfly = butterfly * shiftMultiplier;
-            deltas.add(delta.doubleValue() / 100.);
-            riskReversals.add(rr);
-            butterflies.add(butterfly);
-          }
-        } else {
-          s_logger.info("Had a null value for tenor number " + j);
+      if (atm != null) {
+        if (shiftMultiplier != 1) {
+          atm = atm * shiftMultiplier;
         }
+        final DoubleArrayList deltas = new DoubleArrayList();
+        final DoubleArrayList riskReversals = new DoubleArrayList();
+        final DoubleArrayList butterflies = new DoubleArrayList();
+        for (int j = 0; j < nSmileValues; j++) {
+          final Number delta = deltaValues[j + 1];
+          if (delta != null) {
+            Double rr = fxVolatilitySurface.getVolatility(tenor, ObjectsPair.of(delta, FXVolQuoteType.RISK_REVERSAL));
+            Double butterfly = fxVolatilitySurface.getVolatility(tenor, ObjectsPair.of(delta, FXVolQuoteType.BUTTERFLY));
+            if (rr != null && butterfly != null) {
+              rr = rr * shiftMultiplier;
+              butterfly = butterfly * shiftMultiplier;
+              deltas.add(delta.doubleValue() / 100.);
+              riskReversals.add(rr);
+              butterflies.add(butterfly);
+            }
+          } else {
+            s_logger.info("Had a null delta value for tenor {}", j);
+          }
+        }
+        smile.add(new SmileDeltaParameter(t, atm, deltas.toDoubleArray(), riskReversals.toDoubleArray(), butterflies.toDoubleArray()));
+      } else {
+        s_logger.info("Could not get atm data for tenor {}", tenor);
       }
-      smile[i] = new SmileDeltaParameter(t, atm, deltas.toDoubleArray(), riskReversals.toDoubleArray(), butterflies.toDoubleArray());
     }
-    final SmileDeltaTermStructureParameter smiles = new SmileDeltaTermStructureParameter(smile);
+    if (smile.size() == 0) {
+      throw new OpenGammaRuntimeException("Could not get any data for surface " + surfaceName);
+    }
+    final Interpolator1D interpolator = CombinedInterpolatorExtrapolatorFactory.getInterpolator(interpolatorName, leftExtrapolatorName, rightExtrapolatorName);
+    final SmileDeltaTermStructureParameter smiles = new SmileDeltaTermStructureParameter(smile.toArray(EMPTY_ARRAY), interpolator);
     final ValueProperties.Builder resultProperties = createValueProperties()
         .with(ValuePropertyNames.SURFACE, surfaceName)
-        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.FOREX);
+        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.FOREX)
+        .with(InterpolatedCurveAndSurfaceProperties.X_INTERPOLATOR_NAME, interpolatorName)
+        .with(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME, leftExtrapolatorName)
+        .with(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME, rightExtrapolatorName);
     if (shifts != null) {
       resultProperties.with(VolatilitySurfaceShiftFunction.SHIFT, shifts);
     }
@@ -134,9 +152,22 @@ public class ForexStrangleRiskReversalVolatilitySurfaceFunction extends Abstract
 
   @Override
   public Set<ValueRequirement> getRequirements(final FunctionCompilationContext context, final ComputationTarget target, final ValueRequirement desiredValue) {
-    final Set<String> surfaceNames = desiredValue.getConstraints().getValues(ValuePropertyNames.SURFACE);
+    final ValueProperties constraints = desiredValue.getConstraints();
+    final Set<String> surfaceNames = constraints.getValues(ValuePropertyNames.SURFACE);
     if (surfaceNames == null || surfaceNames.size() != 1) {
       throw new OpenGammaRuntimeException("Need one surface name; have " + surfaceNames);
+    }
+    final Set<String> interpolatorNames = constraints.getValues(InterpolatedCurveAndSurfaceProperties.X_INTERPOLATOR_NAME);
+    if (interpolatorNames == null || interpolatorNames.size() != 1) {
+      return null;
+    }
+    final Set<String> leftExtrapolatorNames = constraints.getValues(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME);
+    if (leftExtrapolatorNames == null || leftExtrapolatorNames.size() != 1) {
+      return null;
+    }
+    final Set<String> rightExtrapolatorNames = constraints.getValues(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME);
+    if (rightExtrapolatorNames == null || rightExtrapolatorNames.size() != 1) {
+      return null;
     }
     final String surfaceName = surfaceNames.iterator().next();
     return Collections.<ValueRequirement>singleton(getDataRequirement(surfaceName, target));
@@ -146,7 +177,10 @@ public class ForexStrangleRiskReversalVolatilitySurfaceFunction extends Abstract
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
     final ValueProperties.Builder resultProperties = createValueProperties()
         .withAny(ValuePropertyNames.SURFACE)
-        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.FOREX);
+        .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.FOREX)
+        .withAny(InterpolatedCurveAndSurfaceProperties.X_INTERPOLATOR_NAME)
+        .withAny(InterpolatedCurveAndSurfaceProperties.LEFT_X_EXTRAPOLATOR_NAME)
+        .withAny(InterpolatedCurveAndSurfaceProperties.RIGHT_X_EXTRAPOLATOR_NAME);
     if (context.getViewCalculationConfiguration() != null) {
       final Set<String> shifts = context.getViewCalculationConfiguration().getDefaultProperties().getValues(DefaultVolatilitySurfaceShiftFunction.VOLATILITY_SURFACE_SHIFT);
       if ((shifts != null) && (shifts.size() == 1)) {

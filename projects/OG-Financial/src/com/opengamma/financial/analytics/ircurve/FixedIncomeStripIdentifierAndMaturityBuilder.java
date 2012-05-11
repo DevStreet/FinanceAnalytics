@@ -16,20 +16,21 @@ import javax.time.calendar.TimeZone;
 import javax.time.calendar.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.region.Region;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.Security;
 import com.opengamma.core.security.SecuritySource;
-import com.opengamma.core.security.SecurityUtils;
 import com.opengamma.financial.analytics.conversion.CalendarUtils;
 import com.opengamma.financial.convention.ConventionBundle;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.convention.InMemoryConventionBundleMaster;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.calendar.Calendar;
-import com.opengamma.financial.schedule.ScheduleCalculator;
 import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.financial.security.deposit.PeriodicZeroDepositSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.swap.FixedInterestRateLeg;
@@ -222,6 +223,11 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
           security = getOISSwap(curveSpecification, strip, marketValues);
           maturity = curveDate.plus(strip.getMaturity().getPeriod()).atTime(11, 00).atZone(TimeZone.UTC);
           break;
+        case PERIODIC_ZERO_DEPOSIT:
+          final PeriodicZeroDepositSecurity depositSecurity = getPeriodicZeroDeposit(curveSpecification, strip, marketValues);
+          maturity = depositSecurity.getMaturityDate();
+          security = depositSecurity;
+          break;
         default:
           throw new OpenGammaRuntimeException("Unhandled type of instrument in curve definition " + strip.getInstrumentType());
       }
@@ -335,8 +341,8 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     final String counterparty = "";
     final ConventionBundle payLegFloatRateConvention = _conventionBundleSource.getConventionBundle(convention.getBasisSwapPayFloatingLegInitialRate());
     final ConventionBundle receiveLegFloatRateConvention = _conventionBundleSource.getConventionBundle(convention.getBasisSwapReceiveFloatingLegInitialRate());
-    final ExternalId payLegFloatRateBloombergTicker = payLegFloatRateConvention.getIdentifiers().getExternalId(SecurityUtils.BLOOMBERG_TICKER);
-    final ExternalId receiveLegFloatRateBloombergTicker = receiveLegFloatRateConvention.getIdentifiers().getExternalId(SecurityUtils.BLOOMBERG_TICKER);
+    final ExternalId payLegFloatRateBloombergTicker = payLegFloatRateConvention.getIdentifiers().getExternalId(ExternalSchemes.BLOOMBERG_TICKER);
+    final ExternalId receiveLegFloatRateBloombergTicker = receiveLegFloatRateConvention.getIdentifiers().getExternalId(ExternalSchemes.BLOOMBERG_TICKER);
     if (rate == null) {
       throw new OpenGammaRuntimeException("Could not get spread; was trying " + swapIdentifier);
     }
@@ -383,6 +389,19 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     final SwapSecurity swap = new SwapSecurity(curveDate, spotDate, maturityDate, counterparty, oisLeg, fixedLeg);
     swap.setExternalIdBundle(ExternalIdBundle.of(swapIdentifier));
     return swap;
+  }
+
+  private PeriodicZeroDepositSecurity getPeriodicZeroDeposit(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues) {
+    final ExternalId id = strip.getSecurity();
+    final Currency currency = spec.getCurrency();
+    final ZonedDateTime startDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC);
+    final ZonedDateTime maturityDate = startDate.plus(strip.getMaturity().getPeriod());
+    final double rate = marketValues.get(id);
+    final int compoundingPeriodsPerYear = strip.getStrip().getPeriodsPerYear();
+    final ExternalId region = spec.getRegion();
+    final PeriodicZeroDepositSecurity deposit = new PeriodicZeroDepositSecurity(currency, startDate, maturityDate, rate, compoundingPeriodsPerYear, region);
+    deposit.setExternalIdBundle(ExternalIdBundle.of(id));
+    return deposit;
   }
 
   private TimeZone ensureZone(final TimeZone zone) {

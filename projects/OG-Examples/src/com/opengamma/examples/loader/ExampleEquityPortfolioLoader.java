@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.time.calendar.LocalDate;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.examples.tool.AbstractExampleTool;
 import com.opengamma.financial.security.equity.EquitySecurity;
 import com.opengamma.financial.security.equity.GICSCode;
@@ -73,7 +74,7 @@ public class ExampleEquityPortfolioLoader extends AbstractExampleTool {
   /**
    * The name of the portfolio.
    */
-  public static final String PORTFOLIO_NAME = "Example Equity Portfolio";
+  public static final String PORTFOLIO_NAME = "Equity Portfolio";
 
   //-------------------------------------------------------------------------
   /**
@@ -101,14 +102,14 @@ public class ExampleEquityPortfolioLoader extends AbstractExampleTool {
     for (EquitySecurity security : securities) {
       
       GICSCode gics = security.getGicsCode();
-      if (gics == null || gics.isPartial()) {
+      if (gics == null || gics.getCode().length() != 2) {
         continue;
       }
       String sector = SECTORS.get(gics.getSectorCode());
-      String industryGroup = gics.getIndustryGroupCode();
-      String industry = gics.getIndustryCode();
-      String subIndustry = gics.getSubIndustryCode();
-      
+      if (sector == null) {
+        s_logger.warn("unrecognised sector code {}", sector);
+        continue;
+      }
       // create portfolio structure
       ManageablePortfolioNode sectorNode = rootNode.findNodeByName(sector);
       if (sectorNode == null) {
@@ -116,31 +117,12 @@ public class ExampleEquityPortfolioLoader extends AbstractExampleTool {
         sectorNode = new ManageablePortfolioNode(sector);
         rootNode.addChildNode(sectorNode);
       }
-      ManageablePortfolioNode groupNode = sectorNode.findNodeByName("Group " + industryGroup);
-      if (groupNode == null) {
-        s_logger.debug("Creating node for industry group {}", industryGroup);
-        groupNode = new ManageablePortfolioNode("Group " + industryGroup);
-        sectorNode.addChildNode(groupNode);
-      }
-      ManageablePortfolioNode industryNode = groupNode.findNodeByName("Industry " + industry);
-      if (industryNode == null) {
-        s_logger.debug("Creating node for industry {}", industry);
-        industryNode = new ManageablePortfolioNode("Industry " + industry);
-        groupNode.addChildNode(industryNode);
-      }
-      ManageablePortfolioNode subIndustryNode = industryNode.findNodeByName("Sub industry " + subIndustry);
-      if (subIndustryNode == null) {
-        s_logger.debug("Creating node for sub industry {}", subIndustry);
-        subIndustryNode = new ManageablePortfolioNode("Sub industry " + subIndustry);
-        industryNode.addChildNode(subIndustryNode);
-      }
-      
       // create the position and add it to the master
       final ManageablePosition position = createPositionAndTrade(security);
       final PositionDocument addedPosition = addPosition(position);
       
       // add the position reference (the unique identifier) to portfolio
-      subIndustryNode.addPosition(addedPosition.getUniqueId());
+      sectorNode.addPosition(addedPosition.getUniqueId());
     }
     
     // adds the complete tree structure to the master
@@ -202,6 +184,8 @@ public class ExampleEquityPortfolioLoader extends AbstractExampleTool {
       throw new OpenGammaRuntimeException("File '" + inputStream + "' could not be found");
     } catch (IOException ex) {
       throw new OpenGammaRuntimeException("An error occurred while reading file '" + inputStream + "'");
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
     
     StringBuilder sb = new StringBuilder();
@@ -225,9 +209,9 @@ public class ExampleEquityPortfolioLoader extends AbstractExampleTool {
     String ticker = getWithException(equityDetails, "ticker");
     
     return createEquitySecurity(companyName, Currency.of(currency), exchange, exchangeCode, gicsCode,
-        ExternalId.of(SecurityUtils.ISIN, isin), 
-        ExternalId.of(SecurityUtils.CUSIP, cusip), 
-        ExternalId.of(SecurityUtils.OG_SYNTHETIC_TICKER, ticker));
+        ExternalId.of(ExternalSchemes.ISIN, isin), 
+        ExternalId.of(ExternalSchemes.CUSIP, cusip), 
+        ExternalId.of(ExternalSchemes.OG_SYNTHETIC_TICKER, ticker));
   }
 
   /**

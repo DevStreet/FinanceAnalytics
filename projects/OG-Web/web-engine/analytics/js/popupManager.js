@@ -19,8 +19,6 @@
     
     function getPopup(className, $cell, rowId, colId) {
       var $popup = $("<div class='" + className + " ui-widget ui-widget-content'></div>");
-      $popup.data("rowId", rowId);
-      $popup.data("colId", colId);
       $popup.appendTo($cell.parent().parent());
       return $popup;
     }
@@ -33,27 +31,29 @@
         offset: "0 -1",
         collision: "none"
       }).show('blind');
-      $popup.data("component", component);
     }
     
-    function removePopup($popup) {
-      var component = $popup.data("component");
+    function removePopup($popup, component) {
       if (component && component.destroy) {
         component.destroy();
       }
-      $popup.remove();
-      $popup = null;      
+      if ($popup) {
+        $popup.remove();
+        $popup = null;
+      }
     }
     
     function removeDetail(rowId, colId) {
       for (var idx = 0; idx < _$details.length; idx++) {
-        var $popup = _$details[idx];
-        var existingRowId = $popup.data("rowId");
-        var existingColId = $popup.data("colId");
+        var details = _$details[idx];
+        var existingRowId = details[2];
+        var existingColId = details[3];
         if (existingRowId != rowId || existingColId != colId) {
           continue;
         }
-        removePopup($popup);
+        var component = details[0]
+        var $popup = details[1]
+        removePopup($popup, component);
         _$details.splice(idx, 1);
         _liveResultsClient.stopDetailedCellUpdates(_gridName, rowId, colId);
         var row = _dataView.getItemById(rowId);
@@ -70,7 +70,7 @@
       }
       removePopup($popup);
       
-      _liveResultsClient.stopDepGraphExplain(rowId, colId);
+      _liveResultsClient.stopDepGraphExplain(_gridName, rowId, colId);
       var row = _dataView.getItemById(rowId);
       delete row.explainComponents[colId];
       $cell.unbind('mouseenter', handleExplainCellHoverIn);
@@ -78,8 +78,8 @@
       $cell.removeClass("explain");
       $cell.removeClass("explain-hover");
       
-      if ($.isEmptyObject(_$explains)) {
-        _$layout.close('east');
+      if (_$popupList.children().size() == 0) {
+        _$layout.close('south');
       }
       
       return true;
@@ -137,7 +137,7 @@
     //-----------------------------------------------------------------------
     // Public API
     
-    this.toggleDetail = function($cell, columnStructure, formatter, rowId) {
+    this.toggleDetail = function($cell, columnStructure, formatter, rowId) { 
       var colId = columnStructure.colId;
       if (removeDetail(rowId, colId)) {
         return;
@@ -148,8 +148,10 @@
         row.detailComponents = {};
       }
 
-      var $popup = getPopup('detail-popup', $cell, rowId, colId);
-      var $content = $("<div class='detail-content'></div>").appendTo($popup);
+      if (!formatter.disableDefaultPopup) {
+        var $popup = getPopup('detail-popup', $cell, rowId, colId);
+        var $content = $("<div class='detail-content'></div>").appendTo($popup);
+      }
       var detailComponent = formatter.createDetail($popup, $content, rowId, columnStructure, _userConfig, row[columnStructure.colId]);
       
       if (detailComponent.resize) {
@@ -167,9 +169,18 @@
           stop: afterResized});
       }
       
-      revealPopup($cell, $popup, detailComponent);
+      if (detailComponent.beforeClosed) {
+        // Component has its own close mechanism
+        detailComponent.beforeClosed.subscribe(function() {
+          self.toggleDetail($cell, columnStructure, formatter, rowId)
+        });
+      }
+      
+      if (!formatter.disableDefaultPopup) {
+        revealPopup($cell, $popup, detailComponent);
+      }
       row.detailComponents[colId] = detailComponent;
-      _$details.push($popup);
+      _$details.push([detailComponent, $popup, rowId, colId]);
 
       _liveResultsClient.startDetailedCellUpdates(_gridName, rowId, colId);
       _liveResultsClient.triggerImmediateUpdate();
@@ -190,19 +201,19 @@
           row.explainComponents = {};
         }
         
-        _$layout.open('east', true, 'none');
+        _$layout.open('south', true, 'none');
         var $closeText = $("<span class='close'>Close</span>").click(handleCloseClick);
         var $popupHead = $("<div class='popup-head ui-widget-header'></div>").append($closeText).append("<span class='title'>Dependency Graph for " + popupTitle + "</span></div>");
-        var $popupContent = $("<div class='popup-content explain'></div>").height(300).width("100%");
+        var $popupContent = $("<div class='popup-content explain'></div>").height(250).width("100%");
         var $popup = $("<li class='popup ui-widget ui-widget-content ui-corner-top'></li>").append($popupHead).append($popupContent).hover(handleExplainPopupHoverIn, handleExplainPopupHoverOut);
         $popup.data('rowId', rowId);
         $popup.data('colId', colId);
         _$popupList.append($popup);
-        var depGraphViewer = new DepGraphViewer($popupContent, rowId, colId, _liveResultsClient, _userConfig);
+        var depGraphViewer = new DepGraphViewer($popupContent, _gridName, rowId, colId, _liveResultsClient, _userConfig);
         $popupContent.resizable({
           handles: 'se',
           helper: 'ui-state-highlight ui-corner-bottom',
-          minHeight: 200,
+          minHeight: 150,
           resize: function(event, ui) { ui.size.width = "100%"; },
           stop: function() { depGraphViewer.resize(); }
         });
@@ -215,7 +226,7 @@
         }
         _$explains[rowId][colId] = $popup;
         
-        _liveResultsClient.startDepGraphExplain(rowId, colId);
+        _liveResultsClient.startDepGraphExplain(_gridName, rowId, colId);
         _liveResultsClient.triggerImmediateUpdate();
       }
       

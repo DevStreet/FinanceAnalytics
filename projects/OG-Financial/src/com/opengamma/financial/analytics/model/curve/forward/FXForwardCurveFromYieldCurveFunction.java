@@ -10,8 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.core.security.SecurityUtils;
-import com.opengamma.core.value.MarketDataRequirementNames;
+import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurveYieldImplied;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.function.AbstractFunction;
@@ -24,11 +25,7 @@ import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.financial.model.interestrate.curve.ForwardCurve;
-import com.opengamma.financial.model.interestrate.curve.ForwardCurveYieldImplied;
-import com.opengamma.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.financial.security.fx.FXUtils;
-import com.opengamma.id.ExternalId;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.UnorderedCurrencyPair;
 
@@ -88,11 +85,9 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
       payCurrency = ccyPair.getSecondCurrency();
       receiveCurrency = ccyPair.getFirstCurrency();
     }
-    //TODO should not rely on Bloomberg here
-    final ExternalId spotIdentifier = SecurityUtils.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
+    result.add(new ValueRequirement(ValueRequirementNames.SPOT_RATE, UnorderedCurrencyPair.of(payCurrency, receiveCurrency)));
     result.add(new ValueRequirement(ValueRequirementNames.YIELD_CURVE, payCurrency.getUniqueId(), payCurveProperties));
     result.add(new ValueRequirement(ValueRequirementNames.YIELD_CURVE, receiveCurrency.getUniqueId(), receiveCurveProperties));
-    result.add(new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, spotIdentifier));
     return result;
   }
 
@@ -120,6 +115,7 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
       payCurrency = ccyPair.getSecondCurrency();
       receiveCurrency = ccyPair.getFirstCurrency();
     }
+    Double spot = null;
     for (final ComputedValue input : inputs.getAllValues()) {
       final ValueSpecification spec = input.getSpecification();
       final ValueProperties properties = spec.getProperties();
@@ -129,6 +125,8 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
       } else if (spec.getTargetSpecification().getUniqueId().equals(receiveCurrency.getUniqueId())) {
         receiveCurveObject = input.getValue();
         receiveCurveNames = properties.getValues(ValuePropertyNames.CURVE);
+      } else {
+        spot = (Double) input.getValue();
       }
     }
     if (payCurveObject == null) {
@@ -148,12 +146,6 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
     if (fxForwardCurveNames == null || fxForwardCurveNames.size() != 1) {
       throw new OpenGammaRuntimeException("Null or non-unique FX forward curve names: " + fxForwardCurveNames);
     }
-    final ExternalId spotIdentifier = SecurityUtils.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
-    final Object spotObject = inputs.getValue(new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, spotIdentifier));
-    if (spotObject == null) {
-      throw new OpenGammaRuntimeException("Could not get spot");
-    }
-    final double spot = (Double) spotObject;
     final YieldCurve payCurve = (YieldCurve) payCurveObject;
     final YieldCurve receiveCurve = (YieldCurve) receiveCurveObject;
     final String fxForwardCurveName = fxForwardCurveNames.iterator().next();

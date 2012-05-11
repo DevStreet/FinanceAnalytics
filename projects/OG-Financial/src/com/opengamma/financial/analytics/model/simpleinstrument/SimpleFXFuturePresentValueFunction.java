@@ -15,8 +15,12 @@ import org.apache.commons.lang.Validate;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.simpleinstruments.derivative.SimpleInstrument;
+import com.opengamma.analytics.financial.simpleinstruments.pricing.SimpleFXFutureDataBundle;
+import com.opengamma.analytics.financial.simpleinstruments.pricing.SimpleFXFuturePresentValueCalculator;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.security.Security;
-import com.opengamma.core.security.SecurityUtils;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
@@ -32,12 +36,8 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.conversion.SimpleFutureConverter;
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunction;
-import com.opengamma.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.financial.security.future.FXFutureSecurity;
 import com.opengamma.financial.security.fx.FXUtils;
-import com.opengamma.financial.simpleinstruments.derivative.SimpleInstrument;
-import com.opengamma.financial.simpleinstruments.pricing.SimpleFXFutureDataBundle;
-import com.opengamma.financial.simpleinstruments.pricing.SimpleFXFuturePresentValueCalculator;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.CurrencyAmount;
@@ -133,9 +133,9 @@ public class SimpleFXFuturePresentValueFunction extends AbstractFunction.NonComp
     final Currency payCurrency = future.getNumerator();
     final Currency receiveCurrency = future.getDenominator();
     if (FXUtils.isInBaseQuoteOrder(payCurrency, receiveCurrency)) {
-      bloombergId = SecurityUtils.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
+      bloombergId = ExternalSchemes.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
     } else {
-      bloombergId = SecurityUtils.bloombergTickerSecurityId(receiveCurrency.getCode() + payCurrency.getCode() + " Curncy");
+      bloombergId = ExternalSchemes.bloombergTickerSecurityId(receiveCurrency.getCode() + payCurrency.getCode() + " Curncy");
     }
     return bloombergId;
   }

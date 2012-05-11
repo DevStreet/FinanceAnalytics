@@ -14,12 +14,16 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.time.calendar.Clock;
+import javax.time.calendar.LocalDate;
 import javax.time.calendar.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
+import com.opengamma.analytics.math.MathException;
+import com.opengamma.analytics.math.curve.NodalDoublesCurve;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceData;
 import com.opengamma.engine.ComputationTarget;
@@ -38,11 +42,11 @@ import com.opengamma.financial.OpenGammaCompilationContext;
 import com.opengamma.financial.OpenGammaExecutionContext;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.model.irfutureoption.IRFutureOptionUtils;
-import com.opengamma.financial.model.volatility.BlackFormulaRepository;
-import com.opengamma.math.MathException;
-import com.opengamma.math.curve.NodalDoublesCurve;
+import com.opengamma.util.CompareUtils;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.Pair;
+
+
 
 /**
  * 
@@ -99,11 +103,16 @@ public class IRFutureOptionVolatilitySurfaceDataFunction extends AbstractFunctio
         .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.IR_FUTURE_OPTION).get();
     final ValueSpecification spec = new ValueSpecification(ValueRequirementNames.STANDARD_VOLATILITY_SURFACE_DATA, target.toSpecification(), properties);
     if (surfaceQuoteUnits.equals(SurfacePropertyNames.VOLATILITY_QUOTE)) {
-      return Collections.singleton(new ComputedValue(spec, getSurfaceFromVolatilityQuote(surfaceData)));
+      return Collections.singleton(new ComputedValue(spec, getSurfaceFromVolatilityQuote(surfaceData, now)));
     } else if (surfaceQuoteUnits.equals(SurfacePropertyNames.PRICE_QUOTE)) {
       final NodalDoublesCurve futuresPrices = getFuturePricesCurve(target, curveName, inputs);
       final VolatilitySurfaceData<Double, Double> volSurface = getSurfaceFromPriceQuote(specification, surfaceData, futuresPrices, now, surfaceQuoteType);
-      return Collections.singleton(new ComputedValue(spec, volSurface));
+      if (volSurface != null) {
+        return Collections.singleton(new ComputedValue(spec, volSurface));
+      } else {
+        return Collections.emptySet();
+      }
+        
     } else {
       throw new OpenGammaRuntimeException("Encountered an unexpected surfaceQuoteUnits. Valid values are found in SurfacePropertyNames as VolatilityQuote or PriceQuote.");
     }
@@ -168,24 +177,28 @@ public class IRFutureOptionVolatilitySurfaceDataFunction extends AbstractFunctio
     return requirements;
   }
 
-  private static VolatilitySurfaceData<Double, Double> getSurfaceFromVolatilityQuote(final VolatilitySurfaceData<Number, Double> optionVolatilities) {
+  /** Build a volatility surface based on Expiry, T, and Strike, K. T is in measured in our standard OG-Analytic years */
+  private static VolatilitySurfaceData<Double, Double> getSurfaceFromVolatilityQuote(final VolatilitySurfaceData<Number, Double> optionVolatilities, ZonedDateTime now) {
     final Map<Pair<Double, Double>, Double> volatilityValues = new HashMap<Pair<Double, Double>, Double>();
-    final DoubleArrayList xList = new DoubleArrayList();
-    final DoubleArrayList yList = new DoubleArrayList();
+    final DoubleArrayList tList = new DoubleArrayList();
+    final DoubleArrayList kList = new DoubleArrayList();
+    final LocalDate today = now.toLocalDate();
     for (final Number x : optionVolatilities.getXs()) {
+      final Double t = IRFutureOptionUtils.getFutureOptionTtm(x.intValue(), today);
       for (final Double y : optionVolatilities.getYs()) {
         final Double volatility = optionVolatilities.getVolatility(x, y);
         if (volatility != null) {
-          xList.add(x.doubleValue());
-          yList.add(y / 100.);
-          volatilityValues.put(Pair.of(x.doubleValue(), y / 100.), volatility / 100); // TODO Normalisation, could this be done elsewhere?
+          tList.add(t);
+          kList.add(y / 100.);
+          volatilityValues.put(Pair.of(t, y / 100.), volatility / 100); // TODO Normalisation, could this be done elsewhere?
         }
       }
     }
     return new VolatilitySurfaceData<Double, Double>(optionVolatilities.getDefinitionName(), optionVolatilities.getSpecificationName(),
-        optionVolatilities.getTarget(), xList.toArray(new Double[0]), yList.toArray(new Double[0]), volatilityValues);
+        optionVolatilities.getTarget(), tList.toArray(new Double[0]), kList.toArray(new Double[0]), volatilityValues);
   }
-
+  
+  /** Build a volatility surface based on Expiry, T, and Strike, K. T is in measured in our standard OG-Analytic years */
   private static VolatilitySurfaceData<Double, Double> getSurfaceFromPriceQuote(final VolatilitySurfaceSpecification specification,
       final VolatilitySurfaceData<Number, Double> optionPrices, final NodalDoublesCurve futurePrices, final ZonedDateTime now, final String surfaceQuoteType) {
     double callAboveStrike = 0;
@@ -193,30 +206,55 @@ public class IRFutureOptionVolatilitySurfaceDataFunction extends AbstractFunctio
       callAboveStrike = ((CallPutSurfaceInstrumentProvider<?, ?>) specification.getSurfaceInstrumentProvider()).useCallAboveStrike();
     }
     final Map<Pair<Double, Double>, Double> volatilityValues = new HashMap<Pair<Double, Double>, Double>();
-    final DoubleArrayList xList = new DoubleArrayList();
-    final DoubleArrayList yList = new DoubleArrayList();
+    final DoubleArrayList txList = new DoubleArrayList();
+    final DoubleArrayList kList = new DoubleArrayList();
+    final LocalDate today = now.toLocalDate();
     for (final Number x : optionPrices.getXs()) {
-      final Number t = IRFutureOptionUtils.getTime(x.doubleValue(), now);
-      for (final Double y : optionPrices.getYs()) {
-        final Double price = optionPrices.getVolatility(x, y);
-        if (price != null) {
-          try {
-            final double xVal = x.doubleValue();
-            final double forward = futurePrices.getYValue(x.doubleValue());
-            final double volatility = getVolatility(surfaceQuoteType, y / 100.0, price, forward, t.doubleValue(), callAboveStrike / 100.);
-            xList.add(xVal);
-            yList.add(y / 100.);
-            volatilityValues.put(Pair.of(xVal, y / 100.), volatility);
-          } catch (final MathException e) {
-            s_logger.info("Could not imply volatility for ({}, {}); error was {}", new Object[] {x, y, e.getMessage() });
-          } catch (final IllegalArgumentException e) {
-            s_logger.info("Could not imply volatility for ({}, {}); error was {}", new Object[] {x, y, e.getMessage() });
+      // Loop over option expiries
+      final Double optionTtm = IRFutureOptionUtils.getFutureOptionTtm(x.intValue(), today);
+      // Get the corresponding future, which may not share the same expiries as the option itself
+      Double[] futureExpiries = futurePrices.getXData();
+      int nFutures = futureExpiries.length;
+      if (nFutures == 0) {
+        s_logger.warn("No future prices found for surface : " + specification.getName());
+        return null;
+      }
+      Double underlyingExpiry;
+      int i = 0;
+      do {
+        underlyingExpiry = futureExpiries[i++];
+      } while(underlyingExpiry < optionTtm && i < nFutures);
+      
+      if (underlyingExpiry < optionTtm) {
+        s_logger.info("Requesting an option price where the underlying future price isn't available. "
+            + "Either there are too many expiries in VolatilitySurfaceDefinition or too few in the corresponding FuturePriceCurveDefinition");
+        
+      } else {
+        final Double forward = futurePrices.getYValue(underlyingExpiry);
+        // Loop over strikes
+        for (final Double y : optionPrices.getYs()) {
+          final Double price = optionPrices.getVolatility(x, y);
+          if (price != null) {
+            try {
+  
+              // Compute the Black volatility implied from the option price
+              final double volatility = getVolatility(surfaceQuoteType, y / 100.0, price, forward, optionTtm, callAboveStrike / 100.);
+              if (!CompareUtils.closeEquals(volatility, 0.0)) {
+                txList.add(optionTtm);
+                kList.add(y / 100.0);
+                volatilityValues.put(Pair.of(optionTtm, y / 100.), volatility);
+              }
+            } catch (final MathException e) {
+              s_logger.info("Could not imply volatility for ({}, {}); error was {}", new Object[] {x, y, e.getMessage() });
+            } catch (final IllegalArgumentException e) {
+              s_logger.info("Could not imply volatility for ({}, {}); error was {}", new Object[] {x, y, e.getMessage() });
+            }
           }
         }
       }
     }
     return new VolatilitySurfaceData<Double, Double>(optionPrices.getDefinitionName(), optionPrices.getSpecificationName(),
-        optionPrices.getTarget(), xList.toArray(new Double[0]), yList.toArray(new Double[0]), volatilityValues);
+        optionPrices.getTarget(), txList.toArray(new Double[0]), kList.toArray(new Double[0]), volatilityValues);
   }
 
   /** Futures prices are required to form implied volatilities when the units of the input surface is quoted in prices. */

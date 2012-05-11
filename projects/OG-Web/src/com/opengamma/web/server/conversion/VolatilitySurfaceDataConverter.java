@@ -18,9 +18,10 @@ import com.opengamma.engine.value.ValueSpecification;
 public class VolatilitySurfaceDataConverter implements ResultConverter<VolatilitySurfaceData> {
 
   @Override
+  // TODO PLAT-2249 Add field to allow transposing the display surface 
   public Object convertForDisplay(ResultConverterCache context, ValueSpecification valueSpec, VolatilitySurfaceData rawValue, ConversionMode mode) {
     @SuppressWarnings("unchecked")
-    VolatilitySurfaceData<Object, Object> value = (VolatilitySurfaceData<Object, Object>) rawValue;
+    VolatilitySurfaceData<Object, Object> value = rawValue;
     Map<String, Object> result = new HashMap<String, Object>();
     
     result.put("xCount", value.getXs().length);
@@ -31,15 +32,13 @@ public class VolatilitySurfaceDataConverter implements ResultConverter<Volatilit
       Object[] xs = value.getXs();
       String[] xsStrings = new String[xs.length];
       for (int i = 0; i < xs.length; i++) {
-        xsStrings[i] = xs[i].toString();
-        //xsStrings[i] = xs[i].getPeriod().toString().replaceFirst("P", "");
+        xsStrings[i] = LabelFormatter.format(xs[i]);
       }
       result.put("xs", xsStrings);
       Object[] ys = value.getYs();
       String[] ysStrings = new String[ys.length];
       for (int i = 0; i < ys.length; i++) {
-        ysStrings[i] = ys[i].toString();
-        //ysStrings[i] = ys[i].getPeriod().toString().replaceFirst("P", "");
+        ysStrings[i] = LabelFormatter.format(ys[i]);
       }
       result.put("ys", ysStrings);
       

@@ -15,10 +15,19 @@ import org.apache.commons.lang.Validate;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.equity.variance.VarianceSwapDataBundle;
+import com.opengamma.analytics.financial.equity.variance.definition.VarianceSwapDefinition;
+import com.opengamma.analytics.financial.equity.variance.derivative.VarianceSwap;
+import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilitySurface;
+import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilitySurfaceStrike;
+import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurface;
+import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
@@ -36,19 +45,10 @@ import com.opengamma.financial.OpenGammaCompilationContext;
 import com.opengamma.financial.OpenGammaExecutionContext;
 import com.opengamma.financial.analytics.equity.EquityVarianceSwapConverter;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
-import com.opengamma.financial.equity.variance.VarianceSwapDataBundle;
-import com.opengamma.financial.equity.variance.definition.VarianceSwapDefinition;
-import com.opengamma.financial.equity.variance.derivative.VarianceSwap;
-import com.opengamma.financial.model.interestrate.curve.ForwardCurve;
-import com.opengamma.financial.model.interestrate.curve.YieldAndDiscountCurve;
-import com.opengamma.financial.model.volatility.surface.BlackVolatilitySurface;
-import com.opengamma.financial.model.volatility.surface.BlackVolatilitySurfaceStrike;
-import com.opengamma.financial.model.volatility.surface.VolatilitySurface;
 import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.UniqueId;
-import com.opengamma.util.time.TimeCalculator;
 
 /**
  * 
@@ -169,7 +169,7 @@ public abstract class EquityVarianceSwapFunction extends AbstractFunction.NonCom
         .withAny(STRIKE_PARAMETERIZATION_METHOD)//, _strikeParameterizationMethodName)
         .get();
     final ExternalId id = security.getSpotUnderlyingId();
-    final UniqueId newId = id.getScheme().equals(SecurityUtils.BLOOMBERG_TICKER) ? UniqueId.of(SecurityUtils.BLOOMBERG_TICKER_WEAK.getName(), id.getValue()) :
+    final UniqueId newId = id.getScheme().equals(ExternalSchemes.BLOOMBERG_TICKER) ? UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName(), id.getValue()) :
       UniqueId.of(id.getScheme().getName(), id.getValue());
     //UniqueId temp = UniqueId.of(SecurityUtils.BLOOMBERG_TICKER_WEAK.getName(), "DJX Index");
     return new ValueRequirement(ValueRequirementNames.INTERPOLATED_VOLATILITY_SURFACE, ComputationTargetType.PRIMITIVE, newId, properties);

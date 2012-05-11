@@ -7,7 +7,7 @@ $.register_module({
     dependencies: ['og.common.util.ui.dialog'],
     obj: function () {
         var ui = og.common.util.ui, api = og.api,
-            template_data, orig_config,
+            template_data,
             dependencies = ['id', 'node', 'version'],
             html = {}, action = {}, $add_trades,
             load, reload, attach_trades_link, format_trades,
@@ -52,7 +52,8 @@ $.register_module({
             else action.replace(obj, trade_id);
             $(this).dialog('close');
         };
-        attach_trades_link = function (selector) {
+        attach_trades_link = function (selector, editable) {
+            if (!editable) return;
             $(selector).append('<a href="#" class="OG-link-add">add trade</a>').find('.OG-link-add').css({
                 'position': 'relative', 'left': '2px', 'top': '3px', 'float': 'left'
             }).unbind('click').bind('click', function (e) {
@@ -180,15 +181,15 @@ $.register_module({
           <table class="OG-table og-tablesorter">\
             <thead>\
               <tr>\
-                <th colspan="6"><span>Trades</span></th>\
+                <th colspan="6"><span><em>Trades</em></span></th>\
               </tr>\
               <tr>\
-                <th>ID</th>\
-                <th>Quantity</th>\
-                <th>Counterparty</th>\
-                <th>Trade Date / Time</th>\
-                <th>Premium</th>\
-                <th>Premium Date / Time</th>\
+                <th><div><em>ID<em/></div></th>\
+                <th><div><em>Quantity<em/></div></th>\
+                <th><div><em>Counterparty<em/></div></th>\
+                <th><div><em>Trade Date / Time<em/></div></th>\
+                <th><div><em>Premium<em/></div></th>\
+                <th><div><em>Premium Date / Time<em/></div></th>\
               </tr>\
             </thead>\
             <tbody>{TBODY}</tbody>\
@@ -292,10 +293,11 @@ $.register_module({
             });
         };
         load = function (config) {
-            var handler, version = config.version !== '*' ? config.version : void 0;
+            var handler, editable = 'editable' in config ? config.editable : true,
+                version = config.version !== '*' ? config.version : void 0,
+                height = config.height || 400;
             handler = function (result) {
                 if (result.error) return alert(result.message);
-                orig_config = config;
                 template_data = result.data.template_data;
                 var trades, selector = config.selector, tbody, has_attributes = false,
                     fields = ['id', 'quantity', 'counterParty', 'trade_date_time', 'premium', 'premium_date_time'];
@@ -305,7 +307,7 @@ $.register_module({
                             : 0;
                 });
                 if (!trades.length) return $(selector).html(html.og_table.replace('{TBODY}',
-                    '<tr><td colspan="6">No Trades</td></tr>')), attach_trades_link(selector);
+                    '<tr><td colspan="6">No Trades</td></tr>')), attach_trades_link(selector, editable);
                 tbody = trades.reduce(function (acc, trade) {
                     acc.push('<tr class="og-row"><td>', fields.map(function (field, i) {
                         var expander;
@@ -348,8 +350,14 @@ $.register_module({
                         });
                     } else $this.find('.og-icon-expand').css('visibility', 'hidden');
                 });
-                if (!version) attach_trades_link(selector);
-                $(selector + ' .OG-table').tablesorter().awesometable({height: 400});
+                if (!version && editable) attach_trades_link(selector);
+                $(selector + ' .OG-table').tablesorter({
+                    headers: {1: {sorter:'numeric_string'}, 4: {sorter: 'currency_string'}}
+                }).awesometable({height: height, resize: function (resize) {
+                    og.common.gadgets.manager.register({
+                        alive: function () {return !!$(selector).length;}, resize: resize
+                    });
+                }});
                 /*
                  * Enable edit/delete trade
                  */
@@ -359,7 +367,7 @@ $.register_module({
                         $(elm).find('td').css(css);
                         if ($(elm).next().is('.og-js-attribute')) $(elm).next().find('> td').css(css);
                     };
-                    $(selector + ' .og-row').hover(
+                    if (editable) $(selector + ' .og-row').hover(
                         function () {
                             swap_css(this, {'background-color': '#d7e7f2', 'cursor': 'default'});
                             $(this).find('td:last-child').append('<div class="og-del"></div>');

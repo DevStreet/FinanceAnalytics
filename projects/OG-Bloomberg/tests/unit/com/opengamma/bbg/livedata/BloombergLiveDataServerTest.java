@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.bbg.test.BloombergLiveDataServerUtils;
 import com.opengamma.bbg.test.BloombergTestUtils;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.livedata.LiveDataClient;
 import com.opengamma.livedata.LiveDataListener;
@@ -66,14 +66,14 @@ public class BloombergLiveDataServerTest {
     StandardRulesUtils.validateOpenGammaMsg(snapshotResponse.getSnapshot().getFields());
   }
   
-  @Test
+  @Test(groups={"bbgSubscriptionTests"})
   public void testSnapshotNotPresent() {
     LiveDataSubscriptionResponse snapshotResponse = snapshot("AAPL.O");
     assertNotNull(snapshotResponse);
     assertEquals(LiveDataSubscriptionResult.NOT_PRESENT, snapshotResponse.getSubscriptionResult());
   }
   
-  @Test
+  @Test(groups={"bbgSubscriptionTests"})
   public void testSubscribeLimit() throws Exception {
     _server.setSubscriptionLimit(0);
     CollectingLiveDataListener listener = new CollectingLiveDataListener(1, 0);
@@ -85,7 +85,8 @@ public class BloombergLiveDataServerTest {
       assertTrue(response.getUserMessage().toLowerCase().contains("limit"));
     }
   }
-  @Test
+  
+  @Test(groups={"bbgSubscriptionTests"})
   public void testSubscribe() throws Exception {
     CollectingLiveDataListener listener = new CollectingLiveDataListener(5, 5);
 
@@ -97,7 +98,7 @@ public class BloombergLiveDataServerTest {
     
     for (LiveDataValueUpdate update : listener.getValueUpdates()) {
       assertEquals(1, update.getSpecification().getIdentifiers().size());
-      assertNotNull(update.getSpecification().getIdentifier(SecurityUtils.BLOOMBERG_BUID));
+      assertNotNull(update.getSpecification().getIdentifier(ExternalSchemes.BLOOMBERG_BUID));
       assertNotNull(StandardRules.getOpenGammaRuleSetId(), update.getSpecification().getNormalizationRuleSetId());
     
       StandardRulesUtils.validateOpenGammaMsg(update.getFields());
@@ -107,24 +108,24 @@ public class BloombergLiveDataServerTest {
   private void subscribe(LiveDataClient liveDataClient, LiveDataListener listener, String ticker) {
     LiveDataSpecification requestedSpecification = new LiveDataSpecification(
         liveDataClient.getDefaultNormalizationRuleSetId(),
-        SecurityUtils.bloombergTickerSecurityId(ticker));
+        ExternalSchemes.bloombergTickerSecurityId(ticker));
     liveDataClient.subscribe(TEST_USER, requestedSpecification, listener);
   }
   
   private LiveDataSubscriptionResponse snapshot(String ticker) {
     LiveDataSpecification requestedSpecification = new LiveDataSpecification(
         _liveDataClient.getDefaultNormalizationRuleSetId(),
-        SecurityUtils.bloombergTickerSecurityId(ticker));
+        ExternalSchemes.bloombergTickerSecurityId(ticker));
     return _liveDataClient.snapshot(TEST_USER, requestedSpecification, 3000);
   }
   
-  @Test
+  @Test(groups={"bbgSubscriptionTests"})
   public void testPersistentServer() {
     // just check the Spring config's OK
     new ClassPathXmlApplicationContext("/com/opengamma/bbg/livedata/bbg-livedata-context.xml");
   }
   
-  @Test
+  @Test(groups={"bbgSubscriptionTests"})
   public void swapStripSubscriptions() throws Exception {
     CollectingLiveDataListener oneWeekListener = new CollectingLiveDataListener();
     CollectingLiveDataListener twoWeekListener = new CollectingLiveDataListener();
@@ -162,7 +163,7 @@ public class BloombergLiveDataServerTest {
     }
   }
   
-  @Test
+  @Test(groups={"bbgSubscriptionTests"})
   public void optionSnapshot() {
     String option = BloombergTestUtils.getSampleEquityOptionTicker();
     LiveDataSubscriptionResponse snapshotResponse = snapshot(option);

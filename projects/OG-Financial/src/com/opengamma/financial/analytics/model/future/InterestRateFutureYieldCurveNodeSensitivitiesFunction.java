@@ -14,6 +14,14 @@ import javax.time.calendar.Clock;
 import javax.time.calendar.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.InstrumentSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueNodeSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.position.Trade;
@@ -42,17 +50,9 @@ import com.opengamma.financial.analytics.model.InterpolatedCurveAndSurfaceProper
 import com.opengamma.financial.analytics.model.YieldCurveNodeSensitivitiesHelper;
 import com.opengamma.financial.analytics.model.curve.interestrate.MarketInstrumentImpliedYieldCurveFunction;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.InstrumentSensitivityCalculator;
-import com.opengamma.financial.interestrate.PresentValueNodeSensitivityCalculator;
-import com.opengamma.financial.interestrate.YieldCurveBundle;
-import com.opengamma.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.financial.security.future.InterestRateFutureSecurity;
-import com.opengamma.math.matrix.DoubleMatrix1D;
-import com.opengamma.math.matrix.DoubleMatrix2D;
 import com.opengamma.util.money.Currency;
 
 /**
@@ -61,7 +61,7 @@ import com.opengamma.util.money.Currency;
 public class InterestRateFutureYieldCurveNodeSensitivitiesFunction extends AbstractFunction.NonCompiledInvoker {
   private static final PresentValueNodeSensitivityCalculator NSC = PresentValueNodeSensitivityCalculator.getDefaultInstance();
   private static final InstrumentSensitivityCalculator CALCULATOR = InstrumentSensitivityCalculator.getInstance();
-  private static final String s_valueRequirement = ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES;
+  private static final String VALUE_REQUIREMENT = ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES;
   private InterestRateFutureTradeConverter _converter;
   private FixedIncomeConverterDataProvider _dataConverter;
 
@@ -243,7 +243,7 @@ public class InterestRateFutureYieldCurveNodeSensitivitiesFunction extends Abstr
         .withAny(ValuePropertyNames.CURVE)
         .withAny(YieldCurveFunction.PROPERTY_FORWARD_CURVE)
         .withAny(YieldCurveFunction.PROPERTY_FUNDING_CURVE).get();
-    return new ValueSpecification(s_valueRequirement, target.toSpecification(), result);
+    return new ValueSpecification(VALUE_REQUIREMENT, target.toSpecification(), result);
   }
 
   private ValueSpecification getResultSpec(final ComputationTarget target, final Currency ccy, final String calculationMethod) {
@@ -254,7 +254,7 @@ public class InterestRateFutureYieldCurveNodeSensitivitiesFunction extends Abstr
         .withAny(ValuePropertyNames.CURVE)
         .withAny(YieldCurveFunction.PROPERTY_FORWARD_CURVE)
         .withAny(YieldCurveFunction.PROPERTY_FUNDING_CURVE).get();
-    return new ValueSpecification(s_valueRequirement, target.toSpecification(), result);
+    return new ValueSpecification(VALUE_REQUIREMENT, target.toSpecification(), result);
   }
 
   private ValueSpecification getResultSpec(final ComputationTarget target, final Currency ccy, final String curveName,
@@ -266,7 +266,7 @@ public class InterestRateFutureYieldCurveNodeSensitivitiesFunction extends Abstr
         .with(ValuePropertyNames.CURVE, curveName)
         .with(YieldCurveFunction.PROPERTY_FORWARD_CURVE, forwardCurveName)
         .with(YieldCurveFunction.PROPERTY_FUNDING_CURVE, fundingCurveName).get();
-    return new ValueSpecification(s_valueRequirement, target.toSpecification(), result);
+    return new ValueSpecification(VALUE_REQUIREMENT, target.toSpecification(), result);
   }
 
   private static ValueRequirement getJacobianRequirement(final ComputationTarget target, final String forwardCurveName, final String fundingCurveName, final String calculationMethod) {

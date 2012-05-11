@@ -10,15 +10,15 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
+import com.opengamma.analytics.financial.interestrate.future.calculator.BondFutureGrossBasisFromCurvesCalculator;
+import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.financial.analytics.StringLabelledMatrix1D;
 import com.opengamma.financial.analytics.model.bond.BondFunction;
-import com.opengamma.financial.interestrate.YieldCurveBundle;
-import com.opengamma.financial.interestrate.future.calculator.BondFutureGrossBasisFromCurvesCalculator;
-import com.opengamma.financial.interestrate.future.derivative.BondFuture;
 import com.opengamma.financial.security.future.BondFutureDeliverable;
 import com.opengamma.util.money.Currency;
 
@@ -47,7 +47,7 @@ public class BondFutureGrossBasisFromCurvesFunction extends BondFutureFromCurves
     }
     final String[] label = new String[n];
     for (int i = 0; i < n; i++) {
-      label[i] = deliverables.get(i).getIdentifiers().getValue(SecurityUtils.BLOOMBERG_BUID); //TODO get a better label
+      label[i] = deliverables.get(i).getIdentifiers().getValue(ExternalSchemes.BLOOMBERG_BUID); //TODO get a better label
     }
     final StringLabelledMatrix1D result = new StringLabelledMatrix1D(label, grossBasis);
     return Sets.newHashSet(new ComputedValue(getResultSpec(target), result));

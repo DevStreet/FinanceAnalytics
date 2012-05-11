@@ -13,6 +13,7 @@ common/deploy.properties
 !/projects/OG-Engine
 !/projects/OG-Examples
 !/projects/OG-Financial
+!/projects/OG-Install
 !/projects/OG-Integration
 !/projects/OG-Language
 !/projects/OG-LiveData
@@ -40,7 +41,11 @@ output-long/
 /Setting-up-an-Eclipse-workspace.html
 test-output/
 /install/
+/OpenGamma/
 /build/
 LOCAL_STASH
 *.iws
 *.ids
+docs.sqlite3
+*.pid
+*.pyc

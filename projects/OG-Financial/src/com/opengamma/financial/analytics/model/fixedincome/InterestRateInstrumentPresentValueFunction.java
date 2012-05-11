@@ -8,12 +8,12 @@ package com.opengamma.financial.analytics.model.fixedincome;
 import java.util.Collections;
 import java.util.Set;
 
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.PresentValueCalculator;
+import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueRequirementNames;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.PresentValueCalculator;
-import com.opengamma.financial.interestrate.YieldCurveBundle;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.bond.BondSecurity;
 
@@ -34,7 +34,7 @@ public class InterestRateInstrumentPresentValueFunction extends InterestRateInst
     Double presentValue = CALCULATOR.visit(derivative, bundle);
     if (security instanceof BondSecurity) {
       final BondSecurity bondSec = (BondSecurity) security;
-      presentValue = presentValue * bondSec.getParAmount();
+      presentValue *= bondSec.getParAmount();
     }
     return Collections.singleton(new ComputedValue(getResultSpec(target, forwardCurveName, fundingCurveName, curveCalculationMethod, currency), presentValue));
   }

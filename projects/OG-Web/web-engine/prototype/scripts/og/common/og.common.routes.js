@@ -43,11 +43,16 @@ $.register_module({
                 $(function () { // in addition to binding hash change events to window, also fire it onload
                     var common = og.views.common;
                     $('.OG-js-loading').hide();
+                    $('.OG-layout-admin-container, .OG-layout-analytics-container').css({'visibility': 'visible'});
                     common.layout = (({
                         'analytics.ftl': common.layout.analytics,
                         'analytics2.ftl': common.layout.analytics2,
                         'admin.ftl': common.layout.admin
                     })[window.location.pathname.split('/').reverse()[0].toLowerCase()] || $.noop)();
+                    if (window.parent !== window && window.parent.og.api.rest)
+                        og.api.rest = window.parent.og.api.rest;
+                    else
+                        if (og.api.rest) og.api.rest.subscribe();
                     routes.handler();
                     set_title(routes.current().hash);
                 });

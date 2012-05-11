@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.function.FunctionCompilationContext;
+import com.opengamma.engine.function.exclusion.FunctionExclusionGroup;
+import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.CompiledFunctionResolver;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
 import com.opengamma.engine.value.ValueRequirement;
@@ -53,7 +55,7 @@ import com.opengamma.util.tuple.Pair;
  * methods at any one time. If multiple threads are to attempt to add targets to the graph
  * concurrently, it is possible to synchronize on the builder instance.
  */
-public final class DependencyGraphBuilder {
+public final class DependencyGraphBuilder implements Cancelable {
 
   private static final Logger s_loggerBuilder = LoggerFactory.getLogger(DependencyGraphBuilder.class);
   private static final Logger s_loggerResolver = LoggerFactory.getLogger(RequirementResolver.class);
@@ -126,7 +128,7 @@ public final class DependencyGraphBuilder {
         }
       }
       if ((fallback == null) && useFallback) {
-        fallback = context.getOrCreateTaskResolving(getValueRequirement(), _parentTask);
+        fallback = context.getOrCreateTaskResolving(getValueRequirement(), _parentTask, _parentTask.getFunctionExclusion());
         synchronized (this) {
           useFallback = _tasks.add(fallback);
         }
@@ -246,6 +248,7 @@ public final class DependencyGraphBuilder {
     private ComputationTargetResolver _targetResolver;
     private CompiledFunctionResolver _functionResolver;
     private FunctionCompilationContext _compilationContext;
+    private FunctionExclusionGroups _functionExclusionGroups;
 
     // The resolve task is ref-counted once for the map (it is being used as a set)
     private final ConcurrentMap<ValueRequirement, Map<ResolveTask, ResolveTask>> _requirements;
@@ -270,6 +273,7 @@ public final class DependencyGraphBuilder {
       setTargetResolver(copyFrom.getTargetResolver());
       setFunctionResolver(copyFrom.getFunctionResolver());
       setCompilationContext(copyFrom.getCompilationContext());
+      setFunctionExclusionGroups(copyFrom.getFunctionExclusionGroups());
       _requirements = copyFrom._requirements;
       _specifications = copyFrom._specifications;
     }
@@ -314,6 +318,14 @@ public final class DependencyGraphBuilder {
 
     private void setCompilationContext(final FunctionCompilationContext compilationContext) {
       _compilationContext = compilationContext;
+    }
+
+    public FunctionExclusionGroups getFunctionExclusionGroups() {
+      return _functionExclusionGroups;
+    }
+
+    private void setFunctionExclusionGroups(final FunctionExclusionGroups functionExclusionGroups) {
+      _functionExclusionGroups = functionExclusionGroups;
     }
 
     // Operations
@@ -406,7 +418,7 @@ public final class DependencyGraphBuilder {
       ExceptionWrapper.createAndPut(t, _exceptions);
     }
 
-    public ResolvedValueProducer resolveRequirement(final ValueRequirement requirement, final ResolveTask dependent) {
+    public ResolvedValueProducer resolveRequirement(final ValueRequirement requirement, final ResolveTask dependent, final Set<FunctionExclusionGroup> functionExclusion) {
       s_loggerResolver.debug("Resolve requirement {}", requirement);
       if ((dependent != null) && dependent.hasParent(requirement)) {
         dependent.setRecursionDetected();
@@ -458,12 +470,12 @@ public final class DependencyGraphBuilder {
         return resolver;
       } else {
         s_loggerResolver.debug("Using direct resolution {}/{}", requirement, dependent);
-        return getOrCreateTaskResolving(requirement, dependent);
+        return getOrCreateTaskResolving(requirement, dependent, functionExclusion);
       }
     }
 
-    private ResolveTask getOrCreateTaskResolving(final ValueRequirement valueRequirement, final ResolveTask parentTask) {
-      ResolveTask newTask = new ResolveTask(valueRequirement, parentTask);
+    private ResolveTask getOrCreateTaskResolving(final ValueRequirement valueRequirement, final ResolveTask parentTask, final Set<FunctionExclusionGroup> functionExclusion) {
+      ResolveTask newTask = new ResolveTask(valueRequirement, parentTask, functionExclusion);
       ResolveTask task;
       Map<ResolveTask, ResolveTask> tasks = _requirements.get(valueRequirement);
       if (tasks == null) {
@@ -713,6 +725,11 @@ public final class DependencyGraphBuilder {
    */
   private volatile int _maxAdditionalThreads = getDefaultMaxAdditionalThreads();
 
+  /**
+   * Flag to indicate when the build has been canceled.
+   */
+  private boolean _cancelled;
+
   // TODO: we could have different run queues for the different states. When the PENDING one is considered, a bulk lookup operation can then be done
 
   // TODO: We should use an external execution framework rather than the one here; there are far better (and probably more accurate) implementations of
@@ -800,6 +817,24 @@ public final class DependencyGraphBuilder {
     getContext().setCompilationContext(compilationContext);
   }
 
+  /**
+   * Sets the function exclusion group rules to use.
+   * 
+   * @param exclusionGroups the source of groups, or null to not use function exclusion groups
+   */
+  public void setFunctionExclusionGroups(final FunctionExclusionGroups exclusionGroups) {
+    getContext().setFunctionExclusionGroups(exclusionGroups);
+  }
+
+  /**
+   * Returns the current function exclusion group rules.
+   * 
+   * @return the function exclusion groups or null if none are being used
+   */
+  public FunctionExclusionGroups getFunctionExclusionGroups() {
+    return getContext().getFunctionExclusionGroups();
+  }
+
   public int getMaxAdditionalThreads() {
     return _maxAdditionalThreads;
   }
@@ -845,7 +880,7 @@ public final class DependencyGraphBuilder {
   public void addTarget(ValueRequirement requirement) {
     ArgumentChecker.notNull(requirement, "requirement");
     checkInjectedInputs();
-    final ResolvedValueProducer resolvedValue = getContext().resolveRequirement(requirement, null);
+    final ResolvedValueProducer resolvedValue = getContext().resolveRequirement(requirement, null, null);
     resolvedValue.addCallback(getContext(), _getTerminalValuesCallback);
     resolvedValue.release(getContext());
     // If the run-queue was empty, we won't have started a thread, so double check 
@@ -864,7 +899,7 @@ public final class DependencyGraphBuilder {
     ArgumentChecker.noNulls(requirements, "requirements");
     checkInjectedInputs();
     for (ValueRequirement requirement : requirements) {
-      final ResolvedValueProducer resolvedValue = getContext().resolveRequirement(requirement, null);
+      final ResolvedValueProducer resolvedValue = getContext().resolveRequirement(requirement, null, null);
       resolvedValue.addCallback(getContext(), _getTerminalValuesCallback);
       resolvedValue.release(getContext());
     }
@@ -880,7 +915,7 @@ public final class DependencyGraphBuilder {
    */
   @Deprecated
   protected void addTargetImpl(final ValueRequirement requirement) {
-    final ResolvedValueProducer resolvedValue = getContext().resolveRequirement(requirement, null);
+    final ResolvedValueProducer resolvedValue = getContext().resolveRequirement(requirement, null, null);
     resolvedValue.addCallback(getContext(), _getTerminalValuesCallback);
     startBackgroundConstructionJob();
     final CountDownLatch latch = new CountDownLatch(1);
@@ -1070,14 +1105,16 @@ public final class DependencyGraphBuilder {
   }
 
   /**
-   * Tests if the graph has been built or if work is still required. Graphs are only built in the
-   * background if additional threads is set to non-zero.
+   * Tests if the graph has been built or if work is still required. Graphs are only built in the background if additional threads is set to non-zero.
    * 
    * @return true if the graph has been built, false if it is outstanding
    */
   public boolean isGraphBuilt() {
     synchronized (_buildCompleteLock) {
       synchronized (_activeJobs) {
+        if (_cancelled) {
+          throw new CancellationException();
+        }
         return _activeJobs.isEmpty() && _runQueue.isEmpty();
       }
     }
@@ -1098,23 +1135,29 @@ public final class DependencyGraphBuilder {
   }
 
   /**
-   * Cancels any construction threads. If background threads had been started for graph construction, they
-   * will be stopped and the construction abandoned. Note that this will also reset the number of
-   * additional threads to zero to prevent further threads from being started by the existing ones before
-   * they terminate. If a thread is already blocked in a call to {@link #getDependencyGraph} it will receive
-   * a {@link CancellationException} unless the graph construction completes before the cancellation is
-   * noted by that or other background threads. The cancellation is temporary, the additional threads
-   * can be reset afterwards for continued background building or a subsequent call to getDependencyGraph
-   * can finish the work.
+   * Cancels any construction threads. If background threads had been started for graph construction, they will be stopped and the construction abandoned. Note that this will also reset the number of
+   * additional threads to zero to prevent further threads from being started by the existing ones before they terminate. If a thread is already blocked in a call to {@link #getDependencyGraph} it
+   * will receive a {@link CancellationException} unless the graph construction completes before the cancellation is noted by that or other background threads. The cancellation is temporary, the
+   * additional threads can be reset afterwards for continued background building or a subsequent call to getDependencyGraph can finish the work.
+   * 
+   * @param mayInterruptIfRunning ignored
+   * @return true if the build was cancelled
    */
-  public void cancelActiveBuild() {
+  @Override
+  public boolean cancel(final boolean mayInterruptIfRunning) {
     setMaxAdditionalThreads(0);
     synchronized (_activeJobs) {
+      _cancelled = true;
       for (Job job : _activeJobs) {
         job.cancel(true);
       }
       _activeJobs.clear();
     }
+    return true;
+  }
+
+  public boolean isCancelled() {
+    return _cancelled;
   }
 
   /**
@@ -1183,7 +1226,9 @@ public final class DependencyGraphBuilder {
       do {
         final Job job = createConstructionJob();
         synchronized (_activeJobs) {
-          _activeJobs.add(job);
+          if (!_cancelled) {
+            _activeJobs.add(job);
+          }
         }
         job.run();
         synchronized (_activeJobs) {

@@ -177,6 +177,9 @@ public class OpenGammaComponentServer {
   //-------------------------------------------------------------------------
   /**
    * Extracts the server name.
+   * <p>
+   * This examines the first part of the file name and the last directory,
+   * merging these with a dash.
    * 
    * @param fileName  the name to extract from, not null
    * @return the server name, not null
@@ -186,12 +189,12 @@ public class OpenGammaComponentServer {
       fileName = StringUtils.substringAfter(fileName, ":");
     }
     fileName = FilenameUtils.removeExtension(fileName);
-    fileName = FilenameUtils.getPathNoEndSeparator(fileName);
-    String name = FilenameUtils.getName(fileName);
-    if (name.length() == 0) {
-      name = StringUtils.substringBefore(fileName, "-");
+    String first = FilenameUtils.getName(FilenameUtils.getPathNoEndSeparator(fileName));
+    String second = FilenameUtils.getName(fileName);
+    if (StringUtils.isEmpty(first) || first.equals(second) || second.startsWith(first + "-")) {
+      return second;
     }
-    return name;
+    return first + "-" + second;
   }
 
   /**
@@ -267,13 +270,17 @@ public class OpenGammaComponentServer {
       super.loadIni(resource);
     }
     @Override
-    protected void initComponent(String groupName, LinkedHashMap<String, String> groupData) {
-      long startInstant = System.nanoTime();
+    protected void initComponent(String groupName, LinkedHashMap<String, String> remainingConfig) {
+      String typeStr = remainingConfig.get("factory");
       log("--- Initializing " + groupName + " ---");
+      if (typeStr != null) {
+        log(" Using factory " + typeStr);
+      }
       
-      super.initComponent(groupName, groupData);
-      
+      long startInstant = System.nanoTime();
+      super.initComponent(groupName, remainingConfig);
       long endInstant = System.nanoTime();
+      
       log("--- Initialized " + groupName + " in " + ((endInstant - startInstant) / 1000000L) + "ms ---");
     }
     @Override

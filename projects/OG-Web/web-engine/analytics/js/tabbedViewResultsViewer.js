@@ -28,7 +28,7 @@
     
     function init() {
       var $mainContentContainer = $("<div class='ui-layout-center'></div>");
-      var $popupContainer = $("<div class='ui-layout-east'></div>");
+      var $popupContainer = $("<div class='ui-layout-south'></div>");
       _$popupList = $("<ul class='popup-list'></ul>");
       _$popupList.sortable({
         connectWith: _$popupList,
@@ -51,8 +51,8 @@
         center: {
           onresize: handleCenterResized
         },
-        east: {
-          size: 600,
+        south: {
+          size: 300,
           initClosed: true
         }
       });
@@ -81,7 +81,7 @@
       if (primitivesDetails) {
         var $primitivesContainer = $("<div id='primitives'></div>");
         _$tabsContainer.append($primitivesContainer);
-        _primitives = new PrimitivesViewer($primitivesContainer, primitivesDetails, _liveResultsClient, _userConfig);
+        _primitives = new PrimitivesViewer($primitivesContainer, _$layout, _$popupList, primitivesDetails, _liveResultsClient, _userConfig);
         _tabManager.registerTab("primitives", _primitives);
         _$tabsContainer.tabs("add", "#primitives", "Primitives");
       }

@@ -148,6 +148,7 @@ public class DbTool extends Task {
     addDbManagement("jdbc:postgresql", PostgresDbManagement.getInstance());
     addDbManagement("jdbc:derby", DerbyDbManagement.getInstance());
     addDbManagement("jdbc:hsqldb", HSQLDbManagement.getInstance());
+    addDbManagement("jdbc:sqlserver", SqlServer2008DbManagement.getInstance());
     
     String dbUrlLowercase = _dbServerHost.toLowerCase();
     for (Map.Entry<String, DbManagement> entry : s_url2Management.entrySet()) {
@@ -400,7 +401,8 @@ public class DbTool extends Task {
   }
 
   public String getTestDatabaseUrl() {
-    return _dbServerHost + "/" + getTestCatalog();         
+    return _dialect.getCatalogToConnectTo(getTestCatalog());
+    //return _dbServerHost + "/" + getTestCatalog();         
   }
 
   public Dialect getHibernateDialect() {
@@ -675,24 +677,29 @@ public class DbTool extends Task {
     createTables(database, dbScripts, highestVersion, targetVersion, createVersion, catalog, schema, callback);
   }
 
-  public void createTables(String database, Map<Integer, Pair<File, File>> dbScripts, int version, int targetVersion, int createVersion, String catalog, String schema, final TableCreationCallback callback) {
+  public void createTables(String database, Map<Integer, Pair<File, File>> dbScripts, int version, int targetVersion, int createVersion, String catalog, String schema,
+      final TableCreationCallback callback) {
     if (version < 1) {
-      throw new IllegalArgumentException("Invalid creation or target version (" + createVersion+ "/" + targetVersion + ")");
+//      throw new IllegalArgumentException("Invalid creation or target version (" + createVersion + "/" + targetVersion + ")");
+      return;
     }
 
     if (targetVersion >= version) {
+      if (dbScripts.get(version) == null) {
+        return;
+      }
       final File createScript = dbScripts.get(version).getFirst();
       if (createVersion >= version && createScript.exists()) {
         s_logger.info("Creating DB version " + version);
-        s_logger.info("Executing create script " + createScript);
-        executeCreateScript(catalog, schema, createScript);
+        s_logger.info("Executing create script " + dbScripts.get(version).getFirst());
+        executeCreateScript(catalog, schema, dbScripts.get(version).getFirst());
         if (callback != null) {
           callback.tablesCreatedOrUpgraded(Integer.toString(version), database);
         }
       } else {
         createTables(database, dbScripts, version - 1, targetVersion, createVersion, catalog, schema, callback);
         final File migrateScript = dbScripts.get(version).getSecond();
-        if (migrateScript.exists()) {
+        if (migrateScript != null && migrateScript.exists()) {
           s_logger.info("Upgrading to DB version " + version);
           s_logger.info("Executing upgrade script " + migrateScript);
           executeCreateScript(catalog, schema, migrateScript);
@@ -753,25 +760,25 @@ public class DbTool extends Task {
     }
 
     if (_clear) {
-      System.out.println("Clearing tables...");
+      s_logger.info("Clearing tables...");
       initialize();
       clearTables(_catalog, _schema);
     }
 
     if (_drop) {
-      System.out.println("Dropping schema...");
+      s_logger.info("Dropping schema...");
       initialize();
       dropSchema(_catalog, _schema);
     }
 
     if (_create) {
-      System.out.println("Creating schema...");
+      s_logger.info("Creating schema...");
       initialize();
       createSchema(_catalog, _schema);
     }
 
     if (_createTables) {
-      System.out.println("Creating tables...");
+      s_logger.info("Creating tables...");
       initialize();
       createTables(_catalog, null, null);
       shutdown(_catalog);
@@ -781,7 +788,7 @@ public class DbTool extends Task {
       TestProperties.setBaseDir(_testPropertiesDir);
 
       for (String dbType : TestProperties.getDatabaseTypes(_testDbType)) {
-        System.out.println("Creating " + dbType + " test database...");
+        s_logger.info("Creating " + dbType + " test database...");
 
         String dbUrl = TestProperties.getDbHost(dbType);
         String user = TestProperties.getDbUsername(dbType);
@@ -799,7 +806,7 @@ public class DbTool extends Task {
       }
     }
 
-    System.out.println("All tasks succeeded.");
+    s_logger.info("All tasks succeeded.");
   }
 
   public static void usage(Options options) {
@@ -860,12 +867,10 @@ public class DbTool extends Task {
     try {
       tool.execute();
     } catch (BuildException e) {
-      System.out.println(e.getMessage());
+      s_logger.info(e.getMessage());
       usage(options);
       System.exit(-1);
     }
-
-    System.exit(0);
   }
 
 }

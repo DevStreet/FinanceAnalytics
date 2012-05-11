@@ -205,8 +205,7 @@
   
   function populateSnapshots($snapshotSelect, specifications, snapshots, selectedView) {
     var $input = $snapshotSelect.next();
-    var currentVal = $input.val();
-    var currentValExists = false;
+    var previousVal = $input.val();
     var selectedViewSnapshots = snapshots[selectedView];
     
     $snapshotSelect.empty();
@@ -226,9 +225,6 @@
       if (selectedViewSnapshots) {
         $.each(selectedViewSnapshots, function(snapshotId, snapshotName) {
           $('<option value="' + snapshotId + '">' + snapshotName + '</option>').appendTo($snapshotSelect);
-          if (!currentValExists && snapshotName == currentVal) {
-            currentValExists = true;
-          }
         });
       }
       
@@ -250,11 +246,12 @@
         });
       });
     }
-    
-    if (!currentValExists && $snapshotSelect.children().size() > 1) {
+  
+    $input.val(previousVal);
+    if (!$input.val() && $snapshotSelect.children().size() > 1) {
       $input.val($snapshotSelect.children()[1].text);
-      $snapshotSelect.children()[1].selected = true;
     }
+    $snapshotSelect.val($input.val());
   }
   
   function initializeView() {
@@ -421,7 +418,21 @@
         _liveResultsClient.resume();
       }
     });
-   
+    var positionFrame;
+    $('.og-js-positiongadget').live('click', function() {
+      var id = $(this).attr('data-posid').split('~').map(function (v) {return v.split('-')[1];}).join('~');
+      var iframe = '<iframe src="/jax/bundles/fm/prototype/gadget.ftl#/positions/' + id + '/trades=true"\
+          frameborder="0" scrolling="no" title="Position"></iframe>';
+      if (positionFrame) {
+        positionFrame.dialog('close');
+        positionFrame = null;
+      }
+      positionFrame = $(iframe).appendTo('body').dialog({
+          autoOpen: true, height: 345, width: 875, modal: false, resizable: false,
+          beforeClose: function () { $(this).remove(); positionFrame = null; }
+      }).css({height: '400px', width: '850px'});
+    });
+    
     _userConfig = new UserConfig();
     toggleSparklines(_userConfig.getSparklinesEnabled());
     disablePauseResumeButtons();

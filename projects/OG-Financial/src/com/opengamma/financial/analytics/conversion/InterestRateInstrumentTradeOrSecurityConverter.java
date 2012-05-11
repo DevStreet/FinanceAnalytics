@@ -7,13 +7,13 @@ package com.opengamma.financial.analytics.conversion;
 
 import org.apache.commons.lang.Validate;
 
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.position.Trade;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.Security;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.financial.instrument.InstrumentDefinition;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.FinancialSecurityVisitor;
 import com.opengamma.financial.security.FinancialSecurityVisitorAdapter;
@@ -46,9 +46,14 @@ public class InterestRateInstrumentTradeOrSecurityConverter {
     final InterestRateFutureSecurityConverter irFutureConverter = new InterestRateFutureSecurityConverter(holidaySource, conventionSource, regionSource);
     final BondFutureSecurityConverter bondFutureConverter = new BondFutureSecurityConverter(securitySource, bondConverter);
     final FutureSecurityConverter futureConverter = new FutureSecurityConverter(bondFutureConverter, irFutureConverter);
-    _securityVisitor = FinancialSecurityVisitorAdapter.<InstrumentDefinition<?>>builder().cashSecurityVisitor(cashConverter).fraSecurityVisitor(fraConverter)
+    final ZeroDepositConverter zeroDepositConverter = new ZeroDepositConverter(conventionSource);
+    _securityVisitor = FinancialSecurityVisitorAdapter.<InstrumentDefinition<?>>builder()
+        .cashSecurityVisitor(cashConverter)
+        .fraSecurityVisitor(fraConverter)
         .swapSecurityVisitor(swapConverter)
-        .futureSecurityVisitor(futureConverter).bondSecurityVisitor(bondConverter).create();
+        .futureSecurityVisitor(futureConverter)
+        .bondSecurityVisitor(bondConverter)
+        .periodicZeroDepositSecurityVisitor(zeroDepositConverter).create();
     _bondTradeConverter = new BondTradeConverter(bondConverter);
     _bondFutureConverter = new BondFutureTradeConverter(bondFutureConverter);
     _interestRateFutureTradeConverter = new InterestRateFutureTradeConverter(irFutureConverter);

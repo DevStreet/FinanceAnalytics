@@ -17,12 +17,12 @@ import javax.time.calendar.Period;
 import org.apache.commons.lang.ArrayUtils;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.forex.method.PresentValueForexBlackVolatilityQuoteSensitivityDataBundle;
+import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.financial.analytics.DoubleLabelledMatrix2D;
 import com.opengamma.financial.analytics.DoubleLabelledMatrix3D;
 import com.opengamma.financial.analytics.volatility.cube.fitting.FittedSmileDataPoints;
 import com.opengamma.financial.analytics.volatility.surface.VolatilitySurfaceDefinition;
-import com.opengamma.financial.forex.method.PresentValueVolatilityQuoteSensitivityDataBundle;
-import com.opengamma.math.matrix.DoubleMatrix2D;
 import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.Pair;
 
@@ -34,7 +34,7 @@ public class VegaMatrixHelper {
   private static final DecimalFormat FX_OPTION_FORMATTER = new DecimalFormat("##");
   private static final DecimalFormat IR_FUTURE_OPTION_FORMATTER = new DecimalFormat("##.###");
 
-  public static DoubleLabelledMatrix2D getVegaFXQuoteMatrixInStandardForm(final PresentValueVolatilityQuoteSensitivityDataBundle data) {
+  public static DoubleLabelledMatrix2D getVegaFXQuoteMatrixInStandardForm(final PresentValueForexBlackVolatilityQuoteSensitivityDataBundle data) {
     final double[] expiries = data.getExpiries();
     final double[] delta = data.getDelta();
     final double[][] vega = data.getVega();

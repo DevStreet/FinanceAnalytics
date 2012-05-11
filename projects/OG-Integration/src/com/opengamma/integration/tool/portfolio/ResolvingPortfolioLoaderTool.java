@@ -15,14 +15,17 @@ import org.apache.commons.cli.Options;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.bbg.BloombergSecuritySource;
-import com.opengamma.integration.loadsave.portfolio.ResolvingPortfolioCopier;
-import com.opengamma.integration.loadsave.portfolio.reader.PortfolioReader;
-import com.opengamma.integration.loadsave.portfolio.reader.SingleSheetSimplePortfolioReader;
-import com.opengamma.integration.loadsave.portfolio.rowparser.ExchangeTradedRowParser;
-import com.opengamma.integration.loadsave.portfolio.writer.DummyPortfolioWriter;
-import com.opengamma.integration.loadsave.portfolio.writer.MasterPortfolioWriter;
-import com.opengamma.integration.loadsave.portfolio.writer.PortfolioWriter;
-import com.opengamma.integration.loadsave.sheet.SheetFormat;
+import com.opengamma.integration.copier.portfolio.PortfolioCopierVisitor;
+import com.opengamma.integration.copier.portfolio.QuietPortfolioCopierVisitor;
+import com.opengamma.integration.copier.portfolio.ResolvingPortfolioCopier;
+import com.opengamma.integration.copier.portfolio.VerbosePortfolioCopierVisitor;
+import com.opengamma.integration.copier.portfolio.reader.PortfolioReader;
+import com.opengamma.integration.copier.portfolio.reader.SingleSheetSimplePortfolioReader;
+import com.opengamma.integration.copier.portfolio.rowparser.ExchangeTradedRowParser;
+import com.opengamma.integration.copier.portfolio.writer.PrettyPrintingPortfolioWriter;
+import com.opengamma.integration.copier.portfolio.writer.MasterPortfolioWriter;
+import com.opengamma.integration.copier.portfolio.writer.PortfolioWriter;
+import com.opengamma.integration.copier.sheet.SheetFormat;
 import com.opengamma.integration.tool.AbstractIntegrationTool;
 import com.opengamma.integration.tool.IntegrationToolContext;
 import com.opengamma.master.portfolio.PortfolioMaster;
@@ -40,14 +43,14 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
   private static final String PORTFOLIO_NAME_OPT = "n";
   /** Write option flag */
   private static final String WRITE_OPT = "w";
-  /** Time series data source option flag*/
-  private static final String TIME_SERIES_DATASOURCE_OPT = "s";
+  /** Overwrite option flag */
+  private static final String OVERWRITE_OPT = "o";
+  /** Verbose option flag */
+  private static final String VERBOSE_OPT = "v";
   /** Time series data provider option flag*/
   private static final String TIME_SERIES_DATAPROVIDER_OPT = "p";
   /** Time series data field option flag*/
   private static final String TIME_SERIES_DATAFIELD_OPT = "d";
-  /** Time series observation time option flag*/
-  private static final String TIME_SERIES_OBSERVATIONTIME_OPT = "o";
   
   //-------------------------------------------------------------------------
   /**
@@ -74,7 +77,8 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
         context.getPortfolioMaster(), 
         context.getPositionMaster(), 
         context.getSecurityMaster(),
-        getCommandLine().hasOption(WRITE_OPT)
+        getCommandLine().hasOption(WRITE_OPT),
+        getCommandLine().hasOption(OVERWRITE_OPT)
     );
 
     // Construct portfolio reader
@@ -93,8 +97,16 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
             new String[]{"PX_LAST"} : getCommandLine().getOptionValues(TIME_SERIES_DATAFIELD_OPT)
     );
     
+    // Create visitor for verbose/quiet mode
+    PortfolioCopierVisitor portfolioCopierVisitor; 
+    if (getCommandLine().hasOption(VERBOSE_OPT)) {
+      portfolioCopierVisitor = new VerbosePortfolioCopierVisitor();
+    } else {
+      portfolioCopierVisitor = new QuietPortfolioCopierVisitor();
+    }
+    
     // Call the portfolio loader with the supplied arguments
-    portfolioCopier.copy(portfolioReader, portfolioWriter);
+    portfolioCopier.copy(portfolioReader, portfolioWriter, portfolioCopierVisitor);
     
     // close stuff
     portfolioReader.close();
@@ -102,8 +114,14 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
   }
 
   private static PortfolioWriter constructPortfolioWriter(String portfolioName, PortfolioMaster portfolioMaster,
-      PositionMaster positionMaster, SecurityMaster securityMaster, boolean write) {
-    if (write) {  
+      PositionMaster positionMaster, SecurityMaster securityMaster, boolean write, boolean overwrite) {
+    if (write) {
+      if (overwrite) {
+        System.out.println("Write and overwrite options specified, will persist to OpenGamma masters"); 
+      } else {
+        System.out.println("Write option specified, persisting to OpenGamma masters");
+      }
+      
       // Check that the portfolio name was specified on the command line
       if (portfolioName == null) {
         throw new OpenGammaRuntimeException("Portfolio name omitted, cannot persist to OpenGamma masters");
@@ -114,10 +132,10 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
           portfolioMaster, 
           positionMaster, 
           securityMaster,
-          false);
+          overwrite);
     } else {
       // Create a dummy portfolio writer to pretty-print instead of persisting
-      return new DummyPortfolioWriter();         
+      return new PrettyPrintingPortfolioWriter(true);         
     }  
   }
   
@@ -166,11 +184,17 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
         WRITE_OPT, "write", false, 
         "Actually persists the portfolio to the database if specified, otherwise pretty-prints without persisting");
     options.addOption(writeOption);
-       
-    Option timeSeriesDataSourceOption = new Option(
-        TIME_SERIES_DATASOURCE_OPT, "source", true, "The name of the time series data source");
-    options.addOption(timeSeriesDataSourceOption);
-    
+ 
+    Option overwriteOption = new Option(
+        OVERWRITE_OPT, "overwrite", false, 
+        "Deletes any existing matching securities, positions and portfolios and recreates them from input data");
+    options.addOption(overwriteOption);
+
+    Option verboseOption = new Option(
+        VERBOSE_OPT, "verbose", false, 
+        "Displays progress messages on the terminal");
+    options.addOption(verboseOption);
+   
     Option timeSeriesDataProviderOption = new Option(
         TIME_SERIES_DATAPROVIDER_OPT, "provider", true, "The name of the time series data provider");
     options.addOption(timeSeriesDataProviderOption);
@@ -179,10 +203,6 @@ public class ResolvingPortfolioLoaderTool extends AbstractIntegrationTool {
         TIME_SERIES_DATAFIELD_OPT, "field", true, "The name of the time series data field");
     options.addOption(timeSeriesDataFieldOption);
     
-    Option timeSeriesObservationTimeOption = new Option(
-        TIME_SERIES_OBSERVATIONTIME_OPT, "time", true, "The time series observation time");
-    options.addOption(timeSeriesObservationTimeOption);
-
     return options;
   }
 

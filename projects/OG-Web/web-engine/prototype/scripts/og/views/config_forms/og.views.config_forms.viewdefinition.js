@@ -179,6 +179,21 @@ $.register_module({
                         }},
                         {type: 'keyup', selector: form_id + ' input[name=name]', handler: function (e) {
                             $('.OG-layout-admin-details-center .og-js-name').text($(e.target).val());
+                        }},
+                        {type: 'click', selector: form_id + ' .og-js-viewdef-tab', handler: function (e) {
+                            e.preventDefault();
+                            var $target = $(e.target),
+                                $tab = $target.is('.og-js-viewdef-tab') ? $target
+                                    : $target.parents('.og-js-viewdef-tab:first'),
+                                active_cl = '.og-active', tab_cl = '.og-js-viewdef-tab',
+                                is_active = $target.is(active_cl) || $target.parent(active_cl).length,
+                                index;
+                            index = $(form_id + ' ' + tab_cl).index($tab);
+                            [0, 1, 2, 3].forEach(function (idx) {
+                                $(form_id + ' .og-js-viewdef-' + idx)[idx === index ? 'show' : 'hide']();
+                            });
+                            $(form_id + ' .og-js-viewdef-tab').removeClass('og-active');
+                            $tab.addClass('og-active');
                         }}
                     ]
                 }),
@@ -202,7 +217,7 @@ $.register_module({
                     handlers: [{type: 'form:load', handler: function () {
                         ['DeltaCalcPeriod', 'FullCalcPeriod'].forEach(function (suffix) {
                             ['min', 'max'].forEach(function (prefix) {
-                                $('#' + prefix + suffix).val(master[prefix + suffix]);
+                                $('input[name=' + prefix + suffix + ']').val(master[prefix + suffix]);
                             });
                         });
                     }}]
@@ -343,7 +358,7 @@ $.register_module({
                                                         col_idx = $(form_id + ' ' + tab_cl)
                                                             .index($(form_id + ' ' + tab_cl + active_cl));
                                                         set_idx = $(form_id + ' .og-js-colset-tab')
-                                                            .index($(form_id + ' ' + active_cl));
+                                                            .index($(form_id + ' .og-js-colset-tab' + active_cl));
                                                         if (!~col_idx) return;
                                                         col = $.extend(true, {},
                                                             form.compile().data[SETS][set_idx][COLS][col_idx]
@@ -578,7 +593,8 @@ $.register_module({
                                             set = {name: 'Set ' + (master[SETS].length + 1)}
                                             set[DEFP] = {};
                                         } else {
-                                            active_idx = $(form_id + ' ' + tab_cl).index($(form_id + ' ' + active_cl));
+                                            active_idx = $(form_id + ' ' + tab_cl)
+												.index($(form_id + ' ' + tab_cl + active_cl));
                                             if (!~active_idx) return;
                                             set = $.extend(true, {}, form.compile().data[SETS][active_idx]);
                                             set.name = 'Cloned ' + set.name;

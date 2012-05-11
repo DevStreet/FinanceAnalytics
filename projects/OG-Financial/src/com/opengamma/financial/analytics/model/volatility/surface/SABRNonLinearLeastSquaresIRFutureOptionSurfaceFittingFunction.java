@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import javax.time.calendar.Clock;
+import javax.time.calendar.LocalDate;
 import javax.time.calendar.ZonedDateTime;
 
 import org.slf4j.Logger;
@@ -23,6 +24,17 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.model.volatility.smile.fitting.SABRModelFitter;
+import com.opengamma.analytics.financial.model.volatility.smile.function.SABRHaganVolatilityFunction;
+import com.opengamma.analytics.math.curve.NodalDoublesCurve;
+import com.opengamma.analytics.math.interpolation.FlatExtrapolator1D;
+import com.opengamma.analytics.math.interpolation.GridInterpolator2D;
+import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
+import com.opengamma.analytics.math.interpolation.LinearInterpolator1D;
+import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.statistics.leastsquare.LeastSquareResultsWithTransform;
+import com.opengamma.analytics.math.surface.InterpolatedDoublesSurface;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceData;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
@@ -42,18 +54,7 @@ import com.opengamma.financial.analytics.volatility.fittedresults.SABRFittedSurf
 import com.opengamma.financial.analytics.volatility.surface.fitting.SurfaceFittedSmileDataPoints;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCountFactory;
-import com.opengamma.financial.model.volatility.smile.fitting.SABRModelFitter;
-import com.opengamma.financial.model.volatility.smile.function.SABRHaganVolatilityFunction;
 import com.opengamma.id.UniqueId;
-import com.opengamma.math.curve.NodalDoublesCurve;
-import com.opengamma.math.interpolation.FlatExtrapolator1D;
-import com.opengamma.math.interpolation.GridInterpolator2D;
-import com.opengamma.math.interpolation.Interpolator1DFactory;
-import com.opengamma.math.interpolation.LinearInterpolator1D;
-import com.opengamma.math.matrix.DoubleMatrix1D;
-import com.opengamma.math.matrix.DoubleMatrix2D;
-import com.opengamma.math.statistics.leastsquare.LeastSquareResultsWithTransform;
-import com.opengamma.math.surface.InterpolatedDoublesSurface;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.DoublesPair;
 import com.opengamma.util.tuple.ObjectsPair;
@@ -115,8 +116,9 @@ public class SABRNonLinearLeastSquaresIRFutureOptionSurfaceFittingFunction exten
     final DoubleArrayList chiSqList = new DoubleArrayList();
     final Map<DoublesPair, DoubleMatrix2D> inverseJacobians = new HashMap<DoublesPair, DoubleMatrix2D>();
     final Map<Double, List<Double>> dataPointsForStrip = new HashMap<Double, List<Double>>();
+    final LocalDate valDate = now.toLocalDate();
     for (final Number x : xValues) {
-      final double t = IRFutureOptionUtils.getTime(x, now);
+      final Double ttm = IRFutureOptionUtils.getFutureOptionTtm(x.intValue(), valDate);
       final List<Double> fittedPointsForStrip = new ArrayList<Double>();
       final List<ObjectsPair<Double, Double>> strip = volatilitySurfaceData.getYValuesForX(x);
       final DoubleArrayList errors = new DoubleArrayList();
@@ -124,7 +126,7 @@ public class SABRNonLinearLeastSquaresIRFutureOptionSurfaceFittingFunction exten
       final DoubleArrayList blackVols = new DoubleArrayList();
       if (strip.size() > 4) {
         try {
-          final Double forward = futurePriceData.getYValue(x.doubleValue());
+          final Double forward = futurePriceData.getYValue(ttm);
           for (final ObjectsPair<Double, Double> value : strip) {
             if (value.second != null) {
               strikes.add(1 - value.first);
@@ -134,10 +136,10 @@ public class SABRNonLinearLeastSquaresIRFutureOptionSurfaceFittingFunction exten
             }
           }
           if (blackVols.size() > 4) {
-            final LeastSquareResultsWithTransform fittedResult = new SABRModelFitter(forward, strikes.toDoubleArray(), t, blackVols.toDoubleArray(),
+            final LeastSquareResultsWithTransform fittedResult = new SABRModelFitter(forward, strikes.toDoubleArray(), ttm, blackVols.toDoubleArray(),
                 errors.toDoubleArray(), SABR_FUNCTION).solve(SABR_INITIAL_VALUES, FIXED);
             final DoubleMatrix1D parameters = fittedResult.getModelParameters();
-            fittedOptionExpiryList.add(t);
+            fittedOptionExpiryList.add(ttm);
             futureDelayList.add(0);
             alphaList.add(parameters.getEntry(0));
             betaList.add(parameters.getEntry(1));

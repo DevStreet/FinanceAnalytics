@@ -37,21 +37,17 @@
     <orderEntry type="module" module-name="OG-Engine" />
     <orderEntry type="module" module-name="OG-LiveData" />
     <orderEntry type="module" module-name="OG-Bloomberg" />
-    <orderEntry type="module" module-name="OG-Reuters" />
     <orderEntry type="module" module-name="OG-Master" />
     <orderEntry type="module" module-name="OG-MasterDB" />
     <orderEntry type="module" module-name="OG-Financial" />
     <orderEntry type="module" module-name="OG-Web" />
-    <orderEntry type="module" module-name="Fudge-Java" />
-    <orderEntry type="module" module-name="Fudge-Proto" />
-    <orderEntry type="module" module-name="OG-Component" />
     <orderEntry type="module-library">
       <library name="IvyIDEA-OG-Integration-default">
         <CLASSES>
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/com.opengamma/region/jars/og-regions-20110127.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.apache.poi/poi/jars/poi-3.7.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.apache.commons/commons-logging/jars/commons-logging-1.1.1.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.apache.commons/commons-logging/jars/commons-logging-adapters-1.1.1.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.apache.commons/commons-logging/jars/commons-logging-1.1.1.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.apache.commons/commons-logging/jars/commons-logging-api-1.1.1.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.jcsp/jcsp/jars/jcsp-1.1-rc2.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache-chris/org.jfree/jfreechart/jars/jfreechart-1.0.13.jar!/" />
@@ -83,6 +79,7 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="OG-Component" />
   </component>
 </module>
 

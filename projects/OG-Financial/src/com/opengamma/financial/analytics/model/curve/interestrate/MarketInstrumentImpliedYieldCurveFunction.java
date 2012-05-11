@@ -20,6 +20,33 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
+import com.opengamma.analytics.financial.instrument.future.InterestRateFutureDefinition;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
+import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisitor;
+import com.opengamma.analytics.financial.interestrate.LastTimeCalculator;
+import com.opengamma.analytics.financial.interestrate.MultipleYieldCurveFinderDataBundle;
+import com.opengamma.analytics.financial.interestrate.MultipleYieldCurveFinderFunction;
+import com.opengamma.analytics.financial.interestrate.MultipleYieldCurveFinderJacobian;
+import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
+import com.opengamma.analytics.financial.interestrate.ParRateCurveSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueCouponSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.PresentValueCurveSensitivityCalculator;
+import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.math.ParallelArrayBinarySort;
+import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
+import com.opengamma.analytics.math.function.Function1D;
+import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolator;
+import com.opengamma.analytics.math.interpolation.FlatExtrapolator1D;
+import com.opengamma.analytics.math.interpolation.Interpolator1D;
+import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
+import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.rootfinding.newton.BroydenVectorRootFinder;
+import com.opengamma.analytics.math.rootfinding.newton.NewtonVectorRootFinder;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
@@ -48,34 +75,8 @@ import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecifica
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunction;
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunctionHelper;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.financial.instrument.InstrumentDefinition;
-import com.opengamma.financial.interestrate.InstrumentDerivative;
-import com.opengamma.financial.interestrate.InstrumentDerivativeVisitor;
-import com.opengamma.financial.interestrate.LastTimeCalculator;
-import com.opengamma.financial.interestrate.MultipleYieldCurveFinderDataBundle;
-import com.opengamma.financial.interestrate.MultipleYieldCurveFinderFunction;
-import com.opengamma.financial.interestrate.MultipleYieldCurveFinderJacobian;
-import com.opengamma.financial.interestrate.ParRateCalculator;
-import com.opengamma.financial.interestrate.ParRateCurveSensitivityCalculator;
-import com.opengamma.financial.interestrate.PresentValueCalculator;
-import com.opengamma.financial.interestrate.PresentValueCouponSensitivityCalculator;
-import com.opengamma.financial.interestrate.PresentValueCurveSensitivityCalculator;
-import com.opengamma.financial.interestrate.YieldCurveBundle;
-import com.opengamma.financial.model.interestrate.curve.YieldAndDiscountCurve;
-import com.opengamma.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.id.ExternalId;
-import com.opengamma.math.ParallelArrayBinarySort;
-import com.opengamma.math.curve.InterpolatedDoublesCurve;
-import com.opengamma.math.function.Function1D;
-import com.opengamma.math.interpolation.CombinedInterpolatorExtrapolator;
-import com.opengamma.math.interpolation.FlatExtrapolator1D;
-import com.opengamma.math.interpolation.Interpolator1D;
-import com.opengamma.math.linearalgebra.DecompositionFactory;
-import com.opengamma.math.matrix.DoubleMatrix1D;
-import com.opengamma.math.matrix.DoubleMatrix2D;
-import com.opengamma.math.rootfinding.newton.BroydenVectorRootFinder;
-import com.opengamma.math.rootfinding.newton.NewtonVectorRootFinder;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -376,25 +377,37 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
     final double[] marketValues = new double[n];
     int i = 0;
     for (final FixedIncomeStripWithSecurity strip : specificationWithSecurities.getStrips()) {
-      final Double marketValue = marketDataMap.get(strip.getSecurityIdentifier());
+      Double marketValue = marketDataMap.get(strip.getSecurityIdentifier());
       if (marketValue == null) {
         throw new NullPointerException("Could not get market data for " + strip);
       }
       InstrumentDerivative derivative;
+
       final FinancialSecurity financialSecurity = (FinancialSecurity) strip.getSecurity();
       final String[] curveNames = FixedIncomeInstrumentCurveExposureHelper.getCurveNamesForFundingCurveInstrument(strip.getInstrumentType(), curveName, curveName);
-      final InstrumentDefinition<?> definition = getSecurityConverter().visit(financialSecurity);
+      
+
+      InstrumentDefinition<?> definition = getSecurityConverter().visit(financialSecurity);
+      if (strip.getSecurity().getSecurityType().equals("FUTURE")) {
+        ((InterestRateFutureDefinition) definition).setTransactionPrice(marketValue);
+        if (getCalculationType().equals(PAR_RATE_STRING)) {
+          marketValue = 1 - marketValue;
+        }
+      }
       derivative = getDefinitionConverter().convert(financialSecurity, definition, now, curveNames, dataSource);
       if (derivative == null) {
         throw new NullPointerException("Had a null InterestRateDefinition for " + strip);
       }
+
+      
+      
       if (PRESENT_VALUE_STRING.equals(getCalculationType())) {
         marketValues[i] = 0;
       } else {
         marketValues[i] = marketValue;
       }
       derivatives.add(derivative);
-      initialRatesGuess[i] = 0.01;
+      initialRatesGuess[i] = marketValues[i];
       nodeTimes[i] = LAST_DATE_CALCULATOR.visit(derivative);
       i++;
     }
@@ -481,6 +494,9 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
       InstrumentDerivative derivative;
       final String[] curveNames = FixedIncomeInstrumentCurveExposureHelper.getCurveNamesForFundingCurveInstrument(strip.getInstrumentType(), fundingCurveName, forwardCurveName);
       final InstrumentDefinition<?> definition = getSecurityConverter().visit(financialSecurity);
+      if (strip.getSecurity().getSecurityType().equals("FUTURE")) {
+        throw new OpenGammaRuntimeException("YieldCurves containing FUTURES currently do not fit to both forward and funding curve. Please specify only Curve, not FundingCurve and ForwardCurve.");
+      }
       derivative = getDefinitionConverter().convert(financialSecurity, definition, now, curveNames, dataSource);
       if (derivative == null) {
         throw new OpenGammaRuntimeException("Had a null InterestRateDefinition for " + strip);
@@ -491,7 +507,7 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
         marketValues[i] = marketValue;
       }
       derivatives.add(derivative);
-      initialRatesGuess[i] = marketValue;
+      initialRatesGuess[i] = marketValues[i];
       i++;
       fundingNodeTimes[fundingIndex] = LAST_DATE_CALCULATOR.visit(derivative);
       fundingIndex++;
@@ -501,12 +517,18 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
       if (forwardMarketValue == null) {
         throw new OpenGammaRuntimeException("Could not get forward market data for " + strip);
       }
-      final double marketValue = forwardMarketValue;
+      double marketValue = forwardMarketValue;
       final FinancialSecurity financialSecurity = (FinancialSecurity) strip.getSecurity();
       InstrumentDerivative derivative = null;
       final String[] curveNames = FixedIncomeInstrumentCurveExposureHelper.getCurveNamesForForwardCurveInstrument(strip.getInstrumentType(), fundingCurveName, forwardCurveName);
       try {
-        final InstrumentDefinition<?> definition = getSecurityConverter().visit(financialSecurity);
+        final InstrumentDefinition<?> definition = getSecurityConverter().visit(financialSecurity); 
+        if (strip.getSecurity().getSecurityType().equals("FUTURE")) {
+          ((InterestRateFutureDefinition) definition).setTransactionPrice(marketValue);
+          if (getCalculationType().equals(PAR_RATE_STRING)) {
+            marketValue = 1 - marketValue;
+          }
+        }
         derivative = getDefinitionConverter().convert(financialSecurity, definition, now, curveNames, dataSource);
       } catch (final Exception e) {
         s_logger.error("Caught exception {} for {}", e, financialSecurity);
@@ -525,13 +547,6 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
       forwardNodeTimes[forwardIndex] = LAST_DATE_CALCULATOR.visit(derivative);
       forwardIndex++;
     }
-    //Arrays.sort(fundingNodeTimes);
-    //Arrays.sort(forwardNodeTimes);
-    // ParallelArrayBinarySort.parallelBinarySort(fundingNodeTimes, initialRatesGuess); //TODO will eventually need two sets of rates guesses
-    // ParallelArrayBinarySort.parallelBinarySort(fundingNodeTimes, initialRatesGuess); //TODO will eventually need two sets of rates guesses
-    final LinkedHashMap<String, double[]> curveKnots = new LinkedHashMap<String, double[]>();
-    curveKnots.put(fundingCurveName, fundingNodeTimes);
-    curveKnots.put(forwardCurveName, forwardNodeTimes);
     final LinkedHashMap<String, double[]> curveNodes = new LinkedHashMap<String, double[]>();
     final LinkedHashMap<String, Interpolator1D> interpolators = new LinkedHashMap<String, Interpolator1D>();
     curveNodes.put(fundingCurveName, fundingNodeTimes);

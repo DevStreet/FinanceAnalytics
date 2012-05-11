@@ -8,10 +8,6 @@ package com.opengamma.bloombergexample.component;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.format.DateTimeFormatter;
-import javax.time.calendar.format.DateTimeFormatterBuilder;
-
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -36,9 +32,7 @@ import com.opengamma.engine.marketdata.PermissiveMarketDataPermissionProvider;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
 import com.opengamma.engine.marketdata.live.LiveMarketDataProvider;
 import com.opengamma.engine.marketdata.live.LiveMarketDataProviderFactory;
-import com.opengamma.engine.marketdata.spec.FixedHistoricalMarketDataSpecification;
 import com.opengamma.engine.marketdata.spec.LiveMarketDataSpecification;
-import com.opengamma.engine.marketdata.spec.MarketDataSpecification;
 import com.opengamma.livedata.LiveDataClient;
 import com.opengamma.livedata.client.RemoteLiveDataClientFactoryBean;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
@@ -49,8 +43,7 @@ import com.opengamma.util.jms.JmsConnector;
  */
 @BeanDefinition
 public class ExampleMarketDataClientComponentFactory extends AbstractComponentFactory {
-
-  private static final String HISTORICAL_SOURCE_PREFIX = "Historical data";
+  
   private static final String BLOOMBERG_LIVE_SOURCE_NAME = "Live market data (Bloomberg)";
   
   /**
@@ -104,13 +97,7 @@ public class ExampleMarketDataClientComponentFactory extends AbstractComponentFa
   }
   
   protected NamedMarketDataSpecificationRepository initNamedMarketDataSpecificationRepository(ComponentRepository repo) {
-    InMemoryNamedMarketDataSpecificationRepository specRepository = new InMemoryNamedMarketDataSpecificationRepository();
-
-    LocalDate historicalDate = LocalDate.of(2011, 10, 14);
-    MarketDataSpecification historicalSpec = new FixedHistoricalMarketDataSpecification(historicalDate);
-    DateTimeFormatter dateDisplayFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
-    String historicalSourceName = HISTORICAL_SOURCE_PREFIX + " (" + historicalDate.toString(dateDisplayFormatter) + ")";
-    specRepository.addSpecification(historicalSourceName, historicalSpec);
+    InMemoryNamedMarketDataSpecificationRepository specRepository = new InMemoryNamedMarketDataSpecificationRepository();   
     
     LiveMarketDataSpecification bbgSpec = new LiveMarketDataSpecification(BLOOMBERG_LIVE_SOURCE_NAME);
     specRepository.addSpecification(BLOOMBERG_LIVE_SOURCE_NAME, bbgSpec);
