@@ -5,12 +5,9 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2;
-
 /**
  * Required behaviours of the BLAS interface, cut down version, may be expanded.
- * API is as close as possible to netlib.org's reference BLAS interface 
+ * API is as close as possible to netlib.org's reference BLAS interface, comments are in part also from the reference BLAS.
  */
 public interface BLASAPIInterface {
 
@@ -129,7 +126,7 @@ public interface BLASAPIInterface {
    * dParam = {1e0, 0.375, 0e0 , 0e0, 0.75} 
    */
   void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM);
-  
+
   /**
    * Provides BLAS LEVEL 1: DROT.
    * DROT applies a plane (Givens) rotation (for example from calls to DROTG) to a set of coordinates as follows:
@@ -506,25 +503,91 @@ public interface BLASAPIInterface {
    */
   int idamax(int n, double[] x, int incx);
 
- /**
-  * Provides BLAS LEVEL 2: DGEMV
-  * DGEMV  performs one of the following matrix vector operations
-  *
-  *  y := alpha*A*x + beta*y OR y := alpha*A^T*x + beta*y,
-  *
-  *  where alpha and beta are scalars, x and y are vectors and A is an
-  *  m by n matrix. The ^T indicates transposition.
-  *
-  *
-  * DGEMV FULL: returns:= alpha*A*x + beta*y OR returns:=alpha*A^T*x + beta*y  depending on the enum orientation.
-  * @param alpha a double indicating the scaling of A*x OR A^T*x
-  * @param aMatrix a Matrix implementing the MatrixPrimitive interface
-  * @param x a double[] vector
-  * @param beta a double indicating the scaling of y
-  * @param y a double[] vector
-  * @param o orientation "normal" performs A*x, "transpose" performs A^T*x
-  * @return tmp a double[] vector
-  */
-  double[] dgemv(double alpha, DenseMatrix aMatrix, double[] x, double beta, double[] y, BLAS2.orientation o);
+  /**
+   *
+   * Provides BLAS LEVEL 2: DGEMV
+   * DGEMV  performs one of the following matrix vector operations
+   *
+   *  y := alpha*A*x + beta*y OR y := alpha*A^T*x + beta*y,
+   *
+   *  where alpha and beta are scalars, x and y are vectors and A is an
+   *  m by n matrix stored in column major format. The ^T indicates transposition.
+   *
+   * The variable {@code char} denotes the operation to be undertaken.
+   * If trans is one of 'N' or 'n', the operation is y := alpha*A*x + beta*y
+   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is y := alpha*A^T*x + beta*y 
+   *
+   * @param trans one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+   * @param m number of rows in matrix {@code aMatrix}
+   * @param n number of columns in matrix {@code aMatrix}
+   * @param alpha scaling factor for the matrix vector product
+   * @param aMatrix the leading part of the "A" matrix of at least m by n entries
+   * @param lda the first dimension of aMatrix, max(1,{@code m})
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * @param beta scaling factor for the variable {@code y}
+   * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
+   * @param incy the increment between successive elements of 'x'
+   * 
+   * _Example_
+   * Input:
+   * trans = 'N'
+   * m=4
+   * n=3
+   * alpha=2.e0
+   * aMatrix = {1,4,7,10,2,5,8,11,3,6,9,12};
+   * lda = m
+   * x = {10,20,30}
+   * incx = 1
+   * beta = 3.e0
+   * y = {1,2,3,4,5,6,7,8}
+   * incy = 2
+   * 
+   * Call:
+   * dgemv(trans, m, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
+   * 
+   * Output:
+   * trans = 'N'
+   * m=4
+   * n=3
+   * alpha=2.e0
+   * aMatrix = {1,4,7,10,2,5,8,11,3,6,9,12};
+   * lda = m
+   * x = {10,20,30}
+   * incx = 1
+   * beta = 3.e0
+   * y = {283, 2, 649, 4, 1015, 6, 1381, 8}
+   * incy = 2
+   *  
+   */
+  void dgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
 
+  /**
+   * 
+   * Provides BLAS LEVEL 3: DGEMM
+   * DGEMM performs the following matrix operations
+   * 
+   * C := alpha*_OP_(A)*_OP_(B) + beta*C
+   * 
+   * Where _OP_(X) is one of X, X^T. Where ^T denotes transpose.
+   * If trans is one of 'N' or 'n', _OP_(X) = X
+   * If trans is one of 'T' or 't', _OP_(X) = X^T
+   * If trans is one of 'C' or 'c', _OP_(X) = X^T
+   * 
+   * @param transa one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+   * @param transb one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+   * @param m number of rows in matrix {@code _OP_(aMatrix)} and number of rows in {@code cMatrix}
+   * @param n number of columns in matrix {@code _OP_(bMatrix) and number of columns in {@code cMatrix}
+   * @param k number of columns in matrix {@code _OP_(aMatrix)} and number of rows in matrix {@code _OP_(bMatrix)}
+   * @param alpha scaling factor for the matrix-matrix product 
+   * @param aMatrix the leading part of the "A" matrix of at least dimension (LDA, ka), where ka is {@code k} when {@code transa} is 'N' or 'n' and is {@code m} otherwise.
+   * @param lda the first dimension of {@code aMatrix}, if {@code transa} is 'N' or 'n' it is max(1,m) else it is at least max(1,k)
+   * @param bMatrix the leading part of the "B" matrix of at least dimension (LDB, kb), where kb is {@code n} when {@code transb} is 'N' or 'n' and is {@code k} otherwise.
+   * @param ldb the first dimension of {@code bMatrix}, if {@code transb} is 'N' or 'n' it is max(1,k) else it is at least max(1,n)
+   * @param beta the scaling factor for the matrix "C", {@code cMatrix}
+   * @param cMatrix the leading part of the "C" matrix of at least dimension (LDC, n). Overwritten by the operation defined in the preamble on exit. 
+   * @param ldc the first dimension of "C" at least max(1,m)
+   */
+  void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix,  int ldb, double beta, double[] cMatrix, int ldc);
+  
 }

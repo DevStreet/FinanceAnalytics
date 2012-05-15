@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2.orientation;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dasum;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Daxpy;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dcopy;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Ddot;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dgemm;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dgemv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dnrm2;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drot;
 import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotg;
@@ -86,8 +86,15 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   }
 
   @Override
-  public double[] dgemv(double alpha, DenseMatrix aMatrix, double[] x, double beta, double[] y, orientation o) {
-    return null;
+  public void dgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
+    Dgemv.dgemv(trans, m, n, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);
   }
+
+  @Override
+  public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
+    Dgemm.dgemm(transa, transb, m, n, k, alpha, aMatrix, 0, lda, bMatrix, 0, ldb, beta, cMatrix, 0, ldc);
+  }
+
+  
 
 }
