@@ -36,16 +36,16 @@ public class Dasum {
           return dtemp;
         }
       }
-      mp1 = (m + 1);
+      mp1 = m;
       int iInc = 6;
       for (i = mp1; i < n; i += iInc) {
-        dtemp = ((((((dtemp + Math.abs(x[i + xOffset])) + Math.abs(x[i + 1 + xOffset])) + Math.abs(x[i + 2 + xOffset])) + Math.abs(x[i + 3 + xOffset])) + Math.abs(x[i + 4 +
-            xOffset])) + Math.abs(x[i + 5 + xOffset]));
+        dtemp = dtemp + Math.abs(x[i + xOffset]) + Math.abs(x[i + 1 + xOffset]) + Math.abs(x[i + 2 + xOffset]) + Math.abs(x[i + 3 + xOffset]) + Math.abs(x[i + 4 +
+            xOffset]) + Math.abs(x[i + 5 + xOffset]);
       }
     } else {
       {
         int iInc = incx;
-        for (i = 0; i < n; i += iInc) {
+        for (i = 0; i < n * incx; i += iInc) {
           dtemp = dtemp + Math.abs(x[i + xOffset]);
         }
       }
