@@ -1,0 +1,93 @@
+/**
+ * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * 
+ * Please see distribution for license.
+ */
+package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
+
+import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2.orientation;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dasum;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Daxpy;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dcopy;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Ddot;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dnrm2;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drot;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotg;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotm;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotmg;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dscal;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dswap;
+import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Idamax;
+
+/**
+ * Hook up for the reference BLAS implementation
+ */
+public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAPIInterface {
+
+  @Override
+  public void drotg(double a, double b, double c, double s) {
+    Drotg.drotg(a, b, c, s);
+  }
+
+  @Override
+  public void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM) {
+    Drotmg.drotmg(dd1, dd2, dx1, dy2, dPARAM);
+  }
+
+  @Override
+  public void drot(int n, double[] x, int incx, double[] y, int incy, double c, double s) {
+    Drot.drot(n, x, 0, incx, y, 0, incy, c, s);
+  }
+
+  @Override
+  public void drotm(int n, double[] x, int incx, double[] y, int incy, double[] dPARAM) {
+    Drotm.drotm(n, x, 0, incx, y, 0, incy, dPARAM, 0);
+  }
+
+  @Override
+  public void dswap(int n, double[] x, int incx, double[] y, int incy) {
+    Dswap.dswap(n, x, 0, incx, y, 0, incy);
+  }
+
+  @Override
+  public void dscal(int n, double alpha, double[] x, int incx) {
+    Dscal.dscal(n, alpha, x, 0, incx);
+  }
+
+  @Override
+  public void dcopy(int n, double[] x, int incx, double[] y, int incy) {
+    Dcopy.dcopy(n, x, 0, incx, y, 0, incy);
+  }
+
+  @Override
+  public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
+    Daxpy.daxpy(n, alpha, x, 0, incx, y, 0, incy);
+  }
+
+  @Override
+  public double ddot(int n, double[] x, int incx, double[] y, int incy) {
+    return Ddot.ddot(n, x, 0, incx, y, 0, incy);
+  }
+
+  @Override
+  public double dnrm2(int n, double[] x, int incx) {
+    return Dnrm2.dnrm2(n, x, 0, incx);
+  }
+
+  @Override
+  public double dasum(int n, double[] x, int incx) {
+    return Dasum.dasum(n, x, 0, incx);
+  }
+
+  @Override
+  public int idamax(int n, double[] x, int incx) {
+    return Idamax.idamax(n, x, 0, incx);
+  }
+
+  @Override
+  public double[] dgemv(double alpha, DenseMatrix aMatrix, double[] x, double beta, double[] y, orientation o) {
+    return null;
+  }
+
+}

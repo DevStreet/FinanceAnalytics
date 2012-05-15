@@ -6,11 +6,11 @@
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitive;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2;
 
 /**
  * Required behaviours of the BLAS interface, cut down version, may be expanded.
+ * API is as close as possible to netlib.org's reference BLAS interface 
  */
 public interface BLASAPIInterface {
 
@@ -129,7 +129,7 @@ public interface BLASAPIInterface {
    * dParam = {1e0, 0.375, 0e0 , 0e0, 0.75} 
    */
   void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM);
-
+  
   /**
    * Provides BLAS LEVEL 1: DROT.
    * DROT applies a plane (Givens) rotation (for example from calls to DROTG) to a set of coordinates as follows:
