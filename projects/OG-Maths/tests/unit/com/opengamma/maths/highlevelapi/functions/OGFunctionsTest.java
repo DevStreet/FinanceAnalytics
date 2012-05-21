@@ -18,10 +18,12 @@ import static com.opengamma.maths.highlevelapi.functions.OGFunctions.transpose;
 import static com.opengamma.maths.highlevelapi.functions.OGFunctions.unique;
 import static com.opengamma.maths.highlevelapi.functions.OGFunctions.vertcat;
 
+import java.lang.reflect.Field;
+
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArrayType;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexType;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
 
 /**
  * tests functions on OGArray
@@ -33,30 +35,30 @@ public class OGFunctionsTest {
   final double[][] doubleRepeatMatrixUniqueData = {{-14, -12, -10, -8, -4, 1, 3, 5, 7, 9, 11, 13, 15 } };
   final double[][] doubleAbsMatrixData = { {1, 2, 3, 4, 5 }, {6, 7, 8, 9, 10 }, {11, 12, 13, 14, 15 } };
   final double[][] doubleMatrixTranposeData = { {1, -6, 11 }, {-2, 7, -12 }, {3, -8, 13 }, {-4, 9, -14 }, {5, -10, 15 } };
-  final double[][] doubleMatrixDataReshape = { {1, -2, 3 }, {-4, 5, -6 }, {7, -8, 9 }, {-10, 11, -12 }, {13, -14, 15 } };
+  final double[][] doubleMatrixDataReshape = { {1, -12, 9 }, {-6, 3, -14 }, {11, -8, 5 }, {-2, 13, -10 }, {7, -4, 15 } };
 
   final double[][] doubleVectorData = { {1 }, {2 }, {3 }, {4 }, {5 } };
   final double[][] doubleShortVectorData = {{1, 2, 3 } };
   final double[][] doubleShortVectorTransposeData = { {1 }, {2 }, {3 } };
   final double[][] doubleVectorTransposeData = {{1, 2, 3, 4, 5 } };
-  final OGArrayType ogDoubleMatrixData = new OGArrayType(doubleMatrixData);
-  final OGArrayType ogDoubleRepeatMatrixData = new OGArrayType(doubleRepeatMatrixData);
-  final OGArrayType ogDoubleRepeatMatrixUniqueData = new OGArrayType(doubleRepeatMatrixUniqueData);
-  final OGArrayType ogDoubleAbsMatrixData = new OGArrayType(doubleAbsMatrixData);
-  final OGArrayType ogDoubleMatrixTranposeData = new OGArrayType(doubleMatrixTranposeData);
-  final OGArrayType ogDoubleMatrixDataReshape = new OGArrayType(doubleMatrixDataReshape);
+  final OGDoubleArray ogDoubleMatrixData = new OGDoubleArray(doubleMatrixData);
+  final OGDoubleArray ogDoubleRepeatMatrixData = new OGDoubleArray(doubleRepeatMatrixData);
+  final OGDoubleArray ogDoubleRepeatMatrixUniqueData = new OGDoubleArray(doubleRepeatMatrixUniqueData);
+  final OGDoubleArray ogDoubleAbsMatrixData = new OGDoubleArray(doubleAbsMatrixData);
+  final OGDoubleArray ogDoubleMatrixTranposeData = new OGDoubleArray(doubleMatrixTranposeData);
+  final OGDoubleArray ogDoubleMatrixDataReshape = new OGDoubleArray(doubleMatrixDataReshape);
 
-  final OGArrayType ogDoubleVectorData = new OGArrayType(doubleVectorData);
-  final OGArrayType ogDoubleShortVectorData = new OGArrayType(doubleShortVectorData);
-  final OGArrayType ogDoubleVectorTranposeData = new OGArrayType(doubleVectorTransposeData);
-  final OGArrayType ogDoubleShortTransposeVectorData = new OGArrayType(doubleShortVectorTransposeData);
+  final OGDoubleArray ogDoubleVectorData = new OGDoubleArray(doubleVectorData);
+  final OGDoubleArray ogDoubleShortVectorData = new OGDoubleArray(doubleShortVectorData);
+  final OGDoubleArray ogDoubleVectorTranposeData = new OGDoubleArray(doubleVectorTransposeData);
+  final OGDoubleArray ogDoubleShortTransposeVectorData = new OGDoubleArray(doubleShortVectorTransposeData);
 
   final int[][] intMatrixData = { {1, -2, 3, -4, 5 }, {-6, 7, -8, 9, -10 }, {11, -12, 13, -14, 15 } };
   final int[][] intRepeatMatrixData = { {1, 1, 3, -4, 5 }, {7, 7, -8, 9, -10 }, {11, -12, 13, -14, 15 } };
   final int[][] intRepeatMatrixUniqueData = {{-14, -12, -10, -8, -4, 1, 3, 5, 7, 9, 11, 13, 15 } };
-  final OGIndexType ogIntMatrixData = new OGIndexType(intMatrixData);
-  final OGIndexType ogIntRepeatMatrixData = new OGIndexType(intRepeatMatrixData);
-  final OGIndexType ogIntRepeatMatrixUniqueData = new OGIndexType(intRepeatMatrixUniqueData);
+  final OGIndexArray ogIntMatrixData = new OGIndexArray(intMatrixData);
+  final OGIndexArray ogIntRepeatMatrixData = new OGIndexArray(intRepeatMatrixData);
+  final OGIndexArray ogIntRepeatMatrixUniqueData = new OGIndexArray(intRepeatMatrixUniqueData);
 
   /* TEST OGArray */
   @Test
@@ -66,10 +68,21 @@ public class OGFunctionsTest {
 
   @Test
   public void testMultiply() {
-    multiply(ogDoubleMatrixData, ogDoubleVectorData); // mat * vec
-    multiply(ogDoubleShortVectorData, ogDoubleMatrixData); // vec * mat
-    multiply(ogDoubleMatrixTranposeData, ogDoubleShortTransposeVectorData); // mat^T * vec
-    multiply(ogDoubleVectorTranposeData, ogDoubleMatrixTranposeData); // vec * mat^T
+    OGDoubleArray Result;
+    Result = multiply(ogDoubleMatrixData, ogDoubleVectorData); // mat * vec
+    System.out.println(Result.toString());
+    
+    Result = multiply(ogDoubleShortVectorData, ogDoubleMatrixData); // vec * mat
+    System.out.println(Result.toString());
+    
+    Result = multiply(ogDoubleMatrixTranposeData, ogDoubleShortTransposeVectorData); // mat^T * vec
+    System.out.println(Result.toString());
+    
+    Result = multiply(ogDoubleVectorTranposeData, ogDoubleMatrixTranposeData); // vec * mat^T
+    System.out.println(Result.toString());
+    
+    Result = multiply(ogDoubleMatrixData, ogDoubleMatrixDataReshape); // mat * mat
+    System.out.println(Result.toString());    
   }
 
   @Test
@@ -89,32 +102,36 @@ public class OGFunctionsTest {
 
   @Test
   public void testOGArrayReshape() {
+    System.out.println("TESTING RESHAPE");
+    System.out.println(ogDoubleMatrixData.toString());
+    System.out.println(ogDoubleMatrixDataReshape.toString());    
     assert (reshape(ogDoubleMatrixData, 5, 3).equals(ogDoubleMatrixDataReshape));
+    System.out.println("reshape = "+reshape(ogDoubleMatrixData, 5, 3).toString());
   }
 
   @Test
   public void testOGArrayfliplr() {
-    print(fliplr(ogDoubleMatrixData));
+    System.out.println("fliplr = "+fliplr(ogDoubleMatrixData).toString());
   }
 
   @Test
   public void testOGArrayflipud() {
-    print(flipud(ogDoubleMatrixData));
+    System.out.println("flipud = "+flipud(ogDoubleMatrixData).toString());
   }
 
   @Test
   public void testOGArrayhorzcat() {
-    print(horzcat(ogDoubleMatrixData, ogDoubleMatrixData, ogDoubleAbsMatrixData));
+    System.out.println("horzcat = "+horzcat(ogDoubleMatrixData, ogDoubleMatrixData, ogDoubleAbsMatrixData).toString());
   }
 
   @Test
   public void testOGArrayvertcat() {
-    print(vertcat(ogDoubleMatrixData, ogDoubleMatrixData, ogDoubleAbsMatrixData));
+    System.out.println("vertcat = "+vertcat(ogDoubleMatrixData, ogDoubleMatrixData, ogDoubleAbsMatrixData).toString());
   }
 
   @Test
   public void testOGArraytranspose() {
-    System.out.println("transpose"+transpose(ogDoubleMatrixData).toString());
+    System.out.println("transpose = "+transpose(ogDoubleMatrixData).toString());
   }
 
   @Test

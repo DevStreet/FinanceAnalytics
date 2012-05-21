@@ -12,7 +12,7 @@ import static org.testng.AssertJUnit.assertTrue;
 import org.apache.commons.lang.NotImplementedException;
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexType;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
 /**
  *
  */
@@ -31,25 +31,25 @@ public class OGIndexTest {
   @Test(expectedExceptions =  NotImplementedException.class)
   public void testContructFromRaggedArray()
   {
-    new OGIndexType(_ragged);
+    new OGIndexArray(_ragged);
   }
 
   @Test
   public void testContructFromSquareArray()
   {
-    new OGIndexType(_square);
+    new OGIndexArray(_square);
   }
 
   @Test
   public void testContructFromTallRectangle()
   {
-    new OGIndexType(_tallRectangle);
+    new OGIndexArray(_tallRectangle);
   }
 
   @Test
   public void testContructFromWideRectangle()
   {
-    new OGIndexType(_wideRectangle);
+    new OGIndexArray(_wideRectangle);
   }
 
 
@@ -58,13 +58,13 @@ public class OGIndexTest {
    */
   @Test
   public void testGetNumberOfElements() {
-    OGIndexType tmp = new OGIndexType(_square);
+    OGIndexArray tmp = new OGIndexArray(_square);
     assertTrue(tmp.getNumberOfElements()==9);
     }
 
   @Test
   public void testGetEntryDualIndex() {
-    OGIndexType tmp = new OGIndexType(_square);
+    OGIndexArray tmp = new OGIndexArray(_square);
     for (int i = 0; i < _square.length; i++) {
       for (int j = 0; j < _square.length; j++) {
         assertTrue(tmp.getEntry(i,j) == _square[i][j]);
@@ -74,84 +74,84 @@ public class OGIndexTest {
 
   @Test
   public void testGetFullRow() {
-    OGIndexType tmp = new OGIndexType(_square);
+    OGIndexArray tmp = new OGIndexArray(_square);
     for (int i = 0; i < _square.length; i++) {
         int[][] st = {_square[i]};
-        OGIndexType obj = new OGIndexType(st);
+        OGIndexArray obj = new OGIndexArray(st);
         assertTrue(tmp.getFullRow(i).equals(obj));
     }
   }
 
   @Test
   public void testGetFullColumn() {
-    OGIndexType tmp = new OGIndexType(_square);
+    OGIndexArray tmp = new OGIndexArray(_square);
     int[] colmangle = new int[_square.length];
     for (int i = 0; i < _square.length; i++) {
       for (int j = 0; j < _square.length; j++) {
         colmangle[j]=_square[j][i];
       }
       int[][] st = {colmangle};
-      OGIndexType obj = new OGIndexType(st);
+      OGIndexArray obj = new OGIndexArray(st);
       assertTrue(tmp.getFullColumn(i).equals(obj));
     }
   }
 
   @Test
   public void testGetRowElements() {
-    OGIndexType tmp = new OGIndexType(_square);
+    OGIndexArray tmp = new OGIndexArray(_square);
     for (int i = 0; i < _square.length; i++) {
       int[][] st = {_square[i]};
-      OGIndexType obj = new OGIndexType(st);
+      OGIndexArray obj = new OGIndexArray(st);
       assertTrue(tmp.getRowElements(i).equals(obj));
     }
   }
 
   @Test
   public void testGetColumnElements() {
-    OGIndexType tmp = new OGIndexType(_square);
+    OGIndexArray tmp = new OGIndexArray(_square);
     int[] colmangle = new int[_square.length];
     for (int i = 0; i < _square.length; i++) {
       for (int j = 0; j < _square.length; j++) {
         colmangle[j]=_square[j][i];
       }
       int[][] st = {colmangle};
-      OGIndexType obj = new OGIndexType(st);
+      OGIndexArray obj = new OGIndexArray(st);
       assertTrue(tmp.getColumnElements(i).equals(obj));
     }
   }
 
   @Test
   public void testGetNumberOfNonZeroElements() {
-    OGIndexType tmp = new OGIndexType(_withZeros);
+    OGIndexArray tmp = new OGIndexArray(_withZeros);
     assertTrue(tmp.getNumberOfNonZeroElements()==5);
-    tmp = new OGIndexType(_square);
+    tmp = new OGIndexArray(_square);
     assertTrue(tmp.getNumberOfNonZeroElements()==9);
   }
 
 
   @Test
   public void testEqualsAndHashCode() {
-    OGIndexType N;
-    OGIndexType M = new OGIndexType(_square);
+    OGIndexArray N;
+    OGIndexArray M = new OGIndexArray(_square);
     assertTrue(M.equals(M)); // test this = obj
     assertFalse(M.equals(null)); // test obj != null
     assertFalse(M.equals(M.getClass())); // test obj class
 
     // false, cols too long
-    N = new OGIndexType(_tallRectangle);
+    N = new OGIndexArray(_tallRectangle);
     assertFalse(M.equals(N));
 
     // false, rows too long
-    N = new OGIndexType(_tallRectangle);
+    N = new OGIndexArray(_tallRectangle);
     assertFalse(M.equals(N));
 
     //
     int [][] _squareDiff = {{1,1,3},{4,5,6},{7,8,9}};
-    N = new OGIndexType(_squareDiff);
+    N = new OGIndexArray(_squareDiff);
     assertFalse(M.equals(N));
 
     // hash
-    N = new OGIndexType(_square);
+    N = new OGIndexArray(_square);
     assertTrue(M.equals(N));
     assertEquals(M.hashCode(), N.hashCode());
   }

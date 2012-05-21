@@ -5,12 +5,15 @@
  */
 package com.opengamma.maths.highlevelapi.functions;
 
+import java.util.Arrays;
+
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArrayType;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexType;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
+import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.utilities.Min;
 import com.opengamma.maths.lowlevelapi.functions.utilities.Reverse;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2;
 
 /**
  * This wraps all the functions for the high level API such that they are just exposed as is.
@@ -20,9 +23,11 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2;
  */
 public class OGFunctions {
 
-  public static OGArrayType multiply(OGArrayType thisArray, OGArrayType thatArray) {
+  public static OGDoubleArray multiply(OGDoubleArray thisArray, OGDoubleArray thatArray) {
     catchNull(thisArray);
     catchNull(thatArray);
+
+    BLAS blas = new BLAS();
 
     // check they commute.
     final int colsArray1 = thisArray.getNumberOfColumns();
@@ -31,28 +36,57 @@ public class OGFunctions {
     final int rowsArray2 = thatArray.getNumberOfRows();
 
     if (colsArray1 != rowsArray2) {
-      throw new MathsExceptionGeneric("Arguments do not conform: thisArray is " + rowsArray1 + "x" + colsArray1 + ", thatArray is " + rowsArray2 + "x" + colsArray2 + ".");
+      throw new MathsExceptionIllegalArgument("Arguments do not conform: thisArray is " + rowsArray1 + "x" + colsArray1 + ", thatArray is " + rowsArray2 + "x" + colsArray2 + ".");
     }
 
-    double[][] answer = null;
+    //    System.out.println("this array="+thisArray.toString());
+    //    System.out.println("that array="+thatArray.toString());
+
+    double[] answer = null;
+    int answerRows = 0;
+    int answerCols = 0;
     if (colsArray2 == 1) { // A*x
       final int rows = thisArray.getNumberOfRows();
-      answer = new double[rows][1];
-      double[] tmp = BLAS2.dgemv(thisArray, thatArray.getData());
-      for (int i = 0; i < rows; i++) {
-        answer[i][0] = tmp[i];
-      }
+      double[] tmp = new double[rows];
+      blas.dgemv('N', thisArray.getNumberOfRows(), thisArray.getNumberOfColumns(), 1.0, thisArray.getData(), thisArray.getNumberOfRows(), thatArray.getData(), 1, 0, tmp, 1);
+      answer = tmp;
+      answerRows = thisArray.getNumberOfRows();
+      answerCols = 1;
     } else if (rowsArray1 == 1) { // x'*A
-      final int cols = thatArray.getNumberOfColumns();
-      answer = new double[1][cols];
-      double[] tmp = BLAS2.dgemvTransposed(thatArray, thisArray.getData());
-      for (int i = 0; i < cols; i++) {
-        answer[0][i] = tmp[i];
-      }
-    } else { // BLAS3.DGEMM
-      throw new MathsExceptionGeneric("BLAS3 DGEMM not implemented yet");
+      double[] tmp = new double[thatArray.getNumberOfColumns()];
+      blas.dgemv('T', thatArray.getNumberOfRows(), thatArray.getNumberOfColumns(), 1.0, thatArray.getData(), thisArray.getNumberOfColumns(), thisArray.getData(), 1, 0, tmp, 1);
+      answer = tmp;
+      answerRows = 1;
+      answerCols = thatArray.getNumberOfColumns();
+    } else {
+      //      * @param transa one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+      //      * @param transb one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+      //      * @param m number of rows in matrix {@code _OP_(aMatrix)} and number of rows in {@code cMatrix}
+      //      * @param n number of columns in matrix {@code _OP_(bMatrix) and number of columns in {@code cMatrix}
+      //      * @param k number of columns in matrix {@code _OP_(aMatrix)} and number of rows in matrix {@code _OP_(bMatrix)}
+      //      * @param alpha scaling factor for the matrix-matrix product 
+      //      * @param aMatrix the leading part of the "A" matrix of at least dimension (LDA, ka), where ka is {@code k} when {@code transa} is 'N' or 'n' and is {@code m} otherwise.
+      //      * @param lda the first dimension of {@code aMatrix}, if {@code transa} is 'N' or 'n' it is max(1,m) else it is at least max(1,k)
+      //      * @param bMatrix the leading part of the "B" matrix of at least dimension (LDB, kb), where kb is {@code n} when {@code transb} is 'N' or 'n' and is {@code k} otherwise.
+      //      * @param ldb the first dimension of {@code bMatrix}, if {@code transb} is 'N' or 'n' it is max(1,k) else it is at least max(1,n)
+      //      * @param beta the scaling factor for the matrix "C", {@code cMatrix}
+      //      * @param cMatrix the leading part of the "C" matrix of at least dimension (LDC, n). Overwritten by the operation defined in the preamble on exit. 
+      //      * @param ldc the first dimension of "C" at least max(1,m)
+      int m = thisArray.getNumberOfRows();
+      int n = thatArray.getNumberOfColumns();
+      int k = thisArray.getNumberOfColumns();
+      double alpha = 1.e0;
+      int lda = m;
+      int ldb = k;
+      double beta = 0.e0;
+      double[] cMatrix = new double[m * n];
+      int ldc = m;
+      blas.dgemm('N', 'N', m, n, k, alpha, thisArray.getData(), lda, thatArray.getData(), ldb, beta, cMatrix, ldc);
+      answer = cMatrix;
+      answerRows = m;
+      answerCols = n;
     }
-    return new OGArrayType(answer);
+    return new OGDoubleArray(answer, answerRows, answerCols);
   }
 
   // non linear algebra ops
@@ -61,13 +95,13 @@ public class OGFunctions {
    * @param thisArray is the array from which the absolute values are to be calculated
    * @return the absolute values of thisArray
    */
-  public static OGArrayType abs(OGArrayType thisArray) {
+  public static OGDoubleArray abs(OGDoubleArray thisArray) {
     catchNull(thisArray);
     double[][] answer = allocNewBasedOnSizeOf(thisArray);
     for (int i = 0; i < answer.length; i++) {
-      answer[i] = com.opengamma.maths.lowlevelapi.functions.utilities.Abs.stateless(thisArray.getFullRow(i));
+      answer[i] = com.opengamma.maths.lowlevelapi.functions.utilities.Abs.stateless(thisArray.getRow(i).getData());
     }
-    return new OGArrayType(answer);
+    return new OGDoubleArray(answer);
   }
 
   /**
@@ -75,13 +109,13 @@ public class OGFunctions {
    * @param thisArray is the array from which the absolute values are to be calculated
    * @return the absolute values of thisArray
    */
-  public static OGIndexType abs(OGIndexType thisArray) {
+  public static OGIndexArray abs(OGIndexArray thisArray) {
     catchNull(thisArray);
     int[][] answer = allocNewBasedOnSizeOf(thisArray);
     for (int i = 0; i < answer.length; i++) {
       answer[i] = com.opengamma.maths.lowlevelapi.functions.utilities.Abs.stateless(thisArray.getFullRow(i).getData());
     }
-    return new OGIndexType(answer);
+    return new OGIndexArray(answer);
   }
 
   /**
@@ -89,10 +123,10 @@ public class OGFunctions {
    * @param thisArray is the array from which the unique values are to be calculated
    * @return the negated values of thisArray
    */
-  public static OGArrayType unique(OGArrayType thisArray) {
+  public static OGDoubleArray unique(OGDoubleArray thisArray) {
     catchNull(thisArray);
     double[] answer = com.opengamma.maths.lowlevelapi.functions.utilities.Unique.bitwise(thisArray.getData());
-    return new OGArrayType(singlePointerToDoublePointer(answer));
+    return new OGDoubleArray(singlePointerToDoublePointer(answer));
   }
 
   /**
@@ -100,10 +134,10 @@ public class OGFunctions {
    * @param thisArray is the array from which the unique values are to be calculated
    * @return the negated values of thisArray
    */
-  public static OGIndexType unique(OGIndexType thisArray) {
+  public static OGIndexArray unique(OGIndexArray thisArray) {
     catchNull(thisArray);
     int[] answer = com.opengamma.maths.lowlevelapi.functions.utilities.Unique.bitwise(thisArray.getData());
-    return new OGIndexType(singlePointerToDoublePointer(answer));
+    return new OGIndexArray(singlePointerToDoublePointer(answer));
   }
 
   /**
@@ -111,7 +145,7 @@ public class OGFunctions {
    * @param thisArray the array to transpose
    * @return the transpose of the matrix.
    */
-  public static OGArrayType transpose(OGArrayType thisArray) {
+  public static OGDoubleArray transpose(OGDoubleArray thisArray) {
     catchNull(thisArray);
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
@@ -119,10 +153,10 @@ public class OGFunctions {
     double[] data = thisArray.getData();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        tmp[j][i] = data[i * cols + j];
+        tmp[j][i] = data[j * rows + i];
       }
     }
-    return new OGArrayType(tmp);
+    return new OGDoubleArray(tmp);
   }
 
   /**
@@ -130,7 +164,7 @@ public class OGFunctions {
    * @param thisArray the array to transpose
    * @return the transpose of the matrix.
    */
-  public static OGIndexType transpose(OGIndexType thisArray) {
+  public static OGIndexArray transpose(OGIndexArray thisArray) {
     catchNull(thisArray);
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
@@ -138,10 +172,10 @@ public class OGFunctions {
     int[] data = thisArray.getData();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        tmp[j][i] = data[i * cols + j];
+        tmp[j][i] = data[j * rows + i];
       }
     }
-    return new OGIndexType(tmp);
+    return new OGIndexArray(tmp);
   }
 
   // array manipulation
@@ -153,7 +187,7 @@ public class OGFunctions {
    * @param newCols the number of columns in the new matrix
    * @return the negated values of thisArray
    */
-  public static OGArrayType reshape(OGArrayType thisArray, int newRows, int newCols) {
+  public static OGDoubleArray reshape(OGDoubleArray thisArray, int newRows, int newCols) {
     catchNull(thisArray);
     int rows = thisArray.getNumberOfRows();
     int cols = thisArray.getNumberOfColumns();
@@ -162,15 +196,9 @@ public class OGFunctions {
       throw new MathsExceptionGeneric("Cannot reshape array, number of elements are not conformant.\n  thisArray is " + rows + "x" + cols + ". Requested reshape is: " + newRows + " x " + newCols);
     }
     double[] data = thisArray.getData();
-    int ptr = 0;
-    double[][] newData = new double[newRows][newCols];
-    for (int i = 0; i < newRows; i++) {
-      for (int j = 0; j < newCols; j++) {
-        newData[i][j] = data[ptr];
-        ptr++;
-      }
-    }
-    return new OGArrayType(newData);
+    double[] newData = new double[newRows * newCols];
+    System.arraycopy(data, 0, newData, 0, data.length);
+    return new OGDoubleArray(newData, newRows, newCols);
   }
 
   /**
@@ -181,7 +209,7 @@ public class OGFunctions {
    * @param newCols the number of columns in the new matrix
    * @return the negated values of thisArray
    */
-  public static OGIndexType reshape(OGIndexType thisArray, int newRows, int newCols) {
+  public static OGIndexArray reshape(OGIndexArray thisArray, int newRows, int newCols) {
     catchNull(thisArray);
     int rows = thisArray.getNumberOfRows();
     int cols = thisArray.getNumberOfColumns();
@@ -198,7 +226,7 @@ public class OGFunctions {
         ptr++;
       }
     }
-    return new OGIndexType(newData);
+    return new OGIndexArray(newData);
   }
 
   /**
@@ -206,15 +234,15 @@ public class OGFunctions {
    * @param thisArray the array to be flipped
    * @return a horizontally flipped version of thisArray
    */
-  public static OGArrayType fliplr(OGArrayType thisArray) {
+  public static OGDoubleArray fliplr(OGDoubleArray thisArray) {
     catchNull(thisArray);
     int rows = thisArray.getNumberOfRows();
     // flip each row.
     double[][] flipped = new double[rows][];
     for (int i = 0; i < rows; i++) {
-      flipped[i] = Reverse.stateless(thisArray.getFullRow(i));
+      flipped[i] = Reverse.stateless(thisArray.getFullRow(i).getData());
     }
-    return new OGArrayType(flipped);
+    return new OGDoubleArray(flipped);
   }
 
   /**
@@ -222,7 +250,7 @@ public class OGFunctions {
    * @param thisArray the array to be flipped
    * @return a horizontally flipped version of thisArray
    */
-  public static OGIndexType fliplr(OGIndexType thisArray) {
+  public static OGIndexArray fliplr(OGIndexArray thisArray) {
     catchNull(thisArray);
     int rows = thisArray.getNumberOfRows();
     // flip each row.
@@ -230,7 +258,7 @@ public class OGFunctions {
     for (int i = 0; i < rows; i++) {
       flipped[i] = Reverse.stateless(thisArray.getFullRow(i).getData());
     }
-    return new OGIndexType(flipped);
+    return new OGIndexArray(flipped);
   }
 
   /**
@@ -238,15 +266,15 @@ public class OGFunctions {
    * @param thisArray the array to be flipped
    * @return a vertically flipped version of thisArray
    */
-  public static OGArrayType flipud(OGArrayType thisArray) {
+  public static OGDoubleArray flipud(OGDoubleArray thisArray) {
     catchNull(thisArray);
     int rows = thisArray.getNumberOfRows();
     // move columns by row at a time.
     double[][] flipped = new double[rows][];
     for (int i = 0; i < rows; i++) {
-      flipped[i] = thisArray.getFullRow(rows - 1 - i);
+      flipped[i] = thisArray.getFullRow(rows - 1 - i).getData();
     }
-    return new OGArrayType(flipped);
+    return new OGDoubleArray(flipped);
   }
 
   /**
@@ -254,7 +282,7 @@ public class OGFunctions {
    * @param thisArray the array to be flipped
    * @return a vertically flipped version of thisArray
    */
-  public static OGIndexType flipud(OGIndexType thisArray) {
+  public static OGIndexArray flipud(OGIndexArray thisArray) {
     catchNull(thisArray);
     int rows = thisArray.getNumberOfRows();
     // move columns by row at a time.
@@ -262,7 +290,7 @@ public class OGFunctions {
     for (int i = 0; i < rows; i++) {
       flipped[i] = thisArray.getFullRow(rows - 1 - i).getData();
     }
-    return new OGIndexType(flipped);
+    return new OGIndexArray(flipped);
   }
 
   /**
@@ -270,7 +298,7 @@ public class OGFunctions {
    * @param theseArrays a number of OGArrays to concatenate horizontally (to the right) in the order specified in vargin.
    * @return the horizontal concatenation of the arrays specified in vargin.
    */
-  public static OGArrayType horzcat(OGArrayType... theseArrays) {
+  public static OGDoubleArray horzcat(OGDoubleArray... theseArrays) {
     catchNull(theseArrays[0]);
 
     final int baseRows = theseArrays[0].getNumberOfRows();
@@ -285,18 +313,13 @@ public class OGFunctions {
       colCount += theseArrays[0].getNumberOfColumns();
     }
     // malloc
-    double[][] tmp = new double[baseRows][colCount];
-    int localCols;
+    double[] tmp = new double[baseRows * colCount];
     int cumCols = 0;
     for (int i = 0; i < theseArrays.length; i++) {
-      localCols = theseArrays[i].getNumberOfColumns();
-      for (int j = 0; j < baseRows; j++) {
-        System.arraycopy(theseArrays[i].getFullRow(j), 0, tmp[j], cumCols, localCols);
-      }
-      cumCols += localCols;
+      System.arraycopy(theseArrays[i].getData(), 0, tmp, cumCols, theseArrays[i].getData().length);
+      cumCols += theseArrays[i].getData().length;
     }
-
-    return new OGArrayType(tmp);
+    return new OGDoubleArray(tmp, baseRows, colCount);
   }
 
   /**
@@ -304,7 +327,7 @@ public class OGFunctions {
    * @param theseArrays a number of OGIndexs to concatenate horizontally (to the right) in the order specified in vargin.
    * @return the horizontal concatenation of the arrays specified in vargin.
    */
-  public static OGIndexType horzcat(OGIndexType... theseArrays) {
+  public static OGIndexArray horzcat(OGIndexArray... theseArrays) {
     catchNull(theseArrays[0]);
 
     final int baseRows = theseArrays[0].getNumberOfRows();
@@ -319,18 +342,13 @@ public class OGFunctions {
       colCount += theseArrays[0].getNumberOfColumns();
     }
     // malloc
-    int[][] tmp = new int[baseRows][colCount];
-    int localCols;
+    int[] tmp = new int[baseRows * colCount];
     int cumCols = 0;
     for (int i = 0; i < theseArrays.length; i++) {
-      localCols = theseArrays[i].getNumberOfColumns();
-      for (int j = 0; j < baseRows; j++) {
-        System.arraycopy(theseArrays[i].getFullRow(j).getData(), 0, tmp[j], cumCols, localCols);
-      }
-      cumCols += localCols;
+      System.arraycopy(theseArrays[i].getData(), 0, tmp, cumCols, theseArrays[i].getData().length);
+      cumCols += theseArrays[i].getData().length;
     }
-
-    return new OGIndexType(tmp);
+    return new OGIndexArray(tmp, baseRows, colCount);
   }
 
   /**
@@ -338,7 +356,7 @@ public class OGFunctions {
    * @param theseArrays a number of OGArrays to concatenate vertically (to the bottom) in the order specified in vargin.
    * @return the vertical concatenation of the arrays specified in vargin.
    */
-  public static OGArrayType vertcat(OGArrayType... theseArrays) {
+  public static OGDoubleArray vertcat(OGDoubleArray... theseArrays) {
     catchNull(theseArrays[0]);
 
     final int baseCols = theseArrays[0].getNumberOfColumns();
@@ -350,19 +368,21 @@ public class OGFunctions {
         throw new MathsExceptionGeneric("Dimension mismatch for horizontal concatenation. Number of rows in first argument is " + baseCols + " whereas arguement " + i + "has " +
             theseArrays[i].getNumberOfRows() + "rows");
       }
-      rowCount += theseArrays[0].getNumberOfRows();
+      rowCount += theseArrays[i].getNumberOfRows();
     }
     // malloc
-    double[][] tmp = new double[rowCount][baseCols];
-    int ptr = 0;
+    double[] tmp = new double[rowCount * baseCols];
+    double[] data;
+    int offset = 0;
     for (int i = 0; i < theseArrays.length; i++) {
-      final int lim = theseArrays[i].getNumberOfRows();
-      for (int j = 0; j < lim; j++) {
-        System.arraycopy(theseArrays[i].getFullRow(j), 0, tmp[ptr], 0, baseCols);
-        ptr++;
+      data = theseArrays[i].getData();
+      for (int j = 0; j < theseArrays[i].getNumberOfColumns(); j++) {
+        System.arraycopy(data, j * theseArrays[i].getNumberOfRows(), tmp, rowCount * j + offset, theseArrays[i].getNumberOfRows());
       }
+      offset += theseArrays[i].getNumberOfRows();
     }
-    return new OGArrayType(tmp);
+
+    return new OGDoubleArray(tmp, rowCount, baseCols);
   }
 
   /**
@@ -370,7 +390,7 @@ public class OGFunctions {
    * @param theseArrays a number of OGIndexs to concatenate vertically (to the bottom) in the order specified in vargin.
    * @return the vertical concatenation of the arrays specified in vargin.
    */
-  public static OGIndexType vertcat(OGIndexType... theseArrays) {
+  public static OGIndexArray vertcat(OGIndexArray... theseArrays) {
     catchNull(theseArrays[0]);
 
     final int baseCols = theseArrays[0].getNumberOfColumns();
@@ -382,19 +402,21 @@ public class OGFunctions {
         throw new MathsExceptionGeneric("Dimension mismatch for horizontal concatenation. Number of rows in first argument is " + baseCols + " whereas arguement " + i + "has " +
             theseArrays[i].getNumberOfRows() + "rows");
       }
-      rowCount += theseArrays[0].getNumberOfRows();
+      rowCount += theseArrays[i].getNumberOfRows();
     }
     // malloc
-    int[][] tmp = new int[rowCount][baseCols];
-    int ptr = 0;
+    int[] tmp = new int[rowCount * baseCols];
+    int[] data;
+    int offset = 0;
     for (int i = 0; i < theseArrays.length; i++) {
-      final int lim = theseArrays[i].getNumberOfRows();
-      for (int j = 0; j < lim; j++) {
-        System.arraycopy(theseArrays[i].getFullRow(j).getData(), 0, tmp[ptr], 0, baseCols);
-        ptr++;
+      data = theseArrays[i].getData();
+      for (int j = 0; j < theseArrays[i].getNumberOfColumns(); j++) {
+        System.arraycopy(data, j * theseArrays[i].getNumberOfRows(), tmp, rowCount * j + offset, theseArrays[i].getNumberOfRows());
       }
+      offset += theseArrays[i].getNumberOfRows();
     }
-    return new OGIndexType(tmp);
+
+    return new OGIndexArray(tmp, rowCount, baseCols);
   }
 
   /**
@@ -404,7 +426,7 @@ public class OGFunctions {
    * @param n the number of tiles in the horizontal direction
    * @return tmp a new matrix made from m x n tiles of thisArray
    */
-  public static OGArrayType repmat(OGArrayType thisArray, int m, int n) {
+  public static OGDoubleArray repmat(OGDoubleArray thisArray, int m, int n) {
     catchNull(thisArray);
     if (n < 1 | m < 1) {
       throw new MathsExceptionGeneric("The number of tiles in the m and n directions must be greater than 1 (" + m + " x " + n + "given).");
@@ -417,13 +439,13 @@ public class OGFunctions {
     for (int i = 0; i < m; i++) {
       offsetRows = i * rows;
       for (int k = 0; k < rows; k++) {
-        localRow = thisArray.getFullRow(k);
+        localRow = thisArray.getFullRow(k).getData();
         for (int j = 0; j < n; j++) {
           System.arraycopy(localRow, 0, tmp[offsetRows + k], j * cols, cols);
         }
       }
     }
-    return new OGArrayType(tmp);
+    return new OGDoubleArray(tmp);
   }
 
   /**
@@ -433,7 +455,7 @@ public class OGFunctions {
    * @param n the number of tiles in the horizontal direction
    * @return tmp a new matrix made from m x n tiles of thisArray
    */
-  public static OGIndexType repmat(OGIndexType thisArray, int m, int n) {
+  public static OGIndexArray repmat(OGIndexArray thisArray, int m, int n) {
     catchNull(thisArray);
     if (n < 1 | m < 1) {
       throw new MathsExceptionGeneric("The number of tiles in the m and n directions must be greater than 1 (" + m + " x " + n + "given).");
@@ -452,7 +474,7 @@ public class OGFunctions {
         }
       }
     }
-    return new OGIndexType(tmp);
+    return new OGIndexArray(tmp);
   }
 
   /**
@@ -460,7 +482,7 @@ public class OGFunctions {
    * @param thisArray the array from which the diagonal will be extracted or a diagonal matrix can be created from 
    * @return a diag or a diagonal matrix, TODO: Fix with better explanation, add in DIAG matrix type 
    */
-  public static OGArrayType diag(OGArrayType thisArray) {
+  public static OGDoubleArray diag(OGDoubleArray thisArray) {
     catchNull(thisArray);
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
@@ -480,7 +502,7 @@ public class OGFunctions {
         tmp[0][i] = dptr[i * cols + i];
       }
     }
-    return new OGArrayType(tmp);
+    return new OGDoubleArray(tmp);
   }
 
   /**
@@ -488,7 +510,7 @@ public class OGFunctions {
    * @param thisArray the array from which the diagonal will be extracted or a diagonal matrix can be created from 
    * @return a diag or a diagonal matrix, TODO: Fix with better explanation, add in DIAG matrix type 
    */
-  public static OGIndexType diag(OGIndexType thisArray) {
+  public static OGIndexArray diag(OGIndexArray thisArray) {
     catchNull(thisArray);
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
@@ -507,7 +529,7 @@ public class OGFunctions {
         tmp[0][i] = dptr[i * cols + i];
       }
     }
-    return new OGIndexType(tmp);
+    return new OGIndexArray(tmp);
   }
 
   /**
@@ -516,7 +538,7 @@ public class OGFunctions {
    * @param k the offset from the diagonal to be used
    * @return a diag or a diagonal matrix, TODO: Fix with better explanation, add in DIAG matrix type 
    */
-  public static OGArrayType diag(OGArrayType thisArray, int k) {
+  public static OGDoubleArray diag(OGDoubleArray thisArray, int k) {
     catchNull(thisArray);
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
@@ -555,7 +577,7 @@ public class OGFunctions {
         }
       } else {
         int pk = -k;
-        int mlen = Min.value(new int[] {rows - pk, cols});
+        int mlen = Min.value(new int[] {rows - pk, cols });
         tmp = new double[1][mlen];
         for (int i = 0; i < mlen; i++) {
           tmp[0][i] = dptr[pk * cols + i * cols + i];
@@ -563,7 +585,7 @@ public class OGFunctions {
       }
 
     }
-    return new OGArrayType(tmp);
+    return new OGDoubleArray(tmp);
   }
 
   /**
@@ -572,7 +594,7 @@ public class OGFunctions {
    * @param k the offset from the diagonal to be used
    * @return a diag or a diagonal matrix, TODO: Fix with better explanation, add in DIAG matrix type 
    */
-  public static OGIndexType diag(OGIndexType thisArray, int k) {
+  public static OGIndexArray diag(OGIndexArray thisArray, int k) {
     catchNull(thisArray);
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
@@ -611,7 +633,7 @@ public class OGFunctions {
         }
       } else {
         int pk = -k;
-        int mlen = Min.value(new int[] {rows - pk, cols});
+        int mlen = Min.value(new int[] {rows - pk, cols });
         tmp = new int[1][mlen];
         for (int i = 0; i < mlen; i++) {
           tmp[0][i] = dptr[pk * cols + i * cols + i];
@@ -619,9 +641,8 @@ public class OGFunctions {
       }
 
     }
-    return new OGIndexType(tmp);
+    return new OGIndexArray(tmp);
   }
-
 
   // printin
   /**
@@ -629,7 +650,7 @@ public class OGFunctions {
    * debug routine
    * @param thisInt an int to print
    */
-  @Deprecated  
+  @Deprecated
   public static void print(int thisInt) {
     System.out.format("Integer = %12d%n", thisInt);
   }
@@ -639,16 +660,16 @@ public class OGFunctions {
    * debug routine
    * @param thisArray an array to print
    */
-  @Deprecated  
+  @Deprecated
   //CSIGNORE
-  public static void print(OGArrayType thisArray) {
+  public static void print(OGDoubleArray thisArray) {
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
     final double[] data = thisArray.getData();
     System.out.println("{");
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        System.out.format("%12.8f ", data[i * cols + j]);
+        System.out.format("%12.8f ", data[j * rows + i]);
       }
       System.out.println("");
     }
@@ -660,9 +681,9 @@ public class OGFunctions {
    * debug routine
    * @param thisArray an array to print
    */
-  @Deprecated  
+  @Deprecated
   //CSIGNORE
-  public static void print(OGIndexType thisArray) {
+  public static void print(OGIndexArray thisArray) {
     final int rows = thisArray.getNumberOfRows();
     final int cols = thisArray.getNumberOfColumns();
     final int[] data = thisArray.getData();
@@ -678,34 +699,34 @@ public class OGFunctions {
 
   // helpers
   // allocs an array that is the same dimension as thisArray
-  private static double[][] allocNewBasedOnSizeOf(OGArrayType thisArray) {
+  private static double[][] allocNewBasedOnSizeOf(OGDoubleArray thisArray) {
     return new double[thisArray.getNumberOfRows()][thisArray.getNumberOfColumns()];
   }
 
   // allocs an array that is the same size in memory as thisArray
-  private static double[] allocFlatNewBasedOnSizeOf(OGArrayType thisArray) {
+  private static double[] allocFlatNewBasedOnSizeOf(OGDoubleArray thisArray) {
     return new double[thisArray.getNumberOfRows() * thisArray.getNumberOfColumns()];
   }
 
   //catches nulls else throws pain
-  private static void catchNull(OGArrayType thisArray) {
+  private static void catchNull(OGDoubleArray thisArray) {
     if (thisArray == null) {
       throw new MathsExceptionGeneric("OGArray passed to function that points to NULL");
     }
   }
 
   // allocs an array that is the same dimension as thisArray
-  private static int[][] allocNewBasedOnSizeOf(OGIndexType thisArray) {
+  private static int[][] allocNewBasedOnSizeOf(OGIndexArray thisArray) {
     return new int[thisArray.getNumberOfRows()][thisArray.getNumberOfColumns()];
   }
 
   // allocs an array that is the same size in memory as thisArray
-  private static int[] allocFlatNewBasedOnSizeOf(OGIndexType thisArray) {
+  private static int[] allocFlatNewBasedOnSizeOf(OGIndexArray thisArray) {
     return new int[thisArray.getNumberOfRows() * thisArray.getNumberOfColumns()];
   }
 
   //catches nulls else throws pain
-  private static void catchNull(OGIndexType thisArray) {
+  private static void catchNull(OGIndexArray thisArray) {
     if (thisArray == null) {
       throw new MathsExceptionGeneric("OGIndex passed to function that points to NULL");
     }
