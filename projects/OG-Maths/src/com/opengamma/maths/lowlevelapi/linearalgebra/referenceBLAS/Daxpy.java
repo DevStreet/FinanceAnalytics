@@ -33,26 +33,26 @@ public class Daxpy {
     if ((incx == 1 && incy == 1)) {
       m = (n) % (4);
       if (m != 0) {
-        for (i = 1; i <= m; i++) {
-          y[(i - (1)) + yOffset] = (y[(i - (1)) + yOffset] + (alpha * x[(i - (1)) + xOffset]));
+        for (i = 0; i < m; i++) {
+          y[i + yOffset] = y[i + yOffset] + (alpha * x[i + xOffset]);
         }
       }
       if ((n < 4)) {
         return;
       }
       int iInc = 4;
-      mp1 = m; //stu-query?
+      mp1 = m;
       for (i = mp1; i < n; i += iInc) {
-        y[(i - (1)) + yOffset] = (y[(i - (1)) + yOffset] + (alpha * x[(i - (1)) + xOffset]));
-        y[((i + 1) - (1)) + yOffset] = (y[((i + 1) - (1)) + yOffset] + (alpha * x[((i + 1) - (1)) + xOffset]));
-        y[((i + 2) - (1)) + yOffset] = (y[((i + 2) - (1)) + yOffset] + (alpha * x[((i + 2) - (1)) + xOffset]));
-        y[((i + 3) - (1)) + yOffset] = (y[((i + 3) - (1)) + yOffset] + (alpha * x[((i + 3) - (1)) + xOffset]));
+        y[i + yOffset] = y[i + yOffset] + alpha * x[i + xOffset];
+        y[i + 1 + yOffset] = y[i + 1 + yOffset] + alpha * x[i + 1 + xOffset];
+        y[i + 2 + yOffset] = y[i + 2 + yOffset] + alpha * x[i + 2 + xOffset];
+        y[i + 3 + yOffset] = y[i + 3 + yOffset] + alpha * x[i + 3 + xOffset];
 
       }
     } else {
       ix = 1;
       iy = 1;
-      if ((incx < 0)) { //stu-query?s
+      if ((incx < 0)) {
         ix = (-n + 1) * incx + 1;
       }
       if ((incy < 0)) {
