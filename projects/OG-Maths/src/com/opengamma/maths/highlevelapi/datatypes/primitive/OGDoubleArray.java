@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
  * High level API.
  * Dense matrix backed array magic.
  */
-public class OGDoubleArray extends OGArraySuper<Double> {
+public class OGDoubleArray extends OGArraySuper<Number> {
 
   private double[] _data;
   private int _columns;
@@ -54,6 +54,16 @@ public class OGDoubleArray extends OGArraySuper<Double> {
     System.arraycopy(dataIn, 0, _data, 0, len);
     _rows = rows;
     _columns = columns;
+  }
+
+  /**
+   * @param number the single number in this array
+   */
+  public OGDoubleArray(double number) {
+    _columns = 1;
+    _rows = 1;
+    _data = new double[1];
+    _data[0] = number;
   }
 
   @Override
@@ -154,13 +164,13 @@ public class OGDoubleArray extends OGArraySuper<Double> {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    } 
+    }
     if (obj == null) {
       return false;
     }
     if (getClass() != obj.getClass()) {
       return false;
-    }   
+    }
     OGDoubleArray other = (OGDoubleArray) obj;
     if (_columns != other._columns) {
       return false;

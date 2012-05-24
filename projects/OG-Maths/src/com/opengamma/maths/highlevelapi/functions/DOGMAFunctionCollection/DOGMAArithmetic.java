@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.interfaces.DOGMAArithmeticAPI;
@@ -14,50 +15,26 @@ import com.opengamma.maths.highlevelapi.functions.interfaces.individialfunctions
  * Basic Arithmetic 
  */
 public class DOGMAArithmetic implements DOGMAArithmeticAPI {
-  private static PlusAndMinus s_localplusandminus = new PlusAndMinus();
-  
-  public OGDoubleArray plus(OGDoubleArray... array) {
-    return s_localplusandminus.plus(array);
+  private final PlusAndMinus plusMinus = new PlusAndMinus();
+
+  @Override
+  public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
+    return null;
   }
 
   @Override
-  public OGDoubleArray plus(OGDoubleArray array1, OGDoubleArray array2) {
-    return s_localplusandminus.plus(array1, array2);
-  }
-  
-  @Override
-  public OGDoubleArray plus(OGDoubleArray array1, OGSparseArray array2) {
-    return s_localplusandminus.plus(array1, array2);
+  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    return plusMinus.plus(array1, array2);
   }
 
   @Override
-  public OGDoubleArray plus(OGSparseArray array1, OGDoubleArray array2) {
-    return s_localplusandminus.plus(array1, array2);
+  public OGArraySuper<Number> minus(OGArraySuper<Number>... array) {
+    return null;
   }
 
   @Override
-  public OGSparseArray plus(OGSparseArray array1, OGSparseArray array2) {
-    return s_localplusandminus.plus(array1, array2);
-  }
-
-  @Override
-  public OGDoubleArray minus(OGDoubleArray array1, OGDoubleArray array2) {
-    return s_localplusandminus.plus(array1, array2);
-  }
-
-  @Override
-  public OGDoubleArray minus(OGDoubleArray array1, OGSparseArray array2) {
-    return s_localplusandminus.plus(array1, array2);
-  }
-
-  @Override
-  public OGDoubleArray minus(OGSparseArray array1, OGDoubleArray array2) {
-    return s_localplusandminus.plus(array1, array2);
-  }
-
-  @Override
-  public OGSparseArray minus(OGSparseArray array1, OGSparseArray array2) {
-    return s_localplusandminus.plus(array1, array2);
+  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    return null;
   }
 
   @Override
@@ -104,5 +81,15 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGDoubleArray tranpose(OGDoubleArray array) {
     return null;
   }
+
+  /**
+   * @param answer2
+   * @param d
+   * @return
+   */
+  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
+    return plus(array1, new OGDoubleArray(aNumber));
+  }  
+
 
 }

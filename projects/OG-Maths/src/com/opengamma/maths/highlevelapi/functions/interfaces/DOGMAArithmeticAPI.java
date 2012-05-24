@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.interfaces;
 
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
@@ -16,13 +17,13 @@ public interface DOGMAArithmeticAPI {
 
   /* ADD */
   /**
-   * Adds OGDoubleArray arrays.
+   * Adds OGArray arrays.
    * If more than two arrays are given the additions are applied from left to right and accumulated.
    * e.g. (((array[0]+array[1])+array[2])+array[3])... 
    * @param array the arrays to add together
    * @return the sum of the arrays  
    */
-  OGDoubleArray plus(OGDoubleArray... array);
+  OGArraySuper<Number> plus(OGArraySuper<Number>... array);
   
   /**
    * Adds two OGDoubleArray arrays
@@ -30,40 +31,17 @@ public interface DOGMAArithmeticAPI {
    * @param array2 the second array
    * @return the sum of the arrays 
    */
-  OGDoubleArray plus(OGDoubleArray array1, OGDoubleArray array2);  
-
-  /**
-   * Adds an OGDoubleArray to an OGSparseArray
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return the sum of the two input arrays
-   */
-  OGDoubleArray plus(OGDoubleArray array1, OGSparseArray array2);
-
-  /**
-   * Adds an OGSparseArray to an OGDoubleArray 
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return the sum of the two input arrays
-   */
-  OGDoubleArray plus(OGSparseArray array1, OGDoubleArray array2);
-
-  /**
-   * Adds an OGSparseArray to an OGSparseArray 
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return the sum of the two input arrays
-   */
-  OGSparseArray plus(OGSparseArray array1, OGSparseArray array2);
+  OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2);  
 
   /* SUBTRACT */
   /**
-   * Subtracts two OGDoubleArray arrays
-   * @param array1 the first array
-   * @param array2 the second array
+   * Subtracts OGArray arrays.
+   * If more than two arrays are given the additions are applied from left to right and accumulated.
+   * e.g. (((array[0]-array[1])-array[2])-array[3])... 
+   * @param array the arrays to subtract
    * @return array1 - array2 
    */
-  OGDoubleArray minus(OGDoubleArray array1, OGDoubleArray array2);
+  OGArraySuper<Number> minus(OGArraySuper<Number>... array);
 
   /**
    * Subtracts an OGDoubleArray from an OGSparseArray
@@ -71,25 +49,9 @@ public interface DOGMAArithmeticAPI {
    * @param array2 the second array
    * @return array1 - array2
    */
-  OGDoubleArray minus(OGDoubleArray array1, OGSparseArray array2);
+  OGArraySuper<Number> minus(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
-  /**
-   * Subtracts an OGSparseArray from an OGDoubleArray 
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return array1 - array2
-   */
-  OGDoubleArray minus(OGSparseArray array1, OGDoubleArray array2);
-
-  /**
-   * Subtracts an OGSparseArray from an OGSparseArray 
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return array1 - array2
-   */
-  OGSparseArray minus(OGSparseArray array1, OGSparseArray array2);
-
-  /* DIVIDE */
+   /* DIVIDE */
   /**
    * Element by element left division
    * @param array1 the first array

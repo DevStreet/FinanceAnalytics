@@ -9,7 +9,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
  * 
  * @param <T> a Number type
  */
-public interface OGArrayInterface<T extends Number> {
+public interface OGArrayInterface<T> {
 
   int getNumberOfRows();
 
