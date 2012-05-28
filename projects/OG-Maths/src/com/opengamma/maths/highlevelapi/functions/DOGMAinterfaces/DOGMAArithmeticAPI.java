@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.interfaces;
+package com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;

@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.interfaces.individialfunctions;
+package com.opengamma.maths.highlevelapi.functions.individualfunctions.concrete.mtimes;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 /**
  * 
  */
-public class Times {
+public class MtimesOGDoubleArrayOGDoubleArray {
 
   public OGDoubleArray times(OGDoubleArray... array) {
     int n = array[0].getData().length;
@@ -32,8 +32,7 @@ public class Times {
   }
 
   public OGDoubleArray mtimes(OGDoubleArray... array) {
-    catchNull(thisArray);
-    catchNull(thatArray);
+    catchNull(array);
 
     BLAS blas = new BLAS();
 
@@ -96,5 +95,4 @@ public class Times {
     }
     return new OGDoubleArray(answer, answerRows, answerCols);
   }
-
 }

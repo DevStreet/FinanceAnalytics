@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.interfaces.individialfunctions.plus;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
@@ -27,7 +27,6 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusAbstract<OGDoubleA
   @SuppressWarnings("unchecked")
   @Override
   public OGArraySuper<Number> plus(OGDoubleArray array1, OGDoubleArray array2) {
-
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -62,8 +61,7 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusAbstract<OGDoubleA
       retRows = rowsArray1;
       retCols = columnsArray1;
     } else {
-      n = array1.getData().length;
-      _localblas.daxpy(n, 1e0, tmp, 1, array2.getData(), 1);
+      _localblas.daxpy(n, 1e0, array2.getData(), 1, tmp, 1);
       retRows = rowsArray1;
       retCols = columnsArray1;
     }

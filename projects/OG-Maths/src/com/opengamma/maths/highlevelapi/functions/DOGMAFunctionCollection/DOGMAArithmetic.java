@@ -7,24 +7,29 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
-import com.opengamma.maths.highlevelapi.functions.interfaces.DOGMAArithmeticAPI;
-import com.opengamma.maths.highlevelapi.functions.interfaces.individialfunctions.PlusAndMinus;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
+import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
 
 /**
  * Basic Arithmetic 
  */
 public class DOGMAArithmetic implements DOGMAArithmeticAPI {
-  private final PlusAndMinus plusMinus = new PlusAndMinus();
+  private final PlusAndMinus _plusMinus = new PlusAndMinus();
+  private final Copy _copy = new Copy();
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
-    return null;
+    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+    for (int i = 1; i < array.length; i++) {
+      tmp = _plusMinus.plus(tmp, array[i]);
+    }
+    return tmp;
   }
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return plusMinus.plus(array1, array2);
+    return _plusMinus.plus(array1, array2);
   }
 
   @Override
@@ -83,13 +88,13 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   /**
-   * @param answer2
-   * @param d
-   * @return
+   * Adds a double to an array
+   * @param array1 the array to add to
+   * @param aNumber the double
+   * @return the array plus element-wise a double
    */
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
     return plus(array1, new OGDoubleArray(aNumber));
-  }  
-
+  }
 
 }
