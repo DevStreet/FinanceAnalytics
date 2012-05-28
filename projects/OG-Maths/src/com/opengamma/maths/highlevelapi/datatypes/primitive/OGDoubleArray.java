@@ -56,6 +56,7 @@ public class OGDoubleArray extends OGArraySuper<Number> {
     _columns = columns;
   }
 
+
   /**
    * @param number the single number in this array
    */
@@ -65,6 +66,7 @@ public class OGDoubleArray extends OGArraySuper<Number> {
     _data = new double[1];
     _data[0] = number;
   }
+
 
   @Override
   public int getNumberOfRows() {
