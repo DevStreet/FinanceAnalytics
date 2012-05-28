@@ -114,6 +114,7 @@ public class OGSparseArray extends OGArraySuper<Number> {
     return tmp;
   }
 
+
   public int getNumberOfNonZeroElements() {
     return _values.length;
   }
