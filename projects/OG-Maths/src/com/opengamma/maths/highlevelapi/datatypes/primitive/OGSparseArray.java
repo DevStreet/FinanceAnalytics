@@ -70,6 +70,33 @@ public class OGSparseArray extends OGArraySuper<Number> {
     _rows = rows;
     _cols = cols;
   }
+  
+  /**
+   * Construct from underlying CSC representation
+   * @param colPtr the columns pointers
+   * @param rowIdx the row indexes
+   * @param values the underlying values
+   * @param rows the number of rows
+   * @param columns the number of columns
+   */
+  public OGSparseArray(int [] colPtr, int [] rowIdx, double[] values, int rows, int columns) {
+    final int vlen = values.length;
+    _values = new double[vlen];
+    System.arraycopy(values, 0, _values, 0, vlen);
+    
+    final int clen = colPtr.length;
+    _colPtr = new int[clen];
+    System.arraycopy(colPtr, 0, _colPtr, 0, clen);
+    
+    final int rlen = rowIdx.length;
+    _rowIdx = new int[rlen];
+    System.arraycopy(rowIdx, 0, _rowIdx, 0, rlen);
+    
+    _rows = rows;
+    //TODO: Check columns == colPtr.length - 1
+    _cols = columns;
+  }
+  
 
   public double[] getFullColumn(int index) {
     double[] tmp = new double[_cols];

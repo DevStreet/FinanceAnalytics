@@ -7,11 +7,12 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 
 /**
  * Element wise multiply 
  */
-public class TimesOGDoubleArrayOGDoubleArray extends TimesAbstract<OGDoubleArray, OGDoubleArray> {
+public final class TimesOGDoubleArrayOGDoubleArray extends TimesAbstract<OGDoubleArray, OGDoubleArray> {
   private static TimesOGDoubleArrayOGDoubleArray s_instance = new TimesOGDoubleArrayOGDoubleArray();
 
   public static TimesOGDoubleArrayOGDoubleArray getInstance() {
@@ -21,9 +22,56 @@ public class TimesOGDoubleArrayOGDoubleArray extends TimesAbstract<OGDoubleArray
   private TimesOGDoubleArrayOGDoubleArray() {
   }
 
+  private BLAS _localblas = new BLAS();
+
+  @SuppressWarnings("unchecked")
   @Override
-  public <U> OGArraySuper<U> times(OGDoubleArray array1, OGDoubleArray array2) {
-    return null;
+  public OGArraySuper<Number> times(OGDoubleArray array1, OGDoubleArray array2) {
+
+    // if either is a single number then we just mul by that
+    // else ew mul.
+    int rowsArray1 = array1.getNumberOfRows();
+    int columnsArray1 = array1.getNumberOfColumns();
+    int rowsArray2 = array2.getNumberOfRows();
+    int columnsArray2 = array2.getNumberOfColumns();
+    int retRows = 0, retCols = 0;
+
+    double[] tmp = null;
+    int n;
+
+    if (rowsArray1 == 1 && columnsArray1 == 1) {
+      n = array2.getData().length;
+      tmp = new double[n];
+      System.arraycopy(array2.getData(), 0, tmp, 0, n);
+
+      final double[] singleDouble = array1.getData();
+      final double deref = singleDouble[0];
+      _localblas.dscal(n, deref, tmp, 1);
+      retRows = rowsArray2;
+      retCols = columnsArray2;
+    } else if (rowsArray2 == 1 && columnsArray2 == 1) {
+      n = array1.getData().length;
+      tmp = new double[n];
+      System.arraycopy(array1.getData(), 0, tmp, 0, n);
+
+      final double[] singleDouble = array2.getData();
+      final double deref = singleDouble[0];
+      _localblas.dscal(n, deref, tmp, 1);
+      retRows = rowsArray1;
+      retCols = columnsArray1;
+
+    } else { // ew mul
+      retRows = rowsArray1;
+      retCols = columnsArray1;
+      n = array1.getData().length;
+      tmp = new double[n];
+      final double [] dat2 = array2.getData();
+      System.arraycopy(array1.getData(), 0, tmp, 0, n);
+      for (int i = 0; i < n; i++) {
+        tmp[i] *= dat2[i];
+      }     
+    }
+    return new OGDoubleArray(tmp, retRows, retCols);
   }
 
 }

@@ -7,6 +7,7 @@ package com.opengamma.maths.lowlevelapi.functions.memory;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Function for shipping data from one format to another
@@ -57,4 +58,95 @@ public class DenseMemoryManipulation {
     return tmp;
   }
 
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static boolean[] memcpy(boolean[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    boolean[] tmp = new boolean[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }
+
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static byte[] memcpy(byte[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    byte[] tmp = new byte[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }
+  
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static short[] memcpy(short[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    short[] tmp = new short[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }  
+    
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static int[] memcpy(int[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    int[] tmp = new int[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }
+  
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static long[] memcpy(long[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    long[] tmp = new long[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }  
+  
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static float[] memcpy(float[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    float[] tmp = new float[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }  
+  
+  /**
+   * Copies and array
+   * @param dataIn the data to copy
+   * @return a copy of dataIn
+   */
+  public static double[] memcpy(double[] dataIn) {
+    Catchers.catchNull(dataIn);
+    final int n = dataIn.length;
+    double[] tmp = new double[n];
+    System.arraycopy(dataIn, 0, tmp, 0, n);
+    return tmp;
+  }  
+  
 }

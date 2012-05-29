@@ -8,9 +8,9 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangi
 import java.util.HashMap;
 import java.util.Map;
 
-import com.opengamma.maths.highlevelapi.datatypes.derived.OGArrayTypeToFunctionMap;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 /**
  * Overloaded Copy
@@ -23,12 +23,7 @@ public class Copy {
   private static Map<Class<?>, CopyAbstract<?>> s_functionPointers = new HashMap<Class<?>, CopyAbstract<?>>();
   static {
     s_functionPointers.put(OGDoubleArray.class, CopyOGDoubleArray.getInstance());
-  }
-
-  private static OGArrayTypeToFunctionMap<CopyAbstract<?>> s_ptr = new OGArrayTypeToFunctionMap<CopyAbstract<?>>();
-  {
-    Map<Class<?>, CopyAbstract<?>> theMap = s_ptr.getMap();
-    theMap.put(OGDoubleArray.class, CopyOGDoubleArray.getInstance());
+    s_functionPointers.put(OGSparseArray.class, CopyOGSparseArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
@@ -38,3 +33,4 @@ public class Copy {
   }
 
 }
+

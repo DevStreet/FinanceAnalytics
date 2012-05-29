@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
 
@@ -17,6 +18,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeti
 public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final PlusAndMinus _plusMinus = new PlusAndMinus();
   private final Copy _copy = new Copy();
+  private final Times _times = new Times();
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
@@ -63,8 +65,19 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGDoubleArray times(OGDoubleArray... array) {
-    return null;
+  public OGArraySuper<Number> times(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    OGArraySuper<Number> tmp = _copy.copy(array1);
+    tmp = _times.times(tmp, array2);
+    return tmp;
+  } 
+  
+  @Override
+  public OGArraySuper<Number> times(OGArraySuper<Number>... array) {
+    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+    for (int i = 1; i < array.length; i++) {
+      tmp = _times.times(tmp, array[i]);
+    }
+    return tmp;
   }
 
   @Override
@@ -96,5 +109,6 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
     return plus(array1, new OGDoubleArray(aNumber));
   }
+
 
 }

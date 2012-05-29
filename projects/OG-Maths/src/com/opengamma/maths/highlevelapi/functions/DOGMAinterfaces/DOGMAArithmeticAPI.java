@@ -95,8 +95,17 @@ public interface DOGMAArithmeticAPI {
    * @param array the arrays to multiply
    * @return the cumulative product of array multiplication
    */
-  OGDoubleArray times(OGDoubleArray...array);
+  OGArraySuper<Number> times(OGArraySuper<Number>...array);
 
+  
+  /**
+   * Element wise multiplication. of two OGArray arrays
+   * @param array1 the first array
+   * @param array2 the second array
+   * @return the element wise produce of the arrays 
+   */
+  OGArraySuper<Number> times(OGArraySuper<Number> array1, OGArraySuper<Number> array2);    
+  
   /**
    * Matrix multiplication. For more than two inputs it returns the multiplications
    * applied and accumulated from left to right, e.g.
@@ -132,5 +141,6 @@ public interface DOGMAArithmeticAPI {
    * @return the transpose of the array
    */
   OGDoubleArray tranpose(OGDoubleArray array);
+
   
 }
