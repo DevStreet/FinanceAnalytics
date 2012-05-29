@@ -12,7 +12,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
  * Catch things that will cause problems
  */
 public class Catchers {
-  
+
   // general complaints about null
 
   /**
@@ -173,7 +173,6 @@ public class Catchers {
     }
   }
 
-  
   ///////////// Null from arg list
   /**
    * Catches null pointer
@@ -185,7 +184,7 @@ public class Catchers {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
   }
-  
+
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -196,7 +195,7 @@ public class Catchers {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
   }
-  
+
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -206,8 +205,8 @@ public class Catchers {
     if (thisArray == null) {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
-  }  
-  
+  }
+
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -218,7 +217,7 @@ public class Catchers {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
   }
-  
+
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -228,8 +227,8 @@ public class Catchers {
     if (thisArray == null) {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
-  }  
-  
+  }
+
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -239,24 +238,21 @@ public class Catchers {
     if (thisArray == null) {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
-  }  
-  
+  }
+
   /**
    * Catches null pointer
    * @param someBlob the object to check
    * @param pos the position in the arg list
    */
-  public static void catchNullFromArgList(Object   someBlob, int pos) {
+  public static void catchNullFromArgList(Object someBlob, int pos) {
     if (someBlob == null) {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
     }
-  }  
-  
-  
-  
-  
+  }
+
   //////////////// commute catch
-  
+
   /**
    * Catches bad commutes, given two dimensions, if they are not the same an exception is thrown 
    * @param dim1 the first dimension
@@ -266,7 +262,7 @@ public class Catchers {
    */
   public static void catchBadCommute(int dim1, String varName1, int dim2, String varName2) {
     if (dim1 != dim2) {
-      throw new MathsExceptionIllegalArgument("Arrays " + varName1 + " and + " + varName2 + " do not commute. STOPPING");
+      throw new MathsExceptionIllegalArgument(varName1 + " and + " + varName2 + " do not commute. STOPPING");
     }
   }
 

@@ -6,8 +6,6 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 /**
  * DOGMA is the OpenGamma Maths Assembly language. 
@@ -26,7 +24,7 @@ public interface DOGMAArithmeticAPI {
   OGArraySuper<Number> plus(OGArraySuper<Number>... array);
   
   /**
-   * Adds two OGDoubleArray arrays
+   * Adds two OGArraySuper<Number> arrays
    * @param array1 the first array
    * @param array2 the second array
    * @return the sum of the arrays 
@@ -44,7 +42,7 @@ public interface DOGMAArithmeticAPI {
   OGArraySuper<Number> minus(OGArraySuper<Number>... array);
 
   /**
-   * Subtracts an OGDoubleArray from an OGSparseArray
+   * Subtracts an OGArraySuper<Number> from an OGSparseArray
    * @param array1 the first array
    * @param array2 the second array
    * @return array1 - array2
@@ -56,9 +54,9 @@ public interface DOGMAArithmeticAPI {
    * Element by element left division
    * @param array1 the first array
    * @param array2 the second array
-   * @return array1 ldivided element-wise by array2
+   * @return array1 ldivided element-wise by array2. i.e. array1.\array2
    */
-  OGDoubleArray ldivide(OGDoubleArray array1, OGDoubleArray array2);
+  OGArraySuper<Number> ldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
   /**
    * Matrix left division
@@ -66,15 +64,15 @@ public interface DOGMAArithmeticAPI {
    * @param array2 the second array
    * @return array1\array2
    */
-  OGDoubleArray mldivide(OGDoubleArray array1, OGDoubleArray array2);
+  OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
   /**
    * Element by element right division
    * @param array1 the first array
    * @param array2 the second array
-   * @return array1 rdivided element-wise by array2
+   * @return array1 rdivided element-wise by array2. i.e. array1./array2
    */
-  OGDoubleArray rdivide(OGDoubleArray array1, OGDoubleArray array2);  
+  OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2);  
   
   /**
    * Right division, which effectively returns x = inverse(A)*b
@@ -83,7 +81,7 @@ public interface DOGMAArithmeticAPI {
    * @param vectorb the second array
    * @return A\b
    */
-  OGDoubleArray mrdivide(OGDoubleArray matrixA, OGDoubleArray vectorb);
+  OGArraySuper<Number> mrdivide(OGArraySuper<Number> matrixA, OGArraySuper<Number> vectorb);
   
   
   
@@ -113,7 +111,7 @@ public interface DOGMAArithmeticAPI {
    * @param array the arrays to multiply
    * @return the cumulative product of array multiplication
    */
-  OGDoubleArray mtimes(OGDoubleArray... array);
+  OGArraySuper<Number> mtimes(OGArraySuper<Number>... array);
 
   /* POWER */
   /**
@@ -122,7 +120,7 @@ public interface DOGMAArithmeticAPI {
    * @param array2 scalar the power
    * @return array1 raised element by element to the power array2
    */
-  OGDoubleArray power(OGDoubleArray array1, OGDoubleArray array2);  
+  OGArraySuper<Number> power(OGArraySuper<Number> array1, OGArraySuper<Number> array2);  
   
   /**
    * Raise a matrix to a power
@@ -130,7 +128,7 @@ public interface DOGMAArithmeticAPI {
    * @param array2 scalar
    * @return array1 raised to the power array2
    */
-  OGDoubleArray mpower(OGDoubleArray array1, OGDoubleArray array2);
+  OGArraySuper<Number> mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
  
 
@@ -140,7 +138,7 @@ public interface DOGMAArithmeticAPI {
    * @param array the array to transpose
    * @return the transpose of the array
    */
-  OGDoubleArray tranpose(OGDoubleArray array);
+  OGArraySuper<Number> tranpose(OGArraySuper<Number> array);
 
   
 }

@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Rdivide;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
@@ -19,6 +20,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final PlusAndMinus _plusMinus = new PlusAndMinus();
   private final Copy _copy = new Copy();
   private final Times _times = new Times();
+  private Rdivide _rdivide = new Rdivide();
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
@@ -49,22 +51,22 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGDoubleArray ldivide(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGArraySuper<Number> ldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return null;
   }
 
   @Override
-  public OGDoubleArray mldivide(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return null;
   }
 
   @Override
-  public OGDoubleArray rdivide(OGDoubleArray array1, OGDoubleArray array2) {
-    return null;
+  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    return _rdivide.rdivide(array1, array2);
   }
 
   @Override
-  public OGDoubleArray mrdivide(OGDoubleArray matrixA, OGDoubleArray vectorb) {
+  public OGArraySuper<Number> mrdivide(OGArraySuper<Number> matrixA, OGArraySuper<Number> vectorb) {
     return null;
   }
 
@@ -73,8 +75,8 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
     OGArraySuper<Number> tmp = _copy.copy(array1);
     tmp = _times.times(tmp, array2);
     return tmp;
-  } 
-  
+  }
+
   @Override
   public OGArraySuper<Number> times(OGArraySuper<Number>... array) {
     OGArraySuper<Number> tmp = _copy.copy(array[0]);
@@ -85,22 +87,22 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGDoubleArray mtimes(OGDoubleArray... array) {
+  public OGDoubleArray mtimes(OGArraySuper<Number>... array) {
     return null;
   }
 
   @Override
-  public OGDoubleArray power(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGDoubleArray power(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return null;
   }
 
   @Override
-  public OGDoubleArray mpower(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGDoubleArray mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return null;
   }
 
   @Override
-  public OGDoubleArray tranpose(OGDoubleArray array) {
+  public OGDoubleArray tranpose(OGArraySuper<Number> array) {
     return null;
   }
 
@@ -113,6 +115,5 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
     return plus(array1, new OGDoubleArray(aNumber));
   }
-
 
 }

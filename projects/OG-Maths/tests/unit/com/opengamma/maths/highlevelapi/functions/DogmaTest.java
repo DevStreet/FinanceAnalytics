@@ -35,7 +35,6 @@ public class DogmaTest {
 
     System.out.println("Input = " + ogDoubleMatrixData.toString());
 
-    bar.daxpy(ogDoubleMatrixData.getData().length, 1e0, ogDoubleMatrixData.getData(), 1, ogDoubleMatrixData.getData(), 1);
     System.out.println("Input = " + ogDoubleMatrixData.toString());
     OGArraySuper<Number> answer = foo.plus(ogDoubleMatrixData, ogDoubleMatrixData);
     OGArraySuper<Number> answer2 = foo.plus(answer, ogDoubleMatrixData);
@@ -76,7 +75,26 @@ public class DogmaTest {
     answer3 = foo.plus(ogSparseMatrixData, ogMoreSparseMatrixData);
     System.out.println("Sparse Plus Sparse = " + baz.full(answer3).toString());
     
-    System.out.println("Sparse minus Sparse = " + baz.full(foo.minus(answer3,ogMoreSparseMatrixData)).toString());    
+    System.out.println("Sparse minus Sparse = " + baz.full(foo.minus(answer3,ogMoreSparseMatrixData)).toString());
+    
+    answer3 = foo.rdivide(ogDoubleMatrixData, new OGDoubleArray(10));
+    System.out.println("rdiv = " + answer3.toString());
+    
+    answer3 = foo.rdivide(new OGDoubleArray(10), ogDoubleMatrixData);
+    System.out.println("rdiv = " + answer3.toString());
+    
+    answer3 = foo.rdivide(new OGDoubleArray(10), ogFullsparseMatrixData);
+    System.out.println("rdiv = " + answer3.toString());
+    
+    answer3 = foo.rdivide(ogDoubleMatrixData, new OGSparseArray(new double [][] {{10}}));
+    System.out.println("rdiv full d single s = " + answer3.toString());
+    
+    answer3 = foo.rdivide(new OGDoubleArray(10), ogSparseMatrixData);
+    System.out.println("rdiv single d full s = " + answer3.toString());
+    
+    answer3 = foo.rdivide(ogDoubleMatrixData, ogSparseMatrixData);
+    System.out.println("rdiv full d full s = " + answer3.toString());          
+    
   }
 
 }
