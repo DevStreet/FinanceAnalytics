@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGDoubleArrayOGSparseArray extends PlusAbstract<OGDoubleArray, OGSparseArray> {
+public final class PlusOGDoubleArrayOGSparseArray extends PlusMinusAbstract<OGDoubleArray, OGSparseArray> {
   private static PlusOGDoubleArrayOGSparseArray s_instance = new PlusOGDoubleArrayOGSparseArray();
 
   public static PlusOGDoubleArrayOGSparseArray getInstance() {
@@ -26,7 +26,7 @@ public final class PlusOGDoubleArrayOGSparseArray extends PlusAbstract<OGDoubleA
 
   @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plus(OGDoubleArray array1, OGSparseArray array2) {
+  public OGArraySuper<Number> plusminus(OGDoubleArray array1, OGSparseArray array2, final int op) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -51,7 +51,7 @@ public final class PlusOGDoubleArrayOGSparseArray extends PlusAbstract<OGDoubleA
       retCols = columnsArray2;
       for (int ir = 0; ir < columnsArray2; ir++) {
         for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) { // loops through elements of correct column
-          tmp[rowIdx[i] + ir * rowsArray2] += data[i];
+          tmp[rowIdx[i] + ir * rowsArray2] +=  op * data[i];
         }
       }
       retArray = new OGDoubleArray(tmp, retRows, retCols);
@@ -63,7 +63,7 @@ public final class PlusOGDoubleArrayOGSparseArray extends PlusAbstract<OGDoubleA
       final double[] singleDouble = array2.getData();
       final double deref = singleDouble[0];
       for (int i = 0; i < n; i++) {
-        tmp[i] += deref;
+        tmp[i] = tmp[i] + op * deref;
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
@@ -79,7 +79,7 @@ public final class PlusOGDoubleArrayOGSparseArray extends PlusAbstract<OGDoubleA
       final double[] data = array2.getData();
       for (int ir = 0; ir < retCols; ir++) {
         for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) {
-          tmp[rowIdx[i] + ir * retRows] += data[i];
+          tmp[rowIdx[i] + ir * retRows] += op * data[i];
         }
       }
       retArray = new OGDoubleArray(tmp, retRows, retCols);

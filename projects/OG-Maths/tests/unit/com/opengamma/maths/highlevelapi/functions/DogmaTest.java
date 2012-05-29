@@ -74,7 +74,9 @@ public class DogmaTest {
     
     
     answer3 = foo.plus(ogSparseMatrixData, ogMoreSparseMatrixData);
-    System.out.println("Sparse Plus Sparse = " + baz.full(answer3).toString());    
+    System.out.println("Sparse Plus Sparse = " + baz.full(answer3).toString());
+    
+    System.out.println("Sparse minus Sparse = " + baz.full(foo.minus(answer3,ogMoreSparseMatrixData)).toString());    
   }
 
 }

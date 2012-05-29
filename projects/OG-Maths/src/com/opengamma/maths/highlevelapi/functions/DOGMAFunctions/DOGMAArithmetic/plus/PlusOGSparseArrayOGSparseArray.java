@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGSparseArrayOGSparseArray extends PlusAbstract<OGSparseArray, OGSparseArray> {
+public final class PlusOGSparseArrayOGSparseArray extends PlusMinusAbstract<OGSparseArray, OGSparseArray> {
   private static PlusOGSparseArrayOGSparseArray s_instance = new PlusOGSparseArrayOGSparseArray();
 
   public static PlusOGSparseArrayOGSparseArray getInstance() {
@@ -27,7 +27,7 @@ public final class PlusOGSparseArrayOGSparseArray extends PlusAbstract<OGSparseA
 
   @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plus(OGSparseArray array1, OGSparseArray array2) {
+  public OGArraySuper<Number> plusminus(OGSparseArray array1, OGSparseArray array2, final int op) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -69,7 +69,7 @@ public final class PlusOGSparseArrayOGSparseArray extends PlusAbstract<OGSparseA
       retCols = fullSparse.getNumberOfColumns();
       for (int ir = 0; ir < retCols; ir++) {
         for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) { // loops through elements of correct column
-          tmp[rowIdx[i] + ir * retRows] += data[i];
+          tmp[rowIdx[i] + ir * retRows] += op * data[i];
         }
       }
       retArray = new OGDoubleArray(tmp, retRows, retCols);
@@ -107,17 +107,17 @@ public final class PlusOGSparseArrayOGSparseArray extends PlusAbstract<OGSparseA
           rowFound1 = rowIdx1[i];
           rowFound2 = rowIdx2[j];
           if (rowFound1 < rowFound2) { // entry exists in stream 1
-            tmp[ptr] = data1[ptrd1];
+            tmp[ptr] = op * data1[ptrd1];
             newRowIdx[ptr] = rowFound1;
             ptrd1++;
             i++;
           } else if (rowFound1 > rowFound2) { // entry exists in stream 2
-            tmp[ptr] = data2[ptrd2];
+            tmp[ptr] = op * data2[ptrd2];
             newRowIdx[ptr] = rowFound2;
             ptrd2++;
             j++;
           } else { // entry exists in both streams
-            tmp[ptr] = data1[ptrd1] + data2[ptrd2];
+            tmp[ptr] = data1[ptrd1] + op * data2[ptrd2];
             newRowIdx[ptr] = rowFound1;
             ptrd1++;
             ptrd2++;
@@ -130,14 +130,14 @@ public final class PlusOGSparseArrayOGSparseArray extends PlusAbstract<OGSparseA
         // clean up as one col has more entries than the other.
         if (i < colPtr1[ir + 1]) {
           for (int k = i; k < colPtr1[ir + 1]; k++) {
-            tmp[ptr] = data1[ptrd1];
+            tmp[ptr] = op * data1[ptrd1];
             newRowIdx[ptr] = rowIdx1[k];
             ptr++;
             ptrd1++;
           }
         } else {
           for (int k = j; k < colPtr2[ir + 1]; k++) {
-            tmp[ptr] = data2[ptrd2];
+            tmp[ptr] = op * data2[ptrd2];
             newRowIdx[ptr] = rowIdx2[k];
             ptr++;
             ptrd2++;

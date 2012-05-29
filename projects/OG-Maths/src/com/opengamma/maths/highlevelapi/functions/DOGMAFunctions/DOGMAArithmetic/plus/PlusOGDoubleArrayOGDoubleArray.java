@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 /**
  * 
  */
-public final class PlusOGDoubleArrayOGDoubleArray extends PlusAbstract<OGDoubleArray, OGDoubleArray> {
+public final class PlusOGDoubleArrayOGDoubleArray extends PlusMinusAbstract<OGDoubleArray, OGDoubleArray> {
   private static PlusOGDoubleArrayOGDoubleArray s_instance = new PlusOGDoubleArrayOGDoubleArray();
 
   public static PlusOGDoubleArrayOGDoubleArray getInstance() {
@@ -26,7 +26,7 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusAbstract<OGDoubleA
 
   @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plus(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGArraySuper<Number> plusminus(OGDoubleArray array1, OGDoubleArray array2, final int op) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -45,7 +45,7 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusAbstract<OGDoubleA
       final double[] singleDouble = array1.getData();
       final double deref = singleDouble[0];
       for (int i = 0; i < n; i++) {
-        tmp[i] += deref;
+        tmp[i] = tmp[i] + op * deref;
       }
       retRows = rowsArray2;
       retCols = columnsArray2;
@@ -56,12 +56,12 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusAbstract<OGDoubleA
       final double[] singleDouble = array2.getData();
       final double deref = singleDouble[0];
       for (int i = 0; i < n; i++) {
-        tmp[i] += deref;
+        tmp[i] = tmp[i] + op * deref;
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
     } else {
-      _localblas.daxpy(n, 1e0, array2.getData(), 1, tmp, 1);
+      _localblas.daxpy(n, (double) op, array2.getData(), 1, tmp, 1);
       retRows = rowsArray1;
       retCols = columnsArray1;
     }

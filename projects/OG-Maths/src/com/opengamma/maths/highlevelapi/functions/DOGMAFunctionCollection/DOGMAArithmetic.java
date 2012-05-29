@@ -36,12 +36,16 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
 
   @Override
   public OGArraySuper<Number> minus(OGArraySuper<Number>... array) {
-    return null;
+    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+    for (int i = 1; i < array.length; i++) {
+      tmp = _plusMinus.minus(tmp, array[i]);
+    }
+    return tmp;
   }
 
   @Override
   public OGArraySuper<Number> minus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return null;
+    return _plusMinus.minus(array1, array2);
   }
 
   @Override
