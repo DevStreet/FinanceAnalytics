@@ -16,6 +16,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDoubleArrayOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDoubleArrayOGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGSparseArrayOGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGSparseArrayOGSparseArray;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 
@@ -29,12 +30,14 @@ public class PlusAndMinus {
    */
   private static Map<Pair<?, ?>, PlusAbstract<?, ?>> s_functionPointers = new HashMap<Pair<?, ?>, PlusAbstract<?, ?>>();
   static {
-    ObjectsPair<Class<?>, Class<?>> pairOGDoubleArrayPlusOGDoubleArray = new ObjectsPair<Class<?>, Class<?>>(OGDoubleArray.class, OGDoubleArray.class);
-    ObjectsPair<Class<?>, Class<?>> pairOGDoubleArrayPlusOGSparseArray = new ObjectsPair<Class<?>, Class<?>>(OGDoubleArray.class, OGSparseArray.class);
-    ObjectsPair<Class<?>, Class<?>> pairOGSparseArrayPlusOGDoubleArray = new ObjectsPair<Class<?>, Class<?>>(OGSparseArray.class, OGDoubleArray.class);    
-    s_functionPointers.put(pairOGDoubleArrayPlusOGDoubleArray, PlusOGDoubleArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGDoubleArrayPlusOGSparseArray, PlusOGDoubleArrayOGSparseArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayPlusOGDoubleArray, PlusOGSparseArrayOGDoubleArray.getInstance());    
+    ObjectsPair<Class<?>, Class<?>> pairOGDoubleArrayOGDoubleArray = new ObjectsPair<Class<?>, Class<?>>(OGDoubleArray.class, OGDoubleArray.class);
+    ObjectsPair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = new ObjectsPair<Class<?>, Class<?>>(OGDoubleArray.class, OGSparseArray.class);
+    ObjectsPair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = new ObjectsPair<Class<?>, Class<?>>(OGSparseArray.class, OGDoubleArray.class);
+    ObjectsPair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = new ObjectsPair<Class<?>, Class<?>>(OGSparseArray.class, OGSparseArray.class);    
+    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, PlusOGDoubleArrayOGDoubleArray.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, PlusOGDoubleArrayOGSparseArray.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, PlusOGSparseArrayOGDoubleArray.getInstance());    
+    s_functionPointers.put(pairOGSparseArrayOGSparseArray, PlusOGSparseArrayOGSparseArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

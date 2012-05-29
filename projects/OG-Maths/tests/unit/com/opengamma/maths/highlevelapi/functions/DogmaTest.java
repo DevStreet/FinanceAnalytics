@@ -71,6 +71,10 @@ public class DogmaTest {
 
     answer3 = foo.times(ogSparseMatrixData, ogMoreSparseMatrixData);
     System.out.println("Sparse Times Sparse = " + baz.full(answer3).toString());
+    
+    
+    answer3 = foo.plus(ogSparseMatrixData, ogMoreSparseMatrixData);
+    System.out.println("Sparse Plus Sparse = " + baz.full(answer3).toString());    
   }
 
 }
