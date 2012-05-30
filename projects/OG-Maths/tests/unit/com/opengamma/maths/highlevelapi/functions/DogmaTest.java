@@ -105,8 +105,7 @@ public class DogmaTest {
     
     answer3 = foo.rdivide(ogSparseMatrixData, ogDoubleMatrixData);
     System.out.println("rdiv full s full d = " + baz.full(answer3).toString());          
-    
-    
+        
     System.out.println("Sparse/Sparse");
     answer3 = foo.rdivide(new OGSparseArray(new double [][] {{10}}),ogSparseMatrixData);
     System.out.println("rdiv single s full s = " + baz.full(answer3).toString() + "Class is" + answer3.getClass().toString());
@@ -116,6 +115,19 @@ public class DogmaTest {
     
     answer3 = foo.rdivide(ogSparseMatrixData, ogMoreSparseMatrixData);
     System.out.println("rdiv full s full s = " + baz.full(answer3).toString());         
+   
+    System.out.println("MTIMES");
+    System.out.println("Dense * Dense");
+    System.out.println("Dense == "+ogDoubleMatrixData.toString());    
+    answer3 = foo.mtimes(new OGDoubleArray(new double [][] {{10}}),ogDoubleMatrixData);
+    System.out.println("mtimes single d full d = " + answer3.toString());
+    
+    answer3 = foo.mtimes(new OGDoubleArray(new double [][] {{10,20,30}}),ogDoubleMatrixData);
+    System.out.println("mtimes row vector d full d = " + answer3.toString());
+    
+    answer3 = foo.mtimes(ogDoubleMatrixData, new OGDoubleArray(new double [][] {{10},{20},{30},{40},{50}}));
+    System.out.println("mtimes full d col vector d = " + answer3.toString());        
+       
     
   }
 

@@ -14,16 +14,11 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesAbstract;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGDoubleArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times.TimesAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times.TimesOGDoubleArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times.TimesOGDoubleArrayOGSparseArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times.TimesOGSparseArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times.TimesOGSparseArrayOGSparseArray;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 
 /**
- * Element wise multiplication
+ * Full multiplication
  */
 public class Mtimes {
   /**
@@ -43,7 +38,7 @@ public class Mtimes {
     ObjectsPair<Class<?>, Class<?>> combo = new ObjectsPair<Class<?>, Class<?>>(array1.getClass(), array2.getClass());
     MtimesAbstract<T, S> use = (MtimesAbstract<T, S>) s_functionPointers.get(combo);
     if (use == null) {
-      throw new MathsExceptionNotImplemented("Times array class " + array1.getClass().toString() + " and " + array2.getClass().toString() + " is not yet implemented");
+      throw new MathsExceptionNotImplemented("Mtimes array class " + array1.getClass().toString() + " and " + array2.getClass().toString() + " is not yet implemented");
     }
     return use.mtimes(array1, array2);
   }

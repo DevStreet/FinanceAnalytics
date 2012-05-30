@@ -7,6 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Mtimes;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Rdivide;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
@@ -21,6 +22,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final Copy _copy = new Copy();
   private final Times _times = new Times();
   private Rdivide _rdivide = new Rdivide();
+  private Mtimes _mtimes = new Mtimes();
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
@@ -87,22 +89,27 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGDoubleArray mtimes(OGArraySuper<Number>... array) {
+  public OGArraySuper<Number> mtimes(OGArraySuper<Number>... array) {
     return null;
   }
 
   @Override
-  public OGDoubleArray power(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<Number> mtimes(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    return _mtimes.mtimes(array1, array2);
+  }
+
+  @Override
+  public OGArraySuper<Number> power(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return null;
   }
 
   @Override
-  public OGDoubleArray mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<Number> mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return null;
   }
 
   @Override
-  public OGDoubleArray tranpose(OGArraySuper<Number> array) {
+  public OGArraySuper<Number> tranpose(OGArraySuper<Number> array) {
     return null;
   }
 
