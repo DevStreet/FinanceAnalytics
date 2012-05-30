@@ -86,6 +86,7 @@ public class DogmaTest {
     answer3 = foo.rdivide(new OGDoubleArray(10), ogFullsparseMatrixData);
     System.out.println("rdiv = " + answer3.toString());
     
+    System.out.println("Dense / Sparse");
     answer3 = foo.rdivide(ogDoubleMatrixData, new OGSparseArray(new double [][] {{10}}));
     System.out.println("rdiv full d single s = " + answer3.toString());
     
@@ -93,7 +94,18 @@ public class DogmaTest {
     System.out.println("rdiv single d full s = " + answer3.toString());
     
     answer3 = foo.rdivide(ogDoubleMatrixData, ogSparseMatrixData);
-    System.out.println("rdiv full d full s = " + answer3.toString());          
+    System.out.println("rdiv full d full s = " + answer3.toString());
+    
+    System.out.println("Sparse/Dense");
+    answer3 = foo.rdivide(new OGSparseArray(new double [][] {{10}}),ogDoubleMatrixData);
+    System.out.println("rdiv single s full d = " + baz.full(answer3).toString());
+    
+    answer3 = foo.rdivide(ogSparseMatrixData, new OGDoubleArray(10));
+    System.out.println("rdiv full s single d = " + baz.full(answer3).toString());
+    
+    answer3 = foo.rdivide(ogSparseMatrixData, ogDoubleMatrixData);
+    System.out.println("rdiv full s full d = " + baz.full(answer3).toString());          
+    
     
   }
 

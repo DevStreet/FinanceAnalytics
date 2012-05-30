@@ -63,12 +63,8 @@ public final class RdivideOGSparseArrayOGDoubleArray extends RdivideAbstract<OGS
       tmp = new double[n];
       System.arraycopy(sparseData, 0, tmp, 0, n);
       final double deref = denseData[0];
-      for (int ir = 0; ir < retCols; ir++) {
-        denseOffset = ir * retRows;
-        for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) {
-          tmp[ptr] = sparseData[ptr] / deref;
-          ptr++;
-        }
+      for (int i = 0; i < n; i++) {
+        tmp[i] /= deref;
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
