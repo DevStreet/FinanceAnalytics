@@ -7,6 +7,9 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 
 import java.util.Arrays;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
+
 /**
  * 
  */
@@ -27,6 +30,23 @@ public class OGSparseArray extends OGArraySuper<Number> {
    * @param matrix is a double[][]
    */
   public OGSparseArray(double[][] matrix) {
+
+    if (MatrixPrimitiveUtils.isRagged(matrix)) {
+      throw new MathsExceptionIllegalArgument("Matrix representation must not be ragged, i.e. all rows must be the same length");
+    }
+
+    // check there is at least some data in the matrix.
+    boolean dataOK = false;
+    for (int i = 0; i < matrix.length; i++) {
+      for (int j = 0; j < matrix[i].length; j++) {
+        if (matrix[i][j] != 0.e0) {
+          dataOK = true;
+        }
+      }
+    }
+    if (!dataOK) {
+      throw new MathsExceptionIllegalArgument("Matrix representation has no non-zero values. Blank matrices are not allowed");
+    }
 
     final int rows = matrix.length;
     final int cols = matrix[0].length;
@@ -70,7 +90,7 @@ public class OGSparseArray extends OGArraySuper<Number> {
     _rows = rows;
     _cols = cols;
   }
-  
+
   /**
    * Construct from underlying CSC representation
    * @param colPtr the columns pointers
@@ -79,24 +99,23 @@ public class OGSparseArray extends OGArraySuper<Number> {
    * @param rows the number of rows
    * @param columns the number of columns
    */
-  public OGSparseArray(int [] colPtr, int [] rowIdx, double[] values, int rows, int columns) {
+  public OGSparseArray(int[] colPtr, int[] rowIdx, double[] values, int rows, int columns) {
     final int vlen = values.length;
     _values = new double[vlen];
     System.arraycopy(values, 0, _values, 0, vlen);
-    
+
     final int clen = colPtr.length;
     _colPtr = new int[clen];
     System.arraycopy(colPtr, 0, _colPtr, 0, clen);
-    
+
     final int rlen = rowIdx.length;
     _rowIdx = new int[rlen];
     System.arraycopy(rowIdx, 0, _rowIdx, 0, rlen);
-    
+
     _rows = rows;
     //TODO: Check columns == colPtr.length - 1
     _cols = columns;
   }
-  
 
   public double[] getFullColumn(int index) {
     double[] tmp = new double[_cols];
@@ -113,7 +132,6 @@ public class OGSparseArray extends OGArraySuper<Number> {
     }
     return tmp;
   }
-
 
   public int getNumberOfNonZeroElements() {
     return _values.length;
@@ -134,7 +152,7 @@ public class OGSparseArray extends OGArraySuper<Number> {
   public int[] getColumnPtr() {
     return _colPtr;
   }
-  
+
   /**
    * Gets the non-zero values in the matrix, i.e. the values that are worth storing
    * @return _values, the non-zero values
@@ -142,15 +160,15 @@ public class OGSparseArray extends OGArraySuper<Number> {
   public double[] getNonZeroElements() {
     return _values;
   }
-  
+
   /**
    * Gets the data backing
    * @return _values, the non-zero values
    */
   public double[] getData() {
     return _values;
-  }  
-  
+  }
+
   @Override
   public int getNumberOfRows() {
     return _rows;
