@@ -107,6 +107,16 @@ public class DogmaTest {
     System.out.println("rdiv full s full d = " + baz.full(answer3).toString());          
     
     
+    System.out.println("Sparse/Sparse");
+    answer3 = foo.rdivide(new OGSparseArray(new double [][] {{10}}),ogSparseMatrixData);
+    System.out.println("rdiv single s full s = " + baz.full(answer3).toString() + "Class is" + answer3.getClass().toString());
+    
+    answer3 = foo.rdivide(ogSparseMatrixData, new OGSparseArray(new double [][] {{10}}));
+    System.out.println("rdiv full s single s = " + baz.full(answer3).toString() + "Class is" + answer3.getClass().toString());   
+    
+    answer3 = foo.rdivide(ogSparseMatrixData, ogMoreSparseMatrixData);
+    System.out.println("rdiv full s full s = " + baz.full(answer3).toString());         
+    
   }
 
 }

@@ -16,6 +16,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGDoubleArrayOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGDoubleArrayOGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGSparseArrayOGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGSparseArrayOGSparseArray;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 
@@ -34,7 +35,8 @@ public class Rdivide {
     ObjectsPair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = new ObjectsPair<Class<?>, Class<?>>(OGSparseArray.class, OGSparseArray.class);
     s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, RdivideOGDoubleArrayOGDoubleArray.getInstance());
     s_functionPointers.put(pairOGDoubleArrayOGSparseArray, RdivideOGDoubleArrayOGSparseArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, RdivideOGSparseArrayOGDoubleArray.getInstance());     
+    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, RdivideOGSparseArrayOGDoubleArray.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGSparseArray, RdivideOGSparseArrayOGSparseArray.getInstance());         
   }
 
   @SuppressWarnings("unchecked")
@@ -42,7 +44,7 @@ public class Rdivide {
     ObjectsPair<Class<?>, Class<?>> combo = new ObjectsPair<Class<?>, Class<?>>(array1.getClass(), array2.getClass());
     RdivideAbstract<T, S> use = (RdivideAbstract<T, S>) s_functionPointers.get(combo);
     if (use == null) {
-      throw new MathsExceptionNotImplemented("Adding array class " + array1.getClass().toString() + " to " + array2.getClass().toString() + " is not yet implemented");
+      throw new MathsExceptionNotImplemented("Rdivide array class " + array1.getClass().toString() + " with " + array2.getClass().toString() + " is not yet implemented");
     }
     return use.rdivide(array1, array2);
   }
