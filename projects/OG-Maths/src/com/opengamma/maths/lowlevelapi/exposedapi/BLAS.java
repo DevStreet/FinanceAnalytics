@@ -89,6 +89,11 @@ public class BLAS implements BLASAPIInterface {
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
     _localBLAS.daxpy(n, alpha, x, incx, y, incy);
   }
+  
+  @Override
+  public void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
+    _localBLAS.daxpy(n, alpha, x, xOffset, incx, y, yOffset, incy);    
+  }  
 
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
@@ -119,6 +124,7 @@ public class BLAS implements BLASAPIInterface {
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc); 
   }
+
 
 
 }

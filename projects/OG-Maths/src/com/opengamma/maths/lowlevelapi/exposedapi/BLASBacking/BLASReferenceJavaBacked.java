@@ -64,6 +64,11 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
     Daxpy.daxpy(n, alpha, x, 0, incx, y, 0, incy);
   }
+  
+  @Override
+  public void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
+    Daxpy.daxpy(n, alpha, x, xOffset, incx, y, yOffset, incy);    
+  }  
 
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
@@ -94,6 +99,8 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     Dgemm.dgemm(transa, transb, m, n, k, alpha, aMatrix, 0, lda, bMatrix, 0, ldb, beta, cMatrix, 0, ldc);
   }
+
+
 
   
 

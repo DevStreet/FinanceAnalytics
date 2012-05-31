@@ -375,6 +375,21 @@ public interface BLASAPIInterface {
    * 
    */
   void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy);
+  
+  /**
+   * Provides BLAS LEVEL 1: DAXPY. Call contains offset parameters.
+   * See standard {@code daxpy} call for more information.
+   * 
+   * @param n the number of elements over which the operation is to be undertaken
+   * @param alpha the scaling factor
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param xOffset offset into the array x at which the operation should take place
+   * @param incx the increment between successive elements of 'x'
+   * @param y a vector of minimum dimension (n-1) * |incy| + 1.
+   * @param yOffset offset into the array y at which the operation should take place 
+   * @param incy the increment between successive elements of 'y'
+   */
+  void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy);  
 
   /**
    * Provides BLAS LEVEL 1: DDOT.
