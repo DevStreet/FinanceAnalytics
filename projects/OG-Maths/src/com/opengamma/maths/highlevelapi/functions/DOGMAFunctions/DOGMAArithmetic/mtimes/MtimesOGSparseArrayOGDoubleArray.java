@@ -14,21 +14,21 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGDoubleArrayOGSparseArray extends MtimesAbstract<OGDoubleArray, OGSparseArray> {
-  private static MtimesOGDoubleArrayOGSparseArray s_instance = new MtimesOGDoubleArrayOGSparseArray();
+public final class MtimesOGSparseArrayOGDoubleArray extends MtimesAbstract<OGSparseArray, OGDoubleArray> {
+  private static MtimesOGSparseArrayOGDoubleArray s_instance = new MtimesOGSparseArrayOGDoubleArray();
 
-  public static MtimesOGDoubleArrayOGSparseArray getInstance() {
+  public static MtimesOGSparseArrayOGDoubleArray getInstance() {
     return s_instance;
   }
 
-  private MtimesOGDoubleArrayOGSparseArray() {
+  private MtimesOGSparseArrayOGDoubleArray() {
   }
 
   private BLAS _localblas = new BLAS();
 
   @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> mtimes(OGDoubleArray array1, OGSparseArray array2) {
+  public OGArraySuper<Number> mtimes(OGSparseArray array1, OGDoubleArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -38,36 +38,36 @@ public final class MtimesOGDoubleArrayOGSparseArray extends MtimesAbstract<OGDou
     final int rowsArray2 = array2.getNumberOfRows();
     final double[] data1 = array1.getData();
     final double[] data2 = array2.getData();
-    final int[] colPtr2 = array2.getColumnPtr();
-    final int[] rowIdx2 = array2.getRowIndex();
+    final int[] colPtr1 = array1.getColumnPtr();
+    final int[] rowIdx1 = array1.getRowIndex();
 
     double[] tmp = null;
     int n = 0;
     OGArraySuper<Number> ret = null;
 
-    if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * sparse matrix
+    if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * dense matrix
       final double deref = data1[0];
       n = data2.length;
       tmp = new double[n];
       System.arraycopy(data2, 0, tmp, 0, n);
       _localblas.dscal(n, deref, tmp, 1);
-      ret = new OGSparseArray(colPtr2, rowIdx2, tmp, rowsArray2, colsArray2);
-    } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have dense matrix * sparse scalar
+      ret = new OGDoubleArray(tmp, rowsArray2, colsArray2);
+    } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have sparse matrix * dense scalar
       final double deref = data2[0];
       n = data1.length;
       tmp = new double[n];
       System.arraycopy(data1, 0, tmp, 0, n);
       _localblas.dscal(n, deref, tmp, 1);
-      ret = new OGDoubleArray(tmp, rowsArray1, colsArray1);
+      ret = new OGSparseArray(colPtr1, rowIdx1, tmp, rowsArray1, colsArray1);
     } else {
       Catchers.catchBadCommute(colsArray1, "Columns in first array", rowsArray2, "Rows in second array");
       // TODO: refactor these calls into a SparseBLAS.
       if (colsArray2 == 1) { // A*x
         tmp = new double[rowsArray1];
         int ptr = 0;
-        for (int ir = 0; ir < colsArray2; ir++) {
-          for (int i = colPtr2[ir]; i < colPtr2[ir + 1]; i++) {
-            _localblas.daxpy(rowsArray1, data2[ptr], data1, rowIdx2[ptr] * rowsArray1, 1, tmp, 0, 1);
+        for (int i = 0; i < colsArray1; i++) {
+          for (int j = colPtr1[i]; j < colPtr1[i + 1]; j++) {
+            tmp[rowIdx1[ptr]] += data1[ptr] * data2[i];
             ptr++;
           }
         }
@@ -75,17 +75,24 @@ public final class MtimesOGDoubleArrayOGSparseArray extends MtimesAbstract<OGDou
       } else {
         final int fm = rowsArray1;
         final int fn = colsArray2;
-        double[] cMatrix = new double[fm * fn];
+        double[] cMatrix = new double[fm * fn]; // will be resized
 
-        //form C col wise, offset daxpy
-        int ptr = 0;
-        for (int ir = 0; ir < colsArray2; ir++) {
-          for (int i = colPtr2[ir]; i < colPtr2[ir + 1]; i++) {
-            _localblas.daxpy(rowsArray1, data2[ptr], data1, rowIdx2[ptr] * rowsArray1, 1, cMatrix, ir * rowsArray1, 1);
-            ptr++;
+        // C = A * B
+        // non-zero pattern in columns of C is given by the intersection of all rows of A with columns of B. As B is dense intersection is assumed.
+        int jmp1, jmp2;
+        for (int icol = 0; icol < fm; icol++) {
+          jmp2 = icol * rowsArray2;
+          jmp1 = icol * fm;
+          int ptr = 0;
+          for (int i = 0; i < colsArray1; i++) {
+            for (int j = colPtr1[i]; j < colPtr1[i + 1]; j++) {
+              cMatrix[jmp1 + rowIdx1[ptr]] += data1[ptr] * data2[i + jmp2];
+              ptr++;
+            }
           }
         }
         ret = new OGDoubleArray(cMatrix, fm, fn);
+
       }
     }
     return ret;
