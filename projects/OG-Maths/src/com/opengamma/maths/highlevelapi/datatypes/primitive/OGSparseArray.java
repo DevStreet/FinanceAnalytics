@@ -196,7 +196,10 @@ public class OGSparseArray extends OGArraySuper<Number> {
     return "\nvalues=" + Arrays.toString(_values) +
         "\nrowInd=" + Arrays.toString(_rowIdx) +
         "\ncolPtr=" + Arrays.toString(_colPtr) +
+        "\ncols=" + _rows+
+        "\nrows=" + _cols+
         "\nels=" + _els;
+
   }
 
   @Override
