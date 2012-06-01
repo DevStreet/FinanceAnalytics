@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
@@ -41,8 +42,15 @@ public class Times {
 
   @SuppressWarnings("unchecked")
   public <T extends OGArraySuper<Number>, S extends OGArraySuper<Number>> OGArraySuper<Number> times(T array1, S array2) {
+    if (array1 == null) {
+      throw new MathsExceptionNullPointer("Null pointer passed in argument 1");
+    }
+    if (array2 == null) {
+      throw new MathsExceptionNullPointer("Null pointer passed in argument 2");
+    }    
     ObjectsPair<Class<?>, Class<?>> combo = new ObjectsPair<Class<?>, Class<?>>(array1.getClass(), array2.getClass());
     TimesAbstract<T, S> use = (TimesAbstract<T, S>) s_functionPointers.get(combo);
+    
     if (use == null) {
       throw new MathsExceptionNotImplemented("Times array class " + array1.getClass().toString() + " and " + array2.getClass().toString() + " is not yet implemented");
     }
