@@ -10,7 +10,6 @@ import java.util.Arrays;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 
 /**
  * Does elementwise OGSparse * OGSparse
@@ -25,8 +24,7 @@ public final class RdivideOGSparseArrayOGSparseArray extends RdivideAbstract<OGS
   private RdivideOGSparseArrayOGSparseArray() {
   }
 
-  private BLAS _localblas = new BLAS();
-
+  
   @SuppressWarnings("unchecked")
   @Override
   public OGArraySuper<Number> rdivide(OGSparseArray array1, OGSparseArray array2) {
