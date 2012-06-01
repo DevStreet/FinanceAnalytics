@@ -30,6 +30,23 @@ public interface DOGMAArithmeticAPI {
    * @return the sum of the arrays 
    */
   OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
+  
+  /**
+   * Adds a number to an OGArraySuper<Number> array
+   * @param array1 the first array
+   * @param number the number
+   * @return array1 plus a number
+   */
+  OGArraySuper<Number> plus(OGArraySuper<Number> array1, double number);
+  
+  /**
+   * Adds a number to an OGArraySuper<Number> array
+   * @param array1 the first array
+   * @param number the number
+   * @return array1 plus a number 
+   */
+  OGArraySuper<Number> plus(OGArraySuper<Number> array1, int number);  
+  
 
   /* SUBTRACT */
   /**
@@ -48,8 +65,24 @@ public interface DOGMAArithmeticAPI {
    * @return array1 - array2
    */
   OGArraySuper<Number> minus(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
+  
+  /**
+   * Subtracts a number to an OGArraySuper<Number> array
+   * @param array1 the first array
+   * @param number the number
+   * @return array1 minus a number
+   */
+  OGArraySuper<Number> minus(OGArraySuper<Number> array1, double number);
+  
+  /**
+   * Subtracts a number to an OGArraySuper<Number> array
+   * @param array1 the first array
+   * @param number the number
+   * @return array1 minus a number 
+   */
+  OGArraySuper<Number> minus(OGArraySuper<Number> array1, int number);    
 
-  /* DIVIDE */
+  /* LDIVIDE */
   /**
    * Element by element left division
    * @param array1 the first array
@@ -66,6 +99,8 @@ public interface DOGMAArithmeticAPI {
    */
   OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
+  
+  /* RDIVIDE */
   /**
    * Element by element right division
    * @param array1 the first array
@@ -75,6 +110,23 @@ public interface DOGMAArithmeticAPI {
   OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
   /**
+   * Element by element right division
+   * @param array1 the first array
+   * @param number the number
+   * @return array1 rdivided element-wise by a number. i.e. array1./number
+   */
+  OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, double number);  
+
+  /**
+   * Element by element right division
+   * @param array1 the first array
+   * @param number the number
+   * @return array1 rdivided element-wise by a number. i.e. array1./number
+   */
+  OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number);  
+  
+  /* MRDIVIDE */
+  /**
    * Right division, which effectively returns x = inverse(A)*b
    * If A is not square a minimum norm solution is returned.
    * @param matrixA the first array
@@ -83,7 +135,7 @@ public interface DOGMAArithmeticAPI {
    */
   OGArraySuper<Number> mrdivide(OGArraySuper<Number> matrixA, OGArraySuper<Number> vectorb);
 
-  /* MULTIPLY */
+  /* TIMES */
   /**
    * Element wise multiplication. For more than two inputs it returns the multiplications
    * applied and accumulated from left to right, e.g.
@@ -97,10 +149,27 @@ public interface DOGMAArithmeticAPI {
    * Element wise multiplication. of two OGArray arrays
    * @param array1 the first array
    * @param array2 the second array
-   * @return the element wise produce of the arrays 
+   * @return the element wise product of the arrays 
    */
   OGArraySuper<Number> times(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
 
+  /**
+   * Element wise multiplication of OGArray with a number
+   * @param array1 the first array
+   * @param number a number
+   * @return the element wise product of the arrays with the number 
+   */
+  OGArraySuper<Number> times(OGArraySuper<Number> array1, double number);
+  
+  /**
+   * Element wise multiplication of OGArray with a number
+   * @param array1 the first array
+   * @param number a number
+   * @return the element wise product of the arrays with the number 
+   */
+  OGArraySuper<Number> times(OGArraySuper<Number> array1, int number);
+  
+  /* MTIMES */
   /**
    * Matrix multiplication. For more two inputs it returns the multiplications
    * applied and accumulated from left to right, e.g.
@@ -110,7 +179,7 @@ public interface DOGMAArithmeticAPI {
    * @return the cumulative product of array multiplication
    */
   OGArraySuper<Number> mtimes(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
-
+  
   /**
    * Matrix multiplication. For more than two inputs it returns the multiplications
    * applied and accumulated from left to right, e.g.
@@ -143,6 +212,6 @@ public interface DOGMAArithmeticAPI {
    * @param array the array to transpose
    * @return the transpose of the array
    */
-  OGArraySuper<Number> tranpose(OGArraySuper<Number> array);
+  OGArraySuper<Number> transpose(OGArraySuper<Number> array);
 
 }

@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Mtimes;
@@ -24,6 +25,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private Rdivide _rdivide = new Rdivide();
   private Mtimes _mtimes = new Mtimes();
 
+  /* ADD */
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
     OGArraySuper<Number> tmp = _copy.copy(array[0]);
@@ -39,6 +41,17 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
+  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
+    return plus(array1, new OGDoubleArray(aNumber));
+  }
+
+  @Override
+  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, int aNumber) {
+    return plus(array1, new OGDoubleArray(aNumber));
+  }
+
+  /* SUBTRACT */
+  @Override
   public OGArraySuper<Number> minus(OGArraySuper<Number>... array) {
     OGArraySuper<Number> tmp = _copy.copy(array[0]);
     for (int i = 1; i < array.length; i++) {
@@ -53,14 +66,30 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> ldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return null;
+  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, double aNumber) {
+    return minus(array1, new OGDoubleArray(aNumber));
   }
 
   @Override
-  public OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return null;
+  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, int aNumber) {
+    return minus(array1, new OGDoubleArray(aNumber));
   }
+
+  /* LDIVIDE */
+
+  @Override
+  public OGArraySuper<Number> ldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    throw new MathsExceptionNotImplemented("ldivide not implemented yet");
+  }
+
+  /* MLDIVIDE */
+
+  @Override
+  public OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    throw new MathsExceptionNotImplemented("mldivide not implemented yet");
+  }
+
+  /* RDIVIDE */
 
   @Override
   public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
@@ -68,15 +97,26 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> mrdivide(OGArraySuper<Number> matrixA, OGArraySuper<Number> vectorb) {
-    return null;
+  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, double number) {
+    return _rdivide.rdivide(array1, new OGDoubleArray(number));
   }
 
   @Override
+  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number) {
+    return _rdivide.rdivide(array1, new OGDoubleArray(number));
+  }
+
+  /* MRDIVIDE */
+
+  @Override
+  public OGArraySuper<Number> mrdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+    throw new MathsExceptionNotImplemented("mrdivide not implemented yet");
+  }
+
+  /* TIMES */
+  @Override
   public OGArraySuper<Number> times(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    OGArraySuper<Number> tmp = _copy.copy(array1);
-    tmp = _times.times(tmp, array2);
-    return tmp;
+    return _times.times(array1, array2);
   }
 
   @Override
@@ -87,10 +127,25 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
     }
     return tmp;
   }
+  
+  @Override
+  public OGArraySuper<Number> times(OGArraySuper<Number> array1, double number) {
+    return _times.times(array1, new OGDoubleArray(number));
+  }
 
   @Override
+  public OGArraySuper<Number> times(OGArraySuper<Number> array1, int number) {
+    return _times.times(array1, new OGDoubleArray(number));
+  }
+
+  /* MTIMES */
+  @Override
   public OGArraySuper<Number> mtimes(OGArraySuper<Number>... array) {
-    return null;
+    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+    for (int i = 1; i < array.length; i++) {
+      tmp = _mtimes.mtimes(tmp, array[i]);
+    }
+    return tmp;
   }
 
   @Override
@@ -98,29 +153,24 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
     return _mtimes.mtimes(array1, array2);
   }
 
+  /* POWER */
   @Override
   public OGArraySuper<Number> power(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return null;
+    throw new MathsExceptionNotImplemented("power not implemented yet");
   }
 
+  /* MPOWER */
   @Override
   public OGArraySuper<Number> mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return null;
+    throw new MathsExceptionNotImplemented("mpower not implemented yet");
   }
 
+  /* TRANSPOSE */
   @Override
-  public OGArraySuper<Number> tranpose(OGArraySuper<Number> array) {
-    return null;
+  public OGArraySuper<Number> transpose(OGArraySuper<Number> array) {
+    throw new MathsExceptionNotImplemented("transpose not implemented yet");
   }
 
-  /**
-   * Adds a double to an array
-   * @param array1 the array to add to
-   * @param aNumber the double
-   * @return the array plus element-wise a double
-   */
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
-    return plus(array1, new OGDoubleArray(aNumber));
-  }
+
 
 }
