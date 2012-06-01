@@ -8,7 +8,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import java.util.Arrays;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -82,7 +81,6 @@ public final class MtimesOGSparseArrayOGSparseArray extends MtimesAbstract<OGSpa
           rhs[rowIdx2[array2ptr]] = data2[array2ptr];
           array2ptr++;
         }
-        System.out.println("rhs col " + icol + " = " + Arrays.toString(rhs));
 
         // sparse dgemv
         tmp = new double[rowsArray1];
@@ -94,7 +92,6 @@ public final class MtimesOGSparseArrayOGSparseArray extends MtimesAbstract<OGSpa
           }
         }
 
-        System.out.println("dgemv col " + icol + " = " + Arrays.toString(tmp));
         // compress dgemv result and update pointers
         for (int i = 0; i < rowsArray1; i++) {
           if (tmp[i] != 0.e0) {
