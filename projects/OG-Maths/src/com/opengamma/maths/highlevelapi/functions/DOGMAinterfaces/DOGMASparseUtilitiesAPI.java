@@ -11,8 +11,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * 
  */
 public interface DOGMASparseUtilitiesAPI {
-  /* ADD */
-
   /**
    * Returns a full matrix. I.e. one will all the entries filled.
    * @param array a matrix to turn into a full matrix
