@@ -425,6 +425,21 @@ public interface BLASAPIInterface {
   double ddot(int n, double[] x, int incx, double[] y, int incy);
 
   /**
+   * Provides BLAS LEVEL 1: DDOT.Call contains offset parameters.
+   * See standard {@code daxpy} call for more information.
+   * @param n the number of elements to be used in forming the dot product.
+   * @param x first vector, minimum dimension (n-1) * |incx| + 1.
+   * @param xOffset offset into the array x at which the operation should take place 
+   * @param incx the increment between successive elements of 'x'
+   * @param y second vector, minimum dimension (n-1) * |incy| + 1.
+   * @param incy the increment between successive elements of 'y'
+   * @param yOffset offset into the array y at which the operation should take place
+   * @return dot product of x and y over the selected elements
+   *
+   */
+  double ddot(int n, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy);
+  
+  /**
    * Provides BLAS LEVEL 1: DNRM2
    * DNRM2 performs the following vector operation
    *

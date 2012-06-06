@@ -101,6 +101,11 @@ public class BLAS implements BLASAPIInterface {
   }
 
   @Override
+  public double ddot(int n, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
+    return _localBLAS.ddot(n, x, xOffset, incx, y, yOffset, incy);
+  }
+  
+  @Override
   public double dnrm2(int n, double[] x, int incx) {
     return _localBLAS.dnrm2(n, x, incx);
   }
