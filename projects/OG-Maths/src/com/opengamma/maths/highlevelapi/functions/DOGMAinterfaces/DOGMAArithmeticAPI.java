@@ -169,6 +169,22 @@ public interface DOGMAArithmeticAPI {
    */
   OGArraySuper<Number> times(OGArraySuper<Number> array1, int number);
   
+  /**
+   * Element wise multiplication of OGArray with a number
+   * @param number a number
+   * @param array1 the first array
+   * @return the element wise product of the arrays with the number 
+   */
+  OGArraySuper<Number> times(double number, OGArraySuper<Number> array1);
+
+  /**
+   * Element wise multiplication of OGArray with a number
+   * @param number a number
+   * @param array1 the first array
+   * @return the element wise product of the arrays with the number 
+   */
+  OGArraySuper<Number> times(int number, OGArraySuper<Number> array1);  
+  
   /* MTIMES */
   /**
    * Matrix multiplication. For more two inputs it returns the multiplications
@@ -213,5 +229,6 @@ public interface DOGMAArithmeticAPI {
    * @return the transpose of the array
    */
   OGArraySuper<Number> transpose(OGArraySuper<Number> array);
+
 
 }

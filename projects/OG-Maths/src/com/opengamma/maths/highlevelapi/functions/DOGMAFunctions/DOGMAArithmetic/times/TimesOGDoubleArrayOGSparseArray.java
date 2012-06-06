@@ -9,6 +9,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does elementwise OGDouble * OGSparse
@@ -28,7 +29,8 @@ public final class TimesOGDoubleArrayOGSparseArray extends TimesAbstract<OGDoubl
   @SuppressWarnings("unchecked")
   @Override
   public OGArraySuper<Number> times(OGDoubleArray array1, OGSparseArray array2) {
-
+    Catchers.catchNullFromArgList(array1, 1);
+    Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
     // else ew mul.
     int rowsArray1 = array1.getNumberOfRows();
@@ -65,6 +67,8 @@ public final class TimesOGDoubleArrayOGSparseArray extends TimesAbstract<OGDoubl
       ret = new OGDoubleArray(tmp, retRows, retCols);
 
     } else { // ew mul. Dense * Sparse -> Sparse scaled by dense entries
+      Catchers.catchBadCommute(columnsArray1, "Columns in first array", columnsArray2, "Columns in second array");
+      Catchers.catchBadCommute(rowsArray1, "Rows in first array", rowsArray2, "Rows in second array");            
       retRows = rowsArray1;
       retCols = columnsArray1;
       n = array2.getData().length;

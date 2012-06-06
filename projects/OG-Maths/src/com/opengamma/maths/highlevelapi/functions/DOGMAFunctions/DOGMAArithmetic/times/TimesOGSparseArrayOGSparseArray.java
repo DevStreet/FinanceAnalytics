@@ -10,6 +10,7 @@ import java.util.Arrays;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does elementwise OGSparse * OGSparse
@@ -29,7 +30,8 @@ public final class TimesOGSparseArrayOGSparseArray extends TimesAbstract<OGSpars
   @SuppressWarnings("unchecked")
   @Override
   public OGArraySuper<Number> times(OGSparseArray array1, OGSparseArray array2) {
-
+    Catchers.catchNullFromArgList(array1, 1);
+    Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
     // else ew mul.
     int rowsArray1 = array1.getNumberOfRows();
@@ -65,7 +67,9 @@ public final class TimesOGSparseArrayOGSparseArray extends TimesAbstract<OGSpars
       retCols = columnsArray1;
       ret = new OGSparseArray(array1.getColumnPtr(), array1.getRowIndex(), tmp, retRows, retCols);
 
-    } else { // ew mul. Sparse * Sparse -> Sparse scaled by Sparse entries. So intersection of 
+    } else { // ew mul. Sparse * Sparse -> Sparse scaled by Sparse entries. So intersection of
+      Catchers.catchBadCommute(columnsArray1, "Columns in first array", columnsArray2, "Columns in second array");
+      Catchers.catchBadCommute(rowsArray1, "Rows in first array", rowsArray2, "Rows in second array");      
       retRows = rowsArray1;
       retCols = columnsArray1;
 
@@ -90,9 +94,9 @@ public final class TimesOGSparseArrayOGSparseArray extends TimesAbstract<OGSpars
       for (int ir = 0; ir < retCols; ir++) { // walk in columns
         newColptr[ir] = ptr;
         shift = colPtr2[ir];
-        for (int i = colPtr1[ir]; i <= colPtr1[ir + 1] - 1; i++) { // this column array1
+        for (int i = colPtr1[ir]; i < colPtr1[ir + 1]; i++) { // this column array1
           ridx1 = rowIdx1[i];
-          for (int j = shift; j <= colPtr2[ir + 1] - 1; j++) { // this column array2
+          for (int j = shift; j < colPtr2[ir + 1]; j++) { // this column array2
             ridx2 = rowIdx2[j];
             if (ridx1 == ridx2) { // match found, store break, shift lower index for next cycle
               tmp[ptr] = data1[i] * data2[j];

@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.checkers;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 
 /**
@@ -262,7 +262,7 @@ public class Catchers {
    */
   public static void catchBadCommute(int dim1, String varName1, int dim2, String varName2) {
     if (dim1 != dim2) {
-      throw new MathsExceptionIllegalArgument(varName1 + " (" + dim1 + ") and " + varName2 + " (" + dim1 + ") do not commute. STOPPING");
+      throw new MathsExceptionNonConformance(varName1 + " (" + dim1 + ") and " + varName2 + " (" + dim1 + ") do not commute. STOPPING");
     }
   }
 

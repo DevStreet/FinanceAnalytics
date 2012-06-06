@@ -137,6 +137,16 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> times(OGArraySuper<Number> array1, int number) {
     return _times.times(array1, new OGDoubleArray(number));
   }
+  
+  @Override
+  public OGArraySuper<Number> times(double number, OGArraySuper<Number> array1) {
+    return _times.times(array1, new OGDoubleArray(number));
+  }
+
+  @Override
+  public OGArraySuper<Number> times(int number, OGArraySuper<Number> array1) {
+    return _times.times(array1, new OGDoubleArray(number));
+  }  
 
   /* MTIMES */
   @Override
@@ -170,7 +180,6 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> transpose(OGArraySuper<Number> array) {
     throw new MathsExceptionNotImplemented("transpose not implemented yet");
   }
-
 
 
 }
