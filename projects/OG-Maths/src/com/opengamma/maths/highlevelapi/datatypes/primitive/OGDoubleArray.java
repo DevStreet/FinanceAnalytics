@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
@@ -56,7 +57,6 @@ public class OGDoubleArray extends OGArraySuper<Number> {
     _columns = columns;
   }
 
-
   /**
    * @param number the single number in this array
    */
@@ -66,7 +66,6 @@ public class OGDoubleArray extends OGArraySuper<Number> {
     _data = new double[1];
     _data[0] = number;
   }
-
 
   @Override
   public int getNumberOfRows() {
@@ -80,7 +79,16 @@ public class OGDoubleArray extends OGArraySuper<Number> {
 
   @Override
   public Double getEntry(int... indices) {
-    return null;
+    if (indices.length > 2) {
+      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
+    }
+    if (indices[0] >= _rows) {
+      throw new MathsExceptionOutOfBounds("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
+    }
+    if (indices[1] >= _columns) {
+      throw new MathsExceptionOutOfBounds("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
+    }
+    return _data[indices[0] * _rows + indices[1]];
   }
 
   public OGDoubleArray getFullRow(int index) {
