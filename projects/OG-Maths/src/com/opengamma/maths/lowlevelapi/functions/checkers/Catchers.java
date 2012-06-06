@@ -266,4 +266,8 @@ public class Catchers {
     }
   }
 
+  public static void catchBadCommute(String message) {
+    throw new MathsExceptionNonConformance("Problem with arrays not commuting. STOPPING. Error message is:" + message);
+  }
+
 }
