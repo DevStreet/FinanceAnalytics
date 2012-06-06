@@ -105,6 +105,16 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number) {
     return _rdivide.rdivide(array1, new OGDoubleArray(number));
   }
+  
+  @Override
+  public OGArraySuper<Number> rdivide(double number, OGArraySuper<Number> array1) {
+    return _rdivide.rdivide(new OGDoubleArray(number), array1);
+  }
+
+  @Override
+  public OGArraySuper<Number> rdivide(int number, OGArraySuper<Number> array1) {
+    return _rdivide.rdivide(new OGDoubleArray(number), array1);
+  }  
 
   /* MRDIVIDE */
 

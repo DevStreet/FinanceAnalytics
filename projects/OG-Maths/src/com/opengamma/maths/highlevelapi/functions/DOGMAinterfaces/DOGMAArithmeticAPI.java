@@ -124,6 +124,23 @@ public interface DOGMAArithmeticAPI {
    * @return array1 rdivided element-wise by a number. i.e. array1./number
    */
   OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number);  
+
+  /**
+   * Element by element right division
+   * @param number the number
+   * @param array1 the first array 
+   * @return number is broadcast and then rdivided element-wise by array1. i.e. number/array1
+   */
+  OGArraySuper<Number> rdivide(double number, OGArraySuper<Number> array1);  
+
+  /**
+   * Element by element right division
+   * @param number the number
+   * @param array1 the first array
+   * @return array1 is broadcast and then rdivided element-wise by array1
+   */
+  OGArraySuper<Number> rdivide(int number, OGArraySuper<Number> array1);    
+  
   
   /* MRDIVIDE */
   /**

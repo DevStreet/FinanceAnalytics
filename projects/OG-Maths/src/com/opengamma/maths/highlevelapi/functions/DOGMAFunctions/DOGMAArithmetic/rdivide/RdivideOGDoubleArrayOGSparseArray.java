@@ -49,20 +49,24 @@ public final class RdivideOGDoubleArrayOGSparseArray extends RdivideAbstract<OGD
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued DenseMatrix rdivide Sparse
       n = rowsArray2 * columnsArray2;
+      retRows = rowsArray2;
+      retCols = columnsArray2;
       tmp = new double[n];
       final double deref = denseData[0];
-      Arrays.fill(tmp, Double.POSITIVE_INFINITY);
+      if (deref != deref) {
+        Arrays.fill(tmp, Double.NaN);
+      } else {
+        Arrays.fill(tmp, Double.POSITIVE_INFINITY);
+      }
       for (int ir = 0; ir < retCols; ir++) {
         denseOffset = ir * retRows;
-        for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) {
-          tmp[ptr] = deref / sparseData[ptr];
+        for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) {
+          tmp[denseOffset + rowIdx[i]] = deref / sparseData[ptr];
           ptr++;
         }
       }
-      retRows = rowsArray2;
-      retCols = columnsArray2;
       ret = new OGDoubleArray(tmp, retRows, retCols);
-    } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Dense matrix times Single valued sparse = scaled dense
+    } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Dense matrix rdiv Single valued sparse 
       n = denseData.length;
       tmp = new double[n];
       System.arraycopy(denseData, 0, tmp, 0, n);
@@ -80,7 +84,14 @@ public final class RdivideOGDoubleArrayOGSparseArray extends RdivideAbstract<OGD
       retCols = columnsArray1;
       n = array1.getData().length;
       tmp = new double[n];
-      Arrays.fill(tmp, Double.POSITIVE_INFINITY);
+      // whizz through array1, look for NaN, if it is present then we set tmp accordingly, this is so IEEE NaN/number -> NaN is implemented correctly.
+      // at the same time copysign of full matrix entry to inf so that sign is preserved
+      for (int i = 0; i < denseData.length; i++) {
+        tmp[i] = Math.copySign(Double.POSITIVE_INFINITY, denseData[i]);
+        if (denseData[i] != denseData[i]) {
+          tmp[i] = Double.NaN;
+        }
+      }
       for (int ir = 0; ir < retCols; ir++) {
         denseOffset = ir * retRows;
         for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) {
