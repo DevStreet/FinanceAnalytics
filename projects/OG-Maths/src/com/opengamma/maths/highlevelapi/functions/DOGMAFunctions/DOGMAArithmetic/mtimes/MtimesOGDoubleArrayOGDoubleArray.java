@@ -59,7 +59,6 @@ public final class MtimesOGDoubleArrayOGDoubleArray extends MtimesAbstract<OGDou
     } else {
       Catchers.catchBadCommute(colsArray1, "Columns in first array", rowsArray2, "Rows in second array");
       if (colsArray2 == 1) { // A*x
-        System.out.println("dgemv n");
         tmp = new double[rowsArray1];
         // dgemv(trans, m, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
         _localblas.dgemv('N', rowsArray1, colsArray1, 1.0, data1, rowsArray1, data2, 1, 0.e0, tmp, 1);
