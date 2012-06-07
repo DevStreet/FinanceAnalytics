@@ -54,7 +54,7 @@ public final class DotOGDoubleArrayOGDoubleArray extends DotAbstract<OGDoubleArr
         jmp = i * rowsArray1;
         tmp[i] = _localblas.ddot(rowsArray1, dataArray1, jmp, 1, dataArray2, jmp, 1);
       }
-
+      dot = new OGDoubleArray(tmp, retRows, retCols);
     } else {
       Catchers.catchBadCommute("Arrays must be the same size for vectorised dot product. Array1 is [" + rowsArray1 + "," + columnsArray1 + "], Array2 is [" + rowsArray2 + "," + columnsArray2 + "]");
     }
