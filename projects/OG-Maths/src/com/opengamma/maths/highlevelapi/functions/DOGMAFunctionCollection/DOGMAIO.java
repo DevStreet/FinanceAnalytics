@@ -16,10 +16,28 @@ public class DOGMAIO implements DOGMAIOAPI {
 
   private SmartImport _si = new SmartImport();
 
-  @Override
-  public OGArraySuper<Number> smartImport(double[][] aMatrix) {
-    return _si.fromNativeDoubleMatrix(aMatrix);
+  /**
+   * describes the orientation of a vector on import
+   */
+  public enum orientation {
+    /** row vector */
+    row,
+    /** column vector */
+    column
   }
 
-}
+  @Override
+  public OGArraySuper<Number> smartImport(double[][] aMatrix) {
+    return _si.fromNativeDoubleDouble(aMatrix);
+  }
 
+  @Override
+  public OGArraySuper<Number> smartImport(double[] aMatrix, orientation o) {
+    return _si.fromNativeDouble(aMatrix, o);
+  }
+
+  public OGArraySuper<Number> smartImport(double[] aMatrix) {   
+    return _si.fromNativeDouble(aMatrix, orientation.column);
+  }  
+  
+}
