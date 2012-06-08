@@ -15,6 +15,8 @@ public class Catchers {
 
   // general complaints about null
 
+
+  
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -140,6 +142,17 @@ public class Catchers {
       throw new MathsExceptionNullPointer("Array points to NULL. STOPPING");
     }
   }
+  
+  /**
+   * Catches null pointer
+   * @param thisArray the array to check
+   * @param varName the literal name of the variable so that the error string makes sense 
+   */
+  public static void catchNull(double[][] thisArray, String varName) {
+    if (thisArray == null) {
+      throw new MathsExceptionNullPointer("Array " + varName + " points to NULL. STOPPING");
+    }
+  }  
 
   /**
    * Catches null pointer
