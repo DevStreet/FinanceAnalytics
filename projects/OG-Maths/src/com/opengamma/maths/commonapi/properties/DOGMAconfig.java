@@ -21,6 +21,9 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
  */
 public class DOGMAconfig {
 
+  /* default place for properties */
+  private static String s_propertiesFilename = "config/OG-Maths.properties";
+
   /* SETTINGS */
   private static boolean s_haltOnNaNOnFunctionEntry;
   private static boolean s_haltOnNaNOnFunctionExit;
@@ -33,29 +36,43 @@ public class DOGMAconfig {
 
   private static HashMap<String, String> s_properties = new HashMap<String, String>();
 
+  /** 
+   * Default settings from default file
+   */
   public DOGMAconfig() {
     getPropertiesFromConfig();
   }
 
-  private void getPropertiesFromConfig() {
-    String propertiesFilename = "config/OG-Maths.properties";
+  /** 
+   * Settings from file with path given by string
+   * @param propertiesFileName path and name of properties file
+   */
+  public DOGMAconfig(String propertiesFileName) {
+    getPropertiesFromConfig(propertiesFileName);
+  }
+
+  private static void getPropertiesFromConfig() {
+    getPropertiesFromConfig(s_propertiesFilename);
+  }
+
+  private static void getPropertiesFromConfig(String configFileName) {
+
     FileInputStream propsFile = null;
     Properties ogMathsProperties = new Properties();
     try {
-      propsFile = new FileInputStream(propertiesFilename);
+      propsFile = new FileInputStream(configFileName);
     } catch (IOException e) {
-      e.printStackTrace();
-      throw new MathsExceptionConfigProblem("Cannot find default properties file. Was looking for file: " + propertiesFilename);
+      throw new MathsExceptionConfigProblem("Cannot find default properties file. Was looking for file: " + configFileName);
     }
     try {
       ogMathsProperties.load(propsFile);
     } catch (IOException e) {
-      throw new MathsExceptionConfigProblem("Cannot load in default properties. Load attempted from file: " + propertiesFilename);
+      throw new MathsExceptionConfigProblem("Cannot load in default properties. Load attempted from file: " + configFileName);
     }
     try {
       propsFile.close();
     } catch (IOException e) {
-      throw new MathsExceptionConfigProblem("Failed to close properties file stream. Clise attempted on file: " + propertiesFilename);
+      throw new MathsExceptionConfigProblem("Failed to close properties file stream. Clise attempted on file: " + configFileName);
     }
 
     // look for DOGMA specific entries
