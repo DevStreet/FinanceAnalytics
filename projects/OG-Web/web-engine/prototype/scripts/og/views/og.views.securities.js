@@ -1,6 +1,6 @@
 /*
- * @copyright 2011 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 $.register_module({
     name: 'og.views.securities',
@@ -136,7 +136,7 @@ $.register_module({
                             $html = $.tmpl(template, json.template_data);
                         $('.OG-layout-admin-details-center .ui-layout-header').html($html.find('> header'));
                         $('.OG-layout-admin-details-center .ui-layout-content').html($html.find('> section'));
-                        og.common.gadgets.securities_identifiers({
+                        new og.common.gadgets.SecuritiesIdentifiers({
                             selector: '.og-js-identifiers',
                             id: rest_options.id
                         });
@@ -166,8 +166,9 @@ $.register_module({
                             $('.OG-layout-admin-details-north').empty();
                         }
                         if (json.template_data.hts_id || args.timeseries) common.gadgets.timeseries({
-                            selector: '.OG-timeseries-gadget',
-                            id: json.template_data.hts_id || args.timeseries
+                            selector: '.OG-timeseries-container',
+                            id: json.template_data.hts_id || args.timeseries,
+                            height: "450"
                         });
                         if (show_loading) view.notify(null);
                         setTimeout(view.layout.inner.resizeAll);
@@ -208,7 +209,7 @@ $.register_module({
                     'default': {
                         buttons: [
                             {id: 'new', tooltip: 'New', handler: toolbar_buttons['new']},
-                            {id: 'import', tooltip: 'Import Portfolio', enabled: 'OG-disabled'},
+                            {id: 'import', tooltip: 'Import', enabled: 'OG-disabled'},
                             {id: 'save', tooltip: 'Save', enabled: 'OG-disabled'},
                             {id: 'saveas', tooltip: 'Save as', enabled: 'OG-disabled'},
                             {id: 'delete', tooltip: 'Delete', enabled: 'OG-disabled'}
@@ -218,7 +219,7 @@ $.register_module({
                     active: {
                         buttons: [
                             {id: 'new', tooltip: 'New', handler: toolbar_buttons['new']},
-                            {id: 'import', tooltip: 'Import Portfolio', enabled: 'OG-disabled'},
+                            {id: 'import', tooltip: 'Import', enabled: 'OG-disabled'},
                             {id: 'save', tooltip: 'Save', enabled: 'OG-disabled'},
                             {id: 'saveas', tooltip: 'Save as', enabled: 'OG-disabled'},
                             {id: 'delete', tooltip: 'Delete', divider: true, handler: toolbar_buttons['delete']},

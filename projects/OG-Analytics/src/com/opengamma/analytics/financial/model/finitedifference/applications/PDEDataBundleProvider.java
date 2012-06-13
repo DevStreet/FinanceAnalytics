@@ -13,10 +13,10 @@ import com.opengamma.analytics.financial.model.finitedifference.ExtendedConvecti
 import com.opengamma.analytics.financial.model.finitedifference.ExtendedCoupledPDEDataBundle;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
-import com.opengamma.analytics.financial.model.volatility.surface.AbsoluteLocalVolatilitySurface;
-import com.opengamma.analytics.financial.model.volatility.surface.LocalVolatilitySurfaceConverter;
-import com.opengamma.analytics.financial.model.volatility.surface.LocalVolatilitySurfaceMoneyness;
-import com.opengamma.analytics.financial.model.volatility.surface.LocalVolatilitySurfaceStrike;
+import com.opengamma.analytics.financial.model.volatility.local.AbsoluteLocalVolatilitySurface;
+import com.opengamma.analytics.financial.model.volatility.local.LocalVolatilitySurfaceConverter;
+import com.opengamma.analytics.financial.model.volatility.local.LocalVolatilitySurfaceMoneyness;
+import com.opengamma.analytics.financial.model.volatility.local.LocalVolatilitySurfaceStrike;
 import com.opengamma.analytics.math.function.Function;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.statistics.distribution.NormalDistribution;
@@ -994,6 +994,46 @@ public class PDEDataBundleProvider {
     return new ExtendedCoupledPDEDataBundle(FunctionalDoublesSurface.from(a), FunctionalDoublesSurface.from(b), FunctionalDoublesSurface.from(c), FunctionalDoublesSurface.from(aStar),
         FunctionalDoublesSurface.from(bStar), -lambda2, initialCondition);
 
+  }
+
+  public ConvectionDiffusionPDEDataBundle getBackwardsLocalVolLogPayoff(final double maturity, final LocalVolatilitySurfaceMoneyness localVol) {
+
+    final Function<Double, Double> a = new Function<Double, Double>() {
+      @Override
+      public Double evaluate(final Double... tx) {
+        Validate.isTrue(tx.length == 2);
+        final double tau = tx[0];
+        final double x = tx[1];
+        final double t = maturity - tau;
+        final double m = Math.exp(x);
+        final double temp = localVol.getVolatilityForMoneyness(t, m);
+        return -0.5 * temp * temp;
+      }
+    };
+
+    final Function<Double, Double> b = new Function<Double, Double>() {
+      @Override
+      public Double evaluate(final Double... tx) {
+        Validate.isTrue(tx.length == 2);
+        final double tau = tx[0];
+        final double x = tx[1];
+        final double t = maturity - tau;
+        final double m = Math.exp(x);
+        final double temp = localVol.getVolatilityForMoneyness(t, m);
+        return 0.5 * temp * temp;
+      }
+    };
+
+    final Function1D<Double, Double> payoff = new Function1D<Double, Double>() {
+
+      @Override
+      public Double evaluate(final Double x) {
+        return x;
+      }
+    };
+
+    return new ConvectionDiffusionPDEDataBundle(FunctionalDoublesSurface.from(a), FunctionalDoublesSurface.from(b),
+        ConstantDoublesSurface.from(0.0), payoff);
   }
 
   private class EuropeanPayoff extends Function1D<Double, Double> {

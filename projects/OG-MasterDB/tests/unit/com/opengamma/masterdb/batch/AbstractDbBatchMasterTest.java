@@ -10,7 +10,6 @@ import static com.opengamma.util.db.DbDateUtils.toSqlTimestamp;
 import java.sql.Timestamp;
 
 import javax.time.Instant;
-import javax.time.calendar.OffsetDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public abstract class AbstractDbBatchMasterTest extends DbTest {
   protected UniqueId _marketDataSnapshotUid = UniqueId.of("MrkDta", "market_data_snapshot_uid");
   protected UniqueId _viewDefinitionUid = UniqueId.of("ViewDef", "view definition uid");
   protected VersionCorrection _versionCorrection = VersionCorrection.LATEST;
-  protected Instant _valuationTime = OffsetDateTime.parse("2011-01-01T15:58:34.183Z").toInstant();
+  protected Instant _valuationTime = Instant.parse("2011-01-01T15:58:34.183Z");
 
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractDbBatchMasterTest.class);
 

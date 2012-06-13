@@ -6,8 +6,17 @@
 package com.opengamma.bloombergexample.loader;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.time.calendar.LocalDate;
 import javax.time.calendar.Period;
@@ -22,13 +31,17 @@ import org.slf4j.helpers.MessageFormatter;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.bbg.*;
+import com.opengamma.bbg.BloombergConstants;
+import com.opengamma.bbg.BloombergFields;
+import com.opengamma.bbg.PerSecurityReferenceDataResult;
+import com.opengamma.bbg.ReferenceDataProvider;
+import com.opengamma.bbg.ReferenceDataResult;
 import com.opengamma.bbg.tool.BloombergToolContext;
 import com.opengamma.bbg.util.BloombergDataUtils;
 import com.opengamma.bbg.util.BloombergTickerParserEQOption;
 import com.opengamma.bloombergexample.tool.AbstractExampleTool;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.security.equity.EquitySecurity;
 import com.opengamma.financial.security.equity.GICSCode;
 import com.opengamma.financial.security.option.OptionType;
@@ -38,7 +51,12 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoDocument;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchRequest;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchResult;
-import com.opengamma.master.portfolio.*;
+import com.opengamma.master.portfolio.ManageablePortfolio;
+import com.opengamma.master.portfolio.ManageablePortfolioNode;
+import com.opengamma.master.portfolio.PortfolioDocument;
+import com.opengamma.master.portfolio.PortfolioMaster;
+import com.opengamma.master.portfolio.PortfolioSearchRequest;
+import com.opengamma.master.portfolio.PortfolioSearchResult;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.position.PositionDocument;
@@ -53,12 +71,11 @@ import com.opengamma.util.tuple.Pair;
  */
 public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
 
-  public static final String TOOL_NAME = "Demo Equity Option Portfolio Loader";
-
-  public static final String PORTFOLIO_NAME_OPT = "p";
-  public static final String OPTION_DEPTH_OPT = "d";
-  public static final String NUM_CONTRACTS_OPT = "n";
-  public static final String NUM_INDEX_MEMBERS_OPT = "m";
+  private static final String TOOL_NAME = "Demo Equity Option Portfolio Loader";
+  private static final String PORTFOLIO_NAME_OPT = "p";
+  private static final String OPTION_DEPTH_OPT = "d";
+  private static final String NUM_CONTRACTS_OPT = "n";
+  private static final String NUM_INDEX_MEMBERS_OPT = "m";
 
   private static final String BLOOMBERG_EQUITY_TICKER_SUFFIX = " Equity";
 
@@ -78,7 +95,10 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
    */
   private static final BigDecimal VALUE_OF_UNDERLYING = BigDecimal.valueOf(100000);
   
-  public static final String PORTFOLIO_NAME = "ExampleEquityOptionPortfolio";
+  /**
+   * The default genearted portfolio name.
+   */
+  public static final String PORTFOLIO_NAME = "Example Equity Option Portfolio";
 
   private static Map<String, String> getIndexToExchangeMap() {
     Map<String, String> ret = new HashMap<String, String>();
@@ -170,7 +190,7 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
   }
 
   private void addNodes(ManageablePortfolioNode rootNode, String underlying, boolean includeUnderlying, Period[] expiries) {
-    ExternalId ticker = SecurityUtils.bloombergTickerSecurityId(underlying);
+    ExternalId ticker = ExternalSchemes.bloombergTickerSecurityId(underlying);
     ManageableSecurity underlyingSecurity = null;
     if (includeUnderlying) {
       underlyingSecurity = getOrLoadEquity(ticker);
@@ -393,7 +413,7 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
   }
 
   private Set<ExternalId> getOptionChain(ExternalId ticker) {
-    if (ticker.getScheme() != SecurityUtils.BLOOMBERG_TICKER) {
+    if (ticker.getScheme() != ExternalSchemes.BLOOMBERG_TICKER) {
       throw new OpenGammaRuntimeException("Not a bloomberg ticker " + ticker);
     }    
     ReferenceDataProvider referenceDataProvider = ((BloombergToolContext) getToolContext()).getBloombergReferenceDataProvider();
@@ -438,7 +458,7 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
 
   private HistoricalTimeSeriesInfoDocument getOrLoadTimeSeries(ExternalId ticker, ExternalIdBundle idBundle) {
 
-    ExternalIdBundle searchBundle = idBundle.withoutScheme(SecurityUtils.ISIN); //For things which move country, e.g. ISIN(VALE5 BZ Equity) == ISIN(RIODF US Equity)
+    ExternalIdBundle searchBundle = idBundle.withoutScheme(ExternalSchemes.ISIN); //For things which move country, e.g. ISIN(VALE5 BZ Equity) == ISIN(RIODF US Equity)
     HistoricalTimeSeriesInfoSearchRequest htsRequest = new HistoricalTimeSeriesInfoSearchRequest(searchBundle);
     htsRequest.setDataField("PX_LAST");
     HistoricalTimeSeriesInfoSearchResult htsSearch = getToolContext().getHistoricalTimeSeriesMaster().search(htsRequest);
@@ -457,7 +477,7 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
 
   private HistoricalTimeSeriesInfoDocument loadTimeSeries(ExternalIdBundle idBundle) {    
     ReferenceDataProvider referenceDataProvider = ((BloombergToolContext) getToolContext()).getBloombergReferenceDataProvider();
-    if (idBundle.getExternalId(SecurityUtils.BLOOMBERG_BUID) == null && idBundle.getExternalId(SecurityUtils.BLOOMBERG_TICKER) != null) {
+    if (idBundle.getExternalId(ExternalSchemes.BLOOMBERG_BUID) == null && idBundle.getExternalId(ExternalSchemes.BLOOMBERG_TICKER) != null) {
       //For some reason loading some series by TICKER fails, but BUID works 
       BiMap<String, ExternalIdBundle> map = BloombergDataUtils.convertToBloombergBuidKeys(Collections.singleton(idBundle), referenceDataProvider);
       if (map.size() != 1) {
@@ -466,11 +486,11 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractExampleTool {
       for (String key : map.keySet()) {
         ReferenceDataResult buidResult = referenceDataProvider.getFields(Collections.singleton(key), Collections.singleton(BloombergConstants.FIELD_ID_BBG_UNIQUE));
         String buid = buidResult.getResult(key).getFieldData().getString(BloombergConstants.FIELD_ID_BBG_UNIQUE);
-        idBundle = idBundle.withExternalId(SecurityUtils.bloombergTickerSecurityId(buid));
+        idBundle = idBundle.withExternalId(ExternalSchemes.bloombergTickerSecurityId(buid));
       }
     }
-    ExternalIdBundle searchBundle = idBundle.withoutScheme(SecurityUtils.ISIN); // For things which move country, e.g. ISIN(VALE5 BZ Equity) == ISIN(RIODF US Equity)
-    Map<ExternalId, UniqueId> timeSeries = getToolContext().getHistoricalTimeSeriesLoader().addTimeSeries(searchBundle.getExternalIds(), "CMPL", "PX_LAST", null, null);
+    ExternalIdBundle searchBundle = idBundle.withoutScheme(ExternalSchemes.ISIN); // For things which move country, e.g. ISIN(VALE5 BZ Equity) == ISIN(RIODF US Equity)
+    Map<ExternalId, UniqueId> timeSeries = getToolContext().getHistoricalTimeSeriesLoader().addTimeSeries(searchBundle.getExternalIds(), "CMPL", "PX_LAST", LocalDate.now().minusYears(1), null);
     if (timeSeries.size() != 1) {
       throw new OpenGammaRuntimeException("Failed to load time series " + idBundle + " " + timeSeries);
     }

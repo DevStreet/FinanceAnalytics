@@ -15,8 +15,8 @@ import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureDefinition;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.region.RegionSource;
-import com.opengamma.core.region.RegionUtils;
 import com.opengamma.financial.convention.ConventionBundle;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.convention.InMemoryConventionBundleMaster;
@@ -51,17 +51,13 @@ public class InterestRateFutureSecurityConverter extends AbstractFutureSecurityV
     if (iborConvention == null) {
       throw new OpenGammaRuntimeException("Could not get ibor convention for " + currency.getCode());
     }
-    final Calendar calendar = CalendarUtils.getCalendar(_regionSource, _holidaySource, RegionUtils.currencyRegionId(currency));
+    final Calendar calendar = CalendarUtils.getCalendar(_regionSource, _holidaySource, ExternalSchemes.currencyRegionId(currency));
     final double paymentAccrualFactor = getAccrualFactor(iborConvention.getPeriod());
     final IborIndex iborIndex = new IborIndex(currency, iborConvention.getPeriod(), iborConvention.getSettlementDays(), calendar, iborConvention.getDayCount(),
         iborConvention.getBusinessDayConvention(), iborConvention.isEOMConvention());
-    final double referencePrice = 0.0; // Not used here!
     final double notional = security.getUnitAmount() * 100.0 / paymentAccrualFactor; // Unit amount in percent
-    return new InterestRateFutureDefinition(lastTradeDate, 0.0, lastTradeDate, iborIndex, referencePrice, notional, paymentAccrualFactor, 1, security.getName());
+    return new InterestRateFutureDefinition(lastTradeDate, 0.0, lastTradeDate, iborIndex, notional, paymentAccrualFactor, 1, security.getName());
   }
-
-  //  public InterestRateFutureDefinition convert(final InterestRateFutureSecurity security) {
-  //  }
 
   private double getAccrualFactor(final Period period) {
     if (period.equals(Period.ofMonths(3))) {

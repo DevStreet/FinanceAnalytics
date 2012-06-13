@@ -32,7 +32,7 @@ import com.opengamma.util.tuple.DoublesPair;
 /**
  *
  */
-public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestRateFutureOptionFunction {
+public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestRateFutureOptionSABRFunction {
   private static final PresentValueSABRSensitivitySABRCalculator CALCULATOR = PresentValueSABRSensitivitySABRCalculator.getInstance();
   private final String _valueRequirementName;
 
@@ -41,7 +41,7 @@ public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestR
   }
 
   @Override
-  protected Set<ComputedValue> getResults(final InstrumentDerivative irFutureOption, final SABRInterestRateDataBundle data, final ComputationTarget target,
+  protected Set<ComputedValue> computeValues(final InstrumentDerivative irFutureOption, final SABRInterestRateDataBundle data, final ComputationTarget target,
       final FunctionInputs inputs, final String forwardCurveName, final String fundingCurveName, final String surfaceName, final String curveCalculationMethod) {
     final PresentValueSABRSensitivityDataBundle sensitivities = CALCULATOR.visit(irFutureOption, data);
     final Map<DoublesPair, Double> result = getSensitivity(sensitivities);

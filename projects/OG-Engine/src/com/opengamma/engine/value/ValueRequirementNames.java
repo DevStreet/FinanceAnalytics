@@ -65,11 +65,18 @@ public final class ValueRequirementNames {
    * The mark as of the previous close (e.g. equity price)
    */
   public static final String MARK = "Mark";
-  
   /**
    * The spot rate for currency pair
    */
   public static final String SPOT_RATE = "SpotRate";
+  /**
+   * The market price of the security underlying a trade or position.
+   */
+  public static final String SECURITY_MARKET_PRICE = "Security Market Price";
+  /**
+   * The market price of the underlying security in a compound security, such as an option
+   */
+  public static final String UNDERLYING_MARKET_PRICE = "Underlying Market Price";
 
   ///// Curves
 
@@ -109,7 +116,22 @@ public final class ValueRequirementNames {
    * Curve property metadata. 
    */
   public static final String YIELD_CURVE_SPEC = "YieldCurveSpec";
-
+  /**
+   * Curve calculation property metadata
+   */
+  public static final String CURVE_CALCULATION_CONFIG = "CurveCalculationConfig";
+  /**
+   * The raw FX forward and spot market data that is used in curve construction
+   */
+  public static final String FX_FORWARD_CURVE_MARKET_DATA = "FXForwardCurveMarketData";
+  /**
+   * The raw forward swap and spot market data that is used in curve construction
+   */
+  public static final String FORWARD_SWAP_CURVE_MARKET_DATA = "ForwardSwapCurveMarketData";
+  /** 
+   * FX forward curve property metadata
+   */
+  public static final String FX_FORWARD_CURVE_SPEC = "FXForwardCurveSpec";
   ///// Surfaces
 
   /**
@@ -124,6 +146,14 @@ public final class ValueRequirementNames {
    * Surface containing (x, y, volatility) triples that is constructed by piecewise fitting the SABR model through the smiles.
    */
   public static final String PIECEWISE_SABR_VOL_SURFACE = "Piecewise SABR fitted surface";
+  /** 
+   * Interpolator for Black volatility surfaces
+   */
+  public static final String BLACK_VOLATILITY_SURFACE_INTERPOLATOR = "BlackVolatilitySurfaceInterpolator";
+  /** 
+   * Surface containing (x, y, Black volatility) triples  
+   */
+  public static final String BLACK_VOLATILITY_SURFACE = "BlackVolatilitySurface";
   /**
    * Set of data containing surfaces of (x, y, parameter) triples, where the parameters are those used in the SABR model.
    */
@@ -164,10 +194,6 @@ public final class ValueRequirementNames {
    */
   public static final String VOLATILITY_CUBE_DEFN = "VolatilityCubeDefinition";
   /**
-   * Result containing information about which points were used in a smile fit.
-   */
-  public static final String VOLATILITY_CUBE_FITTED_POINTS = "Volatility Cube Fitted Points";
-  /**
    * The set of market data that is used in constructing a cube.
    */
   public static final String VOLATILITY_CUBE_MARKET_DATA = "VolatilityCubeMarketData";
@@ -175,7 +201,10 @@ public final class ValueRequirementNames {
    * A volatility cube specification.
    */
   public static final String VOLATILITY_CUBE_SPEC = "VolatilityCubeSpec";
-
+  /**
+   * The points that have been included in a fit
+   */
+  public static final String VOLATILITY_CUBE_FITTED_POINTS = "VolatilityCubeFittedPoints";
   ///// Pricing
 
   /**
@@ -223,13 +252,17 @@ public final class ValueRequirementNames {
    */
   public static final String PV01 = "PV01";
   /**
-   * The market price of a security,
-   */
-  public static final String SECURITY_MARKET_PRICE = "Security Market Price";
-  /**
    * The implied volatility of a security.
    */
-  public static final String SECURITY_IMPLIED_VOLATLITY = "Security Implied Volatility";
+  public static final String SECURITY_IMPLIED_VOLATILITY = "Security Implied Volatility";
+  /**
+   * The model price of the security, as opposed to trade or position.
+   */
+  public static final String SECURITY_MODEL_PRICE = "Security Model Price";
+  /**
+   * The model price of the underlying security in a compound security, such as an option
+   */
+  public static final String UNDERLYING_MODEL_PRICE = "Underlying Model Price";
   /**
    * Generic valuation of a security, for example it might be FAIR_VALUE or PRESENT_VALUE depending on the asset class.
    */
@@ -911,6 +944,22 @@ public final class ValueRequirementNames {
    * The sensitivity of the present value of an instrument to the nu parameter of the SABR model.
    */
   public static final String PRESENT_VALUE_SABR_NU_SENSITIVITY = "Present Value SABR Nu Sensitivity";
+  /**
+   * The sensitivity of the present value of an instrument to the alpha parameter of the SABR model. Sensitivity to the grid node points.
+   */
+  public static final String PRESENT_VALUE_SABR_ALPHA_NODE_SENSITIVITY = "Present Value SABR Alpha Node Sensitivity";
+  /**
+   * The sensitivity of the present value of an instrument to the beta parameter of the SABR model. Sensitivity to the grid node points.
+   */
+  public static final String PRESENT_VALUE_SABR_BETA_NODE_SENSITIVITY = "Present Value SABR Beta Node Sensitivity";
+  /**
+   * The sensitivity of the present value of an instrument to the rho parameter of the SABR model. Sensitivity to the grid node points.
+   */
+  public static final String PRESENT_VALUE_SABR_RHO_NODE_SENSITIVITY = "Present Value SABR Rho Node Sensitivity";
+  /**
+   * The sensitivity of the present value of an instrument to the nu parameter of the SABR model. Sensitivity to the grid node points.
+   */
+  public static final String PRESENT_VALUE_SABR_NU_NODE_SENSITIVITY = "Present Value SABR Nu Node Sensitivity";
 
   ///// FX
   /**
@@ -925,6 +974,13 @@ public final class ValueRequirementNames {
    * The present value in both currencies of a FX instrument.
    */
   public static final String FX_PRESENT_VALUE = "FX Present Value";
+  
+  
+  /**
+   * The value vega of a digital option that is priced using call spread replication
+   */
+  //TODO too specific? Only in here because we can't add the outputs for digital options (which has two in this case) and normal value vega
+  public static final String CALL_SPREAD_VALUE_VEGA = "Call Spread Value Vega";
 
   ///// Local Volatility
   //TODO this set of names might be too specific
@@ -979,7 +1035,7 @@ public final class ValueRequirementNames {
   /**
    * Surface containing (x, y, volatility) triples calculated using the Dupire local volatility method.
    */
-  public static final String LOCAL_VOLATILITY_SURFACE = "Local Volatility Surface";
+  public static final String LOCAL_VOLATILITY_SURFACE = "LocalVolatilitySurface";
   /**
    * The vanna of an instrument calculated using local volatility and PDE methods.
    */
@@ -992,6 +1048,80 @@ public final class ValueRequirementNames {
    * The vomma of an instrument calculated using local volatility and PDE methods.
    */
   public static final String LOCAL_VOLATILITY_VOMMA = "Forward Vomma (LV)";
-  
-
+  /**
+   * The forward delta of an instrument
+   */
+  public static final String FORWARD_DELTA = "Forward Delta";
+  /** 
+   * The forward gamma of an instrument
+   */
+  public static final String FORWARD_GAMMA = "Forward Gamma";
+  /**
+   * The forward vega of an instrument
+   */
+  public static final String FORWARD_VEGA = "Forward Vega";
+  /**
+   * The forward vanna of an instrument
+   */
+  public static final String FORWARD_VANNA = "Forward Vanna";
+  /**
+   * The forward vomma of an instrument
+   */
+  public static final String FORWARD_VOMMA = "Forward Vomma";
+  /**
+   * The dual delta of an instrument
+   */
+  public static final String DUAL_DELTA = "Dual Delta";
+  /** 
+   * The dual gamma of an instrument
+   */
+  public static final String DUAL_GAMMA = "Dual Gamma";
+  /** 
+   * The domestic price for FX options
+   */
+  public static final String FOREX_DOMESTIC_PRICE = "Forex Domestic Price";
+  /**
+   * The PV quote form of FX option prices
+   */
+  public static final String FOREX_PV_QUOTES = "Forex PV Quotes";
+  /**
+   * The implied volatility
+   */
+  public static final String IMPLIED_VOLATILITY = "Implied Volatility";
+  /**
+   * The PDE space grid values of the forward delta of an instrument
+   */
+  public static final String GRID_FORWARD_DELTA = "Grid Forward Delta";
+  /** 
+   * The PDE space grid values of the forward gamma of an instrument
+   */
+  public static final String GRID_FORWARD_GAMMA = "Grid Forward Gamma";
+  /**
+   * The PDE space grid values of the forward vega of an instrument
+   */
+  public static final String GRID_FORWARD_VEGA = "Grid Forward Vega";
+  /**
+   * The PDE space grid values of the forward vanna of an instrument
+   */
+  public static final String GRID_FORWARD_VANNA = "Grid Forward Vanna";
+  /**
+   * The PDE space grid values of the forward vomma of an instrument
+   */
+  public static final String GRID_FORWARD_VOMMA = "Grid Forward Vomma";
+  /**
+   * The PDE space grid values of the dual delta of an instrument
+   */
+  public static final String GRID_DUAL_DELTA = "Grid Dual Delta";
+  /** 
+   * The PDE space grid values of the dual gamma of an instrument
+   */
+  public static final String GRID_DUAL_GAMMA = "Grid Dual Gamma";
+  /**
+   * The PDE space grid values of the implied volatility
+   */
+  public static final String GRID_IMPLIED_VOLATILITY = "Grid Implied Volatility";
+  /**
+   * The PDE space grid values of the price
+   */
+  public static final String GRID_PRESENT_VALUE = "Grid Present Value";
 }

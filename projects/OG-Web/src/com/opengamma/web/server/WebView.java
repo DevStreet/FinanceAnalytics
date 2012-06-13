@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewDeltaResultModel;
@@ -54,7 +55,7 @@ public class WebView {
   private final ViewExecutionOptions _executionOptions;
   private final ExecutorService _executorService;
   private final ResultConverterCache _resultConverterCache;
-
+  private final ComputationTargetResolver _computationTargetResolver;
   private final ReentrantLock _updateLock = new ReentrantLock();
 
   private boolean _awaitingNextUpdate;
@@ -71,7 +72,7 @@ public class WebView {
 
   public WebView(final Client local, final Client remote, final ViewClient client, final UniqueId baseViewDefinitionId,
                  final String aggregatorName, final UniqueId viewDefinitionId, final ViewExecutionOptions executionOptions,
-                 final UserPrincipal user, final ExecutorService executorService, final ResultConverterCache resultConverterCache) {
+                 final UserPrincipal user, final ExecutorService executorService, final ResultConverterCache resultConverterCache, final ComputationTargetResolver computationTargetResolver) {
     ArgumentChecker.notNull(executionOptions, "executionOptions");
     _local = local;
     _remote = remote;
@@ -83,7 +84,7 @@ public class WebView {
     _executorService = executorService;
     _resultConverterCache = resultConverterCache;
     _gridsByName = new HashMap<String, WebViewGrid>();
-
+    _computationTargetResolver = computationTargetResolver;
     _client.setResultListener(new AbstractViewResultListener() {
 
       @Override
@@ -123,7 +124,7 @@ public class WebView {
   private void initGrids(CompiledViewDefinition compiledViewDefinition) {
     _isInit.set(true);
 
-    RequirementBasedWebViewGrid portfolioGrid = new WebViewPortfolioGrid(getViewClient(), compiledViewDefinition, getResultConverterCache(), getLocal(), getRemote());
+    RequirementBasedWebViewGrid portfolioGrid = new WebViewPortfolioGrid(getViewClient(), compiledViewDefinition, getResultConverterCache(), getLocal(), getRemote(), getComputationTargetResolver());
     if (portfolioGrid.getGridStructure().isEmpty()) {
       _portfolioGrid = null;
     } else {
@@ -131,7 +132,7 @@ public class WebView {
       _gridsByName.put(_portfolioGrid.getName(), _portfolioGrid);
     }
 
-    RequirementBasedWebViewGrid primitivesGrid = new WebViewPrimitivesGrid(getViewClient(), compiledViewDefinition, getResultConverterCache(), getLocal(), getRemote());
+    RequirementBasedWebViewGrid primitivesGrid = new WebViewPrimitivesGrid(getViewClient(), compiledViewDefinition, getResultConverterCache(), getLocal(), getRemote(), getComputationTargetResolver());
     if (primitivesGrid.getGridStructure().isEmpty()) {
       _primitivesGrid = null;
     } else {
@@ -203,18 +204,20 @@ public class WebView {
     if (getPortfolioGrid() != null) {
       Map<String, Object> portfolioViewport = (Map<String, Object>) dataMap.get("portfolioViewport");
       getPortfolioGrid().setViewport(processViewportData(portfolioViewport));
-      
-      Map<String, Map<String, Object>> depGraphViewportMap = (Map<String, Map<String, Object>>) dataMap.get("depGraphViewport");
-      for (Map.Entry<String, Map<String, Object>> depGraphViewportEntry : depGraphViewportMap.entrySet()) {
-        WebGridCell depGraphCell = processCellId(depGraphViewportEntry.getKey());
-        SortedMap<Integer, Long> viewportMap = processViewportData(depGraphViewportEntry.getValue());
-        getPortfolioGrid().setDepGraphViewport(depGraphCell, viewportMap);
-      }
     }
 
     if (getPrimitivesGrid() != null) {
       Map<String, Object> primitiveViewport = (Map<String, Object>) dataMap.get("primitiveViewport");
       getPrimitivesGrid().setViewport(processViewportData(primitiveViewport));
+    }
+    
+    Map<String, Map<String, Object>> depGraphViewportMap = (Map<String, Map<String, Object>>) dataMap.get("depGraphViewport");
+    for (Map.Entry<String, Map<String, Object>> depGraphViewportEntry : depGraphViewportMap.entrySet()) {
+      Pair<RequirementBasedWebViewGrid, WebGridCell> depGraphCell = processCellId(depGraphViewportEntry.getKey());
+      SortedMap<Integer, Long> viewportMap = processViewportData(depGraphViewportEntry.getValue());
+      RequirementBasedWebViewGrid parentDepGraphGrid = depGraphCell.getFirst();
+      WebGridCell cellId = depGraphCell.getSecond();
+      parentDepGraphGrid.setDepGraphViewport(cellId, viewportMap);
     }
 
     // Can only provide an immediate response if there is a result available
@@ -232,11 +235,12 @@ public class WebView {
     }
   }
 
-  private static WebGridCell processCellId(String encodedCellId) {
-    String[] rowColumn = encodedCellId.split("-");
-    int rowId = Integer.parseInt(rowColumn[0]);
-    int colId = Integer.parseInt(rowColumn[1]);
-    return new WebGridCell(rowId, colId);
+  private Pair<RequirementBasedWebViewGrid, WebGridCell> processCellId(String encodedCellId) {
+    String[] cellIdFields = encodedCellId.split("-");
+    String parentGridName = cellIdFields[0];
+    int rowId = Integer.parseInt(cellIdFields[1]);
+    int colId = Integer.parseInt(cellIdFields[2]);
+    return Pair.of((RequirementBasedWebViewGrid) getGridByName(parentGridName), new WebGridCell(rowId, colId));
   }
   
   private static SortedMap<Integer, Long> processViewportData(Map<String, Object> viewportData) {
@@ -325,6 +329,7 @@ public class WebView {
       for (ComputationTargetSpecification target : getPrimitivesGrid().getGridStructure().getTargets().keySet()) {
         getPrimitivesGrid().processTargetResult(target, resultModel.getTargetResult(target), resultTimestamp);
       }
+      getPrimitivesGrid().processDepGraphs(resultTimestamp);
     }
 
     if (getPortfolioGrid() != null) {
@@ -373,10 +378,11 @@ public class WebView {
   }
 
   public void setIncludeDepGraph(String parentGridName, WebGridCell cell, boolean includeDepGraph) {
-    if (!getPortfolioGrid().getName().equals(parentGridName)) {
-      throw new OpenGammaRuntimeException("Invalid or unknown grid for dependency graph viewing: " + parentGridName);
+    WebViewGrid parentGrid = getGridByName(parentGridName);
+    if (parentGrid == null || !(parentGrid instanceof RequirementBasedWebViewGrid)) {
+      throw new IllegalArgumentException("Invalid grid for dependency graph introspection: " + parentGridName);
     }
-
+    RequirementBasedWebViewGrid depGraphParentGrid = (RequirementBasedWebViewGrid) parentGrid;
     if (includeDepGraph) {
       if (_activeDepGraphCount.getAndIncrement() == 0) {
         getViewClient().setViewCycleAccessSupported(true);
@@ -386,7 +392,7 @@ public class WebView {
         getViewClient().setViewCycleAccessSupported(false);
       }
     }
-    WebViewGrid grid = getPortfolioGrid().setIncludeDepGraph(cell, includeDepGraph);
+    WebViewGrid grid = depGraphParentGrid.setIncludeDepGraph(cell, includeDepGraph);
     if (grid != null) {
       if (includeDepGraph) {
         registerGrid(grid);
@@ -447,6 +453,10 @@ public class WebView {
 
   private ResultConverterCache getResultConverterCache() {
     return _resultConverterCache;
+  }
+
+  private ComputationTargetResolver getComputationTargetResolver() {
+    return _computationTargetResolver;
   }
 
 }

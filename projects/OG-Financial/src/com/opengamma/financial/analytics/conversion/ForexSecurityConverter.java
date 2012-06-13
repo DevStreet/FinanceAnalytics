@@ -11,6 +11,7 @@ import org.apache.commons.lang.Validate;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.forex.definition.ForexDefinition;
+import com.opengamma.analytics.financial.forex.definition.ForexNonDeliverableForwardDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexOptionDigitalDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexOptionSingleBarrierDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexOptionVanillaDefinition;
@@ -33,20 +34,7 @@ import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.FXUtils;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
-import com.opengamma.financial.security.option.BarrierDirection;
-import com.opengamma.financial.security.option.BarrierType;
-import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
-import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
-import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
-import com.opengamma.financial.security.option.EquityOptionSecurity;
-import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
-import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
-import com.opengamma.financial.security.option.FXOptionSecurity;
-import com.opengamma.financial.security.option.IRFutureOptionSecurity;
-import com.opengamma.financial.security.option.MonitoringType;
-import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
-import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
-import com.opengamma.financial.security.option.SwaptionSecurity;
+import com.opengamma.financial.security.option.*;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.util.money.Currency;
 
@@ -67,16 +55,18 @@ public class ForexSecurityConverter implements FinancialSecurityVisitor<Instrume
     final ZonedDateTime settlementDate = fxDigitalOptionSecurity.getSettlementDate();
     final boolean isLong = fxDigitalOptionSecurity.isLong();
     final ForexDefinition underlying;
-    if (FXUtils.isInBaseQuoteOrder(putCurrency, callCurrency)) { // To get Base/quote in market standard order.
-      final double fxRate = callAmount / putAmount;
-      underlying = new ForexDefinition(putCurrency, callCurrency, settlementDate, putAmount, fxRate);
-      // REVIEW: jim 6-Feb-2012 -- take account of NDF!
-      return new ForexOptionDigitalDefinition(underlying, expiry, false, isLong);
+    final Currency payCurrency = fxDigitalOptionSecurity.getPaymentCurrency();
+    final boolean payDomestic;
+    final boolean order = FXUtils.isInBaseQuoteOrder(putCurrency, callCurrency);
+    // Implementation note: To get Base/quote in market standard order.
+    if (order) {
+      underlying = ForexDefinition.fromAmounts(putCurrency, callCurrency, settlementDate, putAmount, -callAmount);
+      payDomestic = (payCurrency.equals(callCurrency));
+    } else {
+      underlying = ForexDefinition.fromAmounts(callCurrency, putCurrency, settlementDate, callAmount, -putAmount);
+      payDomestic = (payCurrency.equals(putCurrency));
     }
-    final double fxRate = putAmount / callAmount;
-    underlying = new ForexDefinition(callCurrency, putCurrency, settlementDate, callAmount, fxRate);
-    // REVIEW: jim 6-Feb-2012 -- take account of NDF!
-    return new ForexOptionDigitalDefinition(underlying, expiry, true, isLong);
+    return new ForexOptionDigitalDefinition(underlying, expiry, !order, isLong, payDomestic);
   }
 
   @Override
@@ -90,6 +80,7 @@ public class ForexSecurityConverter implements FinancialSecurityVisitor<Instrume
     final ZonedDateTime settlementDate = fxNDFDigitalOptionSecurity.getSettlementDate();
     final boolean isLong = fxNDFDigitalOptionSecurity.isLong();
     final ForexDefinition underlying;
+    // TODO: Review this part (see digital options)
     if (FXUtils.isInBaseQuoteOrder(putCurrency, callCurrency)) { // To get Base/quote in market standard order.
       final double fxRate = callAmount / putAmount;
       underlying = new ForexDefinition(putCurrency, callCurrency, settlementDate, putAmount, fxRate);
@@ -151,6 +142,19 @@ public class ForexSecurityConverter implements FinancialSecurityVisitor<Instrume
     final double receiveAmount = fxForwardSecurity.getReceiveAmount();
     final ZonedDateTime forwardDate = fxForwardSecurity.getForwardDate();
     return ForexDefinition.fromAmounts(payCurrency, receiveCurrency, forwardDate, -payAmount, receiveAmount);
+  }
+
+  @Override
+  public InstrumentDefinition<?> visitNonDeliverableFXForwardSecurity(final NonDeliverableFXForwardSecurity fxForwardSecurity) {
+    Validate.notNull(fxForwardSecurity, "fx forward security");
+    final Currency payCurrency = fxForwardSecurity.getPayCurrency();
+    final Currency receiveCurrency = fxForwardSecurity.getReceiveCurrency();
+    final double payAmount = fxForwardSecurity.getPayAmount();
+    final double receiveAmount = fxForwardSecurity.getReceiveAmount();
+    final double exchangeRate = receiveAmount / payAmount;
+    final ZonedDateTime fixingDate = fxForwardSecurity.getForwardDate();
+    final ZonedDateTime paymentDate = fixingDate; //TODO get this right
+    return new ForexNonDeliverableForwardDefinition(payCurrency, receiveCurrency, receiveAmount, exchangeRate, fixingDate, paymentDate);
   }
 
   private KnockType getKnockType(final BarrierDirection direction) {
@@ -245,12 +249,12 @@ public class ForexSecurityConverter implements FinancialSecurityVisitor<Instrume
   }
 
   @Override
-  public InstrumentDefinition<?> visitEquityIndexDividendFutureOptionSecurity(final EquityIndexDividendFutureOptionSecurity security) {
-    return null;
+  public InstrumentDefinition<?> visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+    return null; 
   }
 
   @Override
-  public InstrumentDefinition<?> visitNonDeliverableFXForwardSecurity(final NonDeliverableFXForwardSecurity security) {
+  public InstrumentDefinition<?> visitEquityIndexDividendFutureOptionSecurity(final EquityIndexDividendFutureOptionSecurity security) {
     return null;
   }
 

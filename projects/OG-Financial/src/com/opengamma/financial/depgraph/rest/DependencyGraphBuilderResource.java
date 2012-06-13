@@ -166,11 +166,12 @@ public final class DependencyGraphBuilderResource extends AbstractDataResource {
     final Collection<ResolutionRule> rules = getBuilderContext().getFunctionResolver().compile(getValuationTime()).getAllResolutionRules();
     // TODO: allow transformation rules
     builder.setFunctionResolver(new DefaultCompiledFunctionResolver(context, rules));
+    builder.setFunctionExclusionGroups(getBuilderContext().getFunctionExclusionGroups());
     builder.setMarketDataAvailabilityProvider(getBuilderContext().getMarketDataProviderResolver().resolve(getMarketData()).getAvailabilityProvider());
     final FudgeContext fudgeContext = getFudgeContext();
     final ResolutionFailureGatherer<MutableFudgeMsg> failures = new ResolutionFailureGatherer<MutableFudgeMsg>(new ResolutionFailureFudgeBuilder.Visitor(getFudgeContext()));
     builder.setResolutionFailureVisitor(failures);
-    builder.setTargetResolver(getBuilderContext().getComputationTargetResolver());
+    builder.setDisableFailureReporting(false);
     for (ValueRequirement requirement : getRequirements()) {
       builder.addTarget(requirement);
     }

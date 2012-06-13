@@ -5,12 +5,12 @@
  */
 package com.opengamma.analytics.financial.model.volatility.smile.fitting.interpolation;
 
-
-
+import com.opengamma.util.ArgumentChecker;
 
 /**
  * 
  */
+// TODO this belongs with interpolators
 public final class CosineWeightingFunction extends WeightingFunction {
   private static final CosineWeightingFunction s_instance = new CosineWeightingFunction();
 
@@ -23,8 +23,29 @@ public final class CosineWeightingFunction extends WeightingFunction {
 
   @Override
   public double getWeight(final double y) {
-
+    ArgumentChecker.isInRangeInclusive(0, 1, y);
     final double cos = Math.cos(Math.PI / 2 * y);
     return cos * cos;
+  }
+
+  @Override
+  public String toString() {
+    return "Cosine weighting function";
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    return true;
   }
 }

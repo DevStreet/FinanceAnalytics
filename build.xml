@@ -462,7 +462,36 @@
         Creates javadocs documentation for whole system                 
       =================================================================== 
   -->
-  <target name="docs" depends="javadoc-all, javadoc-public-jar" description="javadoc &amp; archive for the whole system (requires > 2GB RAM and LaTeX)" />
+  <target name="docs" depends="javadoc-all, javadoc-public-jar" description="javadoc &amp; archive for the whole system (requires > 2GB RAM)" />
+
+  <target name="javadoc-single">
+    <delete dir="${docs.dir}/javadoc-single" includeemptydirs="true" failonerror="false" />
+    <mkdir dir="${docs.dir}" />
+    <mkdir dir="${docs.dir}/javadoc-single" />
+    <javadoc
+        bottom="${javadoc-all.bottom}"
+        classpathref="lib.path.id"
+        destdir="${docs.dir}/javadoc-single"
+        header="${javadoc-all.header}"
+        linksource="Yes"
+        sourcefiles="${fn}"
+    />
+  </target>
+
+  <target name="javadoc-one">
+    <delete dir="${docs.dir}/javadoc-one" includeemptydirs="true" failonerror="false" />
+    <mkdir dir="${docs.dir}" />
+    <mkdir dir="${docs.dir}/javadoc-one" />
+    <javadoc
+        sourcefiles="${fn}"
+        sourcepath="${fn}"
+        destdir="${docs.dir}/javadoc-one"
+        classpathref="lib.path.id"
+        failonerror="Yes"
+        doclet="it.dexy.doclet.MathJaxDoclet"
+        docletpathref="lib.path.id"
+    />
+  </target>
 
   <target name="javadoc-all" depends="load-ivy, resolve">
     <mkdir dir="${docs.dir}" />
@@ -497,7 +526,46 @@
       <link href="http://threeten.sourceforge.net/apidocs/" />
       <link href="http://joda-beans.sourceforge.net/apidocs/" />
     </javadoc>
+    <!-- process javadocs to a sqlite file for Dexy --> 
+    <delete file="docs/shared/docs.sqlite3" />
+    <javadoc
+        sourcepath="${docs.dir}/temp-src"
+        destdir="docs/shared/docs.sqlite3"
+        classpathref="lib.path.id"
+        failonerror="Yes"
+        doclet="it.dexy.doclet.DexyDoclet"
+        docletpathref="lib.path.id"
+    >
+    </javadoc>
     <delete dir="${docs.dir}/temp-src"/>
+  </target>
+
+  <target
+      name="dexy"
+      depends="javadoc-all,dexy-only,copy-javadocs-to-dexy"
+      description="Runs dexy for OG-Platform docs. Requires dexy and LaTeX."
+   />
+
+  <target name="dexy-only" description="Runs dexy without processing OpenGamma source changes (faster).">
+      <exec executable="dexy" dir="docs">
+          <arg value="setup" />
+      </exec>
+      <property name="oglibpathid" refid="lib.path.id"/>
+      <property name="oglibs" value="${projects.dir}/OG-Analytics/lib/classpath.jar:${projects.dir}/OG-Analytics/build/og-analytics.jar:${projects.dir}/OG-Financial/build/og-financial.jar" />
+      <exec executable="dexy" dir="docs" failonerror="true">
+          <env key="CLASSPATH" value="${oglibpathid}:${oglibs}" />
+      </exec>
+  </target>
+
+  <!-- Idea here is that these get copied into a directory which can then be
+       uploaded to docs-static, along with dexy-generated docs, and also to
+       make it easier to preview all docs using a local web server. -->
+  <target name="copy-javadocs-to-dexy">
+      <property name="javadocs.destdir" value="docs/output/javadocs" />
+      <copy todir="${javadocs.destdir}" preservelastmodified="true">
+          <fileset dir="${docs.dir}/javadoc-all" />
+      </copy>
+      <echo message="Copied javadocs to ${javadocs.destdir}" />
   </target>
 
   <!-- we might need to do something with versioning here (like depends on 'version' from common.xml) -->
@@ -570,12 +638,22 @@
     <subant target="projects.pull" buildpath="${basedir}" antfile="build.xml" />
   </target>
 
+  <target name="fetch-noload" if="build.projects.ok">
+    <antcall target="projects.fetch" />
+  </target>
+
+  <target name="fetch-load" unless="build.projects.ok">
+    <echo>Reloading build system ...</echo>
+    <subant target="projects.fetch" buildpath="${basedir}" antfile="build.xml" />
+  </target>
   <!-- 
       =================================================================== 
         Git sync all projects using pull                
       =================================================================== 
   -->
   <target name="pull" depends="pull-noload,pull-load" description="git sync all projects using pull" />
+
+  <target name="fetch" depends="fetch-noload,fetch-load" description="git sync all projects using fetch" />
 
   <target name="status-noload" if="build.projects.ok">
     <antcall target="projects.status" />

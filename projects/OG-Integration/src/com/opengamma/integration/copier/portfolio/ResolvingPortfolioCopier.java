@@ -7,8 +7,6 @@ package com.opengamma.integration.copier.portfolio;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +29,7 @@ import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.tuple.ObjectsPair;
 
 /**
- * A simple portfolio copier that copies positions from readers to the specified writer.
+ * A portfolio copier that copies positions/securities from readers to the specified writer while resolving time-series.
  */
 public class ResolvingPortfolioCopier implements PortfolioCopier {
 
@@ -83,9 +81,6 @@ public class ResolvingPortfolioCopier implements PortfolioCopier {
     // Read in next row, checking for EOF
     while ((next = portfolioReader.readNext()) != null) {
       
-      ManageablePosition writtenPosition;
-      List<ManageableSecurity> writtenSecurities = new LinkedList<ManageableSecurity>();
-      
       // Is position and security data is available for the current row?
       if (next.getFirst() != null && next.getSecond() != null) {
         
@@ -93,39 +88,17 @@ public class ResolvingPortfolioCopier implements PortfolioCopier {
         String[] path = portfolioReader.getCurrentPath();
         portfolioWriter.setPath(path);
         
-        // Write position and security data
+        // Load all relevant HTSes
         for (ManageableSecurity security : next.getSecond()) {
-          writtenSecurities.add(portfolioWriter.writeSecurity(security));
-          
-          // Load this security's relevant HTSes
-          for (String dataField : _dataFields) {
-            Set<ExternalId> ids = new HashSet<ExternalId>();
-            ids = security.getExternalIdBundle().getExternalIds();
-            Map<ExternalId, UniqueId> tsMap = null;
-            for (ExternalId id : ids) {
-              tsMap = bbgLoader.addTimeSeries(Collections.singleton(id), _dataProvider, dataField, null, null);
-              String message = "historical time series " + id.toString() + ", fields " + dataField + 
-                  " from " + _dataProvider;
-              if (tsMap.size() > 0) {
-                s_logger.info("Loaded " + message + ": " + tsMap);
-                if (visitor != null) {
-                  visitor.info("Loaded " + message);
-                }
-                break;
-              }
-            }
-            if (tsMap == null || tsMap.size() == 0) {
-              s_logger.warn("Could not load historical time series for security " + security);
-              if (visitor != null) {
-                visitor.error("Could not load historical time series for security " + security);
-              }
-            }
-          }
+          resolveTimeSeries(bbgLoader, security, _dataFields, _dataProvider, visitor);
         }
-        writtenPosition = portfolioWriter.writePosition(next.getFirst());
+        
+        // Write position and security data
+        ObjectsPair<ManageablePosition, ManageableSecurity[]> written = 
+            portfolioWriter.writePosition(next.getFirst(), next.getSecond());
         
         if (visitor != null) {
-          visitor.info(StringUtils.arrayToDelimitedString(path, "/"), writtenPosition, writtenSecurities);
+          visitor.info(StringUtils.arrayToDelimitedString(path, "/"), written.getFirst(), written.getSecond());
         }
       } else {
         if (visitor != null) {
@@ -139,4 +112,70 @@ public class ResolvingPortfolioCopier implements PortfolioCopier {
     portfolioWriter.flush();
   }
   
+  void resolveTimeSeries(BloombergHistoricalLoader bbgLoader, ManageableSecurity security, String[] dataFields, String dataProvider, PortfolioCopierVisitor visitor) {
+    for (String dataField : dataFields) {
+      Set<ExternalId> ids = new HashSet<ExternalId>();
+      ids = security.getExternalIdBundle().getExternalIds();
+      Map<ExternalId, UniqueId> tsMap = null;
+      for (ExternalId id : ids) {
+        tsMap = bbgLoader.addTimeSeries(Collections.singleton(id), dataProvider, dataField, null, null);
+        String message = "historical time series " + id.toString() + ", fields " + dataField + 
+            " from " + dataProvider;
+        if (tsMap.size() > 0) {
+          s_logger.info("Loaded " + message + ": " + tsMap);
+          if (visitor != null) {
+            visitor.info("Loaded " + message);
+          }
+          break;
+        }
+      }
+      if (tsMap == null || tsMap.size() == 0) {
+        s_logger.warn("Could not load historical time series for security " + security);
+        if (visitor != null) {
+          visitor.error("Could not load historical time series for security " + security);
+        }
+      }
+    }    
+  }
+  
+  public HistoricalTimeSeriesMaster getHtsMaster() {
+    return _htsMaster;
+  }
+
+  public void setHtsMaster(HistoricalTimeSeriesMaster htsMaster) {
+    _htsMaster = htsMaster;
+  }
+
+  public HistoricalTimeSeriesSource getBbgHtsSource() {
+    return _bbgHtsSource;
+  }
+
+  public void setBbgHtsSource(HistoricalTimeSeriesSource bbgHtsSource) {
+    _bbgHtsSource = bbgHtsSource;
+  }
+
+  public ReferenceDataProvider getBbgRefDataProvider() {
+    return _bbgRefDataProvider;
+  }
+
+  public void setBbgRefDataProvider(ReferenceDataProvider bbgRefDataProvider) {
+    _bbgRefDataProvider = bbgRefDataProvider;
+  }
+
+  public String getDataProvider() {
+    return _dataProvider;
+  }
+
+  public void setDataProvider(String dataProvider) {
+    _dataProvider = dataProvider;
+  }
+
+  public String[] getDataFields() {
+    return _dataFields;
+  }
+
+  public void setDataFields(String[] dataFields) {
+    _dataFields = dataFields;
+  }
+
 }

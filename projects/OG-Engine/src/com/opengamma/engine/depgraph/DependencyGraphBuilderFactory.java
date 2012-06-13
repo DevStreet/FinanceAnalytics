@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
+
 /**
  * Constructs {@link DependencyGraphBuider} instances with common parameters. All dependency graph builders
  * created by a single factory will share the same additional thread allowance.
@@ -46,6 +48,9 @@ public class DependencyGraphBuilderFactory {
 
   private int _maxAdditionalThreadsPerBuilder = DependencyGraphBuilder.getDefaultMaxAdditionalThreads();
   private int _maxAdditionalThreads = DependencyGraphBuilder.getDefaultMaxAdditionalThreads();
+  private boolean _enableFailureReporting;
+  private RunQueueFactory _runQueue = DependencyGraphBuilder.getDefaultRunQueueFactory();
+  private FunctionExclusionGroups _functionExclusionGroups;
   private final Executor _executor = createExecutor();
 
   public DependencyGraphBuilderFactory() {
@@ -67,14 +72,40 @@ public class DependencyGraphBuilderFactory {
     return _maxAdditionalThreads;
   }
 
+  public void setEnableFailureReporting(final boolean enableFailureReporting) {
+    _enableFailureReporting = enableFailureReporting;
+  }
+
+  public boolean isEnableFailureReporting() {
+    return _enableFailureReporting;
+  }
+
+  public void setRunQueueFactory(final RunQueueFactory runQueue) {
+    _runQueue = runQueue;
+  }
+
+  public RunQueueFactory getRunQueueFactory() {
+    return _runQueue;
+  }
+
+  public void setFunctionExclusionGroups(final FunctionExclusionGroups functionExclusionGroups) {
+    _functionExclusionGroups = functionExclusionGroups;
+  }
+
+  public FunctionExclusionGroups getFunctionExclusionGroups() {
+    return _functionExclusionGroups;
+  }
+
   public DependencyGraphBuilder newInstance() {
-    final DependencyGraphBuilder builder = new DependencyGraphBuilder(getExecutor());
+    final DependencyGraphBuilder builder = new DependencyGraphBuilder(getExecutor(), getRunQueueFactory());
     configureBuilder(builder);
     return builder;
   }
 
   protected void configureBuilder(final DependencyGraphBuilder builder) {
     builder.setMaxAdditionalThreads(getMaxAdditionalThreadsPerBuilder());
+    builder.setDisableFailureReporting(!isEnableFailureReporting());
+    builder.setFunctionExclusionGroups(getFunctionExclusionGroups());
   }
 
   protected Executor createExecutor() {

@@ -1,25 +1,37 @@
 /*
- * @copyright 2009 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 $.register_module({
     name: 'og.views.analytics2',
-    dependencies: ['og.views.common.state', 'og.common.routes'],
+    dependencies: ['og.views.common.state', 'og.common.routes', 'og.common.gadgets.GadgetsContainer'],
     obj: function () {
-        var api = og.api.rest, routes = og.common.routes, module = this, view,
-            page_name = module.name.split('.').pop(),
-            check_state = og.views.common.state.check.partial('/' + page_name);
+        var routes = og.common.routes, module = this, view,
+            GadgetsContainer = og.common.gadgets.GadgetsContainer;
         module.rules = {load: {route: '/', method: module.name + '.load'}};
         return view = {
-            load: function (args) {
-                og.analytics.grid({
-                    selector: '.OG-layout-analytics-center',
-                    width: 900,
-                    height: 350
+            check_state: og.views.common.state.check.partial('/'),
+            default_details: function () {
+                og.api.text({module: 'og.analytics.grid.configure_tash'}).pipe(function (markup) {
+                    var template = Handlebars.compile(markup);
+                    $('.OG-layout-analytics-center').html(template({}));
                 });
             },
-            init: function () {for (var rule in module.rules) routes.add(module.rules[rule]);},
-            rules: module.rules
+            load: function (args) {if (!args.id) view.default_details();},
+            load_item: function (args) {
+                view.check_state({args: args, conditions: [{new_page: view.load}]});
+                new og.analytics.Grid({selector: '.OG-layout-analytics-center'});
+                ['south', 'dock-north', 'dock-center', 'dock-south'].forEach(function (val) {
+                    new GadgetsContainer('.OG-layout-analytics-', val).add(args[val]);
+                });
+                og.analytics.resize();
+            },
+            init: function () {for (var rule in view.rules) routes.add(view.rules[rule]);},
+            rules: {
+                load: {route: '/', method: module.name + '.load'},
+                load_item: {route: '/:id/south:?/dock-north:?/dock-center:?/dock-south:?',
+                    method: module.name + '.load_item'}
+            }
         };
     }
 });

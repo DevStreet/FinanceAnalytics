@@ -134,7 +134,7 @@ public class FunctionExecutionContext extends AbstractFunctionContext {
   public void setSecuritySource(SecuritySource securitySource) {
     put(SECURITY_SOURCE_NAME, securitySource);
   }
-
+  
   /**
    * Gets the function parameters.
    * 

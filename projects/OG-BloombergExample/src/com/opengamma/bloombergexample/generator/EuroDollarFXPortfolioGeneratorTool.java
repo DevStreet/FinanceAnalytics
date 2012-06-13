@@ -8,6 +8,7 @@ package com.opengamma.bloombergexample.generator;
 import java.math.BigDecimal;
 
 import com.opengamma.financial.generator.MixedFXPortfolioGeneratorTool;
+import com.opengamma.financial.generator.NameGenerator;
 import com.opengamma.financial.generator.SecurityPersister;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.security.ManageableSecurity;
@@ -35,10 +36,10 @@ public class EuroDollarFXPortfolioGeneratorTool extends MixedFXPortfolioGenerato
 
     /**
      * We don't want FX forwards in the generated portfolio so this always returns null.
-     * @return {@code null}
+     * @return null
      */
     @Override
-    protected ManageableTrade createFXForwardSecurityTrade(Bundle bundle, BigDecimal quantity, SecurityPersister persister) {
+    protected ManageableTrade createFXForwardSecurityTrade(Bundle bundle, BigDecimal quantity, SecurityPersister persister, NameGenerator counterPartyGenerator) {
       return null;
     }
   }

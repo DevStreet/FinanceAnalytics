@@ -23,7 +23,9 @@ import com.opengamma.engine.function.CompiledFunctionDefinition;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionInputs;
+import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.ComputationTargetResults;
+import com.opengamma.engine.function.resolver.FunctionPriority;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValueRequirement;
@@ -181,6 +183,20 @@ public abstract class DefaultPropertyFunction extends AbstractFunction.NonCompil
   }
 
   /**
+   * Returns the maximal set of value requirement names that are defined (if the defaults are not dependent on compilation context information or a target)
+   * 
+   * @return the set of value requirement names, shouldn't be null
+   * @throws NullPointerException if the implementation of getDefaults expected a compilation context or target
+   * @deprecated this is for debugging only - it is likely to be removed or unavailable in future versions
+   */
+  @Deprecated
+  public final Set<String> getMaximalValueRequirementNames() {
+    final PropertyDefaults defaults = new PropertyDefaults(null, null);
+    getDefaults(defaults);
+    return defaults.getValueName2PropertyNames().keySet();
+  }
+
+  /**
    * Returns the default value(s) to set for the property. If a default value is
    * not available, must return null.
    * 
@@ -297,8 +313,24 @@ public abstract class DefaultPropertyFunction extends AbstractFunction.NonCompil
     return inputs.keySet();
   }
 
+  /**
+   * Returns a priority adjustment. {@link FunctionPriority} implementations may recognize {@link DefaultPropertyFunction} instances and use this to adjust the priority they would otherwise assign to
+   * the function.
+   * 
+   * @return the priority adjustment, defaults to {@link PriorityClass#NORMAL}
+   */
   public PriorityClass getPriority() {
     return PriorityClass.NORMAL;
+  }
+
+  /**
+   * Returns a mutual function exclusion group name. A {@link FunctionExclusionGroups} implementation may recognize {@link DefaultPropertyFunction} instances and use this to declare application
+   * exclusions.
+   * 
+   * @return the mutual exclusion group, defaults to null for none
+   */
+  public String getMutualExclusionGroup() {
+    return null;
   }
 
 }

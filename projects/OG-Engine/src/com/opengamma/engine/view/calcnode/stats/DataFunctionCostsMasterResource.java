@@ -56,6 +56,11 @@ public class DataFunctionCostsMasterResource extends AbstractDataResource {
   }
 
   //-------------------------------------------------------------------------
+  @GET
+  public Response getHateaos(@Context UriInfo uriInfo) {
+    return hateoasResponse(uriInfo);
+  }
+
   @HEAD
   @Path("functioncosts")
   public Response status() {
@@ -66,7 +71,7 @@ public class DataFunctionCostsMasterResource extends AbstractDataResource {
   @GET
   @Path("functioncosts")
   public Response search(@QueryParam("configurationName") String configurationName, @QueryParam("functionId") String functionId, @QueryParam("versionAsOf") String versionAsOfStr) {
-    Instant versionAsOf = (versionAsOfStr != null ? DateUtils.parseInstant(versionAsOfStr) : null);
+    Instant versionAsOf = (versionAsOfStr != null ? Instant.parse(versionAsOfStr) : null);
     FunctionCostsDocument result = getFunctionCostsMaster().load(configurationName, functionId, versionAsOf);
     return responseOkFudge(result);
   }

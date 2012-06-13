@@ -1,6 +1,6 @@
 /*
- * @copyright 2009 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 $.register_module({
     name: 'og.views.common.toolbar.upload',
@@ -10,7 +10,7 @@ $.register_module({
             og.common.util.ui.dialog({
                 width: 600, height: 420,
                 type: 'input',
-                title: 'Import Portfolio',
+                title: 'import',
                 custom: '<iframe id="import" src="import.ftl" width="500" height="270" marginheight="0" marginwidth="0"\
                          frameborder="0" />',
                 buttons: {

@@ -5,12 +5,6 @@
  */
 package com.opengamma.analytics.financial.instrument.future;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.ZonedDateTime;
-
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.Validate;
-
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionWithData;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
@@ -19,6 +13,12 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.Interest
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.util.money.Currency;
+
+import javax.time.calendar.LocalDate;
+import javax.time.calendar.ZonedDateTime;
+
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.Validate;
 
 /**
  * Description of an interest rate future security.
@@ -54,9 +54,9 @@ public class InterestRateFutureDefinition implements InstrumentDefinitionWithDat
    */
   private final double _fixingPeriodAccrualFactor;
   /**
-   * Future notional.
+   * Future notional. 
    */
-  private final double _notional;
+  private double _notional;
   /**
    * Future payment accrual factor. Usually a standardized number of 0.25 for a 3M future.
    */
@@ -76,14 +76,13 @@ public class InterestRateFutureDefinition implements InstrumentDefinitionWithDat
    * @param transactionPrice The price at which the transaction was done.
    * @param lastTradingDate Future last trading date.
    * @param iborIndex Ibor index associated to the future.
-   * @param referencePrice TODO
    * @param notional Future notional.
    * @param paymentAccrualFactor Future payment accrual factor. 
    * @param quantity The quantity/number of contract.
    * @param name Future name.
    */
-  public InterestRateFutureDefinition(final ZonedDateTime transactionDate, final double transactionPrice, final ZonedDateTime lastTradingDate, final IborIndex iborIndex, double referencePrice,
-      final double notional, final double paymentAccrualFactor, final int quantity, final String name) {
+  public InterestRateFutureDefinition(final ZonedDateTime transactionDate, final double transactionPrice, final ZonedDateTime lastTradingDate, final IborIndex iborIndex, final double notional,
+      final double paymentAccrualFactor, final int quantity, final String name) {
     Validate.notNull(lastTradingDate, "Last trading date");
     Validate.notNull(iborIndex, "Ibor index");
     Validate.notNull(name, "Name");
@@ -107,14 +106,13 @@ public class InterestRateFutureDefinition implements InstrumentDefinitionWithDat
    * @param transactionPrice The price at which the transaction was done.
    * @param lastTradingDate Future last trading date.
    * @param iborIndex Ibor index associated to the future.
-   * @param referencePrice TODO
    * @param notional Future notional.
    * @param paymentAccrualFactor Future payment accrual factor. 
    * @param quantity The quantity/number of contract.
    */
-  public InterestRateFutureDefinition(final ZonedDateTime transactionDate, final double transactionPrice, final ZonedDateTime lastTradingDate, final IborIndex iborIndex, double referencePrice,
-      final double notional, final double paymentAccrualFactor, final int quantity) {
-    this(transactionDate, transactionPrice, lastTradingDate, iborIndex, referencePrice, notional, paymentAccrualFactor, quantity, "RateFuture " + iborIndex.getName());
+  public InterestRateFutureDefinition(final ZonedDateTime transactionDate, final double transactionPrice, final ZonedDateTime lastTradingDate, final IborIndex iborIndex, final double notional,
+      final double paymentAccrualFactor, final int quantity) {
+    this(transactionDate, transactionPrice, lastTradingDate, iborIndex, notional, paymentAccrualFactor, quantity, "RateFuture " + iborIndex.getName());
   }
 
   /**
@@ -131,6 +129,21 @@ public class InterestRateFutureDefinition implements InstrumentDefinitionWithDat
    */
   public double getTransactionPrice() {
     return _transactionPrice;
+  }
+
+  /**
+   * Constructor for Yield Curve fitting. Notional scaling for Jacobian conditioning; pricing to get spot traded trade to value to 0.  
+   * @param notional Face value of the security. This doesn't include accrual factor.
+   * @param txnPrice Not scaled, eg 0.9875
+   * @return New InterestRate Future
+   */
+  public InterestRateFutureDefinition withNewNotionalAndTransactionPrice(double notional, double txnPrice) {
+    return new InterestRateFutureDefinition(getTransactionDate(), txnPrice, getLastTradingDate(), getIborIndex(), notional, getPaymentAccrualFactor(), getQuantity());
+  }
+
+  /** Scales notional to 1.0 in curve fitting to provide better conditioning of the Jacobian */
+  public void setUnitNotional() {
+    _notional = 1.0;
   }
 
   /**

@@ -12,16 +12,17 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIbor;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
-import com.opengamma.analytics.financial.interestrate.payments.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIbor;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
-import com.opengamma.analytics.financial.interestrate.payments.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -66,7 +67,7 @@ public class CashFlowEquivalentCurveSensitivityCalculator extends AbstractInstru
   }
 
   @Override
-  public Map<Double, InterestRateCurveSensitivity> visitFixedCouponPayment(final CouponFixed coupon, final YieldCurveBundle curves) {
+  public Map<Double, InterestRateCurveSensitivity> visitCouponFixed(final CouponFixed coupon, final YieldCurveBundle curves) {
     Validate.notNull(curves);
     Validate.notNull(coupon);
     return new HashMap<Double, InterestRateCurveSensitivity>();
@@ -74,6 +75,39 @@ public class CashFlowEquivalentCurveSensitivityCalculator extends AbstractInstru
 
   @Override
   public Map<Double, InterestRateCurveSensitivity> visitCouponIbor(final CouponIbor payment, final YieldCurveBundle curves) {
+    Validate.notNull(curves);
+    Validate.notNull(payment);
+    final YieldAndDiscountCurve discountingCurve = curves.getCurve(payment.getFundingCurveName());
+    final YieldAndDiscountCurve forwardCurve = curves.getCurve(payment.getForwardCurveName());
+    double fixingStartTime = payment.getFixingPeriodStartTime();
+    double fixingEndTime = payment.getFixingPeriodEndTime();
+    double paymentTime = payment.getPaymentTime();
+    final double beta = forwardCurve.getDiscountFactor(fixingStartTime) / forwardCurve.getDiscountFactor(fixingEndTime) * discountingCurve.getDiscountFactor(paymentTime)
+        / discountingCurve.getDiscountFactor(fixingStartTime);
+    double betaBar = payment.getNotional() * payment.getPaymentYearFraction() / payment.getFixingAccrualFactor();
+
+    Map<Double, InterestRateCurveSensitivity> result = new HashMap<Double, InterestRateCurveSensitivity>();
+    final Map<String, List<DoublesPair>> resultPVS = new HashMap<String, List<DoublesPair>>();
+    final List<DoublesPair> listForward = new ArrayList<DoublesPair>();
+    DoublesPair forwardStart = new DoublesPair(fixingStartTime, -fixingStartTime * beta * betaBar);
+    listForward.add(forwardStart);
+    DoublesPair forwardEnd = new DoublesPair(fixingEndTime, beta * fixingEndTime * betaBar);
+    listForward.add(forwardEnd);
+    resultPVS.put(payment.getForwardCurveName(), listForward);
+
+    final List<DoublesPair> listDisc = new ArrayList<DoublesPair>();
+    DoublesPair discStart = new DoublesPair(fixingStartTime, beta * fixingStartTime * betaBar);
+    listDisc.add(discStart);
+    DoublesPair discPay = new DoublesPair(paymentTime, -paymentTime * beta * betaBar);
+    listDisc.add(discPay);
+    resultPVS.put(payment.getFundingCurveName(), listDisc);
+
+    result.put(fixingStartTime, new InterestRateCurveSensitivity(resultPVS));
+    return result;
+  }
+
+  @Override
+  public Map<Double, InterestRateCurveSensitivity> visitCouponIborSpread(final CouponIborSpread payment, final YieldCurveBundle curves) {
     Validate.notNull(curves);
     Validate.notNull(payment);
     final YieldAndDiscountCurve discountingCurve = curves.getCurve(payment.getFundingCurveName());
@@ -106,7 +140,7 @@ public class CashFlowEquivalentCurveSensitivityCalculator extends AbstractInstru
   }
 
   @Override
-  public Map<Double, InterestRateCurveSensitivity> visitGenericAnnuity(final GenericAnnuity<? extends Payment> annuity, final YieldCurveBundle curves) {
+  public Map<Double, InterestRateCurveSensitivity> visitGenericAnnuity(final Annuity<? extends Payment> annuity, final YieldCurveBundle curves) {
     Validate.notNull(curves);
     Validate.notNull(annuity);
     Map<Double, InterestRateCurveSensitivity> result = new HashMap<Double, InterestRateCurveSensitivity>();
@@ -142,7 +176,7 @@ public class CashFlowEquivalentCurveSensitivityCalculator extends AbstractInstru
   }
 
   @Override
-  public Map<Double, InterestRateCurveSensitivity> visitFixedCouponSwap(final FixedCouponSwap<?> swap, final YieldCurveBundle curves) {
+  public Map<Double, InterestRateCurveSensitivity> visitFixedCouponSwap(final SwapFixedCoupon<?> swap, final YieldCurveBundle curves) {
     return visitSwap(swap, curves);
   }
 

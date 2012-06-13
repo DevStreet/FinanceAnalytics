@@ -78,20 +78,22 @@ public class IRFutureOptionSurfaceConfigPopulator {
   }
 
   private static void populateVolatilitySurfaceSpecifications(final ConfigMaster configMaster) {
-    final SurfaceInstrumentProvider<Number, Double> usSurfaceInstrumentProvider = new BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider("ED", "Comdty",
+    final BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider usSurfaceInstrumentProvider = new BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider("ED", "Comdty",
         MarketDataRequirementNames.IMPLIED_VOLATILITY, 97.775);
-    final FuturePriceCurveInstrumentProvider<Number> usCurveInstrumentProvider = new BloombergIRFuturePriceCurveInstrumentProvider("ED", "Comdty", MarketDataRequirementNames.MARKET_VALUE);
+    final FuturePriceCurveInstrumentProvider<Number> usCurveInstrumentProvider = new BloombergIRFuturePriceCurveInstrumentProvider("ED", "Comdty", 
+        MarketDataRequirementNames.MARKET_VALUE, "BLOOMBERG_TICKER_WEAK");
     final VolatilitySurfaceSpecification usVolSurfaceDefinition = new VolatilitySurfaceSpecification("DEFAULT_USD_IR_FUTURE_OPTION", Currency.USD,
-        SurfaceQuoteType.CALL_AND_PUT_STRIKE,
+        SurfaceAndCubeQuoteType.CALL_AND_PUT_STRIKE,
         usSurfaceInstrumentProvider);
     final FuturePriceCurveSpecification usFutureCurveDefinition = new FuturePriceCurveSpecification("DEFAULT_USD_IR_FUTURE_PRICE", Currency.USD, usCurveInstrumentProvider);
     ConfigMasterUtils.storeByName(configMaster, makeConfigDocument(usVolSurfaceDefinition));
     ConfigMasterUtils.storeByName(configMaster, makeConfigDocument(usFutureCurveDefinition));
-    final SurfaceInstrumentProvider<Number, Double> euSurfaceInstrumentProvider = new BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider("ER", "Comdty",
+    final BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider euSurfaceInstrumentProvider = new BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider("ER", "Comdty",
         MarketDataRequirementNames.IMPLIED_VOLATILITY, 97.775);
-    final FuturePriceCurveInstrumentProvider<Number> euCurveInstrumentProvider = new BloombergIRFuturePriceCurveInstrumentProvider("ER", "Comdty", MarketDataRequirementNames.MARKET_VALUE);
+    final FuturePriceCurveInstrumentProvider<Number> euCurveInstrumentProvider = new BloombergIRFuturePriceCurveInstrumentProvider("ER", "Comdty", 
+        MarketDataRequirementNames.MARKET_VALUE, "BLOOMBERG_TICKER_WEAK");
     final VolatilitySurfaceSpecification euVolSurfaceDefinition = new VolatilitySurfaceSpecification("DEFAULT_EUR_IR_FUTURE_OPTION", Currency.EUR,
-        SurfaceQuoteType.CALL_AND_PUT_STRIKE,
+        SurfaceAndCubeQuoteType.CALL_AND_PUT_STRIKE,
         euSurfaceInstrumentProvider);
     final FuturePriceCurveSpecification euFutureCurveDefinition = new FuturePriceCurveSpecification("DEFAULT_EUR_IR_FUTURE_PRICE", Currency.EUR, euCurveInstrumentProvider);
     ConfigMasterUtils.storeByName(configMaster, makeConfigDocument(euVolSurfaceDefinition));

@@ -13,6 +13,7 @@ import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.marketdata.OverrideOperationCompiler;
+import com.opengamma.financial.analytics.ircurve.calcconfig.CurveCalculationConfigSource;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.master.holiday.HolidayMaster;
 
@@ -57,6 +58,11 @@ public final class OpenGammaExecutionContext {
   public static final String OVERRIDE_OPERATION_COMPILER_NAME = "overrideOperationCompiler";
 
   /**
+   * The name under which an instance of {@link CurveCalculationConfigSource} should be bound.
+   */
+  public static final String CURVE_CALCULATION_CONFIG_NAME = "curveCalculationConfigurationSource";
+
+  /**
    * Restricted constructor.
    */
   private OpenGammaExecutionContext() {
@@ -69,7 +75,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static HistoricalTimeSeriesSource getHistoricalTimeSeriesSource(FunctionExecutionContext context) {
+  public static HistoricalTimeSeriesSource getHistoricalTimeSeriesSource(final FunctionExecutionContext context) {
     return (HistoricalTimeSeriesSource) context.get(HISTORICAL_TIME_SERIES_SOURCE_NAME);
   }
 
@@ -79,7 +85,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param source  the value to store, not null
    */
-  public static void setHistoricalTimeSeriesSource(FunctionExecutionContext context, HistoricalTimeSeriesSource source) {
+  public static void setHistoricalTimeSeriesSource(final FunctionExecutionContext context, final HistoricalTimeSeriesSource source) {
     context.put(HISTORICAL_TIME_SERIES_SOURCE_NAME, source);
   }
 
@@ -90,7 +96,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static SecuritySource getSecuritySource(FunctionExecutionContext context) {
+  public static SecuritySource getSecuritySource(final FunctionExecutionContext context) {
     return context.getSecuritySource();
   }
 
@@ -100,18 +106,17 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param securitySource  the value to store, not null
    */
-  public static void setSecuritySource(FunctionExecutionContext context, SecuritySource securitySource) {
+  public static void setSecuritySource(final FunctionExecutionContext context, final SecuritySource securitySource) {
     context.setSecuritySource(securitySource);
   }
 
-  //-------------------------------------------------------------------------
   /**
    * Gets a {@code ConventionBundleSource} from the context.
    * 
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static ConventionBundleSource getConventionBundleSource(FunctionExecutionContext context) {
+  public static ConventionBundleSource getConventionBundleSource(final FunctionExecutionContext context) {
     return (ConventionBundleSource) context.get(CONVENTION_BUNDLE_SOURCE_NAME);
   }
 
@@ -121,7 +126,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param conventionBundleSource  the value to store, not null
    */
-  public static void setConventionBundleSource(FunctionExecutionContext context, ConventionBundleSource conventionBundleSource) {
+  public static void setConventionBundleSource(final FunctionExecutionContext context, final ConventionBundleSource conventionBundleSource) {
     context.put(CONVENTION_BUNDLE_SOURCE_NAME, conventionBundleSource);
   }
 
@@ -132,7 +137,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static RegionSource getRegionSource(FunctionExecutionContext context) {
+  public static RegionSource getRegionSource(final FunctionExecutionContext context) {
     return (RegionSource) context.get(REGION_SOURCE_NAME);
   }
 
@@ -142,7 +147,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param regionSource  the value to store, not null
    */
-  public static void setRegionSource(FunctionExecutionContext context, RegionSource regionSource) {
+  public static void setRegionSource(final FunctionExecutionContext context, final RegionSource regionSource) {
     context.put(REGION_SOURCE_NAME, regionSource);
   }
 
@@ -153,7 +158,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static HolidaySource getHolidaySource(FunctionExecutionContext context) {
+  public static HolidaySource getHolidaySource(final FunctionExecutionContext context) {
     return (HolidaySource) context.get(HOLIDAY_SOURCE_NAME);
   }
 
@@ -163,7 +168,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param holidaySource  the value to store, not null
    */
-  public static void setHolidaySource(FunctionExecutionContext context, HolidaySource holidaySource) {
+  public static void setHolidaySource(final FunctionExecutionContext context, final HolidaySource holidaySource) {
     context.put(HOLIDAY_SOURCE_NAME, holidaySource);
   }
 
@@ -174,7 +179,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static ExchangeSource getExchangeSource(FunctionExecutionContext context) {
+  public static ExchangeSource getExchangeSource(final FunctionExecutionContext context) {
     return (ExchangeSource) context.get(EXCHANGE_SOURCE_NAME);
   }
 
@@ -184,10 +189,29 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param exchangeSource  the value to store, not null
    */
-  public static void setExchangeSource(FunctionExecutionContext context, ExchangeSource exchangeSource) {
+  public static void setExchangeSource(final FunctionExecutionContext context, final ExchangeSource exchangeSource) {
     context.put(EXCHANGE_SOURCE_NAME, exchangeSource);
   }
 
+  /**
+   * Gets a {@code CurveCalculationConfigSource} from the context.
+   * 
+   * @param context  the context to examine, not null
+   * @return the curve config source, null if not found
+   */
+  public static CurveCalculationConfigSource getCurveCalculationConfigSource(final FunctionExecutionContext context) {
+    return (CurveCalculationConfigSource) context.get(CURVE_CALCULATION_CONFIG_NAME);
+  }
+
+  /**
+   * Stores a {@code CurveCalculationConfigSource} in the context.
+   * 
+   * @param context  the context to store in, not null
+   * @param curveConfigSource  the curve config source to store, not null
+   */
+  public static void setCurveCalculationConfigSource(final FunctionExecutionContext context, final CurveCalculationConfigSource curveConfigSource) {
+    context.put(CURVE_CALCULATION_CONFIG_NAME, curveConfigSource);
+  }
   //-------------------------------------------------------------------------
   /**
    * Gets a {@code ConfigSource} from the context.
@@ -195,7 +219,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to examine, not null
    * @return the value, null if not found
    */
-  public static ConfigSource getConfigSource(FunctionExecutionContext context) {
+  public static ConfigSource getConfigSource(final FunctionExecutionContext context) {
     return (ConfigSource) context.get(CONFIG_SOURCE_NAME);
   }
 
@@ -205,7 +229,7 @@ public final class OpenGammaExecutionContext {
    * @param context  the context to store in, not null
    * @param configSource  the value to store, not null
    */
-  public static void setConfigSource(FunctionExecutionContext context, ConfigSource configSource) {
+  public static void setConfigSource(final FunctionExecutionContext context, final ConfigSource configSource) {
     context.put(CONFIG_SOURCE_NAME, configSource);
   }
 
@@ -216,5 +240,4 @@ public final class OpenGammaExecutionContext {
   public static void setOverrideOperationCompiler(final FunctionExecutionContext context, final OverrideOperationCompiler overrideOperationCompiler) {
     context.put(OVERRIDE_OPERATION_COMPILER_NAME, overrideOperationCompiler);
   }
-
 }

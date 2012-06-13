@@ -22,17 +22,7 @@ import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.FXUtils;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
-import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
-import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
-import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
-import com.opengamma.financial.security.option.EquityOptionSecurity;
-import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
-import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
-import com.opengamma.financial.security.option.FXOptionSecurity;
-import com.opengamma.financial.security.option.IRFutureOptionSecurity;
-import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
-import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
-import com.opengamma.financial.security.option.SwaptionSecurity;
+import com.opengamma.financial.security.option.*;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.UnorderedCurrencyPair;
@@ -129,6 +119,11 @@ public class ForexVisitors {
 
     @Override
     public Currency visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Currency visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
       throw new UnsupportedOperationException();
     }
 
@@ -264,6 +259,11 @@ public class ForexVisitors {
     }
 
     @Override
+    public Currency visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Currency visitEquityIndexDividendFutureOptionSecurity(final EquityIndexDividendFutureOptionSecurity security) {
       throw new UnsupportedOperationException();
     }
@@ -383,7 +383,9 @@ public class ForexVisitors {
 
     @Override
     public ValueRequirement visitNonDeliverableFXOptionSecurity(final NonDeliverableFXOptionSecurity security) {
-      throw new UnsupportedOperationException();
+      final Currency putCurrency = security.getPutCurrency();
+      final Currency callCurrency = security.getCallCurrency();
+      return getSpotIdentifierRequirement(putCurrency, callCurrency);
     }
 
     @Override
@@ -393,6 +395,11 @@ public class ForexVisitors {
 
     @Override
     public ValueRequirement visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ValueRequirement visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
       throw new UnsupportedOperationException();
     }
 
@@ -407,15 +414,19 @@ public class ForexVisitors {
       final Currency callCurrency = security.getCallCurrency();
       return getSpotIdentifierRequirement(putCurrency, callCurrency);
     }
-    
+
     @Override
     public ValueRequirement visitFXForwardSecurity(final FXForwardSecurity security) {
-      throw new UnsupportedOperationException();
+      final Currency payCurrency = security.getPayCurrency();
+      final Currency receiveCurrency = security.getReceiveCurrency();
+      return getSpotIdentifierRequirement(payCurrency, receiveCurrency);
     }
 
     @Override
     public ValueRequirement visitNonDeliverableFXForwardSecurity(final NonDeliverableFXForwardSecurity security) {
-      throw new UnsupportedOperationException();
+      final Currency payCurrency = security.getPayCurrency();
+      final Currency receiveCurrency = security.getReceiveCurrency();
+      return getSpotIdentifierRequirement(payCurrency, receiveCurrency);
     }
 
     @Override
@@ -472,7 +483,7 @@ public class ForexVisitors {
     }
     return new ValueRequirement(ValueRequirementNames.SPOT_RATE, currencyPair);
   }
-  
+
   private static class InverseSpotIdentifierVisitor implements FinancialSecurityVisitor<ValueRequirement> {
 
     public InverseSpotIdentifierVisitor() {
@@ -532,7 +543,9 @@ public class ForexVisitors {
 
     @Override
     public ValueRequirement visitNonDeliverableFXOptionSecurity(final NonDeliverableFXOptionSecurity security) {
-      throw new UnsupportedOperationException();
+      final Currency putCurrency = security.getPutCurrency();
+      final Currency callCurrency = security.getCallCurrency();
+      return getInverseSpotIdentifierRequirement(putCurrency, callCurrency);
     }
 
     @Override
@@ -542,6 +555,11 @@ public class ForexVisitors {
 
     @Override
     public ValueRequirement visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ValueRequirement visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
       throw new UnsupportedOperationException();
     }
 
@@ -611,7 +629,7 @@ public class ForexVisitors {
       throw new UnsupportedOperationException();
     }
   }
-  
+
   private static ValueRequirement getInverseSpotIdentifierRequirement(final Currency putCurrency, final Currency callCurrency) {
     UnorderedCurrencyPair currencyPair;
     if (!FXUtils.isInBaseQuoteOrder(putCurrency, callCurrency)) {

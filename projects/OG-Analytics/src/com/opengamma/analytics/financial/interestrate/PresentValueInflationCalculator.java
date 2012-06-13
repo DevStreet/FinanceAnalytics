@@ -7,22 +7,22 @@ package com.opengamma.analytics.financial.interestrate;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondCapitalIndexedSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondCapitalIndexedTransaction;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponInterpolation;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponInterpolationGearing;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponMonthly;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponMonthlyGearing;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolation;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolationGearing;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthly;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthlyGearing;
 import com.opengamma.analytics.financial.interestrate.inflation.method.CouponInflationZeroCouponInterpolationDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.inflation.method.CouponInflationZeroCouponInterpolationGearingDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.inflation.method.CouponInflationZeroCouponMonthlyDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.inflation.method.CouponInflationZeroCouponMonthlyGearingDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.market.MarketBundle;
 import com.opengamma.analytics.financial.interestrate.market.MarketDiscountingDecorated;
-import com.opengamma.analytics.financial.interestrate.payments.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
-import com.opengamma.analytics.financial.interestrate.payments.PaymentFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
 import com.opengamma.util.money.CurrencyAmount;
 
 /**
@@ -79,12 +79,12 @@ public class PresentValueInflationCalculator extends AbstractInstrumentDerivativ
   }
 
   @Override
-  public CurrencyAmount visitFixedCouponPayment(final CouponFixed coupon, final MarketBundle market) {
+  public CurrencyAmount visitCouponFixed(final CouponFixed coupon, final MarketBundle market) {
     return CurrencyAmount.of(coupon.getCurrency(), market.getDiscountingFactor(coupon.getCurrency(), coupon.getPaymentTime()) * coupon.getAmount());
   }
 
   @Override
-  public CurrencyAmount visitGenericAnnuity(final GenericAnnuity<? extends Payment> annuity, final MarketBundle market) {
+  public CurrencyAmount visitGenericAnnuity(final Annuity<? extends Payment> annuity, final MarketBundle market) {
     Validate.notNull(annuity);
     CurrencyAmount pv = CurrencyAmount.of(annuity.getCurrency(), 0.0);
     for (final Payment p : annuity.getPayments()) {

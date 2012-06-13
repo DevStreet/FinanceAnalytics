@@ -1,6 +1,6 @@
 /**
- * @copyright 2009 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 $.register_module({
     name: 'og.common.search_results.core',
@@ -23,7 +23,7 @@ $.register_module({
                         enableAddRow: false,
                         enableCellNavigation: false,
                         showHeaderRow: false,
-                        headerHeight: 38
+                        headerHeight: 39
                     });
                     obj.columns = og.common.slickgrid.calibrate_columns({
                         container: '.OG-js-search',

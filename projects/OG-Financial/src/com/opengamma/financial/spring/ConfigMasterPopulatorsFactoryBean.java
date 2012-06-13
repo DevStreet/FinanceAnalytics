@@ -22,6 +22,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.opengamma.financial.analytics.fxforwardcurve.FXForwardCurveConfigPopulator;
 import com.opengamma.financial.analytics.ircurve.YieldCurveConfigPopulator;
+import com.opengamma.financial.analytics.ircurve.calcconfig.CurveCalculationConfigConfigPopulator;
 import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeConfigPopulator;
 import com.opengamma.financial.analytics.volatility.surface.EquityOptionSurfaceConfigPopulator;
 import com.opengamma.financial.analytics.volatility.surface.FXOptionVolatilitySurfaceConfigPopulator;
@@ -82,6 +83,11 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
    */
   @PropertyDefinition
   private boolean _fxForwardCurve;
+  /**
+   * The flag to create curve calculation configurations in the config master.
+   */
+  @PropertyDefinition
+  private boolean _curveCalculationConfiguration;
 
   //-------------------------------------------------------------------------
   @Override
@@ -112,6 +118,9 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
     }
     if (isFxForwardCurve()) {
       new FXForwardCurveConfigPopulator(cm);
+    }
+    if (isCurveCalculationConfiguration()) {
+      new CurveCalculationConfigConfigPopulator(cm);
     }
   }
 
@@ -154,6 +163,8 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
         return isVolatilityCube();
       case -1016191204:  // fxForwardCurve
         return isFxForwardCurve();
+      case 364174524:  // curveCalculationConfiguration
+        return isCurveCalculationConfiguration();
     }
     return super.propertyGet(propertyName, quiet);
   }
@@ -188,6 +199,9 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
       case -1016191204:  // fxForwardCurve
         setFxForwardCurve((Boolean) newValue);
         return;
+      case 364174524:  // curveCalculationConfiguration
+        setCurveCalculationConfiguration((Boolean) newValue);
+        return;
     }
     super.propertySet(propertyName, newValue, quiet);
   }
@@ -207,7 +221,8 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
           JodaBeanUtils.equal(isFxOptionVolatilitySurface(), other.isFxOptionVolatilitySurface()) &&
           JodaBeanUtils.equal(isEquityOptionSurface(), other.isEquityOptionSurface()) &&
           JodaBeanUtils.equal(isVolatilityCube(), other.isVolatilityCube()) &&
-          JodaBeanUtils.equal(isFxForwardCurve(), other.isFxForwardCurve());
+          JodaBeanUtils.equal(isFxForwardCurve(), other.isFxForwardCurve()) &&
+          JodaBeanUtils.equal(isCurveCalculationConfiguration(), other.isCurveCalculationConfiguration());
     }
     return false;
   }
@@ -224,6 +239,7 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
     hash += hash * 31 + JodaBeanUtils.hashCode(isEquityOptionSurface());
     hash += hash * 31 + JodaBeanUtils.hashCode(isVolatilityCube());
     hash += hash * 31 + JodaBeanUtils.hashCode(isFxForwardCurve());
+    hash += hash * 31 + JodaBeanUtils.hashCode(isCurveCalculationConfiguration());
     return hash;
   }
 
@@ -454,6 +470,31 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
 
   //-----------------------------------------------------------------------
   /**
+   * Gets the flag to create curve calculation configurations in the config master.
+   * @return the value of the property
+   */
+  public boolean isCurveCalculationConfiguration() {
+    return _curveCalculationConfiguration;
+  }
+
+  /**
+   * Sets the flag to create curve calculation configurations in the config master.
+   * @param curveCalculationConfiguration  the new value of the property
+   */
+  public void setCurveCalculationConfiguration(boolean curveCalculationConfiguration) {
+    this._curveCalculationConfiguration = curveCalculationConfiguration;
+  }
+
+  /**
+   * Gets the the {@code curveCalculationConfiguration} property.
+   * @return the property, not null
+   */
+  public final Property<Boolean> curveCalculationConfiguration() {
+    return metaBean().curveCalculationConfiguration().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * The meta-bean for {@code ConfigMasterPopulatorsFactoryBean}.
    */
   public static class Meta extends DirectMetaBean {
@@ -508,6 +549,11 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
     private final MetaProperty<Boolean> _fxForwardCurve = DirectMetaProperty.ofReadWrite(
         this, "fxForwardCurve", ConfigMasterPopulatorsFactoryBean.class, Boolean.TYPE);
     /**
+     * The meta-property for the {@code curveCalculationConfiguration} property.
+     */
+    private final MetaProperty<Boolean> _curveCalculationConfiguration = DirectMetaProperty.ofReadWrite(
+        this, "curveCalculationConfiguration", ConfigMasterPopulatorsFactoryBean.class, Boolean.TYPE);
+    /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
@@ -520,7 +566,8 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
         "fxOptionVolatilitySurface",
         "equityOptionSurface",
         "volatilityCube",
-        "fxForwardCurve");
+        "fxForwardCurve",
+        "curveCalculationConfiguration");
 
     /**
      * Restricted constructor.
@@ -549,6 +596,8 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
           return _volatilityCube;
         case -1016191204:  // fxForwardCurve
           return _fxForwardCurve;
+        case 364174524:  // curveCalculationConfiguration
+          return _curveCalculationConfiguration;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -639,6 +688,14 @@ public class ConfigMasterPopulatorsFactoryBean extends DirectBean implements Ini
      */
     public final MetaProperty<Boolean> fxForwardCurve() {
       return _fxForwardCurve;
+    }
+
+    /**
+     * The meta-property for the {@code curveCalculationConfiguration} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<Boolean> curveCalculationConfiguration() {
+      return _curveCalculationConfiguration;
     }
 
   }

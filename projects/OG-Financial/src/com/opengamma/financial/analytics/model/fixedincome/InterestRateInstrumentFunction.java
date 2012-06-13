@@ -13,6 +13,8 @@ import javax.time.calendar.Clock;
 import javax.time.calendar.ZonedDateTime;
 
 import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
@@ -58,6 +60,7 @@ import com.opengamma.financial.security.swap.SwapSecurity;
  * 
  */
 public abstract class InterestRateInstrumentFunction extends AbstractFunction.NonCompiledInvoker {
+  private static final Logger s_logger = LoggerFactory.getLogger(InterestRateInstrumentFunction.class);
   private FixedIncomeConverterDataProvider _definitionConverter;
   private final String _valueRequirementName;
   private FinancialSecurityVisitorAdapter<InstrumentDefinition<?>> _visitor;
@@ -89,6 +92,14 @@ public abstract class InterestRateInstrumentFunction extends AbstractFunction.No
     _definitionConverter = new FixedIncomeConverterDataProvider(conventionSource);
   }
 
+  protected FinancialSecurityVisitorAdapter<InstrumentDefinition<?>> getVisitor() {
+    return _visitor;
+  }
+
+  protected FixedIncomeConverterDataProvider getConverter() {
+    return _definitionConverter;
+  }
+
   @Override
   public ComputationTargetType getTargetType() {
     return ComputationTargetType.SECURITY;
@@ -110,7 +121,7 @@ public abstract class InterestRateInstrumentFunction extends AbstractFunction.No
         final InterestRateInstrumentType type = InterestRateInstrumentType.getInstrumentTypeFromSecurity(security);
         return type == InterestRateInstrumentType.SWAP_FIXED_IBOR || type == InterestRateInstrumentType.SWAP_FIXED_IBOR_WITH_SPREAD
             || type == InterestRateInstrumentType.SWAP_IBOR_IBOR || type == InterestRateInstrumentType.SWAP_FIXED_OIS;
-      } catch (OpenGammaRuntimeException ogre) {
+      } catch (final OpenGammaRuntimeException ogre) {
         return false;
       }
     }
@@ -120,11 +131,7 @@ public abstract class InterestRateInstrumentFunction extends AbstractFunction.No
   @Override
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
     final String currency = FinancialSecurityUtils.getCurrency(target.getSecurity()).getCode();
-    final ValueProperties.Builder properties = createValueProperties()
-        .withAny(YieldCurveFunction.PROPERTY_FORWARD_CURVE)
-        .withAny(YieldCurveFunction.PROPERTY_FUNDING_CURVE)
-        .withAny(ValuePropertyNames.CURVE_CALCULATION_METHOD)
-        .with(ValuePropertyNames.CURRENCY, currency);
+    final ValueProperties.Builder properties = getResultProperties(currency);
     return Collections.singleton(new ValueSpecification(getValueRequirementName(), target.toSpecification(), properties.get()));
   }
 
@@ -179,19 +186,39 @@ public abstract class InterestRateInstrumentFunction extends AbstractFunction.No
     if (definition == null) {
       throw new OpenGammaRuntimeException("Definition for security " + security + " was null");
     }
-    final InstrumentDerivative derivative = _definitionConverter.convert(security, definition, now,
-        FixedIncomeInstrumentCurveExposureHelper.getCurveNamesForSecurity(security, fundingCurveName, forwardCurveName), dataSource);
-    final String currency = FinancialSecurityUtils.getCurrency(security).getCode();
-    return getComputedValues(derivative, bundle, security, target, forwardCurveName, fundingCurveName, curveCalculationMethod, currency);
+    try {
+      final InstrumentDerivative derivative = _definitionConverter.convert(security, definition, now,
+          FixedIncomeInstrumentCurveExposureHelper.getCurveNamesForSecurity(security, fundingCurveName, forwardCurveName), dataSource);
+      final String currency = FinancialSecurityUtils.getCurrency(security).getCode();
+      return getComputedValues(derivative, bundle, security, target, forwardCurveName, fundingCurveName, curveCalculationMethod, currency);
+    } catch (OpenGammaRuntimeException ogre) {
+      s_logger.error("Error thrown by analytics on security {} with funding curve name {}, forward curve name {}.  Rethrowing.", 
+                     new Object[] {security.toString(), fundingCurveName, forwardCurveName });
+      throw ogre;
+    }
+  }
+
+  protected ValueProperties.Builder getResultProperties(final String currency) {
+    final ValueProperties.Builder properties = createValueProperties()
+        .withAny(YieldCurveFunction.PROPERTY_FORWARD_CURVE)
+        .withAny(YieldCurveFunction.PROPERTY_FUNDING_CURVE)
+        .withAny(ValuePropertyNames.CURVE_CALCULATION_METHOD)
+        .with(ValuePropertyNames.CURRENCY, currency);
+    return properties;
+  }
+
+  protected ValueProperties.Builder getResultProperties(final String currency, final String forwardCurveName, final String fundingCurveName, final String curveCalculationMethod) {
+    final ValueProperties.Builder properties = createValueProperties()
+        .with(YieldCurveFunction.PROPERTY_FORWARD_CURVE, forwardCurveName)
+        .with(YieldCurveFunction.PROPERTY_FUNDING_CURVE, fundingCurveName)
+        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, curveCalculationMethod)
+        .with(ValuePropertyNames.CURRENCY, currency);
+    return properties;
   }
 
   protected ValueSpecification getResultSpec(final ComputationTarget target, final String forwardCurveName, final String fundingCurveName, final String curveCalculationMethod,
       final String currency) {
-    return new ValueSpecification(getValueRequirementName(), target.toSpecification(), createValueProperties()
-        .with(YieldCurveFunction.PROPERTY_FORWARD_CURVE, forwardCurveName)
-        .with(YieldCurveFunction.PROPERTY_FUNDING_CURVE, fundingCurveName)
-        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, curveCalculationMethod)
-        .with(ValuePropertyNames.CURRENCY, currency).get());
+    return new ValueSpecification(getValueRequirementName(), target.toSpecification(), getResultProperties(currency, forwardCurveName, fundingCurveName, curveCalculationMethod).get());
   }
 
   protected static YieldCurveBundle getYieldCurves(final ComputationTarget target, final FunctionInputs inputs, final String forwardCurveName, final String fundingCurveName,

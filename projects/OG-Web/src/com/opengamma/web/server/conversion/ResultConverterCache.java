@@ -6,16 +6,18 @@
 package com.opengamma.web.server.conversion;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.fudgemsg.FudgeContext;
 
+import com.opengamma.analytics.financial.forex.method.PresentValueForexBlackVolatilitySensitivity;
 import com.opengamma.analytics.financial.greeks.BucketedGreekResultCollection;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.financial.model.volatility.local.LocalVolatilitySurfaceMoneyness;
 import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilitySurfaceMoneyness;
-import com.opengamma.analytics.financial.model.volatility.surface.LocalVolatilitySurfaceMoneyness;
 import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurface;
 import com.opengamma.analytics.math.curve.DoublesCurve;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
@@ -69,6 +71,10 @@ public class ResultConverterCache {
     registerConverter(BucketedGreekResultCollection.class, new BucketedVegaConverter());
     registerConverter(DoublesCurve.class, new CurveConverter());
     registerConverter(LocalDateDoubleTimeSeries.class, new LocalDateDoubleTimeSeriesConverter());
+    registerConverter(double[][].class, new DoubleArrayConverter());
+    registerConverter(Double[][].class, new DoubleObjectArrayConverter());
+    registerConverter(List.class, new ListDoubleArrayConverter());
+    registerConverter(PresentValueForexBlackVolatilitySensitivity.class, new PresentValueVolatilitySensitivityConverter(_doubleConverter));
   }
 
   private <T> void registerConverter(Class<T> clazz, ResultConverter<? super T> converter) {

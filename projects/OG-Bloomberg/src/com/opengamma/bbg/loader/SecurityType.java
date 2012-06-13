@@ -28,6 +28,10 @@ public enum SecurityType {
    */
   BOND_FUTURE,
   /**
+   * 
+   */
+  BILL,
+  /**
    * Cash
    */
   CASH,
@@ -116,5 +120,13 @@ public enum SecurityType {
   /**
    * Artificial security type for forward cross rates, quoted as the difference from the spot rate.
    */
-  FORWARD_CROSS;
+  FORWARD_CROSS,
+  /**
+   * 
+   */
+  FX_FORWARD,
+  /**
+   * Commodity Future Option
+   */
+  COMMODITY_FUTURE_OPTION
 }

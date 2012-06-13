@@ -12,8 +12,7 @@ import java.util.Collections;
 import org.apache.commons.lang.NotImplementedException;
 import org.fudgemsg.FudgeMsgEnvelope;
 
-import com.opengamma.core.exchange.ExchangeUtils;
-import com.opengamma.core.region.RegionUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.security.Security;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.ComputationTarget;
@@ -32,17 +31,7 @@ import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
-import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
-import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
-import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
-import com.opengamma.financial.security.option.EquityOptionSecurity;
-import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
-import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
-import com.opengamma.financial.security.option.FXOptionSecurity;
-import com.opengamma.financial.security.option.IRFutureOptionSecurity;
-import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
-import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
-import com.opengamma.financial.security.option.SwaptionSecurity;
+import com.opengamma.financial.security.option.*;
 import com.opengamma.financial.security.swap.InterestRateNotional;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.financial.sensitivities.SecurityEntryData;
@@ -111,7 +100,7 @@ public class FinancialSecurityUtils {
       final ExternalId regionId = finSec.accept(new FinancialSecurityVisitor<ExternalId>() {
         @Override
         public ExternalId visitBondSecurity(final BondSecurity security) {
-          return ExternalId.of(RegionUtils.ISO_COUNTRY_ALPHA2, security.getIssuerDomicile());
+          return ExternalId.of(ExternalSchemes.ISO_COUNTRY_ALPHA2, security.getIssuerDomicile());
         }
 
         @Override
@@ -172,6 +161,11 @@ public class FinancialSecurityUtils {
         @Override
         public ExternalId visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
           return null;
+        }
+
+        @Override
+        public ExternalId visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+          return null;  
         }
 
         @Override
@@ -260,7 +254,7 @@ public class FinancialSecurityUtils {
 
         @Override
         public ExternalId visitEquitySecurity(final EquitySecurity security) {
-          return ExternalId.of(ExchangeUtils.ISO_MIC, security.getExchangeCode());
+          return ExternalId.of(ExternalSchemes.ISO_MIC, security.getExchangeCode());
         }
 
         @Override
@@ -270,7 +264,7 @@ public class FinancialSecurityUtils {
 
         @Override
         public ExternalId visitFutureSecurity(final FutureSecurity security) {
-          return ExternalId.of(ExchangeUtils.ISO_MIC, security.getTradingExchange());
+          return ExternalId.of(ExternalSchemes.ISO_MIC, security.getTradingExchange());
         }
 
         @Override
@@ -280,17 +274,17 @@ public class FinancialSecurityUtils {
 
         @Override
         public ExternalId visitEquityIndexOptionSecurity(final EquityIndexOptionSecurity security) {
-          return ExternalId.of(ExchangeUtils.ISO_MIC, security.getExchange());
+          return ExternalId.of(ExternalSchemes.ISO_MIC, security.getExchange());
         }
 
         @Override
         public ExternalId visitEquityOptionSecurity(final EquityOptionSecurity security) {
-          return ExternalId.of(ExchangeUtils.ISO_MIC, security.getExchange());
+          return ExternalId.of(ExternalSchemes.ISO_MIC, security.getExchange());
         }
 
         @Override
         public ExternalId visitEquityBarrierOptionSecurity(final EquityBarrierOptionSecurity security) {
-          return ExternalId.of(ExchangeUtils.ISO_MIC, security.getExchange());
+          return ExternalId.of(ExternalSchemes.ISO_MIC, security.getExchange());
         }
 
         @Override
@@ -311,6 +305,11 @@ public class FinancialSecurityUtils {
         @Override
         public ExternalId visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
           return null;
+        }
+
+        @Override
+        public ExternalId visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+          return null; 
         }
 
         @Override
@@ -457,6 +456,11 @@ public class FinancialSecurityUtils {
         @Override
         public Currency visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
           return security.getCurrency();
+        }
+
+        @Override
+        public Currency visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+          return null;
         }
 
         @Override
@@ -628,6 +632,11 @@ public class FinancialSecurityUtils {
         }
 
         @Override
+        public Collection<Currency> visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+          return null;
+        }
+
+        @Override
         public Collection<Currency> visitEquityIndexDividendFutureOptionSecurity(final EquityIndexDividendFutureOptionSecurity security) {
           return Collections.singletonList(security.getCurrency());
         }
@@ -790,6 +799,11 @@ public class FinancialSecurityUtils {
         @Override
         public Boolean visitIRFutureOptionSecurity(final IRFutureOptionSecurity security) {
           return null;
+        }
+
+        @Override
+        public Boolean visitCommodityFutureOptionSecurity(CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
+          return null; 
         }
 
         @Override

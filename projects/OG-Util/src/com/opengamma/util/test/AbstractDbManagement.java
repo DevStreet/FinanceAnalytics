@@ -190,11 +190,12 @@ public abstract class AbstractDbManagement implements DbManagement {
     return conn;
   }
 
-  protected String getCatalogToConnectTo(String catalog) {
+  @Override
+  public String getCatalogToConnectTo(String catalog) {
     return getDbHost() + "/" + catalog;
   }
 
-  private List<String> getAllTables(String catalog, String schema, Statement statement) throws SQLException {
+  protected List<String> getAllTables(String catalog, String schema, Statement statement) throws SQLException {
     List<String> tables = new LinkedList<String>();
     ResultSet rs = statement.executeQuery(getAllTablesSQL(catalog, schema));
     while (rs.next()) {
@@ -204,7 +205,7 @@ public abstract class AbstractDbManagement implements DbManagement {
     return tables;
   }
 
-  private List<String> getAllViews(String catalog, String schema, Statement statement) throws SQLException {
+  protected List<String> getAllViews(String catalog, String schema, Statement statement) throws SQLException {
     List<String> tables = new LinkedList<String>();
     ResultSet rs = statement.executeQuery(getAllViewsSQL(catalog, schema));
     while (rs.next()) {
@@ -531,6 +532,7 @@ public abstract class AbstractDbManagement implements DbManagement {
   
   @Override
   public String describeDatabase(final String catalog, final String prefix) {
+    final String prefixPattern = prefix != null ? "^(?i)"+prefix+".*" : null;
     final StringBuilder description = new StringBuilder();
     Connection conn = null;
     try {
@@ -546,7 +548,7 @@ public abstract class AbstractDbManagement implements DbManagement {
         final List<String> tables = Functional.filter(getAllTables(catalog, schema, stmt), new Function1<String, Boolean>() {
           @Override
           public Boolean execute(String s) {
-            return prefix != null && s.startsWith(prefix);
+            return prefixPattern != null && s.matches(prefixPattern);
           }
         });
         Collections.sort(tables);
@@ -561,7 +563,7 @@ public abstract class AbstractDbManagement implements DbManagement {
         final List<String> sequences = Functional.filter(getAllSequences(catalog, schema, stmt), new Function1<String, Boolean>() {
           @Override
           public Boolean execute(String s) {
-            return prefix != null && s.startsWith(prefix);
+            return prefixPattern != null && s.matches(prefixPattern);
           }
         });
 
@@ -572,7 +574,7 @@ public abstract class AbstractDbManagement implements DbManagement {
         final List<Pair<String, String>> foreignKeys = Functional.filter(getAllForeignKeyConstraints(catalog, schema, stmt), new Function1<Pair<String, String>, Boolean>() {
           @Override
           public Boolean execute(Pair<String, String> s) {
-            return prefix != null && s.getFirst().startsWith(prefix);
+            return prefixPattern != null && s.getFirst().matches(prefixPattern);
           }
         });                              
         Collections.sort(foreignKeys, FirstThenSecondPairComparator.INSTANCE);

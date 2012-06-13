@@ -1,11 +1,9 @@
 /*
- * @copyright 2011 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 
-.OG-form .og-column-sets {
-  width: 800px;
-}
+.OG-form .og-column-sets {}
 
 .OG-form .og-column-sets p {
   margin: 15px 0 20px 0;

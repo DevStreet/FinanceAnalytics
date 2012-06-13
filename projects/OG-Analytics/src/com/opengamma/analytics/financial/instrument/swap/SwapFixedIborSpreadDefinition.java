@@ -15,16 +15,16 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDe
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborSpreadDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwap;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborSpreadDefinition;
 import com.opengamma.analytics.financial.instrument.payment.PaymentDefinition;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
-import com.opengamma.analytics.financial.interestrate.payments.Coupon;
-import com.opengamma.analytics.financial.interestrate.payments.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.util.money.Currency;
@@ -69,7 +69,7 @@ public class SwapFixedIborSpreadDefinition extends SwapDefinition {
    * @param isPayer The payer flag of the fixed leg.
    * @return The vanilla swap.
    */
-  public static SwapFixedIborDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final GeneratorSwap generator, final double notionalFixed,
+  public static SwapFixedIborDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final GeneratorSwapFixedIbor generator, final double notionalFixed,
       final double notionalIbor, final double fixedRate, final double spread, final boolean isPayer) {
     Validate.notNull(settlementDate, "Settlement date");
     Validate.notNull(maturityDate, "Maturity date");
@@ -138,20 +138,20 @@ public class SwapFixedIborSpreadDefinition extends SwapDefinition {
 
   @SuppressWarnings("unchecked")
   @Override
-  public FixedCouponSwap<Coupon> toDerivative(final ZonedDateTime date, final String... yieldCurveNames) {
-    final GenericAnnuity<CouponFixed> fixedLeg = this.getFixedLeg().toDerivative(date, yieldCurveNames);
-    final GenericAnnuity<? extends Payment> iborLeg = this.getIborLeg().toDerivative(date, yieldCurveNames);
-    return new FixedCouponSwap<Coupon>(fixedLeg, (GenericAnnuity<Coupon>) iborLeg);
+  public SwapFixedCoupon<Coupon> toDerivative(final ZonedDateTime date, final String... yieldCurveNames) {
+    final Annuity<CouponFixed> fixedLeg = this.getFixedLeg().toDerivative(date, yieldCurveNames);
+    final Annuity<? extends Payment> iborLeg = this.getIborLeg().toDerivative(date, yieldCurveNames);
+    return new SwapFixedCoupon<Coupon>(fixedLeg, (Annuity<Coupon>) iborLeg);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public FixedCouponSwap<Coupon> toDerivative(final ZonedDateTime date, final DoubleTimeSeries<ZonedDateTime>[] indexDataTS, final String... yieldCurveNames) {
+  public SwapFixedCoupon<Coupon> toDerivative(final ZonedDateTime date, final DoubleTimeSeries<ZonedDateTime>[] indexDataTS, final String... yieldCurveNames) {
     Validate.notNull(indexDataTS, "index data time series array");
     Validate.isTrue(indexDataTS.length > 0, "index data time series must contain at least one element");
-    final GenericAnnuity<CouponFixed> fixedLeg = this.getFixedLeg().toDerivative(date, yieldCurveNames);
-    final GenericAnnuity<? extends Payment> iborLeg = this.getIborLeg().toDerivative(date, indexDataTS[0], yieldCurveNames);
-    return new FixedCouponSwap<Coupon>(fixedLeg, (GenericAnnuity<Coupon>) iborLeg);
+    final Annuity<CouponFixed> fixedLeg = this.getFixedLeg().toDerivative(date, yieldCurveNames);
+    final Annuity<? extends Payment> iborLeg = this.getIborLeg().toDerivative(date, indexDataTS[0], yieldCurveNames);
+    return new SwapFixedCoupon<Coupon>(fixedLeg, (Annuity<Coupon>) iborLeg);
   }
 
   @Override

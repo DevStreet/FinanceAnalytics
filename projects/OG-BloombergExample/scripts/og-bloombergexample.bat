@@ -8,7 +8,7 @@ set SCRIPTDIR=%BASEDIR%\scripts
 set PROJECT=og-bloombergexample
 set PROJECTJAR=%PROJECT%.jar
 set LOGBACK_CONFIG=jetty-logback.xml
-set CONFIG=config\fullstack\bloombergexample-bin.properties
+set CONFIG=config\fullstack\fullstack-bloombergexample-bin.properties
 SETLOCAL EnableDelayedExpansion
 SET CLASSPATH="config;%PROJECTJAR%;lib\*
  for %%i in (lib/*.zip) do (
@@ -18,8 +18,12 @@ set CLASSPATH=!CLASSPATH!"
 
 IF NOT EXIST %BASEDIR%\install\db\hsqldb\bloombergexample-db.properties goto :nodb 
 
-IF "%JAVA_HOME%" == "" ECHO Warning: JAVA_HOME is not set
-SET JAVACMD=%JAVA_HOME%\bin\java.exe
+IF "%JAVA_HOME%" == "" (
+  ECHO Warning: JAVA_HOME is not set
+  SET JAVACMD=java.exe
+) ELSE (
+  SET JAVACMD=%JAVA_HOME%\bin\java.exe
+)
 
 IF "%1"=="start" goto :start
 IF "%1"=="debug" goto :start
@@ -38,7 +42,7 @@ GOTO :exit
 
 :start
 "%JAVACMD%" ^
-  -Xms1024m -Xmx3072m -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC ^
+  -Xms768m -Xmx1280m -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC ^
   -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing ^
   -Dlogback.configurationFile=%LOGBACK_CONFIG% ^
         -Dcommandmonitor.secret=OpenGamma ^

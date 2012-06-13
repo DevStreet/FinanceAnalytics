@@ -17,13 +17,14 @@ import com.opengamma.analytics.financial.interestrate.ParRateCurveSensitivityCal
 import com.opengamma.analytics.financial.interestrate.PresentValueBlackSwaptionSensitivity;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.method.PricingMethod;
-import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedDiscountingMethod;
+import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
 import com.opengamma.analytics.financial.model.option.definition.YieldCurveWithBlackSwaptionBundle;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackPriceFunction;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.EuropeanVanillaOption;
 import com.opengamma.analytics.math.function.Function1D;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -62,7 +63,7 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   /**
    * The swap method.
    */
-  private static final SwapFixedDiscountingMethod METHOD_SWAP = SwapFixedDiscountingMethod.getInstance();
+  private static final SwapFixedCouponDiscountingMethod METHOD_SWAP = SwapFixedCouponDiscountingMethod.getInstance();
 
   /**
    * Computes the present value of a physical delivery European swaption in the Black model.
@@ -78,7 +79,7 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), curveBlack.getBlackParameters().getGeneratorSwap().getFixedLegDayCount(), curveBlack);
     final double forward = PRC.visit(swaption.getUnderlyingSwap(), curveBlack);
     final double forwardModified = forward * pvbp / pvbpModified;
-    final double strikeModified = SwapFixedDiscountingMethod.couponEquivalent(swaption.getUnderlyingSwap(), pvbpModified, curveBlack);
+    final double strikeModified = SwapFixedCouponDiscountingMethod.couponEquivalent(swaption.getUnderlyingSwap(), pvbpModified, curveBlack);
     final double tenor = swaption.getMaturityTime();
     final EuropeanVanillaOption option = new EuropeanVanillaOption(strikeModified, swaption.getTimeToExpiry(), swaption.isCall());
     // Implementation note: option required to pass the strike (in case the swap has non-constant coupon).
@@ -98,6 +99,22 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   }
 
   /**
+   * Computes the implied Black volatility of the vanilla swaption.
+   * @param swaption The swaption.
+   * @param curves The yield curve bundle.
+   * @return The implied volatility.
+   */
+  public double impliedVolatility(final SwaptionPhysicalFixedIbor swaption, final YieldCurveBundle curves) {
+    ArgumentChecker.notNull(curves, "Curves");
+    ArgumentChecker.isTrue(curves instanceof YieldCurveWithBlackSwaptionBundle, "Yield curve bundle should contain Black swaption data");
+    final YieldCurveWithBlackSwaptionBundle curvesBlack = (YieldCurveWithBlackSwaptionBundle) curves;
+    Validate.notNull(swaption, "Forex option");
+    final double tenor = swaption.getMaturityTime();
+    final double volatility = curvesBlack.getBlackParameters().getVolatility(swaption.getTimeToExpiry(), tenor);
+    return volatility;
+  }
+
+  /**
    * Computes the present value rate sensitivity to rates of a physical delivery European swaption in the SABR model.
    * @param swaption The swaption.
    * @param curveBlack The curves with Black volatility data.
@@ -114,7 +131,7 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
     // Derivative of the PVBP with respect to the rates.
     final InterestRateCurveSensitivity pvbpDr = METHOD_SWAP.presentValueBasisPointCurveSensitivity(swaption.getUnderlyingSwap(), curveBlack);
     // Implementation note: strictly speaking, the strike equivalent is curve dependent; that dependency is ignored.
-    final double strike = SwapFixedDiscountingMethod.couponEquivalent(swaption.getUnderlyingSwap(), pvbp, curveBlack);
+    final double strike = SwapFixedCouponDiscountingMethod.couponEquivalent(swaption.getUnderlyingSwap(), pvbp, curveBlack);
     final double tenor = swaption.getMaturityTime();
     final EuropeanVanillaOption option = new EuropeanVanillaOption(strike, swaption.getTimeToExpiry(), swaption.isCall());
     // Implementation note: option required to pass the strike (in case the swap has non-constant coupon).
@@ -143,7 +160,7 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
     final double forward = PRC.visit(swaption.getUnderlyingSwap(), curveBlack);
     final double pvbp = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), curveBlack);
     // Implementation note: strictly speaking, the strike equivalent is curve dependent; that dependency is ignored.
-    final double strike = SwapFixedDiscountingMethod.couponEquivalent(swaption.getUnderlyingSwap(), pvbp, curveBlack);
+    final double strike = SwapFixedCouponDiscountingMethod.couponEquivalent(swaption.getUnderlyingSwap(), pvbp, curveBlack);
     final double tenor = swaption.getMaturityTime();
     final EuropeanVanillaOption option = new EuropeanVanillaOption(strike, swaption.getTimeToExpiry(), swaption.isCall());
     // Implementation note: option required to pass the strike (in case the swap has non-constant coupon).

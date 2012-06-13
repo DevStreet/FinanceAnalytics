@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.opengamma.bbg.ReferenceDataProvider;
 import com.opengamma.bbg.util.BloombergDataUtils;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.security.future.BondFutureDeliverable;
 import com.opengamma.financial.security.future.BondFutureSecurity;
 import com.opengamma.id.ExternalIdBundle;
@@ -95,12 +95,18 @@ public class BondFutureLoader extends SecurityLoader {
     String futureTradingHours = fieldData.getString(FIELD_FUT_TRADING_HRS);
     String micExchangeCode = fieldData.getString(FIELD_ID_MIC_PRIM_EXCH);
     String currencyStr = fieldData.getString(FIELD_CRNCY);
-    String category = fieldData.getString(FIELD_FUTURES_CATEGORY);
+    String category = BloombergDataUtils.removeDuplicateWhiteSpace(fieldData.getString(FIELD_FUTURES_CATEGORY), " ");
     String firstDeliveryDateStr = fieldData.getString(FIELD_FUT_DLV_DT_FIRST);
     String lastDeliveryDateStr = fieldData.getString(FIELD_FUT_DLV_DT_LAST);
-    String name = fieldData.getString(FIELD_FUT_LONG_NAME);
+    String name = BloombergDataUtils.removeDuplicateWhiteSpace(fieldData.getString(FIELD_FUT_LONG_NAME), " ");
     String bbgUnique = fieldData.getString(FIELD_ID_BBG_UNIQUE);
-    double unitAmount = Double.valueOf(fieldData.getString(FIELD_FUT_VAL_PT));
+    double unitAmount;
+    try {
+      unitAmount = Double.valueOf(fieldData.getString(FIELD_FUT_VAL_PT));
+    } catch (NumberFormatException ex) {
+      s_logger.warn("FIELD_FUT_VAL_PT does not contain a numeric value (" + fieldData.getString(FIELD_FUT_VAL_PT) + ")");
+      return null;
+    }
 
     if (!isValidField(bbgUnique)) {
       s_logger.warn("bbgUnique is null, cannot construct bond future security");
@@ -142,15 +148,12 @@ public class BondFutureLoader extends SecurityLoader {
     ZonedDateTime firstDeliverDate = decodeDeliveryDate(firstDeliveryDateStr);
     ZonedDateTime lastDeliverDate = decodeDeliveryDate(firstDeliveryDateStr);
     Set<BondFutureDeliverable> basket = createBondDeliverables(fieldData);
-    BondFutureSecurity security = new BondFutureSecurity(expiry, micExchangeCode, micExchangeCode, currency, unitAmount, basket, category,
-                                                         firstDeliverDate, lastDeliverDate);
-
-    if (isValidField(name)) {
-      security.setName(BloombergDataUtils.removeDuplicateWhiteSpace(name, " "));
-    }
+    BondFutureSecurity security = new BondFutureSecurity(expiry, micExchangeCode, micExchangeCode, currency, unitAmount, basket,
+                                                         firstDeliverDate, lastDeliverDate, category);
 
     // set identifiers
     parseIdentifiers(fieldData, security);
+    security.setName(name);
     return security;
   }
 
@@ -166,7 +169,7 @@ public class BondFutureLoader extends SecurityLoader {
         Double conversionFactor = deliverableContainer.getDouble("Conversion Factor");
         String buid = deliverableContainer.getString("Unique Bloomberg Identifier of Deliverable Bonds");
         if (conversionFactor != null && isValidField(buid)) {
-          ExternalIdBundle ids = ExternalIdBundle.of(SecurityUtils.bloombergBuidSecurityId(buid));
+          ExternalIdBundle ids = ExternalIdBundle.of(ExternalSchemes.bloombergBuidSecurityId(buid));
           BondFutureDeliverable deliverable = new BondFutureDeliverable(ids, conversionFactor);
           result.add(deliverable);
         }

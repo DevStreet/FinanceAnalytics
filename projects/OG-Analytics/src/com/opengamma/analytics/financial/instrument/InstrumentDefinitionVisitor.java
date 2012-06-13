@@ -27,6 +27,8 @@ import com.opengamma.analytics.financial.instrument.cash.DepositIborDefinition;
 import com.opengamma.analytics.financial.instrument.cash.DepositZeroDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.future.BondFutureDefinition;
+import com.opengamma.analytics.financial.instrument.future.BondFutureOptionPremiumSecurityDefinition;
+import com.opengamma.analytics.financial.instrument.future.BondFutureOptionPremiumTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.future.FederalFundsFutureSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.future.FederalFundsFutureTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureDefinition;
@@ -43,6 +45,7 @@ import com.opengamma.analytics.financial.instrument.payment.CouponCMSDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponFloatingDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
+import com.opengamma.analytics.financial.instrument.payment.CouponIborSpreadDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponOISDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponOISSimplifiedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.PaymentDefinition;
@@ -77,6 +80,14 @@ public interface InstrumentDefinitionVisitor<T, U> {
   U visitBondFutureSecurityDefinition(BondFutureDefinition bond, T data);
 
   U visitBondFutureSecurityDefinition(BondFutureDefinition bond);
+
+  U visitBondFutureOptionPremiumSecurityDefinition(BondFutureOptionPremiumSecurityDefinition bond, T data);
+
+  U visitBondFutureOptionPremiumSecurityDefinition(BondFutureOptionPremiumSecurityDefinition bond);
+
+  U visitBondFutureOptionPremiumTransactionDefinition(BondFutureOptionPremiumTransactionDefinition bond, T data);
+
+  U visitBondFutureOptionPremiumTransactionDefinition(BondFutureOptionPremiumTransactionDefinition bond);
 
   U visitBondIborTransactionDefinition(BondIborTransactionDefinition bond, T data);
 
@@ -158,9 +169,9 @@ public interface InstrumentDefinitionVisitor<T, U> {
 
   U visitCouponIbor(CouponIborDefinition payment);
 
-  U visitCouponIborSpread(CouponIborDefinition payment, T data);
+  U visitCouponIborSpread(CouponIborSpreadDefinition payment, T data);
 
-  U visitCouponIborSpread(CouponIborDefinition payment);
+  U visitCouponIborSpread(CouponIborSpreadDefinition payment);
 
   U visitCouponOISSimplified(CouponOISSimplifiedDefinition payment, T data);
 

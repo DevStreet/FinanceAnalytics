@@ -43,12 +43,11 @@ public class ViewCompilationContext {
       final DependencyGraphBuilder builder = compilationServices.getDependencyGraphBuilder().newInstance();
       builder.setCalculationConfigurationName(configName);
       builder.setMarketDataAvailabilityProvider(compilationServices.getMarketDataAvailabilityProvider());
-      builder.setTargetResolver(compilationServices.getComputationTargetResolver());
       final FunctionCompilationContext compilationContext = compilationServices.getFunctionCompilationContext().clone();
       final ViewCalculationConfiguration calcConfig = viewDefinition.getCalculationConfiguration(configName);
       compilationContext.setViewCalculationConfiguration(calcConfig);
       final Collection<ResolutionRule> transformedRules = calcConfig.getResolutionRuleTransform().transform(rules);
-      compilationContext.setComputationTargetResults(new ComputationTargetResults(transformedRules, compilationContext, compilationServices.getComputationTargetResolver()));
+      compilationContext.setComputationTargetResults(new ComputationTargetResults(transformedRules, compilationContext));
       builder.setFunctionResolver(new DefaultCompiledFunctionResolver(compilationContext, transformedRules));
       builder.setCompilationContext(compilationContext);
       configurations.put(configName, (Pair<DependencyGraphBuilder, Set<ValueRequirement>>) (Pair<?, ?>) Pair.of(builder, new HashSet<ValueRequirement>()));

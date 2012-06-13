@@ -12,8 +12,6 @@ import java.util.Map;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivityDataBundle;
-import com.opengamma.analytics.financial.interestrate.SABRSensitivityNodeCalculator;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateParameters;
 import com.opengamma.analytics.math.interpolation.data.Interpolator1DDataBundle;
 import com.opengamma.analytics.util.surface.SurfaceValue;
@@ -24,7 +22,6 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 public class SABRSensitivityNodeCalculatorTest {
 
-  private static final SABRSensitivityNodeCalculator NODE_CALCULATOR = new SABRSensitivityNodeCalculator();
   private static final SABRInterestRateParameters SABR_PARAMETERS = TestsDataSetsSABR.createSABR2();
 
   private static final double TOLERANCE = 1.0E-10;
@@ -42,7 +39,7 @@ public class SABRSensitivityNodeCalculatorTest {
     final double nuValue = 345.0;
     final SurfaceValue nu = SurfaceValue.from(point, 345.0);
     final PresentValueSABRSensitivityDataBundle onePoint = new PresentValueSABRSensitivityDataBundle(alpha, rho, nu);
-    final PresentValueSABRSensitivityDataBundle node = NODE_CALCULATOR.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle node = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
     final DoublesPair[] nodeExpected = new DoublesPair[4];
     nodeExpected[0] = new DoublesPair(1.0, 2.0);
     nodeExpected[1] = new DoublesPair(1.0, 5.0);
@@ -52,6 +49,7 @@ public class SABRSensitivityNodeCalculatorTest {
       assertTrue("SABR Node calculator " + loopnode, node.getAlpha().getMap().get(nodeExpected[loopnode]) != null);
       assertTrue("SABR Node calculator", Math.abs(node.getAlpha().getMap().get(nodeExpected[loopnode])) > TOLERANCE);
     }
+    @SuppressWarnings("unchecked")
     final Map<Double, Interpolator1DDataBundle> alphaData = (Map<Double, Interpolator1DDataBundle>) SABR_PARAMETERS.getAlphaSurface().getInterpolatorData();
     final Map<DoublesPair, Double> weight = SABR_PARAMETERS.getAlphaSurface().getInterpolator().getNodeSensitivitiesForValue(alphaData, point);
     for (int loopnode = 0; loopnode < 4; loopnode++) {
@@ -74,7 +72,7 @@ public class SABRSensitivityNodeCalculatorTest {
     final double nuValue = 345.67;
     final SurfaceValue nu = SurfaceValue.from(point, nuValue);
     final PresentValueSABRSensitivityDataBundle onePoint = new PresentValueSABRSensitivityDataBundle(alpha, rho, nu);
-    final PresentValueSABRSensitivityDataBundle node = NODE_CALCULATOR.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle node = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
     final DoublesPair[] nodeExpected = new DoublesPair[4];
     nodeExpected[0] = new DoublesPair(1.0, 1.0);
     nodeExpected[1] = new DoublesPair(1.0, 2.0);
@@ -83,6 +81,7 @@ public class SABRSensitivityNodeCalculatorTest {
       assertTrue("SABR Node calculator " + loopnode, node.getAlpha().getMap().get(nodeExpected[loopnode]) != null);
       assertTrue("SABR Node calculator", Math.abs(node.getAlpha().getMap().get(nodeExpected[loopnode])) > TOLERANCE);
     }
+    @SuppressWarnings("unchecked")
     final Map<Double, Interpolator1DDataBundle> alphaData = (Map<Double, Interpolator1DDataBundle>) SABR_PARAMETERS.getAlphaSurface().getInterpolatorData();
     final Map<DoublesPair, Double> weight = SABR_PARAMETERS.getAlphaSurface().getInterpolator().getNodeSensitivitiesForValue(alphaData, point);
     for (int loopnode = 0; loopnode < 3; loopnode++) {
@@ -108,9 +107,9 @@ public class SABRSensitivityNodeCalculatorTest {
     final PresentValueSABRSensitivityDataBundle onePoint1 = new PresentValueSABRSensitivityDataBundle(alpha1, rho1, nu1);
     final PresentValueSABRSensitivityDataBundle onePoint2 = new PresentValueSABRSensitivityDataBundle(alpha2, rho2, nu2);
     final PresentValueSABRSensitivityDataBundle twoPoints = PresentValueSABRSensitivityDataBundle.plus(onePoint1, onePoint2);
-    final PresentValueSABRSensitivityDataBundle node1 = NODE_CALCULATOR.calculateNodeSensitivities(onePoint1, SABR_PARAMETERS);
-    final PresentValueSABRSensitivityDataBundle node2 = NODE_CALCULATOR.calculateNodeSensitivities(onePoint2, SABR_PARAMETERS);
-    final PresentValueSABRSensitivityDataBundle nodeSum = NODE_CALCULATOR.calculateNodeSensitivities(twoPoints, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle node1 = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint1, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle node2 = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint2, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle nodeSum = SABRSensitivityNodeCalculator.calculateNodeSensitivities(twoPoints, SABR_PARAMETERS);
     assertEquals("SABR Node calculator", PresentValueSABRSensitivityDataBundle.plus(node1, node2), nodeSum);
   }
 

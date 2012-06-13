@@ -50,11 +50,11 @@ $JAVA  -cp "$CLASSPATH" \
 echo "### Adding Bloomberg example data"
 
 $JAVA  -cp "$CLASSPATH" \
-  -Xms1024M \
-  -Xmx4096M \
-  -Dlogback.configurationFile=bloombergexample-logback.xml \
-  com.opengamma.bloombergexample.tool.ExampleDatabasePopulater \
-  -c classpath:toolcontext/bloombergexample-bin.properties
+  -Xms512M \
+  -Xmx1024M \
+  com.opengamma.bloombergexample.tool.ExampleDatabasePopulator \
+  -l tofile-logback.xml \
+  -c classpath:toolcontext/toolcontext-bloombergexample-bin.properties
 
 echo "### Completed"
 

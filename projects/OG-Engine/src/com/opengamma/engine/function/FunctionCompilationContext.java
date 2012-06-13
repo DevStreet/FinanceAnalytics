@@ -6,6 +6,7 @@
 package com.opengamma.engine.function;
 
 import com.opengamma.core.security.SecuritySource;
+import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.function.resolver.ComputationTargetResults;
 import com.opengamma.engine.view.ViewCalculationConfiguration;
 import com.opengamma.util.PublicAPI;
@@ -20,6 +21,10 @@ import com.opengamma.util.PublicAPI;
 @PublicAPI
 public class FunctionCompilationContext extends AbstractFunctionContext {
 
+  /**
+   * The name under which the {@link ComputationTargetResolver} instance should be bound.
+   */
+  public static final String COMPUTATION_TARGET_RESOLVER = "computationTargetResolver";
   /**
    * The name under which the {@link ComputationTargetResults} instance should be bound.
    */
@@ -60,7 +65,25 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
     super(copyFrom);
   }
 
-  //-------------------------------------------------------------------------
+  /**
+   * Gets the computation target resolver. Functions should not need to access this directly - their computation target will always be resolved when they are invoked. It may be used to access the full
+   * target object referenced by a "desiredValue".
+   * 
+   * @return the computation target resolver, null if not in the context
+   */
+  public ComputationTargetResolver getComputationTargetResolver() {
+    return (ComputationTargetResolver) get(COMPUTATION_TARGET_RESOLVER);
+  }
+
+  /**
+   * Sets the computation target resolver.
+   * 
+   * @param computationTargetResolver the target resolver
+   */
+  public void setComputationTargetResolver(final ComputationTargetResolver computationTargetResolver) {
+    put(COMPUTATION_TARGET_RESOLVER, computationTargetResolver);
+  }
+
   /**
    * Gets the source of result information on a target.
    * 
@@ -100,7 +123,7 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
   public void setSecuritySource(SecuritySource securitySource) {
     put(SECURITY_SOURCE_NAME, securitySource);
   }
-
+  
   /**
    * Gets the source of portfolio structure information.
    * 

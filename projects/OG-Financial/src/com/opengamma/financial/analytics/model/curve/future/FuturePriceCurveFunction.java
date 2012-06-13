@@ -13,8 +13,12 @@ import java.util.Set;
 
 import javax.time.InstantProvider;
 import javax.time.calendar.Clock;
+import javax.time.calendar.LocalDate;
 import javax.time.calendar.TimeZone;
 import javax.time.calendar.ZonedDateTime;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
@@ -36,6 +40,7 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.OpenGammaCompilationContext;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
+import com.opengamma.financial.analytics.model.irfutureoption.IRFutureOptionUtils;
 import com.opengamma.financial.analytics.volatility.surface.ConfigDBFuturePriceCurveDefinitionSource;
 import com.opengamma.financial.analytics.volatility.surface.ConfigDBFuturePriceCurveSpecificationSource;
 import com.opengamma.financial.analytics.volatility.surface.FuturePriceCurveDefinition;
@@ -49,6 +54,8 @@ import com.opengamma.util.money.Currency;
  */
 public class FuturePriceCurveFunction extends AbstractFunction {
 
+  private static final Logger s_logger = LoggerFactory.getLogger(FuturePriceCurveFunction.class);
+  
   @SuppressWarnings("unchecked")
   private FuturePriceCurveDefinition<Object> getCurveDefinition(final ConfigDBFuturePriceCurveDefinitionSource source, final ComputationTarget target,
       final String definitionName) {
@@ -150,17 +157,22 @@ public class FuturePriceCurveFunction extends AbstractFunction {
         final DoubleArrayList xList = new DoubleArrayList();
         final DoubleArrayList prices = new DoubleArrayList();
         final FuturePriceCurveInstrumentProvider<Number> futurePriceCurveProvider = (FuturePriceCurveInstrumentProvider<Number>) priceCurveSpecification.getCurveInstrumentProvider();
+        final LocalDate valDate = now.toLocalDate();
+        if (inputs.getAllValues().isEmpty()) {
+          s_logger.info("FunctionInputs to the execute method isEmpty!");
+        }
         for (final Object x : priceCurveDefinition.getXs()) {
           final Number xNum = (Number) x;
-          final ExternalId identifier = futurePriceCurveProvider.getInstrument(xNum, now.toLocalDate());
+          final ExternalId identifier = futurePriceCurveProvider.getInstrument(xNum, valDate);
           final ValueRequirement requirement = new ValueRequirement(futurePriceCurveProvider.getDataFieldName(), identifier);
           Double futurePrice = null;
           if (inputs.getValue(requirement) != null) {
             futurePrice = (Double) inputs.getValue(requirement);
             if (futurePrice != null) {
-              xList.add(xNum.doubleValue());
+              final Double ttm = IRFutureOptionUtils.getFutureTtm(xNum.intValue(), valDate);
+              xList.add(ttm);
               prices.add(futurePrice);
-            }
+            } 
           }
         }
         final ValueSpecification futurePriceCurveResult = new ValueSpecification(ValueRequirementNames.FUTURE_PRICE_CURVE_DATA,

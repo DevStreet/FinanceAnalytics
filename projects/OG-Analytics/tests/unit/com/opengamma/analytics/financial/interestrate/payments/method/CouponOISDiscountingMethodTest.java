@@ -16,12 +16,12 @@ import javax.time.calendar.ZonedDateTime;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorOIS;
+import com.opengamma.analytics.financial.instrument.index.GeneratorFixedON;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.index.generator.USD1YFEDFUND;
 import com.opengamma.analytics.financial.instrument.payment.CouponOISSimplifiedDefinition;
-import com.opengamma.analytics.financial.instrument.swap.SwapFixedOISDefinition;
-import com.opengamma.analytics.financial.instrument.swap.SwapFixedOISSimplifiedDefinition;
+import com.opengamma.analytics.financial.instrument.swap.SwapFixedONDefinition;
+import com.opengamma.analytics.financial.instrument.swap.SwapFixedONSimplifiedDefinition;
 import com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivity;
 import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
 import com.opengamma.analytics.financial.interestrate.PresentValueCalculator;
@@ -29,10 +29,9 @@ import com.opengamma.analytics.financial.interestrate.PresentValueCurveSensitivi
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.method.SensitivityFiniteDifference;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponOIS;
-import com.opengamma.analytics.financial.interestrate.payments.method.CouponOISDiscountingMethod;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
@@ -99,7 +98,7 @@ public class CouponOISDiscountingMethodTest {
   private static final CouponOIS EONIA_COUPON_STARTED = new CouponOIS(EUR_CUR, PAYMENT_TIME_2, CURVES_NAMES[0], FIXING_YEAR_FRACTION_2, NOTIONAL, EUR_OIS, START_FIXING_TIME_2, END_FIXING_TIME_2,
       FIXING_YEAR_FRACTION_2, NOTIONAL_WITH_ACCRUED, CURVES_NAMES[1]);
 
-  private static final CouponOISDiscountingMethod METHOD_OIS = new CouponOISDiscountingMethod();
+  private static final CouponOISDiscountingMethod METHOD_OIS = CouponOISDiscountingMethod.getInstance();
   private static final PresentValueCalculator PVC = PresentValueCalculator.getInstance();
   private static final PresentValueCurveSensitivityCalculator PVCSC = PresentValueCurveSensitivityCalculator.getInstance();
   private static final ParRateCalculator PRC = ParRateCalculator.getInstance();
@@ -177,8 +176,8 @@ public class CouponOISDiscountingMethodTest {
     final double deltaShift = 1.0E-6;
     // 1. Forward curve sensitivity
     final String bumpedCurveName = "Bumped Curve";
-    final Payment couponBumpedForward = EONIA_COUPON_DEFINITION.toDerivative(REFERENCE_DATE_1, new String[] {CURVES_NAMES[0], bumpedCurveName });
-    final double[] nodeTimesForward = new double[] {EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime(), EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime() };
+    final Payment couponBumpedForward = EONIA_COUPON_DEFINITION.toDerivative(REFERENCE_DATE_1, new String[] {CURVES_NAMES[0], bumpedCurveName});
+    final double[] nodeTimesForward = new double[] {EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime(), EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime()};
     final double[] sensiForwardMethod = SensitivityFiniteDifference.curveSensitivity(couponBumpedForward, CURVES, CURVES_NAMES[1], bumpedCurveName, nodeTimesForward, deltaShift, METHOD_OIS);
     AssertJUnit.assertEquals("Sensitivity finite difference method: number of node", 2, sensiForwardMethod.length);
     final List<DoublesPair> sensiPvForward = pvcs.getSensitivities().get(CURVES_NAMES[1]);
@@ -188,8 +187,8 @@ public class CouponOISDiscountingMethodTest {
       AssertJUnit.assertEquals("Sensitivity finite difference method: node sensitivity", pairPv.second, sensiForwardMethod[loopnode], deltaTolerancePrice);
     }
     // 2. Discounting curve sensitivity
-    final Payment couponBumpedDisc = EONIA_COUPON_DEFINITION.toDerivative(REFERENCE_DATE_1, new String[] {bumpedCurveName, CURVES_NAMES[1] });
-    final double[] nodeTimesDisc = new double[] {EONIA_COUPON_NOTSTARTED.getPaymentTime() };
+    final Payment couponBumpedDisc = EONIA_COUPON_DEFINITION.toDerivative(REFERENCE_DATE_1, new String[] {bumpedCurveName, CURVES_NAMES[1]});
+    final double[] nodeTimesDisc = new double[] {EONIA_COUPON_NOTSTARTED.getPaymentTime()};
     final double[] sensiDiscMethod = SensitivityFiniteDifference.curveSensitivity(couponBumpedDisc, CURVES, CURVES_NAMES[0], bumpedCurveName, nodeTimesDisc, deltaShift, METHOD_OIS);
     AssertJUnit.assertEquals("Sensitivity finite difference method: number of node", 1, sensiDiscMethod.length);
     final List<DoublesPair> sensiPvDisc = pvcs.getSensitivities().get(CURVES_NAMES[0]);
@@ -225,8 +224,8 @@ public class CouponOISDiscountingMethodTest {
     //      assertEquals("Sensitivity finite difference method: node sensitivity", pairPv.second, sensiForwardMethod[loopnode], deltaTolerancePrice);
     //    }
     // Unique curve sensitivity
-    final Payment couponBumpedDisc = EONIA_COUPON_DEFINITION.toDerivative(REFERENCE_DATE_1, new String[] {bumpedCurveName, bumpedCurveName });
-    final double[] nodeTimesDisc = new double[] {EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime(), EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime(), EONIA_COUPON_NOTSTARTED.getPaymentTime() };
+    final Payment couponBumpedDisc = EONIA_COUPON_DEFINITION.toDerivative(REFERENCE_DATE_1, new String[] {bumpedCurveName, bumpedCurveName});
+    final double[] nodeTimesDisc = new double[] {EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime(), EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime(), EONIA_COUPON_NOTSTARTED.getPaymentTime()};
     final double[] sensiDiscMethod = SensitivityFiniteDifference.curveSensitivity(couponBumpedDisc, CURVES, CURVES_NAMES[0], bumpedCurveName, nodeTimesDisc, deltaShift, METHOD_OIS);
     final List<DoublesPair> sensiPvDisc = pvcs.getSensitivities().get(CURVES_NAMES[0]);
     AssertJUnit.assertEquals("Sensitivity finite difference method: number of node", 3, sensiPvDisc.size());
@@ -267,13 +266,13 @@ public class CouponOISDiscountingMethodTest {
     prcs.cleaned();
     final double deltaTolerancePrice = 1.0E-10;
     // 1. Forward curve sensitivity
-    final double[] nodeTimesForward = new double[] {EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime(), EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime() };
+    final double[] nodeTimesForward = new double[] {EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime(), EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime()};
     final double dfForwardStart = CURVES.getCurve(CURVES_NAMES[1]).getDiscountFactor(START_ACCRUAL_TIME_1);
     final double dfForwardEnd = CURVES.getCurve(CURVES_NAMES[1]).getDiscountFactor(END_ACCRUAL_TIME_1);
     final double dfForwardEndBar = -dfForwardStart / (dfForwardEnd * dfForwardEnd) / EONIA_COUPON_NOTSTARTED.getFixingPeriodAccrualFactor();
     final double dfForwardStartBar = 1.0 / (EONIA_COUPON_NOTSTARTED.getFixingPeriodAccrualFactor() * dfForwardEnd);
     final double[] sensiForwardMethod = new double[] {-EONIA_COUPON_NOTSTARTED.getFixingPeriodStartTime() * dfForwardStart * dfForwardStartBar,
-        -EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime() * dfForwardEnd * dfForwardEndBar };
+        -EONIA_COUPON_NOTSTARTED.getFixingPeriodEndTime() * dfForwardEnd * dfForwardEndBar};
     AssertJUnit.assertEquals("Sensitivity finite difference method: number of node", 2, sensiForwardMethod.length);
     final List<DoublesPair> sensiPvForward = prcs.getSensitivities().get(CURVES_NAMES[1]);
     for (int loopnode = 0; loopnode < sensiForwardMethod.length; loopnode++) {
@@ -288,13 +287,13 @@ public class CouponOISDiscountingMethodTest {
   private static final double EUR_FIXED_RATE = 0.01;
   private static final boolean IS_PAYER = true;
   private static final Period EUR_SWAP_3M_TENOR = Period.ofMonths(3);
-  private static final SwapFixedOISSimplifiedDefinition EONIA_SWAP_3M_DEFINITION = SwapFixedOISSimplifiedDefinition.from(SPOT_DATE, EUR_SWAP_3M_TENOR, EUR_SWAP_3M_TENOR, NOTIONAL, EUR_OIS,
+  private static final SwapFixedONSimplifiedDefinition EONIA_SWAP_3M_DEFINITION = SwapFixedONSimplifiedDefinition.from(SPOT_DATE, EUR_SWAP_3M_TENOR, EUR_SWAP_3M_TENOR, NOTIONAL, EUR_OIS,
       EUR_FIXED_RATE, IS_PAYER, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_DAY_COUNT, EUR_IS_EOM);
   private static final Swap<? extends Payment, ? extends Payment> EONIA_SWAP_3M = EONIA_SWAP_3M_DEFINITION.toDerivative(REFERENCE_DATE_1, CURVES_NAMES);
   //Swap EONIA 3Y
   private static final Period EUR_SWAP_3Y_TENOR = Period.ofYears(3);
   private static final Period EUR_COUPON_TENOR = Period.ofMonths(12);
-  private static final SwapFixedOISSimplifiedDefinition EONIA_SWAP_3Y_DEFINITION = SwapFixedOISSimplifiedDefinition.from(SPOT_DATE, EUR_SWAP_3Y_TENOR, EUR_COUPON_TENOR, NOTIONAL, EUR_OIS,
+  private static final SwapFixedONSimplifiedDefinition EONIA_SWAP_3Y_DEFINITION = SwapFixedONSimplifiedDefinition.from(SPOT_DATE, EUR_SWAP_3Y_TENOR, EUR_COUPON_TENOR, NOTIONAL, EUR_OIS,
       EUR_FIXED_RATE, IS_PAYER, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_DAY_COUNT, EUR_IS_EOM);
   private static final Swap<? extends Payment, ? extends Payment> EONIA_SWAP_3Y = EONIA_SWAP_3Y_DEFINITION.toDerivative(REFERENCE_DATE_1, CURVES_NAMES);
 
@@ -324,10 +323,10 @@ public class CouponOISDiscountingMethodTest {
 
   // Swap Fed Fund 6M (the fixing take place at the end of the period; in some cases a negative time discount factor is required).
   private static final Calendar NYC = new MondayToFridayCalendar("NYC");
-  private static final GeneratorOIS OIS_USD_GENERATOR = new USD1YFEDFUND(NYC);
+  private static final GeneratorFixedON OIS_USD_GENERATOR = new USD1YFEDFUND(NYC);
   private static final double USD_FIXED_RATE = 0.0050;
   private static final Period TENOR_6M = Period.ofMonths(6);
-  private static final SwapFixedOISDefinition OIS_DEFINITION = SwapFixedOISDefinition.from(START_ACCRUAL_DATE, TENOR_6M, NOTIONAL, OIS_USD_GENERATOR, USD_FIXED_RATE, IS_PAYER);
+  private static final SwapFixedONDefinition OIS_DEFINITION = SwapFixedONDefinition.from(START_ACCRUAL_DATE, TENOR_6M, NOTIONAL, OIS_USD_GENERATOR, USD_FIXED_RATE, IS_PAYER);
   private static final YieldCurveBundle CURVES_2 = TestsDataSetsSABR.createCurves2();
   private static final String[] CURVES_NAMES_2 = TestsDataSetsSABR.curves2Names();
 
@@ -352,8 +351,8 @@ public class CouponOISDiscountingMethodTest {
   public void presentValueOISSwapUSDAfterFixing() {
     final ZonedDateTime referenceDate = ScheduleCalculator.getAdjustedDate(START_ACCRUAL_DATE, 1, NYC);
     final double fixingRate = 0.0010;
-    final ArrayZonedDateTimeDoubleTimeSeries fixingTS = new ArrayZonedDateTimeDoubleTimeSeries(new ZonedDateTime[] {START_ACCRUAL_DATE }, new double[] {fixingRate });
-    final DoubleTimeSeries<ZonedDateTime>[] fixingTS2 = new ArrayZonedDateTimeDoubleTimeSeries[] {fixingTS };
+    final ArrayZonedDateTimeDoubleTimeSeries fixingTS = new ArrayZonedDateTimeDoubleTimeSeries(new ZonedDateTime[] {START_ACCRUAL_DATE}, new double[] {fixingRate});
+    final DoubleTimeSeries<ZonedDateTime>[] fixingTS2 = new ArrayZonedDateTimeDoubleTimeSeries[] {fixingTS};
     final Swap<? extends Payment, ? extends Payment> ois = OIS_DEFINITION.toDerivative(referenceDate, fixingTS2, CURVES_NAMES_2[0], CURVES_NAMES_2[0]);
     final double pv = PVC.visit(ois, CURVES_2);
     double pvExpected = PVC.visit(ois.getFirstLeg(), CURVES_2);
@@ -368,7 +367,7 @@ public class CouponOISDiscountingMethodTest {
    */
   public void presentValueOISSwapUSDBeforeFixing() {
     final ZonedDateTime referenceDate = ScheduleCalculator.getAdjustedDate(START_ACCRUAL_DATE, 1, NYC);
-    final DoubleTimeSeries<ZonedDateTime>[] fixingTS2 = new ArrayZonedDateTimeDoubleTimeSeries[] {ArrayZonedDateTimeDoubleTimeSeries.EMPTY_SERIES };
+    final DoubleTimeSeries<ZonedDateTime>[] fixingTS2 = new ArrayZonedDateTimeDoubleTimeSeries[] {ArrayZonedDateTimeDoubleTimeSeries.EMPTY_SERIES};
     final Swap<? extends Payment, ? extends Payment> ois = OIS_DEFINITION.toDerivative(referenceDate, fixingTS2, CURVES_NAMES_2[0], CURVES_NAMES_2[0]);
     final double pv = PVC.visit(ois, CURVES_2);
     double pvExpected = PVC.visit(ois.getFirstLeg(), CURVES_2);
@@ -386,7 +385,7 @@ public class CouponOISDiscountingMethodTest {
 
     final ZonedDateTime referenceDate = TRADE_DATE;
     final Period tenor = Period.ofYears(50);
-    SwapFixedOISDefinition oidUsd5YDefinition;
+    SwapFixedONDefinition oidUsd5YDefinition;
     Swap<? extends Payment, ? extends Payment> ois;
 
     final double[] pv = new double[nbTest];
@@ -395,7 +394,7 @@ public class CouponOISDiscountingMethodTest {
     double totalValue = 0.0;
 
     startTime = System.currentTimeMillis();
-    oidUsd5YDefinition = SwapFixedOISDefinition.from(START_ACCRUAL_DATE, tenor, NOTIONAL, OIS_USD_GENERATOR, USD_FIXED_RATE, IS_PAYER);
+    oidUsd5YDefinition = SwapFixedONDefinition.from(START_ACCRUAL_DATE, tenor, NOTIONAL, OIS_USD_GENERATOR, USD_FIXED_RATE, IS_PAYER);
     ois = oidUsd5YDefinition.toDerivative(referenceDate, CURVES_NAMES_2[0], CURVES_NAMES_2[0]);
     endTime = System.currentTimeMillis();
     System.out.println("OIS swap " + tenor + " (construction): " + (endTime - startTime) + " ms");
@@ -420,7 +419,7 @@ public class CouponOISDiscountingMethodTest {
       totalValue += pv[looptest];
     }
     startTime = System.currentTimeMillis();
-    oidUsd5YDefinition = SwapFixedOISDefinition.from(START_ACCRUAL_DATE, tenor, NOTIONAL, OIS_USD_GENERATOR, USD_FIXED_RATE, IS_PAYER);
+    oidUsd5YDefinition = SwapFixedONDefinition.from(START_ACCRUAL_DATE, tenor, NOTIONAL, OIS_USD_GENERATOR, USD_FIXED_RATE, IS_PAYER);
     ois = oidUsd5YDefinition.toDerivative(referenceDate, CURVES_NAMES_2[0], CURVES_NAMES_2[0]);
     endTime = System.currentTimeMillis();
     System.out.println("OIS swap " + tenor + " (construction): " + (endTime - startTime) + " ms");

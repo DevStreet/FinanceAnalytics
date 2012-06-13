@@ -28,6 +28,7 @@ import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.position.Counterparty;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
@@ -111,6 +112,10 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   private String _currencyCurveName;
   private ExternalScheme _preferredScheme;
   private Function2<Currency, Currency, ExternalId> _spotRateIdentifier;
+
+  private Currency[] _currencies;
+
+
 
   public Random getRandom() {
     return _random;
@@ -199,7 +204,7 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   public void setSecurityMaster(final SecurityMaster securityMaster) {
     _securityMaster = securityMaster;
   }
-
+  
   public String getCurrencyCurveName() {
     return _currencyCurveName;
   }
@@ -209,7 +214,8 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   }
 
   protected CurveSpecificationBuilderConfiguration getCurrencyCurveConfig(final Currency currency) {
-    return getConfigSource().getByName(CurveSpecificationBuilderConfiguration.class, getCurrencyCurveName() + "_" + currency.getCode(), null);
+    CurveSpecificationBuilderConfiguration config = getConfigSource().getByName(CurveSpecificationBuilderConfiguration.class, getCurrencyCurveName() + "_" + currency.getCode(), null);
+    return config;
   }
 
   public Function2<Currency, Currency, ExternalId> getSpotRateIdentifier() {
@@ -373,9 +379,17 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   public static Currency[] getDefaultCurrencies() {
     return new Currency[] {Currency.USD, Currency.GBP, Currency.EUR, Currency.JPY, Currency.CHF };
   }
+  
+  public void setCurrencies(Currency[] currencies) {
+    _currencies = currencies;
+  }
 
   public Currency[] getCurrencies() {
-    return getDefaultCurrencies();
+    if (_currencies == null) {
+      return getDefaultCurrencies();
+    } else {
+      return _currencies;
+    }
   }
 
   protected Currency getRandomCurrency() {
@@ -459,10 +473,18 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
    * 
    * @param quantityGenerator the supplied quantity generator
    * @param securityPersister the supplied security persister
+   * @param counterPartyGenerator the supplied counter party generator
    * @return the new trade, or null if no trade can be generated
    */
-  public ManageableTrade createSecurityTrade(final QuantityGenerator quantityGenerator, final SecurityPersister securityPersister) {
-    return null;
+  public ManageableTrade createSecurityTrade(final QuantityGenerator quantityGenerator, final SecurityPersister securityPersister, final NameGenerator counterPartyGenerator) {
+    ManageableTrade trade = null;
+    T security = createSecurity();
+    if (security != null) {
+      ZonedDateTime tradeDate = previousWorkingDay(ZonedDateTime.now().minusDays(getRandom(30)), getRandomCurrency());
+      trade = new ManageableTrade(quantityGenerator.createQuantity(), securityPersister.storeSecurity(security), tradeDate.toLocalDate(), tradeDate.toOffsetTime(), 
+          ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
+    }
+    return trade;
   }
 
 }

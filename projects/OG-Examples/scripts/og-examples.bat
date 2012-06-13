@@ -8,7 +8,7 @@ set SCRIPTDIR=%BASEDIR%\scripts
 set PROJECT=og-examples
 set PROJECTJAR=%PROJECT%.jar
 set LOGBACK_CONFIG=jetty-logback.xml
-set CONFIG=config\fullstack\example-bin.properties
+set CONFIG=config\fullstack\fullstack-example-bin.properties
 
 SETLOCAL EnableDelayedExpansion
 SET CLASSPATH="config;%PROJECTJAR%;lib\*
@@ -19,8 +19,12 @@ set CLASSPATH=!CLASSPATH!"
 
 IF NOT EXIST %BASEDIR%\install\db\hsqldb\example-db.properties goto :nodb 
 
-IF "%JAVA_HOME%" == "" ECHO Warning: JAVA_HOME is not set
-SET JAVACMD=%JAVA_HOME%\bin\java.exe
+IF "%JAVA_HOME%" == "" (
+  ECHO Warning: JAVA_HOME is not set
+  SET JAVACMD=java.exe
+) ELSE (
+  SET JAVACMD=%JAVA_HOME%\bin\java.exe
+)
 
 IF "%1"=="start" goto :start
 IF "%1"=="debug" goto :start
@@ -39,7 +43,7 @@ GOTO :exit
 
 :start
 "%JAVACMD%" ^
-  -Xms1024m -Xmx3072m -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC ^
+  -Xms512m -Xmx1024m -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC ^
   -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing ^
   -Dlogback.configurationFile=%LOGBACK_CONFIG% ^
         -Dcommandmonitor.secret=OpenGamma ^

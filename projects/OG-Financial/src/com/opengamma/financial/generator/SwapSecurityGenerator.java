@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
+import com.opengamma.core.position.Counterparty;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.financial.analytics.ircurve.CurveSpecificationBuilderConfiguration;
 import com.opengamma.financial.convention.ConventionBundle;
@@ -39,6 +40,7 @@ public class SwapSecurityGenerator extends SecurityGenerator<SwapSecurity> {
       Tenor.ofYears(20) };
 
   private int _daysTrading = 60;
+  private LocalDate _swaptionExpiry;
 
   public void setDaysTrading(final int daysTrading) {
     _daysTrading = daysTrading;
@@ -46,6 +48,14 @@ public class SwapSecurityGenerator extends SecurityGenerator<SwapSecurity> {
 
   public int getDaysTrading() {
     return _daysTrading;
+  }
+  
+  public void setSwationExpiry(final LocalDate swaptionExpiry) {
+    _swaptionExpiry = swaptionExpiry;
+  }
+  
+  public LocalDate getSwaptionExpiry() {
+    return _swaptionExpiry;
   }
 
   /**
@@ -78,8 +88,13 @@ public class SwapSecurityGenerator extends SecurityGenerator<SwapSecurity> {
   public SwapSecurity createSecurity() {
     final Currency ccy = getRandomCurrency();
     LocalDate tradeDate;
+    int i = 0;
     do {
-      tradeDate = LocalDate.now().minusDays(getRandom(getDaysTrading()));
+      if (getSwaptionExpiry() == null) { // just a normal swap
+        tradeDate = LocalDate.now().minusDays(getRandom(getDaysTrading()));
+      } else {
+        tradeDate = getSwaptionExpiry().plusDays(2 + i++); // effective date should be at least two days after expiry of swaption.
+      }
     } while (getHolidaySource().isHoliday(tradeDate, ccy));
     ConventionBundle swapConvention = getConventionSource().getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, ccy.getCode() + "_SWAP"));
     if (swapConvention == null) {
@@ -159,10 +174,14 @@ public class SwapSecurityGenerator extends SecurityGenerator<SwapSecurity> {
   }
 
   @Override
-  public ManageableTrade createSecurityTrade(final QuantityGenerator quantity, final SecurityPersister persister) {
+  public ManageableTrade createSecurityTrade(final QuantityGenerator quantity, final SecurityPersister persister, final NameGenerator counterPartyGenerator) {
+    ManageableTrade trade = null;
     final SwapSecurity swap = createSecurity();
-    return new ManageableTrade(quantity.createQuantity(), persister.storeSecurity(swap), swap.getTradeDate().toLocalDate(), swap.getTradeDate().toOffsetTime(), ExternalId.of("CParty",
-        swap.getCounterparty()));
+    if (swap != null) {
+      trade = new ManageableTrade(quantity.createQuantity(), persister.storeSecurity(swap), swap.getTradeDate().toLocalDate(), swap.getTradeDate().toOffsetTime(), 
+          ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
+    }
+    return trade;
   }
 
 }

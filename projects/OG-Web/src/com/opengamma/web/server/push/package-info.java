@@ -51,15 +51,15 @@
  *   /jax/viewdefinitions</pre>
  * <p>returns</p>
  * <pre>
- *   {viewDefId1: viewDefName1, viewDefId2: viewDefName2, ...}
+ *   [{id: viewDefId1, name: viewDefName1}, {id: viewDefId2, name: viewDefName2}, ...]
  * </pre>
  * <p>and</p>
  * <pre>
  *   /jax/marketdatasnapshots</pre>
  * <p>returns</p>
  * <pre>
- *   {basisViewName1: {snapshotUniqueId1: snapshotName1, snapshotUniqueId2: snapshotName2, ...},
- *    basisViewName2: {snapshotUniqueId3: snapshotName3, snapshotUniqueId4: snapshotName4, ...}}
+ *   [{basisViewName: basisViewName1, snapshots: [{id: snapshot1Id, name: snapshot1Name}, {id: snapshot2Id, name: snapshot2Name}, ...]},
+ *    {basisViewName: basisViewName2, snapshots: [{id: snapshot3Id, name: snapshot3Name}, {id: snapshot4Id, name: snapshot4Name}, ...]}, ...]
  * </pre>
  * <p>and</p>
  * <pre>
@@ -95,8 +95,6 @@
  *      "lastTimestamps": [timestamp1, timestamp2, ...],
  *      "dependencyGraphCells": [[row, col], [row, col], ...],
  *      "fullConversionModeCells": [[row, col], [row, col], ...]}</pre>
- * <p><em>Dependency graphs for primitives aren't supported in the UI at the moment but they probably will be eventually
- * so the viewport definition allows them.</em></p>
  * <ul>
  *   <li>{@code viewDefinitionName}: name of the view definition (see below)</li>
  *   <li>{@code marketDataType}: {@code "live"} or {@code "snapshot"}</li>

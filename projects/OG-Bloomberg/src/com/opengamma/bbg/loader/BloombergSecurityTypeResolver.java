@@ -63,12 +63,14 @@ public class BloombergSecurityTypeResolver implements SecurityTypeResolver {
   static {
     addValidTypes(s_miscTypes, EquityLoader.VALID_SECURITY_TYPES, SecurityType.EQUITY);
     addValidTypes(s_miscTypes, BondLoader.VALID_SECURITY_TYPES, SecurityType.BOND);
+    addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_BILL_TYPES, SecurityType.BILL);
     addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_EQUITY_INDEX_SECURITY_TYPES, SecurityType.EQUITY_INDEX);
     addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_FORWARD_CROSS_SECURITY_TYPES, SecurityType.FORWARD_CROSS);
     addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_FRA_SECURITY_TYPES, SecurityType.FRA);
     addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_RATE_TYPES, SecurityType.RATE);
     addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_SPOT_RATE_TYPES, SecurityType.SPOT_RATE);
     addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_VOLATILITY_QUOTE_TYPES, SecurityType.VOLATILITY_QUOTE);
+    addValidTypes(s_miscTypes, NonLoadedSecurityTypes.VALID_FX_FORWARD_TYPES, SecurityType.FX_FORWARD);
   }
 
   private static final Set<String> BBG_FIELDS = Sets.newHashSet(BloombergConstants.FIELD_SECURITY_TYPE, BloombergConstants.FIELD_FUTURES_CATEGORY);
@@ -111,7 +113,7 @@ public class BloombergSecurityTypeResolver implements SecurityTypeResolver {
             } else if (bbgSecurityType.toUpperCase().contains(" OPTION")) {
               securityType = s_optionTypes.get(futureCategory);
             } else if (bbgSecurityType.toUpperCase().endsWith("SWAP")) {
-              securityType = s_swapTypes.get(bbgSecurityType);
+              securityType = s_swapTypes.get(bbgSecurityType);            
             } else {
               securityType = s_miscTypes.get(bbgSecurityType);
             }

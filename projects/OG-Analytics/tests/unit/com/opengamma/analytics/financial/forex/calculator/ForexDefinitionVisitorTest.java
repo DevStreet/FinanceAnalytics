@@ -33,6 +33,8 @@ import com.opengamma.analytics.financial.instrument.cash.DepositIborDefinition;
 import com.opengamma.analytics.financial.instrument.cash.DepositZeroDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.future.BondFutureDefinition;
+import com.opengamma.analytics.financial.instrument.future.BondFutureOptionPremiumSecurityDefinition;
+import com.opengamma.analytics.financial.instrument.future.BondFutureOptionPremiumTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.future.FederalFundsFutureSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.future.FederalFundsFutureTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureDefinition;
@@ -49,6 +51,7 @@ import com.opengamma.analytics.financial.instrument.payment.CouponCMSDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponFloatingDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
+import com.opengamma.analytics.financial.instrument.payment.CouponIborSpreadDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponOISDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponOISSimplifiedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.PaymentDefinition;
@@ -329,12 +332,12 @@ public class ForexDefinitionVisitorTest {
     }
 
     @Override
-    public String visitCouponIborSpread(CouponIborDefinition payment, T data) {
+    public String visitCouponIborSpread(CouponIborSpreadDefinition payment, T data) {
       return null;
     }
 
     @Override
-    public String visitCouponIborSpread(CouponIborDefinition payment) {
+    public String visitCouponIborSpread(CouponIborSpreadDefinition payment) {
       return null;
     }
 
@@ -597,6 +600,26 @@ public class ForexDefinitionVisitorTest {
     @Override
     public String visitDepositZeroDefinition(DepositZeroDefinition deposit) {
       // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public String visitBondFutureOptionPremiumSecurityDefinition(BondFutureOptionPremiumSecurityDefinition bond, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitBondFutureOptionPremiumSecurityDefinition(BondFutureOptionPremiumSecurityDefinition bond) {
+      return null;
+    }
+
+    @Override
+    public String visitBondFutureOptionPremiumTransactionDefinition(BondFutureOptionPremiumTransactionDefinition bond, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitBondFutureOptionPremiumTransactionDefinition(BondFutureOptionPremiumTransactionDefinition bond) {
       return null;
     }
 

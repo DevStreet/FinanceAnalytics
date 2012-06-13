@@ -11,8 +11,8 @@ import java.util.List;
 import javax.time.calendar.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.payment.PaymentFixedDefinition;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityPaymentFixed;
-import com.opengamma.analytics.financial.interestrate.payments.PaymentFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
 
 /**
  * A wrapper class for a AnnuityDefinition containing PaymentFixedDefinition.

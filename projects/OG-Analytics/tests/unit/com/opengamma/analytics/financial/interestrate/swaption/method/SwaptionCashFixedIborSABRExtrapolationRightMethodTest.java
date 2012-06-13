@@ -26,10 +26,9 @@ import com.opengamma.analytics.financial.interestrate.PresentValueSABRExtrapolat
 import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivityDataBundle;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIbor;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
-import com.opengamma.analytics.financial.interestrate.swaption.method.SwaptionCashFixedIborSABRExtrapolationRightMethod;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
@@ -96,7 +95,7 @@ public class SwaptionCashFixedIborSABRExtrapolationRightMethodTest {
   private static final double MU = 10.0;
   private static final SwaptionCashFixedIborSABRExtrapolationRightMethod METHOD_EXTRAPOLATION = new SwaptionCashFixedIborSABRExtrapolationRightMethod(CUT_OFF_STRIKE, MU);
   // Calculators
-  private static final PresentValueSABRExtrapolationCalculator PVC = PresentValueSABRExtrapolationCalculator.getInstance();
+  private static final PresentValueSABRExtrapolationCalculator PVC = new PresentValueSABRExtrapolationCalculator(CUT_OFF_STRIKE, MU);
 
   /**
    * Tests present value in the region where there is no extrapolation. Tests long/short parity.
@@ -104,7 +103,7 @@ public class SwaptionCashFixedIborSABRExtrapolationRightMethodTest {
   @Test
   public void testPresentValueNoExtra() {
     final YieldCurveBundle curves = TestsDataSetsSABR.createCurves1();
-    final SABRInterestRateParameters sabrParameter = TestsDataSetsSABR.createSABRExtrapolation1(CUT_OFF_STRIKE, MU);
+    final SABRInterestRateParameters sabrParameter = TestsDataSetsSABR.createSABR1();
     final SABRInterestRateDataBundle sabrBundle = new SABRInterestRateDataBundle(sabrParameter, curves);
     final SwaptionCashFixedIborSABRExtrapolationRightMethod method = new SwaptionCashFixedIborSABRExtrapolationRightMethod(CUT_OFF_STRIKE, MU);
     final double priceLongPayer = method.presentValue(SWAPTION_LONG_PAYER, sabrBundle);

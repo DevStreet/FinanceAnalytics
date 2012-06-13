@@ -16,12 +16,12 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityPaymentFixedD
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.payment.PaymentFixedDefinition;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityPaymentFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondIborSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondSecurity;
-import com.opengamma.analytics.financial.interestrate.payments.Coupon;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
@@ -77,8 +77,7 @@ public class BondIborSecurityDefinition extends BondSecurityDefinition<PaymentFi
    * @return The fixed coupon bond.
    */
   public static BondIborSecurityDefinition from(final ZonedDateTime maturityDate, final ZonedDateTime firstAccrualDate, final IborIndex index, final int settlementDays, final DayCount dayCount,
-      final BusinessDayConvention businessDay,
-      final boolean isEOM) {
+      final BusinessDayConvention businessDay, final boolean isEOM) {
     Validate.notNull(maturityDate, "Maturity date");
     Validate.notNull(firstAccrualDate, "First accrual date");
     Validate.notNull(index, "Ibor index");
@@ -86,7 +85,7 @@ public class BondIborSecurityDefinition extends BondSecurityDefinition<PaymentFi
     Validate.notNull(businessDay, "Business day convention");
     final AnnuityCouponIborDefinition coupon = AnnuityCouponIborDefinition.fromAccrualUnadjusted(firstAccrualDate, maturityDate, DEFAULT_NOTIONAL, index, false);
     final PaymentFixedDefinition[] nominalPayment = new PaymentFixedDefinition[] {new PaymentFixedDefinition(index.getCurrency(), businessDay.adjustDate(index.getCalendar(), maturityDate),
-        DEFAULT_NOTIONAL) };
+        DEFAULT_NOTIONAL)};
     final AnnuityPaymentFixedDefinition nominal = new AnnuityPaymentFixedDefinition(nominalPayment);
     return new BondIborSecurityDefinition(nominal, coupon, DEFAULT_EX_COUPON_DAYS, settlementDays, index.getCalendar(), dayCount);
   }
@@ -103,7 +102,7 @@ public class BondIborSecurityDefinition extends BondSecurityDefinition<PaymentFi
   public BondIborSecurity toDerivative(final ZonedDateTime date, final String... yieldCurveNames) {
     Validate.notNull(date, "date");
     final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, getSettlementDays(), getCalendar());
-    return toDerivative(date, new ArrayZonedDateTimeDoubleTimeSeries(new ZonedDateTime[] {DateUtils.getUTCDate(1800, 1, 1) }, new double[] {0.0 }), spot, yieldCurveNames);
+    return toDerivative(date, new ArrayZonedDateTimeDoubleTimeSeries(new ZonedDateTime[] {DateUtils.getUTCDate(1800, 1, 1)}, new double[] {0.0}), spot, yieldCurveNames);
 
   }
 
@@ -130,7 +129,7 @@ public class BondIborSecurityDefinition extends BondSecurityDefinition<PaymentFi
       settlementTime = TimeCalculator.getTimeBetween(date, settlementDate);
     }
     final AnnuityPaymentFixed nominal = (AnnuityPaymentFixed) getNominal().toDerivative(date, creditCurveName);
-    final GenericAnnuity<Coupon> coupon = (GenericAnnuity<Coupon>) getCoupon().toDerivative(date, indexFixingTS, yieldCurveNames);
+    final Annuity<Coupon> coupon = (Annuity<Coupon>) getCoupon().toDerivative(date, indexFixingTS, yieldCurveNames);
     return new BondIborSecurity(nominal.trimBefore(settlementTime), coupon.trimBefore(settlementTime), settlementTime, riskFreeCurveName);
   }
 

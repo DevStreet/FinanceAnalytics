@@ -29,6 +29,7 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.CachingComputationTargetResolver;
+import com.opengamma.engine.depgraph.DependencyGraphBuilderFactory;
 import com.opengamma.engine.function.CompiledFunctionService;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.MarketDataInjector;
@@ -92,6 +93,7 @@ public class ViewProcessorImpl implements ViewProcessorInternal {
   private final ViewComputationCacheSource _computationCacheSource;
   private final JobDispatcher _computationJobDispatcher;
   private final ViewProcessorQueryReceiver _viewProcessorQueryReceiver;
+  private final DependencyGraphBuilderFactory _dependencyGraphBuilderFactory;
   private final DependencyGraphExecutorFactory<?> _dependencyGraphExecutorFactory;
   private final GraphExecutorStatisticsGathererProvider _graphExecutionStatistics;
   private final ViewPermissionProvider _viewPermissionProvider;
@@ -132,12 +134,12 @@ public class ViewProcessorImpl implements ViewProcessorInternal {
       ViewComputationCacheSource computationCacheSource,
       JobDispatcher jobDispatcher,
       ViewProcessorQueryReceiver viewProcessorQueryReceiver,
+      DependencyGraphBuilderFactory dependencyGraphBuilderFactory,
       DependencyGraphExecutorFactory<?> dependencyGraphExecutorFactory,
       GraphExecutorStatisticsGathererProvider graphExecutionStatisticsProvider,
       ViewPermissionProvider viewPermissionProvider,
       OverrideOperationCompiler overrideOperationCompiler,
       ViewResultListenerFactory viewResultListenerFactory) {
-
     _name = name;
     _viewDefinitionRepository = viewDefinitionRepository;
     _namedMarketDataSpecificationRepository = namedMarketDataSpecificationRepository;
@@ -150,6 +152,7 @@ public class ViewProcessorImpl implements ViewProcessorInternal {
     _computationCacheSource = computationCacheSource;
     _computationJobDispatcher = jobDispatcher;
     _viewProcessorQueryReceiver = viewProcessorQueryReceiver;
+    _dependencyGraphBuilderFactory = dependencyGraphBuilderFactory;
     _dependencyGraphExecutorFactory = dependencyGraphExecutorFactory;
     _graphExecutionStatistics = graphExecutionStatisticsProvider;
     _viewPermissionProvider = viewPermissionProvider;
@@ -558,6 +561,7 @@ public class ViewProcessorImpl implements ViewProcessorInternal {
         _computationCacheSource,
         _computationJobDispatcher,
         _viewProcessorQueryReceiver,
+        _dependencyGraphBuilderFactory,
         _dependencyGraphExecutorFactory,
         _graphExecutionStatistics,
         _overrideOperationCompiler);

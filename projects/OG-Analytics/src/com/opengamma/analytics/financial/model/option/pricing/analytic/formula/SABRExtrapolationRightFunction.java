@@ -84,6 +84,14 @@ public class SABRExtrapolationRightFunction {
    */
   private static final BlackPriceFunction BLACK_FUNCTION = new BlackPriceFunction();
 
+  /**
+   * Constructor.
+   * @param forward The forward (rate or price).
+   * @param sabrData The SABR formula data.
+   * @param cutOffStrike The cut-off-strike.
+   * @param timeToExpiry The time to expiration.
+   * @param mu The mu parameter.
+   */
   public SABRExtrapolationRightFunction(final double forward, final SABRFormulaData sabrData, final double cutOffStrike, final double timeToExpiry, final double mu) {
     Validate.notNull(sabrData, "SABR data");
     _forward = forward;
@@ -116,6 +124,29 @@ public class SABRExtrapolationRightFunction {
       }
     }
     return p;
+  }
+
+  /**
+   * Computes the option price derivative with respect to the strike. The price is SABR below the cut-off strike and extrapolated beyond.
+   * @param option The option.
+   * @return The option derivative.
+   */
+  public double priceDerivativeStrike(final EuropeanVanillaOption option) {
+    double pDK = 0.0;
+    final double k = option.getStrike();
+    if (k <= _cutOffStrike) { // Uses Hagan et al SABR function.
+      final BlackPriceFunction blackFunction = new BlackPriceFunction();
+      final double[] volatilityAdjoint = _sabrFunction.getVolatilityAdjoint(option, _forward, _sabrData);
+      final BlackFunctionData dataBlack = new BlackFunctionData(_forward, 1.0, volatilityAdjoint[0]);
+      final double[] bsAdjoint = blackFunction.getPriceAdjoint(option, dataBlack);
+      pDK = bsAdjoint[3] + bsAdjoint[2] * volatilityAdjoint[2];
+    } else { // Uses extrapolation for call.
+      pDK = extrapolationDerivative(k);
+      if (!option.isCall()) { // Put by call/put parity
+        pDK += 1.0;
+      }
+    }
+    return pDK;
   }
 
   /**
@@ -252,7 +283,7 @@ public class SABRExtrapolationRightFunction {
    * @return The parameters.
    */
   private double[] computesFittingParameters() {
-    final double[] param = new double[3];
+    final double[] param = new double[3]; // Implementation note: called a,b,c in the note.
     final EuropeanVanillaOption option = new EuropeanVanillaOption(_cutOffStrike, _timeToExpiry, true);
     // Computes derivatives at cut-off.
     final double[] vD = new double[5];
@@ -264,8 +295,12 @@ public class SABRExtrapolationRightFunction {
     _priceK[0] = BLACK_FUNCTION.getPriceAdjoint2(option, dataBlack, bsD, bsD2);
     _priceK[1] = bsD[2] + bsD[1] * vD[1];
     _priceK[2] = bsD2[2][2] + bsD2[1][2] * vD[1] + (bsD2[2][1] + bsD2[1][1] * vD[1]) * vD[1] + bsD[1] * vD2[1][1];
+    double eps = 1.0E-15;
+    if (Math.abs(_priceK[0]) < eps && Math.abs(_priceK[1]) < eps && Math.abs(_priceK[2]) < eps) {
+      // Implementation note: If value and its derivatives is too small, then parameters are such that the extrapolated price is "very small".
+      return new double[] {-100.0, 0, 0};
+    }
     final CFunction toSolveC = new CFunction(_priceK, _cutOffStrike, _mu);
-
     final BracketRoot bracketer = new BracketRoot();
     double accuracy = 1.0E-5;
     final RidderSingleRootFinder rootFinder = new RidderSingleRootFinder(accuracy);
@@ -278,10 +313,16 @@ public class SABRExtrapolationRightFunction {
 
   /**
    * Computes the derivative of the three fitting parameters with respect to the forward. 
+   * The computation requires some third order derivatives; they are computed by finite difference on the second order derivatives.
    * Used to compute the derivative of the price with respect to the forward.
    * @return The derivatives.
    */
   private double[] computesParametersDerivativeForward() {
+    double eps = 1.0E-15;
+    if (Math.abs(_priceK[0]) < eps && Math.abs(_priceK[1]) < eps && Math.abs(_priceK[2]) < eps) {
+      // Implementation note: If value and its derivatives is too small, then parameters are such that the extrapolated price is "very small".
+      return new double[] {0.0, 0.0, 0.0};
+    }
     // Derivative of price with respect to forward.
     final double[] pDF = new double[3];
     final double shift = 0.00001;
@@ -339,7 +380,19 @@ public class SABRExtrapolationRightFunction {
     return derivativeF.getData();
   }
 
+  /**
+   * Computes the derivative of the three fitting parameters with respect to the SABR parameters. 
+   * The computation requires some third order derivatives; they are computed by finite difference on the second order derivatives.
+   * Used to compute the derivative of the price with respect to the SABR parameters.
+   * @return The derivatives.
+   */
   private double[][] computesParametersDerivativeSABR() {
+    double eps = 1.0E-15;
+    final double[][] result = new double[3][3];
+    if (Math.abs(_priceK[0]) < eps && Math.abs(_priceK[1]) < eps && Math.abs(_priceK[2]) < eps) {
+      // Implementation note: If value and its derivatives is too small, then parameters are such that the extrapolated price is "very small".
+      return result;
+    }
     // Derivative of price with respect to SABR parameters.
     final double[][] pDSABR = new double[3][3]; // parameter SABR - equation
     final double shift = 0.00001;
@@ -358,19 +411,23 @@ public class SABRExtrapolationRightFunction {
       final double[][] vD2pP = new double[2][2];
       SABRFormulaData sabrDatapP;
       double param;
+      double paramShift;
       if (loopparam == 0) {
         param = _sabrData.getAlpha();
-        sabrDatapP = _sabrData.withAlpha(param * (1 + shift));
+        paramShift = param * shift; // Relative shift to cope with difference in order of magnitude.
+        sabrDatapP = _sabrData.withAlpha(param + paramShift);
       } else if (loopparam == 1) {
         param = _sabrData.getRho();
-        sabrDatapP = _sabrData.withRho(param * (1 + shift));
+        paramShift = shift; // Absolute shift as -1 <= rho <= 1; rho can be zero, so relative shift is not possible.
+        sabrDatapP = _sabrData.withRho(param + paramShift);
       } else {
         param = _sabrData.getNu();
-        sabrDatapP = _sabrData.withNu(param * (1 + shift));
+        paramShift = param * shift; // Relative shift to cope with difference in order of magnitude.
+        sabrDatapP = _sabrData.withNu(param + paramShift);
       }
       _sabrFunction.getVolatilityAdjoint2(option, _forward, sabrDatapP, vDpP, vD2pP);
-      final double vD2Kp = (vDpP[1] - vD[1]) / (param * shift);
-      final double vD3KKa = (vD2pP[1][1] - vD2[1][1]) / (param * shift);
+      final double vD2Kp = (vDpP[1] - vD[1]) / paramShift;
+      final double vD3KKa = (vD2pP[1][1] - vD2[1][1]) / paramShift;
       pDSABR[loopparam][1] = (bsD2[2][1] + bsD2[1][1] * vD[1]) * vD[paramIndex] + bsD[1] * vD2Kp;
       final double[] bsDVP = new double[3];
       final double[][] bsD2VP = new double[3][3];
@@ -401,7 +458,6 @@ public class SABRExtrapolationRightFunction {
     final ColtMatrixAlgebra algebra = new ColtMatrixAlgebra();
     final DoubleMatrix2D fDInverse = algebra.getInverse(fDmatrix);
     final OGMatrixAlgebra algebraOG = new OGMatrixAlgebra();
-    final double[][] result = new double[3][3];
     for (int loopparam = 0; loopparam < 3; loopparam++) {
       final DoubleMatrix1D pDSABRvector = new DoubleMatrix1D(pDSABR[loopparam]);
       final DoubleMatrix1D derivativeSABR = (DoubleMatrix1D) algebraOG.multiply(fDInverse, pDSABRvector);
@@ -417,6 +473,15 @@ public class SABRExtrapolationRightFunction {
    */
   private double extrapolation(final double strike) {
     return Math.pow(strike, -_mu) * Math.exp(_parameter[0] + _parameter[1] / strike + _parameter[2] / (strike * strike));
+  }
+
+  /**
+   * The first order derivative of the extrapolation function with respect to the strike.
+   * @param strike The strike.
+   * @return The extrapolated price.
+   */
+  private double extrapolationDerivative(final double strike) {
+    return -extrapolation(strike) * (_mu + (_parameter[1] + 2 * _parameter[2] / strike) / strike) / strike;
   }
 
   /**

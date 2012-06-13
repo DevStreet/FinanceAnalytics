@@ -7,29 +7,28 @@ package com.opengamma.analytics.financial.interestrate;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginTransaction;
 import com.opengamma.analytics.financial.interestrate.future.method.InterestRateFutureOptionMarginTransactionSABRMethod;
-import com.opengamma.analytics.financial.interestrate.payments.CapFloorCMS;
-import com.opengamma.analytics.financial.interestrate.payments.CapFloorCMSSpread;
-import com.opengamma.analytics.financial.interestrate.payments.CapFloorIbor;
-import com.opengamma.analytics.financial.interestrate.payments.CouponCMS;
-import com.opengamma.analytics.financial.interestrate.payments.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIbor;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIborFixed;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.method.CapFloorCMSSABRReplicationMethod;
 import com.opengamma.analytics.financial.interestrate.payments.method.CapFloorCMSSpreadSABRBinormalMethod;
 import com.opengamma.analytics.financial.interestrate.payments.method.CapFloorIborSABRMethod;
 import com.opengamma.analytics.financial.interestrate.payments.method.CouponCMSSABRReplicationMethod;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.method.SwaptionCashFixedIborSABRMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.method.SwaptionPhysicalFixedIborSABRMethod;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateCorrelationParameters;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
-import com.opengamma.util.tuple.DoublesPair;
 
 /**
  * Present value sensitivity to SABR parameters calculator for interest rate instruments using SABR volatility formula.
@@ -55,6 +54,11 @@ public final class PresentValueSABRSensitivitySABRCalculator extends AbstractIns
   private PresentValueSABRSensitivitySABRCalculator() {
   }
 
+  /**
+   * Methods.
+   */
+  public static final CapFloorIborSABRMethod METHOD_IBOR_CAP = CapFloorIborSABRMethod.getInstance();
+
   @Override
   public PresentValueSABRSensitivityDataBundle visit(final InstrumentDerivative derivative, final YieldCurveBundle curves) {
     Validate.notNull(curves);
@@ -68,8 +72,7 @@ public final class PresentValueSABRSensitivitySABRCalculator extends AbstractIns
     Validate.notNull(curves);
     if (curves instanceof SABRInterestRateDataBundle) {
       final SABRInterestRateDataBundle sabr = (SABRInterestRateDataBundle) curves;
-      final CapFloorIborSABRMethod method = CapFloorIborSABRMethod.getInstance();
-      return method.presentValueSABRSensitivity(cap, sabr);
+      return METHOD_IBOR_CAP.presentValueSABRSensitivity(cap, sabr);
     }
     throw new UnsupportedOperationException("The PresentValueSABRSensitivitySABRCalculator visitor visitCapFloorIbor requires a SABRInterestRateDataBundle as data.");
   }
@@ -131,7 +134,8 @@ public final class PresentValueSABRSensitivitySABRCalculator extends AbstractIns
       final SABRInterestRateDataBundle sabrBundle = (SABRInterestRateDataBundle) curves;
       if (sabrBundle.getSABRParameter() instanceof SABRInterestRateCorrelationParameters) {
         final SABRInterestRateCorrelationParameters sabrCorrelation = (SABRInterestRateCorrelationParameters) sabrBundle.getSABRParameter();
-        final CapFloorCMSSpreadSABRBinormalMethod method = new CapFloorCMSSpreadSABRBinormalMethod(sabrCorrelation.getCorrelation());
+        final CapFloorCMSSpreadSABRBinormalMethod method = new CapFloorCMSSpreadSABRBinormalMethod(sabrCorrelation.getCorrelation(), CapFloorCMSSABRReplicationMethod.getDefaultInstance(),
+            CouponCMSSABRReplicationMethod.getInstance());
         return method.presentValueSABRSensitivity(payment, sabrBundle);
       }
     }
@@ -151,7 +155,7 @@ public final class PresentValueSABRSensitivitySABRCalculator extends AbstractIns
   }
 
   @Override
-  public PresentValueSABRSensitivityDataBundle visitGenericAnnuity(final GenericAnnuity<? extends Payment> annuity, final YieldCurveBundle curves) {
+  public PresentValueSABRSensitivityDataBundle visitGenericAnnuity(final Annuity<? extends Payment> annuity, final YieldCurveBundle curves) {
     Validate.notNull(curves);
     Validate.notNull(annuity);
     PresentValueSABRSensitivityDataBundle pvss = new PresentValueSABRSensitivityDataBundle();
@@ -162,26 +166,10 @@ public final class PresentValueSABRSensitivitySABRCalculator extends AbstractIns
   }
 
   @Override
-  public PresentValueSABRSensitivityDataBundle visitFixedCouponPayment(final CouponFixed coupon, final YieldCurveBundle curves) {
+  public PresentValueSABRSensitivityDataBundle visitCouponFixed(final CouponFixed coupon, final YieldCurveBundle curves) {
     Validate.notNull(curves);
     Validate.notNull(coupon);
     final PresentValueSABRSensitivityDataBundle pvss = new PresentValueSABRSensitivityDataBundle();
-    final DoublesPair expiryMaturity = DoublesPair.of(0., coupon.getPaymentTime());
-    pvss.addAlpha(expiryMaturity, 0);
-    pvss.addNu(expiryMaturity, 0);
-    pvss.addRho(expiryMaturity, 0);
-    return pvss;
-  }
-
-  @Override
-  public PresentValueSABRSensitivityDataBundle visitCouponIborFixed(final CouponIborFixed coupon, final YieldCurveBundle curves) {
-    Validate.notNull(curves);
-    Validate.notNull(coupon);
-    final PresentValueSABRSensitivityDataBundle pvss = new PresentValueSABRSensitivityDataBundle();
-    final DoublesPair expiryMaturity = DoublesPair.of(0., coupon.getPaymentTime());
-    pvss.addAlpha(expiryMaturity, 0);
-    pvss.addNu(expiryMaturity, 0);
-    pvss.addRho(expiryMaturity, 0);
     return pvss;
   }
 
@@ -201,7 +189,18 @@ public final class PresentValueSABRSensitivitySABRCalculator extends AbstractIns
 
   @Override
   public PresentValueSABRSensitivityDataBundle visitCouponIbor(final CouponIbor coupon, final YieldCurveBundle curves) {
-    final CapFloorIbor capFloor = CapFloorIbor.from(coupon, 0, true);
-    return visit(capFloor, curves);
+    Validate.notNull(curves);
+    Validate.notNull(coupon);
+    final PresentValueSABRSensitivityDataBundle pvss = new PresentValueSABRSensitivityDataBundle();
+    return pvss;
   }
+
+  @Override
+  public PresentValueSABRSensitivityDataBundle visitCouponIborSpread(final CouponIborSpread coupon, final YieldCurveBundle curves) {
+    Validate.notNull(curves);
+    Validate.notNull(coupon);
+    final PresentValueSABRSensitivityDataBundle pvss = new PresentValueSABRSensitivityDataBundle();
+    return pvss;
+  }
+
 }

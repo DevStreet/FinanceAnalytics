@@ -9,17 +9,17 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.Validate;
-
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.security.Security;
-import com.opengamma.core.security.SecurityUtils;
 import com.opengamma.financial.analytics.CurrencyLabelledMatrix1D;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
 import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
 import com.opengamma.id.ExternalId;
-import com.opengamma.id.ExternalIdBundle;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.money.MultipleCurrencyAmount;
@@ -35,102 +35,26 @@ public class FXUtils {
     BASE_ORDER.put(Currency.EUR, 1);
     BASE_ORDER.put(Currency.GBP, 2);
     BASE_ORDER.put(Currency.AUD, 3);
-    // TODO: NZD missing in currencies
+    BASE_ORDER.put(Currency.NZD, 4);
     BASE_ORDER.put(Currency.USD, 5);
     BASE_ORDER.put(Currency.CHF, 6);
   }
 
-  private static ExternalId getSpotIdentifier(final FXForwardSecurity fxForwardSecurity, final boolean convertToPayCurrency) {
-    final Currency payCurrency = fxForwardSecurity.getPayCurrency();
-    final Currency receiveCurrency = fxForwardSecurity.getReceiveCurrency();
-    ExternalId bloomberg;
-    if (convertToPayCurrency) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(payCurrency.getCode() + receiveCurrency.getCode() + " Curncy");
-    } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(receiveCurrency.getCode() + payCurrency.getCode() + " Curncy");
-    }
-    return bloomberg;
-  }
-
-  /**
-   * Returns a bundle containing all known identifiers for the spot rate of this FXForwardSecurity
-   * @param fxForwardSecurity the fx forward security
-   * @param convertToPayCurrency whether to get the code that will convert a value to the pay currency
-   * @return a bundle containing identifiers for the spot rate, not null
-   */
-  public static final ExternalIdBundle getSpotIdentifiers(final FXForwardSecurity fxForwardSecurity, final boolean convertToPayCurrency) {
-    return ExternalIdBundle.of(getSpotIdentifier(fxForwardSecurity, convertToPayCurrency));
-  }
-
-  /**
-   * Returns a bundle containing all known identifiers for the spot rate of this FXOptionSecurity
-   * @param fxOptionSecurity the fx option security
-   * @param convertToPutCurrency whether to get the code that will convert a value to the put currency
-   * @return a bundle containing identifiers for the spot rate, not null
-   */
-  public static final ExternalIdBundle getSpotIdentifiers(final FXOptionSecurity fxOptionSecurity, final boolean convertToPutCurrency) {
-    final Currency putCurrency = fxOptionSecurity.getPutCurrency();
-    final Currency callCurrency = fxOptionSecurity.getCallCurrency();
-    ExternalId bloomberg;
-    if (convertToPutCurrency) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
-    } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
-    }
-    return ExternalIdBundle.of(bloomberg);
-  }
-
-  //TODO remove this
   /**
    * Returns a bundle containing all known identifiers for the spot rate of this FXOptionSecurity
    * @param fxOptionSecurity the fx option security
    * @param convertToPutCurrency whether to get the code that will convert a value to the put currency
    * @return an Identifier containing identifier for the spot rate, not null
    */
-  public static final ExternalId getSpotIdentifier(final FXBarrierOptionSecurity fxOptionSecurity, final boolean convertToPutCurrency) {
-    final Currency putCurrency = fxOptionSecurity.getPutCurrency();
-    final Currency callCurrency = fxOptionSecurity.getCallCurrency();
-    ExternalId bloomberg;
-    if (convertToPutCurrency) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
-    } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
-    }
-    return bloomberg;
-  }
-
-  /**
-   * Returns a bundle containing all known identifiers for the spot rate of this FXOptionSecurity
-   * @param fxOptionSecurity the fx option security
-   * @param convertToPutCurrency whether to get the code that will convert a value to the put currency
-   * @return an Identifier containing identifier for the spot rate, not null
-   */
-  public static final ExternalId getInverseSpotIdentifier(final FXBarrierOptionSecurity fxOptionSecurity, final boolean convertToPutCurrency) {
-    final Currency putCurrency = fxOptionSecurity.getPutCurrency();
-    final Currency callCurrency = fxOptionSecurity.getCallCurrency();
-    ExternalId bloomberg;
-    if (convertToPutCurrency) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
-    } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
-    }
-    return bloomberg;
-  }
-
-  /**
-   * Returns a bundle containing all known identifiers for the spot rate of this FXOptionSecurity
-   * @param fxOptionSecurity the fx option security
-   * @param convertToPutCurrency whether to get the code that will convert a value to the put currency
-   * @return an Identifier containing identifier for the spot rate, not null
-   */
+  // TODO: review: Should Bbg code be in Financial?
   public static final ExternalId getSpotIdentifier(final FXOptionSecurity fxOptionSecurity, final boolean convertToPutCurrency) {
     final Currency putCurrency = fxOptionSecurity.getPutCurrency();
     final Currency callCurrency = fxOptionSecurity.getCallCurrency();
     ExternalId bloomberg;
     if (convertToPutCurrency) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
     } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
     }
     return bloomberg;
   }
@@ -141,32 +65,15 @@ public class FXUtils {
    * @param fxOptionSecurity the fx option security
    * @return an Identifier containing identifier for the spot rate, not null
    */
+  // TODO: review: Should Bbg code be in Financial?
   public static final ExternalId getSpotIdentifier(final FXOptionSecurity fxOptionSecurity) {
     final Currency putCurrency = fxOptionSecurity.getPutCurrency();
     final Currency callCurrency = fxOptionSecurity.getCallCurrency();
     ExternalId bloomberg;
     if (isInBaseQuoteOrder(putCurrency, callCurrency)) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
     } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
-    }
-    return bloomberg;
-  }
-
-  /**
-   * Returns a bundle containing all known identifiers for the spot rate of this FXBarrierOptionSecurity.
-   * The identifier respect the market base/quote currencies.
-   * @param fxBarrierOptionSecurity the fx option security
-   * @return an Identifier containing identifier for the spot rate, not null
-   */
-  public static final ExternalId getSpotIdentifier(final FXBarrierOptionSecurity fxBarrierOptionSecurity) {
-    final Currency putCurrency = fxBarrierOptionSecurity.getPutCurrency();
-    final Currency callCurrency = fxBarrierOptionSecurity.getCallCurrency();
-    ExternalId bloomberg;
-    if (isInBaseQuoteOrder(putCurrency, callCurrency)) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
-    } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
     }
     return bloomberg;
   }
@@ -174,17 +81,37 @@ public class FXUtils {
   /**
    * Returns a bundle containing all known identifiers for the spot rate of this FXOptionSecurity.
    * The identifier respect the market base/quote currencies.
-   * @param fxOptionSecurity the fx option security
+   * @param fxForwardSecurity the fx option security
    * @return an Identifier containing identifier for the spot rate, not null
    */
-  public static final ExternalId getInverseSpotIdentifier(final FXOptionSecurity fxOptionSecurity) {
-    final Currency putCurrency = fxOptionSecurity.getPutCurrency();
-    final Currency callCurrency = fxOptionSecurity.getCallCurrency();
+  // TODO: review: Should Bbg code be in Financial?
+  public static final ExternalId getSpotIdentifier(final FXForwardSecurity fxForwardSecurity) {
+    final Currency putCurrency = fxForwardSecurity.getPayCurrency();
+    final Currency callCurrency = fxForwardSecurity.getReceiveCurrency();
     ExternalId bloomberg;
     if (isInBaseQuoteOrder(putCurrency, callCurrency)) {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
     } else {
-      bloomberg = SecurityUtils.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
+    }
+    return bloomberg;
+  }
+
+  /**
+   * Returns a bundle containing all known identifiers for the spot rate of this FXOptionSecurity.
+   * The identifier respect the market base/quote currencies.
+   * @param fxDigitalOptionSecurity the fx option security
+   * @return an Identifier containing identifier for the spot rate, not null
+   */
+  // TODO: review: Should Bbg code be in Financial?
+  public static final ExternalId getSpotIdentifier(final FXDigitalOptionSecurity fxDigitalOptionSecurity) {
+    final Currency putCurrency = fxDigitalOptionSecurity.getPutCurrency();
+    final Currency callCurrency = fxDigitalOptionSecurity.getCallCurrency();
+    ExternalId bloomberg;
+    if (isInBaseQuoteOrder(putCurrency, callCurrency)) {
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(putCurrency.getCode() + callCurrency.getCode() + " Curncy");
+    } else {
+      bloomberg = ExternalSchemes.bloombergTickerSecurityId(callCurrency.getCode() + putCurrency.getCode() + " Curncy");
     }
     return bloomberg;
   }
@@ -215,12 +142,38 @@ public class FXUtils {
     if (BASE_ORDER.containsKey(currency2)) {
       return false;
     }
-    // TODO: currency not in the order
+    // TODO: Review what to do when none of the currencies is in the given list
     return true;
   }
 
+  /**
+   * Return in the standard base/quote currency from two currencies.
+   * @param currency1 The first currency.
+   * @param currency2 The second currency.
+   * @return The base currency.
+   */
+  public static Currency baseCurrency(final Currency currency1, final Currency currency2) {
+    if (isInBaseQuoteOrder(currency1, currency2)) {
+      return currency1;
+    }
+    return currency2;
+  }
+
+  /**
+   * Return in the currency which is not the base currency from two currencies.
+   * @param currency1 The first currency.
+   * @param currency2 The second currency.
+   * @return The non-base currency.
+   */
+  public static Currency nonBaseCurrency(final Currency currency1, final Currency currency2) {
+    if (isInBaseQuoteOrder(currency1, currency2)) {
+      return currency2;
+    }
+    return currency1;
+  }
+
   public static CurrencyLabelledMatrix1D getMultipleCurrencyAmountAsMatrix(final MultipleCurrencyAmount mca) {
-    Validate.notNull(mca, "multiple currency amount");
+    ArgumentChecker.notNull(mca, "multiple currency amount");
     final int n = mca.size();
     final Currency[] keys = new Currency[n];
     final double[] values = new double[n];
@@ -233,10 +186,8 @@ public class FXUtils {
   }
 
   public static boolean isFXSecurity(final Security security) {
-    return security instanceof FXForwardSecurity
-        || security instanceof FXOptionSecurity
-        || security instanceof FXBarrierOptionSecurity
-        || security instanceof FXDigitalOptionSecurity;
+    return security instanceof FXForwardSecurity || security instanceof FXOptionSecurity || security instanceof FXBarrierOptionSecurity || security instanceof FXDigitalOptionSecurity
+        || security instanceof NonDeliverableFXForwardSecurity || security instanceof NonDeliverableFXOptionSecurity || security instanceof NonDeliverableFXDigitalOptionSecurity;
   }
 
 }

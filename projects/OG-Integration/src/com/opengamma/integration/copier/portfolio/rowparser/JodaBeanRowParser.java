@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -27,6 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.financial.conversion.JodaBeanConverters;
+import com.opengamma.financial.security.equity.EquitySecurity;
+import com.opengamma.financial.security.future.EquityFutureSecurity;
+import com.opengamma.financial.security.future.InterestRateFutureSecurity;
+import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
+
+import com.opengamma.financial.security.option.EquityOptionSecurity;
+import com.opengamma.financial.security.option.IRFutureOptionSecurity;
+import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.FixedInterestRateLeg;
 import com.opengamma.financial.security.swap.FixedVarianceSwapLeg;
 import com.opengamma.financial.security.swap.FloatingGearingIRLeg;
@@ -36,6 +45,7 @@ import com.opengamma.financial.security.swap.FloatingVarianceSwapLeg;
 import com.opengamma.financial.security.swap.InterestRateLeg;
 import com.opengamma.financial.security.swap.Notional;
 import com.opengamma.financial.security.swap.SwapLeg;
+import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.financial.security.swap.VarianceSwapLeg;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.ManageableTrade;
@@ -92,8 +102,16 @@ public class JodaBeanRowParser extends RowParser {
     "attributes",
     "gicscode",
     "parentpositionid",
-    "providerid"
+    "providerid",
+    "deal"
   };
+  
+  /**
+   * Column prefixes
+   */
+  private static final String POSITION_PREFIX = "position";
+  private static final String TRADE_PREFIX = "trade";
+  private static final String UNDERLYING_PREFIX = "underlying";
   
   /**
    * Every security class name ends with this
@@ -101,9 +119,14 @@ public class JodaBeanRowParser extends RowParser {
   private static final String CLASS_POSTFIX = "Security";
 
   /**
-   *  The security class that this parser is adapted to
+   * The security class that this parser is adapted to
    */
   private Class<DirectBean> _securityClass;
+  
+  /**
+   * The underlying security class(es) for the security class above
+   */
+  private List<Class<?>> _underlyingSecurityClasses;
   
   /**
    *  Map from column name to the field's Java type
@@ -127,6 +150,8 @@ public class JodaBeanRowParser extends RowParser {
     VarianceSwapLeg.meta();
     FixedVarianceSwapLeg.meta();
     FloatingVarianceSwapLeg.meta();
+    EquitySecurity.meta();
+    SwapSecurity.meta();
   }
   
   protected JodaBeanRowParser(String securityName) throws OpenGammaRuntimeException {
@@ -136,10 +161,38 @@ public class JodaBeanRowParser extends RowParser {
     // Find the corresponding security class
     _securityClass = getClass(securityName + CLASS_POSTFIX);
 
+    // Find the underlying(s)
+    _underlyingSecurityClasses = getUnderlyingSecurityClasses(_securityClass);
+    
     // Set column map
     _columns = recursiveGetColumnMap(_securityClass, "");
-    _columns.putAll(recursiveGetColumnMap(ManageablePosition.class, "position:"));
-    _columns.putAll(recursiveGetColumnMap(ManageableTrade.class, "trade:"));
+    for (Class<?> securityClass : _underlyingSecurityClasses) {
+      _columns.putAll(recursiveGetColumnMap(securityClass, UNDERLYING_PREFIX + securityClass.getSimpleName() + ":"));
+    }
+    _columns.putAll(recursiveGetColumnMap(ManageablePosition.class, POSITION_PREFIX + ":"));
+    _columns.putAll(recursiveGetColumnMap(ManageableTrade.class, TRADE_PREFIX + ":"));
+  }
+
+  private List<Class<?>> getUnderlyingSecurityClasses(Class<DirectBean> securityClass) {
+    
+    List<Class<?>> result = new ArrayList<Class<?>>();
+          
+    // Futures
+    if (EquityFutureSecurity.class.isAssignableFrom(securityClass)) {
+      result.add(EquitySecurity.class);
+      
+    // Options
+    } else if (EquityBarrierOptionSecurity.class.isAssignableFrom(securityClass)) {
+      result.add(EquitySecurity.class);
+    } else if (EquityOptionSecurity.class.isAssignableFrom(securityClass)) {
+      result.add(EquitySecurity.class);      
+    } else if (IRFutureOptionSecurity.class.isAssignableFrom(securityClass)) {
+      result.add(InterestRateFutureSecurity.class);
+    } else if (SwaptionSecurity.class.isAssignableFrom(securityClass)) {
+      result.add(SwapSecurity.class);
+    } 
+
+    return result;
   }
 
   /**
@@ -172,6 +225,14 @@ public class JodaBeanRowParser extends RowParser {
     if (security != null) {
       ArrayList<ManageableSecurity> securities = new ArrayList<ManageableSecurity>();
       securities.add(security);
+      for (Class<?> underlyingClass : _underlyingSecurityClasses) {
+        ManageableSecurity underlying = (ManageableSecurity) recursiveConstructBean(row, underlyingClass, UNDERLYING_PREFIX + underlyingClass.getSimpleName().toLowerCase() + ":");
+        if (underlying != null) {
+          securities.add(underlying);
+        } else {
+          s_logger.warn("Could not populate underlying security of type " + underlyingClass);
+        }
+      }
       return securities.toArray(new ManageableSecurity[securities.size()]);
     } else {
       return null;
@@ -200,6 +261,9 @@ public class JodaBeanRowParser extends RowParser {
     
     ManageableTrade result = (ManageableTrade) recursiveConstructBean(row, ManageableTrade.class, "trade:");
     if (result != null) {
+      if (result.getTradeDate() == null) {
+        return null;
+      }
       result.setSecurityLink(new ManageableSecurityLink(security.getExternalIdBundle()));
     }
     return result;
@@ -210,9 +274,14 @@ public class JodaBeanRowParser extends RowParser {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    
   @Override
-  public Map<String, String> constructRow(ManageableSecurity security) {
-    ArgumentChecker.notNull(security, "security");
-    return recursiveConstructRow(security, "");
+  public Map<String, String> constructRow(ManageableSecurity[] securities) {
+    ArgumentChecker.notNull(securities, "securities");
+    Map<String, String> result = recursiveConstructRow(securities[0], "");
+    
+    for (int i = 1; i < securities.length; i++) {
+      result.putAll(recursiveConstructRow(securities[i], UNDERLYING_PREFIX + securities[i].getClass().getSimpleName() + ":"));
+    }
+    return result;
   }
   
   @Override
@@ -329,12 +398,19 @@ public class JodaBeanRowParser extends RowParser {
             // Convert raw value in row to the target property's type
             String rawValue = row.get((prefix + metaProperty.name()).trim().toLowerCase());
             
-            // Set property value
-            if (rawValue != null && !rawValue.equals("")) {
-              builder.set(metaProperty.name(), 
-                  JodaBeanUtils.stringConverter().convertFromString(metaProperty.propertyType(), rawValue));
+            if (isConvertible(metaProperty.propertyType())) {
+              // Set property value
+              if (rawValue != null && !rawValue.equals("")) {
+                builder.set(metaProperty.name(), 
+                    JodaBeanUtils.stringConverter().convertFromString(metaProperty.propertyType(), rawValue));
+              } else {
+                s_logger.info("Skipping empty or null value for " + prefix + metaProperty.name());
+              }
+            } else if (List.class.isAssignableFrom(metaProperty.propertyType()) &&
+                isConvertible(JodaBeanUtils.collectionType(metaProperty, metaProperty.propertyType()))) {
+              builder.set(metaProperty.name(), stringToList(rawValue, JodaBeanUtils.collectionType(metaProperty, metaProperty.propertyType())));
             } else {
-              s_logger.info("Skipping empty or null value for " + prefix + metaProperty.name());
+              throw new OpenGammaRuntimeException("Property '" + prefix + metaProperty.name() + "' (" + metaProperty.propertyType() + ") cannot be populated from a string");
             }
           }
         }
@@ -377,12 +453,53 @@ public class JodaBeanRowParser extends RowParser {
         } else {
           // Set the column
           if (_columns.containsKey(prefix + metaProperty.name())) {
-            result.put(prefix + metaProperty.name(), metaProperty.getString(bean));
+            // Can convert
+            if (isConvertible(metaProperty.propertyType())) {
+              result.put(prefix + metaProperty.name(), metaProperty.getString(bean));
+            // Is list, needs to be decomposed
+            } else if (List.class.isAssignableFrom(metaProperty.propertyType()) && 
+                isConvertible(JodaBeanUtils.collectionType(metaProperty, metaProperty.propertyType()))) {
+              result.put(prefix + metaProperty.name(), listToString((List<?>) metaProperty.get(bean)));
+            // Cannot convert :(
+            } else {
+              throw new OpenGammaRuntimeException("Property '" + prefix + metaProperty.name() + "' (" + metaProperty.propertyType() + ") cannot be converted to a string");
+            }
           } else {
             s_logger.info("No matching column found for property " + prefix + metaProperty.name());
           }
         }
       }
+    }
+    return result;
+  }
+  
+  /**
+   * Converts a list of objects to a |-separated string of their JodaConverted string representations
+   * @param i the list to be converted
+   * @return  the |-separated string string
+   */
+  private String listToString(List<?> i) {
+    String result = "";
+    for (Object o : i) {
+      if (isConvertible(o.getClass())) {
+        result = result + JodaBeanUtils.stringConverter().convertToString(o) + " | "; 
+      } else {
+        throw new OpenGammaRuntimeException("Cannot convert " + o.getClass() + " contained in list");
+      }
+    }
+    return result.substring(0, result.lastIndexOf('|')).trim();
+  }
+  
+  /**
+   * Converts a |-separated string to a list of objects using JodaConvert.
+   * @param raw the string to parse
+   * @param t   the class to convert to
+   * @return    the list of objects of type t
+   */
+  private List<?> stringToList(String raw, Class<?> t) {
+    List<Object> result = new ArrayList<Object>();
+    for (String s : raw.split("\\|")) {
+      result.add(JodaBeanUtils.stringConverter().convertFromString(t, s.trim()));
     }
     return result;
   }

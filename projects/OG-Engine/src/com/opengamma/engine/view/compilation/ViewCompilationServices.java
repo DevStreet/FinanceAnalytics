@@ -24,8 +24,6 @@ import com.opengamma.util.ArgumentChecker;
  */
 public class ViewCompilationServices {
 
-  private static final DependencyGraphBuilderFactory s_dependencyGraphBuilder = new DependencyGraphBuilderFactory();
-
   private final MarketDataAvailabilityProvider _marketDataAvailabilityProvider;
   private final FunctionResolver _functionResolver;
   private final PositionSource _positionSource;
@@ -33,36 +31,38 @@ public class ViewCompilationServices {
   private final ExecutorService _executorService;
   private final FunctionCompilationContext _compilationContext;
   private final CachingComputationTargetResolver _computationTargetResolver;
-  // TODO: pass this into constructors
-  private final DependencyGraphBuilderFactory _dependencyGraphBuilder = s_dependencyGraphBuilder;
-  
+  private final DependencyGraphBuilderFactory _dependencyGraphBuilder;
+
   /**
    * Constructs an instance, without a position source or security source.
    * 
-   * @param marketDataAvailabilityProvider  the market data availability provider
-   * @param functionResolver  the function resolver
-   * @param compilationContext  the function compilation context
-   * @param computationTargetResolver  the computation target resolver
-   * @param executorService  the executor service
+   * @param marketDataAvailabilityProvider the market data availability provider
+   * @param functionResolver the function resolver
+   * @param compilationContext the function compilation context
+   * @param computationTargetResolver the computation target resolver
+   * @param executorService the executor service
+   * @param dependencyGraphBuilder the graph building implementation
    */
   public ViewCompilationServices(
       MarketDataAvailabilityProvider marketDataAvailabilityProvider,
       FunctionResolver functionResolver,
       FunctionCompilationContext compilationContext,
       CachingComputationTargetResolver computationTargetResolver,
-      ExecutorService executorService) {
-    this(marketDataAvailabilityProvider, functionResolver, compilationContext, computationTargetResolver, executorService, null, null);
+      ExecutorService executorService,
+      DependencyGraphBuilderFactory dependencyGraphBuilder) {
+    this(marketDataAvailabilityProvider, functionResolver, compilationContext, computationTargetResolver, executorService, dependencyGraphBuilder, null, null);
   }
-  
+
   /**
    * Constructs an instance, without a position source.
    * 
-   * @param marketDataAvailabilityProvider  the market data availability provider
-   * @param functionResolver  the function resolver
-   * @param compilationContext  the function compilation context
-   * @param computationTargetResolver  the computation target resolver
-   * @param executorService  the executor service
-   * @param securitySource  the security source
+   * @param marketDataAvailabilityProvider the market data availability provider
+   * @param functionResolver the function resolver
+   * @param compilationContext the function compilation context
+   * @param computationTargetResolver the computation target resolver
+   * @param executorService the executor service
+   * @param dependencyGraphBuilder the graph building implementation
+   * @param securitySource the security source
    */
   public ViewCompilationServices(
       MarketDataAvailabilityProvider marketDataAvailabilityProvider,
@@ -70,20 +70,22 @@ public class ViewCompilationServices {
       FunctionCompilationContext compilationContext,
       CachingComputationTargetResolver computationTargetResolver,
       ExecutorService executorService,
+      DependencyGraphBuilderFactory dependencyGraphBuilder,
       SecuritySource securitySource) {
-    this(marketDataAvailabilityProvider, functionResolver, compilationContext, computationTargetResolver, executorService, securitySource, null);
+    this(marketDataAvailabilityProvider, functionResolver, compilationContext, computationTargetResolver, executorService, dependencyGraphBuilder, securitySource, null);
   }
-  
+
   /**
    * Constructs an instance
    * 
-   * @param marketDataAvailabilityProvider  the market data availability provider
-   * @param functionResolver  the function resolver
-   * @param compilationContext  the function compilation context
-   * @param computationTargetResolver  the computation target resolver
-   * @param executorService  the executor service
-   * @param securitySource  the security source
-   * @param positionSource  the position source
+   * @param marketDataAvailabilityProvider the market data availability provider
+   * @param functionResolver the function resolver
+   * @param compilationContext the function compilation context
+   * @param computationTargetResolver the computation target resolver
+   * @param executorService the executor service
+   * @param dependencyGraphBuilder the graph building implementation
+   * @param securitySource the security source
+   * @param positionSource the position source
    */
   public ViewCompilationServices(
       MarketDataAvailabilityProvider marketDataAvailabilityProvider,
@@ -91,6 +93,7 @@ public class ViewCompilationServices {
       FunctionCompilationContext compilationContext,
       CachingComputationTargetResolver computationTargetResolver,
       ExecutorService executorService,
+      DependencyGraphBuilderFactory dependencyGraphBuilder,
       SecuritySource securitySource,
       PositionSource positionSource) {
     ArgumentChecker.notNull(marketDataAvailabilityProvider, "marketDataAvailabilityProvider");
@@ -98,12 +101,13 @@ public class ViewCompilationServices {
     ArgumentChecker.notNull(compilationContext, "compilationContext");
     ArgumentChecker.notNull(computationTargetResolver, "computationTargetResolver");
     ArgumentChecker.notNull(executorService, "executorService");
-    
+    ArgumentChecker.notNull(dependencyGraphBuilder, "dependencyGraphBuilder");
     _marketDataAvailabilityProvider = marketDataAvailabilityProvider;
     _functionResolver = functionResolver;
     _compilationContext = compilationContext;
     _executorService = executorService;
     _computationTargetResolver = computationTargetResolver;
+    _dependencyGraphBuilder = dependencyGraphBuilder;
     _securitySource = securitySource;
     _positionSource = positionSource;
   }
@@ -120,6 +124,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the function resolver.
+   * 
    * @return the function resolver, not null
    */
   public FunctionResolver getFunctionResolver() {
@@ -128,6 +133,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the source of positions.
+   * 
    * @return the source of positions, not null
    */
   public PositionSource getPositionSource() {
@@ -136,6 +142,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the source of securities.
+   * 
    * @return the source of securities, not null
    */
   public SecuritySource getSecuritySource() {
@@ -144,6 +151,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the executor service.
+   * 
    * @return the executor service, not null
    */
   public ExecutorService getExecutorService() {
@@ -152,6 +160,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the compilation context.
+   * 
    * @return the compilation context, not null
    */
   public FunctionCompilationContext getFunctionCompilationContext() {
@@ -160,6 +169,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the computation target resolver.
+   * 
    * @return the computation target resolver, not null
    */
   public CachingComputationTargetResolver getComputationTargetResolver() {
@@ -168,6 +178,7 @@ public class ViewCompilationServices {
 
   /**
    * Gets the dependency graph builder factory.
+   * 
    * @return the dependency graph builder factory, not null
    */
   public DependencyGraphBuilderFactory getDependencyGraphBuilder() {

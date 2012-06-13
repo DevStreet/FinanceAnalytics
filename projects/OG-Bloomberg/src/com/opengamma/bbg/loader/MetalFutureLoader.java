@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 import com.opengamma.bbg.ReferenceDataProvider;
 import com.opengamma.bbg.util.BloombergDataUtils;
-import com.opengamma.core.security.SecurityUtils;
+import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.security.future.MetalFutureSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.master.security.ManageableSecurity;
@@ -89,12 +89,12 @@ public class MetalFutureLoader extends SecurityLoader {
     String expiryDate = fieldData.getString(FIELD_FUT_LAST_TRADE_DT);
     String futureTradingHours = fieldData.getString(FIELD_FUT_TRADING_HRS);
     String micExchangeCode = fieldData.getString(FIELD_ID_MIC_PRIM_EXCH);
-    String currencyStr = fieldData.getString(FIELD_CRNCY);
-    String category = fieldData.getString(FIELD_FUTURES_CATEGORY);
+    String currencyStr = fieldData.getString(FIELD_CRNCY);    
+    String category = BloombergDataUtils.removeDuplicateWhiteSpace(fieldData.getString(FIELD_FUTURES_CATEGORY), " ");
     Double unitNumber = fieldData.getDouble(FIELD_FUT_CONT_SIZE);
     String unitName = fieldData.getString(FIELD_FUT_TRADING_UNITS);
     String underlyingTicker = fieldData.getString(FIELD_UNDL_SPOT_TICKER);
-    String name = fieldData.getString(FIELD_FUT_LONG_NAME);
+    String name = BloombergDataUtils.removeDuplicateWhiteSpace(fieldData.getString(FIELD_FUT_LONG_NAME), " ");
     String bbgUnique = fieldData.getString(FIELD_ID_BBG_UNIQUE);
     double unitAmount = Double.valueOf(fieldData.getString(FIELD_FUT_VAL_PT));
 
@@ -132,7 +132,7 @@ public class MetalFutureLoader extends SecurityLoader {
     }
     ExternalId underlying = null;
     if (underlyingTicker != null) {
-      underlying = SecurityUtils.bloombergTickerSecurityId(underlyingTicker);
+      underlying = ExternalSchemes.bloombergTickerSecurityId(underlyingTicker);
     }
     Expiry expiry = decodeExpiry(expiryDate, futureTradingHours);
     if (expiry == null) {
@@ -143,9 +143,7 @@ public class MetalFutureLoader extends SecurityLoader {
     security.setUnitNumber(unitNumber);
     security.setUnitName(unitName);
     security.setUnderlyingId(underlying);
-    if (isValidField(name)) {
-      security.setName(BloombergDataUtils.removeDuplicateWhiteSpace(name, " "));
-    }
+    security.setName(name);
     // set identifiers
     parseIdentifiers(fieldData, security);
     return security;

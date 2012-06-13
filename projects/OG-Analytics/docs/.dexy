@@ -1,9 +1,0 @@
-{
-    "*.java|fn|java": {
-        "env": {
-            "CLASSPATH": "/mnt/work/sqlite4java-282/sqlite4java.jar:/mnt/work/OG-Platform/projects/OG-Examples/lib/classpath.jar:/mnt/work/OG-Platform/projects/OG-Analytics/build/og-analytics.jar"
-        }
-    },
-    "*.java|idio": {},
-    "*.sqlite3": {}
-}

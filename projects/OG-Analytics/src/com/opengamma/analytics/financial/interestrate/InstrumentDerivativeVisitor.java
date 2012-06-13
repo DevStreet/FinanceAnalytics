@@ -12,10 +12,11 @@ import com.opengamma.analytics.financial.forex.derivative.ForexOptionDigital;
 import com.opengamma.analytics.financial.forex.derivative.ForexOptionSingleBarrier;
 import com.opengamma.analytics.financial.forex.derivative.ForexOptionVanilla;
 import com.opengamma.analytics.financial.forex.derivative.ForexSwap;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIbor;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIborRatchet;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIbor;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborRatchet;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BillSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BillTransaction;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondCapitalIndexedSecurity;
@@ -30,6 +31,8 @@ import com.opengamma.analytics.financial.interestrate.cash.derivative.DepositIbo
 import com.opengamma.analytics.financial.interestrate.cash.derivative.DepositZero;
 import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
+import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumSecurity;
+import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
@@ -37,29 +40,29 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.Interest
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionPremiumTransaction;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponInterpolation;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponInterpolationGearing;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponMonthly;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponMonthlyGearing;
-import com.opengamma.analytics.financial.interestrate.payments.CapFloorCMS;
-import com.opengamma.analytics.financial.interestrate.payments.CapFloorCMSSpread;
-import com.opengamma.analytics.financial.interestrate.payments.CapFloorIbor;
-import com.opengamma.analytics.financial.interestrate.payments.CouponCMS;
-import com.opengamma.analytics.financial.interestrate.payments.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIbor;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIborFixed;
-import com.opengamma.analytics.financial.interestrate.payments.CouponIborGearing;
-import com.opengamma.analytics.financial.interestrate.payments.Payment;
-import com.opengamma.analytics.financial.interestrate.payments.PaymentFixed;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolation;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolationGearing;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthly;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthlyGearing;
+import com.opengamma.analytics.financial.interestrate.payments.ForexForward;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborGearing;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponOIS;
-import com.opengamma.analytics.financial.interestrate.swap.definition.CrossCurrencySwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FloatingRateNote;
-import com.opengamma.analytics.financial.interestrate.swap.definition.ForexForward;
-import com.opengamma.analytics.financial.interestrate.swap.definition.OISSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.TenorSwap;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.CrossCurrencySwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FloatingRateNote;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.OISSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.TenorSwap;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionBermudaFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
@@ -89,7 +92,7 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitBillTransaction(BillTransaction bill, S data);
 
-  T visitGenericAnnuity(GenericAnnuity<? extends Payment> genericAnnuity, S data);
+  T visitGenericAnnuity(Annuity<? extends Payment> genericAnnuity, S data);
 
   T visitFixedCouponAnnuity(AnnuityCouponFixed fixedCouponAnnuity, S data);
 
@@ -97,9 +100,7 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitAnnuityCouponIborRatchet(AnnuityCouponIborRatchet annuity, S data);
 
-  T visitSwap(Swap<?, ?> swap, S data);
-
-  T visitFixedCouponSwap(FixedCouponSwap<?> swap, S data);
+  T visitFixedCouponSwap(SwapFixedCoupon<?> swap, S data);
 
   T visitFixedFloatSwap(FixedFloatSwap swap, S data);
 
@@ -113,41 +114,13 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitTenorSwap(TenorSwap<? extends Payment> tenorSwap, S data);
 
-  T visitFloatingRateNote(FloatingRateNote frn, S data);
-
   T visitCrossCurrencySwap(CrossCurrencySwap ccs, S data);
 
   T visitForexForward(ForexForward fx, S data);
 
   T visitCash(Cash cash, S data);
 
-  T visitBondFuture(BondFuture bondFuture, S data);
-
-  T visitInterestRateFuture(InterestRateFuture future, S data);
-
-  T visitFederalFundsFutureSecurity(FederalFundsFutureSecurity future, S data);
-
-  T visitFederalFundsFutureTransaction(FederalFundsFutureTransaction future, S data);
-
-  T visitInterestRateFutureOptionPremiumSecurity(InterestRateFutureOptionPremiumSecurity option, S data);
-
-  T visitInterestRateFutureOptionPremiumTransaction(InterestRateFutureOptionPremiumTransaction option, S data);
-
-  T visitInterestRateFutureOptionMarginSecurity(InterestRateFutureOptionMarginSecurity option, S data);
-
-  T visitInterestRateFutureOptionMarginTransaction(InterestRateFutureOptionMarginTransaction option, S data);
-
   T visitFixedPayment(PaymentFixed payment, S data);
-
-  T visitFixedCouponPayment(CouponFixed payment, S data);
-
-  T visitCouponIbor(CouponIbor payment, S data);
-
-  T visitCouponIborFixed(CouponIborFixed payment, S data);
-
-  T visitCouponIborGearing(CouponIborGearing payment, S data);
-
-  T visitCouponOIS(CouponOIS payment, S data);
 
   T visitCouponCMS(CouponCMS payment, S data);
 
@@ -189,7 +162,7 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitBillTransaction(BillTransaction bill);
 
-  T visitGenericAnnuity(GenericAnnuity<? extends Payment> genericAnnuity);
+  T visitGenericAnnuity(Annuity<? extends Payment> genericAnnuity);
 
   T visitFixedCouponAnnuity(AnnuityCouponFixed fixedCouponAnnuity);
 
@@ -197,9 +170,7 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitAnnuityCouponIborRatchet(AnnuityCouponIborRatchet annuity);
 
-  T visitSwap(Swap<?, ?> swap);
-
-  T visitFixedCouponSwap(FixedCouponSwap<?> swap);
+  T visitFixedCouponSwap(SwapFixedCoupon<?> swap);
 
   T visitFixedFloatSwap(FixedFloatSwap swap);
 
@@ -211,8 +182,6 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitSwaptionBermudaFixedIbor(SwaptionBermudaFixedIbor swaption);
 
-  T visitFloatingRateNote(FloatingRateNote frn);
-
   T visitCrossCurrencySwap(CrossCurrencySwap ccs);
 
   T visitForexForward(ForexForward fx);
@@ -221,33 +190,7 @@ public interface InstrumentDerivativeVisitor<S, T> {
 
   T visitCash(Cash cash);
 
-  T visitBondFuture(BondFuture future);
-
-  T visitInterestRateFutureSecurity(InterestRateFuture future);
-
-  T visitFederalFundsFutureSecurity(FederalFundsFutureSecurity future);
-
-  T visitFederalFundsFutureTransaction(FederalFundsFutureTransaction future);
-
-  T visitInterestRateFutureOptionPremiumSecurity(InterestRateFutureOptionPremiumSecurity option);
-
-  T visitInterestRateFutureOptionPremiumTransaction(InterestRateFutureOptionPremiumTransaction option);
-
-  T visitInterestRateFutureOptionMarginSecurity(InterestRateFutureOptionMarginSecurity option);
-
-  T visitInterestRateFutureOptionMarginTransaction(InterestRateFutureOptionMarginTransaction option);
-
   T visitFixedPayment(PaymentFixed payment);
-
-  T visitFixedCouponPayment(CouponFixed payment);
-
-  T visitCouponIborFixed(CouponIborFixed payment);
-
-  T visitCouponIbor(CouponIbor payment);
-
-  T visitCouponIborGearing(CouponIborGearing payment);
-
-  T visitCouponOIS(CouponOIS payment);
 
   T visitCouponCMS(CouponCMS payment);
 
@@ -270,6 +213,82 @@ public interface InstrumentDerivativeVisitor<S, T> {
   T visitBondCapitalIndexedSecurity(BondCapitalIndexedSecurity<?> bond);
 
   T visitBondCapitalIndexedTransaction(BondCapitalIndexedTransaction<?> bond);
+
+  // -----     Coupons     -----
+
+  T visitCouponFixed(CouponFixed payment, S data);
+
+  T visitCouponFixed(CouponFixed payment);
+
+  T visitCouponIbor(CouponIbor payment, S data);
+
+  T visitCouponIbor(CouponIbor payment);
+
+  T visitCouponIborSpread(CouponIborSpread payment, S data);
+
+  T visitCouponIborSpread(CouponIborSpread payment);
+
+  T visitCouponIborGearing(CouponIborGearing payment);
+
+  T visitCouponIborGearing(CouponIborGearing payment, S data);
+
+  T visitCouponOIS(CouponOIS payment, S data);
+
+  T visitCouponOIS(CouponOIS payment);
+
+  // -----     Annuity     -----
+
+  T visitAnnuityCouponIborSpread(AnnuityCouponIborSpread annuity, S data);
+
+  T visitAnnuityCouponIborSpread(AnnuityCouponIborSpread annuity);
+
+  // -----     Swap     -----
+
+  T visitSwap(Swap<?, ?> swap, S data);
+
+  T visitSwap(Swap<?, ?> swap);
+
+  // -----     Futures     -----
+
+  T visitBondFuture(BondFuture bondFuture, S data);
+
+  T visitBondFuture(BondFuture future);
+
+  T visitBondFutureOptionPremiumSecurity(BondFutureOptionPremiumSecurity option, S data);
+
+  T visitBondFutureOptionPremiumSecurity(BondFutureOptionPremiumSecurity option);
+
+  T visitBondFutureOptionPremiumTransaction(BondFutureOptionPremiumTransaction option, S data);
+
+  T visitBondFutureOptionPremiumTransaction(BondFutureOptionPremiumTransaction option);
+
+  T visitInterestRateFuture(InterestRateFuture future, S data);
+
+  T visitInterestRateFuture(InterestRateFuture future);
+
+  T visitFederalFundsFutureSecurity(FederalFundsFutureSecurity future, S data);
+
+  T visitFederalFundsFutureSecurity(FederalFundsFutureSecurity future);
+
+  T visitFederalFundsFutureTransaction(FederalFundsFutureTransaction future, S data);
+
+  T visitFederalFundsFutureTransaction(FederalFundsFutureTransaction future);
+
+  T visitInterestRateFutureOptionMarginSecurity(InterestRateFutureOptionMarginSecurity option, S data);
+
+  T visitInterestRateFutureOptionMarginSecurity(InterestRateFutureOptionMarginSecurity option);
+
+  T visitInterestRateFutureOptionMarginTransaction(InterestRateFutureOptionMarginTransaction option, S data);
+
+  T visitInterestRateFutureOptionMarginTransaction(InterestRateFutureOptionMarginTransaction option);
+
+  T visitInterestRateFutureOptionPremiumSecurity(InterestRateFutureOptionPremiumSecurity option, S data);
+
+  T visitInterestRateFutureOptionPremiumSecurity(InterestRateFutureOptionPremiumSecurity option);
+
+  T visitInterestRateFutureOptionPremiumTransaction(InterestRateFutureOptionPremiumTransaction option, S data);
+
+  T visitInterestRateFutureOptionPremiumTransaction(InterestRateFutureOptionPremiumTransaction option);
 
   // -----     Deposit     -----
 
@@ -314,5 +333,11 @@ public interface InstrumentDerivativeVisitor<S, T> {
   T visitForexOptionDigital(ForexOptionDigital derivative, S data);
 
   T visitForexOptionDigital(ForexOptionDigital derivative);
+
+  //  -----     Deprecated     -----
+
+  T visitFloatingRateNote(FloatingRateNote derivative, S data);
+
+  T visitFloatingRateNote(FloatingRateNote derivative);
 
 }

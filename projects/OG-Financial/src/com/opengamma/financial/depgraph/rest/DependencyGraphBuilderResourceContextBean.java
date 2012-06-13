@@ -7,10 +7,10 @@ package com.opengamma.financial.depgraph.rest;
 
 import org.springframework.beans.factory.InitializingBean;
 
-import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.depgraph.DependencyGraphBuilderFactory;
 import com.opengamma.engine.function.CompiledFunctionService;
 import com.opengamma.engine.function.FunctionCompilationContext;
+import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.DefaultFunctionResolver;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.resolver.MarketDataProviderResolver;
@@ -23,9 +23,9 @@ public class DependencyGraphBuilderResourceContextBean implements InitializingBe
 
   private DependencyGraphBuilderFactory _graphBuilders = new DependencyGraphBuilderFactory();
   private MarketDataProviderResolver _marketDataProviderResolver;
-  private ComputationTargetResolver _targetResolver;
   private FunctionCompilationContext _compilationContext;
   private FunctionResolver _functionResolver;
+  private FunctionExclusionGroups _functionExclusionGroups;
 
   public void setDependencyGraphBuilderFactory(final DependencyGraphBuilderFactory graphBuilders) {
     _graphBuilders = graphBuilders;
@@ -41,14 +41,6 @@ public class DependencyGraphBuilderResourceContextBean implements InitializingBe
 
   public MarketDataProviderResolver getMarketDataProviderResolver() {
     return _marketDataProviderResolver;
-  }
-
-  public void setComputationTargetResolver(final ComputationTargetResolver targetResolver) {
-    _targetResolver = targetResolver;
-  }
-
-  public ComputationTargetResolver getComputationTargetResolver() {
-    return _targetResolver;
   }
 
   public void setFunctionCompilationContext(final FunctionCompilationContext compilationContext) {
@@ -67,6 +59,14 @@ public class DependencyGraphBuilderResourceContextBean implements InitializingBe
     return _functionResolver;
   }
 
+  public void setFunctionExclusionGroups(final FunctionExclusionGroups functionExclusionGroups) {
+    _functionExclusionGroups = functionExclusionGroups;
+  }
+
+  public FunctionExclusionGroups getFunctionExclusionGroups() {
+    return _functionExclusionGroups;
+  }
+
   public void setCompiledFunctionService(final CompiledFunctionService cfs) {
     setFunctionCompilationContext(cfs.getFunctionCompilationContext());
     if (getFunctionResolver() == null) {
@@ -78,7 +78,6 @@ public class DependencyGraphBuilderResourceContextBean implements InitializingBe
   public void afterPropertiesSet() throws Exception {
     ArgumentChecker.notNull(getDependencyGraphBuilderFactory(), "dependencyGraphBuilderFactory");
     ArgumentChecker.notNull(getMarketDataProviderResolver(), "marketDataProviderResolver");
-    ArgumentChecker.notNull(getComputationTargetResolver(), "computationTargetResolver");
     ArgumentChecker.notNull(getFunctionCompilationContext(), "functionCompilationContext");
     ArgumentChecker.notNull(getFunctionResolver(), "functionResolver");
   }

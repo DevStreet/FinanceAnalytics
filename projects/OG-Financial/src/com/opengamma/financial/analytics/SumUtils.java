@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.opengamma.analytics.financial.forex.method.PresentValueForexBlackVolatilitySensitivity;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValueRequirementNames;
+import com.opengamma.util.money.MultipleCurrencyAmount;
 import com.opengamma.util.timeseries.DoubleTimeSeries;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -53,6 +55,10 @@ public class SumUtils {
       final CurrencyLabelledMatrix1D previousMatrix = (CurrencyLabelledMatrix1D) currentTotal;
       final CurrencyLabelledMatrix1D currentMatrix = (CurrencyLabelledMatrix1D) value;
       return previousMatrix.addIgnoringLabel(currentMatrix);
+    } else if (value instanceof MultipleCurrencyAmount) {
+      MultipleCurrencyAmount previousMCA = (MultipleCurrencyAmount) currentTotal;
+      MultipleCurrencyAmount currentMCA = (MultipleCurrencyAmount) value;
+      return currentMCA.plus(previousMCA);
     } else if (value instanceof StringLabelledMatrix1D) {
       final StringLabelledMatrix1D previousMatrix = (StringLabelledMatrix1D) currentTotal;
       final StringLabelledMatrix1D currentMatrix = (StringLabelledMatrix1D) value;
@@ -91,12 +97,15 @@ public class SumUtils {
     } else if (value instanceof DoubleLabelledMatrix3D) {
       final DoubleLabelledMatrix3D previousMatrix = (DoubleLabelledMatrix3D) currentTotal;
       final DoubleLabelledMatrix3D currentMatrix = (DoubleLabelledMatrix3D) value;
-      return previousMatrix.add((LabelledMatrix3D<Double, Double, Double, Double, Double, Double, DoubleLabelledMatrix3D>) currentMatrix, 0.005, 0.005, 0.005);
+      return previousMatrix.add(currentMatrix, 0.005, 0.005, 0.005);
+    } else if (value instanceof PresentValueForexBlackVolatilitySensitivity) {
+      final PresentValueForexBlackVolatilitySensitivity previousValue = (PresentValueForexBlackVolatilitySensitivity) currentTotal;
+      final PresentValueForexBlackVolatilitySensitivity currentValue = (PresentValueForexBlackVolatilitySensitivity) value;
+      return currentValue.plus(previousValue);
     }
-    throw new IllegalArgumentException("Can only add Doubles, BigDecimal, DoubleTimeSeries and LabelledMatrix1D (Double, LocalDate and ZonedDateTime), " +
-        "or present value curve sensitivities right now.");
+    throw new IllegalArgumentException("Cannot sum results of type " + value.getClass());
   }
-  
+
   public static ValueProperties addProperties(final ValueProperties currentIntersection, final ValueProperties properties) {
     if (currentIntersection == null) {
       return properties;
