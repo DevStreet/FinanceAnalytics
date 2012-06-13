@@ -7,6 +7,11 @@ package com.opengamma.maths.lowlevelapi.functions.checkers;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN.CatchNaN;
+import com.opengamma.maths.lowlevelapi.functions.iss.IsNaN;
 
 /**
  * Catch things that will cause problems
@@ -15,8 +20,6 @@ public class Catchers {
 
   // general complaints about null
 
-
-  
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -142,7 +145,7 @@ public class Catchers {
       throw new MathsExceptionNullPointer("Array points to NULL. STOPPING");
     }
   }
-  
+
   /**
    * Catches null pointer
    * @param thisArray the array to check
@@ -152,7 +155,7 @@ public class Catchers {
     if (thisArray == null) {
       throw new MathsExceptionNullPointer("Array " + varName + " points to NULL. STOPPING");
     }
-  }  
+  }
 
   /**
    * Catches null pointer
@@ -281,6 +284,17 @@ public class Catchers {
 
   public static void catchBadCommute(String message) {
     throw new MathsExceptionNonConformance("Problem with arrays not commuting. STOPPING. Error message is:" + message);
+  }
+
+  //// catch NaN
+
+  /**
+   * Catches NaNs in OGArraySuper types
+   * @param array1 an OGArraySuper type
+   */
+  public static void catchNaN(OGArraySuper<Number> array1) {
+    CatchNaN catchnan = CatchNaN.getInstance();
+    catchnan.catchnan(array1);
   }
 
 }

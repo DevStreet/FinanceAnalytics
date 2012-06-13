@@ -6,6 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
+import com.opengamma.maths.commonapi.properties.DOGMAconfig;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Mtimes;
@@ -14,6 +15,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Basic Arithmetic 
@@ -37,12 +39,44 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    return _plusMinus.plus(array1, array2);
+    OGArraySuper<Number> ret = null;
+    if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
+      Catchers.catchNaN(array1);
+      Catchers.catchNaN(array2);      
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
+      Catchers.catchNaN(array1);
+      Catchers.catchNaN(array2);      
+    }    
+    ret = _plusMinus.plus(array1, array2);
+    if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
+      Catchers.catchNaN(array1);
+      Catchers.catchNaN(array2);      
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionExit()) {
+      Catchers.catchNaN(array1);
+      Catchers.catchNaN(array2);      
+    }    
+    return ret;
   }
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
-    return plus(array1, new OGDoubleArray(aNumber));
+    OGArraySuper<Number> ret = null;
+    if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
+      Catchers.catchNaN(array1);
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
+      Catchers.catchNaN(array1);     
+    }        
+    ret = plus(array1, new OGDoubleArray(aNumber));
+    if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
+      Catchers.catchNaN(array1);    
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionExit()) {
+      Catchers.catchNaN(array1);
+    }        
+    return ret;
   }
 
   @Override
@@ -105,7 +139,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number) {
     return _rdivide.rdivide(array1, new OGDoubleArray(number));
   }
-  
+
   @Override
   public OGArraySuper<Number> rdivide(double number, OGArraySuper<Number> array1) {
     return _rdivide.rdivide(new OGDoubleArray(number), array1);
@@ -114,7 +148,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   @Override
   public OGArraySuper<Number> rdivide(int number, OGArraySuper<Number> array1) {
     return _rdivide.rdivide(new OGDoubleArray(number), array1);
-  }  
+  }
 
   /* MRDIVIDE */
 
@@ -137,7 +171,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
     }
     return tmp;
   }
-  
+
   @Override
   public OGArraySuper<Number> times(OGArraySuper<Number> array1, double number) {
     return _times.times(array1, new OGDoubleArray(number));
@@ -147,7 +181,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> times(OGArraySuper<Number> array1, int number) {
     return _times.times(array1, new OGDoubleArray(number));
   }
-  
+
   @Override
   public OGArraySuper<Number> times(double number, OGArraySuper<Number> array1) {
     return _times.times(array1, new OGDoubleArray(number));
@@ -156,7 +190,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   @Override
   public OGArraySuper<Number> times(int number, OGArraySuper<Number> array1) {
     return _times.times(array1, new OGDoubleArray(number));
-  }  
+  }
 
   /* MTIMES */
   @Override
@@ -190,6 +224,5 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   public OGArraySuper<Number> transpose(OGArraySuper<Number> array) {
     throw new MathsExceptionNotImplemented("transpose not implemented yet");
   }
-
 
 }
