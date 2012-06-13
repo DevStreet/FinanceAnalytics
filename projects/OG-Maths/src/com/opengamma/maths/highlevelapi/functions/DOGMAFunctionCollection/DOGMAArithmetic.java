@@ -30,9 +30,27 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   /* ADD */
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
+    if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
+      Catchers.catchNaN(array[0]);    
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
+      Catchers.catchInf(array[0]);    
+    }
     OGArraySuper<Number> tmp = _copy.copy(array[0]);
     for (int i = 1; i < array.length; i++) {
+      if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
+        Catchers.catchNaN(array[i]);    
+      }
+      if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
+        Catchers.catchInf(array[i]);    
+      }     
       tmp = _plusMinus.plus(tmp, array[i]);
+      if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
+        Catchers.catchNaN(tmp);     
+      }
+      if (DOGMAconfig.getHaltOnInfOnFunctionExit()) {
+        Catchers.catchInf(tmp);      
+      }          
     }
     return tmp;
   }
@@ -45,17 +63,15 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
       Catchers.catchNaN(array2);      
     }
     if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
-      Catchers.catchNaN(array1);
-      Catchers.catchNaN(array2);      
+      Catchers.catchInf(array1);
+      Catchers.catchInf(array2);      
     }    
     ret = _plusMinus.plus(array1, array2);
     if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
-      Catchers.catchNaN(array1);
-      Catchers.catchNaN(array2);      
+      Catchers.catchNaN(ret);   
     }
     if (DOGMAconfig.getHaltOnInfOnFunctionExit()) {
-      Catchers.catchNaN(array1);
-      Catchers.catchNaN(array2);      
+      Catchers.catchInf(ret);     
     }    
     return ret;
   }
@@ -65,23 +81,39 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
     OGArraySuper<Number> ret = null;
     if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
       Catchers.catchNaN(array1);
+      Catchers.catchNaN(aNumber);      
     }
     if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
-      Catchers.catchNaN(array1);     
+      Catchers.catchInf(array1);
+      Catchers.catchInf(aNumber);      
     }        
     ret = plus(array1, new OGDoubleArray(aNumber));
     if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
-      Catchers.catchNaN(array1);    
+      Catchers.catchNaN(ret);    
     }
     if (DOGMAconfig.getHaltOnInfOnFunctionExit()) {
-      Catchers.catchNaN(array1);
+      Catchers.catchInf(ret);
     }        
     return ret;
   }
 
   @Override
   public OGArraySuper<Number> plus(OGArraySuper<Number> array1, int aNumber) {
-    return plus(array1, new OGDoubleArray(aNumber));
+    OGArraySuper<Number> ret = null;
+    if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
+      Catchers.catchNaN(array1);     
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
+      Catchers.catchInf(array1);
+    }        
+    ret = plus(array1, new OGDoubleArray(aNumber));
+    if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
+      Catchers.catchNaN(ret);    
+    }
+    if (DOGMAconfig.getHaltOnInfOnFunctionExit()) {
+      Catchers.catchInf(ret);
+    }        
+    return ret;
   }
 
   /* SUBTRACT */

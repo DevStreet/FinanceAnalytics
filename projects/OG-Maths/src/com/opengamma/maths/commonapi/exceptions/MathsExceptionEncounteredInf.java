@@ -26,4 +26,13 @@ public class MathsExceptionEncounteredInf extends RuntimeException {
   public MathsExceptionEncounteredInf(final Throwable cause) {
     super(cause);
   }
+
+  /**
+   * Specify where in an array an Inf has been found
+   * @param theRow the row in which an Inf has been found
+   * @param theColumn  the column in which an Inf has been found
+   */
+  public MathsExceptionEncounteredInf(int theRow, int theColumn) {
+    super("NaN found first at position: row = " + theRow + ". column = " + theColumn);
+  }
 }

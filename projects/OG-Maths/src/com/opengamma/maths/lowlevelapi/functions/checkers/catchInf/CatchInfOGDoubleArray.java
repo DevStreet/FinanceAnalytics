@@ -3,50 +3,50 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN;
+package com.opengamma.maths.lowlevelapi.functions.checkers.catchInf;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredInf;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.functions.iss.IsNaN;
+import com.opengamma.maths.lowlevelapi.functions.iss.IsInf;
 
 /**
- * Catches NaN in OGDoubleArray
+ * Catches Inf in OGDoubleArray
  */
-public final class CatchNaNOGDoubleArray extends CatchNaNAbstract<OGDoubleArray> {
-  private static CatchNaNOGDoubleArray s_instance = new CatchNaNOGDoubleArray();
+public final class CatchInfOGDoubleArray extends CatchInfAbstract<OGDoubleArray> {
+  private static CatchInfOGDoubleArray s_instance = new CatchInfOGDoubleArray();
 
-  public static CatchNaNOGDoubleArray getInstance() {
+  public static CatchInfOGDoubleArray getInstance() {
     return s_instance;
   }
 
-  private CatchNaNOGDoubleArray() {
+  private CatchInfOGDoubleArray() {
   }
 
   @Override
-  public void catchnan(OGDoubleArray array1) {
+  public void catchinf(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);
     boolean ret;
     final double[] data = array1.getData();
-    ret = IsNaN.any(data);
-    //NaN found, deal with it...
+    ret = IsInf.any(data);
+    //Inf found, deal with it...
     if (ret) {
       int badrow = 0, badcol = 0;
       final int rows = array1.getNumberOfRows();
       final int columns = array1.getNumberOfColumns();
-      boolean[] nans = IsNaN.getBooleans(data);
+      boolean[] infs = IsInf.getBooleans(data);
       int jmp = 0;
       for (int i = 0; i < columns; i++) {
         jmp = i * rows;
         for (int j = 0; j < rows; j++) {
-          if (nans[jmp + j] == true) {
+          if (infs[jmp + j] == true) {
             badrow = j;
             badcol = i;
             break;
           }
         }
       }
-      throw new MathsExceptionEncounteredNaN(badrow, badcol);      
+      throw new MathsExceptionEncounteredInf(badrow, badcol);      
     }
   }
 }

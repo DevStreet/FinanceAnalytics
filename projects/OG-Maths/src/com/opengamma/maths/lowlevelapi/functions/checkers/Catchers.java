@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.checkers;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredInf;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.lowlevelapi.functions.checkers.catchInf.CatchInf;
 import com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN.CatchNaN;
-import com.opengamma.maths.lowlevelapi.functions.iss.IsNaN;
 
 /**
  * Catch things that will cause problems
@@ -295,6 +295,37 @@ public class Catchers {
   public static void catchNaN(OGArraySuper<Number> array1) {
     CatchNaN catchnan = CatchNaN.getInstance();
     catchnan.catchnan(array1);
+  }
+
+  /**
+   * Catches double == NaN 
+   * @param aNumber a double
+   */
+  public static void catchNaN(double aNumber) {
+    if (aNumber == Double.NaN) {
+      throw new MathsExceptionEncounteredNaN("On double value");
+    }
+  }
+
+  //// catch Inf
+
+  /**
+   * Catches NaNs in OGArraySuper types
+   * @param array1 an OGArraySuper type
+   */
+  public static void catchInf(OGArraySuper<Number> array1) {
+    CatchInf catchinf = CatchInf.getInstance();
+    catchinf.catchinf(array1);
+  }
+
+  /**
+   * Catches double == +/-Inf
+   * @param aNumber a double
+   */
+  public static void catchInf(double aNumber) {
+    if (Double.isInfinite(aNumber)) {
+      throw new MathsExceptionEncounteredInf("On double value");
+    }
   }
 
 }
