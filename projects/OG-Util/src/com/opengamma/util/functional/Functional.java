@@ -5,15 +5,7 @@
  */
 package com.opengamma.util.functional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Set of functional-like utilities.
@@ -45,7 +37,7 @@ public class Functional {
 
   /**
    * Creates an array of type V out of provided objects (of type V as well)
-   * 
+   *
    * @param <V>  the object type
    * @param array objects out of which the array is created
    * @return an array of type V out of provided objects
@@ -75,7 +67,7 @@ public class Functional {
 
   /**
    * Returns part of the provided map which keys are contained by provided set of keys.
-   * 
+   *
    * @param map  the map, not null
    * @param keys  the set of keys, not null
    * @param <K> type of map keys
@@ -94,7 +86,7 @@ public class Functional {
 
   /**
    * Creates reversed map of type Map<V, Collection<K>> from map of type Map<K, V>.
-   * 
+   *
    * @param map  the underlying map, not null
    * @param <K> type of map keys
    * @param <V> type of map values
@@ -117,7 +109,7 @@ public class Functional {
   /**
    * Merges source map into target one by mutating it (overwriting entries if
    * the target map already contains the same keys).
-   * 
+   *
    * @param target  the target map, not null
    * @param source  the source map, not null
    * @param <K> type of map keys
@@ -133,12 +125,12 @@ public class Functional {
 
   /**
    * Returns sorted list of elements from unsorted collection.
-   * 
+   *
    * @param coll  unsorted collection
    * @param <T> type if elements in unsorted collection (must implement Comparable interface)
    * @return list sorted using internal entries' {@link Comparable#compareTo(Object)} compareTo} method.
    */
-  @SuppressWarnings({"rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public static <T extends Comparable> List<T> sort(final Collection<T> coll) {
     List<T> list = new ArrayList<T>(coll);
     Collections.sort(list);
@@ -146,7 +138,7 @@ public class Functional {
   }
 
   public static <T, S> T reduce(final T acc, final Iterator<? extends S> iter, final Function2<T, S, T> reducer) {
-    T result = acc;    
+    T result = acc;
     while (iter.hasNext()) {
       result = reducer.execute(result, iter.next());
     }
@@ -176,7 +168,7 @@ public class Functional {
     }
     return any;
   }
-  
+
   public static <T> boolean all(final Iterable<? extends T> c, final Function1<T, Boolean> predicate) {
     final Iterator<? extends T> iter = c.iterator();
     boolean all = true;
@@ -194,7 +186,7 @@ public class Functional {
       }
     };
   }
-  
+
   public static <T> List<T> filter(Iterable<? extends T> c, final Function1<T, Boolean> predicate) {
     return reduce(new LinkedList<T>(), c, new Function2<LinkedList<T>, T, LinkedList<T>>() {
       @Override
@@ -236,9 +228,10 @@ public class Functional {
   }
 
   //-------------------------------------------------------------------------
+
   /**
    * Class for implementing a reducer.
-   * 
+   *
    * @param <T>  the first type
    * @param <S>  the second type
    */
@@ -263,7 +256,7 @@ public class Functional {
 
   /**
    * Class for implementing a reducer on a single type.
-   * 
+   *
    * @param <S>  the second type
    */
   public abstract static class ReduceSame<S> extends Function2<Iterable<? extends S>, Function2<S, S, S>, S> {
@@ -283,6 +276,40 @@ public class Functional {
         }
       });
     }
+  }
+
+  public static <E> Iterator<E> cycle(final Iterator<E> iter) {
+    return new Iterator<E>() {
+
+      Collection<E> collection = new LinkedList<E>();
+      Iterator<E> i;
+      {        
+        while (iter.hasNext()) {
+          E next = iter.next();
+          collection.add(next);
+        }
+        i = collection.iterator();
+      }
+
+      @Override
+      public boolean hasNext() {
+        return !collection.isEmpty();
+      }
+
+      @Override
+      public E next() {
+        if(!i.hasNext()){
+          // reset the heloper iterator
+          i = collection.iterator();
+        }        
+        return i.next();
+      }
+
+      @Override
+      public void remove() {
+        throw new RuntimeException("remove is not supported on cycled iterator");
+      }
+    };
   }
 
 }
