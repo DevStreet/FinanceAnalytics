@@ -211,8 +211,8 @@ public interface DOGMARearrangingMatricesAPI {
 
   /**
    * Creates a clean copy of an array.
-   * @param array
-   * @return
+   * @param array the array to copy
+   * @return a copy of an array
    */
   OGArraySuper<Number> copy(OGArraySuper<Number> array);
 }
