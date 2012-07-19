@@ -82,6 +82,9 @@ public final class VersionCorrection implements Comparable<VersionCorrection>, S
     }
     Instant v = (versionAsOf != null ? Instant.of(versionAsOf) : null);
     Instant c = (correctedTo != null ? Instant.of(correctedTo) : null);
+    if (c != null && v != null && v.compareTo(c) > 0) {
+      throw new IllegalArgumentException("Version time must not be greather then correction time.");
+    }
     return new VersionCorrection(v, c);
   }
 
@@ -180,6 +183,9 @@ public final class VersionCorrection implements Comparable<VersionCorrection>, S
   private VersionCorrection(Instant versionAsOf, Instant correctedTo) {
     _versionAsOf = versionAsOf;
     _correctedTo = correctedTo;
+    if (versionAsOf != null && correctedTo != null && versionAsOf.compareTo(correctedTo) > 0) {
+      throw new IllegalArgumentException("Version time must not be greather then correction time.");
+    }
   }
 
   //-------------------------------------------------------------------------

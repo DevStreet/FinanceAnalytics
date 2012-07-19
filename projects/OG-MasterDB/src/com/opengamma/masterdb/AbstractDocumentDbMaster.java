@@ -426,6 +426,7 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     document.setVersionToInstant(oldDoc.getVersionToInstant());
     document.setCorrectionFromInstant(now);
     document.setCorrectionToInstant(null);
+    ArgumentChecker.isFalse(now.compareTo(oldDoc.getVersionFromInstant()) < 0, "Version time must not be greather then correction time.");
     document.setUniqueId(oldDoc.getUniqueId().toLatest());
     mergeNonUpdatedFields(document, oldDoc);
     insert(document);

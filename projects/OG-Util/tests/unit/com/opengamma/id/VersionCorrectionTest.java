@@ -138,8 +138,8 @@ public class VersionCorrectionTest {
 
   //-------------------------------------------------------------------------
   public void test_withVersionAsOf_instantToInstant() {
-    VersionCorrection test = VersionCorrection.of(INSTANT1, INSTANT2);
-    assertEquals(VersionCorrection.of(INSTANT3, INSTANT2), test.withVersionAsOf(INSTANT3));
+    VersionCorrection test = VersionCorrection.of(INSTANT1, INSTANT3);
+    assertEquals(VersionCorrection.of(INSTANT2, INSTANT3), test.withVersionAsOf(INSTANT2));
   }
 
   public void test_withVersionAsOf_instantToNull() {
@@ -148,8 +148,8 @@ public class VersionCorrectionTest {
   }
 
   public void test_withVersionAsOf_nullToInstant() {
-    VersionCorrection test = VersionCorrection.of(null, INSTANT2);
-    assertEquals(VersionCorrection.of(INSTANT3, INSTANT2), test.withVersionAsOf(INSTANT3));
+    VersionCorrection test = VersionCorrection.of(null, INSTANT3);
+    assertEquals(VersionCorrection.of(INSTANT2, INSTANT3), test.withVersionAsOf(INSTANT2));
   }
 
   public void test_withVersionAsOf_nullToNull() {
@@ -193,8 +193,8 @@ public class VersionCorrectionTest {
   }
 
   public void test_withLatestFixed_nullVersion() {
-    VersionCorrection test = VersionCorrection.of(null, INSTANT2);
-    assertEquals(VersionCorrection.of(INSTANT3, INSTANT2), test.withLatestFixed(INSTANT3));
+    VersionCorrection test = VersionCorrection.of(null, INSTANT3);
+    assertEquals(VersionCorrection.of(INSTANT2, INSTANT3), test.withLatestFixed(INSTANT2));
   }
 
   public void test_withLatestFixed_nullCorrection() {
