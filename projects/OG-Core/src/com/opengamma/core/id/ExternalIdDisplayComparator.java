@@ -47,7 +47,7 @@ public class ExternalIdDisplayComparator implements Comparator<ExternalId> {
    * @param orderConfig sourced from a ConfigSource
    */
   public ExternalIdDisplayComparator(ExternalIdOrderConfig orderConfig) {
-    
+    _scoreMap = orderConfig.getRateMap();
   }
   
   private int scoreExternalId(ExternalId id) {
