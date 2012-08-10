@@ -5,7 +5,9 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.integration.copiernew.Copier;
 import com.opengamma.integration.copiernew.Writeable;
-import com.opengamma.integration.copiernew.portfoliopositionsecurity.PortfolioPositionSecurityMasterWriter;
+import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
+import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterWriter;
+import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioMaster;
@@ -14,74 +16,54 @@ import com.opengamma.master.portfolio.PortfolioSearchResult;
 import com.opengamma.master.portfolio.PortfolioSearchSortOrder;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.PositionMaster;
+import com.opengamma.master.security.ManageableSecurity;
+import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.beancompare.BeanCompare;
 import com.opengamma.util.beancompare.BeanDifference;
 import com.opengamma.util.tuple.ObjectsPair;
+import com.opengamma.util.tuple.Triple;
 
 import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
+import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
-public class PortfolioContentMasterWriter implements Writeable<ObjectsPair<ManageablePortfolio, Iterable<ObjectsPair<String[], ManageablePosition>>>> {
+public class PortfolioContentMasterWriter implements Writeable<PortfolioContent> {
 
-  PortfolioMaster _portfolioMaster;
-  PositionMaster _positionMaster;
+  private Writeable<ManageablePortfolio> _portfolioWriter;
+  private PositionMaster _positionMaster;
+  private Writeable<ManageableSecurity> _securityWriter;
   private BeanCompare _beanCompare;
 
-  public PortfolioContentMasterWriter(PortfolioMaster portfolioMaster, PositionMaster positionMaster) {
-    ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
+  public PortfolioContentMasterWriter(Writeable<ManageablePortfolio> portfolioWriter, PositionMaster positionMaster,
+                                      Writeable<ManageableSecurity> securityWriter) {
+    ArgumentChecker.notNull(portfolioWriter, "portfolioWriter");
     ArgumentChecker.notNull(positionMaster, "positionMaster");
+    ArgumentChecker.notNull(securityWriter, "securityWriter");
 
-    _portfolioMaster = portfolioMaster;
+    _portfolioWriter = portfolioWriter;
     _positionMaster = positionMaster;
+    _securityWriter = securityWriter;
     _beanCompare = new BeanCompare();
   }
 
   @Override
-  public ObjectsPair<ManageablePortfolio, Iterable<ObjectsPair<String[], ManageablePosition>>>
-      addOrUpdate(ObjectsPair<ManageablePortfolio, Iterable<ObjectsPair<String[], ManageablePosition>>> pair) {
+  public PortfolioContent addOrUpdate(PortfolioContent portfolioContent) {
 
-    ArgumentChecker.notNull(pair, "pair");
+    ArgumentChecker.notNull(portfolioContent, "portfolioContent");
 
-    ManageablePortfolio portfolio = pair.getFirst();
-    Iterable<ObjectsPair<String[], ManageablePosition>> positionReader = pair.getSecond();
+    ManageablePortfolio portfolio = portfolioContent.getPortfolio();
+    Iterable<NodePositionSecurity> positionReader = portfolioContent.getNodePositionSecurityReader();
 
-    PortfolioSearchRequest searchReq = new PortfolioSearchRequest();
-    searchReq.setName(portfolio.getName());
-    searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
-    searchReq.setSortOrder(PortfolioSearchSortOrder.VERSION_FROM_INSTANT_DESC);
-    PortfolioSearchResult searchResult = _portfolioMaster.search(searchReq);
-    ManageablePortfolio foundPortfolio = searchResult.getFirstPortfolio();
-    if (foundPortfolio != null) {
-      List<BeanDifference<?>> differences;
-      try {
-        differences = _beanCompare.compare(foundPortfolio, portfolio);
-      } catch (Exception e) {
-        throw new OpenGammaRuntimeException("Error comparing portfolios named " + portfolio.getName(), e);
-      }
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
-        // It's already there, don't update or add it
-        portfolio = foundPortfolio;
-      } else {
-        PortfolioDocument updateDoc = new PortfolioDocument(portfolio);
-        updateDoc.setUniqueId(foundPortfolio.getUniqueId());
-        PortfolioDocument result = _portfolioMaster.update(updateDoc);
-        portfolio = result.getPortfolio();
-      }
-    } else {
-      // Not found, so add it
-      PortfolioDocument addDoc = new PortfolioDocument(portfolio);
-      PortfolioDocument result = _portfolioMaster.add(addDoc);
-      portfolio = result.getPortfolio();
-    }
+    _portfolioWriter.addOrUpdate(portfolio);
 
-    Writeable<ObjectsPair<String[], ManageablePosition>> positionWriter =
-        new PortfolioPositionSecurityMasterWriter(_positionMaster, portfolio, false);
+    Writeable<NodePositionSecurity> positionWriter =
+        new NodePositionSecurityMasterWriter(_positionMaster, _securityWriter, portfolio.getRootNode(), false);
 
-    new Copier<ObjectsPair<String[], ManageablePosition>>().copy(positionReader, positionWriter);
+    new Copier<NodePositionSecurity>().copy(positionReader, positionWriter);
 
-    return pair;
+    return portfolioContent;
   }
 
   @Override

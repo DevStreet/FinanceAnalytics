@@ -15,6 +15,12 @@ import com.opengamma.integration.copiernew.exchange.ExchangeMasterReader;
 import com.opengamma.integration.copiernew.exchange.ExchangeMasterWriter;
 import com.opengamma.integration.copiernew.exchange.ExchangeRowReader;
 import com.opengamma.integration.copiernew.exchange.ExchangeRowWriter;
+import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
+import com.opengamma.integration.copiernew.portfolio.PortfolioMasterReader;
+import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
+import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContent;
+import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterReader;
+import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityRowReader;
 import com.opengamma.integration.copiernew.sheet.*;
@@ -22,8 +28,12 @@ import com.opengamma.integration.copiernew.security.SecurityMasterReader;
 import com.opengamma.integration.copiernew.security.SecurityRowWriter;
 import com.opengamma.master.exchange.ExchangeSearchRequest;
 import com.opengamma.master.exchange.ManageableExchange;
+import com.opengamma.master.portfolio.ManageablePortfolio;
+import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.master.security.SecuritySearchRequest;
+import com.opengamma.util.tuple.ObjectsPair;
+import com.opengamma.util.tuple.Triple;
 
 public class TestCopierTool extends AbstractTool {
 
@@ -40,6 +50,21 @@ public class TestCopierTool extends AbstractTool {
   @Override
   protected void doRun() throws Exception {
 
+    Iterable<PortfolioContent> portfolioContentReader = new PortfolioContentMasterReader(
+        new PortfolioMasterReader(getToolContext().getPortfolioMaster()),
+        getToolContext().getPositionSource(),
+        getToolContext().getSecuritySource()
+    );
+
+    Writeable<PortfolioContent> portfolioContentWriter = new PortfolioContentMasterWriter(
+        new PortfolioMasterWriter(getToolContext().getPortfolioMaster()),
+        getToolContext().getPositionMaster(),
+        new SecurityMasterWriter(getToolContext().getSecurityMaster())
+    );
+
+    new Copier<PortfolioContent>().copy(portfolioContentReader, portfolioContentWriter);
+
+    portfolioContentWriter.flush();
 
 /*
     // Export securities
@@ -58,6 +83,7 @@ public class TestCopierTool extends AbstractTool {
             securityRowWriter);
 */
 
+/*
     // Import securities
     Iterable<ManageableSecurity> reader =
         new SheetReader<ManageableSecurity>(new CsvRawSheetReader("test-mixed 3.csv"),
@@ -66,6 +92,7 @@ public class TestCopierTool extends AbstractTool {
         new SecurityMasterWriter(getToolContext().getSecurityMaster());
 
     new Copier<ManageableSecurity>().copy(reader, writer);
+*/
 
 /*
     // Works fine but does not export details
@@ -88,7 +115,7 @@ public class TestCopierTool extends AbstractTool {
     new Copier<ManageableExchange>().copy(reader, writer);
 */
 
-    writer.flush();
+//    writer.flush();
   }
 
 }

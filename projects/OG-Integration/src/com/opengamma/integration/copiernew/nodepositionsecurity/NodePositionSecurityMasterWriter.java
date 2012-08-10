@@ -1,11 +1,10 @@
-package com.opengamma.integration.copiernew.portfoliopositionsecurity;
+package com.opengamma.integration.copiernew.nodepositionsecurity;
 
 import com.opengamma.id.ExternalIdSearch;
 import com.opengamma.id.ExternalIdSearchType;
 import com.opengamma.integration.copiernew.Copier;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
-import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.PositionDocument;
@@ -15,19 +14,17 @@ import com.opengamma.master.position.PositionSearchResult;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Triple;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
-public class PortfolioPositionSecurityMasterWriter implements
-    Writeable<Triple<String[], ManageablePosition, Iterable<ManageableSecurity>>> {
+public class NodePositionSecurityMasterWriter implements Writeable<NodePositionSecurity> {
 
   private PositionMaster _positionMaster;
-  private SecurityMasterWriter _securityMasterWriter;
-  private ManageablePortfolio _portfolio;
+  private Writeable<ManageableSecurity> _securityWriter;
 
+  private ManageablePortfolioNode _rootNode;
   private ManageablePortfolioNode _currentNode;
   private ManageablePortfolioNode _originalNode;
   private ManageablePortfolioNode _originalRoot;
@@ -35,33 +32,32 @@ public class PortfolioPositionSecurityMasterWriter implements
   private boolean _overwrite;
 
 
-  public PortfolioPositionSecurityMasterWriter(PositionMaster positionMaster, SecurityMaster securityMaster,
-                                               ManageablePortfolio portfolio, boolean overwrite) {
+  public NodePositionSecurityMasterWriter(PositionMaster positionMaster,
+                                          Writeable<ManageableSecurity> securityWriter,
+                                          ManageablePortfolioNode rootNode, boolean overwrite) {
     ArgumentChecker.notNull(positionMaster, "positionMaster");
-    ArgumentChecker.notNull(securityMaster, "securityMaster");
-    ArgumentChecker.notNull(portfolio, "portfolio");
+    ArgumentChecker.notNull(securityWriter, "securityWriter");
+    ArgumentChecker.notNull(rootNode, "rootNode");
 
     _positionMaster = positionMaster;
-    _securityMasterWriter = new SecurityMasterWriter(securityMaster);
-    _portfolio = portfolio;
+    _securityWriter = securityWriter;
+    _currentNode = _originalRoot = _rootNode = rootNode;
     _overwrite = overwrite;
-    _originalRoot = portfolio.getRootNode();
   }
 
   @Override
-  public Triple<String[], ManageablePosition, Iterable<ManageableSecurity>>
-      addOrUpdate(Triple<String[], ManageablePosition, Iterable<ManageableSecurity>> triple) {
-    ArgumentChecker.notNull(triple, "triple");
+  public NodePositionSecurity addOrUpdate(NodePositionSecurity nodePositionSecurity) {
+    ArgumentChecker.notNull(nodePositionSecurity, "triple");
 
-    String[] path = triple.getFirst();
-    ManageablePosition position = triple.getSecond();
-    Iterable<ManageableSecurity> securities = triple.getThird();
+    String[] path = nodePositionSecurity.getPath();
+    ManageablePosition position = nodePositionSecurity.getPosition();
+    Iterable<ManageableSecurity> securities = nodePositionSecurity.getSecurities();
 
     setPath(path);
     position = writePosition(position);
-    new Copier<ManageableSecurity>().copy(securities, _securityMasterWriter);
+    new Copier<ManageableSecurity>().copy(securities, _securityWriter);
 
-    return new Triple<String[], ManageablePosition, Iterable<ManageableSecurity>>(path, position, securities);
+    return new NodePositionSecurity(path, position, securities);
   }
 
   @Override
@@ -138,13 +134,13 @@ public class PortfolioPositionSecurityMasterWriter implements
     ArgumentChecker.notNull(newPath, "newPath");
 
     if (newPath.length == 0) {
-      _currentNode = _portfolio.getRootNode();
+      _currentNode = _rootNode;
       _originalNode = _originalRoot;
     } else {
       if (_originalRoot != null) {
         _originalNode = findNode(newPath, _originalRoot);
       }
-      _currentNode = createNode(newPath, _portfolio.getRootNode());
+      _currentNode = createNode(newPath, _rootNode);
     }
   }
 
