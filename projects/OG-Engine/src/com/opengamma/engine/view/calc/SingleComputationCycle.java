@@ -5,6 +5,35 @@
  */
 package com.opengamma.engine.view.calc;
 
+import static com.opengamma.util.functional.Functional.reduce;
+import static com.opengamma.util.functional.Functional.submapByKeySet;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import javax.time.Duration;
+import javax.time.Instant;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opengamma.DataNotFoundException;
 import com.opengamma.OpenGammaRuntimeException;
@@ -36,40 +65,8 @@ import com.opengamma.engine.view.listener.ComputationResultListener;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.functional.Function1;
 import com.opengamma.util.functional.Function2;
 import com.opengamma.util.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.time.Duration;
-import javax.time.Instant;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static com.opengamma.util.functional.Functional.flatMap;
-import static com.opengamma.util.functional.Functional.map;
-import static com.opengamma.util.functional.Functional.reduce;
-import static com.opengamma.util.functional.Functional.submapByKeySet;
-
 
 /**
  * Holds all data and actions for a single computation pass. The view cycle may be executed at most once.
@@ -87,7 +84,7 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
   private final CompiledViewDefinitionWithGraphsImpl _compiledViewDefinition;
   private final ViewCycleExecutionOptions _executionOptions;
   private final VersionCorrection _versionCorrection;
-  
+
   private final ComputationResultListener _cycleFragmentResultListener;
   private final DependencyGraphExecutor<?> _dependencyGraphExecutor;
   private final GraphExecutorStatisticsGatherer _statisticsGatherer;
@@ -103,7 +100,6 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
 
   // Output
   private final InMemoryViewComputationResultModel _resultModel;
-
 
   public SingleComputationCycle(UniqueId cycleId, UniqueId viewProcessId,
       ComputationResultListener cycleFragmentResultListener, ViewProcessContext viewProcessContext,
@@ -122,9 +118,8 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
     _viewProcessId = viewProcessId;
     _viewProcessContext = viewProcessContext;
     _compiledViewDefinition = compiledViewDefinition;
-    
-    _cycleFragmentResultListener = cycleFragmentResultListener;
 
+    _cycleFragmentResultListener = cycleFragmentResultListener;
 
     _executionOptions = executionOptions;
     _versionCorrection = versionCorrection;
@@ -135,12 +130,11 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
     _statisticsGatherer = getViewProcessContext().getGraphExecutorStatisticsGathererProvider().getStatisticsGatherer(getViewProcessId());
   }
 
-
   private InMemoryViewComputationResultModel constructTemplateResultModel() {
     InMemoryViewComputationResultModel result = new InMemoryViewComputationResultModel();
     result.setViewCycleId(getCycleId());
     result.setViewProcessId(getViewProcessId());
-    result.setValuationTime(getExecutionOptions().getValuationTime());
+    result.setValuationTime(getValuationTime());
     result.setVersionCorrection(getVersionCorrection());
     return result;
   }
@@ -494,7 +488,7 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
       deltaCalculator.computeDelta();
 
       s_logger.info("Computed delta for calculation configuration '{}'. {} nodes out of {} require recomputation.",
-          new Object[]{calcConfigurationName, deltaCalculator.getChangedNodes().size(), depGraph.getSize()});
+          new Object[] {calcConfigurationName, deltaCalculator.getChangedNodes().size(), depGraph.getSize() });
 
       Collection<ValueSpecification> specsToCopy = new HashSet<ValueSpecification>();
 
@@ -547,7 +541,7 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
 
   private void populateResultModel(String calcConfigurationName, DependencyGraph depGraph) {
     ViewComputationCache computationCache = getComputationCache(calcConfigurationName);
-    
+
     for (Pair<ValueSpecification, Object> value : computationCache.getValues(getOutputSpecificationsForResultModel(depGraph), CacheSelectHint.allShared())) {
       if (value.getValue() == null) {
         continue;
@@ -566,7 +560,7 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
     DependencyGraph depGraph = getCompiledViewDefinition().getDependencyGraph(calcConfigurationName);
 
     Map<ValueSpecification, Set<ValueRequirement>> specsToRequirementsMapping = depGraph.getTerminalOutputs();
-    
+
     /*Map<ValueSpecification, Set<ValueRequirement>> mapping = depGraph.getTerminalOutputs();
 
     final Map<ValueRequirement, ValueSpecification> reverseMapping = new HashMap<ValueRequirement, ValueSpecification>();
@@ -577,13 +571,11 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
       }
     }*/
 
-
-
     for (CalculationJobResultItem calculationJobResultItem : calculationJobResult.getResultItems()) {
-      
+
       if (calculationJobResultItem.failed()) {
         // build computed values denoting failure
-        for (ValueSpecification specification : calculationJobResultItem.getOutputs()) {                     
+        for (ValueSpecification specification : calculationJobResultItem.getOutputs()) {
           ComputedValue computedValue = new ComputedValue(specification, null);
           computedValue.setInvocationResult(calculationJobResultItem.getResult());
           computedValue.setMissingInputs(calculationJobResultItem.getMissingInputs());
@@ -612,8 +604,8 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
         // iterate trough all specifications of the calc job result item and build computed values
         for (ValueSpecification specification : specifications) {
           Object actualValue = valuesFromCacheBySpecification.get(specification);
-          if(actualValue == null){
-            throw new OpenGammaRuntimeException("Encountered cache miss for successful CalculationJobResultItem [spec: "+specification+"]");
+          if (actualValue == null) {
+            throw new OpenGammaRuntimeException("Encountered cache miss for successful CalculationJobResultItem [spec: " + specification + "]");
           } else {
             ComputedValue computedValue = new ComputedValue(specification, actualValue);
             computedValue.setInvocationResult(InvocationResult.SUCCESS);
@@ -659,21 +651,21 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
       ViewComputationCache computationCache = getComputationCache(calcConfigurationName);
       for (CalculationJobResultItem calculationJobResultItem : calculationJobResult.getResultItems()) {
         Set<ValueSpecification> specifications = calculationJobResultItem.getOutputs();
-      Map<ValueSpecification, Set<ValueRequirement>> requirements = submapByKeySet(depGraph.getTerminalOutputs(), specifications);
-      resultModel.addRequirements(requirements);
+        Map<ValueSpecification, Set<ValueRequirement>> requirements = submapByKeySet(depGraph.getTerminalOutputs(), specifications);
+        resultModel.addRequirements(requirements);
         //
-      for (Pair<ValueSpecification, Object> value : computationCache.getValues(specifications, CacheSelectHint.allShared())) {
-        ValueSpecification valueSpec = value.getFirst();
-        Object calculatedValue = value.getSecond();
+        for (Pair<ValueSpecification, Object> value : computationCache.getValues(specifications, CacheSelectHint.allShared())) {
+          ValueSpecification valueSpec = value.getFirst();
+          Object calculatedValue = value.getSecond();
           if (!requirements.containsKey(valueSpec)) {
             // Not in cache or not a terminal output
-          continue;
-        }
-        if (calculatedValue instanceof MissingMarketDataSentinel) {
-          continue;
-        }
+            continue;
+          }
+          if (calculatedValue instanceof MissingMarketDataSentinel) {
+            continue;
+          }
           ComputedValue computedValue = new ComputedValue(valueSpec, calculatedValue);
-          
+
           computedValue.setInvocationResult(calculationJobResultItem.getResult());
           computedValue.setMissingInputs(calculationJobResultItem.getMissingInputs());
           computedValue.setExceptionClass(calculationJobResultItem.getExceptionClass());
