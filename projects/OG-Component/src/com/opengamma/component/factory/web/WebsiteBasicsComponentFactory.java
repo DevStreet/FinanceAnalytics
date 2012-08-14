@@ -129,7 +129,7 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
   public void init(ComponentRepository repo, LinkedHashMap<String, String> configuration) {
     initBasics(repo);
     initMasters(repo);
-    initValueRequirementNames(repo, configuration.get("valueRequirementNameClasses"));
+    initValueRequirementNames(repo, configuration.remove("valueRequirementNameClasses"));
   }
 
   protected void initBasics(ComponentRepository repo) {
@@ -139,27 +139,27 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
   protected void initMasters(ComponentRepository repo) {
     JerseyRestResourceFactory cfg = new JerseyRestResourceFactory(WebConfigsResource.class, getConfigMaster());
     repo.getRestComponents().publishResource(cfg);
-    
+
     JerseyRestResourceFactory exg = new JerseyRestResourceFactory(WebExchangesResource.class, getExchangeMaster());
     repo.getRestComponents().publishResource(exg);
-    
+
     JerseyRestResourceFactory hol = new JerseyRestResourceFactory(WebHolidaysResource.class, getHolidayMaster());
     repo.getRestComponents().publishResource(hol);
-    
+
     JerseyRestResourceFactory reg = new JerseyRestResourceFactory(WebRegionsResource.class, getRegionMaster());
     repo.getRestComponents().publishResource(reg);
-    
+
     JerseyRestResourceFactory sec = new JerseyRestResourceFactory(WebSecuritiesResource.class,
         getSecurityMaster(), getSecurityLoader(), getHistoricalTimeSeriesSource());
     repo.getRestComponents().publishResource(sec);
-    
+
     JerseyRestResourceFactory pos = new JerseyRestResourceFactory(WebPositionsResource.class,
         getPositionMaster(), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
     repo.getRestComponents().publishResource(pos);
-    
+
     JerseyRestResourceFactory prt = new JerseyRestResourceFactory(WebPortfoliosResource.class, getPortfolioMaster(), getPositionMaster(), getSecuritySource(), getScheduler());
     repo.getRestComponents().publishResource(prt);
-    
+
     JerseyRestResourceFactory hts = new JerseyRestResourceFactory(WebAllHistoricalTimeSeriesResource.class,
         getHistoricalTimeSeriesMaster(), getHistoricalTimeSeriesLoader(), new MasterConfigSource(getConfigMaster()));
     repo.getRestComponents().publishResource(hts);
@@ -173,7 +173,7 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
           new WebValueRequirementNamesResource(valueRequirementNameClasses.split(",")));
     } else {
       repo.getRestComponents().publishResource(new WebValueRequirementNamesResource(new String[]
-          {valueRequirementNameClasses}));
+      {valueRequirementNameClasses }));
     }
   }
 
@@ -186,6 +186,7 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
   public static WebsiteBasicsComponentFactory.Meta meta() {
     return WebsiteBasicsComponentFactory.Meta.INSTANCE;
   }
+
   static {
     JodaBeanUtils.registerMetaBean(WebsiteBasicsComponentFactory.Meta.INSTANCE);
   }
@@ -792,7 +793,7 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
-      this, (DirectMetaPropertyMap) super.metaPropertyMap(),
+        this, (DirectMetaPropertyMap) super.metaPropertyMap(),
         "configMaster",
         "exchangeMaster",
         "holidayMaster",
