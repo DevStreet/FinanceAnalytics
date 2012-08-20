@@ -6,10 +6,9 @@
 package com.opengamma.financial.analytics.ircurve;
 
 /**
- * @deprecated Deprecated
+ * 
  */
-@Deprecated
-public enum IndexType {
+public enum RateType {
   /** Libor */
   Libor,
   /** Tibor */
@@ -17,5 +16,15 @@ public enum IndexType {
   /** Euribor */
   Euribor,
   /** BBSW (AUD) */
-  BBSW
+  BBSW,
+  /** Deposit */
+  Deposit,
+  /** Bankers acceptance */
+  Bankers_Acceptance,
+  /** CDOR */
+  CDOR,
+  /** Cibor */
+  Cibor,
+  /** Stibor */
+  Stibor
 }

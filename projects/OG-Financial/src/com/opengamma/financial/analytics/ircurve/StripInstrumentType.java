@@ -48,5 +48,7 @@ public enum StripInstrumentType {
   /** Periodic zero deposit strip */
   PERIODIC_ZERO_DEPOSIT,
   /** Continuous zero deposit strip */
-  CONTINUOUS_ZERO_DEPOSIT
+  CONTINUOUS_ZERO_DEPOSIT,
+  /** Rate strip */
+  RATE
 }

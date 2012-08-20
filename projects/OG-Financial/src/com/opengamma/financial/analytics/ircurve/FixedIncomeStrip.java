@@ -20,7 +20,9 @@ import com.opengamma.util.time.Tenor;
 
 /**
  * A fixed income strip. <b>Note that the futures are assumed to be quarterly.</b>
+ * @deprecated Deprecated
  */
+@Deprecated
 public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStrip> {
 
   private static final long serialVersionUID = 1L;
