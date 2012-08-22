@@ -21,8 +21,8 @@ import java.io.IOException;
 
 public class NodePositionSecurityMasterWriter implements Writeable<NodePositionSecurity> {
 
-  private PositionMaster _positionMaster;
   private Writeable<ManageableSecurity> _securityWriter;
+  private Writeable<ManageablePosition> _positionWriter;
 
   private ManageablePortfolioNode _rootNode;
   private ManageablePortfolioNode _currentNode;
@@ -32,14 +32,14 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
   private boolean _overwrite;
 
 
-  public NodePositionSecurityMasterWriter(PositionMaster positionMaster,
+  public NodePositionSecurityMasterWriter(Writeable<ManageablePosition> positionWriter,
                                           Writeable<ManageableSecurity> securityWriter,
                                           ManageablePortfolioNode rootNode, boolean overwrite) {
-    ArgumentChecker.notNull(positionMaster, "positionMaster");
+    ArgumentChecker.notNull(positionWriter, "positionWriter");
     ArgumentChecker.notNull(securityWriter, "securityWriter");
     ArgumentChecker.notNull(rootNode, "rootNode");
 
-    _positionMaster = positionMaster;
+    _positionWriter = positionWriter;
     _securityWriter = securityWriter;
     _currentNode = _originalRoot = _rootNode = rootNode;
     _overwrite = overwrite;
@@ -54,7 +54,7 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
     Iterable<ManageableSecurity> securities = nodePositionSecurity.getSecurities();
 
     setPath(path);
-    position = writePosition(position);
+    _positionWriter.addOrUpdate(position);
     new Copier<ManageableSecurity>().copy(securities, _securityWriter);
 
     return new NodePositionSecurity(path, position, securities);
@@ -63,71 +63,6 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
   @Override
   public void flush() throws IOException {
     // No action
-  }
-
-
-  /**
-   * WritePosition checks if the position exists in the previous version of the portfolio.
-   * If so, the existing position is reused.
-   * @param position    the position to be written
-   * @param securities  the security(ies) related to the above position, also to be written; index 1 onwards are underlyings
-   * @return            the positions/securities in the masters after writing
-   */
-  public ManageablePosition writePosition(ManageablePosition position) {
-    ArgumentChecker.notNull(position, "position");
-
-    // Write position
-    if (_overwrite) {
-      // Add the new position to the position master
-      PositionDocument addedDoc = _positionMaster.add(new PositionDocument(position));
-
-      // Add the new position to the portfolio
-      _currentNode.addPosition(addedDoc.getUniqueId());
-
-      // Return the new position
-      return addedDoc.getPosition();
-
-    } else {
-
-      if (!(_originalNode == null) && !_originalNode.getPositionIds().isEmpty()) {
-        PositionSearchRequest searchReq = new PositionSearchRequest();
-
-        // Filter positions in current node of original portfolio
-        searchReq.setPositionObjectIds(_originalNode.getPositionIds());
-
-        // Filter positions with same external ids
-        ExternalIdSearch externalIdSearch = new ExternalIdSearch();
-        externalIdSearch.addExternalIds(position.getSecurityLink().getExternalIds());
-        externalIdSearch.setSearchType(ExternalIdSearchType.ALL);
-        searchReq.setSecurityIdSearch(externalIdSearch);
-
-        // Filter positions with the same quantity
-        searchReq.setMinQuantity(position.getQuantity());
-        searchReq.setMaxQuantity(position.getQuantity());
-
-        // Search
-        PositionSearchResult searchResult = _positionMaster.search(searchReq);
-
-        PositionDocument firstDocument = searchResult.getFirstDocument();
-        if (firstDocument != null) {
-          ManageablePosition existingPosition = firstDocument.getPosition();
-          // Add the existing position to the portfolio
-          _currentNode.addPosition(existingPosition.getUniqueId());
-
-          // Return the existing position
-          return existingPosition;
-        }
-      }
-
-      // Add the new position to the position master
-      PositionDocument addedDoc = _positionMaster.add(new PositionDocument(position));
-
-      // Add the new position to the portfolio
-      _currentNode.addPosition(addedDoc.getUniqueId());
-
-      // Return the new position
-      return addedDoc.getPosition();
-    }
   }
 
   private void setPath(String[] newPath) {
@@ -143,7 +78,6 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
       _currentNode = createNode(newPath, _rootNode);
     }
   }
-
 
   private ManageablePortfolioNode findNode(String[] path, ManageablePortfolioNode startNode) {
 
