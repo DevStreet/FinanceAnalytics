@@ -23,12 +23,18 @@ public class SheetWriter<E> implements Writeable<E>, Closeable {
   }
 
   @Override
-  public E addOrUpdate(E datum) {
+  public void addOrUpdate(E datum) {
     Map<String, String> row = _rowWriter.writeRow(datum);
     if (row != null) {
       _rawSheetWriter.addOrUpdate(row);
     }
-    return datum;
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<E> data) {
+    for (E datum : data) {
+      addOrUpdate(datum);
+    }
   }
 
   @Override

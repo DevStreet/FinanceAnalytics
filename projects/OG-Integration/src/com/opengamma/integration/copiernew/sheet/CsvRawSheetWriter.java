@@ -64,7 +64,7 @@ public class CsvRawSheetWriter extends RawSheetWriter {
   }
  
   @Override
-  public Map<String, String> addOrUpdate(Map<String, String> row) {
+  public void addOrUpdate(Map<String, String> row) {
     
     ArgumentChecker.notNull(row, "row");
     
@@ -78,10 +78,15 @@ public class CsvRawSheetWriter extends RawSheetWriter {
     }
     
     _csvWriter.writeNext(rawRow);
-
-    return row;
   }
-  
+
+  @Override
+  public void addOrUpdate(Iterable<Map<String, String>> data) {
+    for (Map<String, String> datum : data) {
+      addOrUpdate(datum);
+    }
+  }
+
   @Override
   public void flush() {
     try {
