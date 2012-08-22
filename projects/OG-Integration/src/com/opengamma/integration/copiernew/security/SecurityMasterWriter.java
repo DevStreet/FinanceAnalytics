@@ -32,7 +32,7 @@ public class SecurityMasterWriter implements Writeable<ManageableSecurity> {
   }
 
   @Override
-  public ManageableSecurity addOrUpdate(ManageableSecurity security) {
+  public void addOrUpdate(ManageableSecurity security) {
     ArgumentChecker.notNull(security, "security");
 
     SecuritySearchRequest searchReq = new SecuritySearchRequest();
@@ -54,20 +54,24 @@ public class SecurityMasterWriter implements Writeable<ManageableSecurity> {
       if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
         // It's already there, don't update or add it
         s_logger.info("Not updating existing " + foundSecurity);
-        return foundSecurity;
       } else {
         s_logger.info("Updating " + foundSecurity + " to " + security);
         SecurityDocument updateDoc = new SecurityDocument(security);
         updateDoc.setUniqueId(foundSecurity.getUniqueId());
         SecurityDocument result = _securityMaster.update(updateDoc);
-        return result.getSecurity();
       }
     } else {
       // Not found, so add it
       s_logger.info("Adding " + security);
       SecurityDocument addDoc = new SecurityDocument(security);
       SecurityDocument result = _securityMaster.add(addDoc);
-      return result.getSecurity();
+    }
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<ManageableSecurity> data) {
+    for (ManageableSecurity datum : data) {
+      addOrUpdate(datum);
     }
   }
 

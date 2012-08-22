@@ -46,7 +46,7 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
   }
 
   @Override
-  public NodePositionSecurity addOrUpdate(NodePositionSecurity nodePositionSecurity) {
+  public void addOrUpdate(NodePositionSecurity nodePositionSecurity) {
     ArgumentChecker.notNull(nodePositionSecurity, "triple");
 
     String[] path = nodePositionSecurity.getPath();
@@ -55,9 +55,14 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
 
     setPath(path);
     _positionWriter.addOrUpdate(position);
-    new Copier<ManageableSecurity>().copy(securities, _securityWriter);
+    _securityWriter.addOrUpdate(securities);
+  }
 
-    return new NodePositionSecurity(path, position, securities);
+  @Override
+  public void addOrUpdate(Iterable<NodePositionSecurity> data) {
+    for (NodePositionSecurity datum : data) {
+      addOrUpdate(datum);
+    }
   }
 
   @Override

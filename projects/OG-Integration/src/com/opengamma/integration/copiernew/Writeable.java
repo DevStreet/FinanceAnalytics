@@ -14,6 +14,8 @@ import java.io.Flushable;
  */
 public interface Writeable<E> extends Flushable {
 
-  E addOrUpdate(E datum);
-        
+  void addOrUpdate(E datum);
+
+  void addOrUpdate(Iterable<E> data);
+
 }

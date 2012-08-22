@@ -15,13 +15,6 @@ import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: kevin
- * Date: 6/25/12
- * Time: 2:32 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ExchangeMasterWriter implements Writeable<ManageableExchange> {
 
   ExchangeMaster _exchangeMaster;
@@ -34,7 +27,7 @@ public class ExchangeMasterWriter implements Writeable<ManageableExchange> {
   }
 
   @Override
-  public ManageableExchange addOrUpdate(ManageableExchange exchange) {
+  public void addOrUpdate(ManageableExchange exchange) {
     ArgumentChecker.notNull(exchange, "exchange");
 
     ExchangeSearchRequest searchReq = new ExchangeSearchRequest();
@@ -53,18 +46,22 @@ public class ExchangeMasterWriter implements Writeable<ManageableExchange> {
       }
       if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
         // It's already there, don't update or add it
-        return foundExchange;
       } else {
         ExchangeDocument updateDoc = new ExchangeDocument(exchange);
         updateDoc.setUniqueId(foundExchange.getUniqueId());
         ExchangeDocument result = _exchangeMaster.update(updateDoc);
-        return result.getExchange();
       }
     } else {
       // Not found, so add it
       ExchangeDocument addDoc = new ExchangeDocument(exchange);
       ExchangeDocument result = _exchangeMaster.add(addDoc);
-      return result.getExchange();
+    }
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<ManageableExchange> data) {
+    for (ManageableExchange datum : data) {
+      addOrUpdate(datum);
     }
   }
 

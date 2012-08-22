@@ -34,7 +34,7 @@ public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> 
   }
 
   @Override
-  public ObjectsPair<String, T> addOrUpdate(ObjectsPair<String, T> pair) {
+  public void addOrUpdate(ObjectsPair<String, T> pair) {
     ArgumentChecker.notNull(pair, "config, name pair");
 
     ConfigSearchRequest searchReq = new ConfigSearchRequest<T>();
@@ -58,20 +58,24 @@ public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> 
       }
       if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
         // It's already there, don't update or add it
-        return new ObjectsPair<String, T>(name, (T) foundConfig);
       } else {
         ConfigDocument<T> updateDoc = new ConfigDocument<T>(config.getClass());
         updateDoc.setValue(config);
         updateDoc.setUniqueId(searchResult.getFirstDocument().getUniqueId());
         ConfigDocument result = _configMaster.update(updateDoc);
-        return new ObjectsPair<String, T>(name, (T) result.getValue());
       }
     } else {
       // Not found, so add it
       ConfigDocument<T> addDoc = new ConfigDocument<T>(config.getClass());
       addDoc.setValue(config);
       ConfigDocument result = _configMaster.add(addDoc);
-      return new ObjectsPair<String, T>(name, (T) result.getValue());
+    }
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<ObjectsPair<String, T>> data) {
+    for (ObjectsPair<String, T> datum : data) {
+      addOrUpdate(datum);
     }
   }
 

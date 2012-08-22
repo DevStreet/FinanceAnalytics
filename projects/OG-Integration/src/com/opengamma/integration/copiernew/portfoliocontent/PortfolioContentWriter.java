@@ -29,41 +29,45 @@ import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
-public class PortfolioContentMasterWriter implements Writeable<PortfolioContent> {
+public class PortfolioContentWriter implements Writeable<PortfolioContent> {
 
   private Writeable<ManageablePortfolio> _portfolioWriter;
-  private PositionMaster _positionMaster;
+  private Writeable<ManageablePosition> _positionWriter;
   private Writeable<ManageableSecurity> _securityWriter;
   private BeanCompare _beanCompare;
 
-  public PortfolioContentMasterWriter(Writeable<ManageablePortfolio> portfolioWriter, PositionMaster positionMaster,
-                                      Writeable<ManageableSecurity> securityWriter) {
+  public PortfolioContentWriter(Writeable<ManageablePortfolio> portfolioWriter, Writeable<ManageablePosition> positionWriter,
+                                Writeable<ManageableSecurity> securityWriter) {
     ArgumentChecker.notNull(portfolioWriter, "portfolioWriter");
-    ArgumentChecker.notNull(positionMaster, "positionMaster");
+    ArgumentChecker.notNull(positionWriter, "positionWriter");
     ArgumentChecker.notNull(securityWriter, "securityWriter");
 
     _portfolioWriter = portfolioWriter;
-    _positionMaster = positionMaster;
+    _positionWriter = positionWriter;
     _securityWriter = securityWriter;
     _beanCompare = new BeanCompare();
   }
 
   @Override
-  public PortfolioContent addOrUpdate(PortfolioContent portfolioContent) {
+  public void addOrUpdate(PortfolioContent portfolioContent) {
 
     ArgumentChecker.notNull(portfolioContent, "portfolioContent");
 
     ManageablePortfolio portfolio = portfolioContent.getPortfolio();
-    Iterable<NodePositionSecurity> positionReader = portfolioContent.getNodePositionSecurityReader();
+
+    Iterable<NodePositionSecurity> nodePositionSecurityReader = portfolioContent.getNodePositionSecurityReader();
+    Writeable<NodePositionSecurity> nodePositionSecurityWriter =
+        new NodePositionSecurityMasterWriter(_positionWriter, _securityWriter, portfolio.getRootNode(), false);
+    nodePositionSecurityWriter.addOrUpdate(nodePositionSecurityReader);
 
     _portfolioWriter.addOrUpdate(portfolio);
+  }
 
-    Writeable<NodePositionSecurity> positionWriter =
-        new NodePositionSecurityMasterWriter(_positionMaster, _securityWriter, portfolio.getRootNode(), false);
-
-    new Copier<NodePositionSecurity>().copy(positionReader, positionWriter);
-
-    return portfolioContent;
+  @Override
+  public void addOrUpdate(Iterable<PortfolioContent> data) {
+    for (PortfolioContent datum : data) {
+      addOrUpdate(datum);
+    }
   }
 
   @Override

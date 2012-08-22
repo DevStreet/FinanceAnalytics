@@ -31,7 +31,7 @@ public class HolidayMasterWriter implements Writeable<ManageableHoliday> {
   }
 
   @Override
-  public ManageableHoliday addOrUpdate(ManageableHoliday holiday) {
+  public void addOrUpdate(ManageableHoliday holiday) {
     ArgumentChecker.notNull(holiday, "holiday");
 
     HolidaySearchRequest searchReq = new HolidaySearchRequest();
@@ -53,18 +53,22 @@ public class HolidayMasterWriter implements Writeable<ManageableHoliday> {
       }
       if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
         // It's already there, don't update or add it
-        return foundHoliday;
       } else {
         HolidayDocument updateDoc = new HolidayDocument(holiday);
         updateDoc.setUniqueId(foundHoliday.getUniqueId());
         HolidayDocument result = _holidayMaster.update(updateDoc);
-        return result.getHoliday();
       }
     } else {
       // Not found, so add it
       HolidayDocument addDoc = new HolidayDocument(holiday);
       HolidayDocument result = _holidayMaster.add(addDoc);
-      return result.getHoliday();
+    }
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<ManageableHoliday> data) {
+    for (ManageableHoliday datum : data) {
+      addOrUpdate(datum);
     }
   }
 

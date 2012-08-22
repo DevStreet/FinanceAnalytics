@@ -39,7 +39,7 @@ public class HistoricalTimeSeriesMasterWriter
   }
 
   @Override
-  public ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries> addOrUpdate(ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries> pair) {
+  public void addOrUpdate(ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries> pair) {
     ArgumentChecker.notNull(pair, "historicalTimeSeriesInfo, historicalTimeSeries");
 
     // Write info
@@ -83,10 +83,13 @@ public class HistoricalTimeSeriesMasterWriter
       resultTimeSeries = _historicalTimeSeriesMaster.getTimeSeries(updatedUniqueId);
       resultInfo = _historicalTimeSeriesMaster.get(updatedUniqueId).getInfo();
     }
+  }
 
-    // Return up-to-date info/data points
-    return new ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries>(
-        resultInfo, resultTimeSeries);
+  @Override
+  public void addOrUpdate(Iterable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries>> data) {
+    for (ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries> datum : data) {
+      addOrUpdate(datum);
+    }
   }
 
   private UniqueId addOrUpdate(UniqueId id, LocalDateDoubleTimeSeries ts) {

@@ -30,7 +30,7 @@ public class PositionMasterWriter implements Writeable<ManageablePosition> {
   }
 
   @Override
-  public ManageablePosition addOrUpdate(ManageablePosition position) {
+  public void addOrUpdate(ManageablePosition position) {
     ArgumentChecker.notNull(position, "position");
 
     PositionSearchRequest searchReq = new PositionSearchRequest();
@@ -57,18 +57,22 @@ public class PositionMasterWriter implements Writeable<ManageablePosition> {
       }
       if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
         // It's already there, don't update or add it
-        return foundPosition;
       } else {
         PositionDocument updateDoc = new PositionDocument(position);
         updateDoc.setUniqueId(foundPosition.getUniqueId());
         PositionDocument result = _positionMaster.update(updateDoc);
-        return result.getPosition();
       }
     } else {
       // Not found, so add it
       PositionDocument addDoc = new PositionDocument(position);
       PositionDocument result = _positionMaster.add(addDoc);
-      return result.getPosition();
+    }
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<ManageablePosition> data) {
+    for (ManageablePosition datum : data) {
+      addOrUpdate(datum);
     }
   }
 

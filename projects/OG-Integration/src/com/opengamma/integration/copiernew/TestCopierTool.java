@@ -6,34 +6,14 @@
 package com.opengamma.integration.copiernew;
 
 import com.opengamma.component.tool.AbstractTool;
-import com.opengamma.financial.security.equity.EquitySecurity;
-import com.opengamma.financial.security.future.FutureSecurity;
-import com.opengamma.financial.security.option.SwaptionSecurity;
-import com.opengamma.financial.security.swap.SwapSecurity;
-import com.opengamma.id.ObjectId;
-import com.opengamma.integration.copiernew.exchange.ExchangeMasterReader;
-import com.opengamma.integration.copiernew.exchange.ExchangeMasterWriter;
-import com.opengamma.integration.copiernew.exchange.ExchangeRowReader;
-import com.opengamma.integration.copiernew.exchange.ExchangeRowWriter;
-import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterReader;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContent;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterReader;
-import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterWriter;
+import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentWriter;
+import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
-import com.opengamma.integration.copiernew.security.SecurityRowReader;
-import com.opengamma.integration.copiernew.sheet.*;
-import com.opengamma.integration.copiernew.security.SecurityMasterReader;
-import com.opengamma.integration.copiernew.security.SecurityRowWriter;
-import com.opengamma.master.exchange.ExchangeSearchRequest;
-import com.opengamma.master.exchange.ManageableExchange;
-import com.opengamma.master.portfolio.ManageablePortfolio;
-import com.opengamma.master.position.ManageablePosition;
-import com.opengamma.master.security.ManageableSecurity;
-import com.opengamma.master.security.SecuritySearchRequest;
-import com.opengamma.util.tuple.ObjectsPair;
-import com.opengamma.util.tuple.Triple;
+import com.opengamma.master.portfolio.PortfolioSearchRequest;
 
 public class TestCopierTool extends AbstractTool {
 
@@ -50,19 +30,21 @@ public class TestCopierTool extends AbstractTool {
   @Override
   protected void doRun() throws Exception {
 
+    PortfolioSearchRequest portfolioSearchRequest = new PortfolioSearchRequest();
+    portfolioSearchRequest.setName("KV*");
     Iterable<PortfolioContent> portfolioContentReader = new PortfolioContentMasterReader(
-        new PortfolioMasterReader(getToolContext().getPortfolioMaster()),
+        new PortfolioMasterReader(getToolContext().getPortfolioMaster(), portfolioSearchRequest),
         getToolContext().getPositionSource(),
         getToolContext().getSecuritySource()
     );
 
-    Writeable<PortfolioContent> portfolioContentWriter = new PortfolioContentMasterWriter(
+    Writeable<PortfolioContent> portfolioContentWriter = new PortfolioContentWriter(
         new PortfolioMasterWriter(getToolContext().getPortfolioMaster()),
-        getToolContext().getPositionMaster(),
+        new PositionMasterWriter(getToolContext().getPositionMaster()),
         new SecurityMasterWriter(getToolContext().getSecurityMaster())
     );
 
-    new Copier<PortfolioContent>().copy(portfolioContentReader, portfolioContentWriter);
+    portfolioContentWriter.addOrUpdate(portfolioContentReader);
 
     portfolioContentWriter.flush();
 

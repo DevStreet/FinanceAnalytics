@@ -31,7 +31,7 @@ public class PortfolioMasterWriter implements Writeable<ManageablePortfolio> {
   }
 
   @Override
-  public ManageablePortfolio addOrUpdate(ManageablePortfolio portfolio) {
+  public void addOrUpdate(ManageablePortfolio portfolio) {
     ArgumentChecker.notNull(portfolio, "portfolio");
 
     PortfolioSearchRequest searchReq = new PortfolioSearchRequest();
@@ -49,18 +49,22 @@ public class PortfolioMasterWriter implements Writeable<ManageablePortfolio> {
       }
       if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
         // It's already there, don't update or add it
-        return foundPortfolio;
       } else {
         PortfolioDocument updateDoc = new PortfolioDocument(portfolio);
         updateDoc.setUniqueId(foundPortfolio.getUniqueId());
         PortfolioDocument result = _portfolioMaster.update(updateDoc);
-        return result.getPortfolio();
       }
     } else {
       // Not found, so add it
       PortfolioDocument addDoc = new PortfolioDocument(portfolio);
       PortfolioDocument result = _portfolioMaster.add(addDoc);
-      return result.getPortfolio();
+    }
+  }
+
+  @Override
+  public void addOrUpdate(Iterable<ManageablePortfolio> data) {
+    for (ManageablePortfolio datum : data) {
+      addOrUpdate(datum);
     }
   }
 

@@ -21,13 +21,11 @@ public class Copier<E> {
     ArgumentChecker.notNull(writer, "writer");
     ArgumentChecker.notNull(reader, "reader");
 
-    E written = null;
-
     for (E datum : reader) {
       if (datum != null) {
-        written = writer.addOrUpdate(datum);
+        writer.addOrUpdate(datum);
         if (logBack != null) {
-          logBack.info("Wrote: ", written);
+          logBack.info("Wrote: ", datum);
         }
       }
     }
