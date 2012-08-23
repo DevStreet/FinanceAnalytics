@@ -25,17 +25,17 @@ public class PortfolioContentMasterReader implements
     Iterable<PortfolioContent> {
 
   private Iterator<ManageablePortfolio> _portfolioIterator;
-  private PositionSource _positionSource;
+  private PositionMaster _positionMaster;
   private SecuritySource _securitySource;
 
-  public PortfolioContentMasterReader(Iterable<ManageablePortfolio> portfolioIterable, PositionSource positionSource,
+  public PortfolioContentMasterReader(Iterable<ManageablePortfolio> portfolioIterable, PositionMaster positionMaster,
                                       SecuritySource securitySource) {
     ArgumentChecker.notNull(portfolioIterable, "portfolioIterable");
-    ArgumentChecker.notNull(positionSource, "positionSource");
+    ArgumentChecker.notNull(positionMaster, "positionMaster");
     ArgumentChecker.notNull(securitySource, "securitySource");
 
     _portfolioIterator = portfolioIterable.iterator();
-    _positionSource = positionSource;
+    _positionMaster = positionMaster;
     _securitySource = securitySource;
   }
 
@@ -53,9 +53,10 @@ public class PortfolioContentMasterReader implements
       @Override
       public PortfolioContent next() {
         ManageablePortfolio portfolio = _portfolioIterator.next();
+        portfolio.setUniqueId(null);
         return new PortfolioContent (
             portfolio,
-            new NodePositionSecurityMasterReader(_positionSource, _securitySource, portfolio.getRootNode())
+            new NodePositionSecurityMasterReader(_positionMaster, _securitySource, portfolio.getRootNode())
         );
       }
 

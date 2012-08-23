@@ -22,51 +22,58 @@ public class PositionMasterWriter implements Writeable<ManageablePosition> {
 
   PositionMaster _positionMaster;
   private BeanCompare _beanCompare;
+  private boolean _reuseExistingPositions;
 
-  public PositionMasterWriter(PositionMaster positionMaster) {
+  public PositionMasterWriter(PositionMaster positionMaster, boolean reuseExistingPositions) {
     ArgumentChecker.notNull(positionMaster, "positionMaster");
     _positionMaster = positionMaster;
     _beanCompare = new BeanCompare();
+    _reuseExistingPositions = reuseExistingPositions;
   }
 
   @Override
   public void addOrUpdate(ManageablePosition position) {
-    ArgumentChecker.notNull(position, "position");
-
-    PositionSearchRequest searchReq = new PositionSearchRequest();
-    ExternalIdSearch idSearch = new ExternalIdSearch(position.getSecurity().getExternalIdBundle());  // match any one of the IDs
-    searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
-    searchReq.setSecurityIdSearch(idSearch);
-
-    // Try to match by provider id, otherwise look for positions w/ same quantity (not necessarily good)
-    if (position.getProviderId() != null) {
-      searchReq.setPositionProviderId(position.getProviderId());
-    } else {
-      searchReq.setMaxQuantity(position.getQuantity());
-      searchReq.setMinQuantity(position.getQuantity());
+    if (position == null) {
+      return;
     }
 
-    PositionSearchResult searchResult = _positionMaster.search(searchReq);
-    ManageablePosition foundPosition = searchResult.getFirstPosition();
-    if (foundPosition != null) {
-      List<BeanDifference<?>> differences;
-      try {
-        differences = _beanCompare.compare(foundPosition, position);
-      } catch (Exception e) {
-        throw new OpenGammaRuntimeException("Error comparing positions (" + position.getName() + ")", e);
-      }
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
-        // It's already there, don't update or add it
+    if (_reuseExistingPositions) {
+      PositionSearchRequest searchReq = new PositionSearchRequest();
+      ExternalIdSearch idSearch = new ExternalIdSearch(position.getSecurity().getExternalIdBundle());  // match any one of the IDs
+      searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
+      searchReq.setSecurityIdSearch(idSearch);
+
+      // Try to match by provider id, otherwise look for positions w/ same quantity (not necessarily good)
+      if (position.getProviderId() != null) {
+        searchReq.setPositionProviderId(position.getProviderId());
       } else {
-        PositionDocument updateDoc = new PositionDocument(position);
-        updateDoc.setUniqueId(foundPosition.getUniqueId());
-        PositionDocument result = _positionMaster.update(updateDoc);
+        searchReq.setMaxQuantity(position.getQuantity());
+        searchReq.setMinQuantity(position.getQuantity());
       }
-    } else {
-      // Not found, so add it
-      PositionDocument addDoc = new PositionDocument(position);
-      PositionDocument result = _positionMaster.add(addDoc);
+      PositionSearchResult searchResult = _positionMaster.search(searchReq);
+      ManageablePosition foundPosition = searchResult.getFirstPosition();
+      if (foundPosition != null) {
+        List<BeanDifference<?>> differences;
+        try {
+          differences = _beanCompare.compare(foundPosition, position);
+        } catch (Exception e) {
+          throw new OpenGammaRuntimeException("Error comparing positions (" + position.getName() + ")", e);
+        }
+        if (differences.size() == 0 ||
+            (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class)) {
+          // do nothing
+        } else {
+          PositionDocument updateDoc = new PositionDocument(position);
+          updateDoc.setUniqueId(foundPosition.getUniqueId());
+          PositionDocument result = _positionMaster.update(updateDoc);
+        }
+        return; // use unaltered or updated existing position
+      }
     }
+
+    // Add a new position
+    PositionDocument addDoc = new PositionDocument(position);
+    PositionDocument result = _positionMaster.add(addDoc);
   }
 
   @Override

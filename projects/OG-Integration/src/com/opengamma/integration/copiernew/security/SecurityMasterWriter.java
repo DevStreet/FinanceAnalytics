@@ -33,7 +33,9 @@ public class SecurityMasterWriter implements Writeable<ManageableSecurity> {
 
   @Override
   public void addOrUpdate(ManageableSecurity security) {
-    ArgumentChecker.notNull(security, "security");
+    if (security == null) {
+      return;
+    }
 
     SecuritySearchRequest searchReq = new SecuritySearchRequest();
     ExternalIdSearch idSearch = new ExternalIdSearch(security.getExternalIdBundle());  // match any one of the IDs
@@ -51,7 +53,7 @@ public class SecurityMasterWriter implements Writeable<ManageableSecurity> {
         throw new OpenGammaRuntimeException("Error comparing securities with ID bundle " + security.getExternalIdBundle(), e);
       }
       // Problem since details are not considered here
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
+      if (differences.size() == 0 || (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class)) {
         // It's already there, don't update or add it
         s_logger.info("Not updating existing " + foundSecurity);
       } else {

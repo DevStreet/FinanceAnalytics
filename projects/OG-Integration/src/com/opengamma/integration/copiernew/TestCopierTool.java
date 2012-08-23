@@ -6,13 +6,20 @@
 package com.opengamma.integration.copiernew;
 
 import com.opengamma.component.tool.AbstractTool;
+import com.opengamma.id.UniqueId;
+import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
+import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterReader;
+import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterWriter;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterReader;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContent;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterReader;
-import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentWriter;
+import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterWriter;
 import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
+import com.opengamma.master.portfolio.ManageablePortfolio;
+import com.opengamma.master.portfolio.ManageablePortfolioNode;
+import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
 
 public class TestCopierTool extends AbstractTool {
@@ -31,22 +38,49 @@ public class TestCopierTool extends AbstractTool {
   protected void doRun() throws Exception {
 
     PortfolioSearchRequest portfolioSearchRequest = new PortfolioSearchRequest();
-    portfolioSearchRequest.setName("KV*");
+    portfolioSearchRequest.setName("Example Equity Portfolio*");
     Iterable<PortfolioContent> portfolioContentReader = new PortfolioContentMasterReader(
         new PortfolioMasterReader(getToolContext().getPortfolioMaster(), portfolioSearchRequest),
-        getToolContext().getPositionSource(),
+        getToolContext().getPositionMaster(),
         getToolContext().getSecuritySource()
     );
 
-    Writeable<PortfolioContent> portfolioContentWriter = new PortfolioContentWriter(
-        new PortfolioMasterWriter(getToolContext().getPortfolioMaster()),
-        new PositionMasterWriter(getToolContext().getPositionMaster()),
-        new SecurityMasterWriter(getToolContext().getSecurityMaster())
+    Writeable<PortfolioContent> portfolioContentWriter = new PortfolioContentMasterWriter(
+        getToolContext().getPortfolioMaster(),
+        getToolContext().getPositionMaster(),
+        new SecurityMasterWriter(getToolContext().getSecurityMaster()),
+        "Ex-"
     );
 
     portfolioContentWriter.addOrUpdate(portfolioContentReader);
 
     portfolioContentWriter.flush();
+
+/*
+    PortfolioDocument sourcePortfolioDocument = getToolContext().getPortfolioMaster().get(UniqueId.of("DbPrt", "122711"));
+    ManageablePortfolio destPortfolio;
+      destPortfolio = getToolContext().getPortfolioMaster().get(UniqueId.of("DbPrt", "123001")).getPortfolio();
+//      destPortfolio = new ManageablePortfolio("KVKVKVKVKV Test");
+
+    Iterable<NodePositionSecurity> nodePositionSecurityReader = new NodePositionSecurityMasterReader(
+        getToolContext().getPositionMaster(),
+        getToolContext().getSecuritySource(),
+        sourcePortfolioDocument.getPortfolio().getRootNode()
+    );
+
+    ManageablePortfolioNode root = new ManageablePortfolioNode();
+
+    Writeable<NodePositionSecurity> nodePositionSecurityWriter = new NodePositionSecurityMasterWriter(
+        getToolContext().getPositionMaster(),
+        new SecurityMasterWriter(getToolContext().getSecurityMaster()),
+        root, destPortfolio.getRootNode()
+    );
+
+    nodePositionSecurityWriter.addOrUpdate(nodePositionSecurityReader);
+    new PortfolioMasterWriter(getToolContext().getPortfolioMaster()).addOrUpdate(
+        new ManageablePortfolio("KVKVKVKVKV Test", root)
+    );
+*/
 
 /*
     // Export securities

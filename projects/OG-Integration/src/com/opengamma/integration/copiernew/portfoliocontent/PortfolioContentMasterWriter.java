@@ -9,6 +9,7 @@ import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecu
 import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterWriter;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.master.portfolio.ManageablePortfolio;
+import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
@@ -29,23 +30,31 @@ import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
-public class PortfolioContentWriter implements Writeable<PortfolioContent> {
+public class PortfolioContentMasterWriter implements Writeable<PortfolioContent> {
 
-  private Writeable<ManageablePortfolio> _portfolioWriter;
-  private Writeable<ManageablePosition> _positionWriter;
+  private PortfolioMaster _portfolioMaster;
+  private PositionMaster _positionMaster;
   private Writeable<ManageableSecurity> _securityWriter;
   private BeanCompare _beanCompare;
+  private String _namePrefix;
 
-  public PortfolioContentWriter(Writeable<ManageablePortfolio> portfolioWriter, Writeable<ManageablePosition> positionWriter,
-                                Writeable<ManageableSecurity> securityWriter) {
-    ArgumentChecker.notNull(portfolioWriter, "portfolioWriter");
-    ArgumentChecker.notNull(positionWriter, "positionWriter");
+
+  public PortfolioContentMasterWriter(PortfolioMaster portfolioMaster, PositionMaster positionMaster,
+                                      Writeable<ManageableSecurity> securityWriter) {
+    this(portfolioMaster, positionMaster, securityWriter, null);
+  }
+
+  public PortfolioContentMasterWriter(PortfolioMaster portfolioMaster, PositionMaster positionMaster,
+                                      Writeable<ManageableSecurity> securityWriter, String namePrefix) {
+    ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
+    ArgumentChecker.notNull(positionMaster, "positionMaster");
     ArgumentChecker.notNull(securityWriter, "securityWriter");
 
-    _portfolioWriter = portfolioWriter;
-    _positionWriter = positionWriter;
+    _portfolioMaster = portfolioMaster;
+    _positionMaster = positionMaster;
     _securityWriter = securityWriter;
     _beanCompare = new BeanCompare();
+    _namePrefix = namePrefix;
   }
 
   @Override
@@ -53,14 +62,34 @@ public class PortfolioContentWriter implements Writeable<PortfolioContent> {
 
     ArgumentChecker.notNull(portfolioContent, "portfolioContent");
 
+    Iterable<NodePositionSecurity> nodePositionSecurityReader = portfolioContent.getNodePositionSecurityReader();
     ManageablePortfolio portfolio = portfolioContent.getPortfolio();
 
-    Iterable<NodePositionSecurity> nodePositionSecurityReader = portfolioContent.getNodePositionSecurityReader();
-    Writeable<NodePositionSecurity> nodePositionSecurityWriter =
-        new NodePositionSecurityMasterWriter(_positionWriter, _securityWriter, portfolio.getRootNode(), false);
-    nodePositionSecurityWriter.addOrUpdate(nodePositionSecurityReader);
+    if (_namePrefix != null) {
+      portfolio.setName(_namePrefix + portfolio.getName());
+    }
 
-    _portfolioWriter.addOrUpdate(portfolio);
+    ManageablePortfolioNode newRoot = new ManageablePortfolioNode();
+    ManageablePortfolioNode originalRoot = null;
+
+    PortfolioSearchRequest portfolioSearchRequest = new PortfolioSearchRequest();
+    portfolioSearchRequest.setName(portfolio.getName());
+    PortfolioSearchResult portfolioSearchResult = _portfolioMaster.search(portfolioSearchRequest);
+    ManageablePortfolio existingPortfolio = portfolioSearchResult.getFirstPortfolio();
+    if (existingPortfolio != null) {
+      originalRoot = existingPortfolio.getRootNode();
+    }
+    Writeable<NodePositionSecurity> nodePositionSecurityWriter =
+        new NodePositionSecurityMasterWriter(_positionMaster, _securityWriter, newRoot, originalRoot);
+
+    nodePositionSecurityWriter.addOrUpdate(nodePositionSecurityReader);
+    portfolio.setRootNode(newRoot);
+    if (existingPortfolio == null) {
+      _portfolioMaster.add(new PortfolioDocument(portfolio));
+    } else {
+      portfolio.setUniqueId(existingPortfolio.getUniqueId());
+      _portfolioMaster.update(new PortfolioDocument(portfolio));
+    }
   }
 
   @Override

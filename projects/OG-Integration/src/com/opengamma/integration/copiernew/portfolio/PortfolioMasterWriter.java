@@ -32,7 +32,9 @@ public class PortfolioMasterWriter implements Writeable<ManageablePortfolio> {
 
   @Override
   public void addOrUpdate(ManageablePortfolio portfolio) {
-    ArgumentChecker.notNull(portfolio, "portfolio");
+    if (portfolio == null) {
+      return;
+    }
 
     PortfolioSearchRequest searchReq = new PortfolioSearchRequest();
     searchReq.setName(portfolio.getName());
@@ -47,7 +49,7 @@ public class PortfolioMasterWriter implements Writeable<ManageablePortfolio> {
       } catch (Exception e) {
         throw new OpenGammaRuntimeException("Error comparing portfolios named " + portfolio.getName(), e);
       }
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
+      if (differences.size() == 0 || (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class)) {
         // It's already there, don't update or add it
       } else {
         PortfolioDocument updateDoc = new PortfolioDocument(portfolio);

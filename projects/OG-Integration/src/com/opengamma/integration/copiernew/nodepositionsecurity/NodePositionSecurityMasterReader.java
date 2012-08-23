@@ -6,8 +6,6 @@
 package com.opengamma.integration.copiernew.nodepositionsecurity;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.core.position.Position;
-import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.Security;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.id.ExternalId;
@@ -15,6 +13,8 @@ import com.opengamma.id.ObjectId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.position.ManageablePosition;
+import com.opengamma.master.position.PositionDocument;
+import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.master.security.ManageableSecurityLink;
 import com.opengamma.master.security.SecurityMaster;
@@ -30,7 +30,7 @@ import java.util.Stack;
 
 public class NodePositionSecurityMasterReader implements Iterable<NodePositionSecurity> {
 
-  private PositionSource _positionSource;
+  private PositionMaster _positionMaster;
   private SecuritySource _securitySource;
 
   private ObjectId _nextPositionId;
@@ -43,12 +43,12 @@ public class NodePositionSecurityMasterReader implements Iterable<NodePositionSe
 
 
   public NodePositionSecurityMasterReader(
-      PositionSource positionSource, SecuritySource securitySource, ManageablePortfolioNode rootNode) {
-    ArgumentChecker.notNull(positionSource, "positionSource");
+      PositionMaster positionMaster, SecuritySource securitySource, ManageablePortfolioNode rootNode) {
+    ArgumentChecker.notNull(positionMaster, "positionMaster");
     ArgumentChecker.notNull(securitySource, "securitySource");
     ArgumentChecker.notNull(rootNode, "rootNode");
 
-    _positionSource = positionSource;
+    _positionMaster = positionMaster;
     _securitySource = securitySource;
     _currentNode = _rootNode = rootNode;
 
@@ -68,26 +68,29 @@ public class NodePositionSecurityMasterReader implements Iterable<NodePositionSe
 
       @Override
       public boolean hasNext() {
-        return (_nextPositionId == null);
+        return !(_nextPositionId == null);
       }
 
       @Override
       public NodePositionSecurity next() {
+        String[] path = getCurrentPath();
         ObjectId positionId = _nextPositionId;
         _nextPositionId = getNextPositionId();
         if (positionId == null) {
           return null;
         } else {
-          Position position = _positionSource.getPosition(positionId.atLatestVersion());
-          if (position instanceof ManageablePosition) {
-            return new NodePositionSecurity(
-                getCurrentPath(),
-                (ManageablePosition) position,
-                getSecurities((ManageablePosition) position)
-            );
-          } else {
+          ManageablePosition position;
+          try {
+            PositionDocument positionDocument = _positionMaster.get(positionId.atLatestVersion());
+            position = positionDocument.getPosition();
+          } catch (Throwable t) {
             return null;
           }
+          return new NodePositionSecurity(
+              path,
+              position,
+              getSecurities(position)
+          );
         }
       }
 
