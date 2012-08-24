@@ -7,6 +7,8 @@ package com.opengamma.integration.copiernew;
 
 import com.opengamma.component.tool.AbstractTool;
 import com.opengamma.id.UniqueId;
+import com.opengamma.integration.copiernew.exchange.ExchangeMasterReader;
+import com.opengamma.integration.copiernew.exchange.ExchangeMasterWriter;
 import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
 import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterReader;
 import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterWriter;
@@ -17,6 +19,8 @@ import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMast
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterWriter;
 import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
+import com.opengamma.master.exchange.ExchangeSearchRequest;
+import com.opengamma.master.exchange.ManageableExchange;
 import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.portfolio.PortfolioDocument;
@@ -37,6 +41,8 @@ public class TestCopierTool extends AbstractTool {
   @Override
   protected void doRun() throws Exception {
 
+
+/*
     PortfolioSearchRequest portfolioSearchRequest = new PortfolioSearchRequest();
     portfolioSearchRequest.setName("Example Equity Portfolio*");
     Iterable<PortfolioContent> portfolioContentReader = new PortfolioContentMasterReader(
@@ -55,6 +61,7 @@ public class TestCopierTool extends AbstractTool {
     portfolioContentWriter.addOrUpdate(portfolioContentReader);
 
     portfolioContentWriter.flush();
+*/
 
 /*
     PortfolioDocument sourcePortfolioDocument = getToolContext().getPortfolioMaster().get(UniqueId.of("DbPrt", "122711"));
@@ -110,17 +117,21 @@ public class TestCopierTool extends AbstractTool {
     new Copier<ManageableSecurity>().copy(reader, writer);
 */
 
-/*
     // Works fine but does not export details
     ExchangeSearchRequest searchRequest = new ExchangeSearchRequest();
+    searchRequest.setName("Abu Dhabi Securities Exchange");
     Iterable<ManageableExchange> masterReader =
         new ExchangeMasterReader(getToolContext().getExchangeMaster(), searchRequest);
-    RowWriter<ManageableExchange> rowWriter =
-        new ExchangeRowWriter();
-    Writeable<ManageableExchange> sheetWriter =
-        new SheetWriter<ManageableExchange>(new CsvRawSheetWriter("test.csv", rowWriter.getColumns()), rowWriter);
-    new Copier<ManageableExchange>().copy(masterReader, sheetWriter);
-*/
+    Writeable<ManageableExchange> masterWriter =
+        new ExchangeMasterWriter(getToolContext().getExchangeMaster(), "<name> TEST");
+    masterWriter.addOrUpdate(masterReader);
+
+//    RowWriter<ManageableExchange> rowWriter =
+//        new ExchangeRowWriter();
+//    Writeable<ManageableExchange> sheetWriter =
+//        new SheetWriter<ManageableExchange>(new CsvRawSheetWriter("test.csv", rowWriter.getColumns()), rowWriter);
+//    new Copier<ManageableExchange>().copy(masterReader, sheetWriter);
+
 
 /*
     // Does not function correctly since details are omitted and beancompare detects details in existing exchanges
