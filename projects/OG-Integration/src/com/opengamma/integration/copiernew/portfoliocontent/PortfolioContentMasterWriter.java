@@ -46,7 +46,7 @@ public class PortfolioContentMasterWriter implements Writeable<PortfolioContent>
   /**
    * Creates a new PortfolioContentMasterWriter that persists portfolios and their contents to the portfolio master,
    * position master and a security writer (not necessarily backed by a security master), while renaming the
-   * portfolios according to the supplied nameTemplate
+   * portfolios according to the supplied nameTemplate (where <name> is replaced with the source portfolio name)
    * @param portfolioMaster
    * @param positionMaster
    * @param securityWriter    The security writer for adding/updating securities
