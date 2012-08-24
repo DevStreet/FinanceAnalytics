@@ -34,24 +34,34 @@ public class HolidayMasterWriter implements Writeable<ManageableHoliday> {
   public void addOrUpdate(ManageableHoliday holiday) {
     ArgumentChecker.notNull(holiday, "holiday");
 
+    // Clean unique id (should really be done in reader)
+    holiday.setUniqueId(null);
+
     HolidaySearchRequest searchReq = new HolidaySearchRequest();
-    ExternalIdSearch exchangeIdSearch = new ExternalIdSearch(holiday.getExchangeExternalId());  // match any one of the IDs
+    if (holiday.getExchangeExternalId() != null) {
+      searchReq.setExchangeExternalIdSearch(new ExternalIdSearch(holiday.getExchangeExternalId()));
+    }
+    if (holiday.getCurrency() != null) {
+      searchReq.setCurrency(holiday.getCurrency());
+    }
+    if (holiday.getType() != null) {
+      searchReq.setType(holiday.getType());
+    }
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
-    searchReq.setExchangeExternalIdSearch(exchangeIdSearch);
     searchReq.setSortOrder(HolidaySearchSortOrder.VERSION_FROM_INSTANT_DESC);
-    searchReq.setCurrency(holiday.getCurrency());
     ExternalIdSearch regionIdSearch = new ExternalIdSearch(holiday.getRegionExternalId());  // match any one of the IDs
     searchReq.setRegionExternalIdSearch(regionIdSearch);
     HolidaySearchResult searchResult = _holidayMaster.search(searchReq);
-    ManageableHoliday foundHoliday = searchResult.getFirstHoliday();
-    if (foundHoliday != null) {
+
+    if (searchResult.getDocuments().size() == 1) {
+      ManageableHoliday foundHoliday = searchResult.getFirstHoliday();
       List<BeanDifference<?>> differences;
       try {
         differences = _beanCompare.compare(foundHoliday, holiday);
       } catch (Exception e) {
         throw new OpenGammaRuntimeException("Error comparing holidays " + holiday, e);
       }
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
+      if (differences.size() == 0 || (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class)) {
         // It's already there, don't update or add it
       } else {
         HolidayDocument updateDoc = new HolidayDocument(holiday);
@@ -59,7 +69,7 @@ public class HolidayMasterWriter implements Writeable<ManageableHoliday> {
         HolidayDocument result = _holidayMaster.update(updateDoc);
       }
     } else {
-      // Not found, so add it
+      // Not found or ambiguous, so add it
       HolidayDocument addDoc = new HolidayDocument(holiday);
       HolidayDocument result = _holidayMaster.add(addDoc);
     }

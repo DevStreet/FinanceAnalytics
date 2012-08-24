@@ -21,13 +21,24 @@ import java.util.List;
 
 public class PortfolioMasterWriter implements Writeable<ManageablePortfolio> {
 
+  private static final String TEMPLATE_NAME = "<name>";
+
   PortfolioMaster _portfolioMaster;
   private BeanCompare _beanCompare;
+  String _nameTemplate;
 
   public PortfolioMasterWriter(PortfolioMaster portfolioMaster) {
+    this(portfolioMaster, null);
+  }
+
+  public PortfolioMasterWriter(PortfolioMaster portfolioMaster, String nameTemplate) {
     ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
     _portfolioMaster = portfolioMaster;
     _beanCompare = new BeanCompare();
+    _nameTemplate = nameTemplate;
+    if (_nameTemplate != null && !_nameTemplate.contains(TEMPLATE_NAME)) {
+      _nameTemplate += TEMPLATE_NAME;
+    }
   }
 
   @Override
@@ -36,13 +47,21 @@ public class PortfolioMasterWriter implements Writeable<ManageablePortfolio> {
       return;
     }
 
+    // Clear unique id (should really happen in reader)
+    portfolio.setUniqueId(null);
+
+    // Rename exchange as per supplied template
+    if (_nameTemplate != null) {
+      portfolio.setName(_nameTemplate.replace(TEMPLATE_NAME, portfolio.getName()));
+    }
+
     PortfolioSearchRequest searchReq = new PortfolioSearchRequest();
     searchReq.setName(portfolio.getName());
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
     searchReq.setSortOrder(PortfolioSearchSortOrder.VERSION_FROM_INSTANT_DESC);
     PortfolioSearchResult searchResult = _portfolioMaster.search(searchReq);
-    ManageablePortfolio foundPortfolio = searchResult.getFirstPortfolio();
-    if (foundPortfolio != null) {
+    if (searchResult.getDocuments().size() == 1) {
+      ManageablePortfolio foundPortfolio = searchResult.getFirstPortfolio();
       List<BeanDifference<?>> differences;
       try {
         differences = _beanCompare.compare(foundPortfolio, portfolio);

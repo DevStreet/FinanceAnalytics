@@ -44,16 +44,20 @@ public class ExchangeMasterWriter implements Writeable<ManageableExchange> {
     // Clear passed in unique id just in case (should really happen in reader)
     exchange.setUniqueId(null);
 
+    // Rename exchange as per supplied template
+    if (_nameTemplate != null) {
+      exchange.setName(_nameTemplate.replace(TEMPLATE_NAME, exchange.getName()));
+    }
+
     ExchangeSearchRequest searchReq = new ExchangeSearchRequest();
     ExternalIdSearch idSearch = new ExternalIdSearch(exchange.getExternalIdBundle());  // match any one of the IDs
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
-    searchReq.setName(_nameTemplate.replace(TEMPLATE_NAME, exchange.getName()));
+    searchReq.setName(exchange.getName());
     searchReq.setExternalIdSearch(idSearch);
     searchReq.setSortOrder(ExchangeSearchSortOrder.VERSION_FROM_INSTANT_DESC);
     ExchangeSearchResult searchResult = _exchangeMaster.search(searchReq);
-    ManageableExchange foundExchange = searchResult.getFirstExchange();
-    if (foundExchange != null) {
-
+    if (searchResult.getDocuments().size() == 1) {
+      ManageableExchange foundExchange = searchResult.getFirstExchange();
       List<BeanDifference<?>> differences;
       try {
         differences = _beanCompare.compare(foundExchange, exchange);

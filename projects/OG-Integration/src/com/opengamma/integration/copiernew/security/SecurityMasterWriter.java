@@ -2,6 +2,7 @@ package com.opengamma.integration.copiernew.security;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.id.ExternalIdSearch;
+import com.opengamma.id.ExternalIdSearchType;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.integration.copiernew.Writeable;
@@ -22,13 +23,24 @@ public class SecurityMasterWriter implements Writeable<ManageableSecurity> {
 
   private static final Logger s_logger = LoggerFactory.getLogger(Writeable.class);
 
+  private static final String TEMPLATE_NAME = "<name>";
+
   SecurityMaster _securityMaster;
   private BeanCompare _beanCompare;
+  String _nameTemplate;
 
   public SecurityMasterWriter(SecurityMaster securityMaster) {
+    this(securityMaster, null);
+  }
+
+  public SecurityMasterWriter(SecurityMaster securityMaster, String nameTemplate) {
     ArgumentChecker.notNull(securityMaster, "securityMaster");
     _securityMaster = securityMaster;
     _beanCompare = new BeanCompare();
+    _nameTemplate = nameTemplate;
+    if (_nameTemplate != null && !_nameTemplate.contains(TEMPLATE_NAME)) {
+      _nameTemplate += TEMPLATE_NAME;
+    }
   }
 
   @Override
@@ -37,10 +49,21 @@ public class SecurityMasterWriter implements Writeable<ManageableSecurity> {
       return;
     }
 
+    // Clear unique ID (should really be done in reader)
+    security.setUniqueId(null);
+
+    // Rename exchange as per supplied template
+    if (_nameTemplate != null) {
+      security.setName(_nameTemplate.replace(TEMPLATE_NAME, security.getName()));
+    }
+
     SecuritySearchRequest searchReq = new SecuritySearchRequest();
     ExternalIdSearch idSearch = new ExternalIdSearch(security.getExternalIdBundle());  // match any one of the IDs
-    searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
+    idSearch.setSearchType(ExternalIdSearchType.EXACT); // TODO should we match ALL external IDs?
     searchReq.setExternalIdSearch(idSearch);
+    searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
+    searchReq.setName(security.getName()); // TODO should we require a security name match or not?
+    searchReq.setSecurityType(security.getSecurityType());
     searchReq.setFullDetail(true);
     searchReq.setSortOrder(SecuritySearchSortOrder.VERSION_FROM_INSTANT_DESC);
     SecuritySearchResult searchResult = _securityMaster.search(searchReq);
