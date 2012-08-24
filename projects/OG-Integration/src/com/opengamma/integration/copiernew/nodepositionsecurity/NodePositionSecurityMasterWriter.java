@@ -23,6 +23,12 @@ import org.apache.commons.lang.ArrayUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * NodePositionSecurityMasterWriters persist the contents (node tree, positions and securities) of a single portfolio
+ * to a position master (access to a position master is needed to avoid recreating existing positions already in an
+ * earlier version of the same portfolio node), and a security writer (which may or may not be backed by a security
+ * master)
+ */
 public class NodePositionSecurityMasterWriter implements Writeable<NodePositionSecurity> {
 
   private Writeable<ManageableSecurity> _securityWriter;
@@ -32,6 +38,11 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
   private ManageablePortfolioNode _currentNode;
   private ManageablePortfolioNode _originalNode;
   private ManageablePortfolioNode _originalRoot;
+
+//  Old portfolio writer options to replicate:
+//  boolean overwrite               TO DO, possibly use separate delete tool/class?
+//  boolean mergePositions          TO DO in conjunction with following
+//  boolean keepCurrentPositions    can be made available by merging entries into non-empty newRoot?
 
   /**
    * Creates a new NodePositionSecurityMasterWriter which does not try to reuse existing positions, but always
@@ -131,6 +142,9 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
     // No action
   }
 
+
+  // Rather poor portfolio tree node navigation and creation methods
+
   private void setPath(String[] newPath) {
     ArgumentChecker.notNull(newPath, "newPath");
 
@@ -155,11 +169,6 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
         }
       }
       return null;
-//      if (startNode.getName().equals(path[0])) {
-//        return startNode;
-//      } else {
-//        return null;
-//      }
 
     // Recursive case, traverse all child nodes
     } else {

@@ -1,51 +1,59 @@
 package com.opengamma.integration.copiernew.portfoliocontent;
 
-import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.id.UniqueId;
-import com.opengamma.id.VersionCorrection;
-import com.opengamma.integration.copiernew.Copier;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
 import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterWriter;
-import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
 import com.opengamma.master.portfolio.PortfolioSearchResult;
-import com.opengamma.master.portfolio.PortfolioSearchSortOrder;
-import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.ManageableSecurity;
-import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.beancompare.BeanCompare;
-import com.opengamma.util.beancompare.BeanDifference;
-import com.opengamma.util.tuple.ObjectsPair;
-import com.opengamma.util.tuple.Triple;
 
-import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
-import java.nio.channels.WritableByteChannel;
-import java.util.List;
 
+/**
+ * PortfolioContentMasterWriters persist multiple portfolios and their contents to the portofolio and position
+ * masters and to a security writer (which might or might not be backed by a security master). It makes use of
+ * NodePositionSecurityMasterWriters to transfer the actual contents (node tree, positions and securities) of each
+ * portfolio.
+ */
 public class PortfolioContentMasterWriter implements Writeable<PortfolioContent> {
+
+  private static final String TEMPLATE_NAME = "<name>";
 
   private PortfolioMaster _portfolioMaster;
   private PositionMaster _positionMaster;
   private Writeable<ManageableSecurity> _securityWriter;
-  private BeanCompare _beanCompare;
-  private String _namePrefix;
+  private String _nameTemplate;
 
 
+  /**
+   * Creates a new PortfolioContentMasterWriter that persists portfolios and their contents to the portfolio master,
+   * position master and a security writer (not necessarily backed by a security master).
+   * @param portfolioMaster   The portfolio master (needed to look up existing portfolios and add/update)
+   * @param positionMaster    The position master (needed to look up existing positions and add/update)
+   * @param securityWriter    The security writer for adding/updating securities
+   */
   public PortfolioContentMasterWriter(PortfolioMaster portfolioMaster, PositionMaster positionMaster,
                                       Writeable<ManageableSecurity> securityWriter) {
     this(portfolioMaster, positionMaster, securityWriter, null);
   }
 
+  /**
+   * Creates a new PortfolioContentMasterWriter that persists portfolios and their contents to the portfolio master,
+   * position master and a security writer (not necessarily backed by a security master), while renaming the
+   * portfolios according to the supplied nameTemplate
+   * @param portfolioMaster
+   * @param positionMaster
+   * @param securityWriter    The security writer for adding/updating securities
+   * @param nameTemplate
+   */
   public PortfolioContentMasterWriter(PortfolioMaster portfolioMaster, PositionMaster positionMaster,
-                                      Writeable<ManageableSecurity> securityWriter, String namePrefix) {
+                                      Writeable<ManageableSecurity> securityWriter, String nameTemplate) {
     ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
     ArgumentChecker.notNull(positionMaster, "positionMaster");
     ArgumentChecker.notNull(securityWriter, "securityWriter");
@@ -53,8 +61,10 @@ public class PortfolioContentMasterWriter implements Writeable<PortfolioContent>
     _portfolioMaster = portfolioMaster;
     _positionMaster = positionMaster;
     _securityWriter = securityWriter;
-    _beanCompare = new BeanCompare();
-    _namePrefix = namePrefix;
+    _nameTemplate = nameTemplate;
+    if (_nameTemplate != null && !_nameTemplate.contains(TEMPLATE_NAME)) {
+      _nameTemplate += TEMPLATE_NAME;
+    }
   }
 
   @Override
@@ -65,8 +75,8 @@ public class PortfolioContentMasterWriter implements Writeable<PortfolioContent>
     Iterable<NodePositionSecurity> nodePositionSecurityReader = portfolioContent.getNodePositionSecurityReader();
     ManageablePortfolio portfolio = portfolioContent.getPortfolio();
 
-    if (_namePrefix != null) {
-      portfolio.setName(_namePrefix + portfolio.getName());
+    if (_nameTemplate != null) {
+      portfolio.setName(_nameTemplate.replace(TEMPLATE_NAME, portfolio.getName()));
     }
 
     ManageablePortfolioNode newRoot = new ManageablePortfolioNode();
