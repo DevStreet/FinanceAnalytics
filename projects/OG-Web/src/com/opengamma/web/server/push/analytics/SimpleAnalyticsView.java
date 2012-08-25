@@ -19,7 +19,11 @@ import com.opengamma.engine.view.compilation.CompiledViewDefinition;
 import com.opengamma.util.ArgumentChecker;
 
 /**
- *
+ * Default implementation of {@link AnalyticsView}. This class isn't meant to be thread safe. A thread calling any
+ * method that mutates the state must have an exclusive lock. The get methods can safely be called by multiple
+ * concurrent threads.
+ * @see LockingAnalyticsView
+ * @see com.opengamma.web.server.push.analytics Package concurrency notes
  */
 /* package */ class SimpleAnalyticsView implements AnalyticsView {
 
@@ -119,7 +123,7 @@ import com.opengamma.util.ArgumentChecker;
   public void openDependencyGraph(GridType gridType, String graphId, String gridId, int row, int col) {
     s_logger.debug("Opening dependency graph for cell ({}, {}) of the {} grid", new Object[]{row, col, gridType});
     getGrid(gridType).openDependencyGraph(graphId, gridId, row, col, _compiledViewDefinition);
-    _listener.gridStructureChanged(getGrid(gridType).getDependencyGraph(graphId).getGridId());
+    _listener.gridStructureChanged(getGrid(gridType).getGridId(graphId));
   }
 
   @Override
@@ -146,7 +150,7 @@ import com.opengamma.util.ArgumentChecker;
   public long updateViewport(GridType gridType, String graphId, String viewportId, ViewportSpecification viewportSpec) {
     s_logger.debug("Updating viewport for dependency graph {} of the {} grid using {}", new Object[]{graphId, gridType, viewportSpec});
     long version = getGrid(gridType).updateViewport(graphId, viewportId, viewportSpec);
-    _listener.gridDataChanged(getGrid(gridType).getViewport(viewportId).getDataId());
+    _listener.gridDataChanged(getGrid(gridType).getViewport(graphId, viewportId).getDataId());
     return version;
   }
 
