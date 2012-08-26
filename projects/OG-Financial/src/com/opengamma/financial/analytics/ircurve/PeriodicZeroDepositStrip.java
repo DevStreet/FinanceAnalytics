@@ -15,7 +15,7 @@ public class PeriodicZeroDepositStrip extends CurveStrip {
   private final int _periodsPerYear;
 
   public PeriodicZeroDepositStrip(final int periodsPerYear, final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.PERIODIC_ZERO_DEPOSIT, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.PERIODIC_ZERO_DEPOSIT, curveNodePointTime, configurationName);
     _periodsPerYear = periodsPerYear;
   }
 

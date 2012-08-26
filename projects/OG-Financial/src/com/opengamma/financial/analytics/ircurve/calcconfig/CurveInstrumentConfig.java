@@ -8,25 +8,25 @@ package com.opengamma.financial.analytics.ircurve.calcconfig;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
 import com.opengamma.util.ArgumentChecker;
 
 /**
  * 
  */
 public class CurveInstrumentConfig {
-  private final Map<StripInstrumentTypeDeprecated, String[]> _exposures;
+  private final Map<StripInstrumentType, String[]> _exposures;
 
-  public CurveInstrumentConfig(final Map<StripInstrumentTypeDeprecated, String[]> exposures) {
+  public CurveInstrumentConfig(final Map<StripInstrumentType, String[]> exposures) {
     ArgumentChecker.notNull(exposures, "exposures");
     _exposures = exposures;
   }
 
-  public Map<StripInstrumentTypeDeprecated, String[]> getExposures() {
+  public Map<StripInstrumentType, String[]> getExposures() {
     return _exposures;
   }
 
-  public String[] getExposuresForInstrument(final StripInstrumentTypeDeprecated instrumentType) {
+  public String[] getExposuresForInstrument(final StripInstrumentType instrumentType) {
     final String[] exposures = _exposures.get(instrumentType);
     if (exposures == null) {
       throw new IllegalArgumentException("Could not get exposures for " + instrumentType);
@@ -57,7 +57,7 @@ public class CurveInstrumentConfig {
     if (_exposures.size() != other._exposures.size()) {
       return false;
     }
-    for (final Map.Entry<StripInstrumentTypeDeprecated, String[]> entry : _exposures.entrySet()) {
+    for (final Map.Entry<StripInstrumentType, String[]> entry : _exposures.entrySet()) {
       if (!other._exposures.containsKey(entry.getKey())) {
         return false;
       }

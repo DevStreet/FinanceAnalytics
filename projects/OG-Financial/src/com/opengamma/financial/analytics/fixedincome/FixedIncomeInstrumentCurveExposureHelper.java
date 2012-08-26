@@ -6,7 +6,7 @@
 package com.opengamma.financial.analytics.fixedincome;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
 import com.opengamma.financial.convention.frequency.Frequency;
 import com.opengamma.financial.security.FinancialSecurity;
 
@@ -26,7 +26,7 @@ public final class FixedIncomeInstrumentCurveExposureHelper {
    * @return An array containing the order of the curve names for the type
    */
   @Deprecated
-  public static String[] getCurveNamesForFundingCurveInstrument(final StripInstrumentTypeDeprecated type, final String fundingCurveName, final String forwardCurveName) {
+  public static String[] getCurveNamesForFundingCurveInstrument(final StripInstrumentType type, final String fundingCurveName, final String forwardCurveName) {
     switch (type) {
       case SWAP_3M:
         return new String[] {fundingCurveName, forwardCurveName };
@@ -71,7 +71,7 @@ public final class FixedIncomeInstrumentCurveExposureHelper {
    * @return An array containing the order of the curve names for the type
    */
   @Deprecated
-  public static String[] getCurveNamesForForwardCurveInstrument(final StripInstrumentTypeDeprecated type, final String fundingCurveName, final String forwardCurveName) {
+  public static String[] getCurveNamesForForwardCurveInstrument(final StripInstrumentType type, final String fundingCurveName, final String forwardCurveName) {
     switch (type) {
       case SWAP_3M:
         return new String[] {fundingCurveName, forwardCurveName };

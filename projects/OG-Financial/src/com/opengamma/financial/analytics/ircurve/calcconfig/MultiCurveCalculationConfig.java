@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
 import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.util.ArgumentChecker;
 
@@ -75,7 +75,7 @@ public class MultiCurveCalculationConfig {
     return _curveExposuresForInstruments;
   }
 
-  public String[] getCurveExposureForInstrument(final String yieldCurveName, final StripInstrumentTypeDeprecated instrumentType) {
+  public String[] getCurveExposureForInstrument(final String yieldCurveName, final StripInstrumentType instrumentType) {
     if (_curveExposuresForInstruments.containsKey(yieldCurveName)) {
       return _curveExposuresForInstruments.get(yieldCurveName).getExposuresForInstrument(instrumentType);
     }

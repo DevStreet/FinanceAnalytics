@@ -21,7 +21,7 @@ public class BasisSwapStrip extends CurveStrip {
 
   public BasisSwapStrip(final Tenor payTenor, final RateType payIndexType, final Tenor receiveTenor, final RateType receiveIndexType,
       final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.BASIS_SWAP, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.BASIS_SWAP, curveNodePointTime, configurationName);
     _payTenor = payTenor;
     _payIndexType = payIndexType;
     _receiveTenor = receiveTenor;

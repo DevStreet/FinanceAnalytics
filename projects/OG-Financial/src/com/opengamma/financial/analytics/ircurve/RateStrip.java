@@ -14,7 +14,7 @@ public class RateStrip extends CurveStrip {
   private static final long serialVersionUID = 1L;
 
   public RateStrip(final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.RATE, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.RATE, curveNodePointTime, configurationName);
   }
 
   @Override

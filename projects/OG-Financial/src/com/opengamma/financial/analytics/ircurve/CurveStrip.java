@@ -17,11 +17,11 @@ import com.opengamma.util.time.Tenor;
  */
 public abstract class CurveStrip implements Serializable, Comparable<CurveStrip> {
   private static final long serialVersionUID = 1L;
-  private final StripInstrumentType _instrumentType;
+  private final NewStripInstrumentType _instrumentType;
   private final Tenor _curveNodePointTime;
   private final String _configurationName;
 
-  public CurveStrip(final StripInstrumentType instrumentType, final Tenor curveNodePointTime, final String configurationName) {
+  public CurveStrip(final NewStripInstrumentType instrumentType, final Tenor curveNodePointTime, final String configurationName) {
     ArgumentChecker.notNull(instrumentType, "instrument type");
     ArgumentChecker.notNull(curveNodePointTime, "curve node point time");
     ArgumentChecker.notNull(configurationName, "configuration name");
@@ -35,7 +35,7 @@ public abstract class CurveStrip implements Serializable, Comparable<CurveStrip>
    * 
    * @return the instrument type, not null
    */
-  public StripInstrumentType getInstrumentType() {
+  public NewStripInstrumentType getInstrumentType() {
     return _instrumentType;
   }
 

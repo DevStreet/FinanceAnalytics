@@ -5,12 +5,12 @@
  */
 package com.opengamma.financial.analytics.ircurve;
 
-import static com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated.CIBOR;
-import static com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated.EURIBOR;
-import static com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated.LIBOR;
-import static com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated.STIBOR;
-import static com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated.SWAP_3M;
-import static com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated.SWAP_6M;
+import static com.opengamma.financial.analytics.ircurve.StripInstrumentType.CIBOR;
+import static com.opengamma.financial.analytics.ircurve.StripInstrumentType.EURIBOR;
+import static com.opengamma.financial.analytics.ircurve.StripInstrumentType.LIBOR;
+import static com.opengamma.financial.analytics.ircurve.StripInstrumentType.STIBOR;
+import static com.opengamma.financial.analytics.ircurve.StripInstrumentType.SWAP_3M;
+import static com.opengamma.financial.analytics.ircurve.StripInstrumentType.SWAP_6M;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,10 +44,10 @@ public class SecondaryCurveDefinitionAndSpecifications {
       if (depositTenor.getPeriod().equals(Period.ofDays(30))) {
         throw new OpenGammaRuntimeException("This shouldn't happen!");
       }
-      strips.add(new FixedIncomeStrip(StripInstrumentTypeDeprecated.CASH, depositTenor, SPEC_NAME));
+      strips.add(new FixedIncomeStrip(StripInstrumentType.CASH, depositTenor, SPEC_NAME));
     }
     for (final Tenor tenorSwapTenor : tenorSwaps) {
-      strips.add(new FixedIncomeStrip(StripInstrumentTypeDeprecated.TENOR_SWAP, tenorSwapTenor, SPEC_NAME));
+      strips.add(new FixedIncomeStrip(StripInstrumentType.TENOR_SWAP, tenorSwapTenor, SPEC_NAME));
     }
     final String leftExtrapolatorName = Interpolator1DFactory.LINEAR_EXTRAPOLATOR;
     final String rightExtrapolatorName = Interpolator1DFactory.LINEAR_EXTRAPOLATOR;
@@ -57,14 +57,14 @@ public class SecondaryCurveDefinitionAndSpecifications {
   }
 
   public static YieldCurveDefinition buildForwardCurve(final Currency ccy, final ExternalId region, final Tenor[] liborStrips, final Tenor futureStartTenor, final int numQuarterlyFutures,
-      final Tenor[] swaps, final StripInstrumentTypeDeprecated iborType, final StripInstrumentTypeDeprecated swapType) {
+      final Tenor[] swaps, final StripInstrumentType iborType, final StripInstrumentType swapType) {
     final Collection<FixedIncomeStrip> strips = new ArrayList<FixedIncomeStrip>();
     for (final Tenor liborTenor : liborStrips) {
       strips.add(new FixedIncomeStrip(iborType, liborTenor, SPEC_NAME));
     }
     if (futureStartTenor != null) {
       for (int i = 1; i <= numQuarterlyFutures; i++) {
-        strips.add(new FixedIncomeStrip(StripInstrumentTypeDeprecated.FUTURE, futureStartTenor, i, SPEC_NAME));
+        strips.add(new FixedIncomeStrip(StripInstrumentType.FUTURE, futureStartTenor, i, SPEC_NAME));
       }
     }
     for (final Tenor swapTenor : swaps) {
@@ -78,14 +78,14 @@ public class SecondaryCurveDefinitionAndSpecifications {
   }
 
   public static YieldCurveDefinition buildSecondaryCurve(final Currency ccy, final ExternalId region, final Tenor[] liborStrips, final Tenor futureStartTenor, final int numQuarterlyFutures,
-      final Tenor[] swaps, final StripInstrumentTypeDeprecated iborType, final StripInstrumentTypeDeprecated swapType) {
+      final Tenor[] swaps, final StripInstrumentType iborType, final StripInstrumentType swapType) {
     final Collection<FixedIncomeStrip> strips = new ArrayList<FixedIncomeStrip>();
     for (final Tenor liborTenor : liborStrips) {
-      strips.add(new FixedIncomeStrip(StripInstrumentTypeDeprecated.CASH, liborTenor, SPEC_NAME));
+      strips.add(new FixedIncomeStrip(StripInstrumentType.CASH, liborTenor, SPEC_NAME));
     }
     if (futureStartTenor != null) {
       for (int i = 1; i <= numQuarterlyFutures; i++) {
-        strips.add(new FixedIncomeStrip(StripInstrumentTypeDeprecated.FUTURE, futureStartTenor, i, SPEC_NAME));
+        strips.add(new FixedIncomeStrip(StripInstrumentType.FUTURE, futureStartTenor, i, SPEC_NAME));
       }
     }
     for (final Tenor tenorSwapTenor : swaps) {
@@ -219,20 +219,20 @@ public class SecondaryCurveDefinitionAndSpecifications {
       Tenor.ofYears(20), Tenor.ofYears(25), Tenor.ofYears(30), Tenor.ofYears(40), Tenor.ofYears(50), Tenor.ofYears(80)};
 
     for (final Tenor tenor : tenors) {
-      cashInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.CASH, scheme));
-      fra3MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.FRA_3M, scheme));
-      fra6MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.FRA_6M, scheme));
-      liborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.LIBOR, scheme));
-      euriborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.EURIBOR, scheme));
-      cdorInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.CDOR, scheme));
-      ciborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.CIBOR, scheme));
-      stiborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.STIBOR, scheme));
-      futureInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.FUTURE, scheme));
-      tenorSwapInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.TENOR_SWAP, scheme));
-      swap3MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.SWAP_3M, scheme));
-      swap6MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.SWAP_6M, scheme));
-      basisSwapInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.BASIS_SWAP, scheme));
-      oisSwapInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentTypeDeprecated.OIS_SWAP, scheme));
+      cashInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.CASH, scheme));
+      fra3MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.FRA_3M, scheme));
+      fra6MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.FRA_6M, scheme));
+      liborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.LIBOR, scheme));
+      euriborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.EURIBOR, scheme));
+      cdorInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.CDOR, scheme));
+      ciborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.CIBOR, scheme));
+      stiborInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.STIBOR, scheme));
+      futureInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.FUTURE, scheme));
+      tenorSwapInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.TENOR_SWAP, scheme));
+      swap3MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.SWAP_3M, scheme));
+      swap6MInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.SWAP_6M, scheme));
+      basisSwapInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.BASIS_SWAP, scheme));
+      oisSwapInstrumentProviders.put(tenor, new SyntheticIdentifierCurveInstrumentProvider(ccy, StripInstrumentType.OIS_SWAP, scheme));
     }
     final CurveSpecificationBuilderConfiguration config = new CurveSpecificationBuilderConfiguration(cashInstrumentProviders, fra3MInstrumentProviders, fra6MInstrumentProviders,
         liborInstrumentProviders, euriborInstrumentProviders, cdorInstrumentProviders, ciborInstrumentProviders, stiborInstrumentProviders, futureInstrumentProviders, swap6MInstrumentProviders,

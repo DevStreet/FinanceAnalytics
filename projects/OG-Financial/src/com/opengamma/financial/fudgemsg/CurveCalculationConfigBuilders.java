@@ -21,7 +21,7 @@ import org.fudgemsg.mapping.FudgeDeserializer;
 import org.fudgemsg.mapping.FudgeSerializer;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
 import com.opengamma.financial.analytics.ircurve.calcconfig.CurveInstrumentConfig;
 import com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfig;
 import com.opengamma.id.UniqueIdentifiable;
@@ -136,7 +136,7 @@ import com.opengamma.id.UniqueIdentifiable;
     @Override
     public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final CurveInstrumentConfig object) {
       final MutableFudgeMsg message = serializer.newMessage();
-      for (final Map.Entry<StripInstrumentTypeDeprecated, String[]> entry : object.getExposures().entrySet()) {
+      for (final Map.Entry<StripInstrumentType, String[]> entry : object.getExposures().entrySet()) {
         message.add(STRIP_INSTRUMENT_FIELD, entry.getKey().name());
         final MutableFudgeMsg perInstrumentMessage = serializer.newMessage();
         for (final String curveName : entry.getValue()) {
@@ -154,7 +154,7 @@ import com.opengamma.id.UniqueIdentifiable;
       if (stripInstrumentTypeFields.size() != curveExposureNameFields.size()) {
         throw new OpenGammaRuntimeException("Should never happen");
       }
-      final Map<StripInstrumentTypeDeprecated, String[]> exposures = new HashMap<StripInstrumentTypeDeprecated, String[]>();
+      final Map<StripInstrumentType, String[]> exposures = new HashMap<StripInstrumentType, String[]>();
       for (int i = 0; i < stripInstrumentTypeFields.size(); i++) {
         final String stripName = deserializer.fieldValueToObject(String.class, stripInstrumentTypeFields.get(i));
         final List<FudgeField> namesField = ((FudgeMsg) curveExposureNameFields.get(i).getValue()).getAllByName(PER_INSTRUMENT_FIELD_NAME);
@@ -163,7 +163,7 @@ import com.opengamma.id.UniqueIdentifiable;
         for (final FudgeField field : namesField) {
           curveNames[j++] = deserializer.fieldValueToObject(String.class, field);
         }
-        exposures.put(StripInstrumentTypeDeprecated.valueOf(stripName), curveNames);
+        exposures.put(StripInstrumentType.valueOf(stripName), curveNames);
       }
       return new CurveInstrumentConfig(exposures);
     }

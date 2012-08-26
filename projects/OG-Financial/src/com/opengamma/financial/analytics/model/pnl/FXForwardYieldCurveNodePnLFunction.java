@@ -49,7 +49,7 @@ import com.opengamma.financial.OpenGammaExecutionContext;
 import com.opengamma.financial.analytics.DoubleLabelledMatrix1D;
 import com.opengamma.financial.analytics.ircurve.FixedIncomeStripWithSecurity;
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationWithSecurities;
-import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
 import com.opengamma.financial.analytics.ircurve.calcconfig.ConfigDBCurveCalculationConfigSource;
 import com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfig;
 import com.opengamma.financial.analytics.model.curve.interestrate.FXImpliedYieldCurveFunction;
@@ -347,7 +347,7 @@ public class FXForwardYieldCurveNodePnLFunction extends AbstractFunction.NonComp
     final List<Object> labelsList = Arrays.asList(labels);
     final double[] values = curveSensitivities.getValues();
     final Set<FixedIncomeStripWithSecurity> strips = spec.getStrips();
-    final List<StripInstrumentTypeDeprecated> stripList = new ArrayList<StripInstrumentTypeDeprecated>(n);
+    final List<StripInstrumentType> stripList = new ArrayList<StripInstrumentType>(n);
     for (final FixedIncomeStripWithSecurity strip : strips) {
       final int index = labelsList.indexOf(strip.getSecurityIdentifier());
       if (index < 0) {
@@ -358,7 +358,7 @@ public class FXForwardYieldCurveNodePnLFunction extends AbstractFunction.NonComp
     for (int i = 0; i < n; i++) {
       final ExternalId id = (ExternalId) labels[i];
       double sensitivity = values[i];
-      if (stripList.get(i) == StripInstrumentTypeDeprecated.FUTURE) {
+      if (stripList.get(i) == StripInstrumentType.FUTURE) {
         // TODO Temporary fix as sensitivity is to rate, but historical time series is to price (= 1 - rate)
         sensitivity *= -1;
       }

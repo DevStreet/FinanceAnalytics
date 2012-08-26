@@ -19,7 +19,7 @@ public class FXForwardStrip extends CurveStrip {
   private final Currency _receiveCurrency;
 
   public FXForwardStrip(final Currency payCurrency, final Currency receiveCurrency, final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.FX_FORWARD, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.FX_FORWARD, curveNodePointTime, configurationName);
     _payCurrency = payCurrency;
     _receiveCurrency = receiveCurrency;
   }

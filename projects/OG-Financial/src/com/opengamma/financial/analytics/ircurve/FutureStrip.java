@@ -21,7 +21,7 @@ public class FutureStrip extends CurveStrip {
 
   public FutureStrip(final InterestRateFutureType futureType, final int nthFutureFromTenor, final Tenor futureTenor, final Tenor rateTenor, final Tenor curveNodePointTime,
       final String configurationName) {
-    super(StripInstrumentType.FUTURE, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.FUTURE, curveNodePointTime, configurationName);
     _futureType = futureType;
     _nthFutureFromTenor = nthFutureFromTenor;
     _futureTenor = futureTenor;

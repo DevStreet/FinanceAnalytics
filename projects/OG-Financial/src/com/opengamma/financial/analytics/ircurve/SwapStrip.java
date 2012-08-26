@@ -19,7 +19,7 @@ public class SwapStrip extends CurveStrip {
   private final RateType _floatingIndexType;
 
   public SwapStrip(final Tenor resetTenor, final RateType floatingIndexType, final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.SWAP, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.SWAP, curveNodePointTime, configurationName);
     ArgumentChecker.notNull(resetTenor, "reset tenor");
     ArgumentChecker.notNull(floatingIndexType, "floating index type");
     _resetTenor = resetTenor;

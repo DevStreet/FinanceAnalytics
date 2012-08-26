@@ -179,7 +179,7 @@ public class InterpolatedYieldAndDiscountCurveFunction extends AbstractFunction 
         boolean isFirst = true;
         for (final FixedIncomeStripWithSecurity strip : specWithSecurities.getStrips()) {
           Double price = marketDataMap.get(strip.getSecurityIdentifier());
-          if (strip.getInstrumentType() == StripInstrumentTypeDeprecated.FUTURE) {
+          if (strip.getInstrumentType() == StripInstrumentType.FUTURE) {
             price = 100d - price;
           }
           price /= 100d;

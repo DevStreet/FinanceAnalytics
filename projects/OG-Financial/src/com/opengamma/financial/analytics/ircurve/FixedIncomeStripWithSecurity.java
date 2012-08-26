@@ -38,7 +38,7 @@ public class FixedIncomeStripWithSecurity implements Comparable<FixedIncomeStrip
    * Gets the instrumentType field.
    * @return the instrumentType
    */
-  public StripInstrumentTypeDeprecated getInstrumentType() {
+  public StripInstrumentType getInstrumentType() {
     return _originalStrip.getInstrumentType();
   }
 

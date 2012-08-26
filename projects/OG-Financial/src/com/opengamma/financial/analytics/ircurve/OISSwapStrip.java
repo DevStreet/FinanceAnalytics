@@ -14,7 +14,7 @@ public class OISSwapStrip extends CurveStrip {
   private static final long serialVersionUID = 1L;
 
   public OISSwapStrip(final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.OIS_SWAP, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.OIS_SWAP, curveNodePointTime, configurationName);
   }
 
   @Override

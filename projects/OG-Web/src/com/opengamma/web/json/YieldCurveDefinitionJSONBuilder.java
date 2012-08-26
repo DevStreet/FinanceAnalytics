@@ -7,7 +7,7 @@ package com.opengamma.web.json;
 
 import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.analytics.ircurve.FixedIncomeStrip;
-import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
 import com.opengamma.financial.analytics.ircurve.YieldCurveDefinition;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.i18n.Country;
@@ -52,7 +52,7 @@ public final class YieldCurveDefinitionJSONBuilder extends AbstractJSONBuilder<Y
 
   private static YieldCurveDefinition getDummyYieldCurveDefinition() {
     YieldCurveDefinition dummy = new YieldCurveDefinition(Currency.GBP, ExternalSchemes.countryRegionId(Country.US), "", "", "", "", true);
-    dummy.addStrip(new FixedIncomeStrip(StripInstrumentTypeDeprecated.LIBOR, Tenor.DAY, ""));
+    dummy.addStrip(new FixedIncomeStrip(StripInstrumentType.LIBOR, Tenor.DAY, ""));
     return dummy;
   }
 

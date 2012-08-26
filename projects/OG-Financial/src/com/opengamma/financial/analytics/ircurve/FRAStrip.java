@@ -19,7 +19,7 @@ public class FRAStrip extends CurveStrip {
   private final RateType _floatingIndexType;
 
   public FRAStrip(final Tenor resetTenor, final RateType floatingIndexType, final Tenor curveNodePointTime, final String configurationName) {
-    super(StripInstrumentType.FRA, curveNodePointTime, configurationName);
+    super(NewStripInstrumentType.FRA, curveNodePointTime, configurationName);
     ArgumentChecker.notNull(resetTenor, "reset tenor");
     ArgumentChecker.notNull(floatingIndexType, "floating index type");
     _resetTenor = resetTenor;
