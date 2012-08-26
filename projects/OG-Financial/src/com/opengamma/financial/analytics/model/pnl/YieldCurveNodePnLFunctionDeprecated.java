@@ -44,7 +44,7 @@ import com.opengamma.financial.analytics.DoubleLabelledMatrix1D;
 import com.opengamma.financial.analytics.fixedincome.InterestRateInstrumentType;
 import com.opengamma.financial.analytics.ircurve.FixedIncomeStripWithSecurity;
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationWithSecurities;
-import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
 import com.opengamma.financial.analytics.ircurve.YieldCurveFunction;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
@@ -235,7 +235,7 @@ public class YieldCurveNodePnLFunctionDeprecated extends AbstractFunction.NonCom
     final List<Object> labelsList = Arrays.asList(labels);
     final double[] values = curveSensitivities.getValues();
     final Set<FixedIncomeStripWithSecurity> strips = spec.getStrips();
-    final List<StripInstrumentType> stripList = new ArrayList<StripInstrumentType>(n);
+    final List<StripInstrumentTypeDeprecated> stripList = new ArrayList<StripInstrumentTypeDeprecated>(n);
     for (final FixedIncomeStripWithSecurity strip : strips) {
       final int index = labelsList.indexOf(strip.getSecurityIdentifier());
       if (index < 0) {
@@ -249,7 +249,7 @@ public class YieldCurveNodePnLFunctionDeprecated extends AbstractFunction.NonCom
         throw new OpenGammaRuntimeException("Yield curve node sensitivity label was not an external id; should never happen");
       }
       double sensitivity = values[i];
-      if (stripList.get(i) == StripInstrumentType.FUTURE) {
+      if (stripList.get(i) == StripInstrumentTypeDeprecated.FUTURE) {
         // TODO Temporary fix as sensitivity is to rate, but historical time series is to price (= 1 - rate)
         sensitivity *= -1;
       }

@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import org.testng.annotations.Test;
 import org.testng.internal.junit.ArrayAsserts;
 
-import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
 import com.opengamma.financial.fudgemsg.FinancialTestBase;
 import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.util.money.Currency;
@@ -45,7 +45,7 @@ public class MultiCurveCalculationConfigTest extends FinancialTestBase {
     EXOGENOUS_CURVES = new LinkedHashMap<String, String[]>();
     EXOGENOUS_CURVES.put(DEFAULT_USD_CONFIG_NAME, new String[] {"FUNDING" });
     CURVE_EXPOSURES = new LinkedHashMap<String, CurveInstrumentConfig>();
-    CURVE_EXPOSURES.put("FUNDING", new CurveInstrumentConfig(Collections.singletonMap(StripInstrumentType.CASH, new String[] {"FUNDING" })));
+    CURVE_EXPOSURES.put("FUNDING", new CurveInstrumentConfig(Collections.singletonMap(StripInstrumentTypeDeprecated.CASH, new String[] {"FUNDING" })));
     DEFAULT_USD_CONFIG = new MultiCurveCalculationConfig(DEFAULT_USD_CONFIG_NAME, DEFAULT_USD_YIELD_CURVE_NAMES, DEFAULT_USD_ID,
         DEFAULT_USD_CALCULATION_METHOD, CURVE_EXPOSURES);
     EXTRA_USD_CONFIG = new MultiCurveCalculationConfig(EXTRA_USD_CONFIG_NAME, EXTRA_USD_YIELD_CURVE_NAMES, EXTRA_USD_ID, EXTRA_USD_CALCULATION_METHOD,

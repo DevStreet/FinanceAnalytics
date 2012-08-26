@@ -31,7 +31,7 @@ public class FixedIncomeStripWithIdentifier implements Comparable<FixedIncomeStr
    * Gets the strip instrument type.
    * @return the strip instrument type
    */
-  public StripInstrumentType getInstrumentType() {
+  public StripInstrumentTypeDeprecated getInstrumentType() {
     return _strip.getInstrumentType();
   }
 

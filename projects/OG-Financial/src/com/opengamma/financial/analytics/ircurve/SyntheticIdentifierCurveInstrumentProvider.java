@@ -19,11 +19,11 @@ import com.opengamma.util.time.Tenor;
  */
 public class SyntheticIdentifierCurveInstrumentProvider implements CurveInstrumentProvider {
   private final Currency _ccy;
-  private final StripInstrumentType _type;
-  private StripInstrumentType _idType;
+  private final StripInstrumentTypeDeprecated _type;
+  private StripInstrumentTypeDeprecated _idType;
   private final ExternalScheme _scheme;
 
-  public SyntheticIdentifierCurveInstrumentProvider(final Currency ccy, final StripInstrumentType type, final ExternalScheme scheme) {
+  public SyntheticIdentifierCurveInstrumentProvider(final Currency ccy, final StripInstrumentTypeDeprecated type, final ExternalScheme scheme) {
     Validate.notNull(ccy, "currency");
     Validate.notNull(type, "instrument type");
     Validate.notNull(scheme, "generated identifier scheme");
@@ -35,11 +35,11 @@ public class SyntheticIdentifierCurveInstrumentProvider implements CurveInstrume
       case SWAP_3M:
       case SWAP_6M:
       case SWAP_12M:
-        _idType = StripInstrumentType.SWAP;
+        _idType = StripInstrumentTypeDeprecated.SWAP;
         break;
       case FRA_3M:
       case FRA_6M:
-        _idType = StripInstrumentType.FRA;
+        _idType = StripInstrumentTypeDeprecated.FRA;
         break;
       default:
         _idType = type;
@@ -78,7 +78,7 @@ public class SyntheticIdentifierCurveInstrumentProvider implements CurveInstrume
     return _ccy;
   }
 
-  public StripInstrumentType getType() {
+  public StripInstrumentTypeDeprecated getType() {
     return _type;
   }
 

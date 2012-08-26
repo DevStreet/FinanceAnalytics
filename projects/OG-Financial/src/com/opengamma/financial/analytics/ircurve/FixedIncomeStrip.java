@@ -27,7 +27,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
 
   private static final long serialVersionUID = 1L;
 
-  private final StripInstrumentType _instrumentType;
+  private final StripInstrumentTypeDeprecated _instrumentType;
   private final Tenor _curveNodePointTime;
   private final String _conventionName;
   private final int _nthFutureFromTenor;
@@ -46,11 +46,11 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @param curveNodePointTime  the time of the curve node point
    * @param conventionName  the name of the yield curve specification builder configuration
    */
-  public FixedIncomeStrip(final StripInstrumentType instrumentType, final Tenor curveNodePointTime, final String conventionName) {
+  public FixedIncomeStrip(final StripInstrumentTypeDeprecated instrumentType, final Tenor curveNodePointTime, final String conventionName) {
     ArgumentChecker.notNull(instrumentType, "InstrumentType");
-    ArgumentChecker.isTrue(instrumentType != StripInstrumentType.FUTURE, "Cannot handle futures in this constructor");
-    ArgumentChecker.isTrue(instrumentType != StripInstrumentType.PERIODIC_ZERO_DEPOSIT, "Cannot handle periodic zero deposits in this constructor");
-    ArgumentChecker.isTrue(instrumentType != StripInstrumentType.BASIS_SWAP, "Cannot handle basis swaps in this constructor");
+    ArgumentChecker.isTrue(instrumentType != StripInstrumentTypeDeprecated.FUTURE, "Cannot handle futures in this constructor");
+    ArgumentChecker.isTrue(instrumentType != StripInstrumentTypeDeprecated.PERIODIC_ZERO_DEPOSIT, "Cannot handle periodic zero deposits in this constructor");
+    ArgumentChecker.isTrue(instrumentType != StripInstrumentTypeDeprecated.BASIS_SWAP, "Cannot handle basis swaps in this constructor");
     ArgumentChecker.notNull(curveNodePointTime, "Tenor");
     ArgumentChecker.notNull(conventionName, "ConventionName");
     _instrumentType = instrumentType;
@@ -75,8 +75,8 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @param nthFutureFromTenor  how many futures to step through from the curveDate + the tenor. 1-based, must be >0.
    *   e.g. 3 (tenor = 1YR) => 3rd quarterly future after curveDate +  1YR.
    */
-  public FixedIncomeStrip(final StripInstrumentType instrumentType, final Tenor curveNodePointTime, final int nthFutureFromTenor, final String conventionName) {
-    ArgumentChecker.isTrue(instrumentType == StripInstrumentType.FUTURE, "Strip type for this constructor must be a future");
+  public FixedIncomeStrip(final StripInstrumentTypeDeprecated instrumentType, final Tenor curveNodePointTime, final int nthFutureFromTenor, final String conventionName) {
+    ArgumentChecker.isTrue(instrumentType == StripInstrumentTypeDeprecated.FUTURE, "Strip type for this constructor must be a future");
     ArgumentChecker.notNull(curveNodePointTime, "Tenor");
     ArgumentChecker.isTrue(nthFutureFromTenor > 0, "Number of future must be greater than zero");
     ArgumentChecker.notNull(conventionName, "ConventionName");
@@ -101,9 +101,9 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @param isPeriodicZeroDepositStrip Is this instrument a periodic zero deposit strip
    * @param conventionName The name of the convention to use to resolve the strip into a security
    */
-  public FixedIncomeStrip(final StripInstrumentType instrumentType, final Tenor curveNodePointTime, final int periodsPerYear, final boolean isPeriodicZeroDepositStrip,
+  public FixedIncomeStrip(final StripInstrumentTypeDeprecated instrumentType, final Tenor curveNodePointTime, final int periodsPerYear, final boolean isPeriodicZeroDepositStrip,
       final String conventionName) {
-    ArgumentChecker.isTrue(instrumentType == StripInstrumentType.PERIODIC_ZERO_DEPOSIT, "Strip type for this constructor must be a periodic zero deposit");
+    ArgumentChecker.isTrue(instrumentType == StripInstrumentTypeDeprecated.PERIODIC_ZERO_DEPOSIT, "Strip type for this constructor must be a periodic zero deposit");
     ArgumentChecker.isTrue(isPeriodicZeroDepositStrip, "Must have flag indicating periodic zero deposit set to true");
     ArgumentChecker.notNull(curveNodePointTime, "Tenor");
     ArgumentChecker.isTrue(periodsPerYear > 0, "Number of periods per year must be greater than zero");
@@ -131,9 +131,9 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @param receiveIndexType The receive index type
    * @param conventionName The name of the convention to use to resolve the strip into a security
    */
-  public FixedIncomeStrip(final StripInstrumentType instrumentType, final Tenor curveNodePointTime, final Tenor payTenor, final Tenor receiveTenor,
+  public FixedIncomeStrip(final StripInstrumentTypeDeprecated instrumentType, final Tenor curveNodePointTime, final Tenor payTenor, final Tenor receiveTenor,
       final IndexType payIndexType, final IndexType receiveIndexType, final String conventionName) {
-    ArgumentChecker.isTrue(instrumentType == StripInstrumentType.BASIS_SWAP, "Strip type for this constructor must be a basis swap");
+    ArgumentChecker.isTrue(instrumentType == StripInstrumentTypeDeprecated.BASIS_SWAP, "Strip type for this constructor must be a basis swap");
     ArgumentChecker.notNull(curveNodePointTime, "curve node tenor");
     ArgumentChecker.notNull(payTenor, "pay tenor");
     ArgumentChecker.notNull(receiveTenor, "receive tenor");
@@ -159,9 +159,9 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @param indexType The index type
    * @param conventionName The name of the convention to use to resolve the strip into a security
    */
-  public FixedIncomeStrip(final StripInstrumentType instrumentType, final Tenor curveNodePointTime, final Tenor resetTenor,
+  public FixedIncomeStrip(final StripInstrumentTypeDeprecated instrumentType, final Tenor curveNodePointTime, final Tenor resetTenor,
       final IndexType indexType, final String conventionName) {
-    ArgumentChecker.isTrue(instrumentType == StripInstrumentType.SWAP || instrumentType == StripInstrumentType.OIS_SWAP, "Strip type for this constructor must be a swap or OIS");
+    ArgumentChecker.isTrue(instrumentType == StripInstrumentTypeDeprecated.SWAP || instrumentType == StripInstrumentTypeDeprecated.OIS_SWAP, "Strip type for this constructor must be a swap or OIS");
     ArgumentChecker.notNull(curveNodePointTime, "curve node tenor");
     ArgumentChecker.notNull(resetTenor, "reset tenor");
     ArgumentChecker.notNull(conventionName, "convention name");
@@ -184,7 +184,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * 
    * @return the instrument type, not null
    */
-  public StripInstrumentType getInstrumentType() {
+  public StripInstrumentTypeDeprecated getInstrumentType() {
     return _instrumentType;
   }
 
@@ -205,7 +205,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @throws IllegalStateException if called on a non-future strip
    */
   public int getNumberOfFuturesAfterTenor() {
-    if (_instrumentType != StripInstrumentType.FUTURE) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.FUTURE) {
       throw new IllegalStateException("Cannot get number of futures after tenor for a non-future strip " + toString());
     }
     return _nthFutureFromTenor;
@@ -218,7 +218,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @throws IllegalStateException if called on a non-periodic zero deposit strip
    */
   public int getPeriodsPerYear() {
-    if (_instrumentType != StripInstrumentType.PERIODIC_ZERO_DEPOSIT) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.PERIODIC_ZERO_DEPOSIT) {
       throw new IllegalStateException("Cannot get number of periods per year for a non-periodic zero deposit strip " + toString());
     }
     return _periodsPerYear;
@@ -239,7 +239,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The effective tenor of the strip
    */
   public Tenor getEffectiveTenor() {
-    return new Tenor(getInstrumentType() == StripInstrumentType.FUTURE ?
+    return new Tenor(getInstrumentType() == StripInstrumentTypeDeprecated.FUTURE ?
         getCurveNodePointTime().getPeriod().plusMonths(3 * getNumberOfFuturesAfterTenor()) : getCurveNodePointTime().getPeriod());
   }
 
@@ -248,7 +248,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The pay tenor
    */
   public Tenor getPayTenor() {
-    if (_instrumentType != StripInstrumentType.BASIS_SWAP) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.BASIS_SWAP) {
       throw new IllegalStateException("Cannot get the pay tenor for an instrument that is not a basis swap; have " + toString());
     }
     return _payTenor;
@@ -259,7 +259,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The receive tenor
    */
   public Tenor getReceiveTenor() {
-    if (_instrumentType != StripInstrumentType.BASIS_SWAP) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.BASIS_SWAP) {
       throw new IllegalStateException("Cannot get the receive tenor for an instrument that is not a basis swap; have " + toString());
     }
     return _receiveTenor;
@@ -270,7 +270,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The receive tenor
    */
   public Tenor getResetTenor() {
-    if (_instrumentType != StripInstrumentType.SWAP && _instrumentType != StripInstrumentType.OIS_SWAP) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.SWAP && _instrumentType != StripInstrumentTypeDeprecated.OIS_SWAP) {
       throw new IllegalStateException("Cannot get the receive tenor for an instrument that is not a swap or OIS; have " + toString());
     }
     return _resetTenor;
@@ -281,7 +281,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The pay index type
    */
   public IndexType getPayIndexType() {
-    if (_instrumentType != StripInstrumentType.BASIS_SWAP) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.BASIS_SWAP) {
       throw new IllegalStateException("Cannot get the pay index type for an instrument that is not a basis swap; have " + toString());
     }
     return _payIndexType;
@@ -292,7 +292,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The receive tenor
    */
   public IndexType getReceiveIndexType() {
-    if (_instrumentType != StripInstrumentType.BASIS_SWAP) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.BASIS_SWAP) {
       throw new IllegalStateException("Cannot get the receive index type for an instrument that is not a basis swap; have " + toString());
     }
     return _receiveIndexType;
@@ -303,7 +303,7 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
    * @return The receive tenor
    */
   public IndexType getIndexType() {
-    if (_instrumentType != StripInstrumentType.SWAP && _instrumentType != StripInstrumentType.OIS_SWAP) {
+    if (_instrumentType != StripInstrumentTypeDeprecated.SWAP && _instrumentType != StripInstrumentTypeDeprecated.OIS_SWAP) {
       throw new IllegalStateException("Cannot get the index type for an instrument that is not a swap or OIS; have " + toString());
     }
     return _indexType;
@@ -319,17 +319,17 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
     result = getInstrumentType().ordinal() - other.getInstrumentType().ordinal();
     if (result != 0) {
       return result;
-    } else if (getInstrumentType() == StripInstrumentType.FUTURE) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.FUTURE) {
       result = getNumberOfFuturesAfterTenor() - other.getNumberOfFuturesAfterTenor();
-    } else if (getInstrumentType() == StripInstrumentType.PERIODIC_ZERO_DEPOSIT) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.PERIODIC_ZERO_DEPOSIT) {
       result = getPeriodsPerYear() - other.getPeriodsPerYear();
-    } else if (getInstrumentType() == StripInstrumentType.SWAP || getInstrumentType() == StripInstrumentType.OIS_SWAP && getIndexType() != null) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.SWAP || getInstrumentType() == StripInstrumentTypeDeprecated.OIS_SWAP && getIndexType() != null) {
       result = ObjectUtils.compare(getResetTenor(), other.getResetTenor());
       if (result != 0) {
         return result;
       }
       return ObjectUtils.compare(getIndexType(), other.getIndexType());
-    } else if (getInstrumentType() == StripInstrumentType.BASIS_SWAP) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.BASIS_SWAP) {
       result = getPayTenor().compareTo(other.getPayTenor());
       if (result != 0) {
         return result;
@@ -357,19 +357,19 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
       final boolean result = ObjectUtils.equals(_curveNodePointTime, other._curveNodePointTime) &&
           ObjectUtils.equals(_conventionName, other._conventionName) &&
           _instrumentType == other._instrumentType;
-      if (getInstrumentType() == StripInstrumentType.FUTURE) {
+      if (getInstrumentType() == StripInstrumentTypeDeprecated.FUTURE) {
         System.err.println(result && _nthFutureFromTenor == other._nthFutureFromTenor);
         return result && _nthFutureFromTenor == other._nthFutureFromTenor;
       }
-      if (getInstrumentType() == StripInstrumentType.PERIODIC_ZERO_DEPOSIT) {
+      if (getInstrumentType() == StripInstrumentTypeDeprecated.PERIODIC_ZERO_DEPOSIT) {
         return result && _periodsPerYear == other._periodsPerYear;
       }
-      if (getInstrumentType() == StripInstrumentType.SWAP || getInstrumentType() == StripInstrumentType.OIS_SWAP && getIndexType() != null) {
+      if (getInstrumentType() == StripInstrumentTypeDeprecated.SWAP || getInstrumentType() == StripInstrumentTypeDeprecated.OIS_SWAP && getIndexType() != null) {
         return result &&
             ObjectUtils.equals(getResetTenor(), other.getResetTenor()) &&
             ObjectUtils.equals(getIndexType(), other.getIndexType());
       }
-      if (getInstrumentType() == StripInstrumentType.BASIS_SWAP) {
+      if (getInstrumentType() == StripInstrumentTypeDeprecated.BASIS_SWAP) {
         return result &&
             ObjectUtils.equals(getPayTenor(), other.getPayTenor()) &&
             ObjectUtils.equals(getReceiveTenor(), other.getReceiveTenor()) &&
@@ -395,21 +395,21 @@ public class FixedIncomeStrip implements Serializable, Comparable<FixedIncomeStr
     sb.append("tenor=");
     sb.append(getCurveNodePointTime());
     sb.append(", ");
-    if (getInstrumentType() == StripInstrumentType.FUTURE) {
+    if (getInstrumentType() == StripInstrumentTypeDeprecated.FUTURE) {
       sb.append("future number after tenor=");
       sb.append(getNumberOfFuturesAfterTenor());
       sb.append(", ");
-    } else if (getInstrumentType() == StripInstrumentType.PERIODIC_ZERO_DEPOSIT) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.PERIODIC_ZERO_DEPOSIT) {
       sb.append("periods per year=");
       sb.append(getPeriodsPerYear());
       sb.append(", ");
-    } else if (getInstrumentType() == StripInstrumentType.SWAP || getInstrumentType() == StripInstrumentType.OIS_SWAP && getIndexType() != null) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.SWAP || getInstrumentType() == StripInstrumentTypeDeprecated.OIS_SWAP && getIndexType() != null) {
       sb.append("reset tenor=");
       sb.append(getResetTenor());
       sb.append(" on ");
       sb.append(getIndexType());
       sb.append(", ");
-    } else if (getInstrumentType() == StripInstrumentType.BASIS_SWAP) {
+    } else if (getInstrumentType() == StripInstrumentTypeDeprecated.BASIS_SWAP) {
       sb.append("pay tenor=");
       sb.append(getPayTenor());
       sb.append(" on ");

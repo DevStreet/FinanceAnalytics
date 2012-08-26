@@ -9,12 +9,12 @@ import org.fudgemsg.types.FudgeSecondaryType;
 import org.fudgemsg.types.SecondaryFieldType;
 import org.fudgemsg.wire.types.FudgeWireType;
 
-import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
 
 /**
  * Converts Frequency instances to/from a Fudge string type.
  */
-public final class StripInstrumentTypeFudgeSecondaryType extends SecondaryFieldType<StripInstrumentType, String> {
+public final class StripInstrumentTypeFudgeSecondaryType extends SecondaryFieldType<StripInstrumentTypeDeprecated, String> {
 
   /** Serialization version. */
   private static final long serialVersionUID = 1L;
@@ -26,17 +26,17 @@ public final class StripInstrumentTypeFudgeSecondaryType extends SecondaryFieldT
   public static final StripInstrumentTypeFudgeSecondaryType INSTANCE = new StripInstrumentTypeFudgeSecondaryType();
 
   private StripInstrumentTypeFudgeSecondaryType() {
-    super(FudgeWireType.STRING, StripInstrumentType.class);
+    super(FudgeWireType.STRING, StripInstrumentTypeDeprecated.class);
   }
 
   @Override
-  public String secondaryToPrimary(StripInstrumentType object) {
+  public String secondaryToPrimary(StripInstrumentTypeDeprecated object) {
     return object.name();
   }
 
   @Override
-  public StripInstrumentType primaryToSecondary(final String string) {
-    return StripInstrumentType.valueOf(string);
+  public StripInstrumentTypeDeprecated primaryToSecondary(final String string) {
+    return StripInstrumentTypeDeprecated.valueOf(string);
   }
 
 }

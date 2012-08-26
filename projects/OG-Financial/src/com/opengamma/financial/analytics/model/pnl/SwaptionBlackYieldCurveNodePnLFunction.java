@@ -49,7 +49,7 @@ import com.opengamma.financial.OpenGammaExecutionContext;
 import com.opengamma.financial.analytics.DoubleLabelledMatrix1D;
 import com.opengamma.financial.analytics.ircurve.FixedIncomeStripWithSecurity;
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationWithSecurities;
-import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
 import com.opengamma.financial.analytics.ircurve.calcconfig.ConfigDBCurveCalculationConfigSource;
 import com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfig;
 import com.opengamma.financial.analytics.model.curve.interestrate.FXImpliedYieldCurveFunction;
@@ -259,7 +259,7 @@ public class SwaptionBlackYieldCurveNodePnLFunction extends AbstractFunction.Non
     final List<Object> labelsList = Arrays.asList(labels);
     final double[] values = curveSensitivities.getValues();
     final Set<FixedIncomeStripWithSecurity> strips = spec.getStrips();
-    final List<StripInstrumentType> stripList = new ArrayList<StripInstrumentType>(n);
+    final List<StripInstrumentTypeDeprecated> stripList = new ArrayList<StripInstrumentTypeDeprecated>(n);
     for (final FixedIncomeStripWithSecurity strip : strips) {
       final int index = labelsList.indexOf(strip.getSecurityIdentifier());
       if (index < 0) {

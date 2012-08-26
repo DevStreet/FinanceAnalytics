@@ -12,7 +12,7 @@ import org.fudgemsg.mapping.FudgeBuilderFor;
 import org.fudgemsg.mapping.FudgeDeserializer;
 import org.fudgemsg.mapping.FudgeSerializer;
 
-import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
 import com.opengamma.financial.analytics.ircurve.SyntheticIdentifierCurveInstrumentProvider;
 import com.opengamma.id.ExternalScheme;
 import com.opengamma.util.money.Currency;
@@ -41,7 +41,7 @@ public class SyntheticIdentifierCurveInstrumentProviderFudgeBuilder implements F
   @Override
   public SyntheticIdentifierCurveInstrumentProvider buildObject(FudgeDeserializer deserializer, FudgeMsg message) {
     Currency ccy = Currency.of(message.getString("ccy"));
-    StripInstrumentType stripType = StripInstrumentType.valueOf(message.getString("stripType"));
+    StripInstrumentTypeDeprecated stripType = StripInstrumentTypeDeprecated.valueOf(message.getString("stripType"));
     ExternalScheme scheme = ExternalScheme.of(message.getString("scheme"));
     return new SyntheticIdentifierCurveInstrumentProvider(ccy, stripType, scheme);
   }

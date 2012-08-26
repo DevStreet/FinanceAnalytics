@@ -11,23 +11,23 @@ import org.fudgemsg.UnmodifiableFudgeField;
 import org.fudgemsg.wire.types.FudgeWireType;
 import org.testng.annotations.Test;
 
-import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentTypeDeprecated;
 
 /**
  * Test StripInstrumentType Fudge support.
  */
 public class StripInstrumentTypeFudgeEncodingTest extends FinancialTestBase {
 
-  private static final StripInstrumentType s_ref = StripInstrumentType.FUTURE;
+  private static final StripInstrumentTypeDeprecated s_ref = StripInstrumentTypeDeprecated.FUTURE;
 
   @Test
   public void testCycle() {
-    assertEquals(s_ref, cycleObject(StripInstrumentType.class, s_ref));
+    assertEquals(s_ref, cycleObject(StripInstrumentTypeDeprecated.class, s_ref));
   }
 
   @Test
   public void testFromString() {
-    assertEquals(s_ref, getFudgeContext().getFieldValue(StripInstrumentType.class,
+    assertEquals(s_ref, getFudgeContext().getFieldValue(StripInstrumentTypeDeprecated.class,
         UnmodifiableFudgeField.of(FudgeWireType.STRING, s_ref.name())));
   }
 

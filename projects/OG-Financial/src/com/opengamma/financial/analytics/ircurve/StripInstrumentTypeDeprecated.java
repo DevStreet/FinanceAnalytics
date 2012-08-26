@@ -7,8 +7,10 @@ package com.opengamma.financial.analytics.ircurve;
 
 /**
  * Temporary enum until we replace these with proper securities
+ * @deprecated
  */
-public enum StripInstrumentType {
+@Deprecated
+public enum StripInstrumentTypeDeprecated {
   /** Libor rate */
   LIBOR,
   /** Cash rate */
@@ -52,5 +54,7 @@ public enum StripInstrumentType {
   /** Continuous zero deposit strip */
   CONTINUOUS_ZERO_DEPOSIT,
   /** Rate strip */
-  RATE
+  RATE,
+  /** FX forward strip */
+  FX_FORWARD
 }
