@@ -123,4 +123,24 @@ import com.opengamma.util.time.Tenor;
     }
 
   }
+
+  @FudgeBuilderFor(OISStrip.class)
+  public static final class OISStripBuilder implements FudgeBuilder<OISStrip> {
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final OISStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      return message;
+    }
+
+    @Override
+    public OISStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new OISStrip(curveNodePointTime, configurationName);
+    }
+
+  }
 }

@@ -20,7 +20,7 @@ public enum NewStripInstrumentType {
   /** Tenor swap */
   BASIS_SWAP,
   /** OIS swap */
-  OIS_SWAP,
+  OIS,
   /** Periodic zero deposit strip */
   PERIODIC_ZERO_DEPOSIT,
   /** Rate strip */

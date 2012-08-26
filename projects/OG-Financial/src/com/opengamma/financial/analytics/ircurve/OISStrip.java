@@ -10,11 +10,11 @@ import com.opengamma.util.time.Tenor;
 /**
  * 
  */
-public class OISSwapStrip extends CurveStrip {
+public class OISStrip extends CurveStrip {
   private static final long serialVersionUID = 1L;
 
-  public OISSwapStrip(final Tenor curveNodePointTime, final String configurationName) {
-    super(NewStripInstrumentType.OIS_SWAP, curveNodePointTime, configurationName);
+  public OISStrip(final Tenor curveNodePointTime, final String configurationName) {
+    super(NewStripInstrumentType.OIS, curveNodePointTime, configurationName);
   }
 
   @Override
