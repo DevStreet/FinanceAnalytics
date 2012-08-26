@@ -45,7 +45,7 @@ public class SwapStrip extends CurveStrip {
     if (result != 0) {
       return result;
     }
-    return getFloatingIndexType().ordinal() - otherSwap.getFloatingIndexType().ordinal();
+    return getFloatingIndexType().name().compareTo(otherSwap.getFloatingIndexType().name());
   }
 
   @Override
