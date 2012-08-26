@@ -34,16 +34,18 @@ public class SwapStrip extends CurveStrip {
     return _floatingIndexType;
   }
 
-  public int compareTo(final SwapStrip other) {
+  @Override
+  public int compareTo(final CurveStrip other) {
     int result = super.compareTo(other);
     if (result != 0) {
       return result;
     }
-    result = getResetTenor().getPeriod().toPeriodFields().toEstimatedDuration().compareTo(other.getResetTenor().getPeriod().toPeriodFields().toEstimatedDuration());
+    final SwapStrip otherSwap = (SwapStrip) other;
+    result = getResetTenor().getPeriod().toPeriodFields().toEstimatedDuration().compareTo(otherSwap.getResetTenor().getPeriod().toPeriodFields().toEstimatedDuration());
     if (result != 0) {
       return result;
     }
-    return ObjectUtils.compare(getFloatingIndexType(), other.getFloatingIndexType());
+    return getFloatingIndexType().ordinal() - otherSwap.getFloatingIndexType().ordinal();
   }
 
   @Override
@@ -71,7 +73,7 @@ public class SwapStrip extends CurveStrip {
       return false;
     }
     if (!ObjectUtils.equals(_floatingIndexType, other._floatingIndexType)) {
-      ;
+      return false;
     }
     return true;
   }
