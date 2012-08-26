@@ -36,19 +36,18 @@ import com.opengamma.util.time.Tenor;
       serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
       message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
       serializer.addToMessage(message, RESET_TENOR_FIELD, null, object.getResetTenor());
-      serializer.addToMessage(message, FLOATING_INDEX_FIELD, null, object.getFloatingIndexType());
+      message.add(FLOATING_INDEX_FIELD, object.getFloatingIndexType().name());
       return message;
     }
 
     @Override
     public SwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
       final Tenor resetTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RESET_TENOR_FIELD));
-      final RateType floatingIndexType = deserializer.fieldValueToObject(RateType.class, message.getByName(FLOATING_INDEX_FIELD));
+      final RateType floatingIndexType = RateType.valueOf(message.getString(FLOATING_INDEX_FIELD));
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
       return new SwapStrip(resetTenor, floatingIndexType, curveNodePointTime, configurationName);
     }
-
   }
 
   @FudgeBuilderFor(FRAStrip.class)
@@ -62,19 +61,18 @@ import com.opengamma.util.time.Tenor;
       serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
       message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
       serializer.addToMessage(message, RESET_TENOR_FIELD, null, object.getResetTenor());
-      serializer.addToMessage(message, FLOATING_INDEX_FIELD, null, object.getFloatingIndexType());
+      message.add(FLOATING_INDEX_FIELD, object.getFloatingIndexType().name());
       return message;
     }
 
     @Override
     public FRAStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
       final Tenor resetTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RESET_TENOR_FIELD));
-      final RateType floatingIndexType = deserializer.fieldValueToObject(RateType.class, message.getByName(FLOATING_INDEX_FIELD));
+      final RateType floatingIndexType = RateType.valueOf(message.getString(FLOATING_INDEX_FIELD));
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
       return new FRAStrip(resetTenor, floatingIndexType, curveNodePointTime, configurationName);
     }
-
   }
 
   @FudgeBuilderFor(FXForwardStrip.class)
@@ -99,6 +97,29 @@ import com.opengamma.util.time.Tenor;
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
       return new FXForwardStrip(payCurrency, receiveCurrency, curveNodePointTime, configurationName);
+    }
+
+  }
+
+  @FudgeBuilderFor(RateStrip.class)
+  public static final class RateStripBuilder implements FudgeBuilder<RateStrip> {
+    private static final String RATE_TYPE_FIELD = "rateType";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final RateStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      message.add(RATE_TYPE_FIELD, object.getRateType().name());
+      return message;
+    }
+
+    @Override
+    public RateStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final RateType rateType = RateType.valueOf(message.getString(RATE_TYPE_FIELD));
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new RateStrip(rateType, curveNodePointTime, configurationName);
     }
 
   }
