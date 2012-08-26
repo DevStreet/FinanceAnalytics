@@ -45,7 +45,7 @@ public class FRAStrip extends CurveStrip {
     if (result != 0) {
       return result;
     }
-    return getFloatingIndexType().ordinal() - otherFRA.getFloatingIndexType().ordinal();
+    return getFloatingIndexType().name().compareTo(otherFRA.getFloatingIndexType().name());
   }
 
   @Override

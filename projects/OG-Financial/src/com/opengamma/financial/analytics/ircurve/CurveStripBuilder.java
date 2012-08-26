@@ -49,4 +49,30 @@ import com.opengamma.util.time.Tenor;
     }
 
   }
+
+  @FudgeBuilderFor(FRAStrip.class)
+  public static final class FRAStripBuilder implements FudgeBuilder<FRAStrip> {
+    private static final String RESET_TENOR_FIELD = "resetTenor";
+    private static final String FLOATING_INDEX_FIELD = "floatingIndex";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final FRAStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      serializer.addToMessage(message, RESET_TENOR_FIELD, null, object.getResetTenor());
+      serializer.addToMessage(message, FLOATING_INDEX_FIELD, null, object.getFloatingIndexType());
+      return message;
+    }
+
+    @Override
+    public FRAStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final Tenor resetTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RESET_TENOR_FIELD));
+      final RateType floatingIndexType = deserializer.fieldValueToObject(RateType.class, message.getByName(FLOATING_INDEX_FIELD));
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new FRAStrip(resetTenor, floatingIndexType, curveNodePointTime, configurationName);
+    }
+
+  }
 }
