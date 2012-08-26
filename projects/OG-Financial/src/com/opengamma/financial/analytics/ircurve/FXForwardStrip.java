@@ -7,6 +7,7 @@ package com.opengamma.financial.analytics.ircurve;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
 
@@ -20,6 +21,9 @@ public class FXForwardStrip extends CurveStrip {
 
   public FXForwardStrip(final Currency payCurrency, final Currency receiveCurrency, final Tenor curveNodePointTime, final String configurationName) {
     super(NewStripInstrumentType.FX_FORWARD, curveNodePointTime, configurationName);
+    ArgumentChecker.notNull(payCurrency, "pay currency");
+    ArgumentChecker.notNull(receiveCurrency, "receive currency");
+    ArgumentChecker.isFalse(payCurrency.equals(receiveCurrency), "Currencies must be different");
     _payCurrency = payCurrency;
     _receiveCurrency = receiveCurrency;
   }

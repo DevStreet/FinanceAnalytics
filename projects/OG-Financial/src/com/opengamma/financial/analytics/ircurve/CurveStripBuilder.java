@@ -12,6 +12,7 @@ import org.fudgemsg.mapping.FudgeBuilderFor;
 import org.fudgemsg.mapping.FudgeDeserializer;
 import org.fudgemsg.mapping.FudgeSerializer;
 
+import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
 
 /**
@@ -72,6 +73,32 @@ import com.opengamma.util.time.Tenor;
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
       return new FRAStrip(resetTenor, floatingIndexType, curveNodePointTime, configurationName);
+    }
+
+  }
+
+  @FudgeBuilderFor(FXForwardStrip.class)
+  public static final class FXForwardStripBuilder implements FudgeBuilder<FXForwardStrip> {
+    private static final String PAY_CURRENCY_FIELD = "payCurrency";
+    private static final String RECEIVE_CURRENCY_FIELD = "receiveCurrency";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final FXForwardStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      serializer.addToMessage(message, PAY_CURRENCY_FIELD, null, object.getPayCurrency());
+      serializer.addToMessage(message, RECEIVE_CURRENCY_FIELD, null, object.getReceiveCurrency());
+      return message;
+    }
+
+    @Override
+    public FXForwardStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final Currency payCurrency = deserializer.fieldValueToObject(Currency.class, message.getByName(PAY_CURRENCY_FIELD));
+      final Currency receiveCurrency = deserializer.fieldValueToObject(Currency.class, message.getByName(RECEIVE_CURRENCY_FIELD));
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new FXForwardStrip(payCurrency, receiveCurrency, curveNodePointTime, configurationName);
     }
 
   }
