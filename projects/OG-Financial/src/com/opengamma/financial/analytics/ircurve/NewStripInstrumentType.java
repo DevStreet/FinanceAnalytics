@@ -26,5 +26,7 @@ public enum NewStripInstrumentType {
   /** Rate strip */
   RATE,
   /** FX forward strip */
-  FX_FORWARD
+  FX_FORWARD,
+  /** FX swap strip */
+  FX_SWAP
 }
