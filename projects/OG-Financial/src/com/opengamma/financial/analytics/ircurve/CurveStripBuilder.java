@@ -25,28 +25,34 @@ import com.opengamma.util.time.Tenor;
   private CurveStripBuilder() {
   }
 
-  @FudgeBuilderFor(SwapStrip.class)
-  public static final class SwapStripBuilder implements FudgeBuilder<SwapStrip> {
-    private static final String RESET_TENOR_FIELD = "resetTenor";
-    private static final String FLOATING_INDEX_FIELD = "floatingIndex";
+  @FudgeBuilderFor(BasisSwapStrip.class)
+  public static final class BasisSwapStripBuilder implements FudgeBuilder<BasisSwapStrip> {
+    private static final String PAY_TENOR_FIELD_NAME = "payTenor";
+    private static final String PAY_INDEX_FIELD_NAME = "payIndex";
+    private static final String RECEIVE_TENOR_FIELD_NAME = "receiveTenor";
+    private static final String RECEIVE_INDEX_FIELD_NAME = "receiveIndex";
 
     @Override
-    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final SwapStrip object) {
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final BasisSwapStrip object) {
       final MutableFudgeMsg message = serializer.newMessage();
       serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
       message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
-      serializer.addToMessage(message, RESET_TENOR_FIELD, null, object.getResetTenor());
-      message.add(FLOATING_INDEX_FIELD, object.getFloatingIndexType().name());
+      serializer.addToMessage(message, PAY_TENOR_FIELD_NAME, null, object.getPayResetTenor());
+      message.add(PAY_INDEX_FIELD_NAME, object.getPayIndexType().name());
+      serializer.addToMessage(message, RECEIVE_TENOR_FIELD_NAME, null, object.getReceiveResetTenor());
+      message.add(RECEIVE_INDEX_FIELD_NAME, object.getReceiveIndexType().name());
       return message;
     }
 
     @Override
-    public SwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
-      final Tenor resetTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RESET_TENOR_FIELD));
-      final RateType floatingIndexType = RateType.valueOf(message.getString(FLOATING_INDEX_FIELD));
+    public BasisSwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
-      return new SwapStrip(resetTenor, floatingIndexType, curveNodePointTime, configurationName);
+      final Tenor payTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(PAY_TENOR_FIELD_NAME));
+      final RateType payIndex = RateType.valueOf(message.getString(PAY_INDEX_FIELD_NAME));
+      final Tenor receiveTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RECEIVE_TENOR_FIELD_NAME));
+      final RateType receiveIndex = RateType.valueOf(message.getString(RECEIVE_INDEX_FIELD_NAME));
+      return new BasisSwapStrip(payTenor, payIndex, receiveTenor, receiveIndex, curveNodePointTime, configurationName);
     }
   }
 
@@ -101,27 +107,29 @@ import com.opengamma.util.time.Tenor;
 
   }
 
-  @FudgeBuilderFor(RateStrip.class)
-  public static final class RateStripBuilder implements FudgeBuilder<RateStrip> {
-    private static final String RATE_TYPE_FIELD = "rateType";
+  @FudgeBuilderFor(FXSwapStrip.class)
+  public static final class FXSwapStripBuilder implements FudgeBuilder<FXSwapStrip> {
+    private static final String PAY_CURRENCY_FIELD = "payCurrency";
+    private static final String RECEIVE_CURRENCY_FIELD = "receiveCurrency";
 
     @Override
-    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final RateStrip object) {
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final FXSwapStrip object) {
       final MutableFudgeMsg message = serializer.newMessage();
       serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
       message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
-      message.add(RATE_TYPE_FIELD, object.getRateType().name());
+      serializer.addToMessage(message, PAY_CURRENCY_FIELD, null, object.getPayCurrency());
+      serializer.addToMessage(message, RECEIVE_CURRENCY_FIELD, null, object.getReceiveCurrency());
       return message;
     }
 
     @Override
-    public RateStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
-      final RateType rateType = RateType.valueOf(message.getString(RATE_TYPE_FIELD));
+    public FXSwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final Currency payCurrency = deserializer.fieldValueToObject(Currency.class, message.getByName(PAY_CURRENCY_FIELD));
+      final Currency receiveCurrency = deserializer.fieldValueToObject(Currency.class, message.getByName(RECEIVE_CURRENCY_FIELD));
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
-      return new RateStrip(rateType, curveNodePointTime, configurationName);
+      return new FXSwapStrip(payCurrency, receiveCurrency, curveNodePointTime, configurationName);
     }
-
   }
 
   @FudgeBuilderFor(OISStrip.class)
@@ -144,35 +152,51 @@ import com.opengamma.util.time.Tenor;
 
   }
 
-  @FudgeBuilderFor(BasisSwapStrip.class)
-  public static final class BasisSwapStripBuilder implements FudgeBuilder<BasisSwapStrip> {
-    private static final String PAY_TENOR_FIELD_NAME = "payTenor";
-    private static final String PAY_INDEX_FIELD_NAME = "payIndex";
-    private static final String RECEIVE_TENOR_FIELD_NAME = "receiveTenor";
-    private static final String RECEIVE_INDEX_FIELD_NAME = "receiveIndex";
+  @FudgeBuilderFor(RateStrip.class)
+  public static final class RateStripBuilder implements FudgeBuilder<RateStrip> {
+    private static final String RATE_TYPE_FIELD = "rateType";
 
     @Override
-    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final BasisSwapStrip object) {
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final RateStrip object) {
       final MutableFudgeMsg message = serializer.newMessage();
       serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
       message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
-      serializer.addToMessage(message, PAY_TENOR_FIELD_NAME, null, object.getPayResetTenor());
-      message.add(PAY_INDEX_FIELD_NAME, object.getPayIndexType().name());
-      serializer.addToMessage(message, RECEIVE_TENOR_FIELD_NAME, null, object.getReceiveResetTenor());
-      message.add(RECEIVE_INDEX_FIELD_NAME, object.getReceiveIndexType().name());
+      message.add(RATE_TYPE_FIELD, object.getRateType().name());
       return message;
     }
 
     @Override
-    public BasisSwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+    public RateStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final RateType rateType = RateType.valueOf(message.getString(RATE_TYPE_FIELD));
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
-      final Tenor payTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(PAY_TENOR_FIELD_NAME));
-      final RateType payIndex = RateType.valueOf(message.getString(PAY_INDEX_FIELD_NAME));
-      final Tenor receiveTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RECEIVE_TENOR_FIELD_NAME));
-      final RateType receiveIndex = RateType.valueOf(message.getString(RECEIVE_INDEX_FIELD_NAME));
-      return new BasisSwapStrip(payTenor, payIndex, receiveTenor, receiveIndex, curveNodePointTime, configurationName);
+      return new RateStrip(rateType, curveNodePointTime, configurationName);
+    }
+  }
+
+  @FudgeBuilderFor(SwapStrip.class)
+  public static final class SwapStripBuilder implements FudgeBuilder<SwapStrip> {
+    private static final String RESET_TENOR_FIELD = "resetTenor";
+    private static final String FLOATING_INDEX_FIELD = "floatingIndex";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final SwapStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      serializer.addToMessage(message, RESET_TENOR_FIELD, null, object.getResetTenor());
+      message.add(FLOATING_INDEX_FIELD, object.getFloatingIndexType().name());
+      return message;
     }
 
+    @Override
+    public SwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final Tenor resetTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RESET_TENOR_FIELD));
+      final RateType floatingIndexType = RateType.valueOf(message.getString(FLOATING_INDEX_FIELD));
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new SwapStrip(resetTenor, floatingIndexType, curveNodePointTime, configurationName);
+    }
   }
+
 }
