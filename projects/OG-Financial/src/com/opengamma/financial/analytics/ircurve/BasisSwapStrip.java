@@ -7,6 +7,7 @@ package com.opengamma.financial.analytics.ircurve;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.time.Tenor;
 
 /**
@@ -22,6 +23,10 @@ public class BasisSwapStrip extends CurveStrip {
   public BasisSwapStrip(final Tenor payTenor, final RateType payIndexType, final Tenor receiveTenor, final RateType receiveIndexType,
       final Tenor curveNodePointTime, final String configurationName) {
     super(NewStripInstrumentType.BASIS_SWAP, curveNodePointTime, configurationName);
+    ArgumentChecker.notNull(payTenor, "pay tenor");
+    ArgumentChecker.notNull(payIndexType, "pay index type");
+    ArgumentChecker.notNull(receiveTenor, "receive tenor");
+    ArgumentChecker.notNull(receiveIndexType, "receive index type");
     _payTenor = payTenor;
     _payIndexType = payIndexType;
     _receiveTenor = receiveTenor;
@@ -61,11 +66,11 @@ public class BasisSwapStrip extends CurveStrip {
     if (result != 0) {
       return result;
     }
-    result = getPayIndexType().ordinal() - otherBasisSwap.getPayIndexType().ordinal();
+    result = getPayIndexType().name().compareTo(otherBasisSwap.getPayIndexType().name());
     if (result != 0) {
       return result;
     }
-    return getReceiveIndexType().ordinal() - otherBasisSwap.getReceiveIndexType().ordinal();
+    return getReceiveIndexType().name().compareTo(otherBasisSwap.getReceiveIndexType().name());
   }
 
   @Override

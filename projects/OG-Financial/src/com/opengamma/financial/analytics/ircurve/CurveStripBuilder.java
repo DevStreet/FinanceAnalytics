@@ -143,4 +143,36 @@ import com.opengamma.util.time.Tenor;
     }
 
   }
+
+  @FudgeBuilderFor(BasisSwapStrip.class)
+  public static final class BasisSwapStripBuilder implements FudgeBuilder<BasisSwapStrip> {
+    private static final String PAY_TENOR_FIELD_NAME = "payTenor";
+    private static final String PAY_INDEX_FIELD_NAME = "payIndex";
+    private static final String RECEIVE_TENOR_FIELD_NAME = "receiveTenor";
+    private static final String RECEIVE_INDEX_FIELD_NAME = "receiveIndex";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final BasisSwapStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      serializer.addToMessage(message, PAY_TENOR_FIELD_NAME, null, object.getPayResetTenor());
+      message.add(PAY_INDEX_FIELD_NAME, object.getPayIndexType().name());
+      serializer.addToMessage(message, RECEIVE_TENOR_FIELD_NAME, null, object.getReceiveResetTenor());
+      message.add(RECEIVE_INDEX_FIELD_NAME, object.getReceiveIndexType().name());
+      return message;
+    }
+
+    @Override
+    public BasisSwapStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      final Tenor payTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(PAY_TENOR_FIELD_NAME));
+      final RateType payIndex = RateType.valueOf(message.getString(PAY_INDEX_FIELD_NAME));
+      final Tenor receiveTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RECEIVE_TENOR_FIELD_NAME));
+      final RateType receiveIndex = RateType.valueOf(message.getString(RECEIVE_INDEX_FIELD_NAME));
+      return new BasisSwapStrip(payTenor, payIndex, receiveTenor, receiveIndex, curveNodePointTime, configurationName);
+    }
+
+  }
 }
