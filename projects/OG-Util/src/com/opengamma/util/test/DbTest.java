@@ -7,30 +7,18 @@ package com.opengamma.util.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
+import org.testng.annotations.*;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ZipUtils;
-import com.opengamma.util.db.DbConnector;
-import com.opengamma.util.db.DbConnectorFactoryBean;
-import com.opengamma.util.db.DbDialect;
-import com.opengamma.util.db.HSQLDbDialect;
-import com.opengamma.util.db.PostgresDbDialect;
-import com.opengamma.util.db.SqlServer2008DbDialect;
+import com.opengamma.util.db.*;
 import com.opengamma.util.test.DbTool.TableCreationCallback;
 import com.opengamma.util.time.DateUtils;
 
@@ -42,9 +30,10 @@ public abstract class DbTest implements TableCreationCallback {
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(DbTest.class);
 
-  private static Map<String,String> s_databaseTypeVersion = new HashMap<String,String> ();
+  protected static Map<String, String> s_databaseTypeVersion = new HashMap<String, String>();
   private static final Map<String, DbDialect> s_dbDialects = new HashMap<String, DbDialect>();
   private static final File SCRIPT_INSTALL_DIR = new File(DbTool.getWorkingDirectory(), "temp/" + DbTest.class.getSimpleName());
+
   static {
     DateUtils.initTimeZone();
     addDbDialect("hsqldb", new HSQLDbDialect());
@@ -62,15 +51,17 @@ public abstract class DbTest implements TableCreationCallback {
   }
 
   private final String _databaseType;
-  private final String _databaseVersion;
+  private final String _targetVersion;
+  private final String _createVersion;
   private final DbTool _dbtool;
 
-  protected DbTest(String databaseType, String databaseVersion) {
+  protected DbTest(String databaseType, String targetVersion, String createVersion) {
     ArgumentChecker.notNull(databaseType, "databaseType");
     _databaseType = databaseType;
     _dbtool = TestProperties.getDbTool(databaseType);
     _dbtool.setJdbcUrl(getDbTool().getTestDatabaseUrl());
-    _databaseVersion = databaseVersion;
+    _targetVersion = targetVersion;
+    _createVersion = createVersion;
     if (isScriptPublished()) {
       _dbtool.addDbScriptDirectory(SCRIPT_INSTALL_DIR.getAbsolutePath());
     } else {
@@ -86,9 +77,10 @@ public abstract class DbTest implements TableCreationCallback {
   @BeforeMethod
   public void setUp() throws Exception {
     String prevVersion = s_databaseTypeVersion.get(getDatabaseType());
-    if ((prevVersion == null) || !prevVersion.equals(getDatabaseVersion())) {
-      s_databaseTypeVersion.put(getDatabaseType(), getDatabaseVersion());
-      _dbtool.setCreateVersion(getDatabaseVersion());
+    if ((prevVersion == null) || !prevVersion.equals(getTargetVersion())) {
+      s_databaseTypeVersion.put(getDatabaseType(), getTargetVersion());
+      _dbtool.setTargetVersion(getTargetVersion());
+      _dbtool.setCreateVersion(getCreateVersion());
       _dbtool.dropTestSchema();
       _dbtool.createTestSchema();
       _dbtool.createTestTables(this);
@@ -109,7 +101,7 @@ public abstract class DbTest implements TableCreationCallback {
 
   private static void unzipSQLScripts() throws IOException {
     File zipScriptPath = new File(DbTool.getWorkingDirectory(), getZipPath());
-    for (File file : (Collection<File>) FileUtils.listFiles(zipScriptPath, new String[] {"zip" }, false)) {
+    for (File file : (Collection<File>) FileUtils.listFiles(zipScriptPath, new String[]{"zip"}, false)) {
       ZipUtils.unzipArchive(file, SCRIPT_INSTALL_DIR);
     }
   }
@@ -129,38 +121,58 @@ public abstract class DbTest implements TableCreationCallback {
     FileUtils.deleteQuietly(SCRIPT_INSTALL_DIR);
   }
 
-  //-------------------------------------------------------------------------
-  public static Collection<Object[]> getParameters() {
-    int previousVersionCount = getPreviousVersionCount();
-    return getParameters(previousVersionCount);
-  }
-
-  protected static Collection<Object[]> getParameters(final int previousVersionCount) {
+  protected static Object[][] getParametersForSeparateMasters(int prevVersionCount) {
     String databaseType = System.getProperty("test.database.type");
     if (databaseType == null) {
       databaseType = "all";
     }
-    return getParameters(databaseType, previousVersionCount);
-  }
-
-  protected static Collection<Object[]> getParameters(final String databaseType, final int previousVersionCount) {
-    ArrayList<Object[]> returnValue = new ArrayList<Object[]>();
-    for (String db : TestProperties.getDatabaseTypes(databaseType)) {
-      final DbTool dbTool = TestProperties.getDbTool(db);
+    Collection<String> databaseTypes = TestProperties.getDatabaseTypes(databaseType);
+    ArrayList<Object[]> parameters = new ArrayList<Object[]>();
+    for (String dbType : databaseTypes) {
+      DbTool dbtool = TestProperties.getDbTool(dbType);
+      dbtool.setJdbcUrl(dbtool.getTestDatabaseUrl());
       if (isScriptPublished()) {
-        dbTool.addDbScriptDirectory(SCRIPT_INSTALL_DIR.getAbsolutePath());
+        dbtool.addDbScriptDirectory(SCRIPT_INSTALL_DIR.getAbsolutePath());
       } else {
-        dbTool.addDbScriptDirectory(DbTool.getWorkingDirectory());
+        dbtool.addDbScriptDirectory(DbTool.getWorkingDirectory());
       }
-      final String[] versions = dbTool.getDatabaseCreatableVersions();
-      for (int i = 0; i < versions.length; i++) {
-        returnValue.add(new Object[] {db, versions[i] });
-        if (i >= previousVersionCount) {
-          break;
+      for (String masterDB : dbtool.getScriptDirs().keySet()) {
+        Set<Integer> versions = dbtool.getScriptDirs().get(masterDB).keySet();
+        int max = Collections.max(versions);
+        int min = Collections.min(versions);
+        for (int v = max; v >= Math.max(max - prevVersionCount, min); v--) {
+          parameters.add(new Object[]{dbType, masterDB, "" + max /*target_version*/, "" + v /*migrate_from_version*/});
         }
       }
     }
-    return returnValue;
+    Object[][] array = new Object[parameters.size()][];
+    parameters.toArray(array);
+    return array;
+  }
+
+  protected static Object[][] getParameters() {
+    String databaseType = System.getProperty("test.database.type");
+    if (databaseType == null) {
+      databaseType = "all";
+    }
+    Collection<String> databaseTypes = TestProperties.getDatabaseTypes(databaseType);
+    ArrayList<Object[]> parameters = new ArrayList<Object[]>();
+    for (String dbType : databaseTypes) {
+      parameters.add(new Object[]{dbType, "latest"});
+    }
+    Object[][] array = new Object[parameters.size()][];
+    parameters.toArray(array);
+    return array;
+  }
+
+  protected static Object[][] getParametersForDatabase(final String databaseType) {
+    ArrayList<Object[]> parameters = new ArrayList<Object[]>();
+    for (String db : TestProperties.getDatabaseTypes(databaseType)) {
+      parameters.add(new Object[]{db, "latest"});
+    }
+    Object[][] array = new Object[parameters.size()][];
+    parameters.toArray(array);
+    return array;
   }
 
   private static boolean isScriptPublished() {
@@ -172,35 +184,25 @@ public abstract class DbTest implements TableCreationCallback {
     boolean result = false;
     if (zipScriptPath.exists()) {
       @SuppressWarnings("rawtypes")
-      Collection zipfiles = FileUtils.listFiles(zipScriptPath, new String[] {"zip" }, false);
+      Collection zipfiles = FileUtils.listFiles(zipScriptPath, new String[]{"zip"}, false);
       result = !zipfiles.isEmpty();
     }
     return result;
   }
 
-  //-------------------------------------------------------------------------
   @DataProvider(name = "localDatabase")
   public static Object[][] data_localDatabase() {
-    Collection<Object[]> parameters = getParameters("hsqldb", 0);
-    Object[][] array = new Object[parameters.size()][];
-    parameters.toArray(array);
-    return array;
+    return getParametersForDatabase("hsqldb");
   }
 
   @DataProvider(name = "databases")
   public static Object[][] data_databases() {
-    Collection<Object[]> parameters = getParameters();
-    Object[][] array = new Object[parameters.size()][];
-    parameters.toArray(array);
-    return array;
+    return getParameters();
   }
 
-  @DataProvider(name = "databasesMoreVersions")
-  public static Object[][] data_databasesMoreVersions() {
-    Collection<Object[]> parameters = getParameters(3);
-    Object[][] array = new Object[parameters.size()][];
-    parameters.toArray(array);
-    return array;
+  @DataProvider(name = "databasesVersionsForSeparateMasters")
+  public static Object[][] data_databasesVersionsForSeparateMasters() {
+    return getParametersForSeparateMasters(3);
   }
 
   protected static int getPreviousVersionCount() {
@@ -222,8 +224,12 @@ public abstract class DbTest implements TableCreationCallback {
     return _databaseType;
   }
 
-  public String getDatabaseVersion() {
-    return _databaseVersion;
+  public String getCreateVersion() {
+    return _createVersion;
+  }
+
+  public String getTargetVersion() {
+    return _targetVersion;
   }
 
   public DataSourceTransactionManager getTransactionManager() {
@@ -246,7 +252,7 @@ public abstract class DbTest implements TableCreationCallback {
 
   /**
    * Adds a dialect to the map of known.
-   * 
+   *
    * @param dbType  the database type, not null
    * @param dialect  the dialect, not null
    */
@@ -265,7 +271,7 @@ public abstract class DbTest implements TableCreationCallback {
   //-------------------------------------------------------------------------
   @Override
   public String toString() {
-    return getDatabaseType() + ":" + getDatabaseVersion();
+    return getDatabaseType() + ":" + getTargetVersion();
   }
 
 }

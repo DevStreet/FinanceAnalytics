@@ -230,7 +230,7 @@ public class SwaptionPhysicalFixedIborSABRExtrapolationRightMethodTest {
       nodeTimesForward[i + 1] = timeForwardArray[i];
       yieldsForward[i + 1] = curveForward.getInterestRate(nodeTimesForward[i + 1]);
     }
-    final YieldAndDiscountCurve tempCurveForward = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimesForward, yieldsForward, new LinearInterpolator1D()));
+    final YieldAndDiscountCurve tempCurveForward = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimesForward, yieldsForward, new LinearInterpolator1D()));
     final List<DoublesPair> tempForward = pvsLongPayerExtra.getSensitivities().get(FORWARD_CURVE_NAME);
     final double[] resFwd = new double[nbForwardDate];
     for (int i = 0; i < nbForwardDate; i++) {
@@ -257,7 +257,7 @@ public class SwaptionPhysicalFixedIborSABRExtrapolationRightMethodTest {
       nodeTimesFunding[i + 1] = swaptionLongPayerHighStrike.getUnderlyingSwap().getSecondLeg().getNthPayment(i).getPaymentTime();
       yieldsFunding[i + 1] = curveFunding.getInterestRate(nodeTimesFunding[i + 1]);
     }
-    final YieldAndDiscountCurve tempCurveFunding = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimesFunding, yieldsFunding, new LinearInterpolator1D()));
+    final YieldAndDiscountCurve tempCurveFunding = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimesFunding, yieldsFunding, new LinearInterpolator1D()));
     final List<DoublesPair> tempFunding = pvsLongPayerExtra.getSensitivities().get(FUNDING_CURVE_NAME);
     final double[] resDsc = new double[nbPayDate];
     for (int i = 0; i < nbPayDate; i++) {
@@ -307,6 +307,14 @@ public class SwaptionPhysicalFixedIborSABRExtrapolationRightMethodTest {
     assertEquals("Number of alpha sensitivity", pvsLongPayer.getAlpha().getMap().keySet().size(), 1);
     assertEquals("Alpha sensitivity expiry/tenor", pvsLongPayer.getAlpha().getMap().keySet().contains(expectedExpiryTenor), true);
     assertEquals("Alpha sensitivity value", expectedAlphaSensi, pvsLongPayer.getAlpha().getMap().get(expectedExpiryTenor), 2.0E+3);
+    // Beta sensitivity vs finite difference computation
+    final SABRInterestRateParameters sabrParameterBetaBumped = TestsDataSetsSABR.createSABR1BetaBumped(shift);
+    final SABRInterestRateDataBundle sabrBundleBetaBumped = new SABRInterestRateDataBundle(sabrParameterBetaBumped, curves);
+    final double pvLongPayerBetaBumped = METHOD_EXTRAPOLATION.presentValue(swaptionLongPayerHighStrike, sabrBundleBetaBumped);
+    final double expectedBetaSensi = (pvLongPayerBetaBumped - pvLongPayer) / shift;
+    assertEquals("Number of Beta sensitivity", pvsLongPayer.getBeta().getMap().keySet().size(), 1);
+    assertEquals("Beta sensitivity expiry/tenor", pvsLongPayer.getBeta().getMap().keySet().contains(expectedExpiryTenor), true);
+    assertEquals("Beta sensitivity value", expectedBetaSensi, pvsLongPayer.getBeta().getMap().get(expectedExpiryTenor), 1.5E+2);
     // Rho sensitivity vs finite difference computation
     final SABRInterestRateParameters sabrParameterRhoBumped = TestsDataSetsSABR.createSABR1RhoBumped(shift);
     final SABRInterestRateDataBundle sabrBundleRhoBumped = new SABRInterestRateDataBundle(sabrParameterRhoBumped, curves);

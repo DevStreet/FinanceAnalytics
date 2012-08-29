@@ -112,11 +112,7 @@ public class ForwardSwapCurveMarketDataFunction extends AbstractFunction {
 
       @Override
       public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
-        if (target.getType() != ComputationTargetType.PRIMITIVE) {
-          return false;
-        }
         if (target.getUniqueId() == null) {
-          s_logger.error("Target unique id was null");
           return false;
         }
         return Currency.OBJECT_SCHEME.equals(target.getUniqueId().getScheme());

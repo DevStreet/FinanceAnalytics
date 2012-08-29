@@ -37,7 +37,7 @@ public class ValueRequirementFudgeBuilder implements FudgeBuilder<ValueRequireme
     MutableFudgeMsg msg = serializer.newMessage();
     String valueName = object.getValueName();
     msg.add(VALUE_NAME_FIELD_NAME, valueName);
-    ComputationTargetSpecificationFudgeBuilder.addMessageFields(serializer, msg, object.getTargetSpecification());
+    ComputationTargetSpecificationFudgeBuilder.buildMessageImpl(msg, object.getTargetSpecification());
     if (!object.getConstraints().isEmpty()) {
       serializer.addToMessage(msg, CONSTRAINTS_FIELD_NAME, null, object.getConstraints());
     }

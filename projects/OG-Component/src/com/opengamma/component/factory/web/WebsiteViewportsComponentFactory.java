@@ -45,29 +45,24 @@ import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
-import com.opengamma.web.server.push.ConnectionManager;
+import com.opengamma.web.server.AggregatedViewDefinitionManager;
 import com.opengamma.web.server.push.ConnectionManagerImpl;
 import com.opengamma.web.server.push.LongPollingConnectionManager;
 import com.opengamma.web.server.push.MasterChangeManager;
 import com.opengamma.web.server.push.WebPushServletContextUtils;
+import com.opengamma.web.server.push.analytics.AnalyticsColumnsJsonWriter;
 import com.opengamma.web.server.push.analytics.AnalyticsViewManager;
-import com.opengamma.web.server.push.grid.PushLiveResultsService;
-import com.opengamma.web.server.push.reports.CsvReportGenerator;
-import com.opengamma.web.server.push.reports.ReportFactory;
-import com.opengamma.web.server.push.reports.ReportGenerator;
+import com.opengamma.web.server.push.analytics.formatting.ResultsFormatter;
 import com.opengamma.web.server.push.rest.AggregatorNamesResource;
 import com.opengamma.web.server.push.rest.MarketDataSnapshotListResource;
 import com.opengamma.web.server.push.rest.MasterType;
-import com.opengamma.web.server.push.rest.ReportMessageBodyWriter;
-import com.opengamma.web.server.push.rest.ViewDefinitionEntriesResource;
-import com.opengamma.web.server.push.rest.ViewportDefinitionMessageBodyReader;
-import com.opengamma.web.server.push.rest.ViewportsResource;
 import com.opengamma.web.server.push.rest.ViewsResource;
-import com.opengamma.web.server.push.rest.json.AnalyticsGridStructureMessageBodyWriter;
-import com.opengamma.web.server.push.rest.json.AnalyticsResultsMessageBodyWriter;
-import com.opengamma.web.server.push.rest.json.DependencyGraphRequestMessageBodyReader;
-import com.opengamma.web.server.push.rest.json.ViewRequestMessageBodyReader;
-import com.opengamma.web.server.push.rest.json.ViewportRequestMessageBodyReader;
+import com.opengamma.web.server.push.rest.json.AnalyticsColumnGroupsMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.DependencyGraphGridStructureMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.PortfolioGridStructureMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.PrimitivesGridStructureMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.ViewportResultsMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.ViewportVersionMessageBodyWriter;
 
 /**
  * Component factory for the main website viewports (for analytics).
@@ -164,31 +159,37 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
   //-------------------------------------------------------------------------
   @Override
   public void init(ComponentRepository repo, LinkedHashMap<String, String> configuration) {
-    PushLiveResultsService liveResults = buildLiveResults();
     final LongPollingConnectionManager longPolling = buildLongPolling();
-    ReportFactory reportFactory = buildReportFactory();
     ChangeManager changeMgr = buildChangeManager();
     MasterChangeManager masterChangeMgr = buildMasterChangeManager();
-    
-    final ConnectionManager connectionMgr = new ConnectionManagerImpl(changeMgr, masterChangeMgr, liveResults, longPolling);
-    ViewportsResource viewportsResource = new ViewportsResource(connectionMgr, reportFactory);
-    ViewDefinitionEntriesResource viewDefinitionResource = new ViewDefinitionEntriesResource(getViewDefinitionRepository());
+    final ConnectionManagerImpl connectionMgr = new ConnectionManagerImpl(changeMgr, masterChangeMgr, longPolling);
     AggregatorNamesResource aggregatorsResource = new AggregatorNamesResource(getPortfolioAggregationFunctions().getMappedFunctions().keySet());
     MarketDataSnapshotListResource snapshotResource = new MarketDataSnapshotListResource(getMarketDataSnapshotMaster());
 
-    repo.getRestComponents().publishResource(viewportsResource);
-    repo.getRestComponents().publishResource(viewDefinitionResource);
+    AggregatedViewDefinitionManager aggregatedViewDefManager = new AggregatedViewDefinitionManager(
+        getPositionSource(),
+        getSecuritySource(),
+        getViewDefinitionRepository(),
+        getUserViewDefinitionRepository(),
+        getUserPortfolioMaster(),
+        getUserPositionMaster(),
+        getPortfolioAggregationFunctions().getMappedFunctions());
+    AnalyticsViewManager analyticsViewManager = new AnalyticsViewManager(getViewProcessor(),
+                                                                         aggregatedViewDefManager,
+                                                                         getMarketDataSnapshotMaster(),
+                                                                         getComputationTargetResolver());
+    ResultsFormatter resultsFormatter = new ResultsFormatter();
+    AnalyticsColumnsJsonWriter columnWriter = new AnalyticsColumnsJsonWriter(resultsFormatter);
+
     repo.getRestComponents().publishResource(aggregatorsResource);
     repo.getRestComponents().publishResource(snapshotResource);
-    repo.getRestComponents().publishResource(new ViewsResource(new AnalyticsViewManager()));
-
-    repo.getRestComponents().publishHelper(new ViewportDefinitionMessageBodyReader());
-    repo.getRestComponents().publishHelper(new ViewRequestMessageBodyReader());
-    repo.getRestComponents().publishHelper(new ViewportRequestMessageBodyReader());
-    repo.getRestComponents().publishHelper(new DependencyGraphRequestMessageBodyReader());
-    repo.getRestComponents().publishHelper(new AnalyticsGridStructureMessageBodyWriter());
-    repo.getRestComponents().publishHelper(new AnalyticsResultsMessageBodyWriter());
-    repo.getRestComponents().publishHelper(new ReportMessageBodyWriter());
+    repo.getRestComponents().publishResource(new ViewsResource(analyticsViewManager, connectionMgr));
+    repo.getRestComponents().publishHelper(new ViewportVersionMessageBodyWriter());
+    repo.getRestComponents().publishHelper(new PrimitivesGridStructureMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new PortfolioGridStructureMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new DependencyGraphGridStructureMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new AnalyticsColumnGroupsMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new ViewportResultsMessageBodyWriter(resultsFormatter));
 
     // these items need to be available to the servlet, but aren't important enough to be published components
     repo.registerServletContextAware(new ServletContextAware() {
@@ -200,29 +201,8 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     });
   }
 
-  protected PushLiveResultsService buildLiveResults() {
-    PushLiveResultsService liveResults = new PushLiveResultsService(
-        getViewProcessor(),
-        getPositionSource(),
-        getSecuritySource(),
-        getComputationTargetResolver(),
-        getUserPortfolioMaster(),
-        getUserPositionMaster(),
-        getUserViewDefinitionRepository(),
-        getUser(),
-        getFudgeContext(),
-        getPortfolioAggregationFunctions());
-    return liveResults;
-  }
-
   protected LongPollingConnectionManager buildLongPolling() {
     return new LongPollingConnectionManager();
-  }
-
-  protected ReportFactory buildReportFactory() {
-    Map<String, ReportGenerator> generators = new HashMap<String, ReportGenerator>();
-    generators.put("csv", new CsvReportGenerator());
-    return new ReportFactory(generators);
   }
 
   protected ChangeManager buildChangeManager() {

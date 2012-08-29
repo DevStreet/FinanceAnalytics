@@ -13,6 +13,9 @@ import java.util.Set;
 import javax.time.calendar.Clock;
 import javax.time.calendar.ZonedDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
@@ -29,7 +32,6 @@ import com.opengamma.analytics.financial.model.volatility.smile.function.Volatil
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.surface.InterpolatedDoublesSurface;
-import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.position.Trade;
 import com.opengamma.core.region.RegionSource;
@@ -57,7 +59,9 @@ import com.opengamma.financial.analytics.model.FunctionUtils;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.model.InterpolatedDataProperties;
 import com.opengamma.financial.analytics.model.YieldCurveNodeSensitivitiesHelper;
-import com.opengamma.financial.analytics.model.curve.interestrate.MarketInstrumentImpliedYieldCurveFunction;
+import com.opengamma.financial.analytics.model.curve.interestrate.MultiYieldCurvePropertiesAndDefaults;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesFunctionUtils;
 import com.opengamma.financial.analytics.volatility.fittedresults.SABRFittedSurfaces;
 import com.opengamma.financial.convention.ConventionBundle;
 import com.opengamma.financial.convention.ConventionBundleSource;
@@ -67,15 +71,17 @@ import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
 import com.opengamma.id.ExternalId;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.util.money.Currency;
 
 /**
  * 
  */
 public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction extends AbstractFunction.NonCompiledInvoker {
+  private static final Logger s_logger = LoggerFactory.getLogger(InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction.class);
   @SuppressWarnings("unchecked")
   private static final VolatilityFunctionProvider<SABRFormulaData> SABR_FUNCTION = (VolatilityFunctionProvider<SABRFormulaData>) VolatilityFunctionFactory
-      .getCalculator(VolatilityFunctionFactory.HAGAN);
+  .getCalculator(VolatilityFunctionFactory.HAGAN);
   private static final PresentValueNodeSensitivityCalculator NSC = PresentValueNodeSensitivityCalculator.using(PresentValueCurveSensitivitySABRCalculator.getInstance());
   private static final InstrumentSensitivityCalculator CALCULATOR = InstrumentSensitivityCalculator.getInstance();
   private static final String VALUE_REQUIREMENT = ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES;
@@ -88,8 +94,9 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
     final RegionSource regionSource = OpenGammaCompilationContext.getRegionSource(context);
     final ConventionBundleSource conventionSource = OpenGammaCompilationContext.getConventionBundleSource(context);
     final SecuritySource securitySource = OpenGammaCompilationContext.getSecuritySource(context);
+    final HistoricalTimeSeriesResolver timeSeriesResolver = OpenGammaCompilationContext.getHistoricalTimeSeriesResolver(context);
     _converter = new InterestRateFutureOptionTradeConverter(new InterestRateFutureOptionSecurityConverter(holidaySource, conventionSource, regionSource, securitySource));
-    _dataConverter = new FixedIncomeConverterDataProvider(conventionSource);
+    _dataConverter = new FixedIncomeConverterDataProvider(conventionSource, timeSeriesResolver);
   }
 
   @Override
@@ -104,7 +111,7 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
     final String curveName = constraints.getValues(ValuePropertyNames.CURVE).iterator().next();
     final String surfaceName = constraints.getValues(ValuePropertyNames.SURFACE).iterator().next();
     final String calculationMethod = constraints.getValues(ValuePropertyNames.CURVE_CALCULATION_METHOD).iterator().next();
-    final HistoricalTimeSeriesSource dataSource = OpenGammaExecutionContext.getHistoricalTimeSeriesSource(executionContext);
+    final HistoricalTimeSeriesBundle timeSeries = HistoricalTimeSeriesFunctionUtils.getHistoricalTimeSeriesInputs(executionContext, inputs);
     final ValueRequirement curveSpecRequirement = getCurveSpecRequirement(target, curveName);
     final Object curveSpecObject = inputs.getValue(curveSpecRequirement);
     if (curveSpecObject == null) {
@@ -117,7 +124,7 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
     final FinancialSecurity security = (FinancialSecurity) trade.getSecurity();
     final Currency currency = FinancialSecurityUtils.getCurrency(security);
     final InterpolatedYieldCurveSpecificationWithSecurities curveSpec = (InterpolatedYieldCurveSpecificationWithSecurities) curveSpecObject;
-    final InstrumentDerivative derivative = _dataConverter.convert(security, definition, now, new String[] {fundingCurveName, forwardCurveName }, dataSource);
+    final InstrumentDerivative derivative = _dataConverter.convert(security, definition, now, new String[] {fundingCurveName, forwardCurveName }, timeSeries);
     final String conventionName = currency.getCode() + "_IR_FUTURE";
     final ConventionBundle convention = conventionSource.getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, conventionName));
     if (convention == null) {
@@ -141,7 +148,7 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
     final double[][] array = FunctionUtils.decodeJacobian(jacobianObject);
     final DoubleMatrix2D jacobian = new DoubleMatrix2D(array);
     DoubleMatrix1D sensitivities;
-    if (calculationMethod.equals(MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING)) {
+    if (calculationMethod.equals(MultiYieldCurvePropertiesAndDefaults.PRESENT_VALUE_STRING)) {
       final Object couponSensitivityObject = inputs.getValue(getCouponSensitivityRequirement(target, forwardCurveName, fundingCurveName));
       if (couponSensitivityObject == null) {
         throw new OpenGammaRuntimeException("Could not get " + ValueRequirementNames.PRESENT_VALUE_COUPON_SENSITIVITY);
@@ -199,8 +206,9 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
     final String forwardCurveName = forwardCurves.iterator().next();
     final String fundingCurveName = fundingCurves.iterator().next();
     if (!curveName.equals(forwardCurveName) && !curveName.equals(fundingCurveName)) {
-      throw new OpenGammaRuntimeException("Asked for sensitivities to a curve (" + curveName + ") to which this interest rate future option is not sensitive " +
+      s_logger.error("Asked for sensitivities to a curve (" + curveName + ") to which this interest rate future option is not sensitive " +
           "(allowed " + forwardCurveName + " and " + fundingCurveName + ")");
+      return null;
     }
     final String surfaceName = surfaceNames.iterator().next();
     final String calculationMethod = calculationMethodNames.iterator().next();
@@ -211,7 +219,7 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
       requirements.add(getCurveSpecRequirement(target, curveName));
       if (!calculationMethod.equals(InterpolatedDataProperties.CALCULATION_METHOD_NAME)) {
         requirements.add(getJacobianRequirement(target, calculationMethod));
-        if (calculationMethod.equals(MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING)) {
+        if (calculationMethod.equals(MultiYieldCurvePropertiesAndDefaults.PRESENT_VALUE_STRING)) {
           requirements.add(getCouponSensitivityRequirement(target, null, null));
         }
       }
@@ -222,10 +230,17 @@ public class InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction ext
     requirements.add(getCurveSpecRequirement(target, curveName));
     if (!calculationMethod.equals(InterpolatedDataProperties.CALCULATION_METHOD_NAME)) {
       requirements.add(getJacobianRequirement(target, forwardCurveName, fundingCurveName, calculationMethod));
-      if (calculationMethod.equals(MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING)) {
+      if (calculationMethod.equals(MultiYieldCurvePropertiesAndDefaults.PRESENT_VALUE_STRING)) {
         requirements.add(getCouponSensitivityRequirement(target, forwardCurveName, fundingCurveName));
       }
     }
+    final Trade trade = target.getTrade();
+    final FinancialSecurity security = (FinancialSecurity) trade.getSecurity();
+    final Set<ValueRequirement> timeSeriesRequirements = _dataConverter.getConversionTimeSeriesRequirements(security, _converter.convert(trade), new String[] {fundingCurveName, forwardCurveName });
+    if (timeSeriesRequirements == null) {
+      return null;
+    }
+    requirements.addAll(timeSeriesRequirements);
     return requirements;
   }
 

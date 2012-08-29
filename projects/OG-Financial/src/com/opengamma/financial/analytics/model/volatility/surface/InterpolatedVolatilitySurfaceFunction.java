@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.analytics.model.volatility.surface;
@@ -36,11 +36,12 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.model.InterpolatedDataProperties;
+import com.opengamma.id.UniqueId;
 import com.opengamma.util.CompareUtils;
 import com.opengamma.util.money.Currency;
 
 /**
- * 
+ *
  */
 public class InterpolatedVolatilitySurfaceFunction extends AbstractFunction.NonCompiledInvoker {
   private static final Logger s_logger = LoggerFactory.getLogger(InterpolatedVolatilitySurfaceFunction.class);
@@ -101,13 +102,18 @@ public class InterpolatedVolatilitySurfaceFunction extends AbstractFunction.NonC
 
   @Override
   public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
-    if (target.getType() != ComputationTargetType.PRIMITIVE) {
+    final UniqueId uid = target.getUniqueId();
+    if (uid == null) {
+      return false;
+    }
+    if (target.getUniqueId() == null) {
+      s_logger.error("Target unique id was null, {}", target);
       return false;
     }
     final String scheme = target.getUniqueId().getScheme();
-    return (scheme.equals(Currency.OBJECT_SCHEME) 
-         || scheme.equalsIgnoreCase(ExternalSchemes.BLOOMBERG_TICKER.getName())
-         || scheme.equalsIgnoreCase(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName()));
+    return (scheme.equals(Currency.OBJECT_SCHEME)
+        || scheme.equalsIgnoreCase(ExternalSchemes.BLOOMBERG_TICKER.getName())
+        || scheme.equalsIgnoreCase(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName()));
   }
 
   @Override

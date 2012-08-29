@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
  * 
  * Please see distribution for license.
  */
@@ -8,23 +8,21 @@ package com.opengamma.analytics.financial.forex.method;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
 
-import java.util.Map;
-
 import javax.time.calendar.Period;
 import javax.time.calendar.ZonedDateTime;
 
 import org.testng.annotations.Test;
 import org.testng.internal.junit.ArrayAsserts;
 
-import com.opengamma.analytics.financial.forex.calculator.CurrencyExposureBlackForexCalculator;
+import com.opengamma.analytics.financial.calculator.PresentValueCurveSensitivityConvertedCurveCurrencyCalculator;
+import com.opengamma.analytics.financial.forex.calculator.CurrencyExposureBlackSmileForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.ForwardRateForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.GammaSpotBlackForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.GammaValueBlackForexCalculator;
-import com.opengamma.analytics.financial.forex.calculator.PresentValueBlackForexCalculator;
+import com.opengamma.analytics.financial.forex.calculator.PresentValueBlackSmileForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.PresentValueBlackVolatilityQuoteSensitivityForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.PresentValueBlackVolatilitySensitivityBlackForexCalculator;
-import com.opengamma.analytics.financial.forex.calculator.PresentValueCurveSensitivityBlackForexCalculator;
-import com.opengamma.analytics.financial.forex.calculator.PresentValueCurveSensitivityConvertedForexCalculator;
+import com.opengamma.analytics.financial.forex.calculator.PresentValueCurveSensitivityBlackSmileForexCalculator;
 import com.opengamma.analytics.financial.forex.definition.ForexDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexOptionVanillaDefinition;
 import com.opengamma.analytics.financial.forex.derivative.Forex;
@@ -38,9 +36,11 @@ import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.financial.model.option.definition.SmileDeltaTermStructureDataBundle;
-import com.opengamma.analytics.financial.model.option.definition.SmileDeltaTermStructureParameter;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackPriceFunction;
+import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
+import com.opengamma.analytics.financial.model.volatility.VolatilityAndBucketedSensitivities;
+import com.opengamma.analytics.financial.model.volatility.surface.SmileDeltaTermStructureParametersStrikeInterpolation;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
 import com.opengamma.analytics.math.function.Function1D;
@@ -70,7 +70,7 @@ public class ForexOptionVanillaMethodTest {
   // Smile data
   private static final Currency EUR = Currency.EUR;
   private static final Currency USD = Currency.USD;
-  private static final Period[] EXPIRY_PERIOD = new Period[] {Period.ofMonths(3), Period.ofMonths(6), Period.ofYears(1), Period.ofYears(2), Period.ofYears(5) };
+  private static final Period[] EXPIRY_PERIOD = new Period[] {Period.ofMonths(3), Period.ofMonths(6), Period.ofYears(1), Period.ofYears(2), Period.ofYears(5)};
   private static final int NB_EXP = EXPIRY_PERIOD.length;
   private static final ZonedDateTime REFERENCE_DATE = DateUtils.getUTCDate(2011, 6, 13);
   private static final ZonedDateTime REFERENCE_SPOT = ScheduleCalculator.getAdjustedDate(REFERENCE_DATE, SETTLEMENT_DAYS, CALENDAR);
@@ -86,27 +86,25 @@ public class ForexOptionVanillaMethodTest {
     }
   }
   private static final double SPOT = 1.40;
-  private static final FXMatrix FX_MATRIX = new FXMatrix(EUR, USD, SPOT);
-  private static final double[] ATM = {0.175, 0.185, 0.18, 0.17, 0.16, 0.16 };
-  private static final double[] DELTA = new double[] {0.10, 0.25 };
-  private static final double[][] RISK_REVERSAL = new double[][] { {-0.010, -0.0050 }, {-0.011, -0.0060 }, {-0.012, -0.0070 }, {-0.013, -0.0080 }, {-0.014, -0.0090 }, {-0.014, -0.0090 } };
-  private static final double[][] STRANGLE = new double[][] { {0.0300, 0.0100 }, {0.0310, 0.0110 }, {0.0320, 0.0120 }, {0.0330, 0.0130 }, {0.0340, 0.0140 }, {0.0340, 0.0140 } };
+  private static final double[] ATM = {0.175, 0.185, 0.18, 0.17, 0.16, 0.16};
+  private static final double[] DELTA = new double[] {0.10, 0.25};
+  private static final double[][] RISK_REVERSAL = new double[][] { {-0.010, -0.0050}, {-0.011, -0.0060}, {-0.012, -0.0070}, {-0.013, -0.0080}, {-0.014, -0.0090}, {-0.014, -0.0090}};
+  private static final double[][] STRANGLE = new double[][] { {0.0300, 0.0100}, {0.0310, 0.0110}, {0.0320, 0.0120}, {0.0330, 0.0130}, {0.0340, 0.0140}, {0.0340, 0.0140}};
   private static final int NB_STRIKE = 2 * DELTA.length + 1;
-  private static final SmileDeltaTermStructureParameter SMILE_TERM = new SmileDeltaTermStructureParameter(TIME_TO_EXPIRY, DELTA, ATM, RISK_REVERSAL, STRANGLE);
-  private static final SmileDeltaTermStructureParameter SMILE_TERM_FLAT = TestsDataSetsForex.smileFlat(REFERENCE_DATE);
+  private static final SmileDeltaTermStructureParametersStrikeInterpolation SMILE_TERM = new SmileDeltaTermStructureParametersStrikeInterpolation(TIME_TO_EXPIRY, DELTA, ATM, RISK_REVERSAL, STRANGLE);
+  private static final SmileDeltaTermStructureParametersStrikeInterpolation SMILE_TERM_FLAT = TestsDataSetsForex.smileFlat(REFERENCE_DATE);
   // Methods and curves
   private static final YieldCurveBundle CURVES = TestsDataSetsForex.createCurvesForex();
   private static final String[] CURVES_NAME = TestsDataSetsForex.curveNames();
-  private static final Map<String, Currency> CURVE_CURRENCY = TestsDataSetsForex.curveCurrency();
-  private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE = new SmileDeltaTermStructureDataBundle(FX_MATRIX, CURVE_CURRENCY, CURVES, SMILE_TERM, Pair.of(EUR, USD));
-  private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE_FLAT = new SmileDeltaTermStructureDataBundle(FX_MATRIX, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+  private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE = new SmileDeltaTermStructureDataBundle(CURVES, SMILE_TERM, Pair.of(EUR, USD));
+  private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE_FLAT = new SmileDeltaTermStructureDataBundle(CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
   private static final BlackPriceFunction BLACK_FUNCTION = new BlackPriceFunction();
-  private static final ForexOptionVanillaBlackMethod METHOD_OPTION = ForexOptionVanillaBlackMethod.getInstance();
+  private static final ForexOptionVanillaBlackSmileMethod METHOD_OPTION = ForexOptionVanillaBlackSmileMethod.getInstance();
   private static final ForexDiscountingMethod METHOD_DISC = ForexDiscountingMethod.getInstance();
-  private static final PresentValueBlackForexCalculator PVC_BLACK = PresentValueBlackForexCalculator.getInstance();
-  private static final CurrencyExposureBlackForexCalculator CEC_BLACK = CurrencyExposureBlackForexCalculator.getInstance();
-  private static final PresentValueCurveSensitivityBlackForexCalculator PVCSC_BLACK = PresentValueCurveSensitivityBlackForexCalculator.getInstance();
-  private static final PresentValueCurveSensitivityConvertedForexCalculator PVCSCC_BLACK = new PresentValueCurveSensitivityConvertedForexCalculator(PVCSC_BLACK);
+  private static final PresentValueBlackSmileForexCalculator PVC_BLACK = PresentValueBlackSmileForexCalculator.getInstance();
+  private static final CurrencyExposureBlackSmileForexCalculator CEC_BLACK = CurrencyExposureBlackSmileForexCalculator.getInstance();
+  private static final PresentValueCurveSensitivityBlackSmileForexCalculator PVCSC_BLACK = PresentValueCurveSensitivityBlackSmileForexCalculator.getInstance();
+  private static final PresentValueCurveSensitivityConvertedCurveCurrencyCalculator PVCSCC_BLACK = new PresentValueCurveSensitivityConvertedCurveCurrencyCalculator(PVCSC_BLACK);
   private static final PresentValueBlackVolatilitySensitivityBlackForexCalculator PVVSC_BLACK = PresentValueBlackVolatilitySensitivityBlackForexCalculator.getInstance();
   // option
   private static final double STRIKE = 1.45;
@@ -187,8 +185,8 @@ public class ForexOptionVanillaMethodTest {
     final ForexDefinition forexUSDEURDefinition = new ForexDefinition(USD, EUR, payDate, -notional * strike, 1.0 / strike);
     final ForexOptionVanillaDefinition callEURUSDDefinition = new ForexOptionVanillaDefinition(forexEURUSDDefinition, expDate, isCall, isLong);
     final ForexOptionVanillaDefinition putUSDEURDefinition = new ForexOptionVanillaDefinition(forexUSDEURDefinition, expDate, isCall, isLong);
-    final InstrumentDerivative callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1] });
-    final InstrumentDerivative putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0] });
+    final InstrumentDerivative callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1]});
+    final InstrumentDerivative putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0]});
     final MultipleCurrencyAmount pvCallEURUSD = METHOD_OPTION.presentValue(callEURUSD, SMILE_BUNDLE);
     final MultipleCurrencyAmount pvPutUSDEUR = METHOD_OPTION.presentValue(putUSDEUR, SMILE_BUNDLE);
     assertEquals("Forex vanilla option: present value Method vs Calculator", pvCallEURUSD.getAmount(USD) / SPOT, pvPutUSDEUR.getAmount(EUR), 1E-2);
@@ -292,8 +290,8 @@ public class ForexOptionVanillaMethodTest {
     final ForexDefinition forexUSDEURDefinition = new ForexDefinition(USD, EUR, payDate, -notional * strike, 1.0 / strike);
     final ForexOptionVanillaDefinition callEURUSDDefinition = new ForexOptionVanillaDefinition(forexEURUSDDefinition, expDate, isCall, isLong);
     final ForexOptionVanillaDefinition putUSDEURDefinition = new ForexOptionVanillaDefinition(forexUSDEURDefinition, expDate, isCall, isLong);
-    final InstrumentDerivative callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1] });
-    final InstrumentDerivative putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0] });
+    final InstrumentDerivative callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1]});
+    final InstrumentDerivative putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0]});
     final MultipleCurrencyAmount pvCallEURUSD = METHOD_OPTION.currencyExposure(callEURUSD, SMILE_BUNDLE);
     final MultipleCurrencyAmount pvPutUSDEUR = METHOD_OPTION.currencyExposure(putUSDEUR, SMILE_BUNDLE);
     assertEquals("Forex vanilla option: currency exposure", pvCallEURUSD.getAmount(EUR), pvPutUSDEUR.getAmount(EUR), 1.0E-2);
@@ -387,8 +385,10 @@ public class ForexOptionVanillaMethodTest {
     assertEquals("Forex: relative delta", ce.getAmount(EUR), delta, TOLERANCE_RELATIVE);
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT - shift);
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT + shift);
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final MultipleCurrencyAmount pvM = METHOD_OPTION.presentValue(forexOption, smileBundleM);
     final MultipleCurrencyAmount pvP = METHOD_OPTION.presentValue(forexOption, smileBundleP);
     final double deltaFlat = METHOD_OPTION.deltaRelative(forexOption, SMILE_BUNDLE_FLAT, true);
@@ -403,8 +403,10 @@ public class ForexOptionVanillaMethodTest {
     final double shift = 1.0E-6;
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT - shift);
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT + shift);
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final double strike = 1.45;
     final boolean isCall = true;
     final boolean isLong = true;
@@ -440,8 +442,10 @@ public class ForexOptionVanillaMethodTest {
     assertEquals("Forex: relative delta", ce.getAmount(EUR), delta, TOLERANCE_RELATIVE);
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT * (1 - shift));
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT * (1 + shift));
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final MultipleCurrencyAmount pvM = METHOD_OPTION.presentValue(forexOption, smileBundleM);
     final MultipleCurrencyAmount pvP = METHOD_OPTION.presentValue(forexOption, smileBundleP);
     final double deltaFlat = METHOD_OPTION.deltaRelativeSpot(forexOption, SMILE_BUNDLE_FLAT, true);
@@ -456,8 +460,10 @@ public class ForexOptionVanillaMethodTest {
     final double shift = 1.0E-6;
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT * (1 - shift));
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT * (1 + shift));
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final double strike = 1.45;
     final boolean isCall = true;
     final boolean isLong = true;
@@ -481,8 +487,10 @@ public class ForexOptionVanillaMethodTest {
     final double shift = 1.0E-6;
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT - shift);
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT + shift);
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final double strike = 1.45;
     final boolean isCall = true;
     final boolean isLong = true;
@@ -507,8 +515,10 @@ public class ForexOptionVanillaMethodTest {
     final double shift = 1.0E-6;
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT - shift);
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT + shift);
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final double strike = 1.45;
     final boolean isCall = true;
     final boolean isLong = true;
@@ -533,8 +543,10 @@ public class ForexOptionVanillaMethodTest {
     final double shift = 1.0E-6;
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT * (1 - shift));
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT * (1 + shift));
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final double strike = 1.45;
     final boolean isCall = true;
     final boolean isLong = true;
@@ -558,8 +570,10 @@ public class ForexOptionVanillaMethodTest {
     final double shift = 1.0E-6;
     final FXMatrix fxMatrixM = new FXMatrix(EUR, USD, SPOT * (1 - shift));
     final FXMatrix fxMatrixP = new FXMatrix(EUR, USD, SPOT * (1 + shift));
-    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxMatrixM, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
-    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxMatrixP, CURVE_CURRENCY, CURVES, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final YieldCurveBundle fxDown = new YieldCurveBundle(fxMatrixM, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final YieldCurveBundle fxUp = new YieldCurveBundle(fxMatrixP, CURVES.getCurrencyMap(), CURVES.getCurvesMap());
+    final SmileDeltaTermStructureDataBundle smileBundleM = new SmileDeltaTermStructureDataBundle(fxDown, SMILE_TERM_FLAT, Pair.of(EUR, USD));
+    final SmileDeltaTermStructureDataBundle smileBundleP = new SmileDeltaTermStructureDataBundle(fxUp, SMILE_TERM_FLAT, Pair.of(EUR, USD));
     final double strike = 1.45;
     final boolean isCall = true;
     final boolean isLong = true;
@@ -739,7 +753,7 @@ public class ForexOptionVanillaMethodTest {
     //Foreign
     yields[0] = curveForeign.getInterestRate(nodeTimes[0]);
     yields[1] = curveForeign.getInterestRate(nodeTimes[1]);
-    curveNode = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimes, yields, new LinearInterpolator1D()));
+    curveNode = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimes, yields, new LinearInterpolator1D()));
     curveBumpedPlus = curveNode.withSingleShift(nodeTimes[1], deltaShift);
     curveBumpedMinus = curveNode.withSingleShift(nodeTimes[1], -deltaShift);
     final YieldCurveBundle curvesForeign = new YieldCurveBundle();
@@ -760,7 +774,7 @@ public class ForexOptionVanillaMethodTest {
     //Domestic
     yields[0] = curveDomestic.getInterestRate(nodeTimes[0]);
     yields[1] = curveDomestic.getInterestRate(nodeTimes[1]);
-    curveNode = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimes, yields, new LinearInterpolator1D()));
+    curveNode = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimes, yields, new LinearInterpolator1D()));
     curveBumpedPlus = curveNode.withSingleShift(nodeTimes[1], deltaShift);
     curveBumpedMinus = curveNode.withSingleShift(nodeTimes[1], -deltaShift);
     final YieldCurveBundle curvesDomestic = new YieldCurveBundle();
@@ -844,8 +858,8 @@ public class ForexOptionVanillaMethodTest {
     final ForexDefinition forexUSDEURDefinition = new ForexDefinition(USD, EUR, payDate, -notional * strike, 1.0 / strike);
     final ForexOptionVanillaDefinition callEURUSDDefinition = new ForexOptionVanillaDefinition(forexEURUSDDefinition, expDate, isCall, isLong);
     final ForexOptionVanillaDefinition putUSDEURDefinition = new ForexOptionVanillaDefinition(forexUSDEURDefinition, expDate, isCall, isLong);
-    final ForexOptionVanilla callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1] });
-    final ForexOptionVanilla putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0] });
+    final ForexOptionVanilla callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1]});
+    final ForexOptionVanilla putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0]});
     final PresentValueForexBlackVolatilitySensitivity vsCallEURUSD = METHOD_OPTION.presentValueBlackVolatilitySensitivity(callEURUSD, SMILE_BUNDLE);
     final PresentValueForexBlackVolatilitySensitivity vsPutUSDEUR = METHOD_OPTION.presentValueBlackVolatilitySensitivity(putUSDEUR, SMILE_BUNDLE);
     final DoublesPair point = DoublesPair.of(callEURUSD.getTimeToExpiry(), strike);
@@ -863,10 +877,10 @@ public class ForexOptionVanillaMethodTest {
     final Pair<Currency, Currency> currencyPair = ObjectsPair.of(EUR, USD);
     assertEquals("Forex vanilla option: vega", currencyPair, sensi.getCurrencyPair());
     final PresentValueForexBlackVolatilitySensitivity pointSensitivity = METHOD_OPTION.presentValueBlackVolatilitySensitivity(FOREX_CALL_OPTION, SMILE_BUNDLE);
-    final double[][] nodeWeight = new double[NB_EXP + 1][NB_STRIKE];
     final double df = CURVES.getCurve(CURVES_NAME[1]).getDiscountFactor(TimeCalculator.getTimeBetween(REFERENCE_DATE, OPTION_PAY_DATE));
     final double forward = SPOT * CURVES.getCurve(CURVES_NAME[0]).getDiscountFactor(TimeCalculator.getTimeBetween(REFERENCE_DATE, OPTION_PAY_DATE)) / df;
-    SMILE_TERM.getVolatility(FOREX_CALL_OPTION.getTimeToExpiry(), STRIKE, forward, nodeWeight);
+    final VolatilityAndBucketedSensitivities volAndSensitivities = SMILE_TERM.getVolatilityAndSensitivities(FOREX_CALL_OPTION.getTimeToExpiry(), STRIKE, forward);
+    final double[][] nodeWeight = volAndSensitivities.getBucketedSensitivities();
     final DoublesPair point = DoublesPair.of(FOREX_CALL_OPTION.getTimeToExpiry(), STRIKE);
     for (int loopexp = 0; loopexp < NB_EXP; loopexp++) {
       for (int loopstrike = 0; loopstrike < NB_STRIKE; loopstrike++) {
@@ -890,8 +904,8 @@ public class ForexOptionVanillaMethodTest {
     final ForexDefinition forexUSDEURDefinition = new ForexDefinition(USD, EUR, payDate, -notional * strike, 1.0 / strike);
     final ForexOptionVanillaDefinition callEURUSDDefinition = new ForexOptionVanillaDefinition(forexEURUSDDefinition, expDate, isCall, isLong);
     final ForexOptionVanillaDefinition putUSDEURDefinition = new ForexOptionVanillaDefinition(forexUSDEURDefinition, expDate, isCall, isLong);
-    final ForexOptionVanilla callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1] });
-    final ForexOptionVanilla putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0] });
+    final ForexOptionVanilla callEURUSD = callEURUSDDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[0], CURVES_NAME[1]});
+    final ForexOptionVanilla putUSDEUR = putUSDEURDefinition.toDerivative(REFERENCE_DATE, new String[] {CURVES_NAME[1], CURVES_NAME[0]});
     final PresentValueForexBlackVolatilityNodeSensitivityDataBundle nsCallEURUSD = METHOD_OPTION.presentValueBlackVolatilityNodeSensitivity(callEURUSD, SMILE_BUNDLE);
     final PresentValueForexBlackVolatilityNodeSensitivityDataBundle nsPutUSDEUR = METHOD_OPTION.presentValueBlackVolatilityNodeSensitivity(putUSDEUR, SMILE_BUNDLE);
     for (int loopexp = 0; loopexp < nsCallEURUSD.getExpiries().getNumberOfElements(); loopexp++) {
@@ -972,6 +986,35 @@ public class ForexOptionVanillaMethodTest {
     final MultipleCurrencyAmount pvTomorrow = PVC_BLACK.visit(swapTomorrow, tomorrowData);
     final MultipleCurrencyAmount thetaExpected = pvTomorrow.plus(pvToday.multipliedBy(-1.0));
     assertEquals("ThetaCalculator: forex option", thetaExpected.getAmount(USD), theta.getAmount(USD), TOLERANCE_PV);
+  }
+
+  @Test
+  /**
+   * Tests the theoretical Theta (derivative with respect to time in Black formula).
+   */
+  public void thetaTheoretical() {
+    final double strike = 1.45;
+    final boolean isCall = true;
+    final boolean isLong = true;
+    final double notional = 100000000;
+    final ZonedDateTime payDate = ScheduleCalculator.getAdjustedDate(REFERENCE_DATE, Period.ofMonths(9), BUSINESS_DAY, CALENDAR);
+    final ZonedDateTime expDate = ScheduleCalculator.getAdjustedDate(payDate, -SETTLEMENT_DAYS, CALENDAR);
+    final double timeToExpiry = TimeCalculator.getTimeBetween(REFERENCE_DATE, expDate);
+    final ForexDefinition forexUnderlyingDefinition = new ForexDefinition(EUR, USD, payDate, notional, strike);
+    final ForexOptionVanillaDefinition callDefinition = new ForexOptionVanillaDefinition(forexUnderlyingDefinition, expDate, isCall, isLong);
+    final ForexOptionVanilla call = callDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+    final double df = CURVES.getCurve(CURVES_NAME[1]).getDiscountFactor(TimeCalculator.getTimeBetween(REFERENCE_DATE, payDate));
+    final double forward = SPOT * CURVES.getCurve(CURVES_NAME[0]).getDiscountFactor(TimeCalculator.getTimeBetween(REFERENCE_DATE, payDate)) / df;
+    final double volatility = SMILE_TERM.getVolatility(timeToExpiry, strike, forward);
+    final double thetaUnit = BlackFormulaRepository.theta(forward, strike, timeToExpiry, volatility);
+    final double thetaExpected = thetaUnit * notional;
+    final CurrencyAmount thetaCallComputed = METHOD_OPTION.thetaTheoretical(call, SMILE_BUNDLE);
+    assertEquals("Theta theoretical: forex option", thetaExpected, thetaCallComputed.getAmount(), TOLERANCE_PV);
+    assertEquals("Theta theoretical: forex option", USD, thetaCallComputed.getCurrency());
+    final ForexOptionVanillaDefinition putDefinition = new ForexOptionVanillaDefinition(forexUnderlyingDefinition, expDate, !isCall, isLong);
+    final ForexOptionVanilla put = putDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+    final CurrencyAmount thetaPutComputed = METHOD_OPTION.thetaTheoretical(put, SMILE_BUNDLE);
+    assertEquals("Theta theoretical: forex option", thetaCallComputed.getAmount(), thetaPutComputed.getAmount(), TOLERANCE_PV);
   }
 
 }

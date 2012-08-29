@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.time.calendar.LocalDate;
 
+import com.opengamma.core.change.ChangeManager;
 import org.testng.annotations.Test;
 
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
@@ -185,6 +186,15 @@ public class FetchTimeSeriesFunctionTest {
       throw new UnsupportedOperationException();
     }
 
+    @Override
+    public ExternalIdBundle getExternalIdBundle(UniqueId uniqueId) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ChangeManager changeManager() {
+      throw new UnsupportedOperationException();
+    }
   }
 
   private SessionContext createSessionContext(final HistoricalTimeSeriesSource historicalTimeSeriesSource) {

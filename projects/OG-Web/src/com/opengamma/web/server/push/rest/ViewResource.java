@@ -6,6 +6,7 @@
 package com.opengamma.web.server.push.rest;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -20,12 +21,15 @@ public class ViewResource {
 
   private final AnalyticsView _view;
   private final AnalyticsViewManager _viewManager;
+  private final String _viewId;
 
-  public ViewResource(AnalyticsView view, AnalyticsViewManager viewManager) {
+  public ViewResource(AnalyticsView view, AnalyticsViewManager viewManager, String viewId) {
     ArgumentChecker.notNull(viewManager, "viewManager");
     ArgumentChecker.notNull(view, "view");
+    ArgumentChecker.notNull(viewId, "viewId");
     _viewManager = viewManager;
     _view = view;
+    _viewId = viewId;
   }
 
   @Path("portfolio")
@@ -39,7 +43,12 @@ public class ViewResource {
   }
 
   @DELETE
-  public void deleteView(@PathParam("viewId") String viewId) {
-    _viewManager.deleteView(viewId);
+  public void deleteView() {
+    _viewManager.deleteView(_viewId);
+  }
+
+  @POST
+  public void pauseUnpauseView(boolean paused) {
+    // TODO implement
   }
 }

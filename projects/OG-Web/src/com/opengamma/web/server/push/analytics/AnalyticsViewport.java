@@ -5,39 +5,33 @@
  */
 package com.opengamma.web.server.push.analytics;
 
-import com.opengamma.engine.view.ViewComputationResultModel;
+import com.opengamma.util.ArgumentChecker;
 
 /**
  *
  */
-/* package */ class AnalyticsViewport {
+/* package */ abstract class AnalyticsViewport {
 
-  // TODO list of rows
-  // TODO list of columns
+  protected final String _dataId;
 
-  /* package */ AnalyticsViewport(ViewportRequest viewportRequest, AnalyticsHistory history, ViewComputationResultModel results) {
+  protected ViewportSpecification _viewportSpec;
+  protected ViewportResults _latestResults;
+  protected long _version;
 
+  /* package */ AnalyticsViewport(String dataId) {
+    ArgumentChecker.notNull(dataId, "dataId");
+    _dataId = dataId;
   }
 
-  /**
-   * @return An empty viewport with no rows or columns
-   */
-  /* package */ static AnalyticsViewport empty() {
-    // TODO implement AnalyticsViewport.empty()
-    throw new UnsupportedOperationException("empty not implemented");
+  /* package */ ViewportResults getData() {
+    return _latestResults;
   }
 
-  /* package */ AnalyticsViewport updateResults(ViewComputationResultModel fullResult, AnalyticsHistory history) {
-    // TODO implement AnalyticsViewport.updateResults()
-    throw new UnsupportedOperationException("updateResults not implemented");
+  /* package */ String getDataId() {
+    return _dataId;
   }
 
-  /* package */ AnalyticsResults getData() {
-    throw new UnsupportedOperationException("getData not implemented");
-  }
-
-  public void update(ViewportRequest viewportRequest) {
-    // TODO implement AnalyticsViewport.update()
-    throw new UnsupportedOperationException("update not implemented");
+  /* package */ long getVersion() {
+    return _version;
   }
 }

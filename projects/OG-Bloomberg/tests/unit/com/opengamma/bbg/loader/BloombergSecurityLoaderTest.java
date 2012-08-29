@@ -35,8 +35,10 @@ import org.testng.annotations.Test;
 
 import com.opengamma.core.security.Security;
 import com.opengamma.financial.security.FinancialSecurity;
-import com.opengamma.financial.security.FinancialSecurityVisitor;
-import com.opengamma.financial.security.bond.BondSecurity;
+import com.opengamma.financial.security.FinancialSecurityVisitorAdapter;
+import com.opengamma.financial.security.bond.CorporateBondSecurity;
+import com.opengamma.financial.security.bond.GovernmentBondSecurity;
+import com.opengamma.financial.security.bond.MunicipalBondSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
@@ -54,14 +56,24 @@ import com.opengamma.financial.security.future.EquityFutureSecurity;
 import com.opengamma.financial.security.future.EquityIndexDividendFutureSecurity;
 import com.opengamma.financial.security.future.FXFutureSecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
-import com.opengamma.financial.security.future.FutureSecurityVisitor;
 import com.opengamma.financial.security.future.IndexFutureSecurity;
 import com.opengamma.financial.security.future.InterestRateFutureSecurity;
 import com.opengamma.financial.security.future.MetalFutureSecurity;
 import com.opengamma.financial.security.future.StockFutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
-import com.opengamma.financial.security.option.*;
+import com.opengamma.financial.security.option.CommodityFutureOptionSecurity;
+import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
+import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
+import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
+import com.opengamma.financial.security.option.EquityOptionSecurity;
+import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
+import com.opengamma.financial.security.option.FXDigitalOptionSecurity;
+import com.opengamma.financial.security.option.FXOptionSecurity;
+import com.opengamma.financial.security.option.IRFutureOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXDigitalOptionSecurity;
+import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
+import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
@@ -73,8 +85,9 @@ import com.opengamma.master.security.SecuritySearchResult;
 import com.opengamma.util.test.DbTest;
 
 /**
- * Test BloombergSecurityLoader.
+ * Test.
  */
+@Test(groups = "integration")
 public class BloombergSecurityLoaderTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(BloombergSecurityLoaderTest.class);
@@ -83,14 +96,10 @@ public class BloombergSecurityLoaderTest extends DbTest {
   private SecurityMaster _securityMaster;
   private BloombergSecurityLoader _securityLoader;
 
-  /**
-   * @param databaseType
-   * @param databaseVersion
-   */
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public BloombergSecurityLoaderTest(String databaseType, String databaseVersion) {
-    super(databaseType, databaseVersion);
-    s_logger.info("running testcases for {} version {}", databaseType, databaseVersion);
+    super(databaseType, databaseVersion, databaseVersion);
+    s_logger.info("running testcases for {}", databaseType);
   }
 
   @Override
@@ -134,14 +143,26 @@ public class BloombergSecurityLoaderTest extends DbTest {
     final Security fromSecMaster = securityDocument.getSecurity();
     assertNotNull(fromSecMaster);
 
-    expected.accept(new FinancialSecurityVisitor<Void>() {
+    expected.accept(new FinancialSecurityVisitorAdapter<Void>() {
 
       private void assertSecurity() {
         fail();
       }
 
       @Override
-      public Void visitBondSecurity(BondSecurity security) {
+      public Void visitCorporateBondSecurity(CorporateBondSecurity security) {
+        assertSecurity();
+        return null;
+      }
+
+      @Override
+      public Void visitGovernmentBondSecurity(GovernmentBondSecurity security) {
+        assertSecurity();
+        return null;
+      }
+
+      @Override
+      public Void visitMunicipalBondSecurity(MunicipalBondSecurity security) {
         assertSecurity();
         return null;
       }
@@ -177,8 +198,57 @@ public class BloombergSecurityLoaderTest extends DbTest {
       }
 
       @Override
-      public Void visitFutureSecurity(FutureSecurity security) {
-        security.accept(new FutureSecurityVisitor<Void>() {
+      public Void visitAgricultureFutureSecurity(AgricultureFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitBondFutureSecurity(BondFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitEnergyFutureSecurity(EnergyFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitEquityFutureSecurity(EquityFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitEquityIndexDividendFutureSecurity(EquityIndexDividendFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitFXFutureSecurity(FXFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitIndexFutureSecurity(IndexFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitInterestRateFutureSecurity(InterestRateFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitMetalFutureSecurity(MetalFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      @Override
+      public Void visitStockFutureSecurity(StockFutureSecurity security) {
+        return visitFutureSecurity(security);
+      }
+
+      private Void visitFutureSecurity(FutureSecurity security) {
+        security.accept(new FinancialSecurityVisitorAdapter<Void>() {
 
           @Override
           public Void visitAgricultureFutureSecurity(AgricultureFutureSecurity security) {
@@ -507,7 +577,7 @@ public class BloombergSecurityLoaderTest extends DbTest {
   public void testBondFutureSecurity() {
     assertLoadAndSaveSecurity(makeUSBondFuture());
   }
-  
+
   @Test(groups={"bbgSecurityLoaderTests"})
   public void testIRFutureOptionSecurity() {
     assertLoadAndSaveSecurity(makeEURODOLLARFutureOptionSecurity());

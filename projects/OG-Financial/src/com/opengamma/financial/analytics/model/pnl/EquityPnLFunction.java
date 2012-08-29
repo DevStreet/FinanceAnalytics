@@ -56,12 +56,14 @@ public class EquityPnLFunction extends AbstractFunction.NonCompiledInvoker {
     final Double fairValue = (Double) fairValueObj;
     final TimeSeriesReturnCalculator returnCalculator = getTimeSeriesReturnCalculator(returnCalculatorNames);
     final LocalDateDoubleTimeSeries returnSeries = (LocalDateDoubleTimeSeries) returnCalculator.evaluate((LocalDateDoubleTimeSeries) priceSeriesObj);
+    // Please see http://jira.opengamma.com/browse/PLAT-2330 for information about the PROPERTY_PNL_CONTRIBUTIONS constant
     final ValueProperties properties = createValueProperties()
         .with(ValuePropertyNames.CURRENCY, fairValueCV.getSpecification().getProperty(ValuePropertyNames.CURRENCY))
         .with(ValuePropertyNames.SAMPLING_PERIOD, samplingPeriodName)
         .with(ValuePropertyNames.SCHEDULE_CALCULATOR, scheduleCalculatorName)
         .with(ValuePropertyNames.SAMPLING_FUNCTION, samplingFunctionName)
-        .with(ValuePropertyNames.RETURN_CALCULATOR, returnCalculatorNames.iterator().next()).get();
+        .with(ValuePropertyNames.RETURN_CALCULATOR, returnCalculatorNames.iterator().next())
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, "Delta").get();
     final ValueSpecification valueSpecification = new ValueSpecification(new ValueRequirement(ValueRequirementNames.PNL_SERIES, position, properties), getUniqueId());
     //TODO how do we get dividend data for an equity?
     final ComputedValue result = new ComputedValue(valueSpecification, returnSeries.multiply(fairValue).multiply(position.getQuantity().doubleValue()));
@@ -70,51 +72,45 @@ public class EquityPnLFunction extends AbstractFunction.NonCompiledInvoker {
 
   @Override
   public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
-    return target.getType() == ComputationTargetType.POSITION && target.getPosition().getSecurity() instanceof EquitySecurity;
+    return target.getPosition().getSecurity() instanceof EquitySecurity;
   }
 
   @Override
   public Set<ValueRequirement> getRequirements(final FunctionCompilationContext context, final ComputationTarget target, final ValueRequirement desiredValue) {
-    if (canApplyTo(context, target)) {
-      final ValueProperties constraints = desiredValue.getConstraints();
-      final Set<String> samplingPeriodName = constraints.getValues(ValuePropertyNames.SAMPLING_PERIOD);
-      if (samplingPeriodName == null || samplingPeriodName.isEmpty() || samplingPeriodName.size() != 1) {
-        return null;
-      }
-      final Set<String> scheduleCalculatorName = constraints.getValues(ValuePropertyNames.SCHEDULE_CALCULATOR);
-      if (scheduleCalculatorName == null || scheduleCalculatorName.isEmpty() || scheduleCalculatorName.size() != 1) {
-        return null;
-      }
-      final Set<String> samplingFunctionName = constraints.getValues(ValuePropertyNames.SAMPLING_FUNCTION);
-      if (samplingFunctionName == null || samplingFunctionName.isEmpty() || samplingFunctionName.size() != 1) {
-        return null;
-      }
-      final Set<String> returnCalculatorName = constraints.getValues(ValuePropertyNames.RETURN_CALCULATOR);
-      if (returnCalculatorName == null || returnCalculatorName.isEmpty() || returnCalculatorName.size() != 1) {
-        return null;
-      }
-      final Position position = target.getPosition();
-      final String currency = FinancialSecurityUtils.getCurrency(position.getSecurity()).getCode();
-      final EquitySecurity equity = (EquitySecurity) position.getSecurity();
-      final Set<ValueRequirement> requirements = new HashSet<ValueRequirement>();
-      final ValueProperties priceSeriesProperties = ValueProperties.builder()
+    final ValueProperties constraints = desiredValue.getConstraints();
+    final Set<String> samplingPeriodName = constraints.getValues(ValuePropertyNames.SAMPLING_PERIOD);
+    if (samplingPeriodName == null || samplingPeriodName.size() != 1) {
+      return null;
+    }
+    final Set<String> scheduleCalculatorName = constraints.getValues(ValuePropertyNames.SCHEDULE_CALCULATOR);
+    if (scheduleCalculatorName == null || scheduleCalculatorName.size() != 1) {
+      return null;
+    }
+    final Set<String> samplingFunctionName = constraints.getValues(ValuePropertyNames.SAMPLING_FUNCTION);
+    if (samplingFunctionName == null || samplingFunctionName.size() != 1) {
+      return null;
+    }
+    final Set<String> returnCalculatorName = constraints.getValues(ValuePropertyNames.RETURN_CALCULATOR);
+    if (returnCalculatorName == null || returnCalculatorName.size() != 1) {
+      return null;
+    }
+    final Position position = target.getPosition();
+    final String currency = FinancialSecurityUtils.getCurrency(position.getSecurity()).getCode();
+    final EquitySecurity equity = (EquitySecurity) position.getSecurity();
+    final Set<ValueRequirement> requirements = new HashSet<ValueRequirement>();
+    final ValueProperties priceSeriesProperties = ValueProperties.builder()
         .with(ValuePropertyNames.CURRENCY, currency)
         .with(ValuePropertyNames.SAMPLING_PERIOD, samplingPeriodName.iterator().next())
         .with(ValuePropertyNames.SCHEDULE_CALCULATOR, scheduleCalculatorName.iterator().next())
         .with(ValuePropertyNames.SAMPLING_FUNCTION, samplingFunctionName.iterator().next()).get();
-      requirements.add(new ValueRequirement(ValueRequirementNames.FAIR_VALUE, ComputationTargetType.SECURITY, equity.getUniqueId(), ValueProperties.withAny(ValuePropertyNames.CURRENCY).get()));
-      requirements.add(new ValueRequirement(ValueRequirementNames.PRICE_SERIES, ComputationTargetType.SECURITY, equity.getUniqueId(), priceSeriesProperties));
-      return requirements;
-    }
-    return null;
+    requirements.add(new ValueRequirement(ValueRequirementNames.FAIR_VALUE, ComputationTargetType.SECURITY, equity.getUniqueId(), ValueProperties.withAny(ValuePropertyNames.CURRENCY).get()));
+    requirements.add(new ValueRequirement(ValueRequirementNames.PRICE_SERIES, ComputationTargetType.SECURITY, equity.getUniqueId(), priceSeriesProperties));
+    return requirements;
   }
   
   @Override
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target,
       final Map<ValueSpecification, ValueRequirement> inputs) {
-    if (!canApplyTo(context, target)) {
-      return null;
-    }
     String currency = null;
     for (Entry<ValueSpecification, ValueRequirement> entry : inputs.entrySet()) {
       String newCurrency = entry.getKey().getProperty(ValuePropertyNames.CURRENCY);
@@ -129,29 +125,30 @@ public class EquityPnLFunction extends AbstractFunction.NonCompiledInvoker {
     if (currency == null) {
       return null;
     }    
+    // Please see http://jira.opengamma.com/browse/PLAT-2330 for information about the PROPERTY_PNL_CONTRIBUTIONS constant
     final ValueProperties properties = createValueProperties()
         .with(ValuePropertyNames.CURRENCY, currency)
         .withAny(ValuePropertyNames.SAMPLING_PERIOD)
         .withAny(ValuePropertyNames.SCHEDULE_CALCULATOR)
         .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
-        .withAny(ValuePropertyNames.RETURN_CALCULATOR).get();
+        .withAny(ValuePropertyNames.RETURN_CALCULATOR)
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, "Delta").get();
     return Sets.newHashSet(new ValueSpecification(
         new ValueRequirement(ValueRequirementNames.PNL_SERIES, target.getPosition(), properties), getUniqueId()));
   }
 
   @Override
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
-    if (canApplyTo(context, target)) {
-      final ValueProperties properties = createValueProperties()
+    // Please see http://jira.opengamma.com/browse/PLAT-2330 for information about the PROPERTY_PNL_CONTRIBUTIONS constant
+    final ValueProperties properties = createValueProperties()
         .withAny(ValuePropertyNames.CURRENCY)
         .withAny(ValuePropertyNames.SAMPLING_PERIOD)
         .withAny(ValuePropertyNames.SCHEDULE_CALCULATOR)
         .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
-        .withAny(ValuePropertyNames.RETURN_CALCULATOR).get();
-      ValueRequirement valueReq = new ValueRequirement(ValueRequirementNames.PNL_SERIES, target.getPosition(), properties);
-      return Sets.newHashSet(new ValueSpecification(valueReq, getUniqueId()));
-    }
-    return null;
+        .withAny(ValuePropertyNames.RETURN_CALCULATOR)
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, "Delta").get();
+    ValueRequirement valueReq = new ValueRequirement(ValueRequirementNames.PNL_SERIES, target.getPosition(), properties);
+    return Sets.newHashSet(new ValueSpecification(valueReq, getUniqueId()));
   }
 
   @Override

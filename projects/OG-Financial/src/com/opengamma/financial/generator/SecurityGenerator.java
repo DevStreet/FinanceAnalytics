@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import javax.time.calendar.DateProvider;
 import javax.time.calendar.DayOfWeek;
@@ -61,11 +62,16 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalScheme;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.exchange.ExchangeMaster;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
+import com.opengamma.master.historicaltimeseries.impl.DefaultHistoricalTimeSeriesResolver;
+import com.opengamma.master.historicaltimeseries.impl.DefaultHistoricalTimeSeriesSelector;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.impl.MasterSecuritySource;
 import com.opengamma.util.ArgumentChecker;
+import com.opengamma.util.async.AsynchronousExecution;
+import com.opengamma.util.async.AsynchronousOperation;
 import com.opengamma.util.functional.Function2;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.UnorderedCurrencyPair;
@@ -106,6 +112,7 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   private ConfigSource _configSource;
   private HolidaySource _holidaySource;
   private HistoricalTimeSeriesSource _historicalSource;
+  private HistoricalTimeSeriesMaster _htsMaster;
   private RegionSource _regionSource;
   private ExchangeMaster _exchangeMaster;
   private SecurityMaster _securityMaster;
@@ -180,6 +187,14 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   public void setHistoricalSource(final HistoricalTimeSeriesSource historicalSource) {
     _historicalSource = historicalSource;
   }
+  
+  public HistoricalTimeSeriesMaster getHistoricalTimeSeriesMaster() {
+    return _htsMaster;
+  }
+  
+  public void setHistoricalTimeSeriesMaster(final HistoricalTimeSeriesMaster htsMaster) {
+    _htsMaster = htsMaster;
+  }
 
   public ExchangeMaster getExchangeMaster() {
     return _exchangeMaster;
@@ -247,6 +262,8 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
     OpenGammaCompilationContext.setRegionSource(context, getRegionSource());
     OpenGammaCompilationContext.setConventionBundleSource(context, getConventionSource());
     OpenGammaCompilationContext.setSecuritySource(context, new MasterSecuritySource(getSecurityMaster()));
+    OpenGammaCompilationContext.setHistoricalTimeSeriesResolver(context, new DefaultHistoricalTimeSeriesResolver(new DefaultHistoricalTimeSeriesSelector(getConfigSource()), 
+        getHistoricalTimeSeriesMaster()));
     return context;
   }
 
@@ -262,7 +279,13 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
     for (ComputedValue input : inputs) {
       functionInputs.addValue(input);
     }
-    return function.getFunctionInvoker().execute(context, functionInputs, target, Collections.singleton(output)).iterator().next();
+    Set<ComputedValue> result;
+    try {
+      result = function.getFunctionInvoker().execute(context, functionInputs, target, Collections.singleton(output));
+    } catch (AsynchronousExecution ex) {
+      result = AsynchronousOperation.getResult(ex);
+    }
+    return result.iterator().next();
   }
 
   private ComputedValue findMarketData(final ValueRequirement requirement) {

@@ -9,9 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.time.Instant;
 import javax.time.calendar.LocalDate;
 
 import com.google.common.base.Supplier;
+import com.opengamma.core.change.BasicChangeManager;
+import com.opengamma.core.change.ChangeListener;
+import com.opengamma.core.change.ChangeManager;
+import com.opengamma.core.change.ChangeType;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.id.ExternalIdBundle;
@@ -32,6 +37,10 @@ public class MockHistoricalTimeSeriesSource implements HistoricalTimeSeriesSourc
    * The store of unique identifiers.
    */
   private Map<HistoricalTimeSeriesKey, UniqueId> _metaUniqueIdStore = new ConcurrentHashMap<HistoricalTimeSeriesKey, UniqueId>();
+  /**
+   * The store of unique identifiers.
+   */
+  private Map<UniqueId, HistoricalTimeSeriesKey> _uniqueIdMetaStore = new ConcurrentHashMap<UniqueId, HistoricalTimeSeriesKey>();
   /**
    * The store of unique time-series.
    */
@@ -312,6 +321,7 @@ public class MockHistoricalTimeSeriesSource implements HistoricalTimeSeriesSourc
       if (uniqueId == null) {
         uniqueId = _uniqueIdSupplier.get();
         _metaUniqueIdStore.put(metaKey, uniqueId);
+        _uniqueIdMetaStore.put(uniqueId, metaKey);
       }
     }
     _timeSeriesStore.put(uniqueId, new SimpleHistoricalTimeSeries(uniqueId, timeSeriesDataPoints));
@@ -353,4 +363,16 @@ public class MockHistoricalTimeSeriesSource implements HistoricalTimeSeriesSourc
     return new SimpleHistoricalTimeSeries(hts.getUniqueId(), timeSeries);
   }
 
+  @Override
+  public ExternalIdBundle getExternalIdBundle(UniqueId uniqueId) {
+    if (_uniqueIdMetaStore.containsKey(uniqueId)) {
+      return _uniqueIdMetaStore.get(uniqueId).getExternalIdBundle();
+    }
+    return null;
+  }
+
+  @Override
+  public ChangeManager changeManager() {
+    return new BasicChangeManager();
+  }
 }

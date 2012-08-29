@@ -7,6 +7,7 @@ package com.opengamma.financial;
 
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.exchange.ExchangeSource;
+import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
@@ -17,6 +18,7 @@ import com.opengamma.financial.analytics.ircurve.calcconfig.CurveCalculationConf
 import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeDefinitionSource;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.currency.CurrencyMatrixSource;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 
 /**
  * Utility methods to pull standard objects out of a {@link FunctionCompilationContext}.
@@ -34,6 +36,8 @@ public final class OpenGammaCompilationContext {
   private static final String EXCHANGE_SOURCE_NAME = "exchangeSource";
   private static final String SECURITY_SOURCE_NAME = "securitySource";
   private static final String CURVE_CALCULATION_CONFIG_NAME = "curveCalculationConfigurationSource";
+  private static final String HISTORICAL_TIME_SERIES_SOURCE = "historicalTimeSeriesSource";
+  private static final String HISTORICAL_TIME_SERIES_RESOLVER = "historicalTimeSeriesResolver";
 
   /**
    * Restricted constructor.
@@ -186,4 +190,21 @@ public final class OpenGammaCompilationContext {
   public static void setCurveCalculationConfigSource(final FunctionCompilationContext compilationContext, final CurveCalculationConfigSource curveConfigSource) {
     set(compilationContext, CURVE_CALCULATION_CONFIG_NAME, curveConfigSource);
   }
+  
+  public static HistoricalTimeSeriesSource getHistoricalTimeSeriesSource(final FunctionCompilationContext compilationContext) {
+    return get(compilationContext, HISTORICAL_TIME_SERIES_SOURCE);
+  }
+  
+  public static void setHistoricalTimeSeriesSource(final FunctionCompilationContext compilationContext, final HistoricalTimeSeriesSource historicalTimeSeriesSource) {
+    set(compilationContext, HISTORICAL_TIME_SERIES_SOURCE, historicalTimeSeriesSource);
+  }
+
+  public static HistoricalTimeSeriesResolver getHistoricalTimeSeriesResolver(final FunctionCompilationContext compilationContext) {
+    return get(compilationContext, HISTORICAL_TIME_SERIES_RESOLVER);
+  }
+
+  public static void setHistoricalTimeSeriesResolver(final FunctionCompilationContext compilationContext, final HistoricalTimeSeriesResolver historicalTimeSeriesResolver) {
+    set(compilationContext, HISTORICAL_TIME_SERIES_RESOLVER, historicalTimeSeriesResolver);
+  }
+
 }

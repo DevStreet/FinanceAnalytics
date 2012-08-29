@@ -48,7 +48,7 @@ public class InterestRateFutureLoader extends SecurityLoader {
 
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(InterestRateFutureLoader.class);
-  
+
   /**
    * The fields to load from Bloomberg.
    */
@@ -70,6 +70,7 @@ public class InterestRateFutureLoader extends SecurityLoader {
   private static final Map<String, String> BBGCODE_UNDERLYING = Maps.newHashMap();
   static {
     BBGCODE_UNDERLYING.put("ED", "US0003M Index");
+    BBGCODE_UNDERLYING.put("0E", "US0003M Index");
     BBGCODE_UNDERLYING.put("EM", "US0001M Index");
     BBGCODE_UNDERLYING.put("ER", "EUR003M Index");
     BBGCODE_UNDERLYING.put("0R", "EUR003M Index");

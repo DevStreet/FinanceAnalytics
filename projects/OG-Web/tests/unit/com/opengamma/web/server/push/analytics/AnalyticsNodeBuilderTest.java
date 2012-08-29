@@ -14,15 +14,15 @@ import com.opengamma.core.position.impl.SimplePortfolioNode;
 import com.opengamma.core.position.impl.SimplePosition;
 
 /**
- * Tests that {@link AnalyticsNode.Builder} creates nodes that match a portfolio structure.
+ * Tests that {@link AnalyticsNode.PortfolioNodeBuilder} creates nodes that match a portfolio structure.
  */
 public class AnalyticsNodeBuilderTest {
 
   @Test
   public void emptyPortfolio() {
-    AnalyticsNode root = new AnalyticsNode.Builder(new SimplePortfolioNode()).getRoot();
-    assertEquals(0, root.getStart());
-    assertEquals(0, root.getEnd());
+    AnalyticsNode root = new AnalyticsNode.PortfolioNodeBuilder(new SimplePortfolioNode()).getRoot();
+    assertEquals(0, root.getStartRow());
+    assertEquals(0, root.getEndRow());
     assertTrue(root.getChildren().isEmpty());
   }
 
@@ -35,9 +35,9 @@ public class AnalyticsNodeBuilderTest {
     portfolioRoot.addPosition(new SimplePosition());
     portfolioRoot.addPosition(new SimplePosition());
 
-    AnalyticsNode root = new AnalyticsNode.Builder(portfolioRoot).getRoot();
-    assertEquals(0, root.getStart());
-    assertEquals(5, root.getEnd()); // 1 node for the root and one each for the positions
+    AnalyticsNode root = new AnalyticsNode.PortfolioNodeBuilder(portfolioRoot).getRoot();
+    assertEquals(0, root.getStartRow());
+    assertEquals(5, root.getEndRow()); // 1 node for the root and one each for the positions
     assertTrue(root.getChildren().isEmpty());
   }
 
@@ -51,13 +51,13 @@ public class AnalyticsNodeBuilderTest {
     portfolioRoot.addPosition(new SimplePosition());
     portfolioRoot.addPosition(new SimplePosition());
 
-    AnalyticsNode root = new AnalyticsNode.Builder(portfolioRoot).getRoot();
-    assertEquals(0, root.getStart());
-    assertEquals(5, root.getEnd());
+    AnalyticsNode root = new AnalyticsNode.PortfolioNodeBuilder(portfolioRoot).getRoot();
+    assertEquals(0, root.getStartRow());
+    assertEquals(5, root.getEndRow());
     assertEquals(1, root.getChildren().size());
     AnalyticsNode child = root.getChildren().get(0);
-    assertEquals(1, child.getStart());
-    assertEquals(3, child.getEnd());
+    assertEquals(1, child.getStartRow());
+    assertEquals(3, child.getEndRow());
     assertTrue(child.getChildren().isEmpty());
   }
 
@@ -91,21 +91,21 @@ public class AnalyticsNodeBuilderTest {
     portfolioChild1.addChildNode(portfolioChild2);
     portfolioChild2.addChildNode(portfolioChild3);
 
-    AnalyticsNode root = new AnalyticsNode.Builder(portfolioRoot).getRoot();
-    assertEquals(0, root.getStart());
-    assertEquals(10, root.getEnd());
+    AnalyticsNode root = new AnalyticsNode.PortfolioNodeBuilder(portfolioRoot).getRoot();
+    assertEquals(0, root.getStartRow());
+    assertEquals(10, root.getEndRow());
     assertEquals(1, root.getChildren().size());
     AnalyticsNode child1 = root.getChildren().get(0);
-    assertEquals(1, child1.getStart());
-    assertEquals(9, child1.getEnd());
+    assertEquals(1, child1.getStartRow());
+    assertEquals(9, child1.getEndRow());
     assertEquals(1, child1.getChildren().size());
     AnalyticsNode child2 = child1.getChildren().get(0);
-    assertEquals(2, child2.getStart());
-    assertEquals(7, child2.getEnd());
+    assertEquals(2, child2.getStartRow());
+    assertEquals(7, child2.getEndRow());
     assertEquals(1, child2.getChildren().size());
     AnalyticsNode child3 = child2.getChildren().get(0);
-    assertEquals(3, child3.getStart());
-    assertEquals(5, child3.getEnd());
+    assertEquals(3, child3.getStartRow());
+    assertEquals(5, child3.getEndRow());
     assertTrue(child3.getChildren().isEmpty());
   }
 
@@ -127,17 +127,17 @@ public class AnalyticsNodeBuilderTest {
     portfolioRoot.addChildNode(portfolioChild2);
 
 
-    AnalyticsNode root = new AnalyticsNode.Builder(portfolioRoot).getRoot();
-    assertEquals(0, root.getStart());
-    assertEquals(4, root.getEnd());
+    AnalyticsNode root = new AnalyticsNode.PortfolioNodeBuilder(portfolioRoot).getRoot();
+    assertEquals(0, root.getStartRow());
+    assertEquals(4, root.getEndRow());
     assertEquals(2, root.getChildren().size());
     AnalyticsNode child1 = root.getChildren().get(0);
-    assertEquals(1, child1.getStart());
-    assertEquals(2, child1.getEnd());
+    assertEquals(1, child1.getStartRow());
+    assertEquals(2, child1.getEndRow());
     assertTrue(child1.getChildren().isEmpty());
     AnalyticsNode child2 = root.getChildren().get(1);
-    assertEquals(3, child2.getStart());
-    assertEquals(4, child2.getEnd());
+    assertEquals(3, child2.getStartRow());
+    assertEquals(4, child2.getEndRow());
     assertTrue(child2.getChildren().isEmpty());
   }
 }

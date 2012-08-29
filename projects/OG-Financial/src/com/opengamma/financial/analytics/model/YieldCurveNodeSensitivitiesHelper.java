@@ -14,17 +14,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.time.calendar.LocalDate;
+
 import org.apache.commons.lang.ArrayUtils;
 
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.core.config.ConfigSource;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.DoubleLabelledMatrix1D;
 import com.opengamma.financial.analytics.LabelledMatrix1D;
+import com.opengamma.financial.analytics.fxforwardcurve.ConfigDBFXForwardCurveDefinitionSource;
+import com.opengamma.financial.analytics.fxforwardcurve.ConfigDBFXForwardCurveSpecificationSource;
+import com.opengamma.financial.analytics.fxforwardcurve.FXForwardCurveDefinition;
+import com.opengamma.financial.analytics.fxforwardcurve.FXForwardCurveInstrumentProvider;
+import com.opengamma.financial.analytics.fxforwardcurve.FXForwardCurveSpecification;
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationWithSecurities;
 import com.opengamma.financial.analytics.model.fixedincome.YieldCurveLabelGenerator;
+import com.opengamma.util.money.Currency;
+import com.opengamma.util.money.UnorderedCurrencyPair;
+import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.DoublesPair;
 
 /**
@@ -47,7 +59,10 @@ public class YieldCurveNodeSensitivitiesHelper {
       final DoubleMatrix1D sensitivitiesForCurve, final InterpolatedYieldCurveSpecificationWithSecurities curveSpec,
       final ValueSpecification resultSpec) {
     final int n = sensitivitiesForCurve.getNumberOfElements();
-    final Double[] keys = curve.getCurve().getXData();
+    if (!(curve instanceof YieldCurve)) {
+      throw new IllegalArgumentException("Can only handle YieldCurve");
+    }
+    final Double[] keys = ((YieldCurve) curve).getCurve().getXData();
     final double[] values = new double[n];
     final Object[] labels = YieldCurveLabelGenerator.getLabels(curveSpec);
     DoubleLabelledMatrix1D labelledMatrix = new DoubleLabelledMatrix1D(keys, labels, values);
@@ -66,10 +81,13 @@ public class YieldCurveNodeSensitivitiesHelper {
       if (curveName.equals(name)) {
         break;
       }
-      startIndex += bundle.getCurve(name).getCurve().size(); //TODO won't work for functional curves
+      if (!(bundle.getCurve(name) instanceof YieldCurve)) { //TODO: make it more generic
+        throw new IllegalArgumentException("Can only handle YieldCurve");
+      }
+      startIndex += ((YieldCurve) bundle.getCurve(name)).getCurve().size();
     }
     final YieldAndDiscountCurve curve = bundle.getCurve(curveName);
-    final Double[] keys = curve.getCurve().getXData();
+    final Double[] keys = ((YieldCurve) curve).getCurve().getXData();
     final double[] values = new double[nSensitivities];
     final Object[] labels = YieldCurveLabelGenerator.getLabels(curveSpec);
     for (int i = 0; i < nSensitivities; i++) {
@@ -95,6 +113,30 @@ public class YieldCurveNodeSensitivitiesHelper {
     return Collections.singleton(new ComputedValue(resultSpec, labelledMatrix));
   }
 
+  public static Set<ComputedValue> getInstrumentLabelledSensitivitiesForCurve(final DoubleMatrix1D sensitivities, final Currency domesticCurrency, final Currency foreignCurrency,
+      final String[] curveNames, final YieldCurveBundle curves, final ConfigSource configSource, final LocalDate localNow, final ValueSpecification resultSpec) {
+    final String currencyPair = UnorderedCurrencyPair.of(domesticCurrency, foreignCurrency).toString();
+    final FXForwardCurveSpecification fxForwardCurveSpecification = new ConfigDBFXForwardCurveSpecificationSource(configSource).getSpecification(curveNames[0], currencyPair);
+    final FXForwardCurveDefinition fxForwardCurveDefinition = new ConfigDBFXForwardCurveDefinitionSource(configSource).getDefinition(curveNames[0], currencyPair);
+    final FXForwardCurveInstrumentProvider curveInstrumentProvider = fxForwardCurveSpecification.getCurveInstrumentProvider();
+    final Tenor[] tenors = fxForwardCurveDefinition.getTenors();
+    final int length = tenors.length;
+    final Double[] keys = new Double[length];
+    final Object[] labels = new Object[length];
+    final double[] values = new double[length];
+    if (!(curves.getCurve(curveNames[0]) instanceof YieldCurve)) { //TODO: make it more generic
+      throw new IllegalArgumentException("Can only handle YieldCurve");
+    }
+    final Double[] xData = ((YieldCurve) curves.getCurve(curveNames[0])).getCurve().getXData();
+    for (int i = 0; i < length; i++) {
+      keys[i] = xData[i];
+      labels[i] = curveInstrumentProvider.getInstrument(localNow, tenors[i]);
+      values[i] = sensitivities.getEntry(i);
+    }
+    final DoubleLabelledMatrix1D labelledMatrix = new DoubleLabelledMatrix1D(keys, labels, values);
+    return Collections.singleton(new ComputedValue(resultSpec, labelledMatrix));
+  }
+
   /**
    * @deprecated Use {@link #getInstrumentLabelledSensitivitiesForCurve(String, YieldCurveBundle, DoubleMatrix1D, InterpolatedYieldCurveSpecificationWithSecurities, ValueSpecification)}
    * instead
@@ -111,8 +153,11 @@ public class YieldCurveNodeSensitivitiesHelper {
   public static Set<ComputedValue> getSensitivitiesForMultipleCurves(final String forwardCurveName, final String fundingCurveName,
       final ValueSpecification forwardResultSpecification, final ValueSpecification fundingResultSpecification, final YieldCurveBundle bundle,
       final DoubleMatrix1D sensitivitiesForCurves, final Map<String, InterpolatedYieldCurveSpecificationWithSecurities> curveSpecs) {
-    final int nForward = bundle.getCurve(forwardCurveName).getCurve().size();
-    final int nFunding = bundle.getCurve(fundingCurveName).getCurve().size();
+    if (!(bundle.getCurve(forwardCurveName) instanceof YieldCurve)) { //TODO: make it more generic
+      throw new IllegalArgumentException("Can only handle YieldCurve");
+    }
+    final int nForward = ((YieldCurve) bundle.getCurve(forwardCurveName)).getCurve().size();
+    final int nFunding = ((YieldCurve) bundle.getCurve(fundingCurveName)).getCurve().size();
     final Map<String, DoubleMatrix1D> sensitivities = new HashMap<String, DoubleMatrix1D>();
     sensitivities.put(fundingCurveName, new DoubleMatrix1D(Arrays.copyOfRange(sensitivitiesForCurves.toArray(), 0, nFunding)));
     sensitivities.put(forwardCurveName, new DoubleMatrix1D(Arrays.copyOfRange(sensitivitiesForCurves.toArray(), nFunding, nForward + nFunding)));

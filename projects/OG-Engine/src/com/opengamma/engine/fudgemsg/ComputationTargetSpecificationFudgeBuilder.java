@@ -18,7 +18,14 @@ import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.id.UniqueId;
 
 /**
+ * Fudge builder for {@link ComputationTargetSpecification}.
  * 
+ * <pre>
+ * message ComputationTargetSpecification {
+ *   required ComputationTargetType computationTargetType; // the target type
+ *   required UniqueId computationTargetIdendifier;        // the target identifier
+ * }
+ * </pre>
  */
 @FudgeBuilderFor(ComputationTargetSpecification.class)
 public class ComputationTargetSpecificationFudgeBuilder implements FudgeBuilder<ComputationTargetSpecification> {
@@ -31,28 +38,25 @@ public class ComputationTargetSpecificationFudgeBuilder implements FudgeBuilder<
    */
   private static final String IDENTIFIER_FIELD_NAME = "computationTargetIdentifier";
 
-  protected static void addMessageFields(final FudgeSerializer serializer, final MutableFudgeMsg msg, final ComputationTargetSpecification object) {
+  protected static void buildMessageImpl(final MutableFudgeMsg msg, final ComputationTargetSpecification object) {
     msg.add(TYPE_FIELD_NAME, object.getType().name());
     UniqueId uid = object.getUniqueId();
     if (uid != null) {
-      serializer.addToMessage(msg, IDENTIFIER_FIELD_NAME, null, uid);
+      msg.add(IDENTIFIER_FIELD_NAME, uid);
     }
   }
 
   @Override
-  public MutableFudgeMsg buildMessage(FudgeSerializer serializer, ComputationTargetSpecification object) {
+  public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final ComputationTargetSpecification object) {
     MutableFudgeMsg msg = serializer.newMessage();
-    addMessageFields(serializer, msg, object);
+    buildMessageImpl(msg, object);
     return msg;
   }
 
   protected static ComputationTargetSpecification buildObjectImpl(final FudgeDeserializer deserializer, final FudgeMsg message) {
     final ComputationTargetType type = ComputationTargetType.valueOf(message.getString(TYPE_FIELD_NAME));
-    UniqueId uid = null;
-    if (message.hasField(IDENTIFIER_FIELD_NAME)) {
-      FudgeField fudgeField = message.getByName(IDENTIFIER_FIELD_NAME);
-      uid = deserializer.fieldValueToObject(UniqueId.class, fudgeField);
-    }
+    FudgeField uniqueIdField = message.getByName(IDENTIFIER_FIELD_NAME);
+    UniqueId uid = uniqueIdField != null ? deserializer.fieldValueToObject(UniqueId.class, uniqueIdField) : null;
     return new ComputationTargetSpecification(type, uid);
   }
 

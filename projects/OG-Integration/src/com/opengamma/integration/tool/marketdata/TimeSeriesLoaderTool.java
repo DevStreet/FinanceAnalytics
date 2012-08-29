@@ -16,28 +16,30 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.component.tool.AbstractTool;
 import com.opengamma.integration.copier.sheet.SheetFormat;
 import com.opengamma.integration.copier.timeseries.TimeSeriesLoader;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * The timeseries loader tool
  */
+@Scriptable
 public class TimeSeriesLoaderTool extends AbstractTool {
 
   /** File name option flag */
-  private static final String FILE_NAME_OPT = "f";
+  public static final String FILE_NAME_OPT = "f";
   /** Time series data source option flag*/
-  private static final String TIME_SERIES_DATASOURCE_OPT = "s";
+  public static final String TIME_SERIES_DATASOURCE_OPT = "s";
   /** Time series data provider option flag*/
-  private static final String TIME_SERIES_DATAPROVIDER_OPT = "p";
+  public static final String TIME_SERIES_DATAPROVIDER_OPT = "p";
   /** Time series data field option flag*/
-  private static final String TIME_SERIES_DATAFIELD_OPT = "d";
+  public static final String TIME_SERIES_DATAFIELD_OPT = "d";
   /** Time series observation time option flag*/
-  private static final String TIME_SERIES_OBSERVATIONTIME_OPT = "o";
+  public static final String TIME_SERIES_OBSERVATIONTIME_OPT = "o";
   /** Time series ID scheme option flag*/
-  private static final String TIME_SERIES_IDSCHEME_OPT = "i";
+  public static final String TIME_SERIES_IDSCHEME_OPT = "i";
   /** Time series date format option flag*/
-  private static final String TIME_SERIES_DATEFORMAT_OPT = "t";
+  public static final String TIME_SERIES_DATEFORMAT_OPT = "t";
   /** Write option flag */
-  private static final String WRITE_OPT = "w";
+  public static final String WRITE_OPT = "w";
 
   /**
    * Main method to run the tool.
