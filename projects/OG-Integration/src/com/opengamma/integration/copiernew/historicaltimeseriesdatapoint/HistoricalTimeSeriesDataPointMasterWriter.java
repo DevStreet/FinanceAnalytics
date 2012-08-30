@@ -22,77 +22,37 @@ import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
 import java.util.List;
 
-public class HistoricalTimeSeriesDataPointMasterWriter
-    implements Writeable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries>> {
+public class HistoricalTimeSeriesDataPointMasterWriter implements Writeable<LocalDateDoubleTimeSeries> {
 
   HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
+  ManageableHistoricalTimeSeriesInfo _historicalTimeSeriesInfo;
   HistoricalTimeSeriesMasterUtils _historicalTimeSeriesMasterUtils;
 
-  private BeanCompare _beanCompare;
 
-  public HistoricalTimeSeriesDataPointMasterWriter(HistoricalTimeSeriesMaster historicalTimeSeriesMaster) {
+  public HistoricalTimeSeriesDataPointMasterWriter(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
+                                                   ManageableHistoricalTimeSeriesInfo historicalTimeSeriesInfo) {
     ArgumentChecker.notNull(historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
+    ArgumentChecker.notNull(historicalTimeSeriesInfo, "historicalTimeSeriesInfo");
     _historicalTimeSeriesMaster = historicalTimeSeriesMaster;
+    _historicalTimeSeriesInfo = historicalTimeSeriesInfo;
     _historicalTimeSeriesMasterUtils = new HistoricalTimeSeriesMasterUtils(_historicalTimeSeriesMaster);
-    _beanCompare = new BeanCompare();
   }
 
   @Override
-  public void addOrUpdate(ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries> pair) {
-    ArgumentChecker.notNull(pair, "historicalTimeSeriesInfo, historicalTimeSeries");
+  public void addOrUpdate(LocalDateDoubleTimeSeries timeSeries) {
+    ArgumentChecker.notNull(timeSeries, "timeSeries");
 
-    // Write info
-    ManageableHistoricalTimeSeriesInfo info = pair.getFirst();
-    HistoricalTimeSeriesInfoSearchRequest searchReq = new HistoricalTimeSeriesInfoSearchRequest();
-    ExternalIdSearch idSearch = new ExternalIdSearch(info.getExternalIdBundle().toBundle());  // match any one of the IDs
-    searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
-    searchReq.setExternalIdSearch(idSearch);
-    HistoricalTimeSeriesInfoSearchResult searchResult = _historicalTimeSeriesMaster.search(searchReq);
-    ManageableHistoricalTimeSeriesInfo resultInfo = searchResult.getFirstInfo();
-    if (resultInfo != null) {
-      List<BeanDifference<?>> differences;
-      try {
-        differences = _beanCompare.compare(resultInfo, info);
-      } catch (Exception e) {
-        throw new OpenGammaRuntimeException("Error comparing historicalTimeSeriesInfos with ID bundle " +
-            info.getExternalIdBundle(), e);
-      }
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
-        // It's already there, don't update or add it
-      } else {
-        // Update existing time series
-        HistoricalTimeSeriesInfoDocument updatedDoc = new HistoricalTimeSeriesInfoDocument(info);
-        updatedDoc.setUniqueId(resultInfo.getUniqueId());
-        updatedDoc = _historicalTimeSeriesMaster.update(updatedDoc);
-        resultInfo = updatedDoc.getInfo();
-      }
-    } else {
-      // Not found, so add a new time series
-      HistoricalTimeSeriesInfoDocument addedDoc =
-          _historicalTimeSeriesMaster.add(new HistoricalTimeSeriesInfoDocument(info));
-      resultInfo = addedDoc.getInfo();
-    }
-
-    // Write data points
-    ManageableHistoricalTimeSeries timeSeries = pair.getSecond();
-    ManageableHistoricalTimeSeries resultTimeSeries = null;
     if (timeSeries != null) {
-      UniqueId updatedUniqueId = addOrUpdate(resultInfo.getUniqueId(),
-          timeSeries.getTimeSeries());
-      resultTimeSeries = _historicalTimeSeriesMaster.getTimeSeries(updatedUniqueId);
-      resultInfo = _historicalTimeSeriesMaster.get(updatedUniqueId).getInfo();
+      UniqueId updatedUniqueId =
+          _historicalTimeSeriesMasterUtils.writeTimeSeries(_historicalTimeSeriesInfo.getUniqueId(), timeSeries);
     }
   }
 
   @Override
-  public void addOrUpdate(Iterable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries>> data) {
-    for (ObjectsPair<ManageableHistoricalTimeSeriesInfo, ManageableHistoricalTimeSeries> datum : data) {
+  public void addOrUpdate(Iterable<LocalDateDoubleTimeSeries> data) {
+    for (LocalDateDoubleTimeSeries datum : data) {
       addOrUpdate(datum);
     }
-  }
-
-  private UniqueId addOrUpdate(UniqueId id, LocalDateDoubleTimeSeries ts) {
-    return _historicalTimeSeriesMasterUtils.writeTimeSeries(id, ts);
   }
 
   @Override

@@ -21,19 +21,26 @@ import java.util.Iterator;
 
 public class HistoricalTimeSeriesDataPointMasterReader implements Iterable<LocalDateDoubleTimeSeries> {
 
-  ManageableHistoricalTimeSeries _manageableHistoricalTimeSeries;
+  HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
+  HistoricalTimeSeriesGetFilter _historicalTimeSeriesGetFilter;
+  int _bufferSize;
+  UniqueId _uniqueId;
 
   public HistoricalTimeSeriesDataPointMasterReader(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
                                                    UniqueId uniqueId,
-                                                   HistoricalTimeSeriesGetFilter historicalTimeSeriesGetFilter) {
+                                                   HistoricalTimeSeriesGetFilter historicalTimeSeriesGetFilter,
+                                                   int bufferSize) {
+
     ArgumentChecker.notNull(historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
     ArgumentChecker.notNull(uniqueId, "uniqueId");
     ArgumentChecker.notNull(historicalTimeSeriesGetFilter, "historicalTimeSeriesGetFilter");
+    ArgumentChecker.notNegativeOrZero(bufferSize, "bufferSize");
 
-    if (historicalTimeSeriesGetFilter == null) {
-      historicalTimeSeriesGetFilter = HistoricalTimeSeriesGetFilter.ofAll();
-    }
-    _manageableHistoricalTimeSeries = historicalTimeSeriesMaster.getTimeSeries(uniqueId, historicalTimeSeriesGetFilter);
+    _historicalTimeSeriesMaster = historicalTimeSeriesMaster;
+    _uniqueId = uniqueId;
+    _historicalTimeSeriesGetFilter = historicalTimeSeriesGetFilter;
+
+    _bufferSize = bufferSize;
   }
 
   @Override
@@ -41,16 +48,27 @@ public class HistoricalTimeSeriesDataPointMasterReader implements Iterable<Local
 
     return new Iterator<LocalDateDoubleTimeSeries>() {
 
-      LocalDateDoubleTimeSeries entireSeries = _manageableHistoricalTimeSeries.getTimeSeries();
+      HistoricalTimeSeriesGetFilter _localFilter = HistoricalTimeSeriesGetFilter.ofRange(
+          _historicalTimeSeriesGetFilter.getEarliestDate(),
+          _historicalTimeSeriesGetFilter.getLatestDate(),
+          _bufferSize
+      );
+      LocalDateDoubleTimeSeries _buffer = _historicalTimeSeriesMaster.getTimeSeries(_uniqueId, _localFilter).getTimeSeries();
 
       @Override
       public boolean hasNext() {
-        return false;
+        return (_buffer != null && !_buffer.isEmpty());
       }
 
       @Override
       public LocalDateDoubleTimeSeries next() {
-        return null;
+        LocalDateDoubleTimeSeries result = _buffer;
+        _localFilter = HistoricalTimeSeriesGetFilter.ofRange(
+            _historicalTimeSeriesGetFilter.getEarliestDate(),
+            _localFilter.getEarliestDate().minusDays(1)
+        );
+        _buffer = _historicalTimeSeriesMaster.getTimeSeries(_uniqueId, _localFilter).getTimeSeries();
+        return result;
       }
 
       @Override
