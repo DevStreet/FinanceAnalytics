@@ -25,16 +25,16 @@ import java.util.List;
 public class HistoricalTimeSeriesDataPointMasterWriter implements Writeable<LocalDateDoubleTimeSeries> {
 
   HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
-  ManageableHistoricalTimeSeriesInfo _historicalTimeSeriesInfo;
   HistoricalTimeSeriesMasterUtils _historicalTimeSeriesMasterUtils;
-
+  UniqueId _uniqueId;
 
   public HistoricalTimeSeriesDataPointMasterWriter(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
-                                                   ManageableHistoricalTimeSeriesInfo historicalTimeSeriesInfo) {
+                                                   UniqueId uniqueId) {
     ArgumentChecker.notNull(historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
-    ArgumentChecker.notNull(historicalTimeSeriesInfo, "historicalTimeSeriesInfo");
+    ArgumentChecker.notNull(uniqueId, "uniqueid");
+
     _historicalTimeSeriesMaster = historicalTimeSeriesMaster;
-    _historicalTimeSeriesInfo = historicalTimeSeriesInfo;
+    _uniqueId = uniqueId;
     _historicalTimeSeriesMasterUtils = new HistoricalTimeSeriesMasterUtils(_historicalTimeSeriesMaster);
   }
 
@@ -44,7 +44,7 @@ public class HistoricalTimeSeriesDataPointMasterWriter implements Writeable<Loca
 
     if (timeSeries != null) {
       UniqueId updatedUniqueId =
-          _historicalTimeSeriesMasterUtils.writeTimeSeries(_historicalTimeSeriesInfo.getUniqueId(), timeSeries);
+          _historicalTimeSeriesMasterUtils.writeTimeSeries(_uniqueId, timeSeries);
     }
   }
 

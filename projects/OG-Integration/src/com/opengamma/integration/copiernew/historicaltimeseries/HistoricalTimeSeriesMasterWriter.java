@@ -29,13 +29,24 @@ import java.util.Map;
 public class HistoricalTimeSeriesMasterWriter
     implements Writeable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>> {
 
+  private static final String TEMPLATE_NAME = "<name>";
+
   HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
   private BeanCompare _beanCompare;
+  private String _nameTemplate;
 
   public HistoricalTimeSeriesMasterWriter(HistoricalTimeSeriesMaster historicalTimeSeriesMaster) {
+    this(historicalTimeSeriesMaster, null);
+  }
+
+  public HistoricalTimeSeriesMasterWriter(HistoricalTimeSeriesMaster historicalTimeSeriesMaster, String nameTemplate) {
     ArgumentChecker.notNull(historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
     _historicalTimeSeriesMaster = historicalTimeSeriesMaster;
     _beanCompare = new BeanCompare();
+    _nameTemplate = nameTemplate;
+    if (_nameTemplate != null && !_nameTemplate.contains(TEMPLATE_NAME)) {
+      _nameTemplate += TEMPLATE_NAME;
+    }
   }
 
   @Override
@@ -47,8 +58,15 @@ public class HistoricalTimeSeriesMasterWriter
 
     // Clear unique id
     info.setUniqueId(null);
+    info.setTimeSeriesObjectId(null);
+
+    // Rename time-series as per supplied template
+    if (_nameTemplate != null) {
+      info.setName(_nameTemplate.replace(TEMPLATE_NAME, info.getName()));
+    }
 
     HistoricalTimeSeriesInfoSearchRequest searchReq = new HistoricalTimeSeriesInfoSearchRequest();
+    searchReq.setName(info.getName());
     ExternalIdSearch idSearch = new ExternalIdSearch(info.getExternalIdBundle().toBundle());  // match any one of the IDs
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
     searchReq.setExternalIdSearch(idSearch);
@@ -80,7 +98,7 @@ public class HistoricalTimeSeriesMasterWriter
     Iterable<LocalDateDoubleTimeSeries> timeSeries = pair.getSecond();
     if (timeSeries != null) {
       HistoricalTimeSeriesDataPointMasterWriter dataPointMasterWriter =
-          new HistoricalTimeSeriesDataPointMasterWriter(_historicalTimeSeriesMaster, info);
+          new HistoricalTimeSeriesDataPointMasterWriter(_historicalTimeSeriesMaster, info.getUniqueId());
       dataPointMasterWriter.addOrUpdate(timeSeries);
     }
   }

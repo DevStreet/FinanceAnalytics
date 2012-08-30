@@ -21,10 +21,24 @@ import java.util.Iterator;
 
 public class HistoricalTimeSeriesDataPointMasterReader implements Iterable<LocalDateDoubleTimeSeries> {
 
+  /// The default maximum number of data points to read in at once from a time series
+  public static final int DEFAULT_BUFFER_SIZE = 1024;
+
   HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
   HistoricalTimeSeriesGetFilter _historicalTimeSeriesGetFilter;
   int _bufferSize;
   UniqueId _uniqueId;
+
+  public HistoricalTimeSeriesDataPointMasterReader(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
+                                                   UniqueId uniqueId) {
+    this(historicalTimeSeriesMaster, uniqueId, null);
+  }
+
+  public HistoricalTimeSeriesDataPointMasterReader(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
+                                                   UniqueId uniqueId,
+                                                   HistoricalTimeSeriesGetFilter historicalTimeSeriesGetFilter) {
+    this (historicalTimeSeriesMaster, uniqueId, historicalTimeSeriesGetFilter, DEFAULT_BUFFER_SIZE);
+  }
 
   public HistoricalTimeSeriesDataPointMasterReader(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
                                                    UniqueId uniqueId,
@@ -33,8 +47,11 @@ public class HistoricalTimeSeriesDataPointMasterReader implements Iterable<Local
 
     ArgumentChecker.notNull(historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
     ArgumentChecker.notNull(uniqueId, "uniqueId");
-    ArgumentChecker.notNull(historicalTimeSeriesGetFilter, "historicalTimeSeriesGetFilter");
     ArgumentChecker.notNegativeOrZero(bufferSize, "bufferSize");
+
+    if (historicalTimeSeriesGetFilter == null) {
+      historicalTimeSeriesGetFilter = HistoricalTimeSeriesGetFilter.ofAll();
+    }
 
     _historicalTimeSeriesMaster = historicalTimeSeriesMaster;
     _uniqueId = uniqueId;
@@ -64,8 +81,9 @@ public class HistoricalTimeSeriesDataPointMasterReader implements Iterable<Local
       public LocalDateDoubleTimeSeries next() {
         LocalDateDoubleTimeSeries result = _buffer;
         _localFilter = HistoricalTimeSeriesGetFilter.ofRange(
-            _historicalTimeSeriesGetFilter.getEarliestDate(),
-            _localFilter.getEarliestDate().minusDays(1)
+            _buffer.getLatestTime().plusDays(1),
+            _historicalTimeSeriesGetFilter.getLatestDate(),
+            _bufferSize
         );
         _buffer = _historicalTimeSeriesMaster.getTimeSeries(_uniqueId, _localFilter).getTimeSeries();
         return result;
