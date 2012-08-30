@@ -76,7 +76,7 @@ public class PortfolioContentMasterWriter implements Writeable<PortfolioContent>
     Iterable<NodePositionSecurity> nodePositionSecurityReader = portfolioContent.getNodePositionSecurityReader();
     ManageablePortfolio portfolio = portfolioContent.getPortfolio();
 
-    // Rename exchange as per supplied template
+    // Rename portfolio as per supplied template
     if (_nameTemplate != null) {
       portfolio.setName(_nameTemplate.replace(TEMPLATE_NAME, portfolio.getName()));
     }
