@@ -24,13 +24,24 @@ import java.util.List;
 
 public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> {
 
+  private static final String TEMPLATE_NAME = "<name>";
+
   ConfigMaster _configMaster;
   private BeanCompare _beanCompare;
+  private String _nameTemplate;
 
   public ConfigMasterWriter(ConfigMaster configMaster) {
+    this(configMaster, null);
+  }
+
+  public ConfigMasterWriter(ConfigMaster configMaster, String nameTemplate) {
     ArgumentChecker.notNull(configMaster, "configMaster");
     _configMaster = configMaster;
     _beanCompare = new BeanCompare();
+    _nameTemplate = nameTemplate;
+    if (_nameTemplate != null && !_nameTemplate.contains(TEMPLATE_NAME)) {
+      _nameTemplate += TEMPLATE_NAME;
+    }
   }
 
   @Override
@@ -41,33 +52,31 @@ public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> 
     String name = pair.getFirst();
     T config = pair.getSecond();
 
+    // Rename portfolio as per supplied template
+    if (_nameTemplate != null) {
+      name = _nameTemplate.replace(TEMPLATE_NAME, name);
+    }
+
     searchReq.setName(name);
     searchReq.setType(config.getClass());
-
 
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
     searchReq.setSortOrder(ConfigSearchSortOrder.VERSION_FROM_INSTANT_DESC);
     ConfigSearchResult<T> searchResult = _configMaster.search(searchReq);
     Object foundConfig = searchResult.getFirstValue();
     if (foundConfig != null) {
-      List<BeanDifference<?>> differences;
-      try {
-        differences = _beanCompare.compare((DirectBean) foundConfig, (DirectBean) config);
-      } catch (Exception e) {
-        throw new OpenGammaRuntimeException("Error comparing configs (" + config + ")", e);
-      }
-      if (differences.size() == 1 && differences.get(0).getProperty().propertyType() == UniqueId.class) {
-        // It's already there, don't update or add it
-      } else {
+//      if (!foundConfig.equals(config)) {
         ConfigDocument<T> updateDoc = new ConfigDocument<T>(config.getClass());
+        updateDoc.setName(name);
         updateDoc.setValue(config);
         updateDoc.setUniqueId(searchResult.getFirstDocument().getUniqueId());
         ConfigDocument result = _configMaster.update(updateDoc);
-      }
+//      }
     } else {
       // Not found, so add it
       ConfigDocument<T> addDoc = new ConfigDocument<T>(config.getClass());
       addDoc.setValue(config);
+      addDoc.setName(name);
       ConfigDocument result = _configMaster.add(addDoc);
     }
   }
