@@ -6,11 +6,14 @@
 package com.opengamma.integration.copiernew;
 
 import com.opengamma.component.tool.AbstractTool;
+import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundleWithDates;
 import com.opengamma.id.ExternalIdWithDates;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
+import com.opengamma.integration.copiernew.configuration.ConfigMasterReader;
+import com.opengamma.integration.copiernew.configuration.ConfigMasterWriter;
 import com.opengamma.integration.copiernew.exchange.ExchangeMasterReader;
 import com.opengamma.integration.copiernew.exchange.ExchangeMasterWriter;
 import com.opengamma.integration.copiernew.historicaltimeseries.HistoricalTimeSeriesMasterReader;
@@ -31,6 +34,7 @@ import com.opengamma.integration.copiernew.position.PositionMasterReader;
 import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterReader;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
+import com.opengamma.master.config.ConfigSearchRequest;
 import com.opengamma.master.exchange.ExchangeSearchRequest;
 import com.opengamma.master.exchange.ManageableExchange;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoDocument;
@@ -65,6 +69,17 @@ public class TestCopierTool extends AbstractTool {
   @Override
   protected void doRun() throws Exception {
 
+    // Configuration copier
+    ConfigSearchRequest<Object> searchRequest = new ConfigSearchRequest<Object>();
+    searchRequest.setType(Object.class);
+    searchRequest.setName("*DJX*");
+    Iterable<ObjectsPair<String, Object>> reader =
+        new ConfigMasterReader<Object>(getToolContext().getConfigMaster(), searchRequest);
+    Writeable<ObjectsPair<String, Object>> writer =
+        new ConfigMasterWriter<Object>(getToolContext().getConfigMaster(), "KV <name>");
+    writer.addOrUpdate(reader);
+
+
     // Multi time-series copier
 //    HistoricalTimeSeriesInfoSearchRequest searchRequest = new HistoricalTimeSeriesInfoSearchRequest();
 //    searchRequest.setName("KV*");
@@ -81,7 +96,6 @@ public class TestCopierTool extends AbstractTool {
 //    Iterable<LocalDateDoubleTimeSeries> reader = new HistoricalTimeSeriesDataPointMasterReader(
 //        getToolContext().getHistoricalTimeSeriesMaster(), UniqueId.of("DbHts", "1000")
 //    );
-//
 //    ManageableHistoricalTimeSeriesInfo info = new ManageableHistoricalTimeSeriesInfo();
 //    info.setName("KV Test");
 //    info.setDataField("KVDATA");
