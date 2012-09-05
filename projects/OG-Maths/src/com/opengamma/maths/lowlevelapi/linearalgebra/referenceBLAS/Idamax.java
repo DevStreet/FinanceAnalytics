@@ -46,7 +46,7 @@ public class Idamax {
       ix = (ix + incx);
       for (i = 1; i < n; i++) {
         if ((Math.abs(x[ix + xOffset]) > dmax)) {
-          idamax = i + 1;// shift by as fortran is 1 based
+          idamax = i + 1; // shift by as fortran is 1 based
           dmax = Math.abs(x[ix + xOffset]);
         }
         ix = (ix + incx);
