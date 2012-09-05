@@ -26,12 +26,12 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Idamax;
 public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAPIInterface {
 
   @Override
-  public void drotg(double a, double b, double c, double s) {
+  public void drotg(double[] a, double[] b, double[] c, double[] s) {
     Drotg.drotg(a, b, c, s);
   }
 
   @Override
-  public void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM) {
+  public void drotmg(double[] dd1, double[] dd2, double[] dx1, double[] dy2, double[] dPARAM) {
     Drotmg.drotmg(dd1, dd2, dx1, dy2, dPARAM);
   }
 

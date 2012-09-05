@@ -62,7 +62,7 @@ public interface BLASAPIInterface {
    * sine rotation   = sqrt( 1 - (cosine rotation)^2 ) = 0.91854...
    * 
    */
-  void drotg(double a, double b, double c, double s);
+  void drotg(double[] a, double[] b, double[] c, double[] s);
 
   /**
    * Provides BLAS LEVEL 1: DROTMG.
@@ -125,7 +125,7 @@ public interface BLASAPIInterface {
    * dy2 = 4.000
    * dParam = {1e0, 0.375, 0e0 , 0e0, 0.75} 
    */
-  void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM);
+  void drotmg(double[] dd1, double[] dd2, double[] dx1, double[] dy2, double[] dPARAM);
 
   /**
    * Provides BLAS LEVEL 1: DROT.

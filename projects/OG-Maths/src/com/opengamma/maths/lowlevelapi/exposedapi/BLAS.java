@@ -33,7 +33,11 @@ public class BLAS implements BLASAPIInterface {
     /**
      * OG Native backed BLAS
      */
-    OGnative
+    OGnative,
+    /**
+     * Netlib f2j backed BLAS
+     */
+    Netlib
   }
 
   public BLAS() {
@@ -51,12 +55,12 @@ public class BLAS implements BLASAPIInterface {
   }
   
   @Override
-  public void drotg(double a, double b, double c, double s) {
+  public void drotg(double[] a, double[] b, double[] c, double[] s) {
     _localBLAS.drotg(a, b, c, s);
   }
 
   @Override
-  public void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM) {
+  public void drotmg(double[] dd1, double[] dd2, double[] dx1, double[] dy2, double[] dPARAM) {
     _localBLAS.drotmg(dd1, dd2, dx1, dy2, dPARAM);
   }
 

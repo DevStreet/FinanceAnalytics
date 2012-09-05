@@ -11,11 +11,11 @@ package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 public class BLASOGJavaBacked extends BLASAbstractSuper implements BLASAPIInterface {
 
   @Override
-  public void drotg(double a, double b, double c, double s) {
+  public void drotg(double[] a, double[] b, double[] c, double[] s) {
   }
 
   @Override
-  public void drotmg(double dd1, double dd2, double dx1, double dy2, double[] dPARAM) {
+  public void drotmg(double[] dd1, double[] dd2, double[] dx1, double[] dy2, double[] dPARAM) {
   }
 
   @Override
