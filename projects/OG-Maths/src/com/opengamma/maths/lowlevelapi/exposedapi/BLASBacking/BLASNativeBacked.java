@@ -80,7 +80,7 @@ public class BLASNativeBacked extends BLASAbstractSuper implements BLASAPIInterf
 
   @Override
   public int idamax(int n, double[] x, int incx) {
-    return OGBLASRawWrapper.idamax(new int[] {n}, x, new int[] {incx}) - 1; // Fortran is 1 based
+    return OGBLASRawWrapper.idamax(new int[] {n}, x, new int[] {incx}); // TODO: decide on what's best! - 1; // Fortran is 1 based
   }
 
   @Override
