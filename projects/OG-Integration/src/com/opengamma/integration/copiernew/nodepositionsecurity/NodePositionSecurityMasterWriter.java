@@ -9,6 +9,7 @@ import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
 import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.position.ManageablePosition;
+import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.position.PositionDocument;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.position.PositionSearchRequest;
@@ -88,6 +89,15 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
     ManageablePosition position = nodePositionSecurity.getPosition();
     Iterable<ManageableSecurity> securities = nodePositionSecurity.getSecurities();
 
+    // Clear any passed-in unique ids
+    position.setUniqueId(null);
+    for (ManageableTrade trade : position.getTrades()) {
+      trade.setUniqueId(null);
+    }
+    for (ManageableSecurity security : securities) {
+      security.setUniqueId(null);
+    }
+
     // Write securities
     _securityWriter.addOrUpdate(securities);
 
@@ -124,7 +134,7 @@ public class NodePositionSecurityMasterWriter implements Writeable<NodePositionS
     }
 
     // Add a new position
-    _positionMaster.add(new PositionDocument(position));
+    position = _positionMaster.add(new PositionDocument(position)).getPosition();
 
     // Add position to the correct portfolio node
     _currentNode.addPosition(position.getUniqueId());
