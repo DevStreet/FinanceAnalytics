@@ -32,16 +32,14 @@ public class Dnrm2 {
       // *        The following loop is equivalent to this call to the LAPACK
       // *        auxiliary routine:
       // *        CALL DLASSQ( N, X, INCX, SCALE, SSQ )
-      int iInc = incx;
-      for (ix = 0; (iInc < 0) ? ix >= (0 + (((n - 1)) * incx)) : ix <= (0 + (((n - 1)) * incx)); ix += iInc) //stu-query?
-      {
+      for (ix = 0; ix < n * incx; ix += incx) {
         if (x[ix + xOffset] != 0.0) {
           absxi = Math.abs(x[ix + xOffset]);
           if (scale < absxi) {
             ssq = 1.0 + ssq * (scale / absxi) * (scale / absxi);
             scale = absxi;
           } else {
-            ssq = ssq + (scale / absxi) * (scale / absxi);
+            ssq = ssq + (absxi / scale) * (absxi / scale);
           }
         }
       }
