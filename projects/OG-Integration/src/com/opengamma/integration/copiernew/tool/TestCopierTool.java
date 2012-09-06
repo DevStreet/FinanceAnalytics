@@ -3,58 +3,19 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.integration.copiernew;
+package com.opengamma.integration.copiernew.tool;
 
 import com.opengamma.component.tool.AbstractTool;
-import com.opengamma.engine.view.ViewDefinition;
-import com.opengamma.id.ExternalId;
-import com.opengamma.id.ExternalIdBundleWithDates;
-import com.opengamma.id.ExternalIdWithDates;
-import com.opengamma.id.ObjectId;
-import com.opengamma.id.UniqueId;
-import com.opengamma.integration.copiernew.configuration.ConfigMasterReader;
-import com.opengamma.integration.copiernew.configuration.ConfigMasterWriter;
-import com.opengamma.integration.copiernew.exchange.ExchangeMasterReader;
-import com.opengamma.integration.copiernew.exchange.ExchangeMasterWriter;
-import com.opengamma.integration.copiernew.historicaltimeseries.HistoricalTimeSeriesMasterReader;
-import com.opengamma.integration.copiernew.historicaltimeseries.HistoricalTimeSeriesMasterWriter;
-import com.opengamma.integration.copiernew.historicaltimeseriesdatapoint.HistoricalTimeSeriesDataPointMasterReader;
-import com.opengamma.integration.copiernew.historicaltimeseriesdatapoint.HistoricalTimeSeriesDataPointMasterWriter;
-import com.opengamma.integration.copiernew.holiday.HolidayMasterReader;
-import com.opengamma.integration.copiernew.holiday.HolidayMasterWriter;
-import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurity;
-import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterReader;
-import com.opengamma.integration.copiernew.nodepositionsecurity.NodePositionSecurityMasterWriter;
+import com.opengamma.financial.tool.ToolContext;
+import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterReader;
-import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContent;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterReader;
 import com.opengamma.integration.copiernew.portfoliocontent.PortfolioContentMasterWriter;
-import com.opengamma.integration.copiernew.position.PositionMasterReader;
-import com.opengamma.integration.copiernew.position.PositionMasterWriter;
-import com.opengamma.integration.copiernew.security.SecurityMasterReader;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
-import com.opengamma.master.config.ConfigSearchRequest;
-import com.opengamma.master.exchange.ExchangeSearchRequest;
-import com.opengamma.master.exchange.ManageableExchange;
-import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoDocument;
-import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchRequest;
-import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesSelector;
-import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
-import com.opengamma.master.holiday.HolidaySearchRequest;
-import com.opengamma.master.holiday.ManageableHoliday;
-import com.opengamma.master.portfolio.ManageablePortfolio;
-import com.opengamma.master.portfolio.ManageablePortfolioNode;
-import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
-import com.opengamma.master.position.ManageablePosition;
-import com.opengamma.master.position.PositionSearchRequest;
-import com.opengamma.master.security.ManageableSecurity;
-import com.opengamma.master.security.SecuritySearchRequest;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
-import com.opengamma.util.tuple.ObjectsPair;
 
-public class TestCopierTool extends AbstractTool {
+public class TestCopierTool extends AbstractTool<ToolContext> {
 
   /**
    * Main method to run the tool.
@@ -62,22 +23,42 @@ public class TestCopierTool extends AbstractTool {
    * @param args  the arguments, not null
    */
   public static void main(String[] args) { //CSIGNORE
-    new TestCopierTool().initAndRun(args);
+    new TestCopierTool().initAndRun(args, ToolContext.class);
     System.exit(0);
   }
 
   @Override
   protected void doRun() throws Exception {
 
+    ToolContext sourceContext = getToolContext(0);
+    ToolContext destContext = getToolContext(1);
+
+    PortfolioSearchRequest portfolioSearchRequest = new PortfolioSearchRequest();
+    portfolioSearchRequest.setName("A KV Test");
+    Iterable<PortfolioContent> portfolioContentReader = new PortfolioContentMasterReader(
+        new PortfolioMasterReader(sourceContext.getPortfolioMaster(), portfolioSearchRequest),
+        sourceContext.getPositionMaster(),
+        sourceContext.getSecuritySource()
+    );
+    Writeable<PortfolioContent> portfolioContentWriter = new PortfolioContentMasterWriter(
+        destContext.getPortfolioMaster(),
+        destContext.getPositionMaster(),
+        new SecurityMasterWriter(destContext.getSecurityMaster()),
+        "Ex-"
+    );
+    portfolioContentWriter.addOrUpdate(portfolioContentReader);
+    portfolioContentWriter.flush();
+
+
     // Configuration copier
-    ConfigSearchRequest<Object> searchRequest = new ConfigSearchRequest<Object>();
-    searchRequest.setType(Object.class);
-    searchRequest.setName("*DJX*");
-    Iterable<ObjectsPair<String, Object>> reader =
-        new ConfigMasterReader<Object>(getToolContext().getConfigMaster(), searchRequest);
-    Writeable<ObjectsPair<String, Object>> writer =
-        new ConfigMasterWriter<Object>(getToolContext().getConfigMaster(), "KV <name>");
-    writer.addOrUpdate(reader);
+//    ConfigSearchRequest<Object> searchRequest = new ConfigSearchRequest<Object>();
+//    searchRequest.setType(Object.class);
+//    searchRequest.setName("*DJX*");
+//    Iterable<ObjectsPair<String, Object>> reader =
+//        new ConfigMasterReader<Object>(getToolContext().getConfigMaster(), searchRequest);
+//    Writeable<ObjectsPair<String, Object>> writer =
+//        new ConfigMasterWriter<Object>(getToolContext().getConfigMaster(), "KV <name>");
+//    writer.addOrUpdate(reader);
 
 
     // Multi time-series copier
