@@ -10,8 +10,6 @@
 */
 package com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS;
 
-import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAPIInterface;
-
 /**
  * Does DAXPY, See {@linkplain BLASAPIInterface}
  */
@@ -31,13 +29,13 @@ public class Daxpy {
     }
 
     if ((incx == 1 && incy == 1)) {
-      m = (n) % (4);
+      m = n % 4;
       if (m != 0) {
         for (i = 0; i < m; i++) {
           y[i + yOffset] = y[i + yOffset] + (alpha * x[i + xOffset]);
         }
       }
-      if ((n < 4)) {
+      if (n < 4) {
         return;
       }
       int iInc = 4;
@@ -50,13 +48,13 @@ public class Daxpy {
 
       }
     } else {
-      ix = 1;
-      iy = 1;
-      if ((incx < 0)) {
-        ix = (-n + 1) * incx + 1;
+      ix = 0;
+      iy = 0;
+      if (incx < 0) {
+        ix = (-n + 1) * incx;
       }
-      if ((incy < 0)) {
-        ix = (-n + 1) * incy + 1;
+      if (incy < 0) {
+        iy = (-n + 1) * incy;
       }
       for (i = 0; i < n; i++) {
         y[iy + yOffset] = y[iy + yOffset] + alpha * x[ix + xOffset];

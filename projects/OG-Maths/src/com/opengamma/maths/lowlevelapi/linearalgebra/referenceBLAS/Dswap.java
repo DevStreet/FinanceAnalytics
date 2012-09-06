@@ -27,20 +27,20 @@ public class Dswap {
       return;
     }
     if (incx == 1 && incy == 1) {
-      m = (n) % (3);
+      m = n % 3;
       if (m != 0) {
-        for (i = 1; i <= m; i++) {
-          dtemp = x[(i - (1)) + xOffset];
-          x[(i - (1)) + xOffset] = y[(i - (1)) + yOffset];
-          y[(i - (1)) + yOffset] = dtemp;
+        for (i = 0; i < m; i++) {
+          dtemp = x[i + xOffset];
+          x[i + xOffset] = y[i + yOffset];
+          y[i + yOffset] = dtemp;
         }
         if (n < 3) {
           return;
         }
       }
-      mp1 = (m + 1);
+      mp1 = m;
       int iInc = 3;
-      for (i = mp1; i <= n; i += iInc) {
+      for (i = mp1; i < n; i += iInc) {
         dtemp = x[i + xOffset];
         x[i + xOffset] = y[i + yOffset];
         y[i + yOffset] = dtemp;
@@ -54,13 +54,13 @@ public class Dswap {
     } else {
       // *       code for unequal increments or equal increments not equal
       // *         to 1
-      ix = 1;
-      iy = 1;
+      ix = 0;
+      iy = 0;
       if ((incx < 0)) {
-        ix = (((((-(n)) + 1)) * incx) + 1); // stu -query?
+        ix = (-n + 1) * incx; // stu -query?
       }
       if ((incy < 0)) {
-        iy = (((((-(n)) + 1)) * incy) + 1); // stu -query?
+        iy = (-n + 1) * incy; // stu -query?
       }
       {
         for (i = 0; i < n; i++) {

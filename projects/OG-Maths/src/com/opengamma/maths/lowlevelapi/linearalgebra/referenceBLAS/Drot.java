@@ -28,7 +28,7 @@ public class Drot {
       // *
       // *       code for both increments equal to 1
       // *
-      for (i = 1; i <= n; i++) {
+      for (i = 0; i < n; i++) {
         dtemp = c * x[i + xOffset] + s * y[i + yOffset];
         y[i + yOffset] = c * y[i + yOffset] - s * x[i + xOffset];
         x[i + xOffset] = dtemp;
@@ -36,13 +36,13 @@ public class Drot {
     } else {
       // *       code for unequal increments or equal increments not equal
       // *         to 1
-      ix = 1;
-      iy = 1;
+      ix = 0;
+      iy = 0;
       if ((incx < 0)) {
-        ix = (((((-(n)) + 1)) * incx) + 1); // stu-query?
+        ix = (-n + 1) * incx;
       }
       if ((incy < 0)) {
-        iy = (((((-(n)) + 1)) * incy) + 1);
+        iy = (-n + 1) * incy;
       }
 
       for (i = 0; i < n; i++) {

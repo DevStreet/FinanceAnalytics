@@ -30,16 +30,16 @@ public class Dcopy {
     if (((incx == 1) && (incy == 1))) {
       m = n % 7;
       if (m != 0) {
-        for (i = 1; i <= m; i++) {
+        for (i = 0; i < m; i++) {
           y[i + yOffset] = x[i + xOffset];
         }
-        if ((n < 7)) {
+        if (n < 7) {
           return;
         }
       }
-      mp1 = (m + 1);
+      mp1 = m;
       int iInc = 7;
-      for (i = mp1; i <= n; i += iInc) {
+      for (i = mp1; i < n; i += iInc) {
         y[i + yOffset] = x[i + xOffset];
         y[i + 1 + yOffset] = x[i + 1 + xOffset];
         y[i + 2 + yOffset] = x[i + 2 + xOffset];
@@ -49,13 +49,13 @@ public class Dcopy {
         y[i + 6 + yOffset] = x[i + 6 + xOffset];
       }
     } else {
-      ix = 1;
-      iy = 1;
+      ix = 0;
+      iy = 0;
       if ((incx < 0)) { // stu-query?
-        ix = (-n + 1) * incx + 1;
+        ix = (-n + 1) * incx;
       }
       if ((incy < 0)) {
-        iy = (-n + 1) * incy + 1;
+        iy = (-n + 1) * incy;
       }
       for (i = 0; i < n; i++) {
         y[iy + yOffset] = x[ix + xOffset];
