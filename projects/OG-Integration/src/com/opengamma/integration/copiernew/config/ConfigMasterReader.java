@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.integration.copiernew.configuration;
+package com.opengamma.integration.copiernew.config;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.master.config.ConfigDocument;

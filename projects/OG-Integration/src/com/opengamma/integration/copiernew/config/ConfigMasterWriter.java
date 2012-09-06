@@ -1,26 +1,18 @@
-package com.opengamma.integration.copiernew.configuration;
+package com.opengamma.integration.copiernew.config;
 
-import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.id.ExternalIdSearch;
-import com.opengamma.id.UniqueId;
-import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigDocument;
-import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
 import com.opengamma.master.config.ConfigSearchResult;
 import com.opengamma.master.config.ConfigSearchSortOrder;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.beancompare.BeanCompare;
-import com.opengamma.util.beancompare.BeanDifference;
 import com.opengamma.util.tuple.ObjectsPair;
-import org.joda.beans.impl.direct.DirectBean;
 
 import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
-import java.util.List;
 
 public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> {
 
