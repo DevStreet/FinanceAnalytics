@@ -9,27 +9,18 @@ package com.opengamma.integration.copiernew.tool;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
 import com.opengamma.integration.copiernew.Writeable;
+import com.opengamma.integration.copiernew.sheet.PrettyWriter;
 
 import java.io.IOException;
 
-public class CopyTool {
+public class WriteTool {
 
   public static void main(String[] args) {
 
-    if (args.length != 2) {
-      throw new OpenGammaRuntimeException("Usage: CpTool <source uri> <destination uri>");
+    if (args.length != 1) {
+      throw new OpenGammaRuntimeException("Usage: WriteTool <uri>");
     }
 
-    Iterable reader = ReaderWriterUtils.getMasterReader(args[0]);
-    Writeable writer = ReaderWriterUtils.getMasterWriter(args[1]);
-    writer.addOrUpdate(reader);
-
-    try {
-      writer.flush();
-    } catch (IOException e) {
-      e.printStackTrace();  // TODO
-    }
-
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 }
-

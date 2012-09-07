@@ -9,19 +9,23 @@ package com.opengamma.integration.copiernew.tool;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
 import com.opengamma.integration.copiernew.Writeable;
+import com.opengamma.integration.copiernew.sheet.PrettyWriter;
 
 import java.io.IOException;
 
-public class CopyTool {
+public class ReadTool {
 
   public static void main(String[] args) {
 
-    if (args.length != 2) {
-      throw new OpenGammaRuntimeException("Usage: CpTool <source uri> <destination uri>");
+    if (args.length != 1) {
+      throw new OpenGammaRuntimeException("Usage: ReadTool <uri>");
     }
 
     Iterable reader = ReaderWriterUtils.getMasterReader(args[0]);
-    Writeable writer = ReaderWriterUtils.getMasterWriter(args[1]);
+
+    // need options for different output formats: csv, xml, fudge, etc.
+    Writeable writer = new PrettyWriter(System.out);
+
     writer.addOrUpdate(reader);
 
     try {
@@ -32,4 +36,3 @@ public class CopyTool {
 
   }
 }
-
