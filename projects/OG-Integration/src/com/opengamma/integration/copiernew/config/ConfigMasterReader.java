@@ -15,7 +15,7 @@ import com.opengamma.util.tuple.ObjectsPair;
 
 import java.util.Iterator;
 
-public class ConfigMasterReader<T> implements Iterable<ObjectsPair<String, T>> {
+public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
 
   private ConfigSearchResult<T> _configSearchResult;
 
@@ -32,8 +32,8 @@ public class ConfigMasterReader<T> implements Iterable<ObjectsPair<String, T>> {
   }
 
   @Override
-  public Iterator<ObjectsPair<String, T>> iterator() {
-    return new Iterator<ObjectsPair<String, T>>() {
+  public Iterator<ConfigEntry<T>> iterator() {
+    return new Iterator<ConfigEntry<T>>() {
 
       Iterator<ConfigDocument<T>> iterator = _configSearchResult.getDocuments().iterator();
 
@@ -43,9 +43,9 @@ public class ConfigMasterReader<T> implements Iterable<ObjectsPair<String, T>> {
       }
 
       @Override
-      public ObjectsPair<String, T> next() {
+      public ConfigEntry<T> next() {
         ConfigDocument<T> doc = iterator.next();
-        return new ObjectsPair<String, T>(doc.getName(), doc.getValue());
+        return new ConfigEntry<T>(doc.getName(), doc.getValue(), doc.getUniqueId());
       }
 
       @Override

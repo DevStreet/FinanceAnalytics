@@ -14,7 +14,7 @@ import com.opengamma.util.tuple.ObjectsPair;
 import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
 
-public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> {
+public class ConfigMasterWriter<T> implements Writeable<ConfigEntry<T>> {
 
   private static final String TEMPLATE_NAME = "<name>";
 
@@ -37,12 +37,12 @@ public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> 
   }
 
   @Override
-  public void addOrUpdate(ObjectsPair<String, T> pair) {
-    ArgumentChecker.notNull(pair, "config, name pair");
+  public void addOrUpdate(ConfigEntry<T> configEntry) {
+    ArgumentChecker.notNull(configEntry, "configEntry");
 
     ConfigSearchRequest searchReq = new ConfigSearchRequest<T>();
-    String name = pair.getFirst();
-    T config = pair.getSecond();
+    String name = configEntry.getConfigName();
+    T config = configEntry.getConfigEntry();
 
     // Rename portfolio as per supplied template
     if (_nameTemplate != null) {
@@ -74,8 +74,8 @@ public class ConfigMasterWriter<T> implements Writeable<ObjectsPair<String, T>> 
   }
 
   @Override
-  public void addOrUpdate(Iterable<ObjectsPair<String, T>> data) {
-    for (ObjectsPair<String, T> datum : data) {
+  public void addOrUpdate(Iterable<ConfigEntry<T>> data) {
+    for (ConfigEntry<T> datum : data) {
       addOrUpdate(datum);
     }
   }
