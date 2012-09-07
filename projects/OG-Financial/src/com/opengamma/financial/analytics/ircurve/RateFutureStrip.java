@@ -7,28 +7,33 @@ package com.opengamma.financial.analytics.ircurve;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.time.Tenor;
 
 /**
  * 
  */
-public class FutureStrip extends CurveStrip {
+public class RateFutureStrip extends CurveStrip {
   private static final long serialVersionUID = 1L;
-  private final InterestRateFutureType _futureType;
+  private final FutureType _futureType;
   private final int _nthFutureFromTenor;
   private final Tenor _futureTenor;
   private final Tenor _rateTenor;
 
-  public FutureStrip(final InterestRateFutureType futureType, final int nthFutureFromTenor, final Tenor futureTenor, final Tenor rateTenor, final Tenor curveNodePointTime,
+  public RateFutureStrip(final FutureType futureType, final int nthFutureFromTenor, final Tenor futureTenor, final Tenor rateTenor, final Tenor curveNodePointTime,
       final String configurationName) {
     super(NewStripInstrumentType.FUTURE, curveNodePointTime, configurationName);
+    ArgumentChecker.notNull(futureType, "future type");
+    ArgumentChecker.notNull(futureTenor, "future tenor");
+    ArgumentChecker.notNull(rateTenor, "rate tenor");
+    ArgumentChecker.isTrue(nthFutureFromTenor > 0, "Future number must be greater than 0");
     _futureType = futureType;
     _nthFutureFromTenor = nthFutureFromTenor;
     _futureTenor = futureTenor;
     _rateTenor = rateTenor;
   }
 
-  public InterestRateFutureType getFutureType() {
+  public FutureType getFutureType() {
     return _futureType;
   }
 
@@ -44,6 +49,7 @@ public class FutureStrip extends CurveStrip {
     return _rateTenor;
   }
 
+  //TODO do we want the end of the rate rather than the future?
   @Override
   public Tenor getEffectiveTenor() {
     final int months = (int) getFutureTenor().getPeriod().totalMonths();
@@ -56,7 +62,7 @@ public class FutureStrip extends CurveStrip {
     if (result != 0) {
       return result;
     }
-    final FutureStrip otherFuture = (FutureStrip) other;
+    final RateFutureStrip otherFuture = (RateFutureStrip) other;
     result = getNumberOfFuturesAfterTenor() - otherFuture.getNumberOfFuturesAfterTenor();
     if (result != 0) {
       return result;
@@ -90,7 +96,7 @@ public class FutureStrip extends CurveStrip {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    final FutureStrip other = (FutureStrip) obj;
+    final RateFutureStrip other = (RateFutureStrip) obj;
     if (_nthFutureFromTenor != other._nthFutureFromTenor) {
       return false;
     }
@@ -108,7 +114,7 @@ public class FutureStrip extends CurveStrip {
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("FutureStrip[");
+    final StringBuffer sb = new StringBuffer("RateFutureStrip[");
     sb.append(getCurveNodePointTime());
     sb.append(", future type=");
     sb.append(getFutureType());

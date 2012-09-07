@@ -8,7 +8,7 @@ package com.opengamma.financial.analytics.ircurve;
 /**
  * 
  */
-public enum InterestRateFutureType {
+public enum FutureType {
   IMM,
   BA,
   Fed_Funds
