@@ -3,6 +3,7 @@ package com.opengamma.integration.copiernew.sheet;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.util.ArgumentChecker;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class PrettyWriter<E> implements Writeable<E>, Closeable {
   @Override
   public void addOrUpdate(E datum) {
     try {
-      _outputStream.write((datum.toString() + "\n").getBytes());
+      _outputStream.write((ToStringBuilder.reflectionToString(datum) + "\n").getBytes());
     } catch (Throwable t) {
       throw new OpenGammaRuntimeException("Could not write datum to output stream");
     }
