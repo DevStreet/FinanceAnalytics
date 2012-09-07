@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class HistoricalTimeSeriesMasterWriter
-    implements Writeable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>> {
+public class HistoricalTimeSeriesMasterWriter implements Writeable<HistoricalTimeSeriesEntry> {
 
   private static final String TEMPLATE_NAME = "<name>";
 
@@ -50,11 +49,11 @@ public class HistoricalTimeSeriesMasterWriter
   }
 
   @Override
-  public void addOrUpdate(ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>> pair) {
-    ArgumentChecker.notNull(pair, "historicalTimeSeriesInfo, historicalTimeSeries");
+  public void addOrUpdate(HistoricalTimeSeriesEntry entry) {
+    ArgumentChecker.notNull(entry, "historicalTimeSeriesInfo, historicalTimeSeries");
 
     // Write info
-    ManageableHistoricalTimeSeriesInfo info = pair.getFirst();
+    ManageableHistoricalTimeSeriesInfo info = entry.getInfo();
 
     // Clear unique id
     info.setUniqueId(null);
@@ -95,7 +94,7 @@ public class HistoricalTimeSeriesMasterWriter
     }
 
     // Write data points
-    Iterable<LocalDateDoubleTimeSeries> timeSeries = pair.getSecond();
+    Iterable<LocalDateDoubleTimeSeries> timeSeries = entry.getSeries();
     if (timeSeries != null) {
       HistoricalTimeSeriesDataPointMasterWriter dataPointMasterWriter =
           new HistoricalTimeSeriesDataPointMasterWriter(_historicalTimeSeriesMaster, info.getUniqueId());
@@ -104,8 +103,8 @@ public class HistoricalTimeSeriesMasterWriter
   }
 
   @Override
-  public void addOrUpdate(Iterable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>> data) {
-    for (ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>> datum : data) {
+  public void addOrUpdate(Iterable<HistoricalTimeSeriesEntry> data) {
+    for (HistoricalTimeSeriesEntry datum : data) {
       addOrUpdate(datum);
     }
   }

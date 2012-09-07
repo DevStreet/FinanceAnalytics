@@ -20,7 +20,7 @@ import com.opengamma.util.tuple.ObjectsPair;
 import java.util.Iterator;
 
 public class HistoricalTimeSeriesMasterReader
-    implements Iterable<ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>> {
+    implements Iterable<HistoricalTimeSeriesEntry> {
 
   private HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
   private HistoricalTimeSeriesInfoSearchResult _historicalTimeSeriesInfoSearchResult;
@@ -64,9 +64,9 @@ public class HistoricalTimeSeriesMasterReader
   }
 
   @Override
-  public Iterator<ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>> iterator() {
+  public Iterator<HistoricalTimeSeriesEntry> iterator() {
 
-    return new Iterator<ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>>() {
+    return new Iterator<HistoricalTimeSeriesEntry>() {
       Iterator<ManageableHistoricalTimeSeriesInfo> _iterator =
           _historicalTimeSeriesInfoSearchResult.getInfoList().iterator();
 
@@ -76,14 +76,13 @@ public class HistoricalTimeSeriesMasterReader
       }
 
       @Override
-      public ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>> next() {
+      public HistoricalTimeSeriesEntry next() {
         ManageableHistoricalTimeSeriesInfo info = _iterator.next();
         Iterable<LocalDateDoubleTimeSeries> dataPointMasterReader =
             new HistoricalTimeSeriesDataPointMasterReader(
                 _historicalTimeSeriesMaster, info.getUniqueId(), _historicalTimeSeriesGetFilter, _bufferSize
             );
-        return new ObjectsPair<ManageableHistoricalTimeSeriesInfo, Iterable<LocalDateDoubleTimeSeries>>(
-            info, dataPointMasterReader);
+        return new HistoricalTimeSeriesEntry(info, dataPointMasterReader);
       }
 
       @Override
