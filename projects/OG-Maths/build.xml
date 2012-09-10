@@ -52,4 +52,10 @@
            <arg line="--global OG_VERSION=${module.version.target} --setup"/>
         </exec>
     </target>
+    
+    <target name="performance-tests" depends="build" description="Runs the performance tests, takes a while!">
+            <antcall target="tests">
+                <param name="tests.classes.pattern" value="**/*PerformanceTester.class"/>            
+            </antcall>
+    </target>
 </project>
