@@ -45,7 +45,7 @@ public class Dasum {
     } else {
       {
         int iInc = incx;
-        for (i = 0; i < n * incx; i += iInc) {
+        for (i = 0; iInc < 0 ? i > n * incx : i < n * incx; i += iInc) {
           dtemp = dtemp + Math.abs(x[i + xOffset]);
         }
       }
