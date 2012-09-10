@@ -18,13 +18,13 @@ import com.opengamma.engine.CachingComputationTargetResolver;
 import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.DefaultCachingComputationTargetResolver;
 import com.opengamma.engine.DefaultComputationTargetResolver;
+import com.opengamma.engine.depgraph.DependencyGraphBuilderFactory;
 import com.opengamma.engine.function.CachingFunctionRepositoryCompiler;
 import com.opengamma.engine.function.CompiledFunctionService;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionRepository;
 import com.opengamma.engine.function.InMemoryFunctionRepository;
-import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.DefaultFunctionResolver;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.InMemoryLKVMarketDataProvider;
@@ -43,13 +43,13 @@ import com.opengamma.engine.view.ViewProcessorImpl;
 import com.opengamma.engine.view.ViewResultModel;
 import com.opengamma.engine.view.cache.InMemoryViewComputationCacheSource;
 import com.opengamma.engine.view.calc.DependencyGraphExecutorFactory;
+import com.opengamma.engine.view.calc.ExecutionResult;
 import com.opengamma.engine.view.calc.SingleNodeExecutorFactory;
 import com.opengamma.engine.view.calc.ViewComputationJob;
 import com.opengamma.engine.view.calc.ViewResultListenerFactory;
-import com.opengamma.engine.view.calcnode.CalculationJobResult;
 import com.opengamma.engine.view.calcnode.JobDispatcher;
-import com.opengamma.engine.view.calcnode.LocalCalculationNode;
 import com.opengamma.engine.view.calcnode.LocalNodeJobInvoker;
+import com.opengamma.engine.view.calcnode.SimpleCalculationNode;
 import com.opengamma.engine.view.calcnode.ViewProcessorQueryReceiver;
 import com.opengamma.engine.view.calcnode.ViewProcessorQuerySender;
 import com.opengamma.engine.view.calcnode.stats.DiscardingInvocationStatisticsGatherer;
@@ -89,8 +89,8 @@ public class ViewProcessorTestEnvironment {
   private FunctionCompilationContext _functionCompilationContext;
   private ViewDefinition _viewDefinition;
   private FunctionRepository _functionRepository;
-  private FunctionExclusionGroups _functionExclusionGroups;
-  private DependencyGraphExecutorFactory<CalculationJobResult> _dependencyGraphExecutorFactory;
+  private DependencyGraphExecutorFactory<ExecutionResult> _dependencyGraphExecutorFactory;
+  private DependencyGraphBuilderFactory _dependencyGraphBuilderFactory;
 
   // Environment
   private ViewProcessorImpl _viewProcessor;
@@ -113,8 +113,8 @@ public class ViewProcessorTestEnvironment {
     InMemoryViewComputationCacheSource cacheSource = new InMemoryViewComputationCacheSource(fudgeContext);
     vpFactBean.setComputationCacheSource(cacheSource);
 
-    DependencyGraphExecutorFactory<CalculationJobResult> dependencyGraphExecutorFactory =
-      getDependencyGraphExecutorFactory() != null ? getDependencyGraphExecutorFactory() : generateDependencyGraphExecutorFactory();
+    DependencyGraphExecutorFactory<ExecutionResult> dependencyGraphExecutorFactory = getDependencyGraphExecutorFactory() != null ? getDependencyGraphExecutorFactory()
+        : generateDependencyGraphExecutorFactory();
     vpFactBean.setDependencyGraphExecutorFactory(dependencyGraphExecutorFactory);
 
     FunctionRepository functionRepository = getFunctionRepository() != null ? getFunctionRepository() : generateFunctionRepository();
@@ -125,8 +125,6 @@ public class ViewProcessorTestEnvironment {
     MarketDataProviderResolver marketDataProviderResolver = getMarketDataProviderResolver() != null ? getMarketDataProviderResolver() : generateMarketDataProviderResolver(securitySource);
     vpFactBean.setMarketDataProviderResolver(marketDataProviderResolver);
 
-    vpFactBean.setPositionSource(positionSource);
-    vpFactBean.setSecuritySource(securitySource);
     vpFactBean.setComputationTargetResolver(generateCachingComputationTargetResolver(positionSource, securitySource));
     vpFactBean.setViewDefinitionRepository(viewDefinitionRepository);
     vpFactBean.setViewPermissionProvider(new DefaultViewPermissionProvider());
@@ -143,8 +141,8 @@ public class ViewProcessorTestEnvironment {
     FunctionExecutionContext functionExecutionContext = getFunctionExecutionContext() != null ? getFunctionExecutionContext() : generateFunctionExecutionContext();
     functionExecutionContext.setSecuritySource(securitySource);
 
-    LocalCalculationNode localCalcNode = new LocalCalculationNode(cacheSource, compiledFunctions, functionExecutionContext, new DefaultComputationTargetResolver(
-        securitySource, positionSource), calcNodeQuerySender, Executors.newCachedThreadPool(), new DiscardingInvocationStatisticsGatherer());
+    SimpleCalculationNode localCalcNode = new SimpleCalculationNode(cacheSource, compiledFunctions, functionExecutionContext, new DefaultComputationTargetResolver(
+        securitySource, positionSource), calcNodeQuerySender, "node", Executors.newCachedThreadPool(), new DiscardingInvocationStatisticsGatherer());
     LocalNodeJobInvoker jobInvoker = new LocalNodeJobInvoker(localCalcNode);
     vpFactBean.setComputationJobDispatcher(new JobDispatcher(jobInvoker));
     vpFactBean.setFunctionResolver(generateFunctionResolver(compiledFunctions));
@@ -159,12 +157,10 @@ public class ViewProcessorTestEnvironment {
     ViewCompilationServices compilationServices = new ViewCompilationServices(
         getMarketDataProvider().getAvailabilityProvider(),
         getFunctionResolver(),
-        getFunctionExclusionGroups(),
         getFunctionCompilationContext(),
         getCachingComputationTargetResolver(),
         getViewProcessor().getFunctionCompilationService().getExecutorService(),
-        getSecuritySource(),
-        getPositionSource());
+        (getDependencyGraphBuilderFactory() != null) ? getDependencyGraphBuilderFactory() : generateDependencyGraphBuilderFactory());
     return ViewDefinitionCompiler.compile(getViewDefinition(), compilationServices, valuationTime, versionCorrection);
   }
 
@@ -260,24 +256,30 @@ public class ViewProcessorTestEnvironment {
     return functionRepository;
   }
   
-  public FunctionExclusionGroups getFunctionExclusionGroups() {
-    return _functionExclusionGroups;
+  public DependencyGraphBuilderFactory getDependencyGraphBuilderFactory() {
+    return _dependencyGraphBuilderFactory;
   }
 
-  public void setFunctionExclusionGroups(final FunctionExclusionGroups functionExclusionGroups) {
-    _functionExclusionGroups = functionExclusionGroups;
+  public void setDependencyGraphBuilderFactory(final DependencyGraphBuilderFactory dependencyGraphBuilderFactory) {
+    _dependencyGraphBuilderFactory = dependencyGraphBuilderFactory;
   }
 
-  public DependencyGraphExecutorFactory<CalculationJobResult> getDependencyGraphExecutorFactory() {
+  private DependencyGraphBuilderFactory generateDependencyGraphBuilderFactory() {
+    final DependencyGraphBuilderFactory factory = new DependencyGraphBuilderFactory();
+    setDependencyGraphBuilderFactory(factory);
+    return factory;
+  }
+
+  public DependencyGraphExecutorFactory<ExecutionResult> getDependencyGraphExecutorFactory() {
     return _dependencyGraphExecutorFactory;
   }
 
-  public void setDependencyGraphExecutorFactory(DependencyGraphExecutorFactory<CalculationJobResult> dependencyGraphExecutorFactory) {
+  public void setDependencyGraphExecutorFactory(DependencyGraphExecutorFactory<ExecutionResult> dependencyGraphExecutorFactory) {
     _dependencyGraphExecutorFactory = dependencyGraphExecutorFactory;
   }
   
-  private DependencyGraphExecutorFactory<CalculationJobResult> generateDependencyGraphExecutorFactory() {
-    DependencyGraphExecutorFactory<CalculationJobResult> dgef = new SingleNodeExecutorFactory();
+  private DependencyGraphExecutorFactory<ExecutionResult> generateDependencyGraphExecutorFactory() {
+    DependencyGraphExecutorFactory<ExecutionResult> dgef = new SingleNodeExecutorFactory();
     setDependencyGraphExecutorFactory(dgef);
     return dgef;
   }

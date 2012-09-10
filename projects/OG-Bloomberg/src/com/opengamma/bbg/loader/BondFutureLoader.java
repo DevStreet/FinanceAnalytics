@@ -22,6 +22,7 @@ import static com.opengamma.bbg.BloombergConstants.FIELD_ID_ISIN;
 import static com.opengamma.bbg.BloombergConstants.FIELD_ID_MIC_PRIM_EXCH;
 import static com.opengamma.bbg.BloombergConstants.FIELD_ID_SEDOL1;
 import static com.opengamma.bbg.BloombergConstants.FIELD_PARSEKYABLE_DES;
+import static com.opengamma.bbg.BloombergConstants.FIELD_FUT_CONT_SIZE;
 import static com.opengamma.bbg.util.BloombergDataUtils.isValidField;
 
 import java.util.Collections;
@@ -73,7 +74,8 @@ public class BondFutureLoader extends SecurityLoader {
       FIELD_ID_ISIN,
       FIELD_ID_SEDOL1,
       FIELD_PARSEKYABLE_DES,
-      FIELD_FUT_VAL_PT));
+      FIELD_FUT_VAL_PT,
+      FIELD_FUT_CONT_SIZE));
   
   /**
    * The valid Bloomberg future categories for Bond Futures
@@ -95,12 +97,16 @@ public class BondFutureLoader extends SecurityLoader {
     String futureTradingHours = fieldData.getString(FIELD_FUT_TRADING_HRS);
     String micExchangeCode = fieldData.getString(FIELD_ID_MIC_PRIM_EXCH);
     String currencyStr = fieldData.getString(FIELD_CRNCY);
-    String category = fieldData.getString(FIELD_FUTURES_CATEGORY);
+    String category = BloombergDataUtils.removeDuplicateWhiteSpace(fieldData.getString(FIELD_FUTURES_CATEGORY), " ");
     String firstDeliveryDateStr = fieldData.getString(FIELD_FUT_DLV_DT_FIRST);
     String lastDeliveryDateStr = fieldData.getString(FIELD_FUT_DLV_DT_LAST);
-    String name = fieldData.getString(FIELD_FUT_LONG_NAME);
+    String name = BloombergDataUtils.removeDuplicateWhiteSpace(fieldData.getString(FIELD_FUT_LONG_NAME), " ");
     String bbgUnique = fieldData.getString(FIELD_ID_BBG_UNIQUE);
-    double unitAmount = Double.valueOf(fieldData.getString(FIELD_FUT_VAL_PT));
+    Double unitAmount = fieldData.getDouble(FIELD_FUT_CONT_SIZE);
+    if (!fieldData.hasField(FIELD_FUT_CONT_SIZE) || unitAmount == null) {
+      s_logger.warn("FIELD_FUT_VAL_PT does not contain a numeric value (" + fieldData.getString(FIELD_FUT_VAL_PT) + ")");
+      return null;
+    }
 
     if (!isValidField(bbgUnique)) {
       s_logger.warn("bbgUnique is null, cannot construct bond future security");
@@ -140,17 +146,14 @@ public class BondFutureLoader extends SecurityLoader {
     Currency currency = Currency.parse(currencyStr);
 
     ZonedDateTime firstDeliverDate = decodeDeliveryDate(firstDeliveryDateStr);
-    ZonedDateTime lastDeliverDate = decodeDeliveryDate(firstDeliveryDateStr);
+    ZonedDateTime lastDeliverDate = decodeDeliveryDate(lastDeliveryDateStr);
     Set<BondFutureDeliverable> basket = createBondDeliverables(fieldData);
-    BondFutureSecurity security = new BondFutureSecurity(expiry, micExchangeCode, micExchangeCode, currency, unitAmount, basket, category,
-                                                         firstDeliverDate, lastDeliverDate);
-
-    if (isValidField(name)) {
-      security.setName(BloombergDataUtils.removeDuplicateWhiteSpace(name, " "));
-    }
+    BondFutureSecurity security = new BondFutureSecurity(expiry, micExchangeCode, micExchangeCode, currency, unitAmount, basket,
+                                                         firstDeliverDate, lastDeliverDate, category);
 
     // set identifiers
     parseIdentifiers(fieldData, security);
+    security.setName(name);
     return security;
   }
 

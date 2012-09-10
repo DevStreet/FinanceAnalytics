@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 
@@ -32,7 +31,7 @@ import com.opengamma.engine.value.ValueSpecification;
   private boolean _invokingFunction;
   private boolean _deferredPump;
   private FunctionApplicationStep.PumpingState _taskState;
-  private boolean _closed;
+  private volatile boolean _closed;
 
   public FunctionApplicationWorker(final ValueRequirement valueRequirement) {
     super(valueRequirement);
@@ -50,23 +49,18 @@ import com.opengamma.engine.value.ValueSpecification;
       }
       if (_pendingInputs < 1) {
         if (_pumps.isEmpty()) {
-          if (_validInputs == 0) {
-            s_logger.debug("{} finished (state={})", this, _taskState);
-            finished = _taskState;
-            _taskState = null;
-          } else {
-            // Can this happen? Should we just assert validInputs == 0?
-            s_logger.error("{} inputs valid and not in pumped state", _validInputs);
-          }
+          s_logger.debug("{} finished (state={})", this, _taskState);
+          finished = _taskState;
+          _taskState = null;
         } else {
           pumps = new ArrayList<ResolutionPump>(_pumps);
           _pumps.clear();
           _pendingInputs = pumps.size();
         }
       } else {
-        if (s_logger.isDebugEnabled()) {
-          s_logger.debug("Ignoring pump while {} input(s) pending", _pendingInputs);
-        }
+        // If the state performs a direct pump as well as the trigger from AbstractResolvedValueProducer
+        // on behalf of a subscriber, no action is needed.
+        return;
       }
     }
     if (pumps != null) {
@@ -76,9 +70,30 @@ import com.opengamma.engine.value.ValueSpecification;
       }
     } else if (finished != null) {
       s_logger.debug("Finished producing function applications from {}", this);
-      finished(context);
+      // If the last result was already pushed then finished will have already been called
+      if (!isFinished()) {
+        finished(context);
+      }
       s_logger.debug("Calling finished on {} from {}", finished, this);
       finished.finished(context);
+    }
+  }
+
+  @Override
+  protected void finished(final GraphBuildingContext context) {
+    super.finished(context);
+    Collection<ResolutionPump> pumps = null;
+    synchronized (this) {
+      if (!_pumps.isEmpty()) {
+        pumps = new ArrayList<ResolutionPump>(_pumps);
+        _pumps.clear();
+      }
+    }
+    if (pumps != null) {
+      for (ResolutionPump pump : pumps) {
+        s_logger.debug("Discarding input {} from {}", pump, this);
+        context.close(pump);
+      }
     }
   }
 
@@ -94,7 +109,11 @@ import com.opengamma.engine.value.ValueSpecification;
 
   private void inputsAvailable(final GraphBuildingContext context, final FunctionApplicationStep.PumpingState state, final Map<ValueSpecification, ValueRequirement> resolvedValues) {
     if (resolvedValues != null) {
-      boolean inputsAccepted = state.inputsAvailable(context, resolvedValues);
+      final boolean lastResult;
+      synchronized (this) {
+        lastResult = _pumps.isEmpty();
+      }
+      boolean inputsAccepted = state.inputsAvailable(context, resolvedValues, lastResult);
       synchronized (this) {
         _invokingFunction = false;
         if (_deferredPump) {
@@ -123,8 +142,8 @@ import com.opengamma.engine.value.ValueSpecification;
         if (_inputs.get(value) == null) {
           s_logger.info("Resolution of {} failed", value);
           if (_taskState != null) {
-            requirementFailure = _taskState.functionApplication().requirement(value, failure);
             if (_taskState.canHandleMissingInputs()) {
+              requirementFailure = _taskState.functionApplication(context).requirement(value, null);
               _inputs.remove(value);
               state = _taskState;
               if (_pendingInputs == 0) {
@@ -137,9 +156,11 @@ import com.opengamma.engine.value.ValueSpecification;
                 if (s_logger.isDebugEnabled()) {
                   s_logger.debug("Waiting for {} other inputs in {}", _pendingInputs, _inputs);
                 }
-                // Fall through so that the failure is still logged
+                // Fall through so that failure is logged
               }
               break;
+            } else {
+              requirementFailure = _taskState.functionApplication(context).requirement(value, failure);
             }
           }
         } else {
@@ -213,14 +234,17 @@ import com.opengamma.engine.value.ValueSpecification;
     }
     if (state != null) {
       s_logger.debug("Aborting worker {}", this);
-      finished(context);
+      // If last result has already been pushed then finished will have already been called
+      if (!isFinished()) {
+        finished(context);
+      }
     } else {
       s_logger.debug("Ignoring abort call {}", this);
     }
   }
 
   @Override
-  public void resolved(final GraphBuildingContext context, final ValueRequirement valueRequirement, final ResolvedValue resolvedValue, final ResolutionPump pump) {
+  public void resolved(final GraphBuildingContext context, final ValueRequirement valueRequirement, final ResolvedValue resolvedValue, ResolutionPump pump) {
     s_logger.debug("Resolution complete at {}", this);
     s_logger.info("Resolved {} to {}", valueRequirement, resolvedValue);
     FunctionApplicationStep.PumpingState state = null;
@@ -239,10 +263,16 @@ import com.opengamma.engine.value.ValueSpecification;
             s_logger.debug("Waiting for {} other inputs in {}", _pendingInputs, _inputs);
           }
         }
-        _pumps.add(pump);
+        if (pump != null) {
+          _pumps.add(pump);
+          pump = null;
+        }
       } else {
         s_logger.debug("Already aborted resolution");
       }
+    }
+    if (pump != null) {
+      context.close(pump);
     }
     inputsAvailable(context, state, resolvedValues);
   }
@@ -259,7 +289,8 @@ import com.opengamma.engine.value.ValueSpecification;
     super.storeFailure(failure);
   }
 
-  public void addInput(final GraphBuildingContext context, final ValueRequirement valueRequirement, final ResolvedValueProducer inputProducer) {
+  public void addInput(final GraphBuildingContext context, final ResolvedValueProducer inputProducer) {
+    final ValueRequirement valueRequirement = inputProducer.getValueRequirement();
     s_logger.debug("Adding input {} to {}", valueRequirement, this);
     synchronized (this) {
       _inputs.put(valueRequirement, null);
@@ -293,12 +324,14 @@ import com.opengamma.engine.value.ValueSpecification;
     FunctionApplicationStep.PumpingState state = null;
     Map<ValueSpecification, ValueRequirement> resolvedValues = null;
     FunctionApplicationStep.PumpingState finished = null;
+    boolean lastResult = false;
     synchronized (this) {
       if (_taskState != null) {
         if (--_pendingInputs == 0) {
           if (_validInputs > 0) {
             // We've got a full set of inputs; notify the task state
             resolvedValues = createResolvedValuesMap();
+            lastResult = _pumps.isEmpty();
             state = _taskState;
             _invokingFunction = true;
             s_logger.debug("Full input set available at {}", this);
@@ -308,6 +341,7 @@ import com.opengamma.engine.value.ValueSpecification;
             if (_taskState.canHandleMissingInputs()) {
               // Empty input set; notify the task state
               resolvedValues = Collections.emptyMap();
+              lastResult = true;
               state = _taskState;
               _invokingFunction = true;
               s_logger.debug("Empty input set available at {}", this);
@@ -323,7 +357,7 @@ import com.opengamma.engine.value.ValueSpecification;
       }
     }
     if (resolvedValues != null) {
-      boolean inputsAccepted = state.inputsAvailable(context, resolvedValues);
+      boolean inputsAccepted = state.inputsAvailable(context, resolvedValues, lastResult);
       synchronized (this) {
         _invokingFunction = false;
         if (_deferredPump) {

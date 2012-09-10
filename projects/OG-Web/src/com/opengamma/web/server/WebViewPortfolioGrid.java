@@ -17,11 +17,14 @@ import org.cometd.Client;
 import com.opengamma.core.position.Portfolio;
 import com.opengamma.core.position.PortfolioNode;
 import com.opengamma.core.position.Position;
+import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.view.client.ViewClient;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
 import com.opengamma.id.UniqueId;
+import com.opengamma.web.server.conversion.DoubleValueFormatter;
+import com.opengamma.web.server.conversion.DoubleValueOptionalDecimalPlaceFormatter;
 import com.opengamma.web.server.conversion.ResultConverterCache;
 
 /**
@@ -31,15 +34,16 @@ public class WebViewPortfolioGrid extends RequirementBasedWebViewGrid {
 
   private Map<Integer, PortfolioRow> _rowIdToRowMap;
 
-  public WebViewPortfolioGrid(ViewClient viewClient, CompiledViewDefinition compiledViewDefinition, ResultConverterCache resultConverterCache, Client local, Client remote) {
-    this(viewClient, compiledViewDefinition, flattenPortfolio(compiledViewDefinition.getPortfolio()), resultConverterCache, local, remote);
+  public WebViewPortfolioGrid(ViewClient viewClient, CompiledViewDefinition compiledViewDefinition, ResultConverterCache resultConverterCache, Client local, Client remote,
+      ComputationTargetResolver computationTargetResolver) {
+    this(viewClient, compiledViewDefinition, flattenPortfolio(compiledViewDefinition.getPortfolio()), resultConverterCache, local, remote, computationTargetResolver);
   }
 
   private WebViewPortfolioGrid(ViewClient viewClient, CompiledViewDefinition compiledViewDefinition, List<PortfolioRow> rows, ResultConverterCache resultConverterCache,
-                               Client local, Client remote) {
+                               Client local, Client remote, ComputationTargetResolver computationTargetResolver) {
     super("portfolio", viewClient, compiledViewDefinition, getTargets(rows),
         EnumSet.of(ComputationTargetType.PORTFOLIO_NODE, ComputationTargetType.POSITION), resultConverterCache, local,
-        remote, "Loading...");
+        remote, "Loading...", computationTargetResolver);
     _rowIdToRowMap = new HashMap<Integer, PortfolioRow>();
     for (PortfolioRow row : rows) {
       int rowId = getGridStructure().getRowId(row.getTarget());
@@ -62,7 +66,8 @@ public class WebViewPortfolioGrid extends RequirementBasedWebViewGrid {
       Position position = row.getPosition();
       details.put("posId", position.getUniqueId());
       details.put("position", position.getSecurity().getName());
-      details.put("quantity", position.getQuantity().signum() == 0 ? "0" : position.getQuantity().toPlainString());
+      DoubleValueFormatter formatter = new DoubleValueOptionalDecimalPlaceFormatter();
+      details.put("quantity", position.getQuantity().signum() == 0 ? "0" : formatter.format(position.getQuantity()));
     } else {
       details.put("position", row.getAggregateName());
     }

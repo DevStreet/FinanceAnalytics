@@ -1,6 +1,6 @@
 /*
- * @copyright 2011 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 $.register_module({
     name: 'og.views.securities',
@@ -167,7 +167,8 @@ $.register_module({
                         }
                         if (json.template_data.hts_id || args.timeseries) common.gadgets.timeseries({
                             selector: '.OG-timeseries-container',
-                            id: json.template_data.hts_id || args.timeseries
+                            id: json.template_data.hts_id || args.timeseries,
+                            height: "450"
                         });
                         if (show_loading) view.notify(null);
                         setTimeout(view.layout.inner.resizeAll);

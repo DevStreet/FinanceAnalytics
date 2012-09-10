@@ -17,7 +17,7 @@ import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscou
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
-import com.opengamma.analytics.math.curve.Curve;
+import com.opengamma.analytics.math.curve.DoublesCurve;
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
 import com.opengamma.analytics.math.curve.MultiplyCurveSpreadFunction;
 import com.opengamma.analytics.math.curve.SpreadDoublesCurve;
@@ -40,14 +40,14 @@ public class MarketDataSets {
   private static final Calendar CALENDAR_EUR = new MondayToFridayCalendar("EUR");
   private static final Calendar CALENDAR_USD = new MondayToFridayCalendar("USD");
   //  private static final Calendar CALENDAR_GBP = new MondayToFridayCalendar("GBP");
-  private static final MarketBundle MARKET_1 = new MarketBundle();
-  private static final YieldAndDiscountCurve CURVE_EUR_50 = new YieldCurve(ConstantDoublesCurve.from(0.0500, "EUR 5.00"));
-  private static final YieldAndDiscountCurve CURVE_EUR_45 = new YieldCurve(ConstantDoublesCurve.from(0.0450, "EUR 4.50"));
-  private static final YieldAndDiscountCurve CURVE_EUR_40 = new YieldCurve(ConstantDoublesCurve.from(0.0400, "EUR 4.00"));
-  private static final YieldAndDiscountCurve CURVE_GBP_35 = new YieldCurve(ConstantDoublesCurve.from(0.0350, "GBP 3.50"));
-  private static final YieldAndDiscountCurve CURVE_GBP_30 = new YieldCurve(ConstantDoublesCurve.from(0.0400, "GBP 3.00"));
-  private static final YieldAndDiscountCurve CURVE_USD_35 = new YieldCurve(ConstantDoublesCurve.from(0.0350, "USD 3.50"));
-  private static final YieldAndDiscountCurve CURVE_USD_30 = new YieldCurve(ConstantDoublesCurve.from(0.0300, "USD 3.00"));
+  private static final MarketDiscountBundle MARKET_1 = new MarketDiscountBundle();
+  private static final YieldAndDiscountCurve CURVE_EUR_50 = YieldCurve.from(ConstantDoublesCurve.from(0.0500, "EUR 5.00"));
+  private static final YieldAndDiscountCurve CURVE_EUR_45 = YieldCurve.from(ConstantDoublesCurve.from(0.0450, "EUR 4.50"));
+  private static final YieldAndDiscountCurve CURVE_EUR_40 = YieldCurve.from(ConstantDoublesCurve.from(0.0400, "EUR 4.00"));
+  private static final YieldAndDiscountCurve CURVE_GBP_35 = YieldCurve.from(ConstantDoublesCurve.from(0.0350, "GBP 3.50"));
+  private static final YieldAndDiscountCurve CURVE_GBP_30 = YieldCurve.from(ConstantDoublesCurve.from(0.0400, "GBP 3.00"));
+  private static final YieldAndDiscountCurve CURVE_USD_35 = YieldCurve.from(ConstantDoublesCurve.from(0.0350, "USD 3.50"));
+  private static final YieldAndDiscountCurve CURVE_USD_30 = YieldCurve.from(ConstantDoublesCurve.from(0.0300, "USD 3.00"));
   private static final IborIndex EURIBOR_3M = IndexIborTestsMaster.getInstance().getIndex("EURIBOR3M", CALENDAR_EUR);
   private static final IborIndex EURIBOR_6M = IndexIborTestsMaster.getInstance().getIndex("EURIBOR6M", CALENDAR_EUR);
   private static final IborIndex USDLIBOR_3M = IndexIborTestsMaster.getInstance().getIndex("USDLIBOR3M", CALENDAR_USD);
@@ -91,8 +91,8 @@ public class MarketDataSets {
     MARKET_1.setCurve(PRICE_INDEX_EUR, PRICE_INDEX_CURVE_EUR);
     MARKET_1.setCurve(PRICE_INDEX_GBP, PRICE_INDEX_CURVE_GBP);
     MARKET_1.setCurve(PRICE_INDEX_USD, PRICE_INDEX_CURVE_USD);
-    MARKET_1.setCurve(ISSUER_UK_GOVT, CURVE_GBP_30);
-    MARKET_1.setCurve(ISSUER_US_GOVT, CURVE_USD_30);
+    MARKET_1.setCurve(ISSUER_UK_GOVT, Currency.GBP, CURVE_GBP_30);
+    MARKET_1.setCurve(ISSUER_US_GOVT, Currency.USD, CURVE_USD_30);
   }
   // Seasonal factors (from February/January to December/November)
   //  private static final double[] SEASONAL_FACTOR_EUR = new double[] {1.0010, 1.0010, 1.0020, 0.9990, 0.9990, 0.9990, 0.9990, 1.0000, 1.0010, 1.0010, 1.0010};
@@ -151,7 +151,7 @@ public class MarketDataSets {
    * Returns a market with three currencies (EUR, USD, GBP), three Ibor indexes (Euribor3M, Euribor6M, UsdLibor3M) and three inflation (Euro HICP x, UK RPI and US CPI-U).
    * @return The market.
    */
-  public static MarketBundle createMarket1() {
+  public static MarketDiscountBundle createMarket1() {
     return MARKET_1;
   }
 
@@ -162,8 +162,8 @@ public class MarketDataSets {
    * @param pricingDate The data for which the curve is constructed.
    * @return The market.
    */
-  public static MarketBundle createMarket1(ZonedDateTime pricingDate) {
-    MarketBundle market = new MarketBundle();
+  public static MarketDiscountBundle createMarket1(ZonedDateTime pricingDate) {
+    MarketDiscountBundle market = new MarketDiscountBundle();
     market.setCurve(Currency.EUR, CURVE_EUR_40);
     market.setCurve(Currency.USD, CURVE_USD_30);
     market.setCurve(Currency.GBP, CURVE_GBP_35);
@@ -172,8 +172,8 @@ public class MarketDataSets {
     market.setCurve(USDLIBOR_3M, CURVE_USD_35);
     market.setCurve(PRICE_INDEX_EUR, PRICE_INDEX_CURVE_EUR);
     market.setCurve(PRICE_INDEX_GBP, PRICE_INDEX_CURVE_GBP);
-    market.setCurve(ISSUER_UK_GOVT, CURVE_GBP_30);
-    market.setCurve(ISSUER_US_GOVT, CURVE_USD_30);
+    market.setCurve(ISSUER_UK_GOVT, Currency.GBP, CURVE_GBP_30);
+    market.setCurve(ISSUER_US_GOVT, Currency.GBP, CURVE_USD_30);
     ZonedDateTime spotUs = ScheduleCalculator.getAdjustedDate(pricingDate, SPOT_LAG_US, CALENDAR_USD);
     ZonedDateTime referenceInterpolatedDate = spotUs.minusMonths(MONTH_LAG_US);
     ZonedDateTime[] referenceDate = new ZonedDateTime[2];
@@ -202,13 +202,12 @@ public class MarketDataSets {
     return market;
   }
 
-  public static MarketBundle createMarket2(ZonedDateTime pricingDate) {
-    MarketBundle market = createMarket1(pricingDate);
-    Curve<Double, Double> curveNoAdj = market.getCurve(PRICE_INDEX_USD).getCurve();
-    Curve<Double, Double> adj = new SeasonalCurve(curveNoAdj.getXData()[0], SEASONAL_FACTOR_USD);
-    @SuppressWarnings("unchecked")
-    Curve<Double, Double>[] curveSet = new Curve[] {curveNoAdj, adj};
-    Curve<Double, Double> curveAdj = new SpreadDoublesCurve(new MultiplyCurveSpreadFunction(), curveSet);
+  public static MarketDiscountBundle createMarket2(ZonedDateTime pricingDate) {
+    MarketDiscountBundle market = createMarket1(pricingDate);
+    DoublesCurve curveNoAdj = market.getCurve(PRICE_INDEX_USD).getCurve();
+    DoublesCurve adj = new SeasonalCurve(curveNoAdj.getXData()[0], SEASONAL_FACTOR_USD);
+    DoublesCurve[] curveSet = new DoublesCurve[] {curveNoAdj, adj};
+    DoublesCurve curveAdj = new SpreadDoublesCurve(new MultiplyCurveSpreadFunction(), curveSet);
     market.replaceCurve(PRICE_INDEX_USD, new PriceIndexCurve(curveAdj));
     return market;
   }
@@ -243,6 +242,10 @@ public class MarketDataSets {
 
   public static IborIndex[] getIborIndexes() {
     return new IborIndex[] {EURIBOR_3M, EURIBOR_6M, USDLIBOR_3M};
+  }
+
+  public static String[] getIssuerNames() {
+    return new String[] {ISSUER_US_GOVT, ISSUER_UK_GOVT};
   }
 
 }

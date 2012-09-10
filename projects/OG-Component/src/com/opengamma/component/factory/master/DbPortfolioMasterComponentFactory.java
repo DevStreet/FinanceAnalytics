@@ -20,11 +20,11 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
 import com.opengamma.component.ComponentInfo;
 import com.opengamma.component.ComponentRepository;
-import com.opengamma.component.factory.AbstractComponentFactory;
 import com.opengamma.component.factory.ComponentInfoAttributes;
 import com.opengamma.core.change.JmsChangeManager;
 import com.opengamma.master.portfolio.PortfolioMaster;
-import com.opengamma.master.portfolio.impl.DataPortfolioMasterResource;
+import com.opengamma.master.portfolio.impl.RemotePortfolioMaster;
+import com.opengamma.masterdb.portfolio.DataDbPortfolioMasterResource;
 import com.opengamma.masterdb.portfolio.DbPortfolioMaster;
 import com.opengamma.util.db.DbConnector;
 import com.opengamma.util.jms.JmsConnector;
@@ -33,7 +33,7 @@ import com.opengamma.util.jms.JmsConnector;
  * Component factory for the database portfolio master.
  */
 @BeanDefinition
-public class DbPortfolioMasterComponentFactory extends AbstractComponentFactory {
+public class DbPortfolioMasterComponentFactory extends AbstractDbMasterComponentFactory {
 
   /**
    * The classifier that the factory should publish under.
@@ -93,14 +93,17 @@ public class DbPortfolioMasterComponentFactory extends AbstractComponentFactory 
       }
       info.addAttribute(ComponentInfoAttributes.JMS_CHANGE_MANAGER_TOPIC, getJmsChangeManagerTopic());
     }
+    checkSchemaVersion(master.getSchemaVersion(), "prt_db");
     
     // register
+    info.addAttribute(ComponentInfoAttributes.LEVEL, 1);
+    info.addAttribute(ComponentInfoAttributes.REMOTE_CLIENT_JAVA, RemotePortfolioMaster.class);
     info.addAttribute(ComponentInfoAttributes.UNIQUE_ID_SCHEME, master.getUniqueIdScheme());
     repo.registerComponent(info, master);
     
     // publish
     if (isPublishRest()) {
-      repo.getRestComponents().publish(info, new DataPortfolioMasterResource(master));
+      repo.getRestComponents().publish(info, new DataDbPortfolioMasterResource(master));
     }
   }
 
@@ -391,7 +394,7 @@ public class DbPortfolioMasterComponentFactory extends AbstractComponentFactory 
   /**
    * The meta-bean for {@code DbPortfolioMasterComponentFactory}.
    */
-  public static class Meta extends AbstractComponentFactory.Meta {
+  public static class Meta extends AbstractDbMasterComponentFactory.Meta {
     /**
      * The singleton instance of the meta-bean.
      */

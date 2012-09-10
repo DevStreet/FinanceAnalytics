@@ -18,7 +18,7 @@ import com.opengamma.analytics.financial.interestrate.CashFlowEquivalentCurveSen
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivity;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityPaymentFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
 import com.opengamma.analytics.financial.interestrate.method.PricingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
@@ -218,8 +218,8 @@ public class SwaptionPhysicalFixedIborLMMDDMethod implements PricingMethod {
   }
 
   /**
-   * Computes the present value sensitivity to LMM parameters of the Physical delivery swaption.
-   * @param swaption The swaption.
+   * Computes the present value sensitivity to LMM volatility parameters.
+   * @param swaption The (physical delivery) swaption.
    * @param lmmBundle The LMM parameters and the curves.
    * @return The present value.
    */

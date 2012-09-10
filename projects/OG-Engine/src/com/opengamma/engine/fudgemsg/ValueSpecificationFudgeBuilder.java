@@ -39,7 +39,7 @@ public class ValueSpecificationFudgeBuilder implements FudgeBuilder<ValueSpecifi
   public MutableFudgeMsg buildMessage(FudgeSerializer serializer, ValueSpecification object) {
     MutableFudgeMsg msg = serializer.newMessage();
     msg.add(VALUE_NAME_KEY, null, FudgeWireType.STRING, object.getValueName());
-    ComputationTargetSpecificationFudgeBuilder.addMessageFields(serializer, msg, object.getTargetSpecification());
+    ComputationTargetSpecificationFudgeBuilder.buildMessageImpl(msg, object.getTargetSpecification());
     serializer.addToMessage(msg, PROPERTIES_KEY, null, object.getProperties());
     return msg;
   }

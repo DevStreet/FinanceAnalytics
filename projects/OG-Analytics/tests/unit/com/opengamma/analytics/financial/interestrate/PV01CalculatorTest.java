@@ -17,8 +17,8 @@ import org.apache.commons.lang.Validate;
 import org.testng.annotations.Test;
 
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityPaymentFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondFixedSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondFixedTransaction;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
@@ -26,8 +26,8 @@ import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.math.curve.FunctionalDoublesCurve;
@@ -45,8 +45,8 @@ import com.opengamma.util.money.Currency;
  * 
  */
 public class PV01CalculatorTest {
-  private final static YieldAndDiscountCurve FUNDING_CURVE = new YieldCurve(FunctionalDoublesCurve.from(new MyFunction(-0.04, 0.006, 0.1, 0.05)));
-  private final static YieldAndDiscountCurve LIBOR_CURVE = new YieldCurve(FunctionalDoublesCurve.from(new MyFunction(-0.04, 0.005, 0.11, 0.055)));
+  private final static YieldAndDiscountCurve FUNDING_CURVE = YieldCurve.from(FunctionalDoublesCurve.from(new MyFunction(-0.04, 0.006, 0.1, 0.05)));
+  private final static YieldAndDiscountCurve LIBOR_CURVE = YieldCurve.from(FunctionalDoublesCurve.from(new MyFunction(-0.04, 0.005, 0.11, 0.055)));
   private final static PV01Calculator PV01 = PV01Calculator.getInstance();
   private final static PresentValueCalculator PV = PresentValueCalculator.getInstance();
   private final static double EPS = 1e-8;

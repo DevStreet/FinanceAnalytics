@@ -12,10 +12,12 @@ import javax.time.calendar.ZonedDateTime;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwap;
+import cern.jet.random.engine.MersenneTwister;
+
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
-import com.opengamma.analytics.financial.instrument.index.generator.EUR1YEURIBOR6M;
+import com.opengamma.analytics.financial.instrument.index.generator.GeneratorSwapTestsMaster;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
 import com.opengamma.analytics.financial.instrument.swaption.SwaptionPhysicalFixedIborDefinition;
 import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
@@ -23,11 +25,9 @@ import com.opengamma.analytics.financial.interestrate.PresentValueCalculator;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedDiscountingMethod;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
-import com.opengamma.analytics.financial.interestrate.swaption.method.SwaptionPhysicalFixedIborG2ppApproximationMethod;
-import com.opengamma.analytics.financial.interestrate.swaption.method.SwaptionPhysicalFixedIborG2ppNumericalIntegrationMethod;
 import com.opengamma.analytics.financial.model.interestrate.G2ppTestsDataSet;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
@@ -35,8 +35,10 @@ import com.opengamma.analytics.financial.model.interestrate.definition.G2ppPiece
 import com.opengamma.analytics.financial.model.interestrate.definition.G2ppPiecewiseConstantParameters;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.volatility.BlackImpliedVolatilityFormula;
+import com.opengamma.analytics.financial.montecarlo.G2ppMonteCarloMethod;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
+import com.opengamma.analytics.math.random.NormalRandomNumberGenerator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
 import com.opengamma.financial.convention.calendar.Calendar;
@@ -54,6 +56,7 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
   // Swaption 5Yx5Y
   private static final Currency CUR = Currency.USD;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
+  private static final GeneratorSwapTestsMaster GENERATOR_SWAP_MASTER = GeneratorSwapTestsMaster.getInstance();
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean IS_EOM = true;
   private static final int SETTLEMENT_DAYS = 2;
@@ -83,7 +86,7 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
   private static final String FORWARD_CURVE_NAME = "Forward";
   private static final String[] CURVES_NAME = {FUNDING_CURVE_NAME, FORWARD_CURVE_NAME};
   private static final YieldCurveBundle CURVES = TestsDataSetsSABR.createCurves1();
-  private static final FixedCouponSwap<Coupon> SWAP_RECEIVER = SWAP_RECEIVER_DEFINITION.toDerivative(REFERENCE_DATE, CURVES_NAME);
+  private static final SwapFixedCoupon<Coupon> SWAP_RECEIVER = SWAP_RECEIVER_DEFINITION.toDerivative(REFERENCE_DATE, CURVES_NAME);
   private static final SwaptionPhysicalFixedIbor SWAPTION_PAYER_LONG = SWAPTION_PAYER_LONG_DEFINITION.toDerivative(REFERENCE_DATE, CURVES_NAME);
   private static final SwaptionPhysicalFixedIbor SWAPTION_RECEIVER_LONG = SWAPTION_RECEIVER_LONG_DEFINITION.toDerivative(REFERENCE_DATE, CURVES_NAME);
   private static final SwaptionPhysicalFixedIbor SWAPTION_PAYER_SHORT = SWAPTION_PAYER_SHORT_DEFINITION.toDerivative(REFERENCE_DATE, CURVES_NAME);
@@ -91,7 +94,7 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
   // Calculator
   private static final SwaptionPhysicalFixedIborG2ppApproximationMethod METHOD_G2PP_APPROXIMATION = new SwaptionPhysicalFixedIborG2ppApproximationMethod();
   private static final SwaptionPhysicalFixedIborG2ppNumericalIntegrationMethod METHOD_G2PP_NI = new SwaptionPhysicalFixedIborG2ppNumericalIntegrationMethod();
-  private static final SwapFixedDiscountingMethod METHOD_SWAP = SwapFixedDiscountingMethod.getInstance();
+  private static final SwapFixedCouponDiscountingMethod METHOD_SWAP = SwapFixedCouponDiscountingMethod.getInstance();
   private static final ParRateCalculator PRC = ParRateCalculator.getInstance();
 
   private static final G2ppPiecewiseConstantParameters PARAMETERS_G2PP = G2ppTestsDataSet.createG2ppParameters1();
@@ -106,7 +109,7 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
    */
   public void presentValueExternal() {
     G2ppPiecewiseConstantParameters parametersCst = G2ppTestsDataSet.createG2ppCstParameters();
-    final YieldAndDiscountCurve curve5 = new YieldCurve(ConstantDoublesCurve.from(0.05));
+    final YieldAndDiscountCurve curve5 = YieldCurve.from(ConstantDoublesCurve.from(0.05));
     final YieldCurveBundle curves = new YieldCurveBundle();
     curves.setCurve(FUNDING_CURVE_NAME, curve5);
     curves.setCurve(FORWARD_CURVE_NAME, curve5);
@@ -160,6 +163,33 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
     assertEquals("Swaption physical - G2++ - present value - approximation vs Numerical integration", pvApproximation.getAmount(), pvNI.getAmount(), 2.0E+3);
   }
 
+  @Test
+  /**
+   * Test the present value by approximation vs Monte Carlo.
+   */
+  public void presentValueMonteCarlo() {
+    int nbPath = 12500;
+    G2ppMonteCarloMethod methodMC = new G2ppMonteCarloMethod(new NormalRandomNumberGenerator(0.0, 1.0, new MersenneTwister()), nbPath);
+    CurrencyAmount pvMC = methodMC.presentValue(SWAPTION_PAYER_LONG, CUR, FUNDING_CURVE_NAME, BUNDLE_G2PP);
+    CurrencyAmount pvApproximation = METHOD_G2PP_APPROXIMATION.presentValue(SWAPTION_PAYER_LONG, BUNDLE_G2PP);
+    assertEquals("Swaption physical - G2++ - present value - approximation vs Monte Carlo", pvApproximation.getAmount(), pvMC.getAmount(), 2.5E+4);
+  }
+
+  @Test(enabled = false)
+  /**
+   * Test the present value by approximation vs Monte Carlo: convergence.
+   */
+  public void presentValueMonteCarloConvergence() {
+    CurrencyAmount pvApproximation = METHOD_G2PP_APPROXIMATION.presentValue(SWAPTION_PAYER_LONG, BUNDLE_G2PP);
+    int[] nbPath = new int[] {12500, 100000, 1000000, 5000000};
+    CurrencyAmount[] pvMC = new CurrencyAmount[nbPath.length];
+    for (int loopmc = 0; loopmc < nbPath.length; loopmc++) {
+      G2ppMonteCarloMethod methodMC = new G2ppMonteCarloMethod(new NormalRandomNumberGenerator(0.0, 1.0, new MersenneTwister()), nbPath[loopmc]);
+      pvMC[loopmc] = methodMC.presentValue(SWAPTION_PAYER_LONG, CUR, FUNDING_CURVE_NAME, BUNDLE_G2PP);
+    }
+    assertEquals("Swaption physical - G2++ - present value - approximation vs Monte Carlo", pvApproximation.getAmount(), pvMC[nbPath.length - 1].getAmount(), 1.0E+3);
+  }
+
   @Test(enabled = false)
   /**
    * Test the present value by approximation vs by numerical integration for a grid of expiry/tenor.
@@ -167,7 +197,7 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
   public void approximationNumericalIntegrationGrid() {
     G2ppPiecewiseConstantParameters parametersG2pp = G2ppTestsDataSet.createG2ppParameters2();
     G2ppPiecewiseConstantDataBundle bundleG2pp = new G2ppPiecewiseConstantDataBundle(parametersG2pp, CURVES);
-    GeneratorSwap generator = new EUR1YEURIBOR6M(CALENDAR);
+    GeneratorSwapFixedIbor generator = GENERATOR_SWAP_MASTER.getGenerator("EUR1YEURIBOR6M", CALENDAR);
     Period[] expiry = new Period[] {Period.ofMonths(6), Period.ofYears(1), Period.ofYears(2), Period.ofYears(5), Period.ofYears(10), Period.ofYears(25)};
     int nbExpiry = expiry.length;
     Period[] tenor = new Period[] {Period.ofYears(2), Period.ofYears(5), Period.ofYears(10), Period.ofYears(25)};
@@ -245,6 +275,28 @@ public class SwaptionPhysicalFixedIborG2ppMethodTest {
 
     System.out.println("G2++ approximation - present value: " + pvPayerLongApproximation);
     System.out.println("G2++ numerical integration - present value: " + pvPayerLongNI);
+  }
+
+  @Test(enabled = false)
+  /**
+   * Tests of performance. "enabled = false" for the standard testing.
+   */
+  public void performanceMC() {
+    long startTime, endTime;
+    final int nbTest = 10;
+
+    int nbPath = 12500;
+    G2ppMonteCarloMethod methodMC = new G2ppMonteCarloMethod(new NormalRandomNumberGenerator(0.0, 1.0, new MersenneTwister()), nbPath);
+    @SuppressWarnings("unused")
+    CurrencyAmount pvMC;
+
+    startTime = System.currentTimeMillis();
+    for (int looptest = 0; looptest < nbTest; looptest++) {
+      pvMC = methodMC.presentValue(SWAPTION_PAYER_LONG, CUR, FUNDING_CURVE_NAME, BUNDLE_G2PP);
+    }
+    endTime = System.currentTimeMillis();
+    System.out.println(nbTest + " pv swaption G2++ Monte Carlo with " + nbPath + " paths: " + (endTime - startTime) + " ms");
+    // Performance note: G2++ price: 18-Jul-12: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 140 ms for 10 swaptions (12500 paths).
   }
 
 }

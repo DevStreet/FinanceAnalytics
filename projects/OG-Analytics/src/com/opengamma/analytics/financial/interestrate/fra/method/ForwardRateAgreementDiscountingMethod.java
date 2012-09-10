@@ -30,7 +30,7 @@ import com.opengamma.util.tuple.DoublesPair;
  * today using the discounting curve.
  * $$
  * \begin{equation*}
- * P^D(0,t_1)\frac{\delta_P(F-K)}{1+\delta_F F} \quad \mbox{and}\quad F = \frac{1}{\delta_F}\left( \frac{P^j(0,t_1)}{P^j(0,t_2)}-1\right)
+ * P^D(0,t_1)\frac{\delta_P(F-K)}{1+\delta_P F} \quad \mbox{and}\quad F = \frac{1}{\delta_F}\left( \frac{P^j(0,t_1)}{P^j(0,t_2)}-1\right)
  * \end{equation*}
  * $$
  * This approach is valid subject to a independence hypothesis between the
@@ -146,16 +146,62 @@ public final class ForwardRateAgreementDiscountingMethod implements PricingMetho
     return result;
   }
 
+  /**
+   * Computes the sensitivity of the present value of a FRA with notional 1 to the change of fixed rate.
+   * @param fra The FRA.
+   * @param curves The curve bundle.
+   * @return The sensitivity.
+   */
   public double presentValueCouponSensitivity(final ForwardRateAgreement fra, final YieldCurveBundle curves) {
     Validate.notNull(fra, "FRA");
     Validate.notNull(curves, "Curves");
     final YieldAndDiscountCurve fundingCurve = curves.getCurve(fra.getFundingCurveName());
     final YieldAndDiscountCurve liborCurve = curves.getCurve(fra.getForwardCurveName());
-    final double fwdAlpha = fra.getFixingYearFraction();
-    final double discountAlpha = fra.getPaymentYearFraction();
-    final double forward = (liborCurve.getDiscountFactor(fra.getFixingPeriodStartTime()) / liborCurve.getDiscountFactor(fra.getFixingPeriodEndTime()) - 1.0) / fwdAlpha;
-    final double res = -fundingCurve.getDiscountFactor(fra.getPaymentTime()) * discountAlpha / (1 + forward * discountAlpha);
+    final double fixingAF = fra.getFixingYearFraction();
+    final double paymentAF = fra.getPaymentYearFraction();
+    final double forward = (liborCurve.getDiscountFactor(fra.getFixingPeriodStartTime()) / liborCurve.getDiscountFactor(fra.getFixingPeriodEndTime()) - 1.0) / fixingAF;
+    final double res = -fundingCurve.getDiscountFactor(fra.getPaymentTime()) * paymentAF / (1 + forward * paymentAF);
     return res;
+  }
+
+  /**
+   * Computes the par spread (spread to be added to the fixed rate to have a present value of 0).
+   * @param fra The FRA.
+   * @param curves The yield curve bundle.
+   * @return The par spread.
+   */
+  public double parSpread(final ForwardRateAgreement fra, final YieldCurveBundle curves) {
+    Validate.notNull(fra, "FRA");
+    Validate.notNull(curves, "Curves");
+    final YieldAndDiscountCurve forwardCurve = curves.getCurve(fra.getForwardCurveName());
+    double dfStart = forwardCurve.getDiscountFactor(fra.getFixingPeriodStartTime());
+    double dfEnd = forwardCurve.getDiscountFactor(fra.getFixingPeriodEndTime());
+    final double forward = (dfStart / dfEnd - 1) / fra.getFixingYearFraction();
+    return forward - fra.getRate();
+  }
+
+  /**
+   * Computes the par spread curve sensitivity.
+   * @param fra The FRA.
+   * @param curves The yield curve bundle.
+   * @return The par spread sensitivity.
+   */
+  public InterestRateCurveSensitivity parSpreadCurveSensitivity(final ForwardRateAgreement fra, final YieldCurveBundle curves) {
+    Validate.notNull(fra, "FRA");
+    Validate.notNull(curves, "Curves");
+    final YieldAndDiscountCurve forwardCurve = curves.getCurve(fra.getForwardCurveName());
+    double dfStart = forwardCurve.getDiscountFactor(fra.getFixingPeriodStartTime());
+    double dfEnd = forwardCurve.getDiscountFactor(fra.getFixingPeriodEndTime());
+    // Backward sweep
+    double parSpreadBar = 1.0;
+    double dfEndBar = -dfStart / (dfEnd * dfEnd * fra.getFixingYearFraction()) * parSpreadBar;
+    double dfStartBar = 1 / (dfEnd * fra.getFixingYearFraction()) * parSpreadBar;
+    final Map<String, List<DoublesPair>> resultMapDsc = new HashMap<String, List<DoublesPair>>();
+    final List<DoublesPair> listDiscounting = new ArrayList<DoublesPair>();
+    listDiscounting.add(new DoublesPair(fra.getFixingPeriodStartTime(), -fra.getFixingPeriodStartTime() * dfStart * dfStartBar));
+    listDiscounting.add(new DoublesPair(fra.getFixingPeriodEndTime(), -fra.getFixingPeriodEndTime() * dfEnd * dfEndBar));
+    resultMapDsc.put(fra.getForwardCurveName(), listDiscounting);
+    return new InterestRateCurveSensitivity(resultMapDsc);
   }
 
 }

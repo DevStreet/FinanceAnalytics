@@ -16,7 +16,7 @@ import com.opengamma.analytics.financial.interestrate.CashFlowEquivalentCalculat
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivity;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityPaymentFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
 import com.opengamma.analytics.financial.model.interestrate.HullWhiteOneFactorPiecewiseConstantInterestRateModel;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
@@ -216,8 +216,7 @@ public final class BondFutureHullWhiteMethod extends BondFutureMethod {
   public CurrencyAmount presentValue(final BondFuture future, final HullWhiteOneFactorPiecewiseConstantDataBundle curves) {
     Validate.notNull(future, "Future");
     final double futurePrice = price(future, curves);
-    final double pv = presentValueFromPrice(future, futurePrice);
-    return CurrencyAmount.of(future.getCurrency(), pv);
+    return presentValueFromPrice(future, futurePrice);
   }
 
   /**

@@ -245,7 +245,7 @@ public class CapFloorCMSSABRExtrapolationRightReplicationMethodTest {
       nodeTimesForward[i + 1] = timeForwardArray[i];
       yieldsForward[i + 1] = curveForward.getInterestRate(nodeTimesForward[i + 1]);
     }
-    final YieldAndDiscountCurve tempCurveForward = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimesForward, yieldsForward, new LinearInterpolator1D()));
+    final YieldAndDiscountCurve tempCurveForward = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimesForward, yieldsForward, new LinearInterpolator1D()));
     final List<DoublesPair> tempForward = pvsCapLong.getSensitivities().get(FORWARD_CURVE_NAME);
     final double[] resFwd = new double[nbForwardDate];
     for (int i = 0; i < nbForwardDate; i++) {
@@ -272,7 +272,7 @@ public class CapFloorCMSSABRExtrapolationRightReplicationMethodTest {
       nodeTimesFunding[i + 1] = CMS_CAP_LONG.getUnderlyingSwap().getSecondLeg().getNthPayment(i).getPaymentTime();
       yieldsFunding[i + 1] = curveFunding.getInterestRate(nodeTimesFunding[i + 1]);
     }
-    final YieldAndDiscountCurve tempCurveFunding = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimesFunding, yieldsFunding, new LinearInterpolator1D()));
+    final YieldAndDiscountCurve tempCurveFunding = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimesFunding, yieldsFunding, new LinearInterpolator1D()));
     final List<DoublesPair> tempFunding = pvsCapLong.getSensitivities().get(FUNDING_CURVE_NAME);
     final double[] resDsc = new double[nbPayDate];
     for (int i = 0; i < nbPayDate; i++) {
@@ -450,7 +450,7 @@ public class CapFloorCMSSABRExtrapolationRightReplicationMethodTest {
   /**
    * Tests of performance. "enabled = false" for the standard testing.
    */
-  public void performance() {
+  public void performanceCoupon() {
     final YieldCurveBundle curves = TestsDataSetsSABR.createCurves1();
     final SABRInterestRateParameters sabrParameter = TestsDataSetsSABR.createSABR1();
     final SABRInterestRateDataBundle sabrBundle = new SABRInterestRateDataBundle(sabrParameter, curves);
@@ -478,6 +478,37 @@ public class CapFloorCMSSABRExtrapolationRightReplicationMethodTest {
     // Performance note: price+delta (SABR with extrapolation): 15-Nov-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 455 ms for 1000 CMS coupon 5Y.
     // Performance note: price+delta+vega (standard SABR): 18-Apr-2012: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 710 ms for 1000 CMS coupon 5Y.
     // Performance note: price+delta+vega (SABR with extrapolation): 18-Apr-2012: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 690 ms for 1000 CMS coupon 5Y.
+  }
+
+  @Test(enabled = false)
+  /**
+   * Tests of performance. "enabled = false" for the standard testing.
+   */
+  public void performanceCap() {
+    final YieldCurveBundle curves = TestsDataSetsSABR.createCurves1();
+    final SABRInterestRateParameters sabrParameter = TestsDataSetsSABR.createSABR1();
+    final SABRInterestRateDataBundle sabrBundle = new SABRInterestRateDataBundle(sabrParameter, curves);
+    long startTime, endTime;
+    final int nbTest = 1000;
+
+    startTime = System.currentTimeMillis();
+    for (int looptest = 0; looptest < nbTest; looptest++) {
+      METHOD_STANDARD_CAP.presentValue(CMS_CAP_LONG, sabrBundle);
+      METHOD_STANDARD_CAP.presentValueCurveSensitivity(CMS_CAP_LONG, sabrBundle);
+      METHOD_STANDARD_CAP.presentValueSABRSensitivity(CMS_CAP_LONG, sabrBundle);
+    }
+    endTime = System.currentTimeMillis();
+    System.out.println(nbTest + " CMS coupon by replication SABR standard (price+delta+vega): " + (endTime - startTime) + " ms");
+    startTime = System.currentTimeMillis();
+    for (int looptest = 0; looptest < nbTest; looptest++) {
+      METHOD_EXTRAPOLATION_CAP.presentValue(CMS_CAP_LONG, sabrBundle);
+      METHOD_EXTRAPOLATION_CAP.presentValueCurveSensitivity(CMS_CAP_LONG, sabrBundle);
+      METHOD_EXTRAPOLATION_CAP.presentValueSABRSensitivity(CMS_CAP_LONG, sabrBundle);
+    }
+    endTime = System.currentTimeMillis();
+    System.out.println(nbTest + " CMS coupon by replication SABR with extrapolation (price+delta+vega): " + (endTime - startTime) + " ms");
+    // Performance note: price+delta+vega (standard SABR): 18-Apr-2012: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 700 ms for 1000 CMS cap 5Y.
+    // Performance note: price+delta+vega (SABR with extrapolation): 18-Apr-2012: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 500 ms for 1000 CMS cap 5Y.
   }
 
 }

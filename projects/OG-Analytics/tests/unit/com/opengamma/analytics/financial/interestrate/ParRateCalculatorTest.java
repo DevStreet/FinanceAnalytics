@@ -12,19 +12,19 @@ import javax.time.calendar.Period;
 import org.testng.annotations.Test;
 
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIborSpread;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityPaymentFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborSpread;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondFixedSecurity;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
 import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.TenorSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.TenorSwap;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
@@ -57,10 +57,10 @@ public class ParRateCalculatorTest {
   private static final IborIndex INDEX = new IborIndex(CUR, TENOR, SETTLEMENT_DAYS, CALENDAR, DAY_COUNT_INDEX, BUSINESS_DAY, IS_EOM);
 
   static {
-    YieldAndDiscountCurve curve = new YieldCurve(ConstantDoublesCurve.from(0.05));
+    YieldAndDiscountCurve curve = YieldCurve.from(ConstantDoublesCurve.from(0.05));
     CURVES = new YieldCurveBundle();
     CURVES.setCurve(FIVE_PC_CURVE_NAME, curve);
-    curve = new YieldCurve(ConstantDoublesCurve.from(0.0));
+    curve = YieldCurve.from(ConstantDoublesCurve.from(0.0));
     CURVES.setCurve(ZERO_PC_CURVE_NAME, curve);
   }
 
@@ -171,10 +171,10 @@ public class ParRateCalculatorTest {
       yearFracs[i] = tau;
     }
 
-    final GenericAnnuity<CouponIborSpread> payLeg = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, new double[yearFracs.length],
-        1.0, FIVE_PC_CURVE_NAME, ZERO_PC_CURVE_NAME, true);
-    GenericAnnuity<CouponIborSpread> receiveLeg = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, new double[yearFracs.length],
-        1.0, FIVE_PC_CURVE_NAME, FIVE_PC_CURVE_NAME, false);
+    final Annuity<CouponIborSpread> payLeg = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, new double[yearFracs.length], 1.0,
+        FIVE_PC_CURVE_NAME, ZERO_PC_CURVE_NAME, true);
+    Annuity<CouponIborSpread> receiveLeg = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, new double[yearFracs.length], 1.0,
+        FIVE_PC_CURVE_NAME, FIVE_PC_CURVE_NAME, false);
 
     Swap<?, ?> swap = new TenorSwap<CouponIborSpread>(payLeg, receiveLeg);
     final double rate = PRC.visit(swap, CURVES);
@@ -182,10 +182,10 @@ public class ParRateCalculatorTest {
     for (int i = 0; i < n; i++) {
       spreads[i] = rate;
     }
-    final GenericAnnuity<CouponIborSpread> payLeg2 = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, new double[yearFracs.length],
-        1.0, FIVE_PC_CURVE_NAME, ZERO_PC_CURVE_NAME, true);
-    GenericAnnuity<CouponIborSpread> receiveLeg2 = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, spreads, 1.0,
-        FIVE_PC_CURVE_NAME, FIVE_PC_CURVE_NAME, false);
+    final Annuity<CouponIborSpread> payLeg2 = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, new double[yearFracs.length], 1.0,
+        FIVE_PC_CURVE_NAME, ZERO_PC_CURVE_NAME, true);
+    Annuity<CouponIborSpread> receiveLeg2 = new AnnuityCouponIborSpread(CUR, paymentTimes, indexFixing, INDEX, indexFixing, indexMaturity, yearFracs, yearFracs, spreads, 1.0, FIVE_PC_CURVE_NAME,
+        FIVE_PC_CURVE_NAME, false);
     swap = new TenorSwap<CouponIborSpread>(payLeg2, receiveLeg2);
     assertEquals(0.0, PVC.visit(swap, CURVES), 1e-12);
   }

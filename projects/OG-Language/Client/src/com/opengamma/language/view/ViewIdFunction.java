@@ -8,19 +8,19 @@ package com.opengamma.language.view;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-import com.opengamma.DataNotFoundException;
 import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.engine.view.ViewDefinitionRepository;
 import com.opengamma.id.UniqueId;
-import com.opengamma.language.async.AsynchronousExecution;
 import com.opengamma.language.context.SessionContext;
 import com.opengamma.language.definition.Categories;
 import com.opengamma.language.definition.DefinitionAnnotater;
 import com.opengamma.language.definition.JavaTypeInfo;
 import com.opengamma.language.definition.MetaParameter;
+import com.opengamma.language.error.InvokeInvalidArgumentException;
 import com.opengamma.language.function.AbstractFunctionInvoker;
 import com.opengamma.language.function.MetaFunction;
 import com.opengamma.language.function.PublishedFunction;
+import com.opengamma.util.async.AsynchronousExecution;
 
 /**
  * Returns the identifier of a view definition with a given name.
@@ -51,7 +51,7 @@ public class ViewIdFunction extends AbstractFunctionInvoker implements Published
   public UniqueId invoke(ViewDefinitionRepository repository, String viewDefinitionName) {
     ViewDefinition definition = repository.getDefinition(viewDefinitionName);
     if (definition == null) {
-      throw new DataNotFoundException("No view definition found with name '" + viewDefinitionName + "'");
+      throw new InvokeInvalidArgumentException(1, "No view definition found with name '" + viewDefinitionName + "'");
     }
     return definition.getUniqueId();
   }

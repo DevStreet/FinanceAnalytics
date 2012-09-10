@@ -6,6 +6,8 @@
 package com.opengamma.analytics.financial.instrument.payment;
 
 import javax.time.calendar.LocalDate;
+import javax.time.calendar.LocalTime;
+import javax.time.calendar.TimeZone;
 import javax.time.calendar.ZonedDateTime;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -46,19 +48,18 @@ public class CouponIborDefinition extends CouponFloatingDefinition {
 
   /**
    * Constructor of a Ibor-like floating coupon from the coupon details and the Ibor index. The payment currency is the index currency.
-   * 
-   * @param currency The payment currency.
-   * @param paymentDate Coupon payment date.
-   * @param accrualStartDate Start date of the accrual period.
-   * @param accrualEndDate End date of the accrual period.
-   * @param accrualFactor Accrual factor of the accrual period.
-   * @param notional Coupon notional.
+   * @param currency The coupn currency.
+   * @param paymentDate The coupon payment date.
+   * @param accrualStartDate The start date of the accrual period.
+   * @param accrualEndDate The end date of the accrual period.
+   * @param paymentAccrualFactor The accrual factor of the accrual period.
+   * @param notional The coupon notional.
    * @param fixingDate The coupon fixing date.
    * @param index The coupon Ibor index. Should of the same currency as the payment.
    */
-  public CouponIborDefinition(final Currency currency, final ZonedDateTime paymentDate, final ZonedDateTime accrualStartDate, final ZonedDateTime accrualEndDate, final double accrualFactor,
+  public CouponIborDefinition(final Currency currency, final ZonedDateTime paymentDate, final ZonedDateTime accrualStartDate, final ZonedDateTime accrualEndDate, final double paymentAccrualFactor,
       final double notional, final ZonedDateTime fixingDate, final IborIndex index) {
-    super(currency, paymentDate, accrualStartDate, accrualEndDate, accrualFactor, notional, fixingDate);
+    super(currency, paymentDate, accrualStartDate, accrualEndDate, paymentAccrualFactor, notional, fixingDate);
     Validate.notNull(index, "index");
     Validate.isTrue(currency.equals(index.getCurrency()), "index currency different from payment currency");
     _index = index;
@@ -83,6 +84,20 @@ public class CouponIborDefinition extends CouponFloatingDefinition {
       final ZonedDateTime fixingDate, final IborIndex index) {
     Validate.notNull(index, "index");
     return new CouponIborDefinition(index.getCurrency(), paymentDate, accrualStartDate, accrualEndDate, accrualFactor, notional, fixingDate, index);
+  }
+
+  /**
+   * Builder of a coupon from the accrual dates and the index. The fixing dates are calculated using the index. The payment date is the end accrual date.
+   * @param accrualStartDate Start date of the accrual period.
+   * @param accrualEndDate End date of the accrual period.
+   * @param accrualFactor The accrual factor of the accrual period.
+   * @param notional The coupon notional.
+   * @param index The coupon Ibor index. Should of the same currency as the payment.
+   * @return The coupon.
+   */
+  public static CouponIborDefinition from(final ZonedDateTime accrualStartDate, final ZonedDateTime accrualEndDate, final double accrualFactor, final double notional, final IborIndex index) {
+    final ZonedDateTime fixingDate = ScheduleCalculator.getAdjustedDate(accrualStartDate, -index.getSpotLag(), index.getCalendar());
+    return new CouponIborDefinition(index.getCurrency(), accrualEndDate, accrualStartDate, accrualEndDate, accrualFactor, notional, fixingDate, index);
   }
 
   /**
@@ -160,6 +175,74 @@ public class CouponIborDefinition extends CouponFloatingDefinition {
   }
 
   @Override
+  public Coupon toDerivative(final ZonedDateTime dateTime, final String... yieldCurveNames) {
+    Validate.notNull(dateTime, "date");
+    final LocalDate dayConversion = dateTime.toLocalDate();
+    Validate.isTrue(!dayConversion.isAfter(getFixingDate().toLocalDate()), "Do not have any fixing data but are asking for a derivative at " + dateTime + " which is after fixing date "
+        + getFixingDate());
+    Validate.notNull(yieldCurveNames, "yield curve names");
+    Validate.isTrue(yieldCurveNames.length > 1, "at least two curves required");
+    Validate.isTrue(!dayConversion.isAfter(getPaymentDate().toLocalDate()), "date is after payment date");
+    final String fundingCurveName = yieldCurveNames[0];
+    final String forwardCurveName = yieldCurveNames[1];
+    final double paymentTime = TimeCalculator.getTimeBetween(dateTime, getPaymentDate());
+    final double fixingTime = TimeCalculator.getTimeBetween(dateTime, getFixingDate());
+    final double fixingPeriodStartTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodStartDate());
+    final double fixingPeriodEndTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodEndDate());
+    return new CouponIbor(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixingTime, getIndex(), fixingPeriodStartTime, fixingPeriodEndTime,
+        getFixingPeriodAccrualFactor(), forwardCurveName);
+  }
+
+  @Override
+  /**
+   * If the fixing date is strictly before the conversion date and the fixing rate is not available, an exception is thrown; if the fixing rate is available a fixed coupon is returned.
+   * If the fixing date is equal to the conversion date, if the fixing rate is available a fixed coupon is returned, if not a coupon Ibor with spread is returned.
+   * If the fixing date is strictly after the conversion date, a coupon Ibor is returned.
+   * All the comparisons are between dates without time.
+   */
+  public Coupon toDerivative(final ZonedDateTime dateTime, final DoubleTimeSeries<ZonedDateTime> indexFixingTimeSeries, final String... yieldCurveNames) {
+    Validate.notNull(dateTime, "date");
+    final LocalDate dayConversion = dateTime.toLocalDate();
+    Validate.notNull(indexFixingTimeSeries, "Index fixing time series");
+    Validate.notNull(yieldCurveNames, "yield curve names");
+    Validate.isTrue(yieldCurveNames.length > 1, "at least two curves required");
+    Validate.isTrue(!dayConversion.isAfter(getPaymentDate().toLocalDate()), "date is after payment date");
+    final String fundingCurveName = yieldCurveNames[0];
+    final String forwardCurveName = yieldCurveNames[1];
+    final double paymentTime = TimeCalculator.getTimeBetween(dateTime, getPaymentDate());
+    final LocalDate dayFixing = getFixingDate().toLocalDate();
+    if (dayConversion.equals(dayFixing)) { // The fixing is on the reference date; if known the fixing is used and if not, the floating coupon is created.
+      final Double fixedRate = indexFixingTimeSeries.getValue(getFixingDate());
+      if (fixedRate != null) {
+        return new CouponFixed(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixedRate);
+      }
+    }
+    if (dayConversion.isAfter(dayFixing)) { // The fixing is required
+      final ZonedDateTime rezonedFixingDate = ZonedDateTime.of(getFixingDate().toLocalDate(), LocalTime.of(0, 0), TimeZone.UTC);
+      Double fixedRate = indexFixingTimeSeries.getValue(rezonedFixingDate); // TODO: remove time from fixing date.
+      if (fixedRate == null) {
+        throw new OpenGammaRuntimeException("Could not get fixing value for date " + getFixingDate());
+      }
+      return new CouponFixed(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixedRate);
+    }
+    final double fixingTime = TimeCalculator.getTimeBetween(dateTime, getFixingDate());
+    final double fixingPeriodStartTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodStartDate());
+    final double fixingPeriodEndTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodEndDate());
+    return new CouponIbor(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixingTime, getIndex(), fixingPeriodStartTime, fixingPeriodEndTime,
+        getFixingPeriodAccrualFactor(), forwardCurveName);
+  }
+
+  @Override
+  public <U, V> V accept(final InstrumentDefinitionVisitor<U, V> visitor, final U data) {
+    return visitor.visitCouponIbor(this, data);
+  }
+
+  @Override
+  public <V> V accept(final InstrumentDefinitionVisitor<?, V> visitor) {
+    return visitor.visitCouponIbor(this);
+  }
+
+  @Override
   public String toString() {
     return super.toString() + " *Ibor coupon* Index = " + _index + ", Fixing period = [" + _fixingPeriodStartDate + " - " + _fixingPeriodEndDate + " - " + _fixingPeriodAccrualFactor + "]";
   }
@@ -202,71 +285,5 @@ public class CouponIborDefinition extends CouponFloatingDefinition {
       return false;
     }
     return true;
-  }
-
-  @Override
-  public <U, V> V accept(final InstrumentDefinitionVisitor<U, V> visitor, final U data) {
-    return visitor.visitCouponIbor(this, data);
-  }
-
-  @Override
-  public <V> V accept(final InstrumentDefinitionVisitor<?, V> visitor) {
-    return visitor.visitCouponIbor(this);
-  }
-
-  @Override
-  public Coupon toDerivative(final ZonedDateTime dateTime, final String... yieldCurveNames) {
-    Validate.notNull(dateTime, "date");
-    LocalDate dayConversion = dateTime.toLocalDate();
-    Validate.isTrue(!dayConversion.isAfter(getFixingDate().toLocalDate()), "Do not have any fixing data but are asking for a derivative after the fixing date " + getFixingDate() + " " + dateTime);
-    Validate.notNull(yieldCurveNames, "yield curve names");
-    Validate.isTrue(yieldCurveNames.length > 1, "at least two curves required");
-    Validate.isTrue(!dayConversion.isAfter(getPaymentDate().toLocalDate()), "date is after payment date");
-    final String fundingCurveName = yieldCurveNames[0];
-    final String forwardCurveName = yieldCurveNames[1];
-    final double paymentTime = TimeCalculator.getTimeBetween(dateTime, getPaymentDate());
-    final double fixingTime = TimeCalculator.getTimeBetween(dateTime, getFixingDate());
-    final double fixingPeriodStartTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodStartDate());
-    final double fixingPeriodEndTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodEndDate());
-    return new CouponIbor(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixingTime, getIndex(), fixingPeriodStartTime, fixingPeriodEndTime,
-        getFixingPeriodAccrualFactor(), forwardCurveName);
-  }
-
-  @Override
-  /**
-   * If the fixing date is strictly before the conversion date and the fixing rate is not available, an exception is thrown; if the fixing rate is available a fixed coupon is returned. 
-   * If the fixing date is equal to the conversion date, if the fixing rate is available a fixed coupon is returned, if not a coupon Ibor with spread is returned.
-   * If the fixing date is strictly after the conversion date, a coupon Ibor with spread is returned.
-   * All the comparisons are between dates without time.
-   */
-  public Coupon toDerivative(final ZonedDateTime dateTime, final DoubleTimeSeries<ZonedDateTime> indexFixingTimeSeries, final String... yieldCurveNames) {
-    Validate.notNull(dateTime, "date");
-    LocalDate dayConversion = dateTime.toLocalDate();
-    Validate.notNull(indexFixingTimeSeries, "Index fixing time series");
-    Validate.notNull(yieldCurveNames, "yield curve names");
-    Validate.isTrue(yieldCurveNames.length > 1, "at least two curves required");
-    Validate.isTrue(!dayConversion.isAfter(getPaymentDate().toLocalDate()), "date is after payment date");
-    final String fundingCurveName = yieldCurveNames[0];
-    final String forwardCurveName = yieldCurveNames[1];
-    final double paymentTime = TimeCalculator.getTimeBetween(dateTime, getPaymentDate());
-    LocalDate dayFixing = getFixingDate().toLocalDate();
-    if (dayConversion.equals(dayFixing)) { // The fixing is on the reference date; if known the fixing is used and if not, the floating coupon is created.
-      Double fixedRate = indexFixingTimeSeries.getValue(getFixingDate());
-      if (fixedRate != null) {
-        return new CouponFixed(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixedRate);
-      }
-    }
-    if (dayConversion.isAfter(dayFixing)) { // The fixing is required
-      Double fixedRate = indexFixingTimeSeries.getValue(getFixingDate().withHourOfDay(0)); // TODO: remove time from fixing date.
-      if (fixedRate == null) {
-        throw new OpenGammaRuntimeException("Could not get fixing value for date " + getFixingDate());
-      }
-      return new CouponFixed(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixedRate);
-    }
-    final double fixingTime = TimeCalculator.getTimeBetween(dateTime, getFixingDate());
-    final double fixingPeriodStartTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodStartDate());
-    final double fixingPeriodEndTime = TimeCalculator.getTimeBetween(dateTime, getFixingPeriodEndDate());
-    return new CouponIbor(getCurrency(), paymentTime, fundingCurveName, getPaymentYearFraction(), getNotional(), fixingTime, getIndex(), fixingPeriodStartTime, fixingPeriodEndTime,
-        getFixingPeriodAccrualFactor(), forwardCurveName);
   }
 }

@@ -10,12 +10,13 @@ import javax.time.calendar.ZonedDateTime;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 
+import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
@@ -166,6 +167,16 @@ public class CapFloorCMSSpreadDefinition extends CouponFloatingDefinition implem
   }
 
   @Override
+  public <U, V> V accept(InstrumentDefinitionVisitor<U, V> visitor, U data) {
+    return visitor.visitCapFloorCMSSpread(this, data);
+  }
+
+  @Override
+  public <V> V accept(InstrumentDefinitionVisitor<?, V> visitor) {
+    return visitor.visitCapFloorCMSSpread(this);
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
@@ -227,14 +238,14 @@ public class CapFloorCMSSpreadDefinition extends CouponFloatingDefinition implem
     // CMS spread is not fixed yet, all the details are required.
     final double fixingTime = TimeCalculator.getTimeBetween(date, getFixingDate());
     final double settlementTime = TimeCalculator.getTimeBetween(date, _underlyingSwap1.getFixedLeg().getNthPayment(0).getAccrualStartDate());
-    final FixedCouponSwap<Coupon> swap1 = _underlyingSwap1.toDerivative(date, yieldCurveNames);
+    final SwapFixedCoupon<Coupon> swap1 = _underlyingSwap1.toDerivative(date, yieldCurveNames);
     String[] yieldCurveNames2;
     if (yieldCurveNames.length == 2) {
       yieldCurveNames2 = yieldCurveNames;
     } else {
-      yieldCurveNames2 = new String[] {yieldCurveNames[0], yieldCurveNames[2]};
+      yieldCurveNames2 = new String[] {yieldCurveNames[0], yieldCurveNames[2] };
     }
-    final FixedCouponSwap<Coupon> swap2 = _underlyingSwap2.toDerivative(date, yieldCurveNames2);
+    final SwapFixedCoupon<Coupon> swap2 = _underlyingSwap2.toDerivative(date, yieldCurveNames2);
     return new CapFloorCMSSpread(getCurrency(), paymentTime, getPaymentYearFraction(), getNotional(), fixingTime, swap1, _cmsIndex1, swap2, _cmsIndex2, settlementTime, _strike, _isCap,
         fundingCurveName);
   }
@@ -276,14 +287,14 @@ public class CapFloorCMSSpreadDefinition extends CouponFloatingDefinition implem
     // CMS spread is not fixed yet, all the details are required.
     final double fixingTime = TimeCalculator.getTimeBetween(date, getFixingDate());
     final double settlementTime = TimeCalculator.getTimeBetween(date, _underlyingSwap1.getFixedLeg().getNthPayment(0).getAccrualStartDate());
-    final FixedCouponSwap<Coupon> swap1 = _underlyingSwap1.toDerivative(date, yieldCurveNames);
+    final SwapFixedCoupon<Coupon> swap1 = _underlyingSwap1.toDerivative(date, yieldCurveNames);
     String[] yieldCurveNames2;
     if (yieldCurveNames.length == 2) {
       yieldCurveNames2 = yieldCurveNames;
     } else {
-      yieldCurveNames2 = new String[] {yieldCurveNames[0], yieldCurveNames[2]};
+      yieldCurveNames2 = new String[] {yieldCurveNames[0], yieldCurveNames[2] };
     }
-    final FixedCouponSwap<Coupon> swap2 = _underlyingSwap2.toDerivative(date, yieldCurveNames2);
+    final SwapFixedCoupon<Coupon> swap2 = _underlyingSwap2.toDerivative(date, yieldCurveNames2);
     return new CapFloorCMSSpread(getCurrency(), paymentTime, getPaymentYearFraction(), getNotional(), fixingTime, swap1, _cmsIndex1, swap2, _cmsIndex2, settlementTime, _strike, _isCap,
         fundingCurveName);
   }

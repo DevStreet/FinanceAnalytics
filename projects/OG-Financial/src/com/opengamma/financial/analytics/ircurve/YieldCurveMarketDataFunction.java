@@ -57,7 +57,6 @@ public class YieldCurveMarketDataFunction extends AbstractFunction {
   @Override
   public void init(final FunctionCompilationContext context) {
     _helper.init(context, this);
-
     final ComputationTargetSpecification currencySpec = new ComputationTargetSpecification(_helper.getCurrency());
     _marketDataResult = new ValueSpecification(ValueRequirementNames.YIELD_CURVE_MARKET_DATA, currencySpec,
         createValueProperties().with(ValuePropertyNames.CURVE, _helper.getCurveName()).get());
@@ -76,6 +75,14 @@ public class YieldCurveMarketDataFunction extends AbstractFunction {
       _requirements = requirements;
     }
 
+    @Override
+    public boolean canHandleMissingRequirements() {
+      return true;
+    }
+    @Override
+    public boolean canHandleMissingInputs() {
+      return true;
+    }
     @Override
     public Set<ComputedValue> execute(final FunctionExecutionContext executionContext, final FunctionInputs inputs,
         final ComputationTarget target, final Set<ValueRequirement> desiredValues) {
@@ -106,7 +113,6 @@ public class YieldCurveMarketDataFunction extends AbstractFunction {
     public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
       return _helper.canApplyTo(target);
     }
-
   }
 
   public static Set<ValueRequirement> buildRequirements(final InterpolatedYieldCurveSpecification specification,

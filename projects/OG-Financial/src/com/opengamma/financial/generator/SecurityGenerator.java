@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import javax.time.calendar.DateProvider;
 import javax.time.calendar.DayOfWeek;
@@ -28,6 +29,7 @@ import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.position.Counterparty;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
@@ -60,11 +62,16 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalScheme;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.exchange.ExchangeMaster;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
+import com.opengamma.master.historicaltimeseries.impl.DefaultHistoricalTimeSeriesResolver;
+import com.opengamma.master.historicaltimeseries.impl.DefaultHistoricalTimeSeriesSelector;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.impl.MasterSecuritySource;
 import com.opengamma.util.ArgumentChecker;
+import com.opengamma.util.async.AsynchronousExecution;
+import com.opengamma.util.async.AsynchronousOperation;
 import com.opengamma.util.functional.Function2;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.UnorderedCurrencyPair;
@@ -105,12 +112,17 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   private ConfigSource _configSource;
   private HolidaySource _holidaySource;
   private HistoricalTimeSeriesSource _historicalSource;
+  private HistoricalTimeSeriesMaster _htsMaster;
   private RegionSource _regionSource;
   private ExchangeMaster _exchangeMaster;
   private SecurityMaster _securityMaster;
   private String _currencyCurveName;
   private ExternalScheme _preferredScheme;
   private Function2<Currency, Currency, ExternalId> _spotRateIdentifier;
+
+  private Currency[] _currencies;
+
+
 
   public Random getRandom() {
     return _random;
@@ -175,6 +187,14 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   public void setHistoricalSource(final HistoricalTimeSeriesSource historicalSource) {
     _historicalSource = historicalSource;
   }
+  
+  public HistoricalTimeSeriesMaster getHistoricalTimeSeriesMaster() {
+    return _htsMaster;
+  }
+  
+  public void setHistoricalTimeSeriesMaster(final HistoricalTimeSeriesMaster htsMaster) {
+    _htsMaster = htsMaster;
+  }
 
   public ExchangeMaster getExchangeMaster() {
     return _exchangeMaster;
@@ -209,7 +229,8 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   }
 
   protected CurveSpecificationBuilderConfiguration getCurrencyCurveConfig(final Currency currency) {
-    return getConfigSource().getByName(CurveSpecificationBuilderConfiguration.class, getCurrencyCurveName() + "_" + currency.getCode(), null);
+    CurveSpecificationBuilderConfiguration config = getConfigSource().getByName(CurveSpecificationBuilderConfiguration.class, getCurrencyCurveName() + "_" + currency.getCode(), null);
+    return config;
   }
 
   public Function2<Currency, Currency, ExternalId> getSpotRateIdentifier() {
@@ -241,6 +262,8 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
     OpenGammaCompilationContext.setRegionSource(context, getRegionSource());
     OpenGammaCompilationContext.setConventionBundleSource(context, getConventionSource());
     OpenGammaCompilationContext.setSecuritySource(context, new MasterSecuritySource(getSecurityMaster()));
+    OpenGammaCompilationContext.setHistoricalTimeSeriesResolver(context, new DefaultHistoricalTimeSeriesResolver(new DefaultHistoricalTimeSeriesSelector(getConfigSource()), 
+        getHistoricalTimeSeriesMaster()));
     return context;
   }
 
@@ -256,7 +279,13 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
     for (ComputedValue input : inputs) {
       functionInputs.addValue(input);
     }
-    return function.getFunctionInvoker().execute(context, functionInputs, target, Collections.singleton(output)).iterator().next();
+    Set<ComputedValue> result;
+    try {
+      result = function.getFunctionInvoker().execute(context, functionInputs, target, Collections.singleton(output));
+    } catch (AsynchronousExecution ex) {
+      result = AsynchronousOperation.getResult(ex);
+    }
+    return result.iterator().next();
   }
 
   private ComputedValue findMarketData(final ValueRequirement requirement) {
@@ -373,9 +402,17 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
   public static Currency[] getDefaultCurrencies() {
     return new Currency[] {Currency.USD, Currency.GBP, Currency.EUR, Currency.JPY, Currency.CHF };
   }
+  
+  public void setCurrencies(Currency[] currencies) {
+    _currencies = currencies;
+  }
 
   public Currency[] getCurrencies() {
-    return getDefaultCurrencies();
+    if (_currencies == null) {
+      return getDefaultCurrencies();
+    } else {
+      return _currencies;
+    }
   }
 
   protected Currency getRandomCurrency() {
@@ -459,10 +496,18 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
    * 
    * @param quantityGenerator the supplied quantity generator
    * @param securityPersister the supplied security persister
+   * @param counterPartyGenerator the supplied counter party generator
    * @return the new trade, or null if no trade can be generated
    */
-  public ManageableTrade createSecurityTrade(final QuantityGenerator quantityGenerator, final SecurityPersister securityPersister) {
-    return null;
+  public ManageableTrade createSecurityTrade(final QuantityGenerator quantityGenerator, final SecurityPersister securityPersister, final NameGenerator counterPartyGenerator) {
+    ManageableTrade trade = null;
+    T security = createSecurity();
+    if (security != null) {
+      ZonedDateTime tradeDate = previousWorkingDay(ZonedDateTime.now().minusDays(getRandom(30)), getRandomCurrency());
+      trade = new ManageableTrade(quantityGenerator.createQuantity(), securityPersister.storeSecurity(security), tradeDate.toLocalDate(), tradeDate.toOffsetTime(), 
+          ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
+    }
+    return trade;
   }
 
 }

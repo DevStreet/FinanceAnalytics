@@ -11,6 +11,9 @@
   <p>
     <@rowout label="Name">${position.name}</@rowout>
     <@rowout label="Reference">${position.uniqueId.value}, version ${position.uniqueId.version}, <a href="${uris.positionVersions()}">view history</a></@rowout>
+    <#if position.providerId?has_content>
+        <@rowout label="Provider ID">${position.providerId}</@rowout>
+    </#if>
   </p>
 
 <#-- SUBSECTION Main data -->
@@ -23,6 +26,14 @@
     <@rowout label="Best match"><a href="${securityUris.securities(position.securityLink)}">best matching securities</a></@rowout>
 </#if>
 </@subsection>
+
+<#-- SUBSECTION Attributes -->
+<@subsection title="Attributes">
+  <@table items=attributes?keys empty="No attributes" headers=["Attribute Name","Value"]; item>
+      <td>${item}</td>
+      <td>${attributes[item]}</td>
+  </@table>
+</@subsection>    
 
 <#-- SUBSECTION Trades -->
 <@subsection title="Trades">

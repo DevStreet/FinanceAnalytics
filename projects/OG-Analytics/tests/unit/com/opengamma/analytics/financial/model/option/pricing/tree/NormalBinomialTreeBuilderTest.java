@@ -21,9 +21,6 @@ import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.B
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.CEVFunctionData;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.CEVPriceFunction;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.EuropeanVanillaOption;
-import com.opengamma.analytics.financial.model.option.pricing.tree.BinomialTreeBuilder;
-import com.opengamma.analytics.financial.model.option.pricing.tree.BinomialTreeNode;
-import com.opengamma.analytics.financial.model.option.pricing.tree.NormalBinomialTreeBuilder;
 import com.opengamma.analytics.financial.model.tree.RecombiningBinomialTree;
 import com.opengamma.analytics.financial.model.volatility.BlackImpliedVolatilityFormula;
 import com.opengamma.analytics.financial.model.volatility.surface.DriftSurface;
@@ -43,7 +40,7 @@ public class NormalBinomialTreeBuilderTest {
   private static final double FORWARD;
   private static final double T = 5.0;
   private static final double BETA = 0.4;
-  private static final YieldAndDiscountCurve YIELD_CURVE = new YieldCurve(ConstantDoublesCurve.from(0.05));
+  private static final YieldAndDiscountCurve YIELD_CURVE = YieldCurve.from(ConstantDoublesCurve.from(0.05));
   private static final double ATM_VOL = 0.20;
   private static final double SIGMA_BETA;
   private static final ZonedDateTime DATE = DateUtils.getUTCDate(2010, 7, 1);
@@ -165,8 +162,8 @@ public class NormalBinomialTreeBuilderTest {
       final EuropeanVanillaOption o = new EuropeanVanillaOption(strike, T, true);
       final CEVFunctionData cfd = new CEVFunctionData(FORWARD, YIELD_CURVE.getDiscountFactor(T), SIGMA_BETA, BETA);
       final double cevPrice = CEV_PRICE.getPriceFunction(o).evaluate(cfd);
-      final double cevVol = BLACK_IMPLIED_VOL.getImpliedVolatility(cfd, o, cevPrice);
-      final double impVol = BLACK_IMPLIED_VOL.getImpliedVolatility(cfd, o, optionPriceTree.getNode(0, 0).getValue());
+      final double cevVol = BLACK_IMPLIED_VOL.getImpliedVolatility(new BlackFunctionData(FORWARD, YIELD_CURVE.getDiscountFactor(T), SIGMA_BETA), o, cevPrice);
+      final double impVol = BLACK_IMPLIED_VOL.getImpliedVolatility(new BlackFunctionData(FORWARD, YIELD_CURVE.getDiscountFactor(T), SIGMA_BETA), o, optionPriceTree.getNode(0, 0).getValue());
       //final double cevPrice = CEVFormula.optionPrice(FORWARD, strike, BETA, df, SIGMA_BETA, T, true);
       //final double cevVol = BlackImpliedVolFormula.impliedVol(cevPrice, FORWARD, strike, df, T, true);
       //final double impVol = BlackImpliedVolFormula.impliedVol(optionPriceTree.getNode(0, 0).getValue(), FORWARD, strike, df, T, true);

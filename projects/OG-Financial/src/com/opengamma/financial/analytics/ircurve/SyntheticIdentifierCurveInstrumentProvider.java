@@ -22,6 +22,7 @@ public class SyntheticIdentifierCurveInstrumentProvider implements CurveInstrume
   private final StripInstrumentType _type;
   private StripInstrumentType _idType;
   private final ExternalScheme _scheme;
+
   public SyntheticIdentifierCurveInstrumentProvider(final Currency ccy, final StripInstrumentType type, final ExternalScheme scheme) {
     Validate.notNull(ccy, "currency");
     Validate.notNull(type, "instrument type");
@@ -33,6 +34,7 @@ public class SyntheticIdentifierCurveInstrumentProvider implements CurveInstrume
     switch (type) {
       case SWAP_3M:
       case SWAP_6M:
+      case SWAP_12M:
         _idType = StripInstrumentType.SWAP;
         break;
       case FRA_3M:
@@ -57,7 +59,19 @@ public class SyntheticIdentifierCurveInstrumentProvider implements CurveInstrume
 
   @Override
   public ExternalId getInstrument(final LocalDate curveDate, final Tenor tenor, final int periodsPerYear, final boolean isPeriodicZeroDeposit) {
-    throw new UnsupportedOperationException();
+    return ExternalId.of(_scheme, _ccy.getCode() + _idType.name() + Integer.toString(periodsPerYear) + tenor.getPeriod().toString());
+  }
+
+  @Override
+  public ExternalId getInstrument(final LocalDate curveDate, final Tenor tenor, final Tenor payTenor, final Tenor receiveTenor, final IndexType payIndexType,
+      final IndexType receiveIndexType) {
+    return ExternalId.of(_scheme, _ccy.getCode() + _idType.name() + "_" + payIndexType.name() + payTenor.getPeriod().toString() + receiveIndexType.name()
+        + receiveTenor.getPeriod().toString() + "_" + tenor.getPeriod().toString());
+  }
+
+  @Override
+  public ExternalId getInstrument(final LocalDate curveDate, final Tenor tenor, final Tenor resetTenor, final IndexType indexType) {
+    return ExternalId.of(_scheme, _ccy.getCode() + _idType.name() + "_" + indexType + resetTenor.getPeriod().toString() + "_" + tenor.getPeriod().toString());
   }
 
   public Currency getCurrency() {

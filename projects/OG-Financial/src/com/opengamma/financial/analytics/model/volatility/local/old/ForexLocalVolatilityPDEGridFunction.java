@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.analytics.model.volatility.local.old;
@@ -33,12 +33,12 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.volatility.surface.BloombergFXOptionVolatilitySurfaceInstrumentProvider.FXVolQuoteType;
-import com.opengamma.financial.analytics.volatility.surface.SurfacePropertyNames;
-import com.opengamma.financial.analytics.volatility.surface.SurfaceQuoteType;
+import com.opengamma.financial.analytics.volatility.surface.SurfaceAndCubePropertyNames;
+import com.opengamma.financial.analytics.volatility.surface.SurfaceAndCubeQuoteType;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCountFactory;
+import com.opengamma.financial.currency.CurrencyPair;
 import com.opengamma.financial.security.FinancialSecurity;
-import com.opengamma.financial.security.fx.FXUtils;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.id.UniqueId;
 import com.opengamma.util.money.Currency;
@@ -48,7 +48,7 @@ import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 
 /**
- * 
+ *
  */
 public abstract class ForexLocalVolatilityPDEGridFunction extends LocalVolatilityPDEGridFunction {
   private static final Logger s_logger = LoggerFactory.getLogger(ForexLocalVolatilityPDEGridFunction.class);
@@ -69,12 +69,11 @@ public abstract class ForexLocalVolatilityPDEGridFunction extends LocalVolatilit
   }
 
   @Override
-  protected EuropeanVanillaOption getOption(final FinancialSecurity security, final ZonedDateTime date) {
+  protected EuropeanVanillaOption getOption(final FinancialSecurity security, final ZonedDateTime date, final CurrencyPair currencyPair) {
     final FXOptionSecurity fxOption = (FXOptionSecurity) security;
     final Currency putCurrency = fxOption.getPutCurrency();
-    final Currency callCurrency = fxOption.getCallCurrency();
     double strike;
-    if (FXUtils.isInBaseQuoteOrder(putCurrency, callCurrency)) {
+    if (putCurrency.equals(currencyPair.getBase())) {
       strike = fxOption.getCallAmount() / fxOption.getPutAmount();
     } else {
       strike = fxOption.getPutAmount() / fxOption.getCallAmount();
@@ -90,9 +89,9 @@ public abstract class ForexLocalVolatilityPDEGridFunction extends LocalVolatilit
         id,
         ValueProperties
         .with(ValuePropertyNames.SURFACE, surfaceName)
-        .with(SurfacePropertyNames.PROPERTY_SURFACE_QUOTE_TYPE, SurfaceQuoteType.MARKET_STRANGLE_RISK_REVERSAL)
+        .with(SurfaceAndCubePropertyNames.PROPERTY_SURFACE_QUOTE_TYPE, SurfaceAndCubeQuoteType.MARKET_STRANGLE_RISK_REVERSAL)
         .with(InstrumentTypeProperties.PROPERTY_SURFACE_INSTRUMENT_TYPE, InstrumentTypeProperties.FOREX)
-        .with(SurfacePropertyNames.PROPERTY_SURFACE_UNITS, SurfacePropertyNames.VOLATILITY_QUOTE).get());
+        .with(SurfaceAndCubePropertyNames.PROPERTY_SURFACE_UNITS, SurfaceAndCubePropertyNames.VOLATILITY_QUOTE).get());
   }
 
   //TODO

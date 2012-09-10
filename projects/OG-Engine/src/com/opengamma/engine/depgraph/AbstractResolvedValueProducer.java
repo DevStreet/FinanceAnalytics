@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 
@@ -45,7 +44,7 @@ import com.opengamma.engine.value.ValueSpecification;
       ResolutionFailure failure = null;
       boolean needsOuterPump = false;
       synchronized (this) {
-        if (_resultsPushed < _results.length) {
+        if (_resultsPushed < _results.length - 1) {
           nextValue = _results[_resultsPushed++];
         }
       }
@@ -55,35 +54,90 @@ import com.opengamma.engine.value.ValueSpecification;
             _results = AbstractResolvedValueProducer.this._results;
             if (_resultsPushed < _results.length) {
               nextValue = _results[_resultsPushed++];
+              if (_finished && (_resultsPushed == _results.length)) {
+                finished = true;
+                _callbacks--;
+              }
             } else {
               if (_finished) {
                 finished = true;
                 failure = _failure;
+                _callbacks--;
               } else {
-                needsOuterPump = _pumped.isEmpty();
-                if (s_logger.isDebugEnabled()) {
-                  if (needsOuterPump) {
-                    s_logger.debug("Pumping outer object");
-                  } else {
-                    s_logger.debug("Adding to pump set");
+                if (_pumped != null) {
+                  needsOuterPump = _pumped.isEmpty();
+                  if (s_logger.isDebugEnabled()) {
+                    if (needsOuterPump) {
+                      s_logger.debug("Pumping outer object");
+                    } else {
+                      s_logger.debug("Adding to pump set");
+                    }
                   }
+                  if (needsOuterPump) {
+                    _pumping = 1;
+                  }
+                  _pumped.add(this);
+                } else {
+                  finished = true;
+                  failure = _failure;
+                  _callbacks--;
                 }
-                _pumped.add(this);
               }
             }
           }
         }
       }
       if (nextValue != null) {
-        s_logger.debug("Publishing value {}", nextValue);
-        context.resolved(_callback, getValueRequirement(), nextValue, this);
+        if (finished) {
+          s_logger.debug("Publishing final value {}", nextValue);
+          release(context);
+          context.resolved(_callback, getValueRequirement(), nextValue, null);
+        } else {
+          s_logger.debug("Publishing value {}", nextValue);
+          context.resolved(_callback, getValueRequirement(), nextValue, this);
+        }
       } else {
         if (needsOuterPump) {
           pumpImpl(context);
+          boolean lastResult = false;
+          Collection<Callback> pumped = null;
+          synchronized (this) {
+            switch (_pumping) {
+              case 1:
+                // No deferred results
+                break;
+              case 3:
+                // Next result ready; need to notify subscribers
+                if (!_pumped.isEmpty()) {
+                  pumped = new ArrayList<Callback>(_pumped);
+                  _pumped.clear();
+                }
+                break;
+              case 7:
+                // Last result ready; need to notify subscribers
+                if (!_pumped.isEmpty()) {
+                  pumped = new ArrayList<Callback>(_pumped);
+                  _pumped.clear();
+                }
+                _pumped = null;
+                lastResult = true;
+                break;
+              default:
+                throw new IllegalStateException("pumping = " + _pumping);
+            }
+            _pumping = 0;
+          }
+          if ((pumped != null) || lastResult) {
+            pumpCallbacks(context, pumped, lastResult);
+            if (lastResult) {
+              finished(context);
+            }
+          }
         } else {
           if (finished) {
             s_logger.debug("Finished {}", getValueRequirement());
             context.failed(_callback, getValueRequirement(), failure);
+            release(context);
           }
         }
       }
@@ -95,7 +149,9 @@ import com.opengamma.engine.value.ValueSpecification;
       synchronized (AbstractResolvedValueProducer.this) {
         assert !_closed;
         _closed = true;
-        _pumped.remove(this);
+        // Shouldn't be in the pumped state - a caller can't call close after calling pump
+        assert _pumped == null || !_pumped.remove(this);
+        _callbacks--;
       }
       release(context);
     }
@@ -104,12 +160,13 @@ import com.opengamma.engine.value.ValueSpecification;
     public boolean cancel(final GraphBuildingContext context) {
       s_logger.debug("Cancelling callback {}", this);
       synchronized (AbstractResolvedValueProducer.this) {
-        if (_pumped.remove(this)) {
+        if ((_pumped != null) && _pumped.remove(this)) {
           // Was in a pumped state; close and release the parent resolver
           _closed = true;
         } else {
           return false;
         }
+        _callbacks--;
       }
       release(context);
       return true;
@@ -127,56 +184,127 @@ import com.opengamma.engine.value.ValueSpecification;
 
   }
 
+  private static final ResolvedValue[] NO_RESULTS = new ResolvedValue[0];
+
   private final ValueRequirement _valueRequirement;
-  private final Set<Callback> _pumped = new HashSet<Callback>();
   private final int _objectId = s_nextObjectId.getAndIncrement();
+  //private final InstanceCount _instanceCount = new InstanceCount(this);
   private final Set<ValueSpecification> _resolvedValues = new HashSet<ValueSpecification>();
+  private Set<Callback> _pumped = new HashSet<Callback>();
+  private int _pumping; // 0 = not, 1 = pumpImpl about to be called, 3 = next result ready, 7 = last result ready
   private int _refCount;
+  private int _callbacks;
   private ResolvedValue[] _results;
-  private boolean _finished;
+  private volatile boolean _finished;
   private ResolutionFailure _failure;
+  private boolean _failureCopied;
 
   public AbstractResolvedValueProducer(final ValueRequirement valueRequirement) {
     _valueRequirement = valueRequirement;
-    _results = new ResolvedValue[0];
+    _results = NO_RESULTS;
     _refCount = 1;
   }
 
   @Override
   public Cancelable addCallback(final GraphBuildingContext context, final ResolvedValueCallback valueCallback) {
-    addRef();
+    addRef(); // reference held by the callback object
     final Callback callback = new Callback(valueCallback);
     ResolvedValue firstResult = null;
     boolean finished = false;
     ResolutionFailure failure = null;
     synchronized (this) {
       s_logger.debug("Added callback {} to {}", valueCallback, this);
+      _callbacks++;
       callback._results = _results;
       if (_results.length > 0) {
         callback._resultsPushed = 1;
         firstResult = _results[0];
+        if (_finished && _results.length == 1) {
+          finished = true;
+          _callbacks--;
+        }
       } else {
         if (_finished) {
           finished = true;
           failure = _failure;
+          _callbacks--;
         } else {
           _pumped.add(callback);
         }
       }
     }
     if (firstResult != null) {
-      s_logger.debug("Pushing first callback result {}", firstResult);
-      context.resolved(valueCallback, getValueRequirement(), firstResult, callback);
+      if (finished) {
+        s_logger.debug("Pushing single callback result {}", firstResult);
+        release(context); // reference held by callback object
+        context.resolved(valueCallback, getValueRequirement(), firstResult, null);
+      } else {
+        s_logger.debug("Pushing first callback result {}", firstResult);
+        context.resolved(valueCallback, getValueRequirement(), firstResult, callback);
+      }
     } else if (finished) {
       s_logger.debug("Pushing failure");
       context.failed(valueCallback, getValueRequirement(), failure);
-      release(context);
-      return null;
+      release(context); // reference held by callback object
+    } else {
+      return callback;
     }
-    return callback;
+    return null;
   }
 
-  protected boolean pushResult(final GraphBuildingContext context, final ResolvedValue value) {
+  private void pumpCallbacks(final GraphBuildingContext context, final Collection<Callback> pumped, final boolean lastResult) {
+    if (pumped != null) {
+      final boolean finished;
+      final ResolvedValue[] results;
+      final ResolutionFailure failure;
+      synchronized (this) {
+        finished = _finished;
+        results = _results;
+        failure = _failure;
+      }
+      for (Callback callback : pumped) {
+        ResolvedValue pumpValue = null;
+        boolean lastCallbackResult = false;
+        synchronized (callback) {
+          if (callback._resultsPushed < results.length) {
+            pumpValue = results[callback._resultsPushed++];
+            lastCallbackResult = lastResult && (callback._resultsPushed == results.length);
+          } else {
+            assert finished;
+          }
+        }
+        if (pumpValue != null) {
+          if (lastCallbackResult) {
+            s_logger.debug("Pushing last result to {}", callback._callback);
+            synchronized (this) {
+              _callbacks--;
+            }
+            release(context); // reference held by the callback object
+            context.resolved(callback._callback, getValueRequirement(), pumpValue, null);
+          } else {
+            s_logger.debug("Pushing result to {}", callback._callback);
+            context.resolved(callback._callback, getValueRequirement(), pumpValue, callback);
+          }
+        } else {
+          s_logger.debug("Pushing failure to {}", callback._callback);
+          synchronized (this) {
+            _callbacks--;
+          }
+          context.failed(callback._callback, getValueRequirement(), failure);
+        }
+      }
+    }
+  }
+
+  /**
+   * Stores the result in the producer, publishing to any active subscribers that are currently waiting for a value.
+   * 
+   * @param context the graph building context
+   * @param value the value to store
+   * @param lastResult last result indicator - if this is definitely the last result, the subscribers won't receive a "pump" handle allowing possible garbage collection of this producer
+   * @return true if a value was pushed to the subscribers, false if no value was generated and pushResult or finished must still be called
+   */
+  protected boolean pushResult(final GraphBuildingContext context, final ResolvedValue value, final boolean lastResult) {
     assert value != null;
     assert !_finished;
     if (!getValueRequirement().isSatisfiedBy(value.getValueSpecification())) {
@@ -188,7 +316,6 @@ import com.opengamma.engine.value.ValueSpecification;
       return false;
     }
     Collection<Callback> pumped = null;
-    final ResolvedValue[] newResults;
     synchronized (this) {
       if (!_resolvedValues.add(value.getValueSpecification())) {
         s_logger.debug("Rejecting {} already available from {}", value, this);
@@ -196,24 +323,36 @@ import com.opengamma.engine.value.ValueSpecification;
       }
       final int l = _results.length;
       s_logger.debug("Result {} available from {}", value, this);
-      newResults = new ResolvedValue[l + 1];
+      final ResolvedValue[] newResults = new ResolvedValue[l + 1];
       System.arraycopy(_results, 0, newResults, 0, l);
       newResults[l] = value;
       _results = newResults;
+      if (_failure != null) {
+        // Don't hold onto any failure state if there is a result
+        _failure = null;
+        _failureCopied = false;
+      }
+      if (_pumping > 0) {
+        if (lastResult) {
+          _pumping |= 6;
+        } else {
+          _pumping |= 2;
+        }
+        return true;
+      }
       if (!_pumped.isEmpty()) {
         pumped = new ArrayList<Callback>(_pumped);
         _pumped.clear();
       }
-    }
-    if (pumped != null) {
-      for (Callback callback : pumped) {
-        ResolvedValue pumpValue;
-        synchronized (callback) {
-          pumpValue = newResults[callback._resultsPushed++];
-        }
-        s_logger.debug("Pushing result to {}", callback._callback);
-        context.resolved(callback._callback, getValueRequirement(), pumpValue, callback);
+      if (lastResult) {
+        // Clear the _pumped reference so that if a subscriber calls pump we won't get an invocation of pumpImpl (which may call
+        // "finished") in addition to our call to "finished" below.
+        _pumped = null;
       }
+    }
+    pumpCallbacks(context, pumped, lastResult);
+    if (lastResult) {
+      finished(context);
     }
     return true;
   }
@@ -230,37 +369,44 @@ import com.opengamma.engine.value.ValueSpecification;
    * receive a failure notification. This must only be called once.
    */
   protected void finished(final GraphBuildingContext context) {
-    s_logger.debug("Finished producing results at {}", this);
     assert !_finished;
+    s_logger.debug("Finished producing results at {}", this);
     Collection<Callback> pumped = null;
-    ResolutionFailure failure = null;
     synchronized (this) {
       _finished = true;
-      if (!_pumped.isEmpty()) {
-        failure = _failure;
-        pumped = new ArrayList<Callback>(_pumped);
-        _pumped.clear();
+      if (_pumping > 0) {
+        _pumping |= 2;
+        return;
+      }
+      if (_pumped != null) {
+        if (!_pumped.isEmpty()) {
+          pumped = new ArrayList<Callback>(_pumped);
+        }
+        _pumped = null;
       }
     }
-    if (pumped != null) {
-      for (Callback callback : pumped) {
-        s_logger.debug("Pushing failure to {}", callback._callback);
-        context.failed(callback._callback, getValueRequirement(), failure);
-        release(context);
-      }
-    } else {
-      s_logger.debug("No pumped callbacks");
-    }
+    pumpCallbacks(context, pumped, true);
+  }
+
+  protected boolean isFinished() {
+    return _finished;
   }
 
   protected void storeFailure(final ResolutionFailure failure) {
     if (failure != null) {
       synchronized (this) {
-        if (_failure == null) {
-          _failure = (ResolutionFailure) failure.clone();
-          return;
+        if (_results.length == 0) {
+          // Only store failure info if there are no results to push
+          if (_failure == null) {
+            _failure = failure;
+            return;
+          }
+          if (!_failureCopied) {
+            _failure = (ResolutionFailure) _failure.clone();
+            _failureCopied = true;
+          }
+          _failure.merge(failure);
         }
-        _failure.merge(failure);
       }
     }
   }
@@ -276,6 +422,7 @@ import com.opengamma.engine.value.ValueSpecification;
     return _results;
   }
 
+  @Override
   public ValueRequirement getValueRequirement() {
     return _valueRequirement;
   }
@@ -296,14 +443,24 @@ import com.opengamma.engine.value.ValueSpecification;
     if (s_logger.isDebugEnabled()) {
       s_logger.debug("Release called on {}, refCount={}", this, _refCount);
     }
-    return --_refCount;
+    final int result = --_refCount;
+    if (result == 0) {
+      // help out the garbage collector
+      _failure = null;
+    }
+    return result;
+  }
+
+  @Override
+  public synchronized boolean hasActiveCallbacks() {
+    return _callbacks > 0;
   }
 
   @Override
   public int cancelLoopMembers(final GraphBuildingContext context, final Set<Object> visited) {
     final List<Callback> pumped;
     synchronized (this) {
-      if (_pumped.isEmpty()) {
+      if ((_pumped == null) || _pumped.isEmpty()) {
         s_logger.debug("Callback {} has no pumped callbacks", this);
         // No callbacks pumped (or has already finished), so can't be in a loop
         return 0;
@@ -321,7 +478,7 @@ import com.opengamma.engine.value.ValueSpecification;
           s_logger.info("Detected loop at {}, callback {}", this, callback);
           if (callback.cancel(context)) {
             s_logger.debug("Canceled callback; signalling failure");
-            callback._callback.failed(context, getValueRequirement(), ResolutionFailure.recursiveRequirement(getValueRequirement()));
+            callback._callback.failed(context, getValueRequirement(), context.recursiveRequirement(getValueRequirement()));
             result++;
           } else {
             s_logger.debug("Already canceled");

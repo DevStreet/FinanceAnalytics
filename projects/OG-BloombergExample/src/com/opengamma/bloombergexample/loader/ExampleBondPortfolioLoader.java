@@ -7,12 +7,13 @@ package com.opengamma.bloombergexample.loader;
 
 import java.math.BigDecimal;
 
+import com.opengamma.component.tool.AbstractTool;
+import com.opengamma.integration.tool.IntegrationToolContext;
 import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.core.id.ExternalSchemes;
-import com.opengamma.bloombergexample.tool.AbstractExampleTool;
 import com.opengamma.financial.security.bond.BondSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
@@ -24,6 +25,7 @@ import com.opengamma.master.position.PositionDocument;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.SecuritySearchResult;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * Example code to load and aggregate a bond portfolio.
@@ -34,7 +36,8 @@ import com.opengamma.master.security.SecuritySearchResult;
  * some bond securities, so you typically need some static market data lookup 
  * service.
  */
-public class ExampleBondPortfolioLoader extends AbstractExampleTool {
+@Scriptable
+public class ExampleBondPortfolioLoader extends AbstractTool<IntegrationToolContext> {
 
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(ExampleBondPortfolioLoader.class);
@@ -52,7 +55,7 @@ public class ExampleBondPortfolioLoader extends AbstractExampleTool {
    * @param args  the arguments, unused
    */
   public static void main(String[] args) {  // CSIGNORE
-    new ExampleBondPortfolioLoader().initAndRun(args);
+    new ExampleBondPortfolioLoader().initAndRun(args, IntegrationToolContext.class);
     System.exit(0);
   }
 

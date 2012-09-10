@@ -10,20 +10,17 @@ import static org.testng.AssertJUnit.assertFalse;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.financial.interestrate.AnnualInterestRate;
-import com.opengamma.analytics.financial.interestrate.ContinuousInterestRate;
-import com.opengamma.analytics.financial.interestrate.InterestRate;
-import com.opengamma.analytics.financial.interestrate.PeriodicInterestRate;
-
 /**
  * 
  */
 public class InterestRateTest {
   private static final double RATE = 0.05;
-  private static final AnnualInterestRate ANNUAL = new AnnualInterestRate(RATE);
+  private static final InterestRate ANNUAL = new PeriodicInterestRate(RATE, 1);
   private static final ContinuousInterestRate CONTINUOUS = new ContinuousInterestRate(RATE);
   private static final PeriodicInterestRate QUARTERLY = new PeriodicInterestRate(RATE, 4);
-  private static final double EPS = 1e-15;
+  private static final InterestRateSimpleMoneyMarketBasis SIMPLE_MM = new InterestRateSimpleMoneyMarketBasis(RATE);
+  private static final InterestRateSimpleDiscountBasis SIMPLE_DSC = new InterestRateSimpleDiscountBasis(RATE);
+  private static final double EPS = 1e-10;
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNegativeCompoundingPeriodsPerYear() {
@@ -33,11 +30,6 @@ public class InterestRateTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNoCompoundingPeriodsPerYear() {
     new PeriodicInterestRate(RATE, 0);
-  }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testNullArgument1() {
-    ANNUAL.fromAnnual(null);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -51,11 +43,6 @@ public class InterestRateTest {
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testNullArgument4() {
-    CONTINUOUS.fromAnnual(null);
-  }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullArgument5() {
     CONTINUOUS.fromContinuous(null);
   }
@@ -63,11 +50,6 @@ public class InterestRateTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullArgument6() {
     CONTINUOUS.fromPeriodic(null);
-  }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testNullArgument7() {
-    QUARTERLY.fromAnnual(null);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -110,9 +92,14 @@ public class InterestRateTest {
     QUARTERLY.toPeriodic(-3);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void simpleDiscountingNegativeDf() {
+    SIMPLE_DSC.getDiscountFactor(10000);
+  }
+
   @Test
   public void testEqualsAndHashCode() {
-    final InterestRate annual = new AnnualInterestRate(RATE);
+    final InterestRate annual = new PeriodicInterestRate(RATE, 1);
     final InterestRate continuous = new ContinuousInterestRate(RATE);
     final InterestRate periodic = new PeriodicInterestRate(RATE, 4);
     assertEquals(annual, ANNUAL);
@@ -124,7 +111,7 @@ public class InterestRateTest {
     assertFalse(annual.equals(continuous));
     assertFalse(annual.equals(periodic));
     assertFalse(continuous.equals(periodic));
-    assertFalse(new AnnualInterestRate(RATE + 1).equals(ANNUAL));
+    assertFalse(new PeriodicInterestRate(RATE + 1, 1).equals(ANNUAL));
     assertFalse(new ContinuousInterestRate(RATE + 1).equals(CONTINUOUS));
     assertFalse(new PeriodicInterestRate(RATE + 1, 2).equals(QUARTERLY));
     assertFalse(new PeriodicInterestRate(RATE, 3).equals(QUARTERLY));
@@ -139,24 +126,25 @@ public class InterestRateTest {
 
   @Test
   public void testGetDiscountFactor() {
-    assertEquals(1. / ANNUAL.getDiscountFactor(1), 1 + RATE, EPS);
-    assertEquals(1. / CONTINUOUS.getDiscountFactor(1), Math.exp(RATE), EPS);
-    assertEquals(1. / QUARTERLY.getDiscountFactor(1), Math.pow(1 + RATE / 4, 4), EPS);
+    double[] time = {0.01, 1.0, 2.5, 10.0};
+    for (int looptime = 0; looptime < time.length; looptime++) {
+      assertEquals(1. / ANNUAL.getDiscountFactor(time[looptime]), Math.pow(1 + RATE, time[looptime]), EPS);
+      assertEquals(1. / CONTINUOUS.getDiscountFactor(time[looptime]), Math.exp(RATE * time[looptime]), EPS);
+      assertEquals(1. / QUARTERLY.getDiscountFactor(time[looptime]), Math.pow(1 + RATE / 4, 4 * time[looptime]), EPS);
+      assertEquals("InterestRate: simple money market basis - discount factor", SIMPLE_MM.getDiscountFactor(time[looptime]), 1.0 / (1.0 + RATE * time[looptime]), EPS);
+      assertEquals("InterestRate: simple discounting basis - discount factor", SIMPLE_DSC.getDiscountFactor(time[looptime]), 1.0 - RATE * time[looptime], EPS);
+    }
   }
 
   @Test
   public void testForwardAndBackwardConversion() {
-    assertEquals(ANNUAL.toAnnual().getRate(), RATE, EPS);
-    assertEquals(ANNUAL.fromAnnual(ANNUAL).getRate(), RATE, EPS);
     assertEquals(ANNUAL.fromContinuous(ANNUAL.toContinuous()).getRate(), RATE, EPS);
     assertEquals(ANNUAL.fromPeriodic(ANNUAL.toPeriodic(4)).getRate(), RATE, EPS);
     assertEquals(CONTINUOUS.toContinuous().getRate(), RATE, EPS);
     assertEquals(CONTINUOUS.fromContinuous(CONTINUOUS).getRate(), RATE, EPS);
-    assertEquals(CONTINUOUS.fromAnnual(CONTINUOUS.toAnnual()).getRate(), RATE, EPS);
     assertEquals(CONTINUOUS.fromPeriodic(CONTINUOUS.toPeriodic(4)).getRate(), RATE, EPS);
     assertEquals(QUARTERLY.toPeriodic(4).getRate(), RATE, EPS);
     assertEquals(QUARTERLY.fromPeriodic(QUARTERLY).getRate(), RATE, EPS);
-    assertEquals(QUARTERLY.fromAnnual(QUARTERLY.toAnnual()).getRate(), RATE, EPS);
     assertEquals(QUARTERLY.fromContinuous(QUARTERLY.toContinuous()).getRate(), RATE, EPS);
   }
 }

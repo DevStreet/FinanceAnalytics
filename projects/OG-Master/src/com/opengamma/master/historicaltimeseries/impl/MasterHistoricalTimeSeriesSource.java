@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.opengamma.DataNotFoundException;
+import com.opengamma.core.change.ChangeManager;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
+import com.opengamma.core.historicaltimeseries.impl.SimpleHistoricalTimeSeries;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
@@ -33,6 +35,7 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.OpenGammaClock;
 import com.opengamma.util.PublicSPI;
+import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
 import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
@@ -48,6 +51,7 @@ public class MasterHistoricalTimeSeriesSource
     extends AbstractMasterSource<HistoricalTimeSeriesInfoDocument, HistoricalTimeSeriesMaster>
     implements HistoricalTimeSeriesSource {
   
+  private static final LocalDateDoubleTimeSeries EMPTY_TIMESERIES = new ArrayLocalDateDoubleTimeSeries();
   private static final Logger s_logger = LoggerFactory.getLogger(MasterHistoricalTimeSeriesSource.class);
 
   /**
@@ -58,6 +62,7 @@ public class MasterHistoricalTimeSeriesSource
    * The clock.
    */
   private final Clock _clock = OpenGammaClock.getInstance();
+
 
   /**
    * Creates an instance with an underlying master which does not override versions.
@@ -292,7 +297,6 @@ public class MasterHistoricalTimeSeriesSource
     ArgumentChecker.notNull(identifiers, "identifiers");
     ArgumentChecker.notNull(dataSource, "dataSource");
     ArgumentChecker.notNull(dataField, "field");
-    
     HistoricalTimeSeriesResolutionResult resolutionResult = getResolver().resolve(identifiers, identifierValidityDate, dataSource, dataProvider, dataField, null);
     if (resolutionResult == null) {
       return null;
@@ -439,11 +443,15 @@ public class MasterHistoricalTimeSeriesSource
       s_logger.debug(message);
       return null;
     }
-    HistoricalTimeSeries hts = doGetHistoricalTimeSeries(resolutionResult.getHistoricalTimeSeriesInfo().getUniqueId(), start, end, maxPoints);
-    if (resolutionResult.getAdjuster() != null) {
-      hts = resolutionResult.getAdjuster().adjust(resolutionResult.getHistoricalTimeSeriesInfo().getExternalIdBundle().toBundle(), hts);
+    if (maxPoints != 0) {
+      HistoricalTimeSeries hts = doGetHistoricalTimeSeries(resolutionResult.getHistoricalTimeSeriesInfo().getUniqueId(), start, end, maxPoints);
+      if (resolutionResult.getAdjuster() != null) {
+        hts = resolutionResult.getAdjuster().adjust(resolutionResult.getHistoricalTimeSeriesInfo().getExternalIdBundle().toBundle(), hts);
+      }
+      return hts;
+    } else {
+      return new SimpleHistoricalTimeSeries(resolutionResult.getHistoricalTimeSeriesInfo().getUniqueId(), EMPTY_TIMESERIES);
     }
-    return hts;
   }
 
   //-------------------------------------------------------------------------
@@ -464,6 +472,23 @@ public class MasterHistoricalTimeSeriesSource
   @Override
   public String toString() {
     return "MasterHistoricalTimeSeriesSource[" + getMaster() + "]";
+  }
+
+  @Override
+  public ExternalIdBundle getExternalIdBundle(UniqueId uniqueId) {
+    HistoricalTimeSeriesInfoDocument historicalTimeSeriesInfoDocument = getMaster().get(uniqueId);
+    if (historicalTimeSeriesInfoDocument != null && historicalTimeSeriesInfoDocument.getInfo() != null && historicalTimeSeriesInfoDocument.getInfo().getExternalIdBundle() != null) {
+      return historicalTimeSeriesInfoDocument.getInfo().getExternalIdBundle().toBundle();  
+    } else {
+      s_logger.warn("Cannot find time series info document, or info field is null, or id bundle is null, returning null");
+      return null;
+    }
+  }
+
+    //-------------------------------------------------------------------------
+  @Override
+  public ChangeManager changeManager() {
+    return getMaster().changeManager();
   }
 
 }

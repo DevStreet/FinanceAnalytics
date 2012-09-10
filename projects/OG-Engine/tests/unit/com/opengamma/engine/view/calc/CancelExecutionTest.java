@@ -35,6 +35,7 @@ import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.DefaultCachingComputationTargetResolver;
 import com.opengamma.engine.DefaultComputationTargetResolver;
 import com.opengamma.engine.depgraph.DependencyGraph;
+import com.opengamma.engine.depgraph.DependencyGraphBuilderFactory;
 import com.opengamma.engine.depgraph.DependencyNode;
 import com.opengamma.engine.function.CachingFunctionRepositoryCompiler;
 import com.opengamma.engine.function.CompiledFunctionService;
@@ -63,10 +64,9 @@ import com.opengamma.engine.view.cache.InMemoryViewComputationCacheSource;
 import com.opengamma.engine.view.cache.ViewComputationCacheSource;
 import com.opengamma.engine.view.calc.stats.DiscardingGraphStatisticsGathererProvider;
 import com.opengamma.engine.view.calc.stats.GraphExecutorStatisticsGathererProvider;
-import com.opengamma.engine.view.calcnode.CalculationJobResult;
 import com.opengamma.engine.view.calcnode.JobDispatcher;
-import com.opengamma.engine.view.calcnode.LocalCalculationNode;
 import com.opengamma.engine.view.calcnode.LocalNodeJobInvoker;
+import com.opengamma.engine.view.calcnode.SimpleCalculationNode;
 import com.opengamma.engine.view.calcnode.ViewProcessorQueryReceiver;
 import com.opengamma.engine.view.calcnode.ViewProcessorQuerySender;
 import com.opengamma.engine.view.calcnode.stats.DiscardingInvocationStatisticsGatherer;
@@ -156,17 +156,17 @@ public class CancelExecutionTest {
     final ViewProcessorQuerySender viewProcessorQuerySender = new ViewProcessorQuerySender(InMemoryRequestConduit.create(viewProcessorQueryReceiver));
     final FunctionExecutionContext executionContext = new FunctionExecutionContext();
     final ComputationTargetResolver targetResolver = new DefaultComputationTargetResolver(securitySource, positionSource);
-    final JobDispatcher jobDispatcher = new JobDispatcher(new LocalNodeJobInvoker(new LocalCalculationNode(computationCacheSource, compilationService, executionContext, targetResolver,
-        viewProcessorQuerySender, Executors.newCachedThreadPool(), functionInvocationStatistics)));
+    final JobDispatcher jobDispatcher = new JobDispatcher(new LocalNodeJobInvoker(new SimpleCalculationNode(computationCacheSource, compilationService, executionContext, targetResolver,
+        viewProcessorQuerySender, "node", Executors.newCachedThreadPool(), functionInvocationStatistics)));
     final ViewPermissionProvider viewPermissionProvider = new DefaultViewPermissionProvider();
     final GraphExecutorStatisticsGathererProvider graphExecutorStatisticsProvider = new DiscardingGraphStatisticsGathererProvider();
     ViewDefinition viewDefinition = new ViewDefinition("TestView", UserPrincipal.getTestUser());
     viewDefinition.addViewCalculationConfiguration(new ViewCalculationConfiguration(viewDefinition, "default"));
     MockViewDefinitionRepository viewDefinitionRepository = new MockViewDefinitionRepository();
     viewDefinitionRepository.addDefinition(viewDefinition);
-    final ViewProcessContext vpc = new ViewProcessContext(viewDefinitionRepository, viewPermissionProvider, marketDataProviderResolver, compilationService, functionResolver, null, positionSource,
-        securitySource, new DefaultCachingComputationTargetResolver(new DefaultComputationTargetResolver(securitySource, positionSource), EHCacheUtils.createCacheManager()), computationCacheSource,
-        jobDispatcher, viewProcessorQueryReceiver, factory, graphExecutorStatisticsProvider, new DummyOverrideOperationCompiler());
+    final ViewProcessContext vpc = new ViewProcessContext(viewDefinitionRepository, viewPermissionProvider, marketDataProviderResolver, compilationService, functionResolver,
+        new DefaultCachingComputationTargetResolver(new DefaultComputationTargetResolver(securitySource, positionSource), EHCacheUtils.createCacheManager()), computationCacheSource,
+        jobDispatcher, viewProcessorQueryReceiver, new DependencyGraphBuilderFactory(), factory, graphExecutorStatisticsProvider, new DummyOverrideOperationCompiler());
     final DependencyGraph graph = new DependencyGraph("Default");
     DependencyNode previous = null;
     for (int i = 0; i < JOB_SIZE; i++) {
@@ -186,7 +186,7 @@ public class CancelExecutionTest {
     cycleOptions.setMarketDataSpecification(new MarketDataSpecification());
     final SingleComputationCycle cycle = new SingleComputationCycle(UniqueId.of("Test", "Cycle1"), UniqueId.of("Test", "ViewProcess1"), computationCycleResultListener, vpc, viewEvaluationModel,
         cycleOptions, VersionCorrection.of(Instant.ofEpochMillis(1), Instant.ofEpochMillis(1)));
-    return cycle.getDependencyGraphExecutor().execute(graph, new LinkedBlockingQueue<CalculationJobResult>(), cycle.getStatisticsGatherer());
+    return cycle.getDependencyGraphExecutor().execute(graph, new LinkedBlockingQueue<ExecutionResult>(), cycle.getStatisticsGatherer());
   }
 
   private boolean jobFinished() {

@@ -22,7 +22,6 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 public class SABRSensitivityNodeCalculatorTest {
 
-  private static final SABRSensitivityNodeCalculator NODE_CALCULATOR = new SABRSensitivityNodeCalculator();
   private static final SABRInterestRateParameters SABR_PARAMETERS = TestsDataSetsSABR.createSABR2();
 
   private static final double TOLERANCE = 1.0E-10;
@@ -35,12 +34,14 @@ public class SABRSensitivityNodeCalculatorTest {
     final DoublesPair point = new DoublesPair(1.25, 4.0);
     final double alphaValue = 12345.0;
     final SurfaceValue alpha = SurfaceValue.from(point, alphaValue);
+    final double betaValue = 4321.0;
+    final SurfaceValue beta = SurfaceValue.from(point, betaValue);
     final double rhoValue = 2345.0;
     final SurfaceValue rho = SurfaceValue.from(point, 2345.0);
     final double nuValue = 345.0;
     final SurfaceValue nu = SurfaceValue.from(point, 345.0);
-    final PresentValueSABRSensitivityDataBundle onePoint = new PresentValueSABRSensitivityDataBundle(alpha, rho, nu);
-    final PresentValueSABRSensitivityDataBundle node = NODE_CALCULATOR.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle onePoint = new PresentValueSABRSensitivityDataBundle(alpha, beta, rho, nu);
+    final PresentValueSABRSensitivityDataBundle node = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
     final DoublesPair[] nodeExpected = new DoublesPair[4];
     nodeExpected[0] = new DoublesPair(1.0, 2.0);
     nodeExpected[1] = new DoublesPair(1.0, 5.0);
@@ -68,12 +69,14 @@ public class SABRSensitivityNodeCalculatorTest {
     final DoublesPair point = new DoublesPair(1.25, 1.5);
     final double alphaValue = 12345.0;
     final SurfaceValue alpha = SurfaceValue.from(point, alphaValue);
+    final double betaValue = 4321.0;
+    final SurfaceValue beta = SurfaceValue.from(point, betaValue);
     final double rhoValue = 2345.6;
     final SurfaceValue rho = SurfaceValue.from(point, rhoValue);
     final double nuValue = 345.67;
     final SurfaceValue nu = SurfaceValue.from(point, nuValue);
-    final PresentValueSABRSensitivityDataBundle onePoint = new PresentValueSABRSensitivityDataBundle(alpha, rho, nu);
-    final PresentValueSABRSensitivityDataBundle node = NODE_CALCULATOR.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle onePoint = new PresentValueSABRSensitivityDataBundle(alpha, beta, rho, nu);
+    final PresentValueSABRSensitivityDataBundle node = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint, SABR_PARAMETERS);
     final DoublesPair[] nodeExpected = new DoublesPair[4];
     nodeExpected[0] = new DoublesPair(1.0, 1.0);
     nodeExpected[1] = new DoublesPair(1.0, 2.0);
@@ -99,18 +102,20 @@ public class SABRSensitivityNodeCalculatorTest {
   public void twoPoints() {
     final DoublesPair point1 = new DoublesPair(1.25, 4.0);
     final SurfaceValue alpha1 = SurfaceValue.from(point1, 12345.0);
+    final SurfaceValue beta1 = SurfaceValue.from(point1, 4321.0);
     final SurfaceValue rho1 = SurfaceValue.from(point1, 2345.6);
     final SurfaceValue nu1 = SurfaceValue.from(point1, 345.67);
     final DoublesPair point2 = new DoublesPair(5.5, 9.0);
     final SurfaceValue alpha2 = SurfaceValue.from(point2, 2345.0);
+    final SurfaceValue beta2 = SurfaceValue.from(point2, 5432.0);
     final SurfaceValue rho2 = SurfaceValue.from(point2, 345.6);
     final SurfaceValue nu2 = SurfaceValue.from(point2, 45.67);
-    final PresentValueSABRSensitivityDataBundle onePoint1 = new PresentValueSABRSensitivityDataBundle(alpha1, rho1, nu1);
-    final PresentValueSABRSensitivityDataBundle onePoint2 = new PresentValueSABRSensitivityDataBundle(alpha2, rho2, nu2);
+    final PresentValueSABRSensitivityDataBundle onePoint1 = new PresentValueSABRSensitivityDataBundle(alpha1, beta1, rho1, nu1);
+    final PresentValueSABRSensitivityDataBundle onePoint2 = new PresentValueSABRSensitivityDataBundle(alpha2, beta2, rho2, nu2);
     final PresentValueSABRSensitivityDataBundle twoPoints = PresentValueSABRSensitivityDataBundle.plus(onePoint1, onePoint2);
-    final PresentValueSABRSensitivityDataBundle node1 = NODE_CALCULATOR.calculateNodeSensitivities(onePoint1, SABR_PARAMETERS);
-    final PresentValueSABRSensitivityDataBundle node2 = NODE_CALCULATOR.calculateNodeSensitivities(onePoint2, SABR_PARAMETERS);
-    final PresentValueSABRSensitivityDataBundle nodeSum = NODE_CALCULATOR.calculateNodeSensitivities(twoPoints, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle node1 = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint1, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle node2 = SABRSensitivityNodeCalculator.calculateNodeSensitivities(onePoint2, SABR_PARAMETERS);
+    final PresentValueSABRSensitivityDataBundle nodeSum = SABRSensitivityNodeCalculator.calculateNodeSensitivities(twoPoints, SABR_PARAMETERS);
     assertEquals("SABR Node calculator", PresentValueSABRSensitivityDataBundle.plus(node1, node2), nodeSum);
   }
 

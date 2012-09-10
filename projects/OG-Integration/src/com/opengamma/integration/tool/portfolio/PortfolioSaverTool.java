@@ -25,11 +25,13 @@ import com.opengamma.integration.copier.portfolio.writer.PortfolioWriter;
 import com.opengamma.integration.copier.portfolio.writer.SingleSheetSimplePortfolioWriter;
 import com.opengamma.integration.copier.portfolio.writer.ZippedPortfolioWriter;
 import com.opengamma.integration.copier.sheet.SheetFormat;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * The portfolio saver tool
  */
-public class PortfolioSaverTool extends AbstractTool {
+@Scriptable
+public class PortfolioSaverTool extends AbstractTool<ToolContext> {
 
   /** File name option flag */
   private static final String FILE_NAME_OPT = "f";
@@ -51,7 +53,7 @@ public class PortfolioSaverTool extends AbstractTool {
    * @param args  the arguments, not null
    */
   public static void main(String[] args) { //CSIGNORE
-    new PortfolioSaverTool().initAndRun(args);
+    new PortfolioSaverTool().initAndRun(args, ToolContext.class);
     System.exit(0);
   }
 

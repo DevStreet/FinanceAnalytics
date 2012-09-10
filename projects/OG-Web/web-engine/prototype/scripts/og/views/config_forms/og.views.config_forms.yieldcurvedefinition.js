@@ -1,6 +1,6 @@
 /*
- * @copyright 2011 - present by OpenGamma Inc
- * @license See distribution for license
+ * Copyright 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
  */
 $.register_module({
     name: 'og.views.config_forms.yieldcurvedefinition',
@@ -58,7 +58,7 @@ $.register_module({
                             var rest_options = {page: '*', name: '*_' + currency, type: CURV, cache_for: 30 * 1000};
                             api.configs.get(rest_options).pipe(function (result) {
                                 handler(result.data.data.map(function (val) {
-                                    var value = val.split('|')[1].match(/^([^_]+)/)[1];
+                                    var value = val.split('|')[1].split('_').slice(0, -1).join('_');
                                     return {value: value, text: value};
                                 }));
                             });

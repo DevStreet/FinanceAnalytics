@@ -24,58 +24,44 @@ import com.opengamma.web.server.push.rest.MasterType;
  */
 public class ConnectionManagerImpl implements ConnectionManager {
 
-  /** Period for the periodic tasks that check whether the client connections have been idle for too long */
-  private static final long DEFAULT_TIMEOUT_CHECK_PERIOD = 60000;
-
-  /** By default a client is disconnected if it hasn't been heard from for five minutes */
-  private static final long DEFAULT_TIMEOUT = 300000;
-
+  /** Period for the tasks that check whether the client connections have been idle for too long */
+  private static final long DEFAULT_TIMEOUT_CHECK_PERIOD = 20000;
+  /** By default a client is disconnected if it hasn't been heard from for 60 seconds */
+  private static final long DEFAULT_TIMEOUT = 60000;
   // TODO a better way to generate client IDs
   /** Client ID of the next connection */
   private final AtomicLong _clientConnectionId = new AtomicLong();
-
-  /** Creates and stores viewports */
-  private final ViewportManager _viewportFactory;
-
   /** Provides a connection to the long-polling HTTP connections */
   private final LongPollingConnectionManager _longPollingConnectionManager;
-
   /** Maximum time a client is allow to be idle before it's disconnected */
   private final long _timeout;
-
   /** Period for the tasks that check for idle clients */
   private final long _timeoutCheckPeriod;
-
   /** Connections keyed on client ID */
   private final Map<String, ClientConnection> _connectionsByClientId = new ConcurrentHashMap<String, ClientConnection>();
-
-  /** Connections keyed on viewport ID */
-  private final Map<String, ClientConnection> _connectionsByViewportId = new ConcurrentHashMap<String, ClientConnection>();
-
   /** Timer for tasks that check for idle clients */
   private final Timer _timer = new Timer();
-
   /** For listening for changes in entity data */
   private final ChangeManager _changeManager;
-
   /** For listening for changes to any data in a master */
   private final MasterChangeManager _masterChangeManager;
 
   public ConnectionManagerImpl(ChangeManager changeManager,
                                MasterChangeManager masterChangeManager,
-                               ViewportManager viewportFactory,
                                LongPollingConnectionManager longPollingConnectionManager) {
-    this(changeManager, masterChangeManager, viewportFactory, longPollingConnectionManager, DEFAULT_TIMEOUT, DEFAULT_TIMEOUT_CHECK_PERIOD);
+    this(changeManager,
+         masterChangeManager,
+         longPollingConnectionManager,
+         DEFAULT_TIMEOUT,
+         DEFAULT_TIMEOUT_CHECK_PERIOD);
   }
 
   public ConnectionManagerImpl(ChangeManager changeManager,
                                MasterChangeManager masterChangeManager,
-                               ViewportManager viewportFactory,
                                LongPollingConnectionManager longPollingConnectionManager,
                                long timeout,
                                long timeoutCheckPeriod) {
     _changeManager = changeManager;
-    _viewportFactory = viewportFactory;
     _longPollingConnectionManager = longPollingConnectionManager;
     _timeout = timeout;
     _timeoutCheckPeriod = timeoutCheckPeriod;
@@ -91,11 +77,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
    */
   @Override
   public String clientConnected(String userId) {
-    // TODO check args
+    //ArgumentChecker.notNull(userId, "userId"); // reinstate this when logins are done
     String clientId = Long.toString(_clientConnectionId.getAndIncrement());
     ConnectionTimeoutTask timeoutTask = new ConnectionTimeoutTask(this, userId, clientId, _timeout);
     LongPollingUpdateListener updateListener = _longPollingConnectionManager.handshake(userId, clientId, timeoutTask);
-    ClientConnection connection = new ClientConnection(userId, clientId, updateListener, _viewportFactory, timeoutTask);
+    ClientConnection connection = new ClientConnection(userId, clientId, updateListener, timeoutTask);
     _changeManager.addChangeListener(connection);
     _masterChangeManager.addChangeListener(connection);
     _connectionsByClientId.put(clientId, connection);
@@ -123,33 +109,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
     getConnectionByClientId(userId, clientId).subscribe(masterType, url);
   }
 
-  @Override
-  public Viewport getViewport(String userId, String clientId, String viewportId) {
-    // TODO check args
-    if (clientId == null) {
-      // TODO check the viewport is owned by the user
-      return _viewportFactory.getViewport(viewportId);
-    } else {
-      return getConnectionByViewportId(userId, viewportId).getViewport(viewportId);
-    }
-  }
-
-  @Override
-  public void createViewport(String userId,
-                             String clientId,
-                             ViewportDefinition viewportDefinition,
-                             String viewportId,
-                             String dataUrl,
-                             String gridStructureUrl) {
-    if (clientId == null) {
-      _viewportFactory.createViewport(viewportId, viewportDefinition);
-    } else {
-      ClientConnection connection = getConnectionByClientId(userId, clientId);
-      connection.createViewport(viewportDefinition, viewportId, dataUrl, gridStructureUrl);
-      _connectionsByViewportId.put(viewportId, connection);
-    }
-  }
-
   /**
    * Returns the {@link ClientConnection} corresponding to a client ID.
    * @param userId The ID of the user who owns the connection
@@ -157,8 +116,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
    * @return The connection
    * @throws DataNotFoundException If there is no connection for the specified ID, the user ID is invalid or if
    * the client and user IDs don't correspond
+   * TODO not sure this should be public
+   * TODO or should it be specified in ClientConnection?
    */
-  private ClientConnection getConnectionByClientId(String userId, String clientId) {
+  @Override
+  public ClientConnection getConnectionByClientId(String userId, String clientId) {
     // TODO user logins
     //ArgumentChecker.notEmpty(userId, "userId");
     ArgumentChecker.notEmpty(clientId, "clientId");
@@ -168,25 +130,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
     }
     if (!Objects.equal(userId, connection.getUserId())) {
       throw new DataNotFoundException("User ID " + userId + " is not associated with client ID " + clientId);
-    }
-    return connection;
-  }
-
-  /**
-   * Returns the {@link ClientConnection} that owns a viewport.
-   * @param userId The ID of the user who owns the connection
-   * @param viewportId The ID of the viewport
-   * @return The connection
-   * @throws DataNotFoundException If there is no viewport with the specified ID, the connection doesn't own viewport,
-   * the user ID is invalid or if the client connection isn't owned by the specified user.
-   */
-  private ClientConnection getConnectionByViewportId(String userId, String viewportId) {
-    ClientConnection connection = _connectionsByViewportId.get(viewportId);
-    if (connection == null) {
-      throw new DataNotFoundException("Unknown viewport ID: " + viewportId);
-    }
-    if (!Objects.equal(userId, connection.getUserId())) {
-      throw new DataNotFoundException("User ID " + userId + " is not associated with viewport " + viewportId);
     }
     return connection;
   }

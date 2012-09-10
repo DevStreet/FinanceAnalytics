@@ -9,7 +9,6 @@ import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.exchange.ExchangeSource;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
-import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.function.FunctionExecutionContext;
@@ -73,7 +72,7 @@ public final class OpenGammaExecutionContext {
   /**
    * Gets a {@code HistoricalTimeSeriesSource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static HistoricalTimeSeriesSource getHistoricalTimeSeriesSource(final FunctionExecutionContext context) {
@@ -83,18 +82,17 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code HistoricalTimeSeriesSource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param source  the value to store, not null
+   * @param context the context to store in, not null
+   * @param source the value to store, not null
    */
   public static void setHistoricalTimeSeriesSource(final FunctionExecutionContext context, final HistoricalTimeSeriesSource source) {
     context.put(HISTORICAL_TIME_SERIES_SOURCE_NAME, source);
   }
 
-  //-------------------------------------------------------------------------
   /**
    * Gets a {@code SecuritySource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static SecuritySource getSecuritySource(final FunctionExecutionContext context) {
@@ -104,39 +102,17 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code SecuritySource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param securitySource  the value to store, not null
+   * @param context the context to store in, not null
+   * @param securitySource the value to store, not null
    */
   public static void setSecuritySource(final FunctionExecutionContext context, final SecuritySource securitySource) {
     context.setSecuritySource(securitySource);
   }
 
-  //-------------------------------------------------------------------------
-  /**
-   * Gets a {@code SecuritySource} from the context.
-   * 
-   * @param context  the context to examine, not null
-   * @return the value, null if not found
-   */
-  public static PositionSource getPositionSource(final FunctionExecutionContext context) {
-    return context.getPositionSource();
-  }
-
-  /**
-   * Stores a {@code PositionSource} in the context.
-   * 
-   * @param context  the context to store in, not null
-   * @param positionSource  the value to store, not null
-   */
-  public static void setPositionSource(final FunctionExecutionContext context, final PositionSource positionSource) {
-    context.setPositionSource(positionSource);
-  }
-
-  //-------------------------------------------------------------------------
   /**
    * Gets a {@code ConventionBundleSource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static ConventionBundleSource getConventionBundleSource(final FunctionExecutionContext context) {
@@ -146,8 +122,8 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code ConventionBundleSource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param conventionBundleSource  the value to store, not null
+   * @param context the context to store in, not null
+   * @param conventionBundleSource the value to store, not null
    */
   public static void setConventionBundleSource(final FunctionExecutionContext context, final ConventionBundleSource conventionBundleSource) {
     context.put(CONVENTION_BUNDLE_SOURCE_NAME, conventionBundleSource);
@@ -157,7 +133,7 @@ public final class OpenGammaExecutionContext {
   /**
    * Gets a {@code RegionSource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static RegionSource getRegionSource(final FunctionExecutionContext context) {
@@ -167,8 +143,8 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code RegionSource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param regionSource  the value to store, not null
+   * @param context the context to store in, not null
+   * @param regionSource the value to store, not null
    */
   public static void setRegionSource(final FunctionExecutionContext context, final RegionSource regionSource) {
     context.put(REGION_SOURCE_NAME, regionSource);
@@ -178,7 +154,7 @@ public final class OpenGammaExecutionContext {
   /**
    * Gets a {@code HolidaySource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static HolidaySource getHolidaySource(final FunctionExecutionContext context) {
@@ -188,8 +164,8 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code HolidaySource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param holidaySource  the value to store, not null
+   * @param context the context to store in, not null
+   * @param holidaySource the value to store, not null
    */
   public static void setHolidaySource(final FunctionExecutionContext context, final HolidaySource holidaySource) {
     context.put(HOLIDAY_SOURCE_NAME, holidaySource);
@@ -199,7 +175,7 @@ public final class OpenGammaExecutionContext {
   /**
    * Gets a {@code ExchangeSource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static ExchangeSource getExchangeSource(final FunctionExecutionContext context) {
@@ -209,8 +185,8 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code ExchangeSource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param exchangeSource  the value to store, not null
+   * @param context the context to store in, not null
+   * @param exchangeSource the value to store, not null
    */
   public static void setExchangeSource(final FunctionExecutionContext context, final ExchangeSource exchangeSource) {
     context.put(EXCHANGE_SOURCE_NAME, exchangeSource);
@@ -219,7 +195,7 @@ public final class OpenGammaExecutionContext {
   /**
    * Gets a {@code CurveCalculationConfigSource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the curve config source, null if not found
    */
   public static CurveCalculationConfigSource getCurveCalculationConfigSource(final FunctionExecutionContext context) {
@@ -229,17 +205,18 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code CurveCalculationConfigSource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param curveConfigSource  the curve config source to store, not null
+   * @param context the context to store in, not null
+   * @param curveConfigSource the curve config source to store, not null
    */
   public static void setCurveCalculationConfigSource(final FunctionExecutionContext context, final CurveCalculationConfigSource curveConfigSource) {
     context.put(CURVE_CALCULATION_CONFIG_NAME, curveConfigSource);
   }
+
   //-------------------------------------------------------------------------
   /**
    * Gets a {@code ConfigSource} from the context.
    * 
-   * @param context  the context to examine, not null
+   * @param context the context to examine, not null
    * @return the value, null if not found
    */
   public static ConfigSource getConfigSource(final FunctionExecutionContext context) {
@@ -249,8 +226,8 @@ public final class OpenGammaExecutionContext {
   /**
    * Stores a {@code ConfigSource} in the context.
    * 
-   * @param context  the context to store in, not null
-   * @param configSource  the value to store, not null
+   * @param context the context to store in, not null
+   * @param configSource the value to store, not null
    */
   public static void setConfigSource(final FunctionExecutionContext context, final ConfigSource configSource) {
     context.put(CONFIG_SOURCE_NAME, configSource);

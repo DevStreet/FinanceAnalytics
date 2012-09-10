@@ -5,7 +5,6 @@
  */
 package com.opengamma.analytics.math.interpolation;
 
-
 /**
  * 
  */
@@ -19,8 +18,7 @@ public final class CombinedInterpolatorExtrapolatorFactory {
     return new CombinedInterpolatorExtrapolator(interpolator);
   }
 
-  public static CombinedInterpolatorExtrapolator getInterpolator(final String interpolatorName,
-      final String extrapolatorName) {
+  public static CombinedInterpolatorExtrapolator getInterpolator(final String interpolatorName, final String extrapolatorName) {
     final Interpolator1D interpolator = Interpolator1DFactory.getInterpolator(interpolatorName);
     if (extrapolatorName == null || extrapolatorName.isEmpty()) {
       return new CombinedInterpolatorExtrapolator(interpolator);
@@ -31,8 +29,7 @@ public final class CombinedInterpolatorExtrapolatorFactory {
 
   // REVIEW emcleod 4-8-2010 not sure if this is how people will want to construct the combined interpolator - should it be more strict?
   // Also see CombinedInterpolatorExtrapolatorNodeSensitivityCalculatorFactory
-  public static CombinedInterpolatorExtrapolator getInterpolator(final String interpolatorName, final String leftExtrapolatorName,
-      final String rightExtrapolatorName) {
+  public static CombinedInterpolatorExtrapolator getInterpolator(final String interpolatorName, final String leftExtrapolatorName, final String rightExtrapolatorName) {
     final Interpolator1D interpolator = Interpolator1DFactory.getInterpolator(interpolatorName);
     if (leftExtrapolatorName == null || leftExtrapolatorName.isEmpty()) {
       if (rightExtrapolatorName == null || rightExtrapolatorName.isEmpty()) {
@@ -50,11 +47,13 @@ public final class CombinedInterpolatorExtrapolatorFactory {
     return new CombinedInterpolatorExtrapolator(interpolator, leftExtrapolator, rightExtrapolator);
   }
 
-  private static Interpolator1D getExtrapolator(final String extrapolatorName, final Interpolator1D interpolator) {
+  public static Interpolator1D getExtrapolator(final String extrapolatorName, final Interpolator1D interpolator) {
     if (extrapolatorName.equals(Interpolator1DFactory.FLAT_EXTRAPOLATOR)) {
       return new FlatExtrapolator1D();
     } else if (extrapolatorName.equals(Interpolator1DFactory.LINEAR_EXTRAPOLATOR)) {
       return new LinearExtrapolator1D(interpolator);
+    } else if (extrapolatorName.equals(Interpolator1DFactory.EXPONENTIAL_EXTRAPOLATOR)) {
+      return new ExponentialExtrapolator1D();
     }
     throw new IllegalArgumentException("Cannot get extrapolator " + extrapolatorName);
   }

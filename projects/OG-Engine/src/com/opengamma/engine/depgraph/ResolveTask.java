@@ -15,9 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.engine.ComputationTarget;
-import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext;
+import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.function.ParameterizedFunction;
 import com.opengamma.engine.function.exclusion.FunctionExclusionGroup;
+import com.opengamma.engine.target.LazyComputationTargetResolver;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 
@@ -37,6 +38,8 @@ import com.opengamma.engine.value.ValueSpecification;
 
     private final int _objectId = s_nextObjectId.getAndIncrement();
     private final ResolveTask _task;
+
+    //private final InstanceCount _instanceCount = new InstanceCount(this);
 
     protected State(final ResolveTask task) {
       assert task != null;
@@ -65,19 +68,13 @@ import com.opengamma.engine.value.ValueSpecification;
       context.run(task);
     }
 
-    protected boolean pushResult(final GraphBuildingContext context, final ResolvedValue resolvedValue) {
-      return getTask().pushResult(context, resolvedValue);
+    protected boolean pushResult(final GraphBuildingContext context, final ResolvedValue resolvedValue, final boolean lastResult) {
+      return getTask().pushResult(context, resolvedValue, lastResult);
     }
 
     protected ResolvedValue createResult(final ValueSpecification valueSpecification, final ParameterizedFunction parameterizedFunction, final Set<ValueSpecification> functionInputs,
         final Set<ValueSpecification> functionOutputs) {
-      return new ResolvedValue(valueSpecification, parameterizedFunction, getComputationTarget(), functionInputs, functionOutputs);
-    }
-
-    protected boolean pushResult(final GraphBuildingContext context, final ValueSpecification valueSpecification, final ParameterizedFunction parameterizedFunction,
-        final Set<ValueSpecification> functionInputs,
-        final Set<ValueSpecification> functionOutputs) {
-      return pushResult(context, createResult(valueSpecification, parameterizedFunction, functionInputs, functionOutputs));
+      return new ResolvedValue(valueSpecification, parameterizedFunction, functionInputs, functionOutputs);
     }
 
     protected void storeFailure(final ResolutionFailure failure) {
@@ -88,11 +85,11 @@ import com.opengamma.engine.value.ValueSpecification;
       return getTask().getValueRequirement();
     }
 
-    protected ComputationTarget getComputationTarget() {
-      return getTask().getComputationTarget();
+    protected ComputationTarget getComputationTarget(final GraphBuildingContext context) {
+      return getTask().getComputationTarget(context);
     }
 
-    protected void run(final GraphBuildingContext context) {
+    protected boolean run(final GraphBuildingContext context) {
       throw new UnsupportedOperationException("Not runnable state (" + toString() + ")");
     }
 
@@ -126,12 +123,6 @@ import com.opengamma.engine.value.ValueSpecification;
   }
 
   /**
-   * Parent resolve task (i.e. chain of previous value requirements) so that loops can be detected and avoided. This is not
-   * ref-counted.
-   */
-  private final ResolveTask _parent;
-
-  /**
    * Parent value requirements.
    */
   private final Set<ValueRequirement> _parentRequirements;
@@ -152,18 +143,13 @@ import com.opengamma.engine.value.ValueSpecification;
   private volatile boolean _recursion;
 
   /**
-   * Resolved target for the value requirement.
-   */
-  private ComputationTarget _target;
-
-  /**
    * Function mutual exclusion group hints. Functions shouldn't be considered if their group hint is already present in a parent task.
    */
-  private Set<FunctionExclusionGroup> _functionExclusion;
+  private final Set<FunctionExclusionGroup> _functionExclusion;
 
   public ResolveTask(final ValueRequirement valueRequirement, final ResolveTask parent, final Set<FunctionExclusionGroup> functionExclusion) {
     super(valueRequirement);
-    _parent = parent;
+    final int hc;
     if (parent != null) {
       if (parent.getParentValueRequirements() != null) {
         _parentRequirements = new HashSet<ValueRequirement>(parent.getParentValueRequirements());
@@ -171,13 +157,19 @@ import com.opengamma.engine.value.ValueSpecification;
       } else {
         _parentRequirements = Collections.singleton(parent.getValueRequirement());
       }
-      _hashCode = valueRequirement.hashCode() * 31 + _parentRequirements.hashCode();
+      hc = valueRequirement.hashCode() * 31 + _parentRequirements.hashCode();
     } else {
       _parentRequirements = null;
-      _hashCode = valueRequirement.hashCode();
+      hc = valueRequirement.hashCode();
     }
-    _functionExclusion = (functionExclusion != null) ? new HashSet<FunctionExclusionGroup>(functionExclusion) : null;
-    setState(new ResolveTargetStep(this));
+    if (functionExclusion != null) {
+      _functionExclusion = functionExclusion;
+      _hashCode = hc * 31 + functionExclusion.hashCode();
+    } else {
+      _functionExclusion = null;
+      _hashCode = hc;
+    }
+    setState(new GetFunctionsStep(this));
   }
 
   private State getState() {
@@ -216,28 +208,28 @@ import com.opengamma.engine.value.ValueSpecification;
     super.finished(context);
   }
 
-  protected void setComputationTarget(final ComputationTarget target) {
-    assert target != null;
-    _target = target;
-  }
-
-  protected ComputationTarget getComputationTarget() {
-    return _target;
-  }
-
   @Override
-  public void run(final GraphBuildingContext context) {
-    getState().run(context);
-    // Release the lock that the context added before we got queued
-    release(context);
-  }
-
-  private ResolveTask getParent() {
-    return _parent;
+  public boolean tryRun(final GraphBuildingContext context) {
+    if (getState().run(context)) {
+      // Release the lock that the context added before we got queued
+      release(context);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private Set<ValueRequirement> getParentValueRequirements() {
     return _parentRequirements;
+  }
+
+  private ComputationTarget getComputationTarget(final GraphBuildingContext context) {
+    final ComputationTargetSpecification specification = getValueRequirement().getTargetSpecification();
+    final ComputationTarget target = LazyComputationTargetResolver.resolve(context.getCompilationContext().getComputationTargetResolver(), specification);
+    if (target == null) {
+      s_logger.warn("Computation target {} not found", specification);
+    }
+    return target;
   }
 
   public boolean hasParent(final ResolveTask task) {
@@ -262,8 +254,12 @@ import com.opengamma.engine.value.ValueSpecification;
     return _functionExclusion;
   }
 
-  // HashCode and Equality are to allow tasks to be considered equal iff they are for the same value requirement and
-  // correspond to the same resolution depth (i.e. the sets of parents are equal)
+  // TODO: could use a ResolveTaskKey instead of the unusual behavior of hash/equal here
+
+  // HashCode and Equality are to allow tasks to be considered equal iff they
+  // are for the same value requirement, correspond to the same resolution
+  // depth (i.e. the sets of parents are equal), and have the same function
+  // exclusion set
 
   @Override
   public int hashCode() {
@@ -282,32 +278,21 @@ import com.opengamma.engine.value.ValueSpecification;
     if (!getValueRequirement().equals(other.getValueRequirement())) {
       return false;
     }
-    return ObjectUtils.equals(getParentValueRequirements(), other.getParentValueRequirements());
+    return ObjectUtils.equals(getParentValueRequirements(), other.getParentValueRequirements()) && ObjectUtils.equals(getFunctionExclusion(), other.getFunctionExclusion());
   }
 
   @Override
   protected void pumpImpl(final GraphBuildingContext context) {
     s_logger.debug("Pump called on {}", this);
-    getState().pump(context);
+    final State state = getState();
+    if (state != null) {
+      state.pump(context);
+    }
   }
 
   @Override
   public String toString() {
     return "ResolveTask" + getObjectId() + "[" + getValueRequirement() + ", " + getState() + "]";
-  }
-
-  private void toLongString(final StringBuilder sb) {
-    sb.append(getValueRequirement());
-    if (getParent() != null) {
-      sb.append("->");
-      getParent().toLongString(sb);
-    }
-  }
-
-  public String toLongString() {
-    final StringBuilder sb = new StringBuilder();
-    toLongString(sb);
-    return sb.toString();
   }
 
   @Override

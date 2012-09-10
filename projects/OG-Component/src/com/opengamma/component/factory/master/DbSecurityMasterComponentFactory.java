@@ -22,11 +22,11 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
 import com.opengamma.component.ComponentInfo;
 import com.opengamma.component.ComponentRepository;
-import com.opengamma.component.factory.AbstractComponentFactory;
 import com.opengamma.component.factory.ComponentInfoAttributes;
 import com.opengamma.core.change.JmsChangeManager;
 import com.opengamma.master.security.SecurityMaster;
-import com.opengamma.master.security.impl.DataSecurityMasterResource;
+import com.opengamma.master.security.impl.RemoteSecurityMaster;
+import com.opengamma.masterdb.security.DataDbSecurityMasterResource;
 import com.opengamma.masterdb.security.DbSecurityMaster;
 import com.opengamma.masterdb.security.EHCachingSecurityMasterDetailProvider;
 import com.opengamma.masterdb.security.SecurityMasterDetailProvider;
@@ -38,8 +38,8 @@ import com.opengamma.util.jms.JmsConnector;
  * Component factory for the database security master.
  */
 @BeanDefinition
-public class DbSecurityMasterComponentFactory extends AbstractComponentFactory {
-
+public class DbSecurityMasterComponentFactory extends AbstractDbMasterComponentFactory {
+  
   /**
    * The classifier that the factory should publish under.
    */
@@ -116,14 +116,17 @@ public class DbSecurityMasterComponentFactory extends AbstractComponentFactory {
         master.setDetailProvider(dp);
       }
     }
+    checkSchemaVersion(master.getSchemaVersion(), "sec_db");
     
     // register
+    info.addAttribute(ComponentInfoAttributes.LEVEL, 1);
+    info.addAttribute(ComponentInfoAttributes.REMOTE_CLIENT_JAVA, RemoteSecurityMaster.class);
     info.addAttribute(ComponentInfoAttributes.UNIQUE_ID_SCHEME, master.getUniqueIdScheme());
     repo.registerComponent(info, master);
     
     // publish
     if (isPublishRest()) {
-      repo.getRestComponents().publish(info, new DataSecurityMasterResource(master));
+      repo.getRestComponents().publish(info, new DataDbSecurityMasterResource(master));
     }
   }
 
@@ -479,7 +482,7 @@ public class DbSecurityMasterComponentFactory extends AbstractComponentFactory {
   /**
    * The meta-bean for {@code DbSecurityMasterComponentFactory}.
    */
-  public static class Meta extends AbstractComponentFactory.Meta {
+  public static class Meta extends AbstractDbMasterComponentFactory.Meta {
     /**
      * The singleton instance of the meta-bean.
      */

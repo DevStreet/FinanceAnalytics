@@ -6,18 +6,13 @@
 package com.opengamma.util.test;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
+import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
-import org.hibernate.id.enhanced.SequenceStructure;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Table;
 
@@ -73,9 +68,18 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
     return _hibernateDialect;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Class<?> getJDBCDriverClass() {
-    return com.microsoft.sqlserver.jdbc.SQLServerDriver.class;
+    try {
+      return (Class<? extends Driver>) Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+    } catch (ClassNotFoundException ex) {
+      throw new OpenGammaRuntimeException("Could not load the Microsoft JDBC driver: " + ex.getMessage());
+    }
+    // Use the MS driver...
+    // return com.microsoft.sqlserver.jdbc.SQLServerDriver.class;
+    // ...or the open-source driver (LGPLed)
+    // return net.sourceforge.jtds.jdbc.Driver.class;
   }
 
   @Override
@@ -157,7 +161,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
         getUser(), 
         getPassword(), 
         "SELECT name FROM sys.databases WHERE name NOT IN ('master', 'model', 'msdb', 'tempdb')", 
-        "template1");
+        null);
   }
   
   @Override

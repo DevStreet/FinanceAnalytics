@@ -5,11 +5,11 @@
  */
 package com.opengamma.analytics.financial.interestrate;
 
-
 /**
  * 
  */
 public abstract class InterestRate {
+
   private final double _rate;
 
   public InterestRate(final double rate) {
@@ -21,8 +21,6 @@ public abstract class InterestRate {
   }
 
   public abstract double getDiscountFactor(double t);
-
-  public abstract InterestRate fromAnnual(AnnualInterestRate annual);
 
   /**
    * Create an InterestRate object with the correct composition type from a continuously compounded InterestRate object.
@@ -39,8 +37,6 @@ public abstract class InterestRate {
   public abstract double fromContinuousDerivative(ContinuousInterestRate continuous);
 
   public abstract InterestRate fromPeriodic(PeriodicInterestRate periodic);
-
-  public abstract AnnualInterestRate toAnnual();
 
   public abstract ContinuousInterestRate toContinuous();
 

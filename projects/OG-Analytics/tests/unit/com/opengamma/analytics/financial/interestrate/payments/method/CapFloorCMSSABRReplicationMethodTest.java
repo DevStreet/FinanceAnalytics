@@ -19,10 +19,10 @@ import org.testng.annotations.Test;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCapFloorCMSDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwap;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
-import com.opengamma.analytics.financial.instrument.index.generator.USD6MLIBOR3M;
+import com.opengamma.analytics.financial.instrument.index.generator.GeneratorSwapTestsMaster;
 import com.opengamma.analytics.financial.instrument.payment.CapFloorCMSDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponCMSDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
@@ -34,7 +34,7 @@ import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivit
 import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivitySABRCalculator;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.method.SensitivityFiniteDifference;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
@@ -117,7 +117,7 @@ public class CapFloorCMSSABRReplicationMethodTest {
   private static final PresentValueSABRSensitivitySABRCalculator PVSSC_SABR = PresentValueSABRSensitivitySABRCalculator.getInstance();
   private static final CapFloorCMSSABRReplicationMethod METHOD = CapFloorCMSSABRReplicationMethod.getDefaultInstance();
 
-  private static final GeneratorSwap USD_GENERATOR = new USD6MLIBOR3M(CALENDAR);
+  private static final GeneratorSwapFixedIbor USD_GENERATOR = GeneratorSwapTestsMaster.getInstance().getGenerator("USD6MLIBOR3M", CALENDAR);
   private static final IndexSwap USD_SWAP_10Y = new IndexSwap(USD_GENERATOR, Period.ofYears(5));
   private static final ZonedDateTime SPOT_DATE = ScheduleCalculator.getAdjustedDate(REFERENCE_DATE, USD_GENERATOR.getIborIndex().getSpotLag(), CALENDAR);
 
@@ -152,7 +152,7 @@ public class CapFloorCMSSABRReplicationMethodTest {
     Period capPeriod = Period.ofMonths(6);
     DayCount capDayCount = DayCountFactory.INSTANCE.getDayCount("ACT/360");
     AnnuityCapFloorCMSDefinition capDefinition = AnnuityCapFloorCMSDefinition.from(START_DATE, END_DATE, NOTIONAL, USD_SWAP_10Y, capPeriod, capDayCount, false, STRIKE, IS_CAP);
-    GenericAnnuity<? extends Payment> cap = capDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+    Annuity<? extends Payment> cap = capDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
     double pvCalculator = PVC_SABR.visit(cap, SABR_BUNDLE);
     double pvExpected = 0.0;
     for (int loopcpn = 0; loopcpn < cap.getNumberOfPayments(); loopcpn++) {
@@ -280,7 +280,7 @@ public class CapFloorCMSSABRReplicationMethodTest {
     Period capPeriod = Period.ofMonths(6);
     DayCount capDayCount = DayCountFactory.INSTANCE.getDayCount("ACT/360");
     AnnuityCapFloorCMSDefinition capDefinition = AnnuityCapFloorCMSDefinition.from(START_DATE, END_DATE, NOTIONAL, USD_SWAP_10Y, capPeriod, capDayCount, false, STRIKE, IS_CAP);
-    GenericAnnuity<? extends Payment> cap = capDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+    Annuity<? extends Payment> cap = capDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
     InterestRateCurveSensitivity pvcsCalculator = new InterestRateCurveSensitivity(PVCSC_SABR.visit(cap, SABR_BUNDLE));
     pvcsCalculator = pvcsCalculator.cleaned();
     InterestRateCurveSensitivity pvcsExpected = new InterestRateCurveSensitivity();

@@ -72,7 +72,44 @@ public class SimpleYieldConvention implements YieldConvention, Serializable {
    * Some bonds have this code.
    */
   public static final YieldConvention STEP_FLOATER = new SimpleYieldConvention("STEP FLOATER"); // TODO: check if real yield convention
-
+  /**
+   * Japanese bonds
+   */
+  public static final YieldConvention JAPAN_SIMPLE = new SimpleYieldConvention("JAPAN:SIMPLE YIELD");
+  /**
+   * Bank of Canada 
+   */
+  public static final YieldConvention BANK_OF_CANADA = new SimpleYieldConvention("BANK OF CANADA YLD");
+  /**
+   * Canada Compound Method
+   */
+  public static final YieldConvention CANADA_COMPND_METHOD = new SimpleYieldConvention("CANADA:COMPND METH");  
+  /**
+   * Pay-in-kind
+   */
+  public static final YieldConvention PAY_IN_KIND = new SimpleYieldConvention("PAY-IN-KIND");
+  /**
+   * Floating rate note
+   */
+  public static final YieldConvention FLOAT_RATE_NOTE = new SimpleYieldConvention("FLOAT RATE NOTE");
+  /**
+   * Toggle PIK Notes
+   */
+  public static final YieldConvention TOGGLE_PIK_NOTES = new SimpleYieldConvention("TOGGLE PIK NOTES");
+  /**
+   * Interest at Maturity
+   */
+  public static final YieldConvention INTEREST_AT_MATURITY = new SimpleYieldConvention("INTEREST AT MTY");
+  /**
+   * France Compound Method
+   */
+  public static final YieldConvention FRANCE_COMPOUND_METHOD = new SimpleYieldConvention("FRANCE:COMPND METH");
+  /**
+   * Spain Government Bonds
+   */
+  public static final YieldConvention SPAIN_GOVERNMENT_BONDS = new SimpleYieldConvention("SPAIN:GOVT BONDS");
+  
+  
   /**
    * The convention name.
    */

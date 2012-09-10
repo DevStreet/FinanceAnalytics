@@ -7,10 +7,12 @@ package com.opengamma.financial;
 
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.exchange.ExchangeSource;
+import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
+import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.PortfolioStructure;
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveDefinitionSource;
@@ -18,6 +20,7 @@ import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecifica
 import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeDefinitionSource;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.currency.CurrencyMatrixSource;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.util.SingletonFactoryBean;
 
 /**
@@ -36,6 +39,9 @@ public class OpenGammaCompilationContextFactoryBean extends SingletonFactoryBean
   private CurrencyMatrixSource _currencyMatrixSource;
   private HolidaySource _holidaySource;
   private ExchangeSource _exchangeSource;
+  private ComputationTargetResolver _targetResolver;
+  private HistoricalTimeSeriesSource _historicalTimeSeriesSource;
+  private HistoricalTimeSeriesResolver _historicalTimeSeriesResolver;
 
   public void setSecuritySource(final SecuritySource securitySource) {
     _securitySource = securitySource;
@@ -51,6 +57,14 @@ public class OpenGammaCompilationContextFactoryBean extends SingletonFactoryBean
 
   public PositionSource getPositionSource() {
     return _positionSource;
+  }
+
+  public void setComputationTargetResolver(final ComputationTargetResolver targetResolver) {
+    _targetResolver = targetResolver;
+  }
+
+  public ComputationTargetResolver getComputationTargetResolver() {
+    return _targetResolver;
   }
 
   public void setRegionSource(final RegionSource regionSource) {
@@ -127,18 +141,58 @@ public class OpenGammaCompilationContextFactoryBean extends SingletonFactoryBean
     _exchangeSource = exchangeSource;
   }
 
+  public HistoricalTimeSeriesSource getHistoricalTimeSeriesSource() {
+    return _historicalTimeSeriesSource;
+  }
+
+  public void setHistoricalTimeSeriesSource(final HistoricalTimeSeriesSource historicalTimeSeriesSource) {
+    _historicalTimeSeriesSource = historicalTimeSeriesSource;
+  }
+
+  public HistoricalTimeSeriesResolver getHistoricalTimeSeriesResolver() {
+    return _historicalTimeSeriesResolver;
+  }
+
+  public void setHistoricalTimeSeriesResolver(final HistoricalTimeSeriesResolver historicalTimeSeriesResolver) {
+    _historicalTimeSeriesResolver = historicalTimeSeriesResolver;
+  }
+
   private void configureCompilationContext(final FunctionCompilationContext context) {
-    OpenGammaCompilationContext.setConfigSource(context, _configSource);
-    OpenGammaCompilationContext.setRegionSource(context, _regionSource);
-    OpenGammaCompilationContext.setConventionBundleSource(context, _conventionBundleSource);
-    OpenGammaCompilationContext.setInterpolatedYieldCurveDefinitionSource(context, _interpolatedYieldCurveDefinitionSource);
-    OpenGammaCompilationContext.setInterpolatedYieldCurveSpecificationBuilder(context, _interpolatedYieldCurveSpecificationBuilder);
-    OpenGammaCompilationContext.setVolatilityCubeDefinitionSource(context, _volatilityCubeDefinitionSource);
-    OpenGammaCompilationContext.setCurrencyMatrixSource(context, _currencyMatrixSource);
-    OpenGammaCompilationContext.setHolidaySource(context, _holidaySource);
-    OpenGammaCompilationContext.setExchangeSource(context, _exchangeSource);
+    if (getConfigSource() != null) {
+      OpenGammaCompilationContext.setConfigSource(context, getConfigSource());
+    }
+    if (getRegionSource() != null) {
+      OpenGammaCompilationContext.setRegionSource(context, getRegionSource());
+    }
+    if (getConventionBundleSource() != null) {
+      OpenGammaCompilationContext.setConventionBundleSource(context, getConventionBundleSource());
+    }
+    if (getInterpolatedYieldCurveDefinitionSource() != null) {
+      OpenGammaCompilationContext.setInterpolatedYieldCurveDefinitionSource(context, getInterpolatedYieldCurveDefinitionSource());
+    }
+    if (getInterpolatedYieldCurveSpecificationBuilder() != null) {
+      OpenGammaCompilationContext.setInterpolatedYieldCurveSpecificationBuilder(context, getInterpolatedYieldCurveSpecificationBuilder());
+    }
+    if (getVolatilityCubeDefinitionSource() != null) {
+      OpenGammaCompilationContext.setVolatilityCubeDefinitionSource(context, getVolatilityCubeDefinitionSource());
+    }
+    if (getCurrencyMatrixSource() != null) {
+      OpenGammaCompilationContext.setCurrencyMatrixSource(context, getCurrencyMatrixSource());
+    }
+    if (getHolidaySource() != null) {
+      OpenGammaCompilationContext.setHolidaySource(context, getHolidaySource());
+    }
+    if (getExchangeSource() != null) {
+      OpenGammaCompilationContext.setExchangeSource(context, getExchangeSource());
+    }
+    if (getHistoricalTimeSeriesSource() != null) {
+      OpenGammaCompilationContext.setHistoricalTimeSeriesSource(context, getHistoricalTimeSeriesSource());
+    }
+    if (getHistoricalTimeSeriesResolver() != null) {
+      OpenGammaCompilationContext.setHistoricalTimeSeriesResolver(context, getHistoricalTimeSeriesResolver());
+    }
     context.setSecuritySource(getSecuritySource());
-    context.setPositionSource(getPositionSource());
+    context.setComputationTargetResolver(getComputationTargetResolver());
     context.setPortfolioStructure(new PortfolioStructure(getPositionSource()));
   }
 

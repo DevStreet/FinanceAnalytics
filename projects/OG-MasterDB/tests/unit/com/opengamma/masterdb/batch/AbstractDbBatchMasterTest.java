@@ -10,7 +10,6 @@ import static com.opengamma.util.db.DbDateUtils.toSqlTimestamp;
 import java.sql.Timestamp;
 
 import javax.time.Instant;
-import javax.time.calendar.OffsetDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public abstract class AbstractDbBatchMasterTest extends DbTest {
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractDbBatchMasterTest.class);
 
   public AbstractDbBatchMasterTest(String databaseType, String databaseVersion) {
-    super(databaseType, databaseVersion);
+    super(databaseType, databaseVersion, databaseVersion);
     s_logger.info("running testcases for {}", databaseType);
   }
 

@@ -20,11 +20,15 @@ import org.testng.annotations.Test;
 
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
+import com.opengamma.analytics.financial.instrument.index.generator.GeneratorSwapTestsMaster;
+import com.opengamma.analytics.financial.instrument.index.iborindex.IndexIborTestsMaster;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
 import com.opengamma.analytics.financial.instrument.swaption.SwaptionPhysicalFixedIborDefinition;
 import com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivity;
+import com.opengamma.analytics.financial.interestrate.PV01Calculator;
 import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
 import com.opengamma.analytics.financial.interestrate.PresentValueCurveSensitivityCalculator;
 import com.opengamma.analytics.financial.interestrate.PresentValueCurveSensitivitySABRCalculator;
@@ -37,8 +41,8 @@ import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedDiscountingMethod;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
@@ -107,8 +111,8 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
   private static final YieldCurveBundle CURVES = TestsDataSetsSABR.createCurves1();
   private static final SABRInterestRateParameters SABR_PARAMETER = TestsDataSetsSABR.createSABR1();
   private static final SABRInterestRateDataBundle SABR_BUNDLE = new SABRInterestRateDataBundle(SABR_PARAMETER, CURVES);
-  private static final FixedCouponSwap<Coupon> SWAP_PAYER = SWAP_DEFINITION_PAYER.toDerivative(REFERENCE_DATE, CURVES_NAME);
-  private static final FixedCouponSwap<Coupon> SWAP_RECEIVER = SWAP_DEFINITION_RECEIVER.toDerivative(REFERENCE_DATE, CURVES_NAME);
+  private static final SwapFixedCoupon<Coupon> SWAP_PAYER = SWAP_DEFINITION_PAYER.toDerivative(REFERENCE_DATE, CURVES_NAME);
+  private static final SwapFixedCoupon<Coupon> SWAP_RECEIVER = SWAP_DEFINITION_RECEIVER.toDerivative(REFERENCE_DATE, CURVES_NAME);
   private static final SwaptionPhysicalFixedIbor SWAPTION_LONG_PAYER = SWAPTION_DEFINITION_LONG_PAYER.toDerivative(REFERENCE_DATE, CURVES_NAME);
   private static final SwaptionPhysicalFixedIbor SWAPTION_LONG_RECEIVER = SWAPTION_DEFINITION_LONG_RECEIVER.toDerivative(REFERENCE_DATE, CURVES_NAME);
   private static final SwaptionPhysicalFixedIbor SWAPTION_SHORT_PAYER = SWAPTION_DEFINITION_SHORT_PAYER.toDerivative(REFERENCE_DATE, CURVES_NAME);
@@ -118,11 +122,12 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
   private static final ParRateCalculator PRC = ParRateCalculator.getInstance();
   private static final PresentValueCurveSensitivityCalculator PVSC = PresentValueCurveSensitivityCalculator.getInstance();
   private static final PresentValueCurveSensitivitySABRCalculator PVCSC_SABR = PresentValueCurveSensitivitySABRCalculator.getInstance();
+  private static final PV01Calculator PV01C = new PV01Calculator(PVCSC_SABR);
   private static final PresentValueSABRSensitivitySABRCalculator PVSSC_SABR = PresentValueSABRSensitivitySABRCalculator.getInstance();
   private static final SwaptionPhysicalFixedIborSABRMethod METHOD = SwaptionPhysicalFixedIborSABRMethod.getInstance();
   // Pricing functions
   private static final BlackPriceFunction BLACK_FUNCTION = new BlackPriceFunction();
-  private static final SwapFixedDiscountingMethod METHOD_SWAP = SwapFixedDiscountingMethod.getInstance();
+  private static final SwapFixedCouponDiscountingMethod METHOD_SWAP = SwapFixedCouponDiscountingMethod.getInstance();
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNoSABRHaganSensi() {
@@ -260,7 +265,7 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
       nodeTimesForward[i + 1] = timeForwardArray[i];
       yieldsForward[i + 1] = curveForward.getInterestRate(nodeTimesForward[i + 1]);
     }
-    final YieldAndDiscountCurve tempCurveForward = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimesForward, yieldsForward, new LinearInterpolator1D()));
+    final YieldAndDiscountCurve tempCurveForward = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimesForward, yieldsForward, new LinearInterpolator1D()));
     final List<DoublesPair> tempForward = sensi.getSensitivities().get(FORWARD_CURVE_NAME);
     for (int i = 0; i < nbForwardDate; i++) {
       final YieldAndDiscountCurve bumpedCurveForward = tempCurveForward.withSingleShift(nodeTimesForward[i + 1], deltaShift);
@@ -286,7 +291,7 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
       nodeTimesFunding[i + 1] = SWAPTION_LONG_PAYER.getUnderlyingSwap().getSecondLeg().getNthPayment(i).getPaymentTime();
       yieldsFunding[i + 1] = curveFunding.getInterestRate(nodeTimesFunding[i + 1]);
     }
-    final YieldAndDiscountCurve tempCurveFunding = new YieldCurve(InterpolatedDoublesCurve.fromSorted(nodeTimesFunding, yieldsFunding, new LinearInterpolator1D()));
+    final YieldAndDiscountCurve tempCurveFunding = YieldCurve.from(InterpolatedDoublesCurve.fromSorted(nodeTimesFunding, yieldsFunding, new LinearInterpolator1D()));
     final List<DoublesPair> tempFunding = sensi.getSensitivities().get(FUNDING_CURVE_NAME);
     for (int i = 0; i < nbPayDate; i++) {
       final YieldAndDiscountCurve bumpedCurve = tempCurveFunding.withSingleShift(nodeTimesFunding[i + 1], deltaShift);
@@ -356,7 +361,7 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
 
   @Test(enabled = true)
   /**
-   * Tests the present value SABR parameters sensitivity: Method vs Calculator.
+   * Tests the present value of the Hull-White Monte-Carlo calibrated to SABR swaption.
    */
   public void presentValueSABRHullWhiteMonteCarlo() {
     CurrencyAmount pvSABR = METHOD.presentValue(SWAPTION_LONG_PAYER, SABR_BUNDLE);
@@ -367,11 +372,52 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
 
   @Test(enabled = false)
   /**
+   * Analyzes the smoothness of sensitivities.
+   */
+  public void analysisSensitivities() {
+    IborIndex USDLIBOR3M = IndexIborTestsMaster.getInstance().getIndex("USDLIBOR3M", CALENDAR);
+    Period expiryTenor = Period.ofYears(5);
+    Period underlyingTenor = Period.ofYears(10);
+    ZonedDateTime expiryDate = ScheduleCalculator.getAdjustedDate(REFERENCE_DATE, expiryTenor, USDLIBOR3M);
+    ZonedDateTime settleDate = ScheduleCalculator.getAdjustedDate(expiryDate, USDLIBOR3M.getSpotLag(), CALENDAR);
+    GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapTestsMaster.getInstance().getGenerator("USD6MLIBOR3M", CALENDAR);
+    double notional = 1000000; // 1m
+    double strikeRange = 0.1150;
+    double strikeStart = 0.0050;
+    int nbStrike = 50;
+    double[] strikes = new double[nbStrike + 1];
+    SwaptionPhysicalFixedIbor[] swaptions = new SwaptionPhysicalFixedIbor[nbStrike + 1];
+    double[] pv = new double[nbStrike + 1];
+    double[] pv01Dsc = new double[nbStrike + 1];
+    double[] pv01Fwd = new double[nbStrike + 1];
+    double[] alphaSensi = new double[nbStrike + 1];
+    double[] rhoSensi = new double[nbStrike + 1];
+    double[] nuSensi = new double[nbStrike + 1];
+    for (int loopstrike = 0; loopstrike <= nbStrike; loopstrike++) {
+      strikes[loopstrike] = strikeStart + loopstrike * strikeRange / nbStrike;
+      SwapFixedIborDefinition swapDefinition = SwapFixedIborDefinition.from(settleDate, underlyingTenor, USD6MLIBOR3M, notional, strikes[loopstrike], true);
+      SwaptionPhysicalFixedIborDefinition swaptionDefinition = SwaptionPhysicalFixedIborDefinition.from(expiryDate, swapDefinition, true);
+      swaptions[loopstrike] = swaptionDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+      pv[loopstrike] = METHOD.presentValue(swaptions[loopstrike], SABR_BUNDLE).getAmount();
+      PresentValueSABRSensitivityDataBundle sabrSensi = METHOD.presentValueSABRSensitivity(swaptions[loopstrike], SABR_BUNDLE);
+      Map<String, Double> pv01 = PV01C.visit(swaptions[loopstrike], SABR_BUNDLE);
+      alphaSensi[loopstrike] = sabrSensi.getAlpha().toSingleValue();
+      rhoSensi[loopstrike] = sabrSensi.getRho().toSingleValue();
+      nuSensi[loopstrike] = sabrSensi.getNu().toSingleValue();
+      pv01Dsc[loopstrike] = pv01.get(CURVES_NAME[0]);
+      pv01Fwd[loopstrike] = pv01.get(CURVES_NAME[1]);
+    }
+    @SuppressWarnings("unused")
+    double atm = PRC.visit(swaptions[0].getUnderlyingSwap(), CURVES);
+  }
+
+  @Test(enabled = false)
+  /**
    * Test of performance. In normal testing, "enabled = false".
    */
   public void performance() {
     long startTime, endTime;
-    final int nbTest = 1000;
+    final int nbTest = 10000;
     final double[] pv = new double[nbTest];
     final PresentValueSABRSensitivityDataBundle[] pvss = new PresentValueSABRSensitivityDataBundle[nbTest];
 
@@ -381,7 +427,7 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
     }
     endTime = System.currentTimeMillis();
     System.out.println(nbTest + " physical swaptions SABR (price): " + (endTime - startTime) + " ms");
-    // Performance note: price: 15-Jun-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: xxx ms for 1000 swaptions.
+    // Performance note: price: 12-Jun-12: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 25 ms for 1000 swaptions.
 
     startTime = System.currentTimeMillis();
     for (int looptest = 0; looptest < nbTest; looptest++) {
@@ -391,25 +437,7 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
     }
     endTime = System.currentTimeMillis();
     System.out.println(nbTest + " physical swaptions SABR (price+delta+vega): " + (endTime - startTime) + " ms");
-    // Performance note: price+delta+vega: 15-Jun-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 170 ms for 1000 swaptions.
-
-    startTime = System.currentTimeMillis();
-    for (int looptest = 0; looptest < nbTest; looptest++) {
-      pv[looptest] = PVC.visit(SWAPTION_LONG_PAYER, SABR_BUNDLE) + looptest;
-    }
-    endTime = System.currentTimeMillis();
-    System.out.println(nbTest + " physical swaptions SABR (price): " + (endTime - startTime) + " ms");
-    // Performance note: price: 15-Jun-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: xxx ms for 1000 swaptions.
-
-    startTime = System.currentTimeMillis();
-    for (int looptest = 0; looptest < nbTest; looptest++) {
-      pv[looptest] = PVC.visit(SWAPTION_LONG_PAYER, SABR_BUNDLE) + looptest;
-      PVCSC_SABR.visit(SWAPTION_LONG_PAYER, SABR_BUNDLE);
-      pvss[looptest] = PVSSC_SABR.visit(SWAPTION_LONG_PAYER, SABR_BUNDLE);
-    }
-    endTime = System.currentTimeMillis();
-    System.out.println(nbTest + " physical swaptions SABR (price+delta+vega): " + (endTime - startTime) + " ms");
-    // Performance note: price+delta+vega: 15-Jun-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 170 ms for 1000 swaptions.
+    // Performance note: price+delta+vega: 12-Jun-12: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 110 ms for 1000 swaptions.
 
     final int nbTest2 = 10;
     PresentValueSABRHullWhiteMonteCarloCalculator pvcSABRHWMC = PresentValueSABRHullWhiteMonteCarloCalculator.getInstance();
@@ -420,6 +448,7 @@ public class SwaptionPhysicalFixedIborSABRMethodTest {
     }
     endTime = System.currentTimeMillis();
     System.out.println(nbTest2 + " physical swaptions SABR + Hull-White Monte Carlo: " + (endTime - startTime) + " ms");
+    // Performance note: price+delta+vega: 12-Jun-12: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 375 ms for 100 swaptions.
 
     //    double sum = 0.0;
     //    for (int looptest = 0; looptest < nbTest; looptest++) {

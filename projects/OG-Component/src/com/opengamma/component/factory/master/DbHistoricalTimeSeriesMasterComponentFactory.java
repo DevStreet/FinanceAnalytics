@@ -20,11 +20,11 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
 import com.opengamma.component.ComponentInfo;
 import com.opengamma.component.ComponentRepository;
-import com.opengamma.component.factory.AbstractComponentFactory;
 import com.opengamma.component.factory.ComponentInfoAttributes;
 import com.opengamma.core.change.JmsChangeManager;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.historicaltimeseries.impl.DataHistoricalTimeSeriesMasterResource;
+import com.opengamma.master.historicaltimeseries.impl.RemoteHistoricalTimeSeriesMaster;
 import com.opengamma.masterdb.historicaltimeseries.DbHistoricalTimeSeriesMaster;
 import com.opengamma.util.db.DbConnector;
 import com.opengamma.util.jms.JmsConnector;
@@ -33,7 +33,7 @@ import com.opengamma.util.jms.JmsConnector;
  * Component factory for the database time-series master.
  */
 @BeanDefinition
-public class DbHistoricalTimeSeriesMasterComponentFactory extends AbstractComponentFactory {
+public class DbHistoricalTimeSeriesMasterComponentFactory extends AbstractDbMasterComponentFactory {
 
   /**
    * The classifier that the factory should publish under.
@@ -93,8 +93,11 @@ public class DbHistoricalTimeSeriesMasterComponentFactory extends AbstractCompon
       }
       info.addAttribute(ComponentInfoAttributes.JMS_CHANGE_MANAGER_TOPIC, getJmsChangeManagerTopic());
     }
+    checkSchemaVersion(master.getSchemaVersion(), "hts_db");
     
     // register
+    info.addAttribute(ComponentInfoAttributes.LEVEL, 1);
+    info.addAttribute(ComponentInfoAttributes.REMOTE_CLIENT_JAVA, RemoteHistoricalTimeSeriesMaster.class);
     info.addAttribute(ComponentInfoAttributes.UNIQUE_ID_SCHEME, master.getUniqueIdScheme());
     repo.registerComponent(info, master);
     
@@ -391,7 +394,7 @@ public class DbHistoricalTimeSeriesMasterComponentFactory extends AbstractCompon
   /**
    * The meta-bean for {@code DbHistoricalTimeSeriesMasterComponentFactory}.
    */
-  public static class Meta extends AbstractComponentFactory.Meta {
+  public static class Meta extends AbstractDbMasterComponentFactory.Meta {
     /**
      * The singleton instance of the meta-bean.
      */

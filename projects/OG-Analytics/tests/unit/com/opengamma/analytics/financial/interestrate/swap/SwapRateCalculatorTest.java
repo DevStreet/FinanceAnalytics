@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
 import com.opengamma.analytics.financial.model.interestrate.curve.DiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
@@ -32,7 +32,7 @@ import com.opengamma.util.money.Currency;
 public class SwapRateCalculatorTest {
   private static final double DF_1 = 0.95;
   private static final ParRateCalculator CALCULATOR = ParRateCalculator.getInstance();
-  private static final YieldAndDiscountCurve FUNDING_CURVE = new DiscountCurve(ConstantDoublesCurve.from(DF_1));
+  private static final YieldAndDiscountCurve FUNDING_CURVE = DiscountCurve.from(ConstantDoublesCurve.from(DF_1));
   private static final YieldAndDiscountCurve FORWARD_CURVE;
   private static final String FUNDING_CURVE_NAME = "Bill";
   private static final String FORWARD_CURVE_NAME = "Ben";
@@ -55,7 +55,7 @@ public class SwapRateCalculatorTest {
     for (int i = 0; i < n; i++) {
       forward[i] = Math.pow(DF_1, t1[i]);
     }
-    FORWARD_CURVE = new DiscountCurve(InterpolatedDoublesCurve.from(t1, forward, new LinearInterpolator1D()));
+    FORWARD_CURVE = DiscountCurve.from(InterpolatedDoublesCurve.from(t1, forward, new LinearInterpolator1D()));
     SWAP = new FixedFloatSwap(CUR, t2, t2, INDEX, 0.0, FUNDING_CURVE_NAME, FORWARD_CURVE_NAME, true);
   }
 

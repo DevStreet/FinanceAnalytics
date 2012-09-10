@@ -32,6 +32,7 @@ import com.opengamma.financial.security.bond.BondSecuritySearchRequest;
 import com.opengamma.financial.security.bond.GovernmentBondSecurity;
 import com.opengamma.financial.security.equity.EquitySecurity;
 import com.opengamma.financial.security.equity.GICSCode;
+import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecuritySearchResult;
@@ -51,7 +52,7 @@ public class DbSecurityMasterTest extends DbTest {
 
   @Factory(dataProvider = "databases", dataProviderClass = DbTest.class)
   public DbSecurityMasterTest(String databaseType, String databaseVersion) {
-    super(databaseType, databaseVersion);
+    super(databaseType, databaseVersion, databaseVersion);
     s_logger.info("running testcases for {}", databaseType);
   }
 
@@ -105,6 +106,7 @@ public class DbSecurityMasterTest extends DbTest {
         Currency.GBP, SimpleYieldConvention.US_TREASURY_EQUIVALANT, new Expiry(zdt),
         "couponType", 23.5d, SimpleFrequency.ANNUAL, DayCountFactory.INSTANCE.getDayCount("Act/Act"),
         zdt, zdt, zdt, 129d, 1324d, 12d, 1d, 2d, 3d);
+    sec.addExternalId(ExternalId.of("abc", "def"));
     SecurityDocument addDoc = new SecurityDocument(sec);
     SecurityDocument added = _secMaster.add(addDoc);
     

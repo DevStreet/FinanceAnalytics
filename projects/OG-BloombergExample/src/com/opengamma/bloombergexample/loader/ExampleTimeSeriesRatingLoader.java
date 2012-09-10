@@ -12,16 +12,18 @@ import static com.opengamma.master.historicaltimeseries.impl.HistoricalTimeSerie
 import java.util.ArrayList;
 import java.util.List;
 
+import com.opengamma.component.tool.AbstractTool;
+import com.opengamma.integration.tool.IntegrationToolContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.bbg.BloombergConstants;
-import com.opengamma.bloombergexample.tool.AbstractExampleTool;
 import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigMasterUtils;
 import com.opengamma.master.historicaltimeseries.impl.HistoricalTimeSeriesRating;
 import com.opengamma.master.historicaltimeseries.impl.HistoricalTimeSeriesRatingRule;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * Example code to create a timeseries rating document
@@ -29,7 +31,8 @@ import com.opengamma.master.historicaltimeseries.impl.HistoricalTimeSeriesRating
  * It is designed to run against the HSQLDB example database.  
  * It should be possible to run this class with no extra command line parameters.
  */
-public class ExampleTimeSeriesRatingLoader extends AbstractExampleTool {
+@Scriptable
+public class ExampleTimeSeriesRatingLoader extends AbstractTool<IntegrationToolContext> {
 
   /** Logger. */
   @SuppressWarnings("unused")
@@ -42,7 +45,7 @@ public class ExampleTimeSeriesRatingLoader extends AbstractExampleTool {
    * @param args  the arguments, unused
    */
   public static void main(String[] args) {  // CSIGNORE
-    new ExampleTimeSeriesRatingLoader().initAndRun(args);
+    new ExampleTimeSeriesRatingLoader().initAndRun(args, IntegrationToolContext.class);
     System.exit(0);
   }
 

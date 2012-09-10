@@ -14,7 +14,9 @@ import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
+import com.opengamma.financial.analytics.OpenGammaFunctionExclusions;
 import com.opengamma.financial.property.DefaultPropertyFunction;
+import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -81,6 +83,11 @@ public class ForexLocalVolatilityPDEPriceDefaultPropertiesFunction extends Defau
     _maxMoneyness = maxMoneyness;
     _strikeInterpolatorName = strikeInterpolatorName;
     _timeInterpolatorName = timeInterpolatorName;
+  }
+
+  @Override
+  public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
+    return target.getSecurity() instanceof FXOptionSecurity;
   }
 
   @Override
@@ -161,4 +168,10 @@ public class ForexLocalVolatilityPDEPriceDefaultPropertiesFunction extends Defau
     }
     return null;
   }
+
+  @Override
+  public String getMutualExclusionGroup() {
+    return OpenGammaFunctionExclusions.PDE_DEFAULTS;
+  }
+
 }

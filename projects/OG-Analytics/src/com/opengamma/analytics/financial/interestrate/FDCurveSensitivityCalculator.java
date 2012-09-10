@@ -11,13 +11,10 @@ import java.util.List;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.financial.interestrate.method.PricingMethod;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountAddZeroSpreadCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
-import com.opengamma.analytics.math.curve.AddCurveSpreadFunction;
-import com.opengamma.analytics.math.curve.Curve;
 import com.opengamma.analytics.math.curve.FunctionalDoublesCurve;
-import com.opengamma.analytics.math.curve.SpreadDoublesCurve;
-import com.opengamma.analytics.math.curve.SubtractCurveSpreadFunction;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -65,6 +62,11 @@ public abstract class FDCurveSensitivityCalculator {
     return res;
   }
 
+  //  public static final List<DoublesPair> curveSensitvityFDCalculator(final InstrumentDerivative ird, AbstractInstrumentDerivativeVisitor<YieldCurveBundle, Double> calculator,
+  //      final YieldCurveBundle curves, final String curveName, final Double[] times, final double absTol) {
+  //    return curveSensitvityFDCalculator(ird, calculator, curves, curveName, times, absTol);
+  //  }
+
   /**
    * Gives the sensitivity of the some metric of an IRD to a points on a one of the family of curves by finite difference
      * @param ird The Interest Rate Derivative
@@ -76,8 +78,8 @@ public abstract class FDCurveSensitivityCalculator {
    * @param absTol If the absolute value of a sensitivities is below this value it is ignored 
    * @return Sensitivities at a given points 
    */
-  public static final List<DoublesPair> curveSensitvityFDCalculator(final InstrumentDerivative ird, PricingMethod method, final YieldCurveBundle curves, final String curveName,
-      final double[] times, final double absTol) {
+  public static final List<DoublesPair> curveSensitvityFDCalculator(final InstrumentDerivative ird, PricingMethod method, final YieldCurveBundle curves, final String curveName, final double[] times,
+      final double absTol) {
 
     Validate.notNull(times, "null times");
     Validate.notNull(ird, "null ird");
@@ -136,15 +138,10 @@ public abstract class FDCurveSensitivityCalculator {
       }
     };
 
-    FunctionalDoublesCurve blipCurve = FunctionalDoublesCurve.from(blip);
+    YieldAndDiscountCurve blipCurve = YieldCurve.from(new FunctionalDoublesCurve(blip));
     YieldAndDiscountCurve originalCurve = curves.getCurve(curveName);
-
-    @SuppressWarnings("rawtypes")
-    Curve[] curveSet = new Curve[] {originalCurve.getCurve(), blipCurve};
-    @SuppressWarnings("unchecked")
-    YieldAndDiscountCurve upCurve = new YieldCurve(SpreadDoublesCurve.from(new AddCurveSpreadFunction(), curveSet));
-    @SuppressWarnings("unchecked")
-    YieldAndDiscountCurve downCurve = new YieldCurve(SpreadDoublesCurve.from(new SubtractCurveSpreadFunction(), curveSet));
+    YieldAndDiscountCurve upCurve = new YieldAndDiscountAddZeroSpreadCurve("UpCurve", false, originalCurve, blipCurve);
+    YieldAndDiscountCurve downCurve = new YieldAndDiscountAddZeroSpreadCurve("DownCurve", true, originalCurve, blipCurve);
 
     curves.replaceCurve(curveName, upCurve);
     double up = calculator.visit(ird, curves);
@@ -166,15 +163,10 @@ public abstract class FDCurveSensitivityCalculator {
       }
     };
 
-    FunctionalDoublesCurve blipCurve = FunctionalDoublesCurve.from(blip);
+    YieldAndDiscountCurve blipCurve = YieldCurve.from(new FunctionalDoublesCurve(blip));
     YieldAndDiscountCurve originalCurve = curves.getCurve(curveName);
-
-    @SuppressWarnings("rawtypes")
-    Curve[] curveSet = new Curve[] {originalCurve.getCurve(), blipCurve};
-    @SuppressWarnings("unchecked")
-    YieldAndDiscountCurve upCurve = new YieldCurve(SpreadDoublesCurve.from(new AddCurveSpreadFunction(), curveSet));
-    @SuppressWarnings("unchecked")
-    YieldAndDiscountCurve downCurve = new YieldCurve(SpreadDoublesCurve.from(new SubtractCurveSpreadFunction(), curveSet));
+    YieldAndDiscountCurve upCurve = new YieldAndDiscountAddZeroSpreadCurve("UpCurve", false, originalCurve, blipCurve);
+    YieldAndDiscountCurve downCurve = new YieldAndDiscountAddZeroSpreadCurve("DownCurve", true, originalCurve, blipCurve);
 
     curves.replaceCurve(curveName, upCurve);
     double up = method.presentValue(ird, curves).getAmount();

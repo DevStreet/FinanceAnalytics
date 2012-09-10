@@ -10,6 +10,7 @@ common/deploy.properties
 !/projects/OG-Bloomberg
 !/projects/OG-Component
 !/projects/OG-Core
+!/projects/OG-Client
 !/projects/OG-Engine
 !/projects/OG-Examples
 !/projects/OG-Financial
@@ -30,6 +31,7 @@ bootstrap/
 tests/output/
 javadoc
 lib/
+target/
 .idea/
 .DS_Store
 .*.sw?

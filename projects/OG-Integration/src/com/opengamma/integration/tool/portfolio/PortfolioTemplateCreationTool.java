@@ -5,6 +5,7 @@
  */
 package com.opengamma.integration.tool.portfolio;
 
+import com.opengamma.financial.tool.ToolContext;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
@@ -14,11 +15,13 @@ import com.opengamma.integration.copier.portfolio.rowparser.JodaBeanRowParser;
 import com.opengamma.integration.copier.portfolio.writer.PortfolioWriter;
 import com.opengamma.integration.copier.portfolio.writer.SingleSheetSimplePortfolioWriter;
 import com.opengamma.integration.copier.sheet.SheetFormat;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * The portfolio saver tool
  */
-public class PortfolioTemplateCreationTool extends AbstractTool {
+@Scriptable
+public class PortfolioTemplateCreationTool extends AbstractTool<ToolContext> {
 
   /** File name option flag */
   private static final String FILE_NAME_OPT = "f";
@@ -32,7 +35,7 @@ public class PortfolioTemplateCreationTool extends AbstractTool {
    * @param args  the arguments, not null
    */
   public static void main(String[] args) { //CSIGNORE
-    new PortfolioTemplateCreationTool().initAndRun(args);
+    new PortfolioTemplateCreationTool().initAndRun(args, ToolContext.class);
     System.exit(0);
   }
 

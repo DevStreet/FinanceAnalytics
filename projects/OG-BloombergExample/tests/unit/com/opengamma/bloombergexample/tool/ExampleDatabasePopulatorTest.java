@@ -8,14 +8,13 @@ package com.opengamma.bloombergexample.tool;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 
+import com.opengamma.integration.tool.IntegrationToolContext;
 import org.testng.annotations.Test;
 
 import com.opengamma.bloombergexample.DBTestUtils;
-import com.opengamma.component.tool.ToolContextUtils;
 import com.opengamma.bloombergexample.loader.ExampleEquityPortfolioLoader;
-import com.opengamma.bloombergexample.loader.ExampleMixedPortfolioLoader;
 import com.opengamma.bloombergexample.loader.ExampleMultiCurrencySwapPortfolioLoader;
-import com.opengamma.bloombergexample.loader.ExampleSwapPortfolioLoader;
+import com.opengamma.component.tool.ToolContextUtils;
 import com.opengamma.financial.tool.ToolContext;
 import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
@@ -27,7 +26,7 @@ import com.opengamma.master.portfolio.PortfolioSearchResult;
 public class ExampleDatabasePopulatorTest {
 
   private static final String CONFIG_RESOURCE_LOCATION = "classpath:toolcontext/toolcontext-bloombergexample.properties";
-  
+
 //  @BeforeMethod
 //  public void setUp() throws IOException {
 //    DBTestUtils.createHsqlDB(CONFIG_RESOURCE_LOCATION);
@@ -43,13 +42,11 @@ public class ExampleDatabasePopulatorTest {
     for (int i = 0; i < 2; i++) {
       DBTestUtils.createHsqlDB(CONFIG_RESOURCE_LOCATION);
       
-      new ExampleDatabasePopulator().run(AbstractExampleTool.TOOLCONTEXT_EXAMPLE_PROPERTIES);
+      new ExampleDatabasePopulator().run(CONFIG_RESOURCE_LOCATION, IntegrationToolContext.class);
       
-      ToolContext toolContext = getToolContext();
+      IntegrationToolContext toolContext = getToolContext();
       try {
-        assertMixedPortfolio(toolContext);
         assertEquityPortfolio(toolContext);
-        assertSwapPortfolio(toolContext);
         assertMultiCurrencySwapPortfolio(toolContext);
         
       } finally {
@@ -61,24 +58,14 @@ public class ExampleDatabasePopulatorTest {
     }
   }
 
-  private void assertMultiCurrencySwapPortfolio(ToolContext toolContext) {
+  private void assertMultiCurrencySwapPortfolio(IntegrationToolContext toolContext) {
     PortfolioMaster portfolioMaster = toolContext.getPortfolioMaster();
     assertPortfolio(portfolioMaster, ExampleMultiCurrencySwapPortfolioLoader.PORTFOLIO_NAME);
   }
 
-  private void assertSwapPortfolio(ToolContext toolContext) {
-    PortfolioMaster portfolioMaster = toolContext.getPortfolioMaster();
-    assertPortfolio(portfolioMaster, ExampleSwapPortfolioLoader.PORTFOLIO_NAME);
-  }
-
-  private void assertEquityPortfolio(ToolContext toolContext) {
+  private void assertEquityPortfolio(IntegrationToolContext toolContext) {
     PortfolioMaster portfolioMaster = toolContext.getPortfolioMaster();
     assertPortfolio(portfolioMaster, ExampleEquityPortfolioLoader.PORTFOLIO_NAME);
-  }
-
-  private void assertMixedPortfolio(ToolContext toolContext) {
-    PortfolioMaster portfolioMaster = toolContext.getPortfolioMaster();
-    assertPortfolio(portfolioMaster, ExampleMixedPortfolioLoader.PORTFOLIO_NAME);
   }
 
   private void assertPortfolio(PortfolioMaster portfolioMaster, String portfolioName) {
@@ -89,7 +76,7 @@ public class ExampleDatabasePopulatorTest {
     assertEquals(1, portfolioSearchResult.getDocuments().size());
   }
 
-  private ToolContext getToolContext() {
-    return ToolContextUtils.getToolContext(CONFIG_RESOURCE_LOCATION);
+  private IntegrationToolContext getToolContext() {
+    return (IntegrationToolContext) ToolContextUtils.getToolContext(CONFIG_RESOURCE_LOCATION, IntegrationToolContext.class);
   }
 }

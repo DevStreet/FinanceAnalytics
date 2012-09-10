@@ -5,7 +5,6 @@
  */
 package com.opengamma.engine.depgraph;
 
-import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext;
 
 /**
  * Interface to request the next resolution be "pumped" into the chain of those requesting
@@ -41,8 +40,9 @@ import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext
     }
 
     @Override
-    public void run(final GraphBuildingContext context) {
+    public boolean tryRun(final GraphBuildingContext context) {
       _instance.pump(context);
+      return true;
     }
 
   }
@@ -59,8 +59,9 @@ import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext
     }
 
     @Override
-    public void run(final GraphBuildingContext context) {
+    public boolean tryRun(final GraphBuildingContext context) {
       _instance.close(context);
+      return true;
     }
 
   }

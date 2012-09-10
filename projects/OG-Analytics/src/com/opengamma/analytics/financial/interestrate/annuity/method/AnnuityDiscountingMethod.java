@@ -8,7 +8,7 @@ package com.opengamma.analytics.financial.interestrate.annuity.method;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.method.CouponFixedDiscountingMethod;
 import com.opengamma.util.money.CurrencyAmount;
@@ -54,6 +54,22 @@ public final class AnnuityDiscountingMethod {
     CurrencyAmount pv = CurrencyAmount.of(annuity.getCurrency(), 0);
     for (final CouponFixed cpn : annuity.getPayments()) {
       pv = pv.plus(METHOD_CPN_FIXED.presentValue(cpn, curves));
+    }
+    return pv;
+  }
+
+  /**
+   * Computes the present value of an annuity of fixed coupons with positive notional (abs(notional) is used for each coupon).
+   * @param annuity The annuity.
+   * @param curves The curve bundle.
+   * @return The present value.
+   */
+  public CurrencyAmount presentValuePositiveNotional(final AnnuityCouponFixed annuity, final YieldCurveBundle curves) {
+    Validate.notNull(curves);
+    Validate.notNull(annuity);
+    CurrencyAmount pv = CurrencyAmount.of(annuity.getCurrency(), 0);
+    for (final CouponFixed cpn : annuity.getPayments()) {
+      pv = pv.plus(METHOD_CPN_FIXED.presentValuePositiveNotional(cpn, curves));
     }
     return pv;
   }

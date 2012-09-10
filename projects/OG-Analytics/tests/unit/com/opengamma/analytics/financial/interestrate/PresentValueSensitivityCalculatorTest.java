@@ -7,7 +7,6 @@ package com.opengamma.analytics.financial.interestrate;
 
 import static com.opengamma.analytics.financial.interestrate.FDCurveSensitivityCalculator.curveSensitvityFDCalculator;
 import static com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivityUtils.clean;
-import static com.opengamma.analytics.financial.interestrate.SimpleInstrumentFactory.makeOISSwap;
 import static com.opengamma.analytics.financial.interestrate.TestUtils.assertSensitivityEquals;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
@@ -24,12 +23,12 @@ import javax.time.calendar.ZonedDateTime;
 import org.testng.annotations.Test;
 
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwap;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
 import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
@@ -39,10 +38,9 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.OISSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
@@ -74,10 +72,10 @@ public class PresentValueSensitivityCalculatorTest {
   private static final String[] CURVES_NAME = {FUNDING_CURVE_NAME, FORWARD_CURVE_NAME};
 
   static {
-    YieldAndDiscountCurve curve = new YieldCurve(ConstantDoublesCurve.from(0.05));
+    YieldAndDiscountCurve curve = YieldCurve.from(ConstantDoublesCurve.from(0.05));
     CURVES = new YieldCurveBundle();
     CURVES.setCurve(FIVE_PC_CURVE_NAME, curve);
-    curve = new YieldCurve(ConstantDoublesCurve.from(0.0));
+    curve = YieldCurve.from(ConstantDoublesCurve.from(0.0));
     CURVES.setCurve(ZERO_PC_CURVE_NAME, curve);
   }
 
@@ -213,8 +211,8 @@ public class PresentValueSensitivityCalculatorTest {
     final AnnuityCouponIborDefinition iborAnnuityDefinition = AnnuityCouponIborDefinition.from(settleDate, Period.ofYears(5), notional, INDEX, !isPayer);
 
     final YieldCurveBundle curves = TestsDataSetsSABR.createCurves1();
-    final GenericAnnuity<? extends Payment> iborAnnuity1Curve = iborAnnuityDefinition.toDerivative(REFERENCE_DATE, FUNDING_CURVE_NAME, FUNDING_CURVE_NAME);
-    final GenericAnnuity<? extends Payment> iborAnnuity = iborAnnuityDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+    final Annuity<? extends Payment> iborAnnuity1Curve = iborAnnuityDefinition.toDerivative(REFERENCE_DATE, FUNDING_CURVE_NAME, FUNDING_CURVE_NAME);
+    final Annuity<? extends Payment> iborAnnuity = iborAnnuityDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
 
     //produce a array of strictly ascending times
     final Set<Double> times = new TreeSet<Double>();
@@ -314,7 +312,7 @@ public class PresentValueSensitivityCalculatorTest {
       payments[i] = new PaymentFixed(CUR, times[i], amounts[i], curveNames[i]);
     }
 
-    final GenericAnnuity<Payment> annuity = new GenericAnnuity<Payment>(payments);
+    final Annuity<Payment> annuity = new Annuity<Payment>(payments);
     final Map<String, List<DoublesPair>> sense = PVSC.visit(annuity, CURVES);
     final List<DoublesPair> sense0FD = curveSensitvityFDCalculator(annuity, PVC, CURVES, ZERO_PC_CURVE_NAME, times, eps);
     final List<DoublesPair> sense5FD = curveSensitvityFDCalculator(annuity, PVC, CURVES, FIVE_PC_CURVE_NAME, times, eps);
@@ -454,18 +452,18 @@ public class PresentValueSensitivityCalculatorTest {
   private static final Period INDEX_TENOR = Period.ofMonths(3);
   private static final DayCount DAY_COUNT = DayCountFactory.INSTANCE.getDayCount("Actual/360");
   private static final IborIndex IBOR_INDEX = new IborIndex(CUR, INDEX_TENOR, SETTLEMENT_DAYS, CALENDAR, DAY_COUNT, BUSINESS_DAY, IS_EOM);
-  private static final GeneratorSwap SWAP_GENERATOR = new GeneratorSwap(FIXED_PAYMENT_PERIOD, FIXED_DAY_COUNT, IBOR_INDEX);
+  private static final GeneratorSwapFixedIbor SWAP_GENERATOR = new GeneratorSwapFixedIbor("Swap Generator", FIXED_PAYMENT_PERIOD, FIXED_DAY_COUNT, IBOR_INDEX);
   private static final IndexSwap CMS_INDEX = new IndexSwap(SWAP_GENERATOR, ANNUITY_TENOR);
   private static final SwapFixedIborDefinition SWAP_DEFINITION_PAYER = SwapFixedIborDefinition.from(SETTLEMENT_DATE, CMS_INDEX, NOTIONAL, RATE, FIXED_IS_PAYER);
-  private static final FixedCouponSwap<Coupon> SWAP_PAYER = SWAP_DEFINITION_PAYER.toDerivative(REFERENCE_DATE, CURVES_NAME);
+  private static final SwapFixedCoupon<Coupon> SWAP_PAYER = SWAP_DEFINITION_PAYER.toDerivative(REFERENCE_DATE, CURVES_NAME);
 
   @Test
   public void testFixedCouponSwap() {
     final double eps = 1e-9;
     final YieldCurveBundle curves = TestsDataSetsSABR.createCurves1();
 
-    final GenericAnnuity<CouponFixed> fixedLeg = SWAP_PAYER.getFirstLeg();
-    final GenericAnnuity<Coupon> floatLeg = SWAP_PAYER.getSecondLeg();
+    final Annuity<CouponFixed> fixedLeg = SWAP_PAYER.getFirstLeg();
+    final Annuity<Coupon> floatLeg = SWAP_PAYER.getSecondLeg();
 
     //produce a array of strictly ascending times
     final Set<Double> times = new TreeSet<Double>();
@@ -491,42 +489,6 @@ public class PresentValueSensitivityCalculatorTest {
 
     assertSensitivityEquals(fdFundSense, sense.get(FUNDING_CURVE_NAME), eps * NOTIONAL);
     assertSensitivityEquals(fdFwdSense, sense.get(FORWARD_CURVE_NAME), eps * NOTIONAL);
-  }
-
-  @Test
-  final void testOISSwap() {
-    final double eps = 1e-9;
-    final double notional = 1e8;
-    final double relTol = eps;
-    final double absTol = notional * eps;
-    final double maturity = 10.0;
-    final double rate = Math.exp(0.05) - 1;
-
-    final double[] nodeTimes = new double[10];
-    for (int i = 0; i < 10; i++) {
-      nodeTimes[i] = 1.0 * (i + 1);
-    }
-
-    OISSwap swap = makeOISSwap(maturity, FIVE_PC_CURVE_NAME, FIVE_PC_CURVE_NAME, rate, notional);
-    Map<String, List<DoublesPair>> sense = PVSC.visit(swap, CURVES);
-
-    //1. single curve sense
-    List<DoublesPair> senseAnal = clean(sense.get(FIVE_PC_CURVE_NAME), relTol, absTol);
-    List<DoublesPair> senseFD = curveSensitvityFDCalculator(swap, PVC, CURVES, FIVE_PC_CURVE_NAME, nodeTimes, absTol);
-    assertSensitivityEquals(senseFD, senseAnal, absTol);
-
-    swap = makeOISSwap(maturity, ZERO_PC_CURVE_NAME, FIVE_PC_CURVE_NAME, rate, notional);
-    sense = PVSC.visit(swap, CURVES);
-
-    //    //2. index curve sense
-    senseAnal = clean(sense.get(FIVE_PC_CURVE_NAME), relTol, absTol);
-    senseFD = curveSensitvityFDCalculator(swap, PVC, CURVES, FIVE_PC_CURVE_NAME, nodeTimes, absTol);
-    assertSensitivityEquals(senseFD, senseAnal, absTol);
-
-    //    //2. funding curve sense
-    senseAnal = clean(sense.get(ZERO_PC_CURVE_NAME), relTol, absTol);
-    senseFD = curveSensitvityFDCalculator(swap, PVC, CURVES, ZERO_PC_CURVE_NAME, nodeTimes, absTol);
-    assertSensitivityEquals(senseFD, senseAnal, absTol);
   }
 
 }

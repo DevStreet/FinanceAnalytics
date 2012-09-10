@@ -1,4 +1,11 @@
+/*
+ * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
+ *
+ * Please see distribution for license.
+ */
+
 /**
+ * <em>THIS IS OUT OF DATE. SEE {@link com.opengamma.web.server.push.rest}</em>
  * <p>This package provides push notifications when changes occur to resources requested through the REST interface.
  * This includes analytics data, entities and queries for entities.</p>
  *
@@ -95,8 +102,6 @@
  *      "lastTimestamps": [timestamp1, timestamp2, ...],
  *      "dependencyGraphCells": [[row, col], [row, col], ...],
  *      "fullConversionModeCells": [[row, col], [row, col], ...]}</pre>
- * <p><em>Dependency graphs for primitives aren't supported in the UI at the moment but they probably will be eventually
- * so the viewport definition allows them.</em></p>
  * <ul>
  *   <li>{@code viewDefinitionName}: name of the view definition (see below)</li>
  *   <li>{@code marketDataType}: {@code "live"} or {@code "snapshot"}</li>

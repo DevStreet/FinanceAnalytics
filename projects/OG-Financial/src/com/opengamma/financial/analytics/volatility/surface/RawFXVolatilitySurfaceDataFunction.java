@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.analytics.volatility.surface;
@@ -12,7 +12,6 @@ import javax.time.calendar.ZonedDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.function.CompiledFunctionDefinition;
@@ -22,7 +21,7 @@ import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.util.money.UnorderedCurrencyPair;
 
 /**
- * 
+ *
  */
 public class RawFXVolatilitySurfaceDataFunction extends RawVolatilitySurfaceDataFunction {
   private static final Logger s_logger = LoggerFactory.getLogger(RawFXVolatilitySurfaceDataFunction.class);
@@ -33,6 +32,10 @@ public class RawFXVolatilitySurfaceDataFunction extends RawVolatilitySurfaceData
 
   @Override
   public boolean isCorrectIdType(final ComputationTarget target) {
+    if (target.getUniqueId() == null) {
+      s_logger.error("Target unique id was null {}", target);
+      return false;
+    }
     return UnorderedCurrencyPair.OBJECT_SCHEME.equals(target.getUniqueId().getScheme());
   }
 
@@ -45,6 +48,9 @@ public class RawFXVolatilitySurfaceDataFunction extends RawVolatilitySurfaceData
     return new FXVolatilitySurfaceCompiledFunction(atInstant.withTime(0, 0), atInstant.plusDays(1).withTime(0, 0).minusNanos(1000000), atInstant, definitionSource, specificationSource);
   }
 
+  /**
+   * Implementation of the compiled function
+   */
   protected class FXVolatilitySurfaceCompiledFunction extends CompiledFunction {
 
     public FXVolatilitySurfaceCompiledFunction(final ZonedDateTime from, final ZonedDateTime to, final ZonedDateTime now,
@@ -53,7 +59,6 @@ public class RawFXVolatilitySurfaceDataFunction extends RawVolatilitySurfaceData
     }
 
     @Override
-    @SuppressWarnings({"unchecked" })
     protected VolatilitySurfaceDefinition<Object, Object> getSurfaceDefinition(final ComputationTarget target, final String definitionName, final String instrumentType) {
       final UnorderedCurrencyPair pair = UnorderedCurrencyPair.of(target.getUniqueId());
       String name = pair.getFirstCurrency().getCode() + pair.getSecondCurrency().getCode();
@@ -64,7 +69,8 @@ public class RawFXVolatilitySurfaceDataFunction extends RawVolatilitySurfaceData
         fullDefinitionName = definitionName + "_" + name;
         definition = (VolatilitySurfaceDefinition<Object, Object>) getDefinitionSource().getDefinition(fullDefinitionName, instrumentType);
         if (definition == null) {
-          throw new OpenGammaRuntimeException("Could not get volatility surface definition named " + fullDefinitionName + " for instrument type " + instrumentType);
+          s_logger.error("Could not get volatility surface definition named " + fullDefinitionName + " for instrument type " + instrumentType);
+          return null;
         }
       }
       return definition;
@@ -81,7 +87,8 @@ public class RawFXVolatilitySurfaceDataFunction extends RawVolatilitySurfaceData
         fullSpecificationName = specificationName + "_" + name;
         specification = getSpecificationSource().getSpecification(fullSpecificationName, instrumentType);
         if (specification == null) {
-          throw new OpenGammaRuntimeException("Could not get volatility surface specification named " + fullSpecificationName);
+          s_logger.error("Could not get volatility surface specification named " + fullSpecificationName);
+          return null;
         }
       }
       return specification;

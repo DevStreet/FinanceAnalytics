@@ -18,6 +18,7 @@ import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
 import com.opengamma.analytics.financial.interestrate.method.PricingMethod;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -102,6 +103,47 @@ public final class CashDiscountingMethod implements PricingMethod {
     final double endTime = deposit.getEndTime();
     final double af = deposit.getAccrualFactor();
     return (dsc.getDiscountFactor(startTime) / dsc.getDiscountFactor(endTime) - 1) / af;
+  }
+
+  /**
+   * Computes the spread to be added to the deposit rate to have a zero present value.
+   * When deposit has already start the number may not be meaning full as only the final payment remains (no initial payment).
+   * @param deposit The deposit.
+   * @param curves The curves.
+   * @return The spread.
+   */
+  public double parSpread(final Cash deposit, final YieldCurveBundle curves) {
+    ArgumentChecker.notNull(deposit, "Deposit");
+    ArgumentChecker.notNull(curves, "Curves");
+    ArgumentChecker.isTrue(deposit.getNotional() != 0.0, "Notional is 0");
+    double dfStart = curves.getCurve(deposit.getYieldCurveName()).getDiscountFactor(deposit.getStartTime());
+    double dfEnd = curves.getCurve(deposit.getYieldCurveName()).getDiscountFactor(deposit.getEndTime());
+    return (deposit.getInitialAmount() * dfStart - (deposit.getNotional() + deposit.getInterestAmount()) * dfEnd) / (deposit.getNotional() * deposit.getAccrualFactor() * dfEnd);
+  }
+
+  /**
+   * Computes the par spread curve sensitivity.
+   * When deposit has already start the number may not be meaning full as only the final payment remains (no initial payment).
+   * @param deposit The deposit.
+   * @param curves The curves.
+   * @return The spread curve sensitivity.
+   */
+  public InterestRateCurveSensitivity parSpreadCurveSensitivity(final Cash deposit, final YieldCurveBundle curves) {
+    ArgumentChecker.notNull(deposit, "Deposit");
+    ArgumentChecker.notNull(curves, "Curves");
+    ArgumentChecker.isTrue(deposit.getNotional() != 0.0, "Notional is 0");
+    double dfStart = curves.getCurve(deposit.getYieldCurveName()).getDiscountFactor(deposit.getStartTime());
+    double dfEnd = curves.getCurve(deposit.getYieldCurveName()).getDiscountFactor(deposit.getEndTime());
+    // Backward sweep
+    double parSpreadBar = 1.0;
+    double dfEndBar = -(deposit.getInitialAmount() * dfStart / (dfEnd * dfEnd)) / (deposit.getNotional() * deposit.getAccrualFactor()) * parSpreadBar;
+    double dfStartBar = (deposit.getInitialAmount() / dfEnd) / (deposit.getNotional() * deposit.getAccrualFactor()) * parSpreadBar;
+    final Map<String, List<DoublesPair>> resultMapDsc = new HashMap<String, List<DoublesPair>>();
+    final List<DoublesPair> listDiscounting = new ArrayList<DoublesPair>();
+    listDiscounting.add(new DoublesPair(deposit.getStartTime(), -deposit.getStartTime() * dfStart * dfStartBar));
+    listDiscounting.add(new DoublesPair(deposit.getEndTime(), -deposit.getEndTime() * dfEnd * dfEndBar));
+    resultMapDsc.put(deposit.getYieldCurveName(), listDiscounting);
+    return new InterestRateCurveSensitivity(resultMapDsc);
   }
 
 }

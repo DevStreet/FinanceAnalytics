@@ -5,6 +5,7 @@
  */
 package com.opengamma.integration.tool.marketdata;
 
+import com.opengamma.component.tool.AbstractTool;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
@@ -17,13 +18,14 @@ import com.opengamma.integration.copier.portfolio.reader.PortfolioReader;
 import com.opengamma.integration.copier.portfolio.writer.PrettyPrintingPortfolioWriter;
 
 import com.opengamma.integration.copier.portfolio.writer.PortfolioWriter;
-import com.opengamma.integration.tool.AbstractIntegrationTool;
 import com.opengamma.integration.tool.IntegrationToolContext;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * The portfolio loader tool
  */
-public class PortfolioHtsResolverTool extends AbstractIntegrationTool {
+@Scriptable
+public class PortfolioHtsResolverTool extends AbstractTool<IntegrationToolContext> {
 
   /** Portfolio name option flag*/
   private static final String PORTFOLIO_NAME_OPT = "n";
@@ -43,7 +45,7 @@ public class PortfolioHtsResolverTool extends AbstractIntegrationTool {
    * @param args  the arguments, not null
    */
   public static void main(String[] args) { //CSIGNORE
-    new PortfolioHtsResolverTool().initAndRun(args);
+    new PortfolioHtsResolverTool().initAndRun(args, IntegrationToolContext.class);
     System.exit(0);
   }
 

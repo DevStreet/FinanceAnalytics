@@ -50,6 +50,7 @@ public abstract class SmileInterpolator<T extends SmileModelData> implements Gen
    * The logger
    */
   protected static final Logger s_logger = LoggerFactory.getLogger(SmileInterpolator.class);
+
   private final VolatilityFunctionProvider<T> _model;
   private final WeightingFunction _weightingFunction;
 
@@ -94,7 +95,7 @@ public abstract class SmileInterpolator<T extends SmileModelData> implements Gen
           chiSqr = gBest.getChiSq();
         }
         count++;
-      } catch (final MathException e) {
+      } catch (final Exception e) {
       }
       tries++;
       if (tries > 20) {
@@ -106,7 +107,7 @@ public abstract class SmileInterpolator<T extends SmileModelData> implements Gen
     }
     if (n == 3) {
       if (gBest.getChiSq() / n > 1.0) {
-        s_logger.warn("chi^2 on fit to ", +n + " points is " + gBest.getChiSq());
+        s_logger.debug("chi^2 on fit to ", +n + " points is " + gBest.getChiSq());
       }
       modelParameters.add(toSmileModelData(gBest.getModelParameters()));
     } else {
@@ -132,7 +133,7 @@ public abstract class SmileInterpolator<T extends SmileModelData> implements Gen
         }
 
         if (best.getChiSq() > 3.0) {
-          s_logger.warn("chi^2 on 3-point fit #" + i + " is " + best.getChiSq());
+          s_logger.debug("chi^2 on 3-point fit #" + i + " is " + best.getChiSq());
         }
         modelParameters.add(toSmileModelData(best.getModelParameters()));
       }
@@ -218,6 +219,7 @@ public abstract class SmileInterpolator<T extends SmileModelData> implements Gen
     final int n = strikes.length;
 
     return new Function1D<Double, Double>() {
+      @SuppressWarnings("synthetic-access")
       @Override
       public Double evaluate(final Double strike) {
         final EuropeanVanillaOption option = new EuropeanVanillaOption(strike, expiry, true);

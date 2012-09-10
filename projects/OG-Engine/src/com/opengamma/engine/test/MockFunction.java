@@ -155,14 +155,6 @@ public class MockFunction extends AbstractFunction.NonCompiledInvoker {
     return _resultSpecs.iterator().next();
   }
 
-  public Set<ValueRequirement> getResultRequirements() {
-    Set<ValueRequirement> returnValue = new HashSet<ValueRequirement>();
-    for (ValueSpecification spec : getResultSpecs()) {
-      returnValue.add(spec.toRequirementSpecification());
-    }
-    return returnValue;
-  }
-
   public Set<ComputedValue> getResults() {
     return _results;
   }
@@ -176,7 +168,7 @@ public class MockFunction extends AbstractFunction.NonCompiledInvoker {
 
   @Override
   public String getShortName() {
-    return "Fn for " + _target;
+    return getUniqueId() + " for " + _target;
   }
 
   @Override

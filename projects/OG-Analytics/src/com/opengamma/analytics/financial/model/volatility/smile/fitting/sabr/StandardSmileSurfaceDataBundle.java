@@ -7,6 +7,7 @@ package com.opengamma.analytics.financial.model.volatility.smile.fitting.sabr;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
@@ -24,10 +25,11 @@ public class StandardSmileSurfaceDataBundle extends SmileSurfaceDataBundle {
   private final double[][] _impliedVols;
   private final ForwardCurve _forwardCurve;
   private final int _nExpiries;
-  private final boolean _isCallData;
 
-  public StandardSmileSurfaceDataBundle(final double[] forwards, final double[] expiries, final double[][] strikes, final double[][] impliedVols,
-      final boolean isCallData, final Interpolator1D forwardCurveInterpolator) {
+  // private final boolean _isCallData;
+
+  public StandardSmileSurfaceDataBundle(final double spot, final double[] forwards, final double[] expiries, final double[][] strikes, final double[][] impliedVols,
+      final Interpolator1D forwardCurveInterpolator) {
     ArgumentChecker.notNull(forwards, "forwards");
     ArgumentChecker.notNull(expiries, "expiries");
     ArgumentChecker.notNull(strikes, "strikes");
@@ -41,16 +43,19 @@ public class StandardSmileSurfaceDataBundle extends SmileSurfaceDataBundle {
       ArgumentChecker.isTrue(strikes[i].length == impliedVols[i].length,
           "implied volatilities for expiry {} not the same length as strikes; have {}, need {}", strikes[i].length, impliedVols[i].length);
     }
-    checkVolatilities(expiries, impliedVols);
+    // checkVolatilities(expiries, strikes, impliedVols); // Put this check in place, if desired, after construction.
     _expiries = expiries;
     _forwards = forwards;
-    _forwardCurve = new ForwardCurve(InterpolatedDoublesCurve.from(_expiries, _forwards, forwardCurveInterpolator));
+
+    double[] t = ArrayUtils.add(expiries, 0, 0.0);
+    double[] f = ArrayUtils.add(forwards, 0, spot);
+    _forwardCurve = new ForwardCurve(InterpolatedDoublesCurve.from(t, f, forwardCurveInterpolator));
     _strikes = strikes;
     _impliedVols = impliedVols;
-    _isCallData = isCallData;
+    //   _isCallData = isCallData;
   }
 
-  public StandardSmileSurfaceDataBundle(final ForwardCurve forwardCurve, final double[] expiries, final double[][] strikes, final double[][] impliedVols, final boolean isCallData) {
+  public StandardSmileSurfaceDataBundle(final ForwardCurve forwardCurve, final double[] expiries, final double[][] strikes, final double[][] impliedVols) {
     ArgumentChecker.notNull(forwardCurve, "forward curve");
     ArgumentChecker.notNull(expiries, "expiries");
     ArgumentChecker.notNull(strikes, "strikes");
@@ -64,12 +69,12 @@ public class StandardSmileSurfaceDataBundle extends SmileSurfaceDataBundle {
           "implied volatilities for expiry {} not the same length as strikes; have {}, need {}", strikes[i].length, impliedVols[i].length);
       _forwards[i] = forwardCurve.getForward(expiries[i]);
     }
-    checkVolatilities(expiries, impliedVols);
+    // checkVolatilities(expiries, strikes, impliedVols); // Put this check in place, if desired, after construction.
     _expiries = expiries;
     _strikes = strikes;
     _impliedVols = impliedVols;
     _forwardCurve = forwardCurve;
-    _isCallData = isCallData;
+    //  _isCallData = isCallData;
   }
 
   @Override
@@ -107,14 +112,14 @@ public class StandardSmileSurfaceDataBundle extends SmileSurfaceDataBundle {
     ArgumentChecker.isTrue(ArgumentChecker.isInRangeExcludingHigh(0, _nExpiries, expiryIndex), "Invalid index for expiry; {}", expiryIndex);
     final double[][] strikes = getStrikes();
     ArgumentChecker.isTrue(ArgumentChecker.isInRangeExcludingHigh(0, strikes[expiryIndex].length, strikeIndex), "Invalid index for strike; {}", strikeIndex);
-    final int nStrikes = strikes[expiryIndex].length;
     final double[][] vols = new double[_nExpiries][];
     for (int i = 0; i < _nExpiries; i++) {
+      int nStrikes = strikes[i].length;
       vols[i] = new double[nStrikes];
       System.arraycopy(_impliedVols[i], 0, vols[i], 0, nStrikes);
     }
     vols[expiryIndex][strikeIndex] += amount;
-    return new StandardSmileSurfaceDataBundle(getForwardCurve(), getExpiries(), getStrikes(), vols, _isCallData);
+    return new StandardSmileSurfaceDataBundle(getForwardCurve(), getExpiries(), getStrikes(), vols);
   }
 
   @Override

@@ -7,9 +7,11 @@ package com.opengamma.analytics.financial.interestrate;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIbor;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.forex.derivative.ForexSwap;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIbor;
+import com.opengamma.analytics.financial.interestrate.bond.definition.BillTransaction;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondFixedSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondFixedTransaction;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondIborSecurity;
@@ -27,10 +29,10 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponOIS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.TenorSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.TenorSwap;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 
 /**
@@ -84,7 +86,7 @@ public final class LastTimeCalculator extends AbstractInstrumentDerivativeVisito
   }
 
   @Override
-  public Double visitFixedCouponSwap(final FixedCouponSwap<?> swap) {
+  public Double visitFixedCouponSwap(final SwapFixedCoupon<?> swap) {
     return visitSwap(swap);
   }
 
@@ -94,7 +96,7 @@ public final class LastTimeCalculator extends AbstractInstrumentDerivativeVisito
   }
 
   @Override
-  public Double visitInterestRateFutureSecurity(final InterestRateFuture future) {
+  public Double visitInterestRateFuture(final InterestRateFuture future) {
     return future.getFixingPeriodEndTime();
   }
 
@@ -114,7 +116,7 @@ public final class LastTimeCalculator extends AbstractInstrumentDerivativeVisito
   }
 
   @Override
-  public Double visitGenericAnnuity(final GenericAnnuity<? extends Payment> annuity) {
+  public Double visitGenericAnnuity(final Annuity<? extends Payment> annuity) {
     return visit(annuity.getNthPayment(annuity.getNumberOfPayments() - 1));
   }
 
@@ -163,6 +165,13 @@ public final class LastTimeCalculator extends AbstractInstrumentDerivativeVisito
   }
 
   @Override
+  public Double visitDepositZero(final DepositZero deposit) {
+    return deposit.getEndTime();
+  }
+
+  // -----     Bond     -----
+
+  @Override
   public Double visitBondFixedSecurity(final BondFixedSecurity bond) {
     return Math.max(visit(bond.getCoupon()), visit(bond.getNominal()));
   }
@@ -182,8 +191,18 @@ public final class LastTimeCalculator extends AbstractInstrumentDerivativeVisito
     return visit(bond.getBondStandard());
   }
 
+  // -----     Bond     -----
+
   @Override
-  public Double visitDepositZero(final DepositZero deposit) {
-    return deposit.getEndTime();
+  public Double visitBillTransaction(final BillTransaction bill) {
+    return bill.getBillStandard().getEndTime();
   }
+
+  // -----     Forex     -----
+
+  @Override
+  public Double visitForexSwap(final ForexSwap fx) {
+    return fx.getFarLeg().getPaymentTime();
+  }
+
 }

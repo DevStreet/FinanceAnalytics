@@ -17,7 +17,6 @@ import com.google.common.base.Objects;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.CompareUtils;
 import com.opengamma.util.PublicAPI;
-import com.opengamma.util.time.DateUtils;
 
 /**
  * An immutable version-correction combination.
@@ -261,7 +260,7 @@ public final class VersionCorrection implements Comparable<VersionCorrection>, S
   public VersionCorrection withLatestFixed(Instant now) {
     ArgumentChecker.notNull(now, "Now must not be null");
     if (containsLatest()) {
-      return new VersionCorrection(Objects.firstNonNull(_versionAsOf, now), Objects.firstNonNull(_correctedTo, now));
+      return new VersionCorrection((_versionAsOf != null) ? _versionAsOf : now, (_correctedTo != null) ? _correctedTo : now);
     }
     return this;
   }

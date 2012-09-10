@@ -68,9 +68,13 @@
           <@rowout label="Announcement date">${security.announcementDate}</@rowout>
         </#if>  
         <@rowout label="Interest accrual date">${security.interestAccrualDate.toLocalDate()} - ${security.interestAccrualDate.zone}</@rowout>
-        <@rowout label="Settlement date">${security.settlementDate.toLocalDate()} - ${security.settlementDate.zone}</@rowout>
+        <#if security.settlementDate?has_content>
+          <@rowout label="Settlement date">${security.settlementDate.toLocalDate()} - ${security.settlementDate.zone}</@rowout>
+        </#if>
         <@rowout label="First coupon date">${security.firstCouponDate.toLocalDate()} - ${security.firstCouponDate.zone}</@rowout>
-        <@rowout label="Issuance price">${security.issuancePrice}</@rowout>
+        <#if security.issuancePrice?has_content>
+          <@rowout label="Issuance price">${security.issuancePrice}</@rowout>
+        </#if>
         <@rowout label="Total amount issued">${security.totalAmountIssued}</@rowout>
         <@rowout label="Minimum amount">${security.minimumAmount}</@rowout>
         <@rowout label="Minimum increment">${security.minimumIncrement}</@rowout>
@@ -83,14 +87,18 @@
         <@rowout label="Trading exchange">${security.tradingExchange}</@rowout>
         <@rowout label="Settlement exchange">${security.settlementExchange}</@rowout>
         <@rowout label="Redemption value">${security.currency}</@rowout>
-        
+        <@rowout label="Unit Amount">${security.unitAmount}</@rowout>
         <#if futureSecurityType == "BondFuture">
+            <@rowout label="First delivery date">${security.firstDeliveryDate}</@rowout>
+            <@rowout label="Last delivery date">${security.lastDeliveryDate}</@rowout>
             <@rowout label="Underlying Bond"></@rowout>
             <#list basket?keys as key>
               <@rowout label="">${key} - ${basket[key]}</@rowout>
             </#list>
         <#else>
-            <@rowout label="Underlying identifier">${security.underlyingId.scheme.name?replace("_", " ")} - ${security.underlyingId.value}</@rowout>
+            <#if futureSecurityType != "MetalFuture">
+              <@rowout label="Underlying identifier">${security.underlyingId.scheme.name?replace("_", " ")} - ${security.underlyingId.value}</@rowout>
+            </#if>
         </#if>
         
         <#break>
@@ -256,6 +264,17 @@
         <@rowout label="Exercise Type">${customRenderer.printExerciseType(security.exerciseType)}</@rowout>
         <@rowout label="Expiry">${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}</@rowout>
         <@rowout label="Is Margined">${security.margined?string?upper_case}</@rowout>
+        <@rowout label="Option Type">${security.optionType}</@rowout>
+        <@rowout label="Point Value">${security.pointValue}</@rowout>
+        <@rowout label="Strike">${security.strike}</@rowout>
+        <@rowout label="Underlying Identifier">${security.underlyingId.scheme.name?replace("_", " ")} - ${security.underlyingId.value}</@rowout>
+        <#break>
+      <#case "BONDFUTURE_OPTION">
+        <@rowout label="Currency">${security.currency}</@rowout>
+        <@rowout label="Trading Exchange">${security.tradingExchange}</@rowout>
+        <@rowout label="Settlement Exchange">${security.settlementExchange}</@rowout>
+        <@rowout label="Exercise Type">${customRenderer.printExerciseType(security.exerciseType)}</@rowout>
+        <@rowout label="Expiry">${security.expiry.expiry.toLocalDate()} - ${security.expiry.expiry.zone}</@rowout>
         <@rowout label="Option Type">${security.optionType}</@rowout>
         <@rowout label="Point Value">${security.pointValue}</@rowout>
         <@rowout label="Strike">${security.strike}</@rowout>

@@ -15,30 +15,33 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.livedata.LiveDataValueUpdate;
 import com.opengamma.livedata.normalization.StandardRules;
 import com.opengamma.livedata.server.DistributionSpecification;
+import com.opengamma.livedata.server.MapLastKnownValueStoreProvider;
 import com.opengamma.livedata.server.Subscription;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 
 /**
- * 
+ * Test.
  */
+@Test(groups = "unit")
 public class MarketDataDistributorTest {
-  
   public static MarketDataDistributor getTestDistributor(MarketDataSenderFactory factory) {
+    MapLastKnownValueStoreProvider lkvStoreProvider = new MapLastKnownValueStoreProvider();
     return new MarketDataDistributor(new DistributionSpecification(
         ExternalId.of("RIC", "AAPL.O"),
         StandardRules.getNoNormalization(),
         "LiveData.Bloomberg.Equity.AAPL"),
-        new Subscription("", factory),
+        new Subscription("", factory, lkvStoreProvider),
         factory,
-        false);
+        false,
+        lkvStoreProvider);
   }
-  
-  public static MarketDataDistributor getTestDistributor() {
+
+  static MarketDataDistributor getTestDistributor() {
     return getTestDistributor(new EmptyMarketDataSenderFactory());
   }
-  
-  @Test
-  public void sequenceNumber() {
+
+  //-------------------------------------------------------------------------
+  public void testSequenceNumber() {
     MarketDataDistributor mdd = getTestDistributor();
     assertEquals(LiveDataValueUpdate.SEQUENCE_START, mdd.getNumMessagesSent());
     mdd.updateFieldHistory(FudgeContext.EMPTY_MESSAGE);
@@ -51,5 +54,5 @@ public class MarketDataDistributorTest {
     mdd.distributeLiveData(FudgeContext.EMPTY_MESSAGE); // empty msg not sent
     assertEquals(1, mdd.getNumMessagesSent());
   }
-  
+
 }

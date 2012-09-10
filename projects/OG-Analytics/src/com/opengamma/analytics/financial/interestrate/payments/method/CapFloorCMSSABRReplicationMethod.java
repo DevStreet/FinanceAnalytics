@@ -18,10 +18,10 @@ import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
 import com.opengamma.analytics.financial.interestrate.ParRateCurveSensitivityCalculator;
 import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivityDataBundle;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateParameters;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
@@ -89,7 +89,7 @@ public class CapFloorCMSSABRReplicationMethod extends CapFloorCMSSABRReplication
   @Override
   public CurrencyAmount presentValue(final CapFloorCMS cmsCapFloor, final SABRInterestRateDataBundle sabrData) {
     final SABRInterestRateParameters sabrParameter = sabrData.getSABRParameter();
-    final FixedCouponSwap<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
+    final SwapFixedCoupon<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
     final double forward = PRC.visit(underlyingSwap, sabrData);
     final double discountFactor = sabrData.getCurve(underlyingSwap.getFixedLeg().getNthPayment(0).getFundingCurveName()).getDiscountFactor(cmsCapFloor.getPaymentTime());
     final CMSIntegrant integrant = new CMSIntegrant(cmsCapFloor, sabrParameter, forward);
@@ -132,7 +132,7 @@ public class CapFloorCMSSABRReplicationMethod extends CapFloorCMSSABRReplication
   @SuppressWarnings("synthetic-access")
   public InterestRateCurveSensitivity presentValueCurveSensitivity(final CapFloorCMS cmsCapFloor, final SABRInterestRateDataBundle sabrData) {
     final SABRInterestRateParameters sabrParameter = sabrData.getSABRParameter();
-    final FixedCouponSwap<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
+    final SwapFixedCoupon<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
     final double forward = PRC.visit(underlyingSwap, sabrData);
     final double discountFactor = sabrData.getCurve(underlyingSwap.getFixedLeg().getNthPayment(0).getFundingCurveName()).getDiscountFactor(cmsCapFloor.getPaymentTime());
     final double strike = cmsCapFloor.getStrike();
@@ -192,7 +192,7 @@ public class CapFloorCMSSABRReplicationMethod extends CapFloorCMSSABRReplication
   @Override
   public PresentValueSABRSensitivityDataBundle presentValueSABRSensitivity(final CapFloorCMS cmsCapFloor, final SABRInterestRateDataBundle sabrData) {
     final SABRInterestRateParameters sabrParameter = sabrData.getSABRParameter();
-    final FixedCouponSwap<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
+    final SwapFixedCoupon<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
     final double forward = PRC.visit(underlyingSwap, sabrData);
     final double discountFactor = sabrData.getCurve(underlyingSwap.getFixedLeg().getNthPayment(0).getFundingCurveName()).getDiscountFactor(cmsCapFloor.getPaymentTime());
     double strike = cmsCapFloor.getStrike();
@@ -203,19 +203,16 @@ public class CapFloorCMSSABRReplicationMethod extends CapFloorCMSSABRReplication
     final double relativeTolerance = 1E-3;
     final RungeKuttaIntegrator1D integrator = new RungeKuttaIntegrator1D(absoluteTolerance, relativeTolerance, getNbIteration());
     final double factor2 = factor * integrantVega.k(strike) * integrantVega.bs(strike);
-    final double[] strikePartPrice = new double[3];
+    final double[] strikePartPrice = new double[4];
     final double[] volatilityAdjoint = sabrData.getSABRParameter().getVolatilityAdjoint(cmsCapFloor.getFixingTime(), maturity, strike, forward);
     strikePartPrice[0] = factor2 * volatilityAdjoint[3];
     strikePartPrice[1] = factor2 * volatilityAdjoint[4];
     strikePartPrice[2] = factor2 * volatilityAdjoint[5];
-    final double[] integralPart = new double[3];
-    final double[] totalSensi = new double[3];
-    final int[] parameterIndex = new int[3];
-    parameterIndex[0] = 0; // sabr-alpha
-    parameterIndex[1] = 2; // sabr-rho
-    parameterIndex[2] = 3; // sabr-nu
-    for (int loopparameter = 0; loopparameter < 3; loopparameter++) {
-      integrantVega.setParameterIndex(parameterIndex[loopparameter]);
+    strikePartPrice[3] = factor2 * volatilityAdjoint[6];
+    final double[] integralPart = new double[4];
+    final double[] totalSensi = new double[4];
+    for (int loopparameter = 0; loopparameter < 4; loopparameter++) {
+      integrantVega.setParameterIndex(loopparameter);
       try {
         if (cmsCapFloor.isCap()) {
           integralPart[loopparameter] = discountFactor * integrator.integrate(integrantVega, strike, strike + getIntegrationInterval());
@@ -230,8 +227,9 @@ public class CapFloorCMSSABRReplicationMethod extends CapFloorCMSSABRReplication
     final PresentValueSABRSensitivityDataBundle sensi = new PresentValueSABRSensitivityDataBundle();
     final DoublesPair expiryMaturity = new DoublesPair(cmsCapFloor.getFixingTime(), maturity);
     sensi.addAlpha(expiryMaturity, totalSensi[0]);
-    sensi.addRho(expiryMaturity, totalSensi[1]);
-    sensi.addNu(expiryMaturity, totalSensi[2]);
+    sensi.addBeta(expiryMaturity, totalSensi[1]);
+    sensi.addRho(expiryMaturity, totalSensi[2]);
+    sensi.addNu(expiryMaturity, totalSensi[3]);
     return sensi;
   }
 
@@ -244,7 +242,7 @@ public class CapFloorCMSSABRReplicationMethod extends CapFloorCMSSABRReplication
   @Override
   public double presentValueStrikeSensitivity(final CapFloorCMS cmsCapFloor, final SABRInterestRateDataBundle sabrData) {
     final SABRInterestRateParameters sabrParameter = sabrData.getSABRParameter();
-    final FixedCouponSwap<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
+    final SwapFixedCoupon<? extends Payment> underlyingSwap = cmsCapFloor.getUnderlyingSwap();
     final double forward = PRC.visit(underlyingSwap, sabrData);
     final double discountFactor = sabrData.getCurve(underlyingSwap.getFixedLeg().getNthPayment(0).getFundingCurveName()).getDiscountFactor(cmsCapFloor.getPaymentTime());
     final double strike = cmsCapFloor.getStrike();

@@ -41,7 +41,7 @@ public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestR
   }
 
   @Override
-  protected Set<ComputedValue> getResults(final InstrumentDerivative irFutureOption, final SABRInterestRateDataBundle data, final ComputationTarget target,
+  protected Set<ComputedValue> computeValues(final InstrumentDerivative irFutureOption, final SABRInterestRateDataBundle data, final ComputationTarget target,
       final FunctionInputs inputs, final String forwardCurveName, final String fundingCurveName, final String surfaceName, final String curveCalculationMethod) {
     final PresentValueSABRSensitivityDataBundle sensitivities = CALCULATOR.visit(irFutureOption, data);
     final Map<DoublesPair, Double> result = getSensitivity(sensitivities);
@@ -88,6 +88,11 @@ public class InterestRateFutureOptionSABRSensitivitiesFunction extends InterestR
     }
     requirements.add(getCurveRequirement(target, forwardCurveName, forwardCurveName, fundingCurveName, curveCalculationMethodName));
     requirements.add(getCurveRequirement(target, fundingCurveName, forwardCurveName, fundingCurveName, curveCalculationMethodName));
+    final Set<ValueRequirement> timeSeriesRequirements = getTimeSeriesRequirements(target, fundingCurveName, forwardCurveName);
+    if (timeSeriesRequirements == null) {
+      return null;
+    }
+    requirements.addAll(timeSeriesRequirements);
     return requirements;
   }
   private DoubleLabelledMatrix2D getMatrix(final Map<DoublesPair, Double> map) {

@@ -5,9 +5,14 @@
  */
 package com.opengamma.analytics.financial.instrument.index;
 
+import javax.time.calendar.Period;
+import javax.time.calendar.ZonedDateTime;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 
+import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
+import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
@@ -16,7 +21,7 @@ import com.opengamma.util.money.Currency;
 /**
  * Class with the description of deposit characteristics (conventions, calendar, ...).
  */
-public class GeneratorDeposit {
+public class GeneratorDeposit extends GeneratorInstrument {
 
   /**
    * The index currency. Not null.
@@ -45,6 +50,7 @@ public class GeneratorDeposit {
 
   /**
    * Deposit generator from all the financial details.
+   * @param name The generator name. Not null.
    * @param currency The index currency. Not null.
    * @param calendar The calendar associated to the index. Not null.
    * @param spotLag The index spot lag in days between trade and settlement date (usually 2 or 0).
@@ -52,7 +58,9 @@ public class GeneratorDeposit {
    * @param businessDayConvention The business day convention associated to the index.
    * @param endOfMonth Flag indicating if the end-of-month rule is used.
    */
-  public GeneratorDeposit(final Currency currency, final Calendar calendar, final int spotLag, final DayCount dayCount, final BusinessDayConvention businessDayConvention, final boolean endOfMonth) {
+  public GeneratorDeposit(final String name, final Currency currency, final Calendar calendar, final int spotLag, final DayCount dayCount, final BusinessDayConvention businessDayConvention,
+      final boolean endOfMonth) {
+    super(name);
     Validate.notNull(currency, "Currency");
     Validate.notNull(calendar, "Calendar");
     Validate.notNull(dayCount, "Day count");
@@ -111,6 +119,14 @@ public class GeneratorDeposit {
    */
   public boolean isEndOfMonth() {
     return _endOfMonth;
+  }
+
+  @Override
+  public CashDefinition generateInstrument(ZonedDateTime date, Period tenor, double rate, double notional, Object... objects) {
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(date, _spotLag, _calendar);
+    final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, tenor, this);
+    final double accrualFactor = _dayCount.getDayCountFraction(startDate, endDate);
+    return new CashDefinition(_currency, startDate, endDate, notional, rate, accrualFactor);
   }
 
   @Override

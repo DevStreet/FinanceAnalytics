@@ -10,11 +10,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.math.curve.Curve;
-import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.interpolation.Interpolator1D;
-import com.opengamma.analytics.math.interpolation.data.Interpolator1DDataBundle;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.util.tuple.DoublesPair;
@@ -23,6 +20,7 @@ import com.opengamma.util.tuple.DoublesPair;
  * 
  */
 public class MultipleYieldCurveFinderJacobian extends Function1D<DoubleMatrix1D, DoubleMatrix2D> {
+
   private final InstrumentDerivativeVisitor<YieldCurveBundle, Map<String, List<DoublesPair>>> _calculator;
   private final MultipleYieldCurveFinderDataBundle _data;
   private final YieldCurveBundleBuildingFunction _curveBuilderFunction; //TODO this could be moved into MultipleYieldCurveFinderDataBundle
@@ -51,23 +49,18 @@ public class MultipleYieldCurveFinderJacobian extends Function1D<DoubleMatrix1D,
 
     final double[][] res = new double[_data.getNumInstruments()][totalNodes];
     for (int i = 0; i < _data.getNumInstruments(); i++) { // loop over all instruments
-      final Map<String, List<DoublesPair>> senseMap = _calculator.visit(_data.getDerivative(i), curves);
+      InstrumentDerivative deriv = _data.getDerivative(i);
+      final Map<String, List<DoublesPair>> senseMap = _calculator.visit(deriv, curves);
       int offset = 0;
       for (final String name : curveNames) { // loop over all curves (by name)
         if (senseMap.containsKey(name)) {
-          final Curve<Double, Double> curve = curves.getCurve(name).getCurve();
-          if (!(curve instanceof InterpolatedDoublesCurve)) {
-            throw new IllegalArgumentException("Can only handle InterpolatedDoublesCurve");
-          }
-          final InterpolatedDoublesCurve interpolatedCurve = (InterpolatedDoublesCurve) curve;
-          final Interpolator1DDataBundle data = interpolatedCurve.getDataBundle();
-          final Interpolator1D sensitivityCalculator = _data.getInterpolatorForCurve(name);
+          final YieldAndDiscountCurve curve = curves.getCurve(name);
           final List<DoublesPair> senseList = senseMap.get(name);
           if (senseList.size() != 0) {
             final double[][] sensitivity = new double[senseList.size()][];
             int k = 0;
             for (final DoublesPair timeAndDF : senseList) {
-              sensitivity[k++] = sensitivityCalculator.getNodeSensitivitiesForValue(data, timeAndDF.getFirst(), _data.useFiniteDifferenceForNodeSensitivities());
+              sensitivity[k++] = curve.getInterestRateParameterSensitivity(timeAndDF.first);
             }
             for (int j = 0; j < sensitivity[0].length; j++) {
               double temp = 0.0;
@@ -84,4 +77,5 @@ public class MultipleYieldCurveFinderJacobian extends Function1D<DoubleMatrix1D,
     }
     return new DoubleMatrix2D(res);
   }
+
 }

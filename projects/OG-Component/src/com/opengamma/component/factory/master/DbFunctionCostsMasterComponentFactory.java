@@ -21,8 +21,10 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import com.opengamma.component.ComponentInfo;
 import com.opengamma.component.ComponentRepository;
 import com.opengamma.component.factory.AbstractComponentFactory;
+import com.opengamma.component.factory.ComponentInfoAttributes;
 import com.opengamma.engine.view.calcnode.stats.DataFunctionCostsMasterResource;
 import com.opengamma.engine.view.calcnode.stats.FunctionCostsMaster;
+import com.opengamma.engine.view.calcnode.stats.RemoteFunctionCostsMaster;
 import com.opengamma.masterdb.engine.stats.DbFunctionCostsMaster;
 import com.opengamma.util.db.DbConnector;
 
@@ -30,7 +32,7 @@ import com.opengamma.util.db.DbConnector;
  * Component factory for the database function costs master.
  */
 @BeanDefinition
-public class DbFunctionCostsMasterComponentFactory extends AbstractComponentFactory {
+public class DbFunctionCostsMasterComponentFactory extends AbstractDbMasterComponentFactory {
 
   /**
    * The classifier that the factory should publish under.
@@ -55,8 +57,11 @@ public class DbFunctionCostsMasterComponentFactory extends AbstractComponentFact
     
     // create
     DbFunctionCostsMaster master = new DbFunctionCostsMaster(getDbConnector());
+    checkSchemaVersion(master.getSchemaVersion(), "eng_db");
     
     // register
+    info.addAttribute(ComponentInfoAttributes.LEVEL, 1);
+    info.addAttribute(ComponentInfoAttributes.REMOTE_CLIENT_JAVA, RemoteFunctionCostsMaster.class);
     repo.registerComponent(info, master);
     
     // publish
@@ -224,7 +229,7 @@ public class DbFunctionCostsMasterComponentFactory extends AbstractComponentFact
   /**
    * The meta-bean for {@code DbFunctionCostsMasterComponentFactory}.
    */
-  public static class Meta extends AbstractComponentFactory.Meta {
+  public static class Meta extends AbstractDbMasterComponentFactory.Meta {
     /**
      * The singleton instance of the meta-bean.
      */

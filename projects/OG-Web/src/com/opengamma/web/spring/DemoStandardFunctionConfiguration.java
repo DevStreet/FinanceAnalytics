@@ -1,10 +1,14 @@
 /**
  * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.web.spring;
 
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.DOUBLE_QUADRATIC;
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.FLAT_EXTRAPOLATOR;
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.LINEAR;
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.LINEAR_EXTRAPOLATOR;
 import static com.opengamma.master.historicaltimeseries.impl.HistoricalTimeSeriesRatingFieldNames.DEFAULT_CONFIG_NAME;
 
 import java.io.OutputStreamWriter;
@@ -40,7 +44,9 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.financial.aggregation.BottomPositionValues;
 import com.opengamma.financial.aggregation.SortedPositionValues;
 import com.opengamma.financial.aggregation.TopPositionValues;
-import com.opengamma.financial.analytics.DummyPortfolioNodeMultipleCurrencyAmountFunction;
+import com.opengamma.financial.analytics.CurrencyPairsDefaults;
+import com.opengamma.financial.analytics.CurrencyPairsFunction;
+import com.opengamma.financial.analytics.DV01Function;
 import com.opengamma.financial.analytics.FilteringSummingFunction;
 import com.opengamma.financial.analytics.LastHistoricalValueFunction;
 import com.opengamma.financial.analytics.PositionScalingFunction;
@@ -73,14 +79,45 @@ import com.opengamma.financial.analytics.model.bond.BondZSpreadFromMarketCleanPr
 import com.opengamma.financial.analytics.model.bond.BondZSpreadPresentValueSensitivityFromCurveCleanPriceFunction;
 import com.opengamma.financial.analytics.model.bond.BondZSpreadPresentValueSensitivityFromMarketCleanPriceFunction;
 import com.opengamma.financial.analytics.model.bond.NelsonSiegelSvenssonBondCurveFunction;
-import com.opengamma.financial.analytics.model.curve.forward.FXForwardCurveValuePropertyNames;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackDeltaFunction;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackFromFuturePresentValueFunction;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackGammaFunction;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackPV01Function;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackPresentValueFunction;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackVegaFunction;
+import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackYCNSFunction;
+import com.opengamma.financial.analytics.model.curve.forward.ForwardCurveValuePropertyNames;
 import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveDefaults;
 import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveFunction;
 import com.opengamma.financial.analytics.model.curve.interestrate.MarketInstrumentImpliedYieldCurveFunction;
+import com.opengamma.financial.analytics.model.equity.EquityForwardCurveFunction;
 import com.opengamma.financial.analytics.model.equity.futures.EquityFutureYieldCurveNodeSensitivityFunction;
 import com.opengamma.financial.analytics.model.equity.futures.EquityFuturesFunction;
 import com.opengamma.financial.analytics.model.equity.futures.EquityIndexDividendFutureYieldCurveNodeSensitivityFunction;
 import com.opengamma.financial.analytics.model.equity.futures.EquityIndexDividendFuturesFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionForwardValueFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionFundingCurveSensitivitiesFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionImpliedVolFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionPresentValueFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionRhoFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionSpotDeltaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionSpotGammaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionSpotIndexFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionSpotVannaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionVegaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionVegaMatrixFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionVommaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionForwardValueFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionPresentValueFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionRhoFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotDeltaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotGammaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotIndexFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotVannaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionVegaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionVommaFunction;
 import com.opengamma.financial.analytics.model.equity.portfoliotheory.CAPMBetaDefaultPropertiesPortfolioNodeFunction;
 import com.opengamma.financial.analytics.model.equity.portfoliotheory.CAPMBetaDefaultPropertiesPositionFunction;
 import com.opengamma.financial.analytics.model.equity.portfoliotheory.CAPMBetaModelPortfolioNodeFunction;
@@ -110,28 +147,57 @@ import com.opengamma.financial.analytics.model.equity.variance.EquityForwardFrom
 import com.opengamma.financial.analytics.model.equity.variance.EquityVarianceSwapPresentValueFunction;
 import com.opengamma.financial.analytics.model.equity.variance.EquityVarianceSwapVegaFunction;
 import com.opengamma.financial.analytics.model.equity.variance.EquityVarianceSwapYieldCurveNodeSensitivityFunction;
-import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentDefaultCurveNameFunction;
+import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentDefaultPropertiesFunction;
 import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentPV01Function;
 import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentParRateCurveSensitivityFunction;
 import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentParRateFunction;
 import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentParRateParallelCurveSensitivityFunction;
 import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentPresentValueFunction;
 import com.opengamma.financial.analytics.model.fixedincome.InterestRateInstrumentYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.forex.BloombergForexSpotRateMarketDataFunction;
-import com.opengamma.financial.analytics.model.forex.defaultproperties.ForexForwardDefaultPropertiesFunction;
-import com.opengamma.financial.analytics.model.forex.defaultproperties.ForexOptionBlackDefaultPropertiesFunction;
-import com.opengamma.financial.analytics.model.forex.forward.ForexForwardCurrencyExposureFunction;
-import com.opengamma.financial.analytics.model.forex.forward.ForexForwardPresentValueCurveSensitivityFunction;
-import com.opengamma.financial.analytics.model.forex.forward.ForexForwardPresentValueFunction;
-import com.opengamma.financial.analytics.model.forex.forward.ForexForwardYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackCurrencyExposureFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackPV01Function;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackPresentValueCurveSensitivityFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackPresentValueFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackVegaFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackVegaMatrixFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackVegaQuoteMatrixFunction;
-import com.opengamma.financial.analytics.model.forex.option.black.ForexOptionBlackYieldCurveNodeSensitivitiesFunction;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentDefaultCurveNameFunctionDeprecated;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentPV01FunctionDeprecated;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentParRateCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentParRateFunctionDeprecated;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentParRateParallelCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentPresentValueFunctionDeprecated;
+import com.opengamma.financial.analytics.model.fixedincome.deprecated.InterestRateInstrumentYieldCurveNodeSensitivitiesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.BloombergFXSpotRateMarketDataFunction;
+import com.opengamma.financial.analytics.model.forex.defaultproperties.FXForwardDefaults;
+import com.opengamma.financial.analytics.model.forex.defaultproperties.FXOptionBlackDefaults;
+import com.opengamma.financial.analytics.model.forex.forward.FXForwardCurrencyExposureFunction;
+import com.opengamma.financial.analytics.model.forex.forward.FXForwardFXPresentValueFunction;
+import com.opengamma.financial.analytics.model.forex.forward.FXForwardPV01Function;
+import com.opengamma.financial.analytics.model.forex.forward.FXForwardPresentValueCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.forex.forward.FXForwardYCNSFunction;
+import com.opengamma.financial.analytics.model.forex.forward.deprecated.FXForwardCurrencyExposureFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.forward.deprecated.FXForwardPresentValueCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.forward.deprecated.FXForwardPresentValueFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.forward.deprecated.FXForwardYCNSFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.BloombergFXOptionSpotRateFunction;
+import com.opengamma.financial.analytics.model.forex.option.BloombergFXSpotRatePercentageChangeFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackCurrencyExposureFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackFXPresentValueFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackGammaFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackGammaSpotFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackImpliedVolatilityFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackPV01Function;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackPresentValueCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackPresentValueFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackTermStructureCurrencyExposureFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackThetaFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackVannaFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackVegaFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackVegaMatrixFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackVegaQuoteMatrixFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.FXOptionBlackVommaFunction;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackCurrencyExposureFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackPV01FunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackPresentValueCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackPresentValueFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackVegaFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackVegaMatrixFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackVegaQuoteMatrixFunctionDeprecated;
+import com.opengamma.financial.analytics.model.forex.option.black.deprecated.FXOptionBlackYCNSFunctionDeprecated;
 import com.opengamma.financial.analytics.model.forex.option.localvol.ForexLocalVolatilityForwardPDEDualDeltaFunction;
 import com.opengamma.financial.analytics.model.forex.option.localvol.ForexLocalVolatilityForwardPDEDualGammaFunction;
 import com.opengamma.financial.analytics.model.forex.option.localvol.ForexLocalVolatilityForwardPDEForwardDeltaFunction;
@@ -152,23 +218,41 @@ import com.opengamma.financial.analytics.model.forex.option.localvol.ForexLocalV
 import com.opengamma.financial.analytics.model.forex.option.localvol.ForexLocalVolatilityForwardPDEPipsPresentValueFunction;
 import com.opengamma.financial.analytics.model.future.BondFutureGrossBasisFromCurvesFunction;
 import com.opengamma.financial.analytics.model.future.BondFutureNetBasisFromCurvesFunction;
-import com.opengamma.financial.analytics.model.future.InterestRateFutureDefaultValuesFunction;
-import com.opengamma.financial.analytics.model.future.InterestRateFuturePV01Function;
-import com.opengamma.financial.analytics.model.future.InterestRateFuturePresentValueFunction;
-import com.opengamma.financial.analytics.model.future.InterestRateFutureYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.future.InterestRateFuturePV01FunctionDeprecated;
+import com.opengamma.financial.analytics.model.future.InterestRateFuturePresentValueFunctionDeprecated;
+import com.opengamma.financial.analytics.model.future.InterestRateFutureYieldCurveNodeSensitivitiesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.horizon.FXOptionBlackConstantSpreadThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.FXOptionBlackForwardSlideThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.FXOptionBlackVolatilitySurfaceConstantSpreadThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.FXOptionBlackVolatilitySurfaceForwardSlideThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.FXOptionBlackYieldCurvesConstantSpreadThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.FXOptionBlackYieldCurvesForwardSlideThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.InterestRateFutureOptionConstantSpreadThetaFunction;
+import com.opengamma.financial.analytics.model.horizon.SwaptionBlackThetaDefaults;
+import com.opengamma.financial.analytics.model.horizon.SwaptionConstantSpreadThetaFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackDefaultPropertiesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackDefaults;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackGammaFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackGammaFunctionDeprecated;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackImpliedVolatilityFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackImpliedVolatilityFunctionDeprecated;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPV01Function;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPV01FunctionDeprecated;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPresentValueFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPresentValueFunctionDeprecated;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPriceFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackPriceFunctionDeprecated;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackVolatilitySensitivityFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackVolatilitySensitivityFunctionDeprecated;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionDefaultValuesFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionDefaultValuesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionMarketUnderlyingPriceFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionSABRPresentValueFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionSABRSensitivitiesFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionSABRVegaFunction;
 import com.opengamma.financial.analytics.model.irfutureoption.InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction;
+import com.opengamma.financial.analytics.model.irfutureoption.MarginPriceFunction;
 import com.opengamma.financial.analytics.model.option.AnalyticOptionDefaultCurveFunction;
 import com.opengamma.financial.analytics.model.option.BlackScholesMertonModelFunction;
 import com.opengamma.financial.analytics.model.option.BlackScholesModelCostOfCarryFunction;
@@ -176,6 +260,8 @@ import com.opengamma.financial.analytics.model.pnl.EquityPnLDefaultPropertiesFun
 import com.opengamma.financial.analytics.model.pnl.EquityPnLFunction;
 import com.opengamma.financial.analytics.model.pnl.ExternallyProvidedSensitivityPnLDefaultPropertiesFunction;
 import com.opengamma.financial.analytics.model.pnl.ExternallyProvidedSensitivityPnLFunction;
+import com.opengamma.financial.analytics.model.pnl.FXForwardCurrencyExposurePnLCurrencyConversionFunction;
+import com.opengamma.financial.analytics.model.pnl.FXForwardYCNSPnLCurrencyConversionFunction;
 import com.opengamma.financial.analytics.model.pnl.PortfolioExchangeTradedDailyPnLFunction;
 import com.opengamma.financial.analytics.model.pnl.PortfolioExchangeTradedPnLFunction;
 import com.opengamma.financial.analytics.model.pnl.PositionExchangeTradedDailyPnLFunction;
@@ -190,33 +276,61 @@ import com.opengamma.financial.analytics.model.pnl.TradeExchangeTradedDailyPnLFu
 import com.opengamma.financial.analytics.model.pnl.TradeExchangeTradedPnLFunction;
 import com.opengamma.financial.analytics.model.pnl.ValueGreekSensitivityPnLDefaultPropertiesFunction;
 import com.opengamma.financial.analytics.model.pnl.ValueGreekSensitivityPnLFunction;
-import com.opengamma.financial.analytics.model.pnl.YieldCurveNodeSensitivityPnLDefaultPropertiesFunction;
-import com.opengamma.financial.analytics.model.pnl.YieldCurveNodeSensitivityPnLFunction;
+import com.opengamma.financial.analytics.model.pnl.YieldCurveNodePnLFunctionDeprecated;
+import com.opengamma.financial.analytics.model.pnl.YieldCurveNodeSensitivityPnLDefaultsDeprecated;
 import com.opengamma.financial.analytics.model.riskfactor.option.OptionGreekToValueGreekConverterFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPresentValueCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPVCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPVCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPresentValueFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPresentValueSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationPresentValueFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationVegaFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPresentValueCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationVegaFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationYCNSFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadNoExtrapolationYCNSFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPVCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPVCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPresentValueFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPresentValueSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationPresentValueFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationVegaFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPresentValueCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationVegaFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationYCNSFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRCMSSpreadRightExtrapolationYCNSFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPVCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPVCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPVSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPVSABRSensitivityFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPresentValueFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPresentValueSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationPresentValueFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationVegaFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPresentValueCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationVegaFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationYCNSFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRNoExtrapolationYCNSFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPVCurveSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPVCurveSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPVSABRNodeSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPVSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPVSABRSensitivityFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPresentValueFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPresentValueSABRSensitivityFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationPresentValueFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationVegaFunction;
-import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationYieldCurveNodeSensitivitiesFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationVegaFunctionDeprecated;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationYCNSFunction;
+import com.opengamma.financial.analytics.model.sabrcube.SABRRightExtrapolationYCNSFunctionDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRNoExtrapolationDefaults;
+import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRNoExtrapolationDefaultsDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRNoExtrapolationVegaDefaults;
+import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRNoExtrapolationVegaDefaultsDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRRightExtrapolationDefaults;
+import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRRightExtrapolationDefaultsDeprecated;
 import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRRightExtrapolationVegaDefaults;
+import com.opengamma.financial.analytics.model.sabrcube.defaultproperties.SABRRightExtrapolationVegaDefaultsDeprecated;
 import com.opengamma.financial.analytics.model.sensitivities.ExternallyProvidedSecurityMarkFunction;
 import com.opengamma.financial.analytics.model.sensitivities.ExternallyProvidedSensitivitiesCreditFactorsFunction;
 import com.opengamma.financial.analytics.model.sensitivities.ExternallyProvidedSensitivitiesNonYieldCurveFunction;
@@ -231,12 +345,20 @@ import com.opengamma.financial.analytics.model.swaption.black.SwaptionBlackPV01F
 import com.opengamma.financial.analytics.model.swaption.black.SwaptionBlackPresentValueFunction;
 import com.opengamma.financial.analytics.model.swaption.black.SwaptionBlackVolatilitySensitivityFunction;
 import com.opengamma.financial.analytics.model.swaption.black.SwaptionBlackYieldCurveNodeSensitivitiesFunction;
-import com.opengamma.financial.analytics.model.var.PortfolioHistoricalVaRDefaultPropertiesFunction;
-import com.opengamma.financial.analytics.model.var.PortfolioHistoricalVaRFunction;
-import com.opengamma.financial.analytics.model.var.PositionHistoricalVaRDefaultPropertiesFunction;
-import com.opengamma.financial.analytics.model.var.PositionHistoricalVaRFunction;
+import com.opengamma.financial.analytics.model.swaption.deprecated.SwaptionBlackDefaultPropertiesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.swaption.deprecated.SwaptionBlackImpliedVolatilityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.swaption.deprecated.SwaptionBlackPV01FunctionDeprecated;
+import com.opengamma.financial.analytics.model.swaption.deprecated.SwaptionBlackPresentValueFunctionDeprecated;
+import com.opengamma.financial.analytics.model.swaption.deprecated.SwaptionBlackVolatilitySensitivityFunctionDeprecated;
+import com.opengamma.financial.analytics.model.swaption.deprecated.SwaptionBlackYieldCurveNodeSensitivitiesFunctionDeprecated;
+import com.opengamma.financial.analytics.model.var.NormalPortfolioHistoricalVaRDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.var.NormalPortfolioHistoricalVaRFunction;
+import com.opengamma.financial.analytics.model.var.NormalPositionHistoricalVaRDefaultPropertiesFunction;
+import com.opengamma.financial.analytics.model.var.NormalPositionHistoricalVaRFunction;
+import com.opengamma.financial.analytics.model.volatility.VolatilityDataFittingDefaults;
 import com.opengamma.financial.analytics.model.volatility.cube.SABRNonLinearLeastSquaresSwaptionCubeFittingDefaults;
 import com.opengamma.financial.analytics.model.volatility.cube.SABRNonLinearLeastSquaresSwaptionCubeFittingFunction;
+import com.opengamma.financial.analytics.model.volatility.local.EquityDupireLocalVolatilitySurfaceFunction;
 import com.opengamma.financial.analytics.model.volatility.local.ForexDupireLocalVolatilitySurfaceFunction;
 import com.opengamma.financial.analytics.model.volatility.local.defaultproperties.BackwardPDEMixedLogNormalDefaults;
 import com.opengamma.financial.analytics.model.volatility.local.defaultproperties.BackwardPDESABRDefaults;
@@ -269,6 +391,7 @@ import com.opengamma.financial.analytics.model.volatility.surface.black.BlackVol
 import com.opengamma.financial.analytics.model.volatility.surface.black.BlackVolatilitySurfacePropertyNamesAndValues;
 import com.opengamma.financial.analytics.model.volatility.surface.black.BlackVolatilitySurfaceSABRInterpolatorFunction;
 import com.opengamma.financial.analytics.model.volatility.surface.black.BlackVolatilitySurfaceSplineInterpolatorFunction;
+import com.opengamma.financial.analytics.model.volatility.surface.black.EquityBlackVolatilitySurfaceFunction;
 import com.opengamma.financial.analytics.model.volatility.surface.black.ForexBlackVolatilitySurfaceFunction;
 import com.opengamma.financial.analytics.model.volatility.surface.black.defaultproperties.BlackVolatilitySurfaceMixedLogNormalDefaults;
 import com.opengamma.financial.analytics.model.volatility.surface.black.defaultproperties.BlackVolatilitySurfaceMixedLogNormalInterpolatorDefaults;
@@ -276,19 +399,33 @@ import com.opengamma.financial.analytics.model.volatility.surface.black.defaultp
 import com.opengamma.financial.analytics.model.volatility.surface.black.defaultproperties.BlackVolatilitySurfaceSABRInterpolatorDefaults;
 import com.opengamma.financial.analytics.model.volatility.surface.black.defaultproperties.BlackVolatilitySurfaceSplineDefaults;
 import com.opengamma.financial.analytics.model.volatility.surface.black.defaultproperties.BlackVolatilitySurfaceSplineInterpolatorDefaults;
+import com.opengamma.financial.analytics.timeseries.DefaultHistoricalTimeSeriesShiftFunction;
+import com.opengamma.financial.analytics.timeseries.FXVolatilitySurfaceHistoricalTimeSeriesFunction;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesFunction;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesLatestSecurityValueFunction;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesLatestValueFunction;
+import com.opengamma.financial.analytics.timeseries.YieldCurveHistoricalTimeSeriesFunction;
+import com.opengamma.financial.analytics.timeseries.YieldCurveInstrumentConversionHistoricalTimeSeriesFunction;
+import com.opengamma.financial.analytics.timeseries.YieldCurveInstrumentConversionHistoricalTimeSeriesFunctionDeprecated;
+import com.opengamma.financial.analytics.timeseries.YieldCurveInstrumentConversionHistoricalTimeSeriesShiftFunctionDeprecated;
 import com.opengamma.financial.analytics.volatility.surface.DefaultVolatilitySurfaceShiftFunction;
 import com.opengamma.financial.analytics.volatility.surface.VolatilitySurfaceShiftFunction;
+import com.opengamma.financial.currency.BondFutureOptionBlackPnLSeriesCurrencyConversionFunction;
 import com.opengamma.financial.currency.CurrencyMatrixConfigPopulator;
 import com.opengamma.financial.currency.CurrencyMatrixSourcingFunction;
-import com.opengamma.financial.currency.DefaultCurrencyInjectionFunction;
-import com.opengamma.financial.currency.PnlSeriesCurrencyConversionFunction;
+import com.opengamma.financial.currency.CurrencyPairs;
+import com.opengamma.financial.currency.FXOptionBlackPnLSeriesCurrencyConversionFunction;
+import com.opengamma.financial.currency.FixedIncomeInstrumentPnLSeriesCurrencyConversionFunction;
+import com.opengamma.financial.currency.FixedIncomeInstrumentPnLSeriesCurrencyConversionFunctionDeprecated;
 import com.opengamma.financial.currency.PortfolioNodeCurrencyConversionFunction;
 import com.opengamma.financial.currency.PortfolioNodeDefaultCurrencyFunction;
 import com.opengamma.financial.currency.PositionCurrencyConversionFunction;
 import com.opengamma.financial.currency.PositionDefaultCurrencyFunction;
 import com.opengamma.financial.currency.SecurityCurrencyConversionFunction;
 import com.opengamma.financial.currency.SecurityDefaultCurrencyFunction;
+import com.opengamma.financial.currency.YCNSPnLSeriesCurrencyConversionFunction;
 import com.opengamma.financial.property.AggregationDefaultPropertyFunction;
+import com.opengamma.financial.property.DefaultPropertyFunction.PriorityClass;
 import com.opengamma.financial.property.PortfolioNodeCalcConfigDefaultPropertyFunction;
 import com.opengamma.financial.property.PositionCalcConfigDefaultPropertyFunction;
 import com.opengamma.financial.property.PositionDefaultPropertyFunction;
@@ -296,7 +433,9 @@ import com.opengamma.financial.property.PrimitiveCalcConfigDefaultPropertyFuncti
 import com.opengamma.financial.property.SecurityCalcConfigDefaultPropertyFunction;
 import com.opengamma.financial.property.TradeCalcConfigDefaultPropertyFunction;
 import com.opengamma.financial.property.TradeDefaultPropertyFunction;
-import com.opengamma.financial.value.PortfolioNodeValueFunction;
+import com.opengamma.financial.value.ForwardPricePositionRenamingFunction;
+import com.opengamma.financial.value.ForwardPriceSecurityRenamingFunction;
+import com.opengamma.financial.value.ForwardPriceTradeRenamingFunction;
 import com.opengamma.financial.value.PositionValueFunction;
 import com.opengamma.financial.value.SecurityValueFunction;
 import com.opengamma.util.SingletonFactoryBean;
@@ -311,7 +450,7 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
 
   private static final boolean OUTPUT_REPO_CONFIGURATION = false;
 
-  public static <F extends FunctionDefinition> FunctionConfiguration functionConfiguration(final Class<F> clazz, String... args) {
+  public static <F extends FunctionDefinition> FunctionConfiguration functionConfiguration(final Class<F> clazz, final String... args) {
     if (Modifier.isAbstract(clazz.getModifiers())) {
       throw new IllegalStateException("Attempting to register an abstract class - " + clazz);
     }
@@ -322,44 +461,47 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     }
   }
 
-  protected static void addValueFunctions(List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(functionConfiguration(PortfolioNodeValueFunction.class));
+  protected static void addValueFunctions(final List<FunctionConfiguration> functionConfigs) {
+    addSummingFunction(functionConfigs, ValueRequirementNames.VALUE);
     functionConfigs.add(functionConfiguration(PositionValueFunction.class));
     functionConfigs.add(functionConfiguration(SecurityValueFunction.class));
+    functionConfigs.add(functionConfiguration(ForwardPricePositionRenamingFunction.class));
+    functionConfigs.add(functionConfiguration(ForwardPriceSecurityRenamingFunction.class));
+    functionConfigs.add(functionConfiguration(ForwardPriceTradeRenamingFunction.class));
+
+
+
   }
 
-  public static void addScalingFunction(List<FunctionConfiguration> functionConfigs, String requirementName) {
+  public static void addScalingFunction(final List<FunctionConfiguration> functionConfigs, final String requirementName) {
     functionConfigs.add(functionConfiguration(PositionScalingFunction.class, requirementName));
     functionConfigs.add(functionConfiguration(PositionTradeScalingFunction.class, requirementName));
   }
 
-  public static void addUnitScalingFunction(List<FunctionConfiguration> functionConfigs, String requirementName) {
+  public static void addUnitScalingFunction(final List<FunctionConfiguration> functionConfigs, final String requirementName) {
     functionConfigs.add(functionConfiguration(UnitPositionScalingFunction.class, requirementName));
     functionConfigs.add(functionConfiguration(UnitPositionTradeScalingFunction.class, requirementName));
   }
 
-  protected static void addDummyMultipleCurrencyAmountFunction(List<FunctionConfiguration> functionConfigs, String requirementName) {
-    functionConfigs.add(functionConfiguration(DummyPortfolioNodeMultipleCurrencyAmountFunction.class, requirementName));
-  }
-
-  public static void addSummingFunction(List<FunctionConfiguration> functionConfigs, String requirementName) {
-    functionConfigs.add(functionConfiguration(SummingFunction.class, requirementName));
-    functionConfigs.add(functionConfiguration(AggregationDefaultPropertyFunction.class, requirementName, SummingFunction.AGGREGATION_STYLE_FULL));
-  }
-
-  // TODO: Is there a reason why we can't just include both the normal and filtered summing functions all the time? Filtering is a lower priority.
-
-  public static void addFilteredSummingFunction(List<FunctionConfiguration> functionConfigs, String requirementName) {
+  /**
+   * Adds a summing function for the value.
+   *
+   * @param functionConfigs the configuration block to add the definition to
+   * @param requirementName the requirement to sum at portfolio node levels
+   */
+  public static void addSummingFunction(final List<FunctionConfiguration> functionConfigs, final String requirementName) {
     functionConfigs.add(functionConfiguration(FilteringSummingFunction.class, requirementName));
-    functionConfigs.add(functionConfiguration(AggregationDefaultPropertyFunction.class, requirementName, FilteringSummingFunction.AGGREGATION_STYLE_FILTERED));
+    functionConfigs.add(functionConfiguration(SummingFunction.class, requirementName));
+    functionConfigs.add(functionConfiguration(AggregationDefaultPropertyFunction.class, requirementName, SummingFunction.AGGREGATION_STYLE_FULL,
+        FilteringSummingFunction.AGGREGATION_STYLE_FILTERED));
   }
 
-  protected static void addValueGreekAndSummingFunction(List<FunctionConfiguration> functionConfigs, String requirementName) {
+  protected static void addValueGreekAndSummingFunction(final List<FunctionConfiguration> functionConfigs, final String requirementName) {
     functionConfigs.add(functionConfiguration(OptionGreekToValueGreekConverterFunction.class, requirementName));
-    addFilteredSummingFunction(functionConfigs, requirementName);
+    addSummingFunction(functionConfigs, requirementName);
   }
 
-  protected static void addCurrencyConversionFunctions(List<FunctionConfiguration> functionConfigs, String requirementName) {
+  protected static void addCurrencyConversionFunctions(final List<FunctionConfiguration> functionConfigs, final String requirementName) {
     functionConfigs.add(functionConfiguration(PortfolioNodeCurrencyConversionFunction.class, requirementName));
     functionConfigs.add(functionConfiguration(PositionCurrencyConversionFunction.class, requirementName));
     functionConfigs.add(functionConfiguration(SecurityCurrencyConversionFunction.class, requirementName));
@@ -371,24 +513,38 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
   protected static void addCurrencyConversionFunctions(final List<FunctionConfiguration> functionConfigs) {
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.FAIR_VALUE);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.PV01);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.DV01);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.PRESENT_VALUE);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.DAILY_PNL);
     //TODO PRESENT_VALUE_CURVE_SENSITIVITY
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_DELTA);
-    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_GAMMA);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_THETA);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_SPEED);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_VOMMA);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_VANNA);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_RHO);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_PHI);
+
     functionConfigs.add(functionConfiguration(SecurityCurrencyConversionFunction.class, ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES));
     functionConfigs.add(functionConfiguration(PortfolioNodeDefaultCurrencyFunction.Permissive.class, ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES));
-    // functionConfigs.add(functionConfiguration(PositionDefaultCurrencyFunction.Permissive.class, ValueRequirementNames.EXTERNAL_SENSITIVITIES));
-    // functionConfigs.add(functionConfiguration(PortfolioNodeDefaultCurrencyFunction.Permissive.class, ValueRequirementNames.EXTERNAL_SENSITIVITIES));
     functionConfigs.add(functionConfiguration(CurrencyMatrixSourcingFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
     functionConfigs.add(functionConfiguration(CurrencyMatrixSourcingFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
-    functionConfigs.add(functionConfiguration(PnlSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
-    functionConfigs.add(functionConfiguration(PnlSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
-    functionConfigs.add(functionConfiguration(DefaultCurrencyInjectionFunction.class));
-    // functionConfigs.add(functionConfiguration(CurrencyInversionFunction.class));
-    // functionConfigs.add(functionConfiguration(CurrencyCrossRateFunction.class, "USD"));
-    // functionConfigs.add(functionConfiguration(BloombergCurrencyRateFunction.class));
+    functionConfigs.add(functionConfiguration(FixedIncomeInstrumentPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FixedIncomeInstrumentPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(YCNSPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(YCNSPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FXForwardCurrencyExposurePnLCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FXForwardCurrencyExposurePnLCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FXForwardYCNSPnLCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FXForwardYCNSPnLCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackPnLSeriesCurrencyConversionFunction.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
+    functionConfigs
+        .add(functionConfiguration(FixedIncomeInstrumentPnLSeriesCurrencyConversionFunctionDeprecated.class, CurrencyMatrixConfigPopulator.BLOOMBERG_LIVE_DATA));
+    functionConfigs
+        .add(functionConfiguration(FixedIncomeInstrumentPnLSeriesCurrencyConversionFunctionDeprecated.class, CurrencyMatrixConfigPopulator.SYNTHETIC_LIVE_DATA));
   }
 
   protected static void addLateAggregationFunctions(final List<FunctionConfiguration> functionConfigs) {
@@ -431,6 +587,17 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addHistoricalDataFunctions(functionConfigs, ValueRequirementNames.DAILY_MARKET_CAP);
     addHistoricalDataFunctions(functionConfigs, ValueRequirementNames.DAILY_APPLIED_BETA);
     addHistoricalDataFunctions(functionConfigs, ValueRequirementNames.DAILY_PRICE);
+    functionConfigs.add(functionConfiguration(HistoricalTimeSeriesFunction.class));
+    functionConfigs.add(functionConfiguration(HistoricalTimeSeriesLatestValueFunction.class));
+    functionConfigs.add(functionConfiguration(HistoricalTimeSeriesLatestSecurityValueFunction.class));
+    functionConfigs.add(functionConfiguration(YieldCurveHistoricalTimeSeriesFunction.class));
+    functionConfigs.add(functionConfiguration(FXVolatilitySurfaceHistoricalTimeSeriesFunction.class));
+    functionConfigs.add(functionConfiguration(YieldCurveInstrumentConversionHistoricalTimeSeriesFunction.class));
+    functionConfigs.add(functionConfiguration(YieldCurveInstrumentConversionHistoricalTimeSeriesFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(YieldCurveInstrumentConversionHistoricalTimeSeriesShiftFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(DefaultHistoricalTimeSeriesShiftFunction.class));
+    functionConfigs.add(functionConfiguration(CurrencyPairsFunction.class));
+    functionConfigs.add(functionConfiguration(CurrencyPairsDefaults.class, CurrencyPairs.DEFAULT_CURRENCY_PAIRS));
   }
 
   public static RepositoryConfiguration constructRepositoryConfiguration() {
@@ -450,12 +617,14 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(PositionExchangeTradedPnLFunction.class));
     functionConfigs.add(functionConfiguration(PortfolioExchangeTradedPnLFunction.class));
     functionConfigs.add(functionConfiguration(PortfolioExchangeTradedDailyPnLFunction.Impl.class));
-    functionConfigs.add(functionConfiguration(AggregationDefaultPropertyFunction.class, ValueRequirementNames.DAILY_PNL, PortfolioExchangeTradedDailyPnLFunction.Impl.AGGREGATION_STYLE_FULL));
+    functionConfigs.add(functionConfiguration(AggregationDefaultPropertyFunction.class, ValueRequirementNames.DAILY_PNL,
+        PortfolioExchangeTradedDailyPnLFunction.Impl.AGGREGATION_STYLE_FULL));
 
     addPnLCalculators(functionConfigs);
     addVaRCalculators(functionConfigs);
     addPortfolioAnalysisCalculators(functionConfigs);
     addFixedIncomeInstrumentCalculators(functionConfigs);
+    addDeprecatedFixedIncomeInstrumentCalculators(functionConfigs);
 
     functionConfigs.add(functionConfiguration(StandardEquityModelFunction.class));
     functionConfigs.add(functionConfiguration(SimpleFuturePresentValueFunction.class, "FUNDING"));
@@ -463,18 +632,25 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addBondCalculators(functionConfigs);
     addBondFutureCalculators(functionConfigs);
     addSABRCalculators(functionConfigs);
+    addDeprecatedSABRCalculators(functionConfigs);
     addForexOptionCalculators(functionConfigs);
+    addDeprecatedForexOptionCalculators(functionConfigs);
+    addDeprecatedForexForwardCalculators(functionConfigs);
     addForexForwardCalculators(functionConfigs);
-    addInterestRateFutureCalculators(functionConfigs);
+    addDeprecatedInterestRateFutureCalculators(functionConfigs);
     addInterestRateFutureOptionCalculators(functionConfigs);
+    addBondFutureOptionCalculators(functionConfigs);
     addEquityDerivativesCalculators(functionConfigs);
     addBlackCalculators(functionConfigs);
+    addDeprecatedBlackCalculators(functionConfigs);
     addLocalVolatilityCalculatorsOld(functionConfigs);
     addLocalVolatilityCalculators(functionConfigs);
     addExternallyProvidedSensitivitiesFunctions(functionConfigs);
 
     addScalingFunction(functionConfigs, ValueRequirementNames.FAIR_VALUE);
 
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SPOT_RATE_FOR_SECURITY);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SPOT_FX_PERCENTAGE_CHANGE);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.DELTA);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.DELTA_BLEED);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.STRIKE_DELTA);
@@ -552,27 +728,36 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_ALPHA_SENSITIVITY);
     addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_NU_SENSITIVITY);
     addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_RHO_SENSITIVITY);
+    addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_ALPHA_NODE_SENSITIVITY);
+    addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_RHO_NODE_SENSITIVITY);
+    addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_NU_NODE_SENSITIVITY);
     addScalingFunction(functionConfigs, ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.PAR_RATE);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.PAR_RATE_PARALLEL_CURVE_SHIFT);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.PAR_RATE_CURVE_SENSITIVITY);
 
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.FAIR_VALUE);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.PV01);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.DV01);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.CS01);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.FX_CURRENCY_EXPOSURE);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.FX_PRESENT_VALUE);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.VEGA_MATRIX);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_MATRIX);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_CUBE);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_CURVE_SENSITIVITY);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.PRICE_SERIES);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.PNL_SERIES);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.EXTERNAL_SENSITIVITIES);
-    addFilteredSummingFunction(functionConfigs, ValueRequirementNames.CREDIT_SENSITIVITIES);
+    addSummingFunction(functionConfigs, ValueRequirementNames.FAIR_VALUE);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PV01);
+    addSummingFunction(functionConfigs, ValueRequirementNames.DV01);
+    addSummingFunction(functionConfigs, ValueRequirementNames.CS01);
+    addSummingFunction(functionConfigs, ValueRequirementNames.FX_CURRENCY_EXPOSURE);
+    addSummingFunction(functionConfigs, ValueRequirementNames.FX_PRESENT_VALUE);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VEGA_MATRIX);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_MATRIX);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_CUBE);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_CURVE_SENSITIVITY);
+    addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_ALPHA_SENSITIVITY);
+    addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_NU_SENSITIVITY);
+    addScalingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_RHO_SENSITIVITY);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_ALPHA_NODE_SENSITIVITY);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_RHO_NODE_SENSITIVITY);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_SABR_NU_NODE_SENSITIVITY);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PRICE_SERIES);
+    addSummingFunction(functionConfigs, ValueRequirementNames.PNL_SERIES);
+    addSummingFunction(functionConfigs, ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES);
+    addSummingFunction(functionConfigs, ValueRequirementNames.EXTERNAL_SENSITIVITIES);
+    addSummingFunction(functionConfigs, ValueRequirementNames.CREDIT_SENSITIVITIES);
     addSummingFunction(functionConfigs, ValueRequirementNames.WEIGHT);
 
     addSummingFunction(functionConfigs, ValueRequirementNames.PRESENT_VALUE_Z_SPREAD_SENSITIVITY);
@@ -584,25 +769,30 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.FX_CURVE_SENSITIVITIES);
 
     addScalingFunction(functionConfigs, ValueRequirementNames.VEGA_MATRIX);
-    addSummingFunction(functionConfigs, ValueRequirementNames.VEGA_MATRIX);
     addScalingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_MATRIX);
-    addSummingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_MATRIX);
     addScalingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_CUBE);
-    addSummingFunction(functionConfigs, ValueRequirementNames.VEGA_QUOTE_CUBE);
     addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_VEGA);
     addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_VEGA);
+    addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_THETA);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_THETA);
     addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_GAMMA);
     addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_GAMMA);
 
     addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_DELTA);
-    //addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_DELTA);
     addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_RHO);
     addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_RHO);
+    addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_PHI);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_PHI);
 
+    addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_VOMMA);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_VOMMA);
+    addScalingFunction(functionConfigs, ValueRequirementNames.VALUE_VANNA);
+    addSummingFunction(functionConfigs, ValueRequirementNames.VALUE_VANNA);
+
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.SPOT);
     addUnitScalingFunction(functionConfigs, ValueRequirementNames.FORWARD);
-    addSummingFunction(functionConfigs, ValueRequirementNames.FORWARD);
     addValueGreekAndSummingFunction(functionConfigs, ValueRequirementNames.VALUE_DELTA);
-    addValueGreekAndSummingFunction(functionConfigs, ValueRequirementNames.VALUE_GAMMA);
+    addValueGreekAndSummingFunction(functionConfigs, ValueRequirementNames.VALUE_THETA);
     addValueGreekAndSummingFunction(functionConfigs, ValueRequirementNames.VALUE_SPEED);
 
     addCurrencyConversionFunctions(functionConfigs);
@@ -610,24 +800,26 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addDataShiftingFunctions(functionConfigs);
     addDefaultPropertyFunctions(functionConfigs);
     addHistoricalDataFunctions(functionConfigs);
+    addPassthroughFunctions(functionConfigs);
+
     functionConfigs.add(functionConfiguration(AnalyticOptionDefaultCurveFunction.class, "FUNDING"));
     functionConfigs.add(functionConfiguration(AnalyticOptionDefaultCurveFunction.class, "SECONDARY"));
 
-    RepositoryConfiguration repoConfig = new RepositoryConfiguration(functionConfigs);
+    final RepositoryConfiguration repoConfig = new RepositoryConfiguration(functionConfigs);
 
     if (OUTPUT_REPO_CONFIGURATION) {
-      FudgeMsg msg = OpenGammaFudgeContext.getInstance().toFudgeMsg(repoConfig).getMessage();
+      final FudgeMsg msg = OpenGammaFudgeContext.getInstance().toFudgeMsg(repoConfig).getMessage();
       FudgeMsgFormatter.outputToSystemOut(msg);
       try {
-        FudgeXMLSettings xmlSettings = new FudgeXMLSettings();
+        final FudgeXMLSettings xmlSettings = new FudgeXMLSettings();
         xmlSettings.setEnvelopeElementName(null);
-        FudgeMsgWriter msgWriter = new FudgeMsgWriter(new FudgeXMLStreamWriter(FudgeContext.GLOBAL_DEFAULT, new OutputStreamWriter(System.out), xmlSettings));
+        final FudgeMsgWriter msgWriter = new FudgeMsgWriter(new FudgeXMLStreamWriter(FudgeContext.GLOBAL_DEFAULT, new OutputStreamWriter(System.out), xmlSettings));
         msgWriter.setDefaultMessageProcessingDirectives(0);
         msgWriter.setDefaultMessageVersion(0);
         msgWriter.setDefaultTaxonomyId(0);
         msgWriter.writeMessage(msg);
         msgWriter.flush();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         // Just swallow it.
       }
     }
@@ -644,21 +836,25 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(TradeExchangeTradedDailyPnLFunction.class, DEFAULT_CONFIG_NAME, "PX_LAST", "COST_OF_CARRY"));
     functionConfigs.add(functionConfiguration(PositionExchangeTradedDailyPnLFunction.class, DEFAULT_CONFIG_NAME, "PX_LAST", "COST_OF_CARRY"));
     functionConfigs.add(functionConfiguration(SecurityPriceSeriesFunction.class, DEFAULT_CONFIG_NAME, MarketDataRequirementNames.MARKET_VALUE));
-    functionConfigs.add(functionConfiguration(SecurityPriceSeriesDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName));
+    functionConfigs.add(functionConfiguration(SecurityPriceSeriesDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName));
     functionConfigs.add(functionConfiguration(EquityPnLFunction.class));
-    functionConfigs.add(functionConfiguration(EquityPnLDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName, defaultReturnCalculatorName));
-    functionConfigs.add(functionConfiguration(SimpleFuturePnLFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(SimpleFuturePnLDefaultPropertiesFunction.class, "FUNDING", defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName));
-    functionConfigs.add(functionConfiguration(SimpleFXFuturePnLFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(SimpleFXFuturePnLDefaultPropertiesFunction.class, "FUNDING", "FUNDING", defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName));
-    functionConfigs.add(functionConfiguration(YieldCurveNodeSensitivityPnLFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(YieldCurveNodeSensitivityPnLDefaultPropertiesFunction.class, "FORWARD_3M", "FUNDING", defaultCurveCalculationMethod, defaultSamplingPeriodName,
-        defaultScheduleName, defaultSamplingCalculatorName));
-    functionConfigs.add(functionConfiguration(YieldCurveNodeSensitivityPnLDefaultPropertiesFunction.class, "FORWARD_6M", "FUNDING", defaultCurveCalculationMethod, defaultSamplingPeriodName,
-        defaultScheduleName, defaultSamplingCalculatorName));
-    functionConfigs.add(functionConfiguration(ValueGreekSensitivityPnLFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(ValueGreekSensitivityPnLDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName,
+    functionConfigs.add(functionConfiguration(EquityPnLDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName,
         defaultReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(SimpleFuturePnLFunction.class, DEFAULT_CONFIG_NAME));
+    functionConfigs.add(functionConfiguration(SimpleFuturePnLDefaultPropertiesFunction.class, "FUNDING", defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName));
+    functionConfigs.add(functionConfiguration(SimpleFXFuturePnLFunction.class, DEFAULT_CONFIG_NAME));
+    functionConfigs.add(functionConfiguration(SimpleFXFuturePnLDefaultPropertiesFunction.class, "FUNDING", "FUNDING", defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName));
+    functionConfigs.add(functionConfiguration(YieldCurveNodePnLFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(YieldCurveNodeSensitivityPnLDefaultsDeprecated.class, "FORWARD_3M", "FUNDING", defaultCurveCalculationMethod,
+        defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName, "USD", "EUR", "AUD"));
+    functionConfigs.add(functionConfiguration(YieldCurveNodeSensitivityPnLDefaultsDeprecated.class, "FORWARD_6M", "FUNDING", defaultCurveCalculationMethod,
+        defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName, "EUR"));
+    functionConfigs.add(functionConfiguration(ValueGreekSensitivityPnLFunction.class, DEFAULT_CONFIG_NAME));
+    functionConfigs.add(functionConfiguration(ValueGreekSensitivityPnLDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName, defaultReturnCalculatorName));
   }
 
   private static void addVaRCalculators(final List<FunctionConfiguration> functionConfigs) {
@@ -671,60 +867,84 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     final String defaultHorizonName = "1";
 
     //   functionConfigs.add(functionConfiguration(OptionPositionParametricVaRFunction.class, DEFAULT_CONFIG_NAME));
-    //functionConfigs.add(functionConfiguration(OptionPortfolioParametricVaRFunction.class, DEFAULT_CONFIG_NAME, startDate, defaultReturnCalculatorName, 
+    //functionConfigs.add(functionConfiguration(OptionPortfolioParametricVaRFunction.class, DEFAULT_CONFIG_NAME, startDate, defaultReturnCalculatorName,
     //  defaultScheduleName, defaultSamplingCalculatorName, "0.99", "1", ValueRequirementNames.VALUE_DELTA));
-    //functionConfigs.add(functionConfiguration(PositionValueGreekSensitivityPnLFunction.class, DEFAULT_CONFIG_NAME, startDate, defaultReturnCalculatorName, 
+    //functionConfigs.add(functionConfiguration(PositionValueGreekSensitivityPnLFunction.class, DEFAULT_CONFIG_NAME, startDate, defaultReturnCalculatorName,
     //  defaultScheduleName, defaultSamplingCalculatorName, ValueRequirementNames.VALUE_DELTA));
-    functionConfigs.add(functionConfiguration(PositionHistoricalVaRFunction.class));
-    functionConfigs.add(functionConfiguration(PortfolioHistoricalVaRFunction.class));
-    functionConfigs.add(functionConfiguration(PositionHistoricalVaRDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName,
-        defaultMeanCalculatorName, defaultStdDevCalculatorName, defaultConfidenceLevelName, defaultHorizonName));
-    functionConfigs.add(functionConfiguration(PortfolioHistoricalVaRDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName,
-        defaultMeanCalculatorName, defaultStdDevCalculatorName, defaultConfidenceLevelName, defaultHorizonName));
+    functionConfigs.add(functionConfiguration(NormalPositionHistoricalVaRFunction.class));
+    functionConfigs.add(functionConfiguration(NormalPortfolioHistoricalVaRFunction.class));
+    functionConfigs.add(functionConfiguration(NormalPositionHistoricalVaRDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName, defaultMeanCalculatorName, defaultStdDevCalculatorName, defaultConfidenceLevelName, defaultHorizonName,
+        PriorityClass.NORMAL.name()));
+    functionConfigs.add(functionConfiguration(NormalPortfolioHistoricalVaRDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName, defaultMeanCalculatorName, defaultStdDevCalculatorName, defaultConfidenceLevelName, defaultHorizonName,
+        PriorityClass.NORMAL.name()));
   }
 
-  private static void addEquityDerivativesCalculators(List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.PRESENT_VALUE, EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
-    //functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PRESENT_VALUE, EquityFuturePricerFactory.COST_OF_CARRY)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.PRESENT_VALUE, EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityIndexDividendFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.PRESENT_VALUE, EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
-    //functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PRESENT_VALUE, EquityFuturePricerFactory.COST_OF_CARRY)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.PRESENT_VALUE, EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.PV01, EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
-    //functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PV01, EquityFuturePricerFactory.COST_OF_CARRY)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.PV01, EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.VALUE_RHO, EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
-    //functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.VALUE_RHO, EquityFuturePricerFactory.COST_OF_CARRY)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.VALUE_RHO, EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.VALUE_DELTA, EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
-    //functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.VALUE_DELTA, EquityFuturePricerFactory.COST_OF_CARRY)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(),
-        Arrays.asList(ValueRequirementNames.VALUE_DELTA, EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
+  private static void addEquityDerivativesCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PRESENT_VALUE,
+        EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PRESENT_VALUE,
+        EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PV01,
+        EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PV01,
+        EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.VALUE_RHO,
+        EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.VALUE_RHO,
+        EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.VALUE_DELTA,
+        EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.VALUE_DELTA,
+        EquityFuturePricerFactory.DIVIDEND_YIELD, "FUNDING")));
     functionConfigs.add(functionConfiguration(EquityFutureYieldCurveNodeSensitivityFunction.class, "FUNDING"));
+
+    functionConfigs.add(new ParameterizedFunctionConfiguration(EquityIndexDividendFuturesFunction.class.getName(), Arrays.asList(ValueRequirementNames.PRESENT_VALUE,
+        EquityFuturePricerFactory.MARK_TO_MARKET, "FUNDING")));
     functionConfigs.add(functionConfiguration(EquityIndexDividendFutureYieldCurveNodeSensitivityFunction.class, "FUNDING"));
     functionConfigs.add(functionConfiguration(EquityForwardFromSpotAndYieldCurveFunction.class, "FUNDING"));
-    functionConfigs.add(functionConfiguration(EquityVarianceSwapPresentValueFunction.class, "FUNDING", "DEFAULT", EquityForwardFromSpotAndYieldCurveFunction.FORWARD_FROM_SPOT_AND_YIELD_CURVE));
-    functionConfigs.add(functionConfiguration(EquityVarianceSwapYieldCurveNodeSensitivityFunction.class, "FUNDING", "DEFAULT",
+    functionConfigs.add(functionConfiguration(EquityVarianceSwapPresentValueFunction.class, "FUNDING", "BBG",
         EquityForwardFromSpotAndYieldCurveFunction.FORWARD_FROM_SPOT_AND_YIELD_CURVE));
-    functionConfigs.add(functionConfiguration(EquityVarianceSwapVegaFunction.class, "FUNDING", "DEFAULT",
+    functionConfigs.add(functionConfiguration(EquityVarianceSwapYieldCurveNodeSensitivityFunction.class, "FUNDING", "BBG",
         EquityForwardFromSpotAndYieldCurveFunction.FORWARD_FROM_SPOT_AND_YIELD_CURVE));
+    functionConfigs.add(functionConfiguration(EquityVarianceSwapVegaFunction.class, "FUNDING", "BBG",
+        EquityForwardFromSpotAndYieldCurveFunction.FORWARD_FROM_SPOT_AND_YIELD_CURVE));
+    functionConfigs.add(functionConfiguration(EquityForwardCurveFunction.class));
+
+    functionConfigs.add(functionConfiguration(EquityIndexOptionPresentValueFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionImpliedVolFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionForwardValueFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionSpotIndexFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionSpotDeltaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionFundingCurveSensitivitiesFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionVegaMatrixFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionVegaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionSpotGammaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionSpotVannaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionVommaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionRhoFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexOptionDefaultPropertiesFunction.class, "BBG", "FUNDING", "Spline"));
+
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionPresentValueFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionSpotIndexFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionForwardValueFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionRhoFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionSpotDeltaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionSpotGammaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionSpotVannaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionVegaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionVommaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionDefaultPropertiesFunction.class, "0.0", "0.001"));
+
   }
 
-  private static void addBondFutureCalculators(List<FunctionConfiguration> functionConfigs) {
+  private static void addBondFutureCalculators(final List<FunctionConfiguration> functionConfigs) {
     functionConfigs.add(functionConfiguration(BondFutureGrossBasisFromCurvesFunction.class, "USD", "FUNDING", "FUNDING"));
     functionConfigs.add(functionConfiguration(BondFutureNetBasisFromCurvesFunction.class, "USD", "FUNDING", "FUNDING"));
   }
 
-  private static void addBondCalculators(List<FunctionConfiguration> functionConfigs) {
+  private static void addBondCalculators(final List<FunctionConfiguration> functionConfigs) {
     functionConfigs.add(functionConfiguration(BondCouponPaymentDiaryFunction.class));
     functionConfigs.add(functionConfiguration(BondTenorFunction.class));
     functionConfigs.add(functionConfiguration(BondMarketCleanPriceFunction.class));
@@ -744,62 +964,115 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(BondZSpreadPresentValueSensitivityFromCurveCleanPriceFunction.class));
     functionConfigs.add(functionConfiguration(BondZSpreadPresentValueSensitivityFromMarketCleanPriceFunction.class));
     functionConfigs.add(functionConfiguration(NelsonSiegelSvenssonBondCurveFunction.class));
-    functionConfigs.add(functionConfiguration(BondDefaultCurveNamesFunction.class, "FUNDING", "FUNDING", ValueRequirementNames.CLEAN_PRICE,
-        ValueRequirementNames.DIRTY_PRICE, ValueRequirementNames.MACAULAY_DURATION, ValueRequirementNames.MODIFIED_DURATION, ValueRequirementNames.YTM,
-        ValueRequirementNames.Z_SPREAD, ValueRequirementNames.PRESENT_VALUE_Z_SPREAD_SENSITIVITY));
+    functionConfigs.add(functionConfiguration(BondDefaultCurveNamesFunction.class, PriorityClass.ABOVE_NORMAL.name(),
+        "USD", "Discounting", "DefaultTwoCurveUSDConfig", "Discounting", "DefaultTwoCurveUSDConfig",
+        "EUR", "Discounting", "DefaultTwoCurveEURConfig", "Discounting", "DefaultTwoCurveEURConfig",
+        "GBP", "Discounting", "DefaultTwoCurveGBPConfig", "Discounting", "DefaultTwoCurveGBPConfig"));
   }
 
-  private static void addForexOptionCalculators(List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(functionConfiguration(BloombergForexSpotRateMarketDataFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackPresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackCurrencyExposureFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackVegaFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackVegaMatrixFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackVegaQuoteMatrixFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackPresentValueCurveSensitivityFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackPV01Function.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackDefaultPropertiesFunction.class, "FUNDING", "FORWARD_3M", "PresentValue", "FUNDING",
-        "FORWARD_6M", "PresentValue", "DEFAULT", "DoubleQuadratic", "LinearExtrapolator", "LinearExtrapolator", "USD", "EUR"));
-    functionConfigs.add(functionConfiguration(ForexOptionBlackDefaultPropertiesFunction.class, "FUNDING", "FORWARD_6M", "PresentValue", "FUNDING",
-        "FORWARD_3M", "PresentValue", "DEFAULT", "DoubleQuadratic", "LinearExtrapolator", "LinearExtrapolator", "EUR", "USD"));
+  private static void addForexOptionCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(CurrencyPairsFunction.class));
+    functionConfigs.add(functionConfiguration(CurrencyPairsDefaults.class, CurrencyPairs.DEFAULT_CURRENCY_PAIRS));
+    functionConfigs.add(functionConfiguration(BloombergFXSpotRateMarketDataFunction.class));
+    functionConfigs.add(functionConfiguration(BloombergFXSpotRatePercentageChangeFunction.class));
+    functionConfigs.add(functionConfiguration(BloombergFXOptionSpotRateFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPresentValueFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackFXPresentValueFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackCurrencyExposureFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVegaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVegaMatrixFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVegaQuoteMatrixFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackGammaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackGammaSpotFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVannaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVommaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPresentValueCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPV01Function.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackImpliedVolatilityFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackTermStructureCurrencyExposureFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackConstantSpreadThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVolatilitySurfaceConstantSpreadThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackYieldCurvesConstantSpreadThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackForwardSlideThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVolatilitySurfaceForwardSlideThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackYieldCurvesForwardSlideThetaFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackDefaults.class, PriorityClass.NORMAL.name(), DOUBLE_QUADRATIC, LINEAR_EXTRAPOLATOR, LINEAR_EXTRAPOLATOR,
+        "USD", "DefaultTwoCurveUSDConfig", "Discounting", "EUR", "DefaultTwoCurveEURConfig", "Discounting", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting",
+        "CAD", "DefaultTwoCurveCADConfig", "Discounting", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "AUD", "DefaultTwoCurveAUDConfig", "Discounting",
+        "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "CHF", "DefaultTwoCurveCHFConfig", "Discounting", "TULLETT", "USD", "DefaultTwoCurveUSDConfig",
+        "Discounting", "MXN", "DefaultCashCurveMXNConfig", "Cash", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "JPY", "DefaultTwoCurveJPYConfig",
+        "Discounting", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "GBP", "DefaultTwoCurveGBPConfig", "Discounting", "TULLETT", "USD",
+        "DefaultTwoCurveUSDConfig", "Discounting", "NZD", "DefaultTwoCurveNZDConfig", "Discounting", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "HUF",
+        "DefaultCashCurveHUFConfig", "Cash", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "KRW", "DefaultCashCurveKRWConfig", "Cash", "TULLETT", "USD",
+        "DefaultTwoCurveUSDConfig", "Discounting", "BRL", "DefaultCashCurveBRLConfig", "Cash", "TULLETT", "EUR", "DefaultTwoCurveEURConfig", "Discounting", "CHF",
+        "DefaultTwoCurveCHFConfig", "Discounting", "TULLETT", "USD", "DefaultTwoCurveUSDConfig", "Discounting", "HKD", "DefaultCashCurveHKDConfig", "Cash", "TULLETT"));
   }
 
-  private static void addForexForwardCalculators(List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(functionConfiguration(ForexForwardPresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(ForexForwardCurrencyExposureFunction.class));
-    functionConfigs.add(functionConfiguration(ForexForwardYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(ForexForwardPresentValueCurveSensitivityFunction.class));
-    functionConfigs.add(functionConfiguration(ForexForwardDefaultPropertiesFunction.class, "FUNDING", "FORWARD_3M", "PresentValue", "FUNDING", "FORWARD_6M", "PresentValue", "USD", "EUR"));
-    functionConfigs.add(functionConfiguration(ForexForwardDefaultPropertiesFunction.class, "FUNDING", "FORWARD_6M", "PresentValue", "FUNDING", "FORWARD_3M", "PresentValue", "EUR", "USD"));
-    functionConfigs.add(functionConfiguration(ForexForwardDefaultPropertiesFunction.class, "FUNDING", "FORWARD_6M", "PresentValue", "FUNDING", "FORWARD_6M", "PresentValue", "CHF", "EUR"));
-    functionConfigs.add(functionConfiguration(ForexForwardDefaultPropertiesFunction.class, "FUNDING", "FORWARD_6M", "PresentValue", "FUNDING", "FORWARD_6M", "PresentValue", "EUR", "CHF"));
+  private static void addDeprecatedForexOptionCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(BloombergFXSpotRateMarketDataFunction.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackCurrencyExposureFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVegaFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVegaMatrixFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackVegaQuoteMatrixFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPresentValueCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackPV01FunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXOptionBlackYCNSFunctionDeprecated.class));
   }
 
-  private static void addInterestRateFutureCalculators(List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(functionConfiguration(InterestRateFuturePresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(InterestRateFuturePV01Function.class));
-    functionConfigs.add(functionConfiguration(InterestRateFutureYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(InterestRateFutureDefaultValuesFunction.class, "FORWARD_3M", "FUNDING", "PresentValue", "USD", "EUR"));
+  private static void addForexForwardCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(FXForwardPV01Function.class));
+    functionConfigs.add(functionConfiguration(FXForwardFXPresentValueFunction.class));
+    functionConfigs.add(functionConfiguration(FXForwardCurrencyExposureFunction.class));
+    functionConfigs.add(functionConfiguration(FXForwardYCNSFunction.class));
+    functionConfigs.add(functionConfiguration(FXForwardPresentValueCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(FXForwardDefaults.class, PriorityClass.NORMAL.name(), "USD", "DefaultTwoCurveUSDConfig", "Discounting", "EUR",
+        "DefaultTwoCurveEURConfig", "Discounting", "CHF", "DefaultTwoCurveCHFConfig", "Discounting", "RUB", "DefaultCashCurveRUBConfig", "Cash"));
   }
 
-  private static void addInterestRateFutureOptionCalculators(List<FunctionConfiguration> functionConfigs) {
+  private static void addDeprecatedForexForwardCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(FXForwardPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXForwardCurrencyExposureFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXForwardYCNSFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(FXForwardPresentValueCurveSensitivityFunctionDeprecated.class));
+  }
+
+  private static void addDeprecatedInterestRateFutureCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(InterestRateFuturePresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFuturePV01FunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureYieldCurveNodeSensitivitiesFunctionDeprecated.class));
+  }
+
+  private static void addInterestRateFutureOptionCalculators(final List<FunctionConfiguration> functionConfigs) {
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionSABRPresentValueFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionSABRSensitivitiesFunction.class, ValueRequirementNames.PRESENT_VALUE_SABR_ALPHA_SENSITIVITY));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionSABRSensitivitiesFunction.class, ValueRequirementNames.PRESENT_VALUE_SABR_NU_SENSITIVITY));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionSABRSensitivitiesFunction.class, ValueRequirementNames.PRESENT_VALUE_SABR_RHO_SENSITIVITY));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionSABRVegaFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionSABRYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(InterestRateFutureOptionDefaultValuesFunction.class, "FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue", "USD", "EUR"));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionDefaultValuesFunctionDeprecated.class, "FUTURES", "FUNDING", "DEFAULT", "PresentValue", "USD",
+        "EUR"));
     functionConfigs.add(functionConfiguration(SABRNonLinearLeastSquaresIRFutureOptionSurfaceFittingFunction.class));
     functionConfigs.add(functionConfiguration(SABRNonLinearLeastSquaresIRFutureSurfaceDefaultValuesFunction.class, "DEFAULT"));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionMarketUnderlyingPriceFunction.class));
     //functionConfigs.add(functionConfiguration(HestonFourierIRFutureSurfaceFittingFunction.class, "USD", "DEFAULT"));
     //functionConfigs.add(functionConfiguration(InterestRateFutureOptionHestonPresentValueFunction.class, "FORWARD_3M", "FUNDING", "DEFAULT"));
   }
 
-  private static void addLocalVolatilityCalculatorsOld(List<FunctionConfiguration> functionConfigs) {
+  private static void addBondFutureOptionCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackPresentValueFunction.class));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackDeltaFunction.class));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackGammaFunction.class));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackPV01Function.class));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackYCNSFunction.class));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackVegaFunction.class));
+    functionConfigs.add(functionConfiguration(BondFutureOptionBlackFromFuturePresentValueFunction.class));
+  }
+
+  private static void addLocalVolatilityCalculatorsOld(final List<FunctionConfiguration> functionConfigs) {
     final List<String> blackVolSurfaceProperties = new ArrayList<String>();
-    blackVolSurfaceProperties.add(FXForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD);
+    blackVolSurfaceProperties.add(ForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD);
     blackVolSurfaceProperties.add("FUNDING-FUNDING");
     blackVolSurfaceProperties.add(LocalVolatilityPDEValuePropertyNames.MONEYNESS);
     blackVolSurfaceProperties.add(LocalVolatilityPDEValuePropertyNames.LOG_TIME);
@@ -855,136 +1128,143 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
   private static void addLocalVolatilityCalculators(final List<FunctionConfiguration> functionConfigs) {
     functionConfigs.add(new StaticFunctionConfiguration(BlackVolatilitySurfaceMixedLogNormalInterpolatorFunction.class.getName()));
     functionConfigs.add(new StaticFunctionConfiguration(BlackVolatilitySurfaceSABRInterpolatorFunction.class.getName()));
-    functionConfigs.add(new StaticFunctionConfiguration(BlackVolatilitySurfaceSplineInterpolatorFunction.class.getName()));
+    functionConfigs.add(new StaticFunctionConfiguration(BlackVolatilitySurfaceSplineInterpolatorFunction.Exception.class.getName()));
+    functionConfigs.add(new StaticFunctionConfiguration(BlackVolatilitySurfaceSplineInterpolatorFunction.Quiet.class.getName()));
+
+    functionConfigs.add(new StaticFunctionConfiguration(EquityBlackVolatilitySurfaceFunction.class.getName()));
+
     functionConfigs.add(new StaticFunctionConfiguration(ForexBlackVolatilitySurfaceFunction.MixedLogNormal.class.getName()));
     functionConfigs.add(new StaticFunctionConfiguration(ForexBlackVolatilitySurfaceFunction.SABR.class.getName()));
     functionConfigs.add(new StaticFunctionConfiguration(ForexBlackVolatilitySurfaceFunction.Spline.class.getName()));
     functionConfigs.add(new StaticFunctionConfiguration(ForexDupireLocalVolatilitySurfaceFunction.MixedLogNormal.class.getName()));
     functionConfigs.add(new StaticFunctionConfiguration(ForexDupireLocalVolatilitySurfaceFunction.SABR.class.getName()));
     functionConfigs.add(new StaticFunctionConfiguration(ForexDupireLocalVolatilitySurfaceFunction.Spline.class.getName()));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEPipsPresentValueFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEPipsPresentValueFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEPipsPresentValueFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVegaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVegaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVegaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVannaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVannaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVannaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVommaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVommaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVommaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEImpliedVolatilityFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEImpliedVolatilityFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEImpliedVolatilityFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+
+    functionConfigs.add(new StaticFunctionConfiguration(EquityDupireLocalVolatilitySurfaceFunction.MixedLogNormal.class.getName()));
+    functionConfigs.add(new StaticFunctionConfiguration(EquityDupireLocalVolatilitySurfaceFunction.SABR.class.getName()));
+    functionConfigs.add(new StaticFunctionConfiguration(EquityDupireLocalVolatilitySurfaceFunction.Spline.class.getName()));
+
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEPipsPresentValueFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEPipsPresentValueFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEPipsPresentValueFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEDualGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVegaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVegaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVegaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVannaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVannaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVannaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVommaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVommaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEForwardVommaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEImpliedVolatilityFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEImpliedVolatilityFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEImpliedVolatilityFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
     addLocalVolatilityGridFunctions(functionConfigs);
     addLocalVolatilityDefaultProperties(functionConfigs);
   }
 
   private static void addLocalVolatilityGridFunctions(final List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardDeltaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardGammaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVegaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVegaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVegaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVannaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVannaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVannaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVommaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVommaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVommaFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridImpliedVolatilityFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridImpliedVolatilityFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridImpliedVolatilityFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridPipsPresentValueFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridPipsPresentValueFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridPipsPresentValueFunction.class.getName(),
-        Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridDualGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardDeltaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardGammaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVegaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVegaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVegaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVannaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVannaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVannaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVommaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVommaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridForwardVommaFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridImpliedVolatilityFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridImpliedVolatilityFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridImpliedVolatilityFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridPipsPresentValueFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SPLINE)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridPipsPresentValueFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.SABR)));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(ForexLocalVolatilityForwardPDEGridPipsPresentValueFunction.class.getName(), Arrays
+        .asList(BlackVolatilitySurfacePropertyNamesAndValues.MIXED_LOG_NORMAL)));
   }
 
+  /** See BlackVolatilitySurfacePropertyNamesAndValues for Strings one might use to override the defaults */
   private static void addLocalVolatilityDefaultProperties(final List<FunctionConfiguration> functionConfigs) {
-    final List<String> commonBlackSurfaceInterpolatorProperties = Arrays.asList(
-        BlackVolatilitySurfacePropertyNamesAndValues.LOG_TIME,
-        BlackVolatilitySurfacePropertyNamesAndValues.LOG_Y,
-        BlackVolatilitySurfacePropertyNamesAndValues.INTEGRATED_VARIANCE,
-        Interpolator1DFactory.DOUBLE_QUADRATIC,
-        Interpolator1DFactory.LINEAR_EXTRAPOLATOR,
-        Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    // Interpolator properties. There are three types: SABR, MIXED_LOGNORMAL, SPLINE.
+    final List<String> commonBlackSurfaceInterpolatorProperties = Arrays.asList(BlackVolatilitySurfacePropertyNamesAndValues.LOG_TIME,
+        BlackVolatilitySurfacePropertyNamesAndValues.LOG_Y, BlackVolatilitySurfacePropertyNamesAndValues.INTEGRATED_VARIANCE, Interpolator1DFactory.DOUBLE_QUADRATIC,
+        Interpolator1DFactory.LINEAR_EXTRAPOLATOR, Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
     final List<String> mixedLogNormalProperties = new ArrayList<String>(commonBlackSurfaceInterpolatorProperties);
     mixedLogNormalProperties.add(WeightingFunctionFactory.SINE_WEIGHTING_FUNCTION_NAME);
     final List<String> sabrProperties = new ArrayList<String>(commonBlackSurfaceInterpolatorProperties);
@@ -996,23 +1276,37 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     splineProperties.add(Interpolator1DFactory.DOUBLE_QUADRATIC);
     splineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
     splineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    // Equity default is: Quiet - if ShiftedLogNormalTailExtrapolationFitter fails on boundary, try on next strike in interior of domain
+    splineProperties.add(BlackVolatilitySurfacePropertyNamesAndValues.QUIET_SPLINE_EXTRAPOLATOR_FAILURE);
+
+    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceMixedLogNormalInterpolatorDefaults.class.getName(), mixedLogNormalProperties));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSABRInterpolatorDefaults.class.getName(), sabrProperties));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSplineInterpolatorDefaults.class.getName(), splineProperties));
+
+    // commonForexBLACKSurfaceProperties
     final List<String> commonForexBlackSurfaceProperties = new ArrayList<String>(commonBlackSurfaceInterpolatorProperties);
     commonForexBlackSurfaceProperties.add("FUNDING-FUNDING");
-    commonForexBlackSurfaceProperties.add(FXForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD);
+    commonForexBlackSurfaceProperties.add(ForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD);
     commonForexBlackSurfaceProperties.add("DEFAULT");
     final List<String> forexBlackSurfaceMixedLogNormalProperties = new ArrayList<String>(commonForexBlackSurfaceProperties);
     forexBlackSurfaceMixedLogNormalProperties.add(WeightingFunctionFactory.SINE_WEIGHTING_FUNCTION_NAME);
+    // forexBlackSurface[Interpr]Properties  ( depend on commonForexBlackSurfaceProperties)
     final List<String> forexBlackSurfaceSABRProperties = new ArrayList<String>(commonForexBlackSurfaceProperties);
     forexBlackSurfaceSABRProperties.add(VolatilityFunctionFactory.HAGAN);
     forexBlackSurfaceSABRProperties.add(WeightingFunctionFactory.SINE_WEIGHTING_FUNCTION_NAME);
     forexBlackSurfaceSABRProperties.add("false");
     forexBlackSurfaceSABRProperties.add("0.5");
-    final List<String> forexBlackSurfaceSplineProperties = new ArrayList<String>(commonForexBlackSurfaceProperties);
-    forexBlackSurfaceSplineProperties.add(Interpolator1DFactory.DOUBLE_QUADRATIC);
-    forexBlackSurfaceSplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
-    forexBlackSurfaceSplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    // BlackSurface with Spline Interpolation and  ShiftedLogNormalTailExtrapolation
+    final List<String> blackSurfaceSplineProperties = new ArrayList<String>(commonForexBlackSurfaceProperties);
+    blackSurfaceSplineProperties.add(Interpolator1DFactory.DOUBLE_QUADRATIC);
+    blackSurfaceSplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    blackSurfaceSplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    // Spline default is: Quiet - if ShiftedLogNormalTailExtrapolationFitter fails on boundary, try on next strike in interior of domain
+    blackSurfaceSplineProperties.add(BlackVolatilitySurfacePropertyNamesAndValues.QUIET_SPLINE_EXTRAPOLATOR_FAILURE);
+
+    // commonForexLOCALSurfaceProperties
     final List<String> commonForexLocalSurfaceProperties = new ArrayList<String>(commonForexBlackSurfaceProperties);
-    commonForexLocalSurfaceProperties.add("1e-3");
+    commonForexLocalSurfaceProperties.add("1e-3"); // "SurfaceDerivativeEPS" shift used for FD derivative approximations
     final List<String> forexLocalSurfaceMixedLogNormalProperties = new ArrayList<String>(commonForexLocalSurfaceProperties);
     forexLocalSurfaceMixedLogNormalProperties.add(WeightingFunctionFactory.SINE_WEIGHTING_FUNCTION_NAME);
     final List<String> forexLocalSurfaceSABRProperties = new ArrayList<String>(commonForexLocalSurfaceProperties);
@@ -1024,6 +1318,9 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     forexLocalSurfaceSplineProperties.add(Interpolator1DFactory.DOUBLE_QUADRATIC);
     forexLocalSurfaceSplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
     forexLocalSurfaceSplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    // FX default is:  Quiet - if ShiftedLogNormalTailExtrapolationFitter fails on boundary, try on next strike in interior of domain
+    forexLocalSurfaceSplineProperties.add(BlackVolatilitySurfacePropertyNamesAndValues.QUIET_SPLINE_EXTRAPOLATOR_FAILURE);
+
     final List<String> commonForexBackwardPDEProperties = new ArrayList<String>(commonForexLocalSurfaceProperties);
     commonForexBackwardPDEProperties.add("0.5");
     commonForexBackwardPDEProperties.add("100");
@@ -1044,6 +1341,8 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     forexBackwardPDESplineProperties.add(Interpolator1DFactory.DOUBLE_QUADRATIC);
     forexBackwardPDESplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
     forexBackwardPDESplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
+    // backwardPDE default is: Quiet - if ShiftedLogNormalTailExtrapolationFitter fails on boundary, try on next strike in interior of domain
+    forexBackwardPDESplineProperties.add(BlackVolatilitySurfacePropertyNamesAndValues.QUIET_SPLINE_EXTRAPOLATOR_FAILURE);
     final List<String> commonForexForwardPDEProperties = new ArrayList<String>(commonForexLocalSurfaceProperties);
     commonForexForwardPDEProperties.add("0.5");
     commonForexForwardPDEProperties.add("100");
@@ -1065,12 +1364,12 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     forexForwardPDESplineProperties.add(Interpolator1DFactory.DOUBLE_QUADRATIC);
     forexForwardPDESplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
     forexForwardPDESplineProperties.add(Interpolator1DFactory.LINEAR_EXTRAPOLATOR);
-    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceMixedLogNormalInterpolatorDefaults.class.getName(), mixedLogNormalProperties));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSABRInterpolatorDefaults.class.getName(), sabrProperties));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSplineInterpolatorDefaults.class.getName(), splineProperties));
+    // forwardPDE default is: Quiet - if ShiftedLogNormalTailExtrapolationFitter fails on boundary, try on next strike in interior of domain
+    forexForwardPDESplineProperties.add(BlackVolatilitySurfacePropertyNamesAndValues.QUIET_SPLINE_EXTRAPOLATOR_FAILURE);
+
     functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceMixedLogNormalDefaults.class.getName(), forexBlackSurfaceMixedLogNormalProperties));
     functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSABRDefaults.class.getName(), forexBlackSurfaceSABRProperties));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSplineDefaults.class.getName(), forexBlackSurfaceSplineProperties));
+    functionConfigs.add(new ParameterizedFunctionConfiguration(BlackVolatilitySurfaceSplineDefaults.class.getName(), blackSurfaceSplineProperties));
     functionConfigs.add(new ParameterizedFunctionConfiguration(LocalVolatilitySurfaceMixedLogNormalDefaults.class.getName(), forexLocalSurfaceMixedLogNormalProperties));
     functionConfigs.add(new ParameterizedFunctionConfiguration(LocalVolatilitySurfaceSABRDefaults.class.getName(), forexLocalSurfaceSABRProperties));
     functionConfigs.add(new ParameterizedFunctionConfiguration(LocalVolatilitySurfaceSplineDefaults.class.getName(), forexLocalSurfaceSplineProperties));
@@ -1085,40 +1384,127 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
   private static void addSABRCalculators(final List<FunctionConfiguration> functionConfigs) {
     functionConfigs.add(functionConfiguration(SABRNonLinearLeastSquaresSwaptionCubeFittingFunction.class));
     functionConfigs.add(functionConfiguration(SABRNonLinearLeastSquaresSwaptionCubeFittingDefaults.class, "USD", "BLOOMBERG"));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPresentValueCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(SABRNonLinearLeastSquaresSwaptionCubeFittingDefaults.class, "EUR", "BLOOMBERG"));
+    functionConfigs.add(functionConfiguration(SABRNonLinearLeastSquaresSwaptionCubeFittingDefaults.class, "GBP", "BLOOMBERG"));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVCurveSensitivityFunction.class));
     functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPresentValueSABRSensitivityFunction.Alpha.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPresentValueSABRSensitivityFunction.Nu.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPresentValueSABRSensitivityFunction.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunction.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunction.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunction.Rho.class));
     functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationVegaFunction.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPresentValueCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationYCNSFunction.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVCurveSensitivityFunction.class));
     functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPresentValueSABRSensitivityFunction.Alpha.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPresentValueSABRSensitivityFunction.Nu.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPresentValueSABRSensitivityFunction.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunction.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunction.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunction.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunction.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunction.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunction.Rho.class));
     functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationVegaFunction.class));
-    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPresentValueCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationYCNSFunction.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVCurveSensitivityFunction.class));
     functionConfigs.add(functionConfiguration(SABRNoExtrapolationPresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPresentValueSABRSensitivityFunction.Alpha.class));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPresentValueSABRSensitivityFunction.Nu.class));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPresentValueSABRSensitivityFunction.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVSABRSensitivityFunction.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVSABRSensitivityFunction.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVSABRSensitivityFunction.Rho.class));
     functionConfigs.add(functionConfiguration(SABRNoExtrapolationVegaFunction.class));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPresentValueCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationYCNSFunction.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVCurveSensitivityFunction.class));
     functionConfigs.add(functionConfiguration(SABRRightExtrapolationPresentValueFunction.class));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPresentValueSABRSensitivityFunction.Alpha.class));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPresentValueSABRSensitivityFunction.Nu.class));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPresentValueSABRSensitivityFunction.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRSensitivityFunction.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRSensitivityFunction.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRSensitivityFunction.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRNodeSensitivityFunction.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRNodeSensitivityFunction.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRNodeSensitivityFunction.Rho.class));
     functionConfigs.add(functionConfiguration(SABRRightExtrapolationVegaFunction.class));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationDefaults.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares", "PresentValue", "USD"));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationDefaults.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares", "PresentValue", "0.07", "10.0", "USD"));
-    functionConfigs.add(functionConfiguration(SABRNoExtrapolationVegaDefaults.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares", "PresentValue", 
-        "Linear", "FlatExtrapolator", "FlatExtrapolator", "Linear", "FlatExtrapolator", "FlatExtrapolator", "USD"));
-    functionConfigs.add(functionConfiguration(SABRRightExtrapolationVegaDefaults.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares", "PresentValue",
-        "0.07", "10.0", "Linear", "FlatExtrapolator", "FlatExtrapolator", "Linear", "FlatExtrapolator", "FlatExtrapolator", "USD"));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationYCNSFunction.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationDefaults.class, PriorityClass.BELOW_NORMAL.name(),
+        VolatilityDataFittingDefaults.NON_LINEAR_LEAST_SQUARES, "USD", "DefaultTwoCurveUSDConfig", "BLOOMBERG", "EUR", "DefaultTwoCurveEURConfig", "BLOOMBERG", "GBP",
+        "DefaultTwoCurveGBPConfig", "BLOOMBERG"));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationDefaults.class, PriorityClass.BELOW_NORMAL.name(),
+        VolatilityDataFittingDefaults.NON_LINEAR_LEAST_SQUARES, "0.07", "10.0", "USD", "DefaultTwoCurveUSDConfig", "BLOOMBERG", "EUR", "DefaultTwoCurveEURConfig",
+        "BLOOMBERG", "GBP", "DefaultTwoCurveGBPConfig", "BLOOMBERG"));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationVegaDefaults.class, PriorityClass.BELOW_NORMAL.name(),
+        VolatilityDataFittingDefaults.NON_LINEAR_LEAST_SQUARES, LINEAR, FLAT_EXTRAPOLATOR, FLAT_EXTRAPOLATOR, LINEAR, FLAT_EXTRAPOLATOR, FLAT_EXTRAPOLATOR, "USD",
+        "DefaultTwoCurveUSDConfig", "BLOOMBERG", "EUR", "DefaultTwoCurveEURConfig", "BLOOMBERG", "GBP", "DefaultTwoCurveGBPConfig", "BLOOMBERG"));
+    functionConfigs
+        .add(functionConfiguration(SABRRightExtrapolationVegaDefaults.class, PriorityClass.BELOW_NORMAL.name(), VolatilityDataFittingDefaults.NON_LINEAR_LEAST_SQUARES,
+            "0.07", "10.0", LINEAR, FLAT_EXTRAPOLATOR, FLAT_EXTRAPOLATOR, LINEAR, FLAT_EXTRAPOLATOR, FLAT_EXTRAPOLATOR, "USD", "DefaultTwoCurveUSDConfig", "BLOOMBERG",
+            "EUR", "DefaultTwoCurveEURConfig", "BLOOMBERG", "GBP", "DefaultTwoCurveGBPConfig", "BLOOMBERG"));
+  }
+
+  private static void addDeprecatedSABRCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunctionDeprecated.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunctionDeprecated.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationPVSABRSensitivityFunctionDeprecated.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationVegaFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadNoExtrapolationYCNSFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunctionDeprecated.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunctionDeprecated.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRSensitivityFunctionDeprecated.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationVegaFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRCMSSpreadRightExtrapolationYCNSFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVSABRSensitivityFunctionDeprecated.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVSABRSensitivityFunctionDeprecated.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationPVSABRSensitivityFunctionDeprecated.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationVegaFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationYCNSFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRSensitivityFunctionDeprecated.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRSensitivityFunctionDeprecated.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRSensitivityFunctionDeprecated.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated.Alpha.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated.Nu.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationPVSABRNodeSensitivityFunctionDeprecated.Rho.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationVegaFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationYCNSFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationDefaultsDeprecated.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares", "PresentValue",
+        "USD"));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationDefaultsDeprecated.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares",
+        "PresentValue", "0.07", "10.0", "USD"));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationVegaDefaultsDeprecated.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares",
+        "PresentValue", "Linear", "FlatExtrapolator", "FlatExtrapolator", "Linear", "FlatExtrapolator", "FlatExtrapolator", "USD"));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationVegaDefaultsDeprecated.class, "FORWARD_3M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares",
+        "PresentValue", "0.07", "10.0", "Linear", "FlatExtrapolator", "FlatExtrapolator", "Linear", "FlatExtrapolator", "FlatExtrapolator", "USD"));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationDefaultsDeprecated.class, "FORWARD_6M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares", "PresentValue",
+        "EUR", "GBP"));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationDefaultsDeprecated.class, "FORWARD_6M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares",
+        "PresentValue", "0.07", "10.0", "EUR", "GBP"));
+    functionConfigs.add(functionConfiguration(SABRNoExtrapolationVegaDefaultsDeprecated.class, "FORWARD_6M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares",
+        "PresentValue", "Linear", "FlatExtrapolator", "FlatExtrapolator", "Linear", "FlatExtrapolator", "FlatExtrapolator", "EUR", "GBP"));
+    functionConfigs.add(functionConfiguration(SABRRightExtrapolationVegaDefaultsDeprecated.class, "FORWARD_6M", "FUNDING", "BLOOMBERG", "NonLinearLeastSquares",
+        "PresentValue", "0.07", "10.0", "Linear", "FlatExtrapolator", "FlatExtrapolator", "Linear", "FlatExtrapolator", "FlatExtrapolator", "EUR", "GBP"));
+  }
+
+  private static void addDeprecatedBlackCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackVolatilitySensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackImpliedVolatilityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackPV01FunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackGammaFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackPriceFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackDefaultPropertiesFunctionDeprecated.class, "FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue",
+        "USD", "EUR"));
+    // TODO Change FORWARD_3M to FUTURES once available in db
+    functionConfigs.add(functionConfiguration(SwaptionBlackPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SwaptionBlackVolatilitySensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SwaptionBlackPV01FunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SwaptionBlackYieldCurveNodeSensitivitiesFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SwaptionBlackImpliedVolatilityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(SwaptionBlackDefaultPropertiesFunctionDeprecated.class, "FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue", "USD", "EUR"));
   }
 
   private static void addBlackCalculators(final List<FunctionConfiguration> functionConfigs) {
@@ -1129,33 +1515,50 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackYieldCurveNodeSensitivitiesFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackGammaFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackPriceFunction.class));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(InterestRateFutureOptionBlackDefaultPropertiesFunction.class.getName(),
-        Arrays.asList("FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue", "USD", "EUR")));  // TODO Change FORWARD_3M to FUTURES once available in db
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionConstantSpreadThetaFunction.class));
+    functionConfigs.add(functionConfiguration(InterestRateFutureOptionBlackDefaults.class, PriorityClass.ABOVE_NORMAL.name(),
+        "USD", "DefaultTwoCurveUSDConfig", "DEFAULT"));
+    functionConfigs.add(functionConfiguration(MarginPriceFunction.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackPresentValueFunction.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackVolatilitySensitivityFunction.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackPV01Function.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackYieldCurveNodeSensitivitiesFunction.class));
     functionConfigs.add(functionConfiguration(SwaptionBlackImpliedVolatilityFunction.class));
-    functionConfigs.add(new ParameterizedFunctionConfiguration(SwaptionBlackDefaultPropertiesFunction.class.getName(), Arrays.asList("FORWARD_3M", "FUNDING", "DEFAULT", "PresentValue", "USD")));
+    functionConfigs.add(functionConfiguration(SwaptionConstantSpreadThetaFunction.class));
+    functionConfigs.add(functionConfiguration(SwaptionBlackDefaultPropertiesFunction.class, PriorityClass.NORMAL.name(), "EUR", "DefaultTwoCurveEURConfig", "DEFAULT"));
+    functionConfigs.add(functionConfiguration(SwaptionBlackThetaDefaults.class, PriorityClass.NORMAL.name(), "1", "EUR", "DefaultTwoCurveEURConfig", "DEFAULT"));
   }
 
-  private static void addFixedIncomeInstrumentCalculators(List<FunctionConfiguration> functionConfigs) {
-    functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateFunction.class));
-    functionConfigs.add(functionConfiguration(InterestRateInstrumentPresentValueFunction.class));
+  private static void addFixedIncomeInstrumentCalculators(final List<FunctionConfiguration> functionConfigs) {
     functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateParallelCurveSensitivityFunction.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentPresentValueFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateInstrumentPV01Function.class));
     functionConfigs.add(functionConfiguration(InterestRateInstrumentYieldCurveNodeSensitivitiesFunction.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultPropertiesFunction.class, PriorityClass.BELOW_NORMAL.name(), "false", "EUR",
+        "DefaultTwoCurveEURConfig"));
+  }
+
+  private static void addDeprecatedFixedIncomeInstrumentCalculators(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentPresentValueFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentParRateParallelCurveSensitivityFunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentPV01FunctionDeprecated.class));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentYieldCurveNodeSensitivitiesFunctionDeprecated.class));
     functionConfigs.add(functionConfiguration(InterpolatedYieldCurveFunction.class));
     final String leftExtrapolatorName = Interpolator1DFactory.LINEAR_EXTRAPOLATOR;
     final String rightExtrapolatorName = Interpolator1DFactory.FLAT_EXTRAPOLATOR;
     functionConfigs.add(functionConfiguration(InterpolatedYieldCurveDefaults.class, leftExtrapolatorName, rightExtrapolatorName, "USD", "EUR", "DKK", "AUD", "MYR"));
     functionConfigs.add(functionConfiguration(MarketInstrumentImpliedYieldCurveFunction.class, MarketInstrumentImpliedYieldCurveFunction.PAR_RATE_STRING));
     functionConfigs.add(functionConfiguration(MarketInstrumentImpliedYieldCurveFunction.class, MarketInstrumentImpliedYieldCurveFunction.PRESENT_VALUE_STRING));
-    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunction.class, "PresentValue", "FORWARD_3M", "FUNDING", "AUD", "USD", "CAD"));
-    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunction.class, "PresentValue", "FORWARD_6M", "FUNDING", "DKK", "EUR", "GBP", "JPY", "NZD", "CHF"));
-    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunction.class, "PresentValue", "SECONDARY", "SECONDARY", "AUD", "CAD", "CHF", "DKK", "EUR",
-        "GBP", "JPY", "NZD", "USD"));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunctionDeprecated.class, "PresentValue", "FORWARD_3M", "FUNDING", "AUD", "USD",
+        "CAD"));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunctionDeprecated.class, "PresentValue", "FORWARD_6M", "FUNDING", "DKK", "EUR",
+        "GBP", "JPY", "NZD", "CHF"));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultCurveNameFunctionDeprecated.class, "PresentValue", "SECONDARY", "SECONDARY", "AUD", "CAD",
+        "CHF", "DKK", "EUR", "GBP", "JPY", "NZD", "USD"));
   }
 
   private static void addPortfolioAnalysisCalculators(final List<FunctionConfiguration> functionConfigs) {
@@ -1168,44 +1571,44 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     final String defaultVarianceCalculatorName = StatisticsCalculatorFactory.SAMPLE_VARIANCE;
     final String defaultExcessReturnCalculatorName = StatisticsCalculatorFactory.MEAN; //TODO static variables?
 
-    functionConfigs.add(functionConfiguration(CAPMBetaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
-    functionConfigs.add(functionConfiguration(CAPMBetaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
-    functionConfigs.add(functionConfiguration(CAPMBetaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
-    functionConfigs.add(functionConfiguration(CAPMBetaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
+    functionConfigs.add(functionConfiguration(CAPMBetaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
+    functionConfigs.add(functionConfiguration(CAPMBetaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
     functionConfigs.add(functionConfiguration(CAPMBetaModelPositionFunction.class, DEFAULT_CONFIG_NAME));
     functionConfigs.add(functionConfiguration(CAPMBetaModelPortfolioNodeFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(CAPMFromRegressionDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName));
-    functionConfigs.add(functionConfiguration(CAPMFromRegressionDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(CAPMFromRegressionDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(CAPMFromRegressionDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName));
     functionConfigs.add(functionConfiguration(CAPMFromRegressionModelPositionFunction.class, DEFAULT_CONFIG_NAME));
     functionConfigs.add(functionConfiguration(CAPMFromRegressionModelPortfolioNodeFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(SharpeRatioDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
-    functionConfigs.add(functionConfiguration(SharpeRatioDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(SharpeRatioDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(SharpeRatioDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
     functionConfigs.add(functionConfiguration(SharpeRatioPositionFunction.class, DEFAULT_CONFIG_NAME));
     functionConfigs.add(functionConfiguration(SharpeRatioPortfolioNodeFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(TreynorRatioDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
-    functionConfigs.add(functionConfiguration(TreynorRatioDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
+    functionConfigs.add(functionConfiguration(TreynorRatioDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName,
+        defaultVarianceCalculatorName));
+    functionConfigs.add(functionConfiguration(TreynorRatioDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName,
+        defaultVarianceCalculatorName));
     functionConfigs.add(functionConfiguration(TreynorRatioPositionFunction.class, DEFAULT_CONFIG_NAME));
     functionConfigs.add(functionConfiguration(TreynorRatioPortfolioNodeFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(JensenAlphaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
-    functionConfigs.add(functionConfiguration(JensenAlphaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName, defaultVarianceCalculatorName));
+    functionConfigs.add(functionConfiguration(JensenAlphaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName,
+        defaultVarianceCalculatorName));
+    functionConfigs.add(functionConfiguration(JensenAlphaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName, defaultCovarianceCalculatorName,
+        defaultVarianceCalculatorName));
     functionConfigs.add(functionConfiguration(JensenAlphaPositionFunction.class, DEFAULT_CONFIG_NAME));
     functionConfigs.add(functionConfiguration(JensenAlphaPortfolioNodeFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(TotalRiskAlphaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
-    functionConfigs.add(functionConfiguration(TotalRiskAlphaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingFunctionName,
-        defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(TotalRiskAlphaDefaultPropertiesPortfolioNodeFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
+    functionConfigs.add(functionConfiguration(TotalRiskAlphaDefaultPropertiesPositionFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingFunctionName, defaultReturnCalculatorName, defaultStdDevCalculatorName, defaultExcessReturnCalculatorName));
     functionConfigs.add(functionConfiguration(TotalRiskAlphaPositionFunction.class, DEFAULT_CONFIG_NAME));
     functionConfigs.add(functionConfiguration(TotalRiskAlphaPortfolioNodeFunction.class, DEFAULT_CONFIG_NAME));
     //    functionConfigs.add(functionConfiguration(PositionWeightFromNAVFunction.class, "56000000"));
@@ -1221,10 +1624,15 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
 
     functionConfigs.add(functionConfiguration(ExternallyProvidedSensitivitiesCreditFactorsFunction.class));
     functionConfigs.add(functionConfiguration(ExternallyProvidedSensitivityPnLFunction.class, DEFAULT_CONFIG_NAME));
-    functionConfigs.add(functionConfiguration(ExternallyProvidedSensitivityPnLDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName, defaultSamplingCalculatorName));
+    functionConfigs.add(functionConfiguration(ExternallyProvidedSensitivityPnLDefaultPropertiesFunction.class, defaultSamplingPeriodName, defaultScheduleName,
+        defaultSamplingCalculatorName));
     functionConfigs.add(functionConfiguration(ExternallyProvidedSecurityMarkFunction.class));
     functionConfigs.add(functionConfiguration(ExternallyProvidedSensitivitiesYieldCurveDV01Function.class));
     functionConfigs.add(functionConfiguration(ExternallyProvidedSensitivitiesYieldCurveCS01Function.class));
+  }
+
+  private static void addPassthroughFunctions(final List<FunctionConfiguration> functionConfigs) {
+    functionConfigs.add(functionConfiguration(DV01Function.class));
   }
 
   //-------------------------------------------------------------------------

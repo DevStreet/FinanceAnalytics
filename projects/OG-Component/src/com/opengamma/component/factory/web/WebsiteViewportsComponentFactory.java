@@ -32,6 +32,7 @@ import com.opengamma.core.change.ChangeManager;
 import com.opengamma.core.change.ChangeProvider;
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.SecuritySource;
+import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.view.ViewDefinitionRepository;
 import com.opengamma.engine.view.ViewProcessor;
 import com.opengamma.financial.aggregation.PortfolioAggregationFunctions;
@@ -44,22 +45,27 @@ import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
-import com.opengamma.web.server.push.ConnectionManager;
+import com.opengamma.web.server.AggregatedViewDefinitionManager;
 import com.opengamma.web.server.push.ConnectionManagerImpl;
 import com.opengamma.web.server.push.LongPollingConnectionManager;
 import com.opengamma.web.server.push.MasterChangeManager;
 import com.opengamma.web.server.push.WebPushServletContextUtils;
-import com.opengamma.web.server.push.grid.PushLiveResultsService;
-import com.opengamma.web.server.push.reports.CsvReportGenerator;
-import com.opengamma.web.server.push.reports.ReportFactory;
-import com.opengamma.web.server.push.reports.ReportGenerator;
+import com.opengamma.web.server.push.analytics.AnalyticsColumnsJsonWriter;
+import com.opengamma.web.server.push.analytics.AnalyticsViewManager;
+import com.opengamma.web.server.push.analytics.ViewportResultsJsonWriter;
+import com.opengamma.web.server.push.analytics.formatting.ResultsFormatter;
 import com.opengamma.web.server.push.rest.AggregatorNamesResource;
 import com.opengamma.web.server.push.rest.MarketDataSnapshotListResource;
 import com.opengamma.web.server.push.rest.MasterType;
-import com.opengamma.web.server.push.rest.ReportMessageBodyWriter;
 import com.opengamma.web.server.push.rest.ViewDefinitionEntriesResource;
-import com.opengamma.web.server.push.rest.ViewportDefinitionMessageBodyReader;
-import com.opengamma.web.server.push.rest.ViewportsResource;
+import com.opengamma.web.server.push.rest.ViewsResource;
+import com.opengamma.web.server.push.rest.json.AnalyticsColumnGroupsMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.Compressor;
+import com.opengamma.web.server.push.rest.json.DependencyGraphGridStructureMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.PortfolioGridStructureMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.PrimitivesGridStructureMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.ViewportResultsMessageBodyWriter;
+import com.opengamma.web.server.push.rest.json.ViewportVersionMessageBodyWriter;
 
 /**
  * Component factory for the main website viewports (for analytics).
@@ -97,6 +103,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
    */
   @PropertyDefinition(validate = "notNull")
   private PositionSource _positionSource;
+  /**
+   * The computation target resolver.
+   */
+  @PropertyDefinition(validate = "notNull")
+  private ComputationTargetResolver _computationTargetResolver;
   /**
    * The time-series master.
    */
@@ -151,26 +162,41 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
   //-------------------------------------------------------------------------
   @Override
   public void init(ComponentRepository repo, LinkedHashMap<String, String> configuration) {
-    PushLiveResultsService liveResults = buildLiveResults();
     final LongPollingConnectionManager longPolling = buildLongPolling();
-    ReportFactory reportFactory = buildReportFactory();
     ChangeManager changeMgr = buildChangeManager();
     MasterChangeManager masterChangeMgr = buildMasterChangeManager();
-    
-    final ConnectionManager connectionMgr = new ConnectionManagerImpl(changeMgr, masterChangeMgr, liveResults, longPolling);
-    ViewportsResource viewportsResource = new ViewportsResource(connectionMgr, reportFactory);
-    ViewDefinitionEntriesResource viewDefinitionResource = new ViewDefinitionEntriesResource(getViewDefinitionRepository());
+    final ConnectionManagerImpl connectionMgr = new ConnectionManagerImpl(changeMgr, masterChangeMgr, longPolling);
     AggregatorNamesResource aggregatorsResource = new AggregatorNamesResource(getPortfolioAggregationFunctions().getMappedFunctions().keySet());
     MarketDataSnapshotListResource snapshotResource = new MarketDataSnapshotListResource(getMarketDataSnapshotMaster());
 
-    repo.getRestComponents().publishResource(viewportsResource);
-    repo.getRestComponents().publishResource(viewDefinitionResource);
+    AggregatedViewDefinitionManager aggregatedViewDefManager = new AggregatedViewDefinitionManager(
+        getPositionSource(),
+        getSecuritySource(),
+        getViewDefinitionRepository(),
+        getUserViewDefinitionRepository(),
+        getUserPortfolioMaster(),
+        getUserPositionMaster(),
+        getPortfolioAggregationFunctions().getMappedFunctions());
+    AnalyticsViewManager analyticsViewManager = new AnalyticsViewManager(getViewProcessor(),
+                                                                         aggregatedViewDefManager,
+                                                                         getMarketDataSnapshotMaster(),
+                                                                         getComputationTargetResolver());
+    ResultsFormatter resultsFormatter = new ResultsFormatter();
+    AnalyticsColumnsJsonWriter columnWriter = new AnalyticsColumnsJsonWriter(resultsFormatter);
+    ViewportResultsJsonWriter viewportResultsWriter = new ViewportResultsJsonWriter(resultsFormatter);
+
     repo.getRestComponents().publishResource(aggregatorsResource);
     repo.getRestComponents().publishResource(snapshotResource);
+    repo.getRestComponents().publishResource(new ViewsResource(analyticsViewManager, connectionMgr));
+    repo.getRestComponents().publishResource(new Compressor());
+    repo.getRestComponents().publishHelper(new ViewportVersionMessageBodyWriter());
+    repo.getRestComponents().publishHelper(new PrimitivesGridStructureMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new PortfolioGridStructureMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new DependencyGraphGridStructureMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new AnalyticsColumnGroupsMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new ViewportResultsMessageBodyWriter(viewportResultsWriter));
+    repo.getRestComponents().publishHelper(new ViewDefinitionEntriesResource(getViewDefinitionRepository()));
 
-    repo.getRestComponents().publishHelper(new ViewportDefinitionMessageBodyReader());
-    repo.getRestComponents().publishHelper(new ReportMessageBodyWriter());
-    
     // these items need to be available to the servlet, but aren't important enough to be published components
     repo.registerServletContextAware(new ServletContextAware() {
       @Override
@@ -181,28 +207,8 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     });
   }
 
-  protected PushLiveResultsService buildLiveResults() {
-    PushLiveResultsService liveResults = new PushLiveResultsService(
-        getViewProcessor(),
-        getPositionSource(),
-        getSecuritySource(),
-        getUserPortfolioMaster(),
-        getUserPositionMaster(),
-        getUserViewDefinitionRepository(),
-        getUser(),
-        getFudgeContext(),
-        getPortfolioAggregationFunctions());
-    return liveResults;
-  }
-
   protected LongPollingConnectionManager buildLongPolling() {
     return new LongPollingConnectionManager();
-  }
-
-  protected ReportFactory buildReportFactory() {
-    Map<String, ReportGenerator> generators = new HashMap<String, ReportGenerator>();
-    generators.put("csv", new CsvReportGenerator());
-    return new ReportFactory(generators);
   }
 
   protected ChangeManager buildChangeManager() {
@@ -258,6 +264,8 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
         return getPortfolioMaster();
       case -1655657820:  // positionSource
         return getPositionSource();
+      case 1562222174:  // computationTargetResolver
+        return getComputationTargetResolver();
       case 173967376:  // historicalTimeSeriesMaster
         return getHistoricalTimeSeriesMaster();
       case 1808868758:  // userPositionMaster
@@ -303,6 +311,9 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
       case -1655657820:  // positionSource
         setPositionSource((PositionSource) newValue);
         return;
+      case 1562222174:  // computationTargetResolver
+        setComputationTargetResolver((ComputationTargetResolver) newValue);
+        return;
       case 173967376:  // historicalTimeSeriesMaster
         setHistoricalTimeSeriesMaster((HistoricalTimeSeriesMaster) newValue);
         return;
@@ -345,6 +356,7 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     JodaBeanUtils.notNull(_positionMaster, "positionMaster");
     JodaBeanUtils.notNull(_portfolioMaster, "portfolioMaster");
     JodaBeanUtils.notNull(_positionSource, "positionSource");
+    JodaBeanUtils.notNull(_computationTargetResolver, "computationTargetResolver");
     JodaBeanUtils.notNull(_historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
     JodaBeanUtils.notNull(_userPositionMaster, "userPositionMaster");
     JodaBeanUtils.notNull(_userPortfolioMaster, "userPortfolioMaster");
@@ -371,6 +383,7 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
           JodaBeanUtils.equal(getPositionMaster(), other.getPositionMaster()) &&
           JodaBeanUtils.equal(getPortfolioMaster(), other.getPortfolioMaster()) &&
           JodaBeanUtils.equal(getPositionSource(), other.getPositionSource()) &&
+          JodaBeanUtils.equal(getComputationTargetResolver(), other.getComputationTargetResolver()) &&
           JodaBeanUtils.equal(getHistoricalTimeSeriesMaster(), other.getHistoricalTimeSeriesMaster()) &&
           JodaBeanUtils.equal(getUserPositionMaster(), other.getUserPositionMaster()) &&
           JodaBeanUtils.equal(getUserPortfolioMaster(), other.getUserPortfolioMaster()) &&
@@ -395,6 +408,7 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     hash += hash * 31 + JodaBeanUtils.hashCode(getPositionMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getPortfolioMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getPositionSource());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getComputationTargetResolver());
     hash += hash * 31 + JodaBeanUtils.hashCode(getHistoricalTimeSeriesMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getUserPositionMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getUserPortfolioMaster());
@@ -562,6 +576,32 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
    */
   public final Property<PositionSource> positionSource() {
     return metaBean().positionSource().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the computation target resolver.
+   * @return the value of the property, not null
+   */
+  public ComputationTargetResolver getComputationTargetResolver() {
+    return _computationTargetResolver;
+  }
+
+  /**
+   * Sets the computation target resolver.
+   * @param computationTargetResolver  the new value of the property, not null
+   */
+  public void setComputationTargetResolver(ComputationTargetResolver computationTargetResolver) {
+    JodaBeanUtils.notNull(computationTargetResolver, "computationTargetResolver");
+    this._computationTargetResolver = computationTargetResolver;
+  }
+
+  /**
+   * Gets the the {@code computationTargetResolver} property.
+   * @return the property, not null
+   */
+  public final Property<ComputationTargetResolver> computationTargetResolver() {
+    return metaBean().computationTargetResolver().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
@@ -865,6 +905,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     private final MetaProperty<PositionSource> _positionSource = DirectMetaProperty.ofReadWrite(
         this, "positionSource", WebsiteViewportsComponentFactory.class, PositionSource.class);
     /**
+     * The meta-property for the {@code computationTargetResolver} property.
+     */
+    private final MetaProperty<ComputationTargetResolver> _computationTargetResolver = DirectMetaProperty.ofReadWrite(
+        this, "computationTargetResolver", WebsiteViewportsComponentFactory.class, ComputationTargetResolver.class);
+    /**
      * The meta-property for the {@code historicalTimeSeriesMaster} property.
      */
     private final MetaProperty<HistoricalTimeSeriesMaster> _historicalTimeSeriesMaster = DirectMetaProperty.ofReadWrite(
@@ -925,6 +970,7 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
         "positionMaster",
         "portfolioMaster",
         "positionSource",
+        "computationTargetResolver",
         "historicalTimeSeriesMaster",
         "userPositionMaster",
         "userPortfolioMaster",
@@ -957,6 +1003,8 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
           return _portfolioMaster;
         case -1655657820:  // positionSource
           return _positionSource;
+        case 1562222174:  // computationTargetResolver
+          return _computationTargetResolver;
         case 173967376:  // historicalTimeSeriesMaster
           return _historicalTimeSeriesMaster;
         case 1808868758:  // userPositionMaster
@@ -1043,6 +1091,14 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
      */
     public final MetaProperty<PositionSource> positionSource() {
       return _positionSource;
+    }
+
+    /**
+     * The meta-property for the {@code computationTargetResolver} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<ComputationTargetResolver> computationTargetResolver() {
+      return _computationTargetResolver;
     }
 
     /**

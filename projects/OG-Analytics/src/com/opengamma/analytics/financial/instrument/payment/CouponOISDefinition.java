@@ -182,15 +182,10 @@ public class CouponOISDefinition extends CouponDefinition implements InstrumentD
     double accruedNotional = getNotional();
     while (valDate.isAfter(_fixingPeriodDate[fixedPeriod + _index.getPublicationLag()].toLocalDate()) && (fixedPeriod < _fixingPeriodDate.length - 1)) {
 
-      Double fixedRate = indexFixingDateSeries.getValue(_fixingPeriodDate[fixedPeriod].toLocalDate());
+      final Double fixedRate = indexFixingDateSeries.getValue(_fixingPeriodDate[fixedPeriod].toLocalDate());
 
       if (fixedRate == null) {
-        // TODO review this - what happens if a fixing date falls on a holiday?
-        final LocalDate adjustedDate = ScheduleCalculator.getAdjustedDate(_fixingPeriodDate[fixedPeriod].toLocalDate(), 0, _index.getCalendar());
-        fixedRate = indexFixingDateSeries.getValue(adjustedDate);
-        if (fixedRate == null) {
-          throw new OpenGammaRuntimeException("Could not get fixing value for date " + _fixingPeriodDate[fixedPeriod + _index.getPublicationLag()]);
-        }
+        throw new OpenGammaRuntimeException("Could not get fixing value for date " + _fixingPeriodDate[fixedPeriod]);
       }
       accruedNotional *= 1 + _fixingPeriodAccrualFactor[fixedPeriod] * fixedRate;
       fixedPeriod++;

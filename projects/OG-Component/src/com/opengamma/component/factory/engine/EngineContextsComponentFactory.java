@@ -28,9 +28,12 @@ import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
+import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.PortfolioStructure;
+import com.opengamma.engine.function.blacklist.DefaultFunctionBlacklistQuery;
+import com.opengamma.engine.function.blacklist.FunctionBlacklist;
 import com.opengamma.engine.marketdata.OverrideOperationCompiler;
 import com.opengamma.financial.OpenGammaCompilationContext;
 import com.opengamma.financial.OpenGammaExecutionContext;
@@ -40,6 +43,7 @@ import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeDefinitio
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.currency.CurrencyMatrixSource;
 import com.opengamma.financial.marketdata.MarketDataELCompiler;
+import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 
 /**
  * Component factory for the config source.
@@ -67,6 +71,11 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
    */
   @PropertyDefinition(validate = "notNull")
   private PositionSource _positionSource;
+  /**
+   * The target resolver.
+   */
+  @PropertyDefinition(validate = "notNull")
+  private ComputationTargetResolver _targetResolver;
   /**
    * The region source.
    */
@@ -112,6 +121,21 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
    */
   @PropertyDefinition(validate = "notNull")
   private HistoricalTimeSeriesSource _historicalTimeSeriesSource;
+  /**
+   * The time-series resolver.
+   */
+  @PropertyDefinition(validate = "notNull")
+  private HistoricalTimeSeriesResolver _historicalTimeSeriesResolver;
+  /**
+   * The execution blacklist. View processors will not submit nodes matched by this blacklist for execution.
+   */
+  @PropertyDefinition
+  private FunctionBlacklist _executionBlacklist;
+  /**
+   * The compilation blacklist. Dependency graph builders will not produce graphs which contain nodes matched by this blacklist.
+   */
+  @PropertyDefinition
+  private FunctionBlacklist _compilationBlacklist;
 
   //-------------------------------------------------------------------------
   @Override
@@ -132,17 +156,24 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     OpenGammaCompilationContext.setCurrencyMatrixSource(context, getCurrencyMatrixSource());
     OpenGammaCompilationContext.setHolidaySource(context, getHolidaySource());
     OpenGammaCompilationContext.setExchangeSource(context, getExchangeSource());
+    OpenGammaCompilationContext.setHistoricalTimeSeriesSource(context, getHistoricalTimeSeriesSource());
+    OpenGammaCompilationContext.setHistoricalTimeSeriesResolver(context, getHistoricalTimeSeriesResolver());
     context.setSecuritySource(getSecuritySource());
-    context.setPositionSource(getPositionSource());
     context.setPortfolioStructure(new PortfolioStructure(getPositionSource()));
-    
+    context.setComputationTargetResolver(getTargetResolver());
+    if (getCompilationBlacklist() != null) {
+      context.setGraphBuildingBlacklist(new DefaultFunctionBlacklistQuery(getCompilationBlacklist()));
+    }
+    if (getExecutionBlacklist() != null) {
+      context.setGraphExecutionBlacklist(new DefaultFunctionBlacklistQuery(getExecutionBlacklist()));
+    }
     ComponentInfo info = new ComponentInfo(FunctionCompilationContext.class, getClassifier());
     repo.registerComponent(info, context);
   }
 
   protected OverrideOperationCompiler initOverrideOperationCompiler(ComponentRepository repo, LinkedHashMap<String, String> configuration) {
     OverrideOperationCompiler ooc = new MarketDataELCompiler(getSecuritySource());
-    
+
     ComponentInfo info = new ComponentInfo(OverrideOperationCompiler.class, getClassifier());
     repo.registerComponent(info, ooc);
     return ooc;
@@ -158,9 +189,7 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     OpenGammaExecutionContext.setConfigSource(context, getConfigSource());
     OpenGammaExecutionContext.setOverrideOperationCompiler(context, ooc);
     context.setSecuritySource(getSecuritySource());
-    context.setPositionSource(getPositionSource());
     context.setPortfolioStructure(new PortfolioStructure(getPositionSource()));
-    
     ComponentInfo info = new ComponentInfo(FunctionExecutionContext.class, getClassifier());
     repo.registerComponent(info, context);
   }
@@ -194,6 +223,8 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
         return getSecuritySource();
       case -1655657820:  // positionSource
         return getPositionSource();
+      case -1933414217:  // targetResolver
+        return getTargetResolver();
       case -1636207569:  // regionSource
         return getRegionSource();
       case -1281578674:  // conventionBundleSource
@@ -212,6 +243,12 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
         return getExchangeSource();
       case 358729161:  // historicalTimeSeriesSource
         return getHistoricalTimeSeriesSource();
+      case -946313676:  // historicalTimeSeriesResolver
+        return getHistoricalTimeSeriesResolver();
+      case -557041435:  // executionBlacklist
+        return getExecutionBlacklist();
+      case 1210914458:  // compilationBlacklist
+        return getCompilationBlacklist();
     }
     return super.propertyGet(propertyName, quiet);
   }
@@ -230,6 +267,9 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
         return;
       case -1655657820:  // positionSource
         setPositionSource((PositionSource) newValue);
+        return;
+      case -1933414217:  // targetResolver
+        setTargetResolver((ComputationTargetResolver) newValue);
         return;
       case -1636207569:  // regionSource
         setRegionSource((RegionSource) newValue);
@@ -258,6 +298,15 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
       case 358729161:  // historicalTimeSeriesSource
         setHistoricalTimeSeriesSource((HistoricalTimeSeriesSource) newValue);
         return;
+      case -946313676:  // historicalTimeSeriesResolver
+        setHistoricalTimeSeriesResolver((HistoricalTimeSeriesResolver) newValue);
+        return;
+      case -557041435:  // executionBlacklist
+        setExecutionBlacklist((FunctionBlacklist) newValue);
+        return;
+      case 1210914458:  // compilationBlacklist
+        setCompilationBlacklist((FunctionBlacklist) newValue);
+        return;
     }
     super.propertySet(propertyName, newValue, quiet);
   }
@@ -268,6 +317,7 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     JodaBeanUtils.notNull(_configSource, "configSource");
     JodaBeanUtils.notNull(_securitySource, "securitySource");
     JodaBeanUtils.notNull(_positionSource, "positionSource");
+    JodaBeanUtils.notNull(_targetResolver, "targetResolver");
     JodaBeanUtils.notNull(_regionSource, "regionSource");
     JodaBeanUtils.notNull(_conventionBundleSource, "conventionBundleSource");
     JodaBeanUtils.notNull(_interpolatedYieldCurveDefinitionSource, "interpolatedYieldCurveDefinitionSource");
@@ -277,6 +327,7 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     JodaBeanUtils.notNull(_holidaySource, "holidaySource");
     JodaBeanUtils.notNull(_exchangeSource, "exchangeSource");
     JodaBeanUtils.notNull(_historicalTimeSeriesSource, "historicalTimeSeriesSource");
+    JodaBeanUtils.notNull(_historicalTimeSeriesResolver, "historicalTimeSeriesResolver");
     super.validate();
   }
 
@@ -291,6 +342,7 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
           JodaBeanUtils.equal(getConfigSource(), other.getConfigSource()) &&
           JodaBeanUtils.equal(getSecuritySource(), other.getSecuritySource()) &&
           JodaBeanUtils.equal(getPositionSource(), other.getPositionSource()) &&
+          JodaBeanUtils.equal(getTargetResolver(), other.getTargetResolver()) &&
           JodaBeanUtils.equal(getRegionSource(), other.getRegionSource()) &&
           JodaBeanUtils.equal(getConventionBundleSource(), other.getConventionBundleSource()) &&
           JodaBeanUtils.equal(getInterpolatedYieldCurveDefinitionSource(), other.getInterpolatedYieldCurveDefinitionSource()) &&
@@ -300,6 +352,9 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
           JodaBeanUtils.equal(getHolidaySource(), other.getHolidaySource()) &&
           JodaBeanUtils.equal(getExchangeSource(), other.getExchangeSource()) &&
           JodaBeanUtils.equal(getHistoricalTimeSeriesSource(), other.getHistoricalTimeSeriesSource()) &&
+          JodaBeanUtils.equal(getHistoricalTimeSeriesResolver(), other.getHistoricalTimeSeriesResolver()) &&
+          JodaBeanUtils.equal(getExecutionBlacklist(), other.getExecutionBlacklist()) &&
+          JodaBeanUtils.equal(getCompilationBlacklist(), other.getCompilationBlacklist()) &&
           super.equals(obj);
     }
     return false;
@@ -312,6 +367,7 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     hash += hash * 31 + JodaBeanUtils.hashCode(getConfigSource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getSecuritySource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getPositionSource());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getTargetResolver());
     hash += hash * 31 + JodaBeanUtils.hashCode(getRegionSource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getConventionBundleSource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getInterpolatedYieldCurveDefinitionSource());
@@ -321,6 +377,9 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     hash += hash * 31 + JodaBeanUtils.hashCode(getHolidaySource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getExchangeSource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getHistoricalTimeSeriesSource());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getHistoricalTimeSeriesResolver());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getExecutionBlacklist());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getCompilationBlacklist());
     return hash ^ super.hashCode();
   }
 
@@ -426,6 +485,32 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
    */
   public final Property<PositionSource> positionSource() {
     return metaBean().positionSource().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the target resolver.
+   * @return the value of the property, not null
+   */
+  public ComputationTargetResolver getTargetResolver() {
+    return _targetResolver;
+  }
+
+  /**
+   * Sets the target resolver.
+   * @param targetResolver  the new value of the property, not null
+   */
+  public void setTargetResolver(ComputationTargetResolver targetResolver) {
+    JodaBeanUtils.notNull(targetResolver, "targetResolver");
+    this._targetResolver = targetResolver;
+  }
+
+  /**
+   * Gets the the {@code targetResolver} property.
+   * @return the property, not null
+   */
+  public final Property<ComputationTargetResolver> targetResolver() {
+    return metaBean().targetResolver().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
@@ -664,6 +749,82 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
 
   //-----------------------------------------------------------------------
   /**
+   * Gets the time-series resolver.
+   * @return the value of the property, not null
+   */
+  public HistoricalTimeSeriesResolver getHistoricalTimeSeriesResolver() {
+    return _historicalTimeSeriesResolver;
+  }
+
+  /**
+   * Sets the time-series resolver.
+   * @param historicalTimeSeriesResolver  the new value of the property, not null
+   */
+  public void setHistoricalTimeSeriesResolver(HistoricalTimeSeriesResolver historicalTimeSeriesResolver) {
+    JodaBeanUtils.notNull(historicalTimeSeriesResolver, "historicalTimeSeriesResolver");
+    this._historicalTimeSeriesResolver = historicalTimeSeriesResolver;
+  }
+
+  /**
+   * Gets the the {@code historicalTimeSeriesResolver} property.
+   * @return the property, not null
+   */
+  public final Property<HistoricalTimeSeriesResolver> historicalTimeSeriesResolver() {
+    return metaBean().historicalTimeSeriesResolver().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the execution blacklist. View processors will not submit nodes matched by this blacklist for execution.
+   * @return the value of the property
+   */
+  public FunctionBlacklist getExecutionBlacklist() {
+    return _executionBlacklist;
+  }
+
+  /**
+   * Sets the execution blacklist. View processors will not submit nodes matched by this blacklist for execution.
+   * @param executionBlacklist  the new value of the property
+   */
+  public void setExecutionBlacklist(FunctionBlacklist executionBlacklist) {
+    this._executionBlacklist = executionBlacklist;
+  }
+
+  /**
+   * Gets the the {@code executionBlacklist} property.
+   * @return the property, not null
+   */
+  public final Property<FunctionBlacklist> executionBlacklist() {
+    return metaBean().executionBlacklist().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the compilation blacklist. Dependency graph builders will not produce graphs which contain nodes matched by this blacklist.
+   * @return the value of the property
+   */
+  public FunctionBlacklist getCompilationBlacklist() {
+    return _compilationBlacklist;
+  }
+
+  /**
+   * Sets the compilation blacklist. Dependency graph builders will not produce graphs which contain nodes matched by this blacklist.
+   * @param compilationBlacklist  the new value of the property
+   */
+  public void setCompilationBlacklist(FunctionBlacklist compilationBlacklist) {
+    this._compilationBlacklist = compilationBlacklist;
+  }
+
+  /**
+   * Gets the the {@code compilationBlacklist} property.
+   * @return the property, not null
+   */
+  public final Property<FunctionBlacklist> compilationBlacklist() {
+    return metaBean().compilationBlacklist().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * The meta-bean for {@code EngineContextsComponentFactory}.
    */
   public static class Meta extends AbstractComponentFactory.Meta {
@@ -692,6 +853,11 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
      */
     private final MetaProperty<PositionSource> _positionSource = DirectMetaProperty.ofReadWrite(
         this, "positionSource", EngineContextsComponentFactory.class, PositionSource.class);
+    /**
+     * The meta-property for the {@code targetResolver} property.
+     */
+    private final MetaProperty<ComputationTargetResolver> _targetResolver = DirectMetaProperty.ofReadWrite(
+        this, "targetResolver", EngineContextsComponentFactory.class, ComputationTargetResolver.class);
     /**
      * The meta-property for the {@code regionSource} property.
      */
@@ -738,6 +904,21 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
     private final MetaProperty<HistoricalTimeSeriesSource> _historicalTimeSeriesSource = DirectMetaProperty.ofReadWrite(
         this, "historicalTimeSeriesSource", EngineContextsComponentFactory.class, HistoricalTimeSeriesSource.class);
     /**
+     * The meta-property for the {@code historicalTimeSeriesResolver} property.
+     */
+    private final MetaProperty<HistoricalTimeSeriesResolver> _historicalTimeSeriesResolver = DirectMetaProperty.ofReadWrite(
+        this, "historicalTimeSeriesResolver", EngineContextsComponentFactory.class, HistoricalTimeSeriesResolver.class);
+    /**
+     * The meta-property for the {@code executionBlacklist} property.
+     */
+    private final MetaProperty<FunctionBlacklist> _executionBlacklist = DirectMetaProperty.ofReadWrite(
+        this, "executionBlacklist", EngineContextsComponentFactory.class, FunctionBlacklist.class);
+    /**
+     * The meta-property for the {@code compilationBlacklist} property.
+     */
+    private final MetaProperty<FunctionBlacklist> _compilationBlacklist = DirectMetaProperty.ofReadWrite(
+        this, "compilationBlacklist", EngineContextsComponentFactory.class, FunctionBlacklist.class);
+    /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
@@ -746,6 +927,7 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
         "configSource",
         "securitySource",
         "positionSource",
+        "targetResolver",
         "regionSource",
         "conventionBundleSource",
         "interpolatedYieldCurveDefinitionSource",
@@ -754,7 +936,10 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
         "currencyMatrixSource",
         "holidaySource",
         "exchangeSource",
-        "historicalTimeSeriesSource");
+        "historicalTimeSeriesSource",
+        "historicalTimeSeriesResolver",
+        "executionBlacklist",
+        "compilationBlacklist");
 
     /**
      * Restricted constructor.
@@ -773,6 +958,8 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
           return _securitySource;
         case -1655657820:  // positionSource
           return _positionSource;
+        case -1933414217:  // targetResolver
+          return _targetResolver;
         case -1636207569:  // regionSource
           return _regionSource;
         case -1281578674:  // conventionBundleSource
@@ -791,6 +978,12 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
           return _exchangeSource;
         case 358729161:  // historicalTimeSeriesSource
           return _historicalTimeSeriesSource;
+        case -946313676:  // historicalTimeSeriesResolver
+          return _historicalTimeSeriesResolver;
+        case -557041435:  // executionBlacklist
+          return _executionBlacklist;
+        case 1210914458:  // compilationBlacklist
+          return _compilationBlacklist;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -841,6 +1034,14 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
      */
     public final MetaProperty<PositionSource> positionSource() {
       return _positionSource;
+    }
+
+    /**
+     * The meta-property for the {@code targetResolver} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<ComputationTargetResolver> targetResolver() {
+      return _targetResolver;
     }
 
     /**
@@ -913,6 +1114,30 @@ public class EngineContextsComponentFactory extends AbstractComponentFactory {
      */
     public final MetaProperty<HistoricalTimeSeriesSource> historicalTimeSeriesSource() {
       return _historicalTimeSeriesSource;
+    }
+
+    /**
+     * The meta-property for the {@code historicalTimeSeriesResolver} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<HistoricalTimeSeriesResolver> historicalTimeSeriesResolver() {
+      return _historicalTimeSeriesResolver;
+    }
+
+    /**
+     * The meta-property for the {@code executionBlacklist} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<FunctionBlacklist> executionBlacklist() {
+      return _executionBlacklist;
+    }
+
+    /**
+     * The meta-property for the {@code compilationBlacklist} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<FunctionBlacklist> compilationBlacklist() {
+      return _compilationBlacklist;
     }
 
   }

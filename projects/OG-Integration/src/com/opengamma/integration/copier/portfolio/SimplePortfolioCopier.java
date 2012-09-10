@@ -19,6 +19,16 @@ import com.opengamma.util.tuple.ObjectsPair;
  */
 public class SimplePortfolioCopier implements PortfolioCopier {
 
+  private boolean _flatten;
+
+  public SimplePortfolioCopier() {
+    _flatten = false;
+  }
+
+  public SimplePortfolioCopier(boolean flatten) {
+     _flatten = flatten;
+  }
+
   @Override
   public void copy(PortfolioReader portfolioReader, PortfolioWriter portfolioWriter) {
     copy(portfolioReader, portfolioWriter, null);
@@ -38,7 +48,7 @@ public class SimplePortfolioCopier implements PortfolioCopier {
       if (next.getFirst() != null && next.getSecond() != null) {
         
         // Set current path
-        String[] path = portfolioReader.getCurrentPath();
+        String[] path = _flatten ? new String[0] : portfolioReader.getCurrentPath();
         portfolioWriter.setPath(path);
         
         // Write position and security data
@@ -50,10 +60,15 @@ public class SimplePortfolioCopier implements PortfolioCopier {
         }
       } else {
         if (visitor != null) {
-          visitor.error("Could not load" + (next.getFirst() == null ? " position" : "") + (next.getSecond() == null ? " security" : ""));
+          if (next.getFirst() == null) {
+            visitor.error("Could not load position");
+          }
+          if (next.getSecond() == null) {
+            visitor.error("Could not load security(ies)");
+          }
         }
       }
-      
+
     }
 
     // Flush changes to portfolio master

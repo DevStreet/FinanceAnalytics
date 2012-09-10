@@ -20,11 +20,11 @@ import com.opengamma.analytics.financial.forex.derivative.ForexSwap;
 import com.opengamma.analytics.financial.interestrate.AbstractInstrumentDerivativeVisitor;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisitor;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIbor;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIborRatchet;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIborSpread;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIbor;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborRatchet;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BillSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BillTransaction;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondCapitalIndexedSecurity;
@@ -48,10 +48,10 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.Interest
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionPremiumTransaction;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponInterpolation;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponInterpolationGearing;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponMonthly;
-import com.opengamma.analytics.financial.interestrate.inflation.derivatives.CouponInflationZeroCouponMonthlyGearing;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolation;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolationGearing;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthly;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthlyGearing;
 import com.opengamma.analytics.financial.interestrate.payments.ForexForward;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
@@ -59,18 +59,18 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFlo
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborCompounded;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborGearing;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponOIS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.definition.CrossCurrencySwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FloatingRateNote;
-import com.opengamma.analytics.financial.interestrate.swap.definition.OISSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.Swap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.TenorSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.CrossCurrencySwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FloatingRateNote;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.TenorSwap;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionBermudaFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
@@ -130,7 +130,7 @@ public class ForexDerivativeVisitorTest {
     testException(NDO, o);
     testException(FX_OPTION_DIGITAL);
     testException(FX_OPTION_DIGITAL, o);
-    final InstrumentDerivative[] forexArray = new InstrumentDerivative[] {FX, FX_SWAP};
+    final InstrumentDerivative[] forexArray = new InstrumentDerivative[] {FX, FX_SWAP };
     try {
       VISITOR_ABSTRACT.visit(forexArray[0]);
       assertTrue(false);
@@ -282,7 +282,7 @@ public class ForexDerivativeVisitorTest {
     }
 
     @Override
-    public String visitGenericAnnuity(GenericAnnuity<? extends Payment> genericAnnuity, T data) {
+    public String visitGenericAnnuity(Annuity<? extends Payment> genericAnnuity, T data) {
       return null;
     }
 
@@ -307,17 +307,12 @@ public class ForexDerivativeVisitorTest {
     }
 
     @Override
-    public String visitFixedCouponSwap(FixedCouponSwap<?> swap, T data) {
+    public String visitFixedCouponSwap(SwapFixedCoupon<?> swap, T data) {
       return null;
     }
 
     @Override
     public String visitFixedFloatSwap(FixedFloatSwap swap, T data) {
-      return null;
-    }
-
-    @Override
-    public String visitOISSwap(OISSwap swap, T data) {
       return null;
     }
 
@@ -492,7 +487,7 @@ public class ForexDerivativeVisitorTest {
     }
 
     @Override
-    public String visitGenericAnnuity(GenericAnnuity<? extends Payment> genericAnnuity) {
+    public String visitGenericAnnuity(Annuity<? extends Payment> genericAnnuity) {
       return null;
     }
 
@@ -517,17 +512,12 @@ public class ForexDerivativeVisitorTest {
     }
 
     @Override
-    public String visitFixedCouponSwap(FixedCouponSwap<?> swap) {
+    public String visitFixedCouponSwap(SwapFixedCoupon<?> swap) {
       return null;
     }
 
     @Override
     public String visitFixedFloatSwap(FixedFloatSwap swap) {
-      return null;
-    }
-
-    @Override
-    public String visitOISSwap(OISSwap swap) {
       return null;
     }
 
@@ -577,7 +567,7 @@ public class ForexDerivativeVisitorTest {
     }
 
     @Override
-    public String visitInterestRateFutureSecurity(InterestRateFuture future) {
+    public String visitInterestRateFuture(InterestRateFuture future) {
       return null;
     }
 
@@ -800,6 +790,18 @@ public class ForexDerivativeVisitorTest {
 
     @Override
     public String visitAnnuityCouponIborSpread(AnnuityCouponIborSpread annuity) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponIborCompounded(CouponIborCompounded payment) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public String visitCouponIborCompounded(CouponIborCompounded payment, T data) {
+      // TODO Auto-generated method stub
       return null;
     }
 

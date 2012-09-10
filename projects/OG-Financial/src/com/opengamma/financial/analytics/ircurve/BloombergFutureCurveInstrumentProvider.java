@@ -5,7 +5,6 @@
  */
 package com.opengamma.financial.analytics.ircurve;
 
-import javax.time.calendar.DateAdjuster;
 import javax.time.calendar.LocalDate;
 import javax.time.calendar.MonthOfYear;
 
@@ -13,7 +12,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.id.ExternalSchemes;
-import com.opengamma.financial.analytics.volatility.surface.BloombergIRFutureUtils;
+import com.opengamma.financial.analytics.volatility.surface.BloombergFutureUtils;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalScheme;
 import com.opengamma.util.time.Tenor;
@@ -63,15 +62,24 @@ public class BloombergFutureCurveInstrumentProvider implements CurveInstrumentPr
     return createQuarterlyIRFutureStrips(curveDate, tenor, numQuarterlyFuturesFromTenor, _futurePrefix, " " + _marketSector);
   }
 
-  private static final DateAdjuster s_nextExpiryAdjuster = new NextExpiryAdjuster();
+  @Override
+  public ExternalId getInstrument(final LocalDate curveDate, final Tenor tenor, final Tenor payTenor, final Tenor receiveTenor, final IndexType payIndexType,
+      final IndexType receiveIndexType) {
+    throw new OpenGammaRuntimeException("Only futures supported");
+  }
+
+  @Override
+  public ExternalId getInstrument(final LocalDate curveDate, final Tenor tenor, final Tenor resetTenor, final IndexType indexType) {
+    throw new OpenGammaRuntimeException("Only futures supported");
+  }
 
   private static final ExternalScheme SCHEME = ExternalSchemes.BLOOMBERG_TICKER;
 
   private ExternalId createQuarterlyIRFutureStrips(final LocalDate curveDate, final Tenor tenor, final int numQuartlyFuturesFromTenor, final String prefix, final String postfix) {
     final StringBuilder futureCode = new StringBuilder();
     futureCode.append(prefix);
-    final LocalDate curveFutureStartDate = curveDate.plus(tenor.getPeriod());    
-    final String expiryCode = BloombergIRFutureUtils.getQuarterlyExpiryCodeForFutures(prefix, numQuartlyFuturesFromTenor, curveFutureStartDate);
+    final LocalDate curveFutureStartDate = curveDate.plus(tenor.getPeriod());
+    final String expiryCode = BloombergFutureUtils.getQuarterlyExpiryCodeForFutures(prefix, numQuartlyFuturesFromTenor, curveFutureStartDate);
     futureCode.append(expiryCode);
     futureCode.append(postfix);
     return ExternalId.of(SCHEME, futureCode.toString());

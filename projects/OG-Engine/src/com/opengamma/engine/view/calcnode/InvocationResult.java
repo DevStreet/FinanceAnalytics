@@ -11,16 +11,23 @@ package com.opengamma.engine.view.calcnode;
  */
 public enum InvocationResult {
   /**
+   * The invocation was not attempted because of a function blacklisting rule.
+   */
+  SUPPRESSED,
+  /**
    * The invocation was completely successful.
    */
   SUCCESS,
   /**
-   * The invocation failed because the function unexpected threw an exception
+   * The invocation completed but did not produce all expected results.
+   */
+  PARTIAL_SUCCESS,
+  /**
+   * The invocation failed with the function throwing an exception.
    */
   FUNCTION_THREW_EXCEPTION,
   /**
-   * The invocation failed - in fact, could not even be attempted - because
-   * one of the inputs to the function was missing 
+   * The invocation was not attempted because one or more inputs were missing.
    */
   MISSING_INPUTS;
 

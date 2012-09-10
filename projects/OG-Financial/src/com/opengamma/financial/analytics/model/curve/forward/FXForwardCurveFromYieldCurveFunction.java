@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.analytics.model.curve.forward;
@@ -9,10 +9,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurveYieldImplied;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.core.config.ConfigSource;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.function.AbstractFunction;
@@ -25,14 +29,19 @@ import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.financial.security.fx.FXUtils;
+import com.opengamma.financial.OpenGammaCompilationContext;
+import com.opengamma.financial.OpenGammaExecutionContext;
+import com.opengamma.financial.currency.ConfigDBCurrencyPairsSource;
+import com.opengamma.financial.currency.CurrencyPair;
+import com.opengamma.financial.currency.CurrencyPairs;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.UnorderedCurrencyPair;
 
 /**
- * 
+ *
  */
 public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCompiledInvoker {
+  private static final Logger s_logger = LoggerFactory.getLogger(FXForwardCurveFromYieldCurveFunction.class);
 
   @Override
   public ComputationTargetType getTargetType() {
@@ -43,7 +52,7 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
     final ValueProperties properties = createValueProperties()
         .withAny(ValuePropertyNames.CURVE)
-        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, FXForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD)
+        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, ForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD)
         .withAny(ValuePropertyNames.PAY_CURVE)
         .withAny(ValuePropertyNames.RECEIVE_CURVE)
         .get();
@@ -78,14 +87,21 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
     final UnorderedCurrencyPair ccyPair = UnorderedCurrencyPair.of(target.getUniqueId());
     Currency payCurrency;
     Currency receiveCurrency;
-    if (FXUtils.isInBaseQuoteOrder(ccyPair.getFirstCurrency(), ccyPair.getSecondCurrency())) {
-      payCurrency = ccyPair.getFirstCurrency();
-      receiveCurrency = ccyPair.getSecondCurrency();
-    } else {
-      payCurrency = ccyPair.getSecondCurrency();
-      receiveCurrency = ccyPair.getFirstCurrency();
+    final ConfigSource configSource = OpenGammaCompilationContext.getConfigSource(context);
+    final ConfigDBCurrencyPairsSource currencyPairsSource = new ConfigDBCurrencyPairsSource(configSource);
+    final CurrencyPairs baseQuotePairs = currencyPairsSource.getCurrencyPairs(CurrencyPairs.DEFAULT_CURRENCY_PAIRS);
+    final CurrencyPair baseQuotePair = baseQuotePairs.getCurrencyPair(ccyPair.getFirstCurrency(), ccyPair.getSecondCurrency());
+    if (baseQuotePair == null) {
+      throw new OpenGammaRuntimeException("Could not get base/quote pair for currency pair " + ccyPair);
     }
-    result.add(new ValueRequirement(ValueRequirementNames.SPOT_RATE, UnorderedCurrencyPair.of(payCurrency, receiveCurrency)));
+    if (baseQuotePair.getBase().equals(ccyPair.getFirstCurrency())) {
+      payCurrency = baseQuotePair.getBase();
+      receiveCurrency = baseQuotePair.getCounter();
+    } else {
+      payCurrency = baseQuotePair.getCounter();
+      receiveCurrency = baseQuotePair.getBase();
+    }
+    result.add(new ValueRequirement(ValueRequirementNames.SPOT_RATE, ccyPair));
     result.add(new ValueRequirement(ValueRequirementNames.YIELD_CURVE, payCurrency.getUniqueId(), payCurveProperties));
     result.add(new ValueRequirement(ValueRequirementNames.YIELD_CURVE, receiveCurrency.getUniqueId(), receiveCurveProperties));
     return result;
@@ -94,6 +110,10 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
   @Override
   public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
     if (target.getType() != ComputationTargetType.PRIMITIVE) {
+      return false;
+    }
+    if (target.getUniqueId() == null) {
+      s_logger.error("Target unique id was null, {}", target);
       return false;
     }
     return UnorderedCurrencyPair.OBJECT_SCHEME.equals(target.getUniqueId().getScheme());
@@ -108,14 +128,21 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
     final UnorderedCurrencyPair ccyPair = UnorderedCurrencyPair.of(target.getUniqueId());
     Currency payCurrency;
     Currency receiveCurrency;
-    if (FXUtils.isInBaseQuoteOrder(ccyPair.getFirstCurrency(), ccyPair.getSecondCurrency())) {
-      payCurrency = ccyPair.getFirstCurrency();
-      receiveCurrency = ccyPair.getSecondCurrency();
-    } else {
-      payCurrency = ccyPair.getSecondCurrency();
-      receiveCurrency = ccyPair.getFirstCurrency();
+    final ConfigSource configSource = OpenGammaExecutionContext.getConfigSource(executionContext);
+    final ConfigDBCurrencyPairsSource currencyPairsSource = new ConfigDBCurrencyPairsSource(configSource);
+    final CurrencyPairs baseQuotePairs = currencyPairsSource.getCurrencyPairs(CurrencyPairs.DEFAULT_CURRENCY_PAIRS);
+    final CurrencyPair baseQuotePair = baseQuotePairs.getCurrencyPair(ccyPair.getFirstCurrency(), ccyPair.getSecondCurrency());
+    if (baseQuotePair == null) {
+      throw new OpenGammaRuntimeException("Could not get base/quote pair for currency pair " + ccyPair);
     }
-    Double spot = null;
+    if (baseQuotePair.getBase().equals(ccyPair.getFirstCurrency())) {
+      payCurrency = baseQuotePair.getBase();
+      receiveCurrency = baseQuotePair.getCounter();
+    } else {
+      payCurrency = baseQuotePair.getCounter();
+      receiveCurrency = baseQuotePair.getBase();
+    }
+    final Double spot = (Double) inputs.getValue(ValueRequirementNames.SPOT_RATE);
     for (final ComputedValue input : inputs.getAllValues()) {
       final ValueSpecification spec = input.getSpecification();
       final ValueProperties properties = spec.getProperties();
@@ -125,8 +152,6 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
       } else if (spec.getTargetSpecification().getUniqueId().equals(receiveCurrency.getUniqueId())) {
         receiveCurveObject = input.getValue();
         receiveCurveNames = properties.getValues(ValuePropertyNames.CURVE);
-      } else {
-        spot = (Double) input.getValue();
       }
     }
     if (payCurveObject == null) {
@@ -152,7 +177,7 @@ public class FXForwardCurveFromYieldCurveFunction extends AbstractFunction.NonCo
     final ForwardCurve fxForwardCurve = new ForwardCurveYieldImplied(spot, payCurve, receiveCurve);
     final ValueProperties properties = createValueProperties()
         .with(ValuePropertyNames.CURVE, fxForwardCurveName)
-        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, FXForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD)
+        .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, ForwardCurveValuePropertyNames.PROPERTY_YIELD_CURVE_IMPLIED_METHOD)
         .with(ValuePropertyNames.PAY_CURVE, payCurveNames.iterator().next())
         .with(ValuePropertyNames.RECEIVE_CURVE, receiveCurveNames.iterator().next())
         .get();

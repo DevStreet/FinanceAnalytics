@@ -8,7 +8,6 @@ package com.opengamma.engine.function;
 import javax.time.Instant;
 import javax.time.calendar.Clock;
 
-import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.view.calcnode.ViewProcessorQuery;
 import com.opengamma.util.PublicAPI;
@@ -39,10 +38,6 @@ public class FunctionExecutionContext extends AbstractFunctionContext {
    * The name under which an instance of {@link SecuritySource} should be bound.
    */
   public static final String SECURITY_SOURCE_NAME = "securitySource";
-  /**
-   * The name under which an instance of {@link PositionSource} should be bound.
-   */
-  public static final String POSITION_SOURCE_NAME = "positionSource";
   /**
    * The name under which function parameters (such as # of Monte Carlo iterations) should be bound.
    */
@@ -141,24 +136,6 @@ public class FunctionExecutionContext extends AbstractFunctionContext {
   }
   
   /**
-   * Gets the source of positions.
-   * 
-   * @return the source of positions, null if not in the context
-   */
-  public PositionSource getPositionSource() {
-    return (PositionSource) get(POSITION_SOURCE_NAME);
-  }
-  
-  /**
-   * Sets the source of positions.
-   * 
-   * @param positionSource  the source of positions to bind
-   */
-  public void setPositionSource(PositionSource positionSource) {
-    put(POSITION_SOURCE_NAME, positionSource);
-  }
-
-  /**
    * Gets the function parameters.
    * 
    * @return the function parameters, null if not in the context
@@ -194,7 +171,6 @@ public class FunctionExecutionContext extends AbstractFunctionContext {
     put(PORTFOLIO_STRUCTURE_NAME, portfolioStructure);
   }
 
-  //-------------------------------------------------------------------------
   /**
    * Gets the source of securities cast to a specific type.
    * 

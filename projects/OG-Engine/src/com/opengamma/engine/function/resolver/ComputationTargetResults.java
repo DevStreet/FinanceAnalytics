@@ -51,19 +51,15 @@ public class ComputationTargetResults {
    */
   private final FunctionCompilationContext _context;
 
-  private final ComputationTargetResolver _targetResolver;
-
   /**
    * Creates a new instance.
    * 
    * @param rules the resolution rules to use, not null
    * @param context the containing context, not null
-   * @param resolver the computation target resolver, not null
    */
-  public ComputationTargetResults(final Collection<ResolutionRule> rules, final FunctionCompilationContext context, final ComputationTargetResolver resolver) {
+  public ComputationTargetResults(final Collection<ResolutionRule> rules, final FunctionCompilationContext context) {
     ArgumentChecker.notNull(rules, "rules");
     ArgumentChecker.notNull(context, "context");
-    ArgumentChecker.notNull(resolver, "resolver");
     _rules = new ArrayList<ResolutionRule>(rules);
     Collections.sort(_rules, new Comparator<ResolutionRule>() {
 
@@ -81,7 +77,6 @@ public class ComputationTargetResults {
     });
     _context = context.clone();
     _context.setComputationTargetResults(null);
-    _targetResolver = resolver;
   }
 
   /**
@@ -108,7 +103,7 @@ public class ComputationTargetResults {
    * @return the target resolver, not null
    */
   protected ComputationTargetResolver getTargetResolver() {
-    return _targetResolver;
+    return getContext().getComputationTargetResolver();
   }
 
   /**
@@ -200,7 +195,7 @@ public class ComputationTargetResults {
     }
     s_logger.debug("Partially resolving {}", requirement);
     for (ResolutionRule rule : getRules()) {
-      final CompiledFunctionDefinition function = rule.getFunction().getFunction();
+      final CompiledFunctionDefinition function = rule.getParameterizedFunction().getFunction();
       if (function.getTargetType() != target.getType()) {
         continue;
       }

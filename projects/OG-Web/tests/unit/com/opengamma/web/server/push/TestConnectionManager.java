@@ -7,8 +7,6 @@ package com.opengamma.web.server.push;
 
 import static org.mockito.Mockito.mock;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.opengamma.id.UniqueId;
 import com.opengamma.web.server.push.rest.MasterType;
 
@@ -17,9 +15,7 @@ import com.opengamma.web.server.push.rest.MasterType;
  */
 public class TestConnectionManager implements ConnectionManager {
 
-  private volatile RestUpdateListener _listener;
-
-  private final ConcurrentHashMap<String, Viewport> _viewports = new ConcurrentHashMap<String, Viewport>();
+  private volatile UpdateListener _listener;
   private final LongPollingConnectionManager _longPollingConnectionManager;
 
   public TestConnectionManager() {
@@ -53,24 +49,10 @@ public class TestConnectionManager implements ConnectionManager {
   }
 
   @Override
-  public Viewport getViewport(String userId, String clientId, String viewportId) {
-    return _viewports.get(viewportId);
+  public ClientConnection getConnectionByClientId(String userId, String clientId) {
+    throw new UnsupportedOperationException("getConnectionByClientId not implemented");
   }
 
-  @Override
-  public void createViewport(String userId,
-                             String clientId,
-                             ViewportDefinition viewportDefinition,
-                             String viewportId,
-                             String dataUrl,
-                             String gridStructureUrl) {
-    throw new UnsupportedOperationException("createViewport not implemented");
-  }
-
-  public void addViewport(String viewportId, Viewport viewport) {
-    _viewports.put(viewportId, viewport);
-  }
-  
   public void sendUpdate(String update) {
     _listener.itemUpdated(update);
   }

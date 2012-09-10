@@ -8,6 +8,7 @@ package com.opengamma.integration.tool.portfolio;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.opengamma.financial.tool.ToolContext;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
@@ -19,11 +20,13 @@ import com.opengamma.id.ObjectId;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.SecuritySearchResult;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * The portfolio loader tool
  */
-public class SecurityDeleteTool extends AbstractTool {
+@Scriptable
+public class SecurityDeleteTool extends AbstractTool<ToolContext> {
 
   private static final Logger s_logger = LoggerFactory.getLogger(SecurityDeleteTool.class);
 
@@ -47,7 +50,7 @@ public class SecurityDeleteTool extends AbstractTool {
    * @param args  the arguments, not null
    */
   public static void main(String[] args) { //CSIGNORE
-    new SecurityDeleteTool().initAndRun(args);
+    new SecurityDeleteTool().initAndRun(args, ToolContext.class);
     System.exit(0);
   }
 
@@ -83,7 +86,7 @@ public class SecurityDeleteTool extends AbstractTool {
 
     for (SecurityDocument securityDocument : securitySearchResult.getDocuments()) {
       if (getCommandLine().hasOption(WRITE_OPT)) {
-        getToolContext().getPositionMaster().remove(securityDocument.getUniqueId());
+        getToolContext().getSecurityMaster().remove(securityDocument.getUniqueId());
         s_logger.warn("Deleted " + securityDocument.getSecurity().getUniqueId() + 
             " (" + securityDocument.getSecurity().getName() + ")");
       } else {

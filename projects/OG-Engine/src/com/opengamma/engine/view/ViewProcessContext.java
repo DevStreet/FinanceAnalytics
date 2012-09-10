@@ -5,11 +5,9 @@
  */
 package com.opengamma.engine.view;
 
-import com.opengamma.core.position.PositionSource;
-import com.opengamma.core.security.SecuritySource;
-import com.opengamma.engine.CachingComputationTargetResolver;
+import com.opengamma.engine.ComputationTargetResolver;
+import com.opengamma.engine.depgraph.DependencyGraphBuilderFactory;
 import com.opengamma.engine.function.CompiledFunctionService;
-import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.InMemoryLKVMarketDataProvider;
 import com.opengamma.engine.marketdata.MarketDataInjector;
@@ -35,13 +33,11 @@ public class ViewProcessContext {
   private final ViewPermissionProvider _viewPermissionProvider;
   private final CompiledFunctionService _functionCompilationService;
   private final FunctionResolver _functionResolver;
-  private final FunctionExclusionGroups _functionExclusionGroups;
-  private final PositionSource _positionSource;
-  private final SecuritySource _securitySource;
   private final ViewComputationCacheSource _computationCacheSource;
   private final JobDispatcher _computationJobDispatcher;
   private final ViewProcessorQueryReceiver _viewProcessorQueryReceiver;
-  private final CachingComputationTargetResolver _computationTargetResolver;
+  private final ComputationTargetResolver _computationTargetResolver; // REVIEW andrew 2012-03-05 -- This isn't necessary as there is a resolver in the FunctionCompilationContext 
+  private final DependencyGraphBuilderFactory _dependencyGraphBuilderFactory;
   private final DependencyGraphExecutorFactory<?> _dependencyGraphExecutorFactory;
   private final GraphExecutorStatisticsGathererProvider _graphExecutorStatisticsGathererProvider;
   private final MarketDataInjector _liveDataOverrideInjector;
@@ -54,13 +50,11 @@ public class ViewProcessContext {
       MarketDataProviderResolver marketDataProviderResolver,
       CompiledFunctionService functionCompilationService,
       FunctionResolver functionResolver,
-      FunctionExclusionGroups functionExclusionGroups,
-      PositionSource positionSource,
-      SecuritySource securitySource,
-      CachingComputationTargetResolver computationTargetResolver,
+      ComputationTargetResolver computationTargetResolver,
       ViewComputationCacheSource computationCacheSource,
       JobDispatcher computationJobDispatcher,
       ViewProcessorQueryReceiver viewProcessorQueryReceiver,
+      DependencyGraphBuilderFactory dependencyGraphBuilderFactory,
       DependencyGraphExecutorFactory<?> dependencyGraphExecutorFactory,
       GraphExecutorStatisticsGathererProvider graphExecutorStatisticsProvider,
       OverrideOperationCompiler overrideOperationCompiler) {
@@ -69,31 +63,25 @@ public class ViewProcessContext {
     ArgumentChecker.notNull(marketDataProviderResolver, "marketDataSnapshotProviderResolver");
     ArgumentChecker.notNull(functionCompilationService, "functionCompilationService");
     ArgumentChecker.notNull(functionResolver, "functionResolver");
-    ArgumentChecker.notNull(positionSource, "positionSource");
-    ArgumentChecker.notNull(securitySource, "securitySource");
     ArgumentChecker.notNull(computationCacheSource, "computationCacheSource");
     ArgumentChecker.notNull(computationJobDispatcher, "computationJobDispatcher");
     ArgumentChecker.notNull(viewProcessorQueryReceiver, "viewProcessorQueryReceiver");
+    ArgumentChecker.notNull(dependencyGraphBuilderFactory, "dependencyGraphBuilderFactory");
     ArgumentChecker.notNull(dependencyGraphExecutorFactory, "dependencyGraphExecutorFactory");
     ArgumentChecker.notNull(graphExecutorStatisticsProvider, "graphExecutorStatisticsProvider");
     ArgumentChecker.notNull(overrideOperationCompiler, "overrideOperationCompiler");
-
     _viewDefinitionRepository = viewDefinitionRepository;
     _viewPermissionProvider = viewPermissionProvider;
-    
-    InMemoryLKVMarketDataProvider liveDataOverrideInjector = new InMemoryLKVMarketDataProvider(securitySource);
+    final InMemoryLKVMarketDataProvider liveDataOverrideInjector = new InMemoryLKVMarketDataProvider(computationTargetResolver.getSecuritySource());
     _liveDataOverrideInjector = liveDataOverrideInjector;
     _marketDataProviderResolver = new MarketDataProviderResolverWithOverride(marketDataProviderResolver, liveDataOverrideInjector);
-    
     _functionCompilationService = functionCompilationService;
     _functionResolver = functionResolver;
-    _functionExclusionGroups = functionExclusionGroups;
-    _positionSource = positionSource;
-    _securitySource = securitySource;
     _computationTargetResolver = computationTargetResolver;
     _computationCacheSource = computationCacheSource;
     _computationJobDispatcher = computationJobDispatcher;
     _viewProcessorQueryReceiver = viewProcessorQueryReceiver;
+    _dependencyGraphBuilderFactory = dependencyGraphBuilderFactory;
     _dependencyGraphExecutorFactory = dependencyGraphExecutorFactory;
     _graphExecutorStatisticsGathererProvider = graphExecutorStatisticsProvider;
     _overrideOperationCompiler = overrideOperationCompiler;
@@ -150,30 +138,12 @@ public class ViewProcessContext {
   }
 
   /**
-   * Gets the function exclusion groups, if used.
+   * Gets the dependency graph builder factory.
    * 
-   * @return the function exclusion groups, null if none are being used
+   * @return the dependency graph builder, not null
    */
-  public FunctionExclusionGroups getFunctionExclusionGroups() {
-    return _functionExclusionGroups;
-  }
-
-  /**
-   * Gets the source of positions.
-   * 
-   * @return the source of positions, not null
-   */
-  public PositionSource getPositionSource() {
-    return _positionSource;
-  }
-
-  /**
-   * Gets the source of securities.
-   * 
-   * @return the source of securities, not null
-   */
-  public SecuritySource getSecuritySource() {
-    return _securitySource;
+  public DependencyGraphBuilderFactory getDependencyGraphBuilderFactory() {
+    return _dependencyGraphBuilderFactory;
   }
 
   /**
@@ -209,7 +179,7 @@ public class ViewProcessContext {
    * 
    * @return the computationTargetResolver, not null
    */
-  public CachingComputationTargetResolver getComputationTargetResolver() {
+  public ComputationTargetResolver getComputationTargetResolver() {
     return _computationTargetResolver;
   }
 
@@ -238,9 +208,8 @@ public class ViewProcessContext {
    * @return the services, not null
    */
   public ViewCompilationServices asCompilationServices(MarketDataAvailabilityProvider marketDataAvailabilityProvider) {
-    return new ViewCompilationServices(marketDataAvailabilityProvider, getFunctionResolver(), getFunctionExclusionGroups(), getFunctionCompilationService().getFunctionCompilationContext(),
-        getComputationTargetResolver(),
-        getFunctionCompilationService().getExecutorService(), getSecuritySource(), getPositionSource());
+    return new ViewCompilationServices(marketDataAvailabilityProvider, getFunctionResolver(), getFunctionCompilationService().getFunctionCompilationContext(), getComputationTargetResolver(),
+        getFunctionCompilationService().getExecutorService(), getDependencyGraphBuilderFactory());
   }
 
 }

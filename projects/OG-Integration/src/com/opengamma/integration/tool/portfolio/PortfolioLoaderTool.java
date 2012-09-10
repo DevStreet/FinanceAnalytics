@@ -21,11 +21,13 @@ import com.opengamma.integration.copier.portfolio.writer.PrettyPrintingPortfolio
 import com.opengamma.integration.copier.portfolio.writer.MasterPortfolioWriter;
 import com.opengamma.integration.copier.portfolio.writer.PortfolioWriter;
 import com.opengamma.integration.copier.sheet.SheetFormat;
+import com.opengamma.util.generate.scripts.Scriptable;
 
 /**
  * The portfolio loader tool
  */
-public class PortfolioLoaderTool extends AbstractTool {
+@Scriptable
+public class PortfolioLoaderTool extends AbstractTool<ToolContext> {
 
   /** File name option flag */
   private static final String FILE_NAME_OPT = "f";
@@ -49,7 +51,7 @@ public class PortfolioLoaderTool extends AbstractTool {
    * @param args  the arguments, not null
    */
   public static void main(String[] args) { //CSIGNORE
-    new PortfolioLoaderTool().initAndRun(args);
+    new PortfolioLoaderTool().initAndRun(args, ToolContext.class);
     System.exit(0);
   }
 
@@ -111,7 +113,7 @@ public class PortfolioLoaderTool extends AbstractTool {
           s_context.getPortfolioMaster(), 
           s_context.getPositionMaster(), 
           s_context.getSecurityMaster(),
-          overwrite);
+          overwrite, false, false);
     } else {
       System.out.println("Write option not specified, not persisting to OpenGamma masters");
 

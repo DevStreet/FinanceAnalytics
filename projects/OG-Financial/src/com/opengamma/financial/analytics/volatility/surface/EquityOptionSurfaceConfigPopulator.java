@@ -34,9 +34,9 @@ public class EquityOptionSurfaceConfigPopulator {
         LocalDate.of(2011, 9, 17), LocalDate.of(2011, 12, 17),
         LocalDate.of(2012, 3, 17), LocalDate.of(2012, 6, 16),
         LocalDate.of(2012, 12, 22), LocalDate.of(2013, 6, 22) };
-    final Double[] strikes = new Double[21];
+    final Double[] strikes = new Double[31];
     int j = 0;
-    for (int i = 50; i <= 150; i += 5) {
+    for (int i = 50; i <= 200; i += 5) {
       strikes[j++] = (double) i;
     }
     final VolatilitySurfaceDefinition<LocalDate, Double> usVolSurfaceDefinition =
@@ -62,7 +62,7 @@ public class EquityOptionSurfaceConfigPopulator {
     final SurfaceInstrumentProvider<LocalDate, Double> surfaceInstrumentProvider =
         new BloombergEquityOptionVolatilitySurfaceInstrumentProvider("DJX", "Index", MarketDataRequirementNames.IMPLIED_VOLATILITY);
     final VolatilitySurfaceSpecification usVolSurfaceSpec = new VolatilitySurfaceSpecification("DEFAULT_DJX_EQUITY_OPTION",
-        UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName(), "DJX Index"), SurfaceQuoteType.CALL_AND_PUT_STRIKE,
+        UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName(), "DJX Index"), SurfaceAndCubeQuoteType.CALL_AND_PUT_STRIKE,
         surfaceInstrumentProvider);
     ConfigMasterUtils.storeByName(configMaster, makeConfigDocument(usVolSurfaceSpec));
   }

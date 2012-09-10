@@ -5,6 +5,8 @@
  */
 package com.opengamma.bbg;
 
+import net.sf.ehcache.CacheManager;
+
 import org.testng.annotations.Test;
 
 import com.opengamma.bbg.test.BloombergLiveDataServerUtils;
@@ -12,18 +14,20 @@ import com.opengamma.util.ehcache.EHCacheUtils;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 
 /**
- * 
+ * Test.
  */
-@Test
+@Test(groups = "integration")
 public class BloombergReferenceDataProviderWithEHCacheTest  extends BloombergReferenceDataProviderTestCase {
 
   @Override
   protected ReferenceDataProvider createReferenceDataProvider(Class<?> c) {
-    EHCacheUtils.clearAll();
+    // REVIEW jonathan 2012-09-04 -- a reference data provider wrapped in Mongo, wrapped again in EHCache... seriously?
     CachingReferenceDataProvider underlying = BloombergLiveDataServerUtils.getCachingReferenceDataProvider(c);
+    CacheManager cm = EHCacheUtils.createCacheManager();
+    EHCacheUtils.clear(cm, EHCachingReferenceDataProvider.REFERENCE_DATA_CACHE);
     return new EHCachingReferenceDataProvider(
         underlying, 
-        EHCacheUtils.createCacheManager(), 
+        cm, 
         OpenGammaFudgeContext.getInstance());
   }
 

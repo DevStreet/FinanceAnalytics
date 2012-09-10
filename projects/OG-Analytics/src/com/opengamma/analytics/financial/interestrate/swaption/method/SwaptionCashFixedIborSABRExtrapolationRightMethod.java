@@ -16,8 +16,8 @@ import com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivi
 import com.opengamma.analytics.financial.interestrate.ParRateCalculator;
 import com.opengamma.analytics.financial.interestrate.ParRateCurveSensitivityCalculator;
 import com.opengamma.analytics.financial.interestrate.PresentValueSABRSensitivityDataBundle;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedDiscountingMethod;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
@@ -47,7 +47,7 @@ public class SwaptionCashFixedIborSABRExtrapolationRightMethod {
    */
   private static final ParRateCurveSensitivityCalculator PRSC = ParRateCurveSensitivityCalculator.getInstance();
   private static final ParRateCalculator PRC = ParRateCalculator.getInstance();
-  private static final SwapFixedDiscountingMethod METHOD_SWAP = SwapFixedDiscountingMethod.getInstance();
+  private static final SwapFixedCouponDiscountingMethod METHOD_SWAP = SwapFixedCouponDiscountingMethod.getInstance();
 
   /**
    * Constructor from cut-off strike and tail parameter.
@@ -158,12 +158,13 @@ public class SwaptionCashFixedIborSABRExtrapolationRightMethod {
     final double nu = sabrData.getSABRParameter().getNu(expiryMaturity);
     final SABRFormulaData sabrParam = new SABRFormulaData(alpha, beta, rho, nu);
     final SABRExtrapolationRightFunction sabrExtrapolation = new SABRExtrapolationRightFunction(forward, sabrParam, _cutOffStrike, swaption.getTimeToExpiry(), _mu);
-    final double[] priceDSabr = new double[3];
+    final double[] priceDSabr = new double[4];
     sabrExtrapolation.priceAdjointSABR(swaption, priceDSabr);
     final double omega = (swaption.isLong() ? 1.0 : -1.0);
     sensi.addAlpha(expiryMaturity, omega * discountFactorSettle * pvbp * priceDSabr[0]);
-    sensi.addRho(expiryMaturity, omega * discountFactorSettle * pvbp * priceDSabr[1]);
-    sensi.addNu(expiryMaturity, omega * discountFactorSettle * pvbp * priceDSabr[2]);
+    sensi.addBeta(expiryMaturity, omega * discountFactorSettle * pvbp * priceDSabr[1]);
+    sensi.addRho(expiryMaturity, omega * discountFactorSettle * pvbp * priceDSabr[2]);
+    sensi.addNu(expiryMaturity, omega * discountFactorSettle * pvbp * priceDSabr[3]);
     return sensi;
   }
 

@@ -8,13 +8,9 @@ package com.opengamma.engine.view;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.core.position.PositionSource;
-import com.opengamma.core.security.SecuritySource;
-import com.opengamma.engine.CachingComputationTargetResolver;
-import com.opengamma.engine.DefaultCachingComputationTargetResolver;
-import com.opengamma.engine.DefaultComputationTargetResolver;
+import com.opengamma.engine.ComputationTargetResolver;
+import com.opengamma.engine.depgraph.DependencyGraphBuilderFactory;
 import com.opengamma.engine.function.CompiledFunctionService;
-import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.DefaultFunctionResolver;
 import com.opengamma.engine.function.resolver.FunctionResolver;
 import com.opengamma.engine.marketdata.DummyOverrideOperationCompiler;
@@ -31,7 +27,6 @@ import com.opengamma.engine.view.calcnode.ViewProcessorQueryReceiver;
 import com.opengamma.engine.view.permission.ViewPermissionProvider;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.SingletonFactoryBean;
-import com.opengamma.util.ehcache.EHCacheUtils;
 
 /**
  * Spring factory bean for {@link ViewProcessor}.
@@ -43,16 +38,14 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
   private String _name;
   private ViewDefinitionRepository _viewDefinitionRepository;
   private NamedMarketDataSpecificationRepository _namedMarketDataSpecificationRepository;
-  private SecuritySource _securitySource;
-  private PositionSource _positionSource;
-  private CachingComputationTargetResolver _computationTargetResolver;
+  private ComputationTargetResolver _computationTargetResolver;
   private CompiledFunctionService _functionCompilationService;
   private FunctionResolver _functionResolver;
-  private FunctionExclusionGroups _functionExclusionGroups;
   private MarketDataProviderResolver _marketDataProviderResolver;
   private ViewComputationCacheSource _computationCacheSource;
   private JobDispatcher _computationJobDispatcher;
   private ViewProcessorQueryReceiver _viewProcessorQueryReceiver;
+  private DependencyGraphBuilderFactory _dependencyGraphBuilderFactory = new DependencyGraphBuilderFactory();
   private DependencyGraphExecutorFactory<?> _dependencyGraphExecutorFactory;
   private GraphExecutorStatisticsGathererProvider _graphExecutionStatistics = new DiscardingGraphStatisticsGathererProvider();
   private ViewPermissionProvider _viewPermissionProvider;
@@ -84,27 +77,11 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
     _namedMarketDataSpecificationRepository = namedMarketDataSpecificationRepository;
   }
 
-  public SecuritySource getSecuritySource() {
-    return _securitySource;
-  }
-
-  public void setSecuritySource(SecuritySource securitySource) {
-    _securitySource = securitySource;
-  }
-
-  public PositionSource getPositionSource() {
-    return _positionSource;
-  }
-
-  public void setPositionSource(PositionSource positionSource) {
-    _positionSource = positionSource;
-  }
-
-  public CachingComputationTargetResolver getComputationTargetResolver() {
+  public ComputationTargetResolver getComputationTargetResolver() {
     return _computationTargetResolver;
   }
 
-  public void setComputationTargetResolver(CachingComputationTargetResolver computationTargetResolver) {
+  public void setComputationTargetResolver(ComputationTargetResolver computationTargetResolver) {
     _computationTargetResolver = computationTargetResolver;
   }
 
@@ -124,12 +101,12 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
     _functionResolver = functionResolver;
   }
 
-  public FunctionExclusionGroups getFunctionExclusionGroups() {
-    return _functionExclusionGroups;
+  public DependencyGraphBuilderFactory getDependencyGraphBuilderFactory() {
+    return _dependencyGraphBuilderFactory;
   }
 
-  public void setFunctionExclusionGroups(final FunctionExclusionGroups functionExclusionGroups) {
-    _functionExclusionGroups = functionExclusionGroups;
+  public void setDependencyGraphBuilderFactory(final DependencyGraphBuilderFactory dependencyGraphBuilderFactory) {
+    _dependencyGraphBuilderFactory = dependencyGraphBuilderFactory;
   }
 
   public MarketDataProviderResolver getMarketDataProviderResolver() {
@@ -206,12 +183,7 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
     if (getFunctionResolver() == null) {
       setFunctionResolver(new DefaultFunctionResolver(getFunctionCompilationService()));
     }
-    ArgumentChecker.notNullInjected(getSecuritySource(), "securitySource");
-    ArgumentChecker.notNullInjected(getPositionSource(), "positionSource");
     ArgumentChecker.notNullInjected(getComputationTargetResolver(), "computationTargetResolver");
-    if (getComputationTargetResolver() == null) {
-      setComputationTargetResolver(new DefaultCachingComputationTargetResolver(new DefaultComputationTargetResolver(getSecuritySource(), getPositionSource()), EHCacheUtils.createCacheManager()));
-    }
     ArgumentChecker.notNullInjected(getMarketDataProviderResolver(), "marketDataProviderResolver");
     ArgumentChecker.notNullInjected(getComputationCacheSource(), "computationCacheSource");
     ArgumentChecker.notNullInjected(getComputationJobDispatcher(), "computationJobRequestSender");
@@ -225,16 +197,14 @@ public class ViewProcessorFactoryBean extends SingletonFactoryBean<ViewProcessor
         getName(),
         getViewDefinitionRepository(),
         getNamedMarketDataSpecificationRepository(),
-        getSecuritySource(),
-        getPositionSource(),
         getComputationTargetResolver(),
         getFunctionCompilationService(),
         getFunctionResolver(),
-        getFunctionExclusionGroups(),
         getMarketDataProviderResolver(),
         getComputationCacheSource(),
         getComputationJobDispatcher(),
         getViewProcessorQueryReceiver(),
+        getDependencyGraphBuilderFactory(),
         getDependencyGraphExecutorFactory(),
         getGraphExecutionStatistics(),
         getViewPermissionProvider(),

@@ -10,6 +10,7 @@ import java.util.Random;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.position.PositionDocument;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.ManageableSecurityLink;
+import com.opengamma.util.money.Currency;
 
 /**
  * Utility for generating a portfolio of securities.
@@ -39,6 +41,10 @@ import com.opengamma.master.security.ManageableSecurityLink;
 public abstract class AbstractPortfolioGeneratorTool {
 
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractPortfolioGeneratorTool.class);
+  /**
+   * Default counter party name
+   */
+  public static final String DEFAULT_COUNTER_PARTY = "COUNTERPARTY";
 
   /**
    * Default portfolio size used by sub-classes.
@@ -50,6 +56,8 @@ public abstract class AbstractPortfolioGeneratorTool {
   private ToolContext _toolContext;
   private Class<? extends AbstractPortfolioGeneratorTool> _classContext;
   private AbstractPortfolioGeneratorTool _objectContext;
+  private NameGenerator _counterPartyGenerator;
+  private Currency[] _currencies;
 
   public AbstractPortfolioGeneratorTool() {
     _classContext = getClass();
@@ -63,10 +71,10 @@ public abstract class AbstractPortfolioGeneratorTool {
     return createPortfolioGenerator(new StaticNameGenerator(portfolioName)).createPortfolio();
   }
 
-  public PortfolioNodeGenerator createPortfolioNodeGenerator(int portfolioSize) {
+  public PortfolioNodeGenerator createPortfolioNodeGenerator(final int portfolioSize) {
     throw new UnsupportedOperationException();
   }
-  
+
   public PortfolioNode createPortfolioNode(final int size) {
     return createPortfolioNodeGenerator(size).createPortfolioNode();
   }
@@ -81,6 +89,14 @@ public abstract class AbstractPortfolioGeneratorTool {
 
   public void setRandom(final Random random) {
     _random = random;
+  }
+
+  public Currency[] getCurrencies() {
+    return _currencies;
+  }
+
+  public void setCurrencies(final Currency[] currencies) {
+    _currencies = currencies;
   }
 
   private void setContext(final Class<? extends AbstractPortfolioGeneratorTool> classContext, final AbstractPortfolioGeneratorTool objectContext) {
@@ -104,6 +120,14 @@ public abstract class AbstractPortfolioGeneratorTool {
     _securityPersister = securityPersister;
   }
 
+  public NameGenerator getCounterPartyGenerator() {
+    return _counterPartyGenerator;
+  }
+
+  public void setCounterPartyGenerator(final NameGenerator counterPartyGenerator) {
+    _counterPartyGenerator = counterPartyGenerator;
+  }
+
   public ToolContext getToolContext() {
     return _toolContext;
   }
@@ -116,6 +140,9 @@ public abstract class AbstractPortfolioGeneratorTool {
     if (getRandom() != null) {
       securityGenerator.setRandom(getRandom());
     }
+    if (getCurrencies() != null && getCurrencies().length > 0) {
+      securityGenerator.setCurrencies(getCurrencies());
+    }
     if (getToolContext() != null) {
       securityGenerator.setConfigSource(getToolContext().getConfigSource());
       securityGenerator.setConventionSource(getToolContext().getConventionBundleSource());
@@ -124,6 +151,7 @@ public abstract class AbstractPortfolioGeneratorTool {
       securityGenerator.setExchangeMaster(getToolContext().getExchangeMaster());
       securityGenerator.setRegionSource(getToolContext().getRegionSource());
       securityGenerator.setSecurityMaster(getToolContext().getSecurityMaster());
+      securityGenerator.setHistoricalTimeSeriesMaster(getToolContext().getHistoricalTimeSeriesMaster());
     }
     configureChain(securityGenerator);
   }
@@ -144,6 +172,9 @@ public abstract class AbstractPortfolioGeneratorTool {
     if (getSecurityPersister() != null) {
       tool.setSecurityPersister(getSecurityPersister());
     }
+    if (getCounterPartyGenerator() != null) {
+      tool.setCounterPartyGenerator(getCounterPartyGenerator());
+    }
   }
 
   /**
@@ -158,6 +189,11 @@ public abstract class AbstractPortfolioGeneratorTool {
    * Command line option to specify to write to the database masters.
    */
   public static final String WRITE_OPT = "write";
+  /**
+   * Command line option to specifying the name of the counter party to use for trades.
+   */
+  public static final String COUNTER_PARTY_OPT = "counterPty";
+  private static final String CURRENCIES_OPT = "currencies";
 
   private AbstractPortfolioGeneratorTool getInstance(final Class<?> clazz, final String security) {
     if (!AbstractPortfolioGeneratorTool.class.isAssignableFrom(clazz)) {
@@ -165,7 +201,7 @@ public abstract class AbstractPortfolioGeneratorTool {
     }
     try {
       final String className;
-      int i = security.indexOf('.');
+      final int i = security.indexOf('.');
       if (i < 0) {
         className = clazz.getPackage().getName() + "." + security + "PortfolioGeneratorTool";
       } else {
@@ -175,14 +211,14 @@ public abstract class AbstractPortfolioGeneratorTool {
       try {
         s_logger.debug("Trying class {}", className);
         instanceClass = Class.forName(className);
-      } catch (ClassNotFoundException e) {
+      } catch (final ClassNotFoundException e) {
         return getInstance(clazz.getSuperclass(), security);
       }
       s_logger.info("Loading {}", className);
       final AbstractPortfolioGeneratorTool tool = (AbstractPortfolioGeneratorTool) instanceClass.newInstance();
       tool.setContext(getClassContext(), this);
       return tool;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new OpenGammaRuntimeException("Couldn't create generator tool instance for " + security, e);
     }
   }
@@ -191,9 +227,10 @@ public abstract class AbstractPortfolioGeneratorTool {
     return getInstance(getClassContext(), security);
   }
 
-  public void run(final ToolContext context, final String portfolioName, final String security, final boolean write) {
+  public void run(final ToolContext context, final String portfolioName, final String security, final boolean write, final Currency[] currencies) {
     final AbstractPortfolioGeneratorTool instance = getInstance(security);
     instance.setToolContext(context);
+    instance.setCounterPartyGenerator(getCounterPartyGenerator());
     instance.setRandom(new SecureRandom());
     final SecuritySource securitySource;
     if (write) {
@@ -205,6 +242,9 @@ public abstract class AbstractPortfolioGeneratorTool {
       final MockSecurityPersister securityPersister = new MockSecurityPersister();
       instance.setSecurityPersister(securityPersister);
       securitySource = securityPersister.getMockSecuritySource();
+    }
+    if (currencies != null && currencies.length > 0) {
+      instance.setCurrencies(currencies);
     }
     s_logger.info("Creating portfolio {}", portfolioName);
     final Portfolio portfolio = instance.createPortfolio(portfolioName);
@@ -237,15 +277,15 @@ public abstract class AbstractPortfolioGeneratorTool {
 
   private ManageablePortfolioNode createPortfolioNode(final PositionMaster positionMaster, final PortfolioNode node) {
     final ManageablePortfolioNode newNode = new ManageablePortfolioNode(node.getName());
-    for (PortfolioNode child : node.getChildNodes()) {
+    for (final PortfolioNode child : node.getChildNodes()) {
       newNode.addChildNode(createPortfolioNode(positionMaster, child));
     }
-    for (Position position : node.getPositions()) {
+    for (final Position position : node.getPositions()) {
       final ManageablePosition newPosition = new ManageablePosition();
       newPosition.setAttributes(position.getAttributes());
       newPosition.setQuantity(position.getQuantity());
       newPosition.setSecurityLink(new ManageableSecurityLink(position.getSecurityLink()));
-      for (Trade trade : position.getTrades()) {
+      for (final Trade trade : position.getTrades()) {
         newPosition.addTrade(new ManageableTrade(trade));
       }
       newNode.addPosition(positionMaster.add(new PositionDocument(newPosition)).getUniqueId());
@@ -255,10 +295,10 @@ public abstract class AbstractPortfolioGeneratorTool {
 
   private void writePortfolio(final SecuritySource securitySource, final PortfolioNode node, final String indent) {
     s_logger.debug("{}+{}", indent, node.getName());
-    for (PortfolioNode childNode : node.getChildNodes()) {
+    for (final PortfolioNode childNode : node.getChildNodes()) {
       writePortfolio(securitySource, childNode, indent + "  ");
     }
-    for (Position position : node.getPositions()) {
+    for (final Position position : node.getPositions()) {
       final Security security = position.getSecurityLink().resolve(securitySource);
       s_logger.debug("{} {} x {}", new Object[] {indent, position.getQuantity(), security });
     }
@@ -269,14 +309,37 @@ public abstract class AbstractPortfolioGeneratorTool {
     return option;
   }
 
+  @SuppressWarnings("static-access")
   public void createOptions(final Options options) {
     options.addOption(required(new Option("p", PORTFOLIO_OPT, true, "sets the name of the portfolio to create")));
     options.addOption(required(new Option("s", SECURITY_OPT, true, "selects the asset class to populate the portfolio with")));
     options.addOption(new Option("w", WRITE_OPT, false, "writes the portfolio and securities to the masters"));
+    options.addOption(new Option("cp", COUNTER_PARTY_OPT, true, "sets the name of the counter party"));
+    options.addOption(OptionBuilder.hasArgs()
+        .withArgName("Currency")
+        .withDescription("Specify the currencies of the securities to be generated")
+        .withLongOpt(CURRENCIES_OPT)
+        .create("ccy"));
+  }
+
+  private Currency[] parseCurrencies(final CommandLine commandLine) {
+    if (commandLine.hasOption(CURRENCIES_OPT)) {
+      final String[] currencies = commandLine.getOptionValues(CURRENCIES_OPT);
+      final Currency[] ccys = new Currency[currencies.length];
+      int i = 0;
+      for (final String ccyStr : currencies) {
+        ccys[i++] = Currency.of(ccyStr.trim());
+      }
+      return ccys;
+    } else {
+      return null;
+    }
   }
 
   public void run(final ToolContext context, final CommandLine commandLine) {
-    run(context, commandLine.getOptionValue(PORTFOLIO_OPT), commandLine.getOptionValue(SECURITY_OPT), commandLine.hasOption(WRITE_OPT));
+    setCounterPartyGenerator(new StaticNameGenerator(commandLine.getOptionValue(COUNTER_PARTY_OPT, DEFAULT_COUNTER_PARTY)));
+    run(context, commandLine.getOptionValue(PORTFOLIO_OPT), commandLine.getOptionValue(SECURITY_OPT),
+        commandLine.hasOption(WRITE_OPT), parseCurrencies(commandLine));
   }
 
 }

@@ -26,12 +26,22 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 public final class InterestRateFutureDiscountingMethod extends InterestRateFutureMethod {
 
+  /**
+   * The unique instance of the calculator.
+   */
   private static final InterestRateFutureDiscountingMethod INSTANCE = new InterestRateFutureDiscountingMethod();
 
+  /**
+   * Gets the calculator instance.
+   * @return The calculator.
+   */
   public static InterestRateFutureDiscountingMethod getInstance() {
     return INSTANCE;
   }
 
+  /**
+   * Constructor.
+   */
   private InterestRateFutureDiscountingMethod() {
   }
 
@@ -78,7 +88,7 @@ public final class InterestRateFutureDiscountingMethod extends InterestRateFutur
   }
 
   /**
-   * Compute the price sensitivity to rates of a interest rate future by discounting.
+   * Compute the price sensitivity to rates of an interest rate future by discounting.
    * @param future The future.
    * @param curves The yield curves. Should contain the forward curve associated.
    * @return The price rate sensitivity.
@@ -90,7 +100,7 @@ public final class InterestRateFutureDiscountingMethod extends InterestRateFutur
     final YieldAndDiscountCurve forwardCurve = curves.getCurve(future.getForwardCurveName());
     final double dfForwardStart = forwardCurve.getDiscountFactor(future.getFixingPeriodStartTime());
     final double dfForwardEnd = forwardCurve.getDiscountFactor(future.getFixingPeriodEndTime());
-    // Backward sweep
+    // Partials - XBar => d(price)/dX
     final double priceBar = 1.0;
     final double forwardBar = -priceBar;
     final double dfForwardEndBar = -dfForwardStart / (dfForwardEnd * dfForwardEnd) / future.getFixingPeriodAccrualFactor() * forwardBar;

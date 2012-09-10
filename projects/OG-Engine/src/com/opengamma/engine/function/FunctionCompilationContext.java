@@ -5,8 +5,10 @@
  */
 package com.opengamma.engine.function;
 
-import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.SecuritySource;
+import com.opengamma.engine.ComputationTargetResolver;
+import com.opengamma.engine.function.blacklist.DummyFunctionBlacklistQuery;
+import com.opengamma.engine.function.blacklist.FunctionBlacklistQuery;
 import com.opengamma.engine.function.resolver.ComputationTargetResults;
 import com.opengamma.engine.view.ViewCalculationConfiguration;
 import com.opengamma.util.PublicAPI;
@@ -22,6 +24,10 @@ import com.opengamma.util.PublicAPI;
 public class FunctionCompilationContext extends AbstractFunctionContext {
 
   /**
+   * The name under which the {@link ComputationTargetResolver} instance should be bound.
+   */
+  public static final String COMPUTATION_TARGET_RESOLVER = "computationTargetResolver";
+  /**
    * The name under which the {@link ComputationTargetResults} instance should be bound.
    */
   public static final String COMPUTATION_TARGET_RESULTS_NAME = "computationTargetResults";
@@ -29,10 +35,6 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
    * The name under which an instance of {@link SecuritySource} should be bound.
    */
   public static final String SECURITY_SOURCE_NAME = "securitySource";
-  /**
-   * The name under which an instance of {@link PositionSource} should be bound.
-   */
-  public static final String POSITION_SOURCE_NAME = "positionSource";
   /**
    * The name under which an instance of {@link PortfolioStructure} should be bound.
    */
@@ -49,11 +51,23 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
    * The name under which a re-initialization hook should be bound.
    */
   public static final String FUNCTION_REINITIALIZER_NAME = "functionReinitializer";
+  /**
+   * The name under which the graph building blacklist should be bound.
+   */
+  public static final String GRAPH_BUILDING_BLACKLIST = "graphBuildingBlacklist";
+  /**
+   * The name under which the graph execution blacklist should be bound.
+   */
+  public static final String GRAPH_EXECUTION_BLACKLIST = "graphExecutionBlacklist";
+
+  // TODO: [PLAT-2638] The blacklists should not really be here. 
 
   /**
    * Creates an empty function compilation context.
    */
   public FunctionCompilationContext() {
+    setGraphBuildingBlacklist(new DummyFunctionBlacklistQuery());
+    setGraphExecutionBlacklist(new DummyFunctionBlacklistQuery());
   }
 
   /**
@@ -65,7 +79,25 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
     super(copyFrom);
   }
 
-  //-------------------------------------------------------------------------
+  /**
+   * Gets the computation target resolver. Functions should not need to access this directly - their computation target will always be resolved when they are invoked. It may be used to access the full
+   * target object referenced by a "desiredValue".
+   * 
+   * @return the computation target resolver, null if not in the context
+   */
+  public ComputationTargetResolver getComputationTargetResolver() {
+    return (ComputationTargetResolver) get(COMPUTATION_TARGET_RESOLVER);
+  }
+
+  /**
+   * Sets the computation target resolver.
+   * 
+   * @param computationTargetResolver the target resolver
+   */
+  public void setComputationTargetResolver(final ComputationTargetResolver computationTargetResolver) {
+    put(COMPUTATION_TARGET_RESOLVER, computationTargetResolver);
+  }
+
   /**
    * Gets the source of result information on a target.
    * 
@@ -106,24 +138,6 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
     put(SECURITY_SOURCE_NAME, securitySource);
   }
   
-  /**
-   * Gets the source of positions.
-   * 
-   * @return the source of positions, null if not in the context
-   */
-  public PositionSource getPositionSource() {
-    return (PositionSource) get(POSITION_SOURCE_NAME);
-  }
-  
-  /**
-   * Sets the source of positions.
-   * 
-   * @param positionSource  the source of positions to bind
-   */
-  public void setPositionSource(PositionSource positionSource) {
-    put(POSITION_SOURCE_NAME, positionSource);
-  }
-
   /**
    * Gets the source of portfolio structure information.
    * 
@@ -201,12 +215,49 @@ public class FunctionCompilationContext extends AbstractFunctionContext {
     }
   }
 
-  //-------------------------------------------------------------------------
+  /**
+   * Returns the function blacklist to be used during graph building. Graphs should not be built containing any items that are currently on the blacklist.
+   * 
+   * @return the query interface to the blacklist, not null
+   */
+  public FunctionBlacklistQuery getGraphBuildingBlacklist() {
+    return (FunctionBlacklistQuery) get(GRAPH_BUILDING_BLACKLIST);
+  }
+
+  /**
+   * Sets the function blacklist to be used during graph building. Graphs should not be built containing any items that are currently on the blacklist.
+   * 
+   * @param graphBuildingBlacklist interface to the blacklist to use, not null
+   */
+  public void setGraphBuildingBlacklist(final FunctionBlacklistQuery graphBuildingBlacklist) {
+    put(GRAPH_BUILDING_BLACKLIST, graphBuildingBlacklist);
+  }
+
+  /**
+   * Returns the function blacklist to use when executing a graph. This is part of the compilation context because the blacklist applies immediately before the graph is submitted for execution, before
+   * an execution context is valid.
+   * 
+   * @return the execution blacklist, not null
+   */
+  public FunctionBlacklistQuery getGraphExecutionBlacklist() {
+    return (FunctionBlacklistQuery) get(GRAPH_EXECUTION_BLACKLIST);
+  }
+
+  /**
+   * Sets the function blacklist to use when executing a graph. This is part of the compilation context because the blacklist applies immediately before the graph is submitted for execution, before an
+   * execution context is valid.
+   * 
+   * @param blacklist the execution blacklist, not null
+   */
+  public void setGraphExecutionBlacklist(final FunctionBlacklistQuery blacklist) {
+    put(GRAPH_EXECUTION_BLACKLIST, blacklist);
+  }
+
   /**
    * Gets the source of securities cast to a specific type.
    * 
-   * @param <T>  the security source type
-   * @param clazz  the security source type
+   * @param <T> the security source type
+   * @param clazz the security source type
    * @return the security source
    * @throws ClassCastException if the security source is of a different type
    */

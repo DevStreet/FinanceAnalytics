@@ -7,9 +7,9 @@ package com.opengamma.analytics.financial.interestrate;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.AnnuityCouponIborSpread;
-import com.opengamma.analytics.financial.interestrate.annuity.definition.GenericAnnuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
+import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondFixedSecurity;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.DepositZero;
@@ -28,13 +28,14 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.method.CouponIborDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.payments.method.CouponOISDiscountingMethod;
-import com.opengamma.analytics.financial.interestrate.swap.definition.CrossCurrencySwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedCouponSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.FloatingRateNote;
-import com.opengamma.analytics.financial.interestrate.swap.definition.OISSwap;
-import com.opengamma.analytics.financial.interestrate.swap.definition.TenorSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.CrossCurrencySwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.FloatingRateNote;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.TenorSwap;
+import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.util.CompareUtils;
 
 /**
@@ -72,6 +73,7 @@ public final class ParRateCalculator extends AbstractInstrumentDerivativeVisitor
   private static final DepositZeroDiscountingMethod METHOD_DEPOSIT_ZERO = DepositZeroDiscountingMethod.getInstance();
   private static final ForwardRateAgreementDiscountingMethod METHOD_FRA = ForwardRateAgreementDiscountingMethod.getInstance();
   private static final InterestRateFutureDiscountingMethod METHOD_IRFUT = InterestRateFutureDiscountingMethod.getInstance();
+  private static final SwapFixedCouponDiscountingMethod METHOD_SWAP = SwapFixedCouponDiscountingMethod.getInstance();
 
   @Override
   public Double visit(final InstrumentDerivative derivative, final YieldCurveBundle curves) {
@@ -125,15 +127,36 @@ public final class ParRateCalculator extends AbstractInstrumentDerivativeVisitor
    * @return The par swap rate. If the fixed leg has been set up with some fixed payments these are ignored for the purposes of finding the swap rate
    */
   @Override
-  public Double visitFixedCouponSwap(final FixedCouponSwap<?> swap, final YieldCurveBundle curves) {
+  public Double visitFixedCouponSwap(final SwapFixedCoupon<?> swap, final YieldCurveBundle curves) {
     final double pvSecond = PVC.visit(swap.getSecondLeg(), curves);
     final double pvbp = PVC.visit(swap.getFixedLeg().withUnitCoupon(), curves);
     return -pvSecond / pvbp;
   }
 
-  @Override
-  public Double visitOISSwap(final OISSwap swap, final YieldCurveBundle curves) {
-    return visitFixedCouponSwap(swap, curves);
+  /**
+   * Computes the swap convention-modified par rate for a fixed coupon swap.
+   * <P>Reference: Swaption pricing - v 1.3, OpenGamma Quantitative Research, June 2012.
+   * @param swap The swap.
+   * @param dayCount The day count convention to modify the swap rate.
+   * @param curves The curves.
+   * @return The modified rate.
+   */
+  public Double visitFixedCouponSwap(final SwapFixedCoupon<?> swap, final DayCount dayCount, final YieldCurveBundle curves) {
+    final double pvbp = METHOD_SWAP.presentValueBasisPoint(swap, dayCount, curves);
+    return visitFixedCouponSwap(swap, pvbp, curves);
+  }
+
+  /**
+   * Computes the swap convention-modified par rate for a fixed coupon swap with a PVBP externally provided.
+   * <P>Reference: Swaption pricing - v 1.3, OpenGamma Quantitative Research, June 2012.
+   * @param swap The swap.
+   * @param pvbp The present value of a basis point.
+   * @param curves The curves.
+   * @return The modified rate.
+   */
+  public Double visitFixedCouponSwap(final SwapFixedCoupon<?> swap, final double pvbp, final YieldCurveBundle curves) {
+    final double pvSecond = -PVC.visit(swap.getSecondLeg(), curves) * Math.signum(swap.getSecondLeg().getNthPayment(0).getNotional());
+    return -pvSecond / pvbp;
   }
 
   /**
@@ -198,13 +221,13 @@ public final class ParRateCalculator extends AbstractInstrumentDerivativeVisitor
    */
   @Override
   public Double visitBondFixedSecurity(final BondFixedSecurity bond, final YieldCurveBundle curves) {
-    final GenericAnnuity<CouponFixed> coupons = bond.getCoupon();
+    final Annuity<CouponFixed> coupons = bond.getCoupon();
     final int n = coupons.getNumberOfPayments();
     final CouponFixed[] unitCoupons = new CouponFixed[n];
     for (int i = 0; i < n; i++) {
       unitCoupons[i] = coupons.getNthPayment(i).withUnitCoupon();
     }
-    final GenericAnnuity<CouponFixed> unitCouponAnnuity = new GenericAnnuity<CouponFixed>(unitCoupons);
+    final Annuity<CouponFixed> unitCouponAnnuity = new Annuity<CouponFixed>(unitCoupons);
     final double pvann = PVC.visit(unitCouponAnnuity, curves);
     final double matPV = PVC.visit(bond.getNominal(), curves);
     return (1 - matPV) / pvann;

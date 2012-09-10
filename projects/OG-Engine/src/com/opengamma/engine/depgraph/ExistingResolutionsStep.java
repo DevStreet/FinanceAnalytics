@@ -5,16 +5,16 @@
  */
 package com.opengamma.engine.depgraph;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.engine.depgraph.DependencyGraphBuilder.GraphBuildingContext;
 import com.opengamma.engine.function.ParameterizedFunction;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.util.tuple.Pair;
+import com.opengamma.util.tuple.Triple;
 
 /* package */final class ExistingResolutionsStep extends FunctionApplicationStep implements ResolvedValueCallback {
 
@@ -22,9 +22,9 @@ import com.opengamma.util.tuple.Pair;
 
   private ResolutionPump _pump;
 
-  public ExistingResolutionsStep(final ResolveTask task, final Iterator<Pair<ParameterizedFunction, ValueSpecification>> nextFunctions, final ParameterizedFunction function,
-      final ValueSpecification originalOutput, final ValueSpecification resolvedOutput) {
-    super(task, nextFunctions, function, originalOutput, resolvedOutput);
+  public ExistingResolutionsStep(final ResolveTask task, final Iterator<Triple<ParameterizedFunction, ValueSpecification, Collection<ValueSpecification>>> nextFunctions,
+      final Triple<ParameterizedFunction, ValueSpecification, Collection<ValueSpecification>> resolved, final ValueSpecification resolvedOutput) {
+    super(task, nextFunctions, resolved, resolvedOutput);
   }
 
   @Override
@@ -35,21 +35,27 @@ import com.opengamma.util.tuple.Pair;
       _pump = null;
     }
     // All existing resolutions have been completed, so now try the actual application
-    setRunnableTaskState(new FunctionApplicationStep(getTask(), getFunctions(), getFunction(), getOriginalOutput(), getResolvedOutput()), context);
+    setRunnableTaskState(new FunctionApplicationStep(getTask(), getFunctions(), getResolved(), getResolvedOutput()), context);
   }
 
   @Override
   public void resolved(final GraphBuildingContext context, final ValueRequirement valueRequirement, final ResolvedValue value, final ResolutionPump pump) {
     s_logger.debug("Resolved {} from {}", value, this);
-    synchronized (this) {
-      _pump = pump;
-    }
-    if (!pushResult(context, value)) {
+    if (pump != null) {
       synchronized (this) {
-        assert _pump == pump;
-        _pump = null;
+        _pump = pump;
       }
-      context.pump(pump);
+      if (!pushResult(context, value, false)) {
+        synchronized (this) {
+          assert _pump == pump;
+          _pump = null;
+        }
+        context.pump(pump);
+      }
+    } else {
+      if (!pushResult(context, value, true)) {
+        context.failed(this, valueRequirement, null);
+      }
     }
   }
 
@@ -63,6 +69,18 @@ import com.opengamma.util.tuple.Pair;
     if (pump != null) {
       s_logger.debug("Pumping underlying delegate");
       context.pump(pump);
+    }
+  }
+
+  @Override
+  protected void onDiscard(final GraphBuildingContext context) {
+    final ResolutionPump pump;
+    synchronized (this) {
+      pump = _pump;
+      _pump = null;
+    }
+    if (pump != null) {
+      context.close(pump);
     }
   }
 

@@ -28,7 +28,7 @@ public class MarginPriceFunction extends InterestRateFutureOptionBlackFunction {
   }
 
   @Override
-  protected Set<ComputedValue> getResult(InstrumentDerivative irFutureOption, YieldCurveWithBlackCubeBundle data, ValueSpecification spec) {
+  protected Set<ComputedValue> getResult(final InstrumentDerivative irFutureOption, final YieldCurveWithBlackCubeBundle data, final ValueSpecification spec) {
     final Double price = irFutureOption.accept(s_priceVisitor, data);
     return Collections.singleton(new ComputedValue(spec, price));
   }
