@@ -4,6 +4,8 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.util.ArgumentChecker;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,7 +14,10 @@ import java.util.Map;
 
 public class PrettyWriter<E> implements Writeable<E>, Closeable {
 
+  private static final Logger s_logger = LoggerFactory.getLogger(PrettyWriter.class);
+
   private OutputStream _outputStream;
+  private int _count = 0;
 
   public PrettyWriter(OutputStream outputStream) {
     ArgumentChecker.notNull(outputStream, "OutputStream");
@@ -22,9 +27,9 @@ public class PrettyWriter<E> implements Writeable<E>, Closeable {
   @Override
   public void addOrUpdate(E datum) {
     try {
-      _outputStream.write((ToStringBuilder.reflectionToString(datum) + "\n").getBytes());
+      _outputStream.write((Integer.toString(++_count) + ": " + ToStringBuilder.reflectionToString(datum) + "\n").getBytes());
     } catch (Throwable t) {
-      throw new OpenGammaRuntimeException("Could not write datum to output stream");
+      s_logger.error("Could not write datum to output stream");
     }
   }
 
