@@ -57,7 +57,7 @@ public class BLAS implements BLASAPIInterface {
     }
 
   }
-  
+
   @Override
   public void drotg(double[] a, double[] b, double[] c, double[] s) {
     _localBLAS.drotg(a, b, c, s);
@@ -97,11 +97,11 @@ public class BLAS implements BLASAPIInterface {
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
     _localBLAS.daxpy(n, alpha, x, incx, y, incy);
   }
-  
+
   @Override
   public void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
-    _localBLAS.daxpy(n, alpha, x, xOffset, incx, y, yOffset, incy);    
-  }  
+    _localBLAS.daxpy(n, alpha, x, xOffset, incx, y, yOffset, incy);
+  }
 
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
@@ -112,7 +112,7 @@ public class BLAS implements BLASAPIInterface {
   public double ddot(int n, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
     return _localBLAS.ddot(n, x, xOffset, incx, y, yOffset, incy);
   }
-  
+
   @Override
   public double dnrm2(int n, double[] x, int incx) {
     return _localBLAS.dnrm2(n, x, incx);
@@ -130,14 +130,17 @@ public class BLAS implements BLASAPIInterface {
 
   @Override
   public void dgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    _localBLAS.dgemv(trans, m, n, alpha, aMatrix, lda, x, incx, beta, y, incy);        
+    _localBLAS.dgemv(trans, m, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
+  }
+
+  @Override
+  public void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
+    _localBLAS.dgbmv(trans, m, n, kl, ku, alpha, aMatrix, lda, x, incx, beta, y, incy);
   }
 
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
-    _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc); 
+    _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
-
-
 
 }

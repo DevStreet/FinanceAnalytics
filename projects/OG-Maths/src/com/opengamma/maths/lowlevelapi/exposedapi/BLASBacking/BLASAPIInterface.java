@@ -375,7 +375,7 @@ public interface BLASAPIInterface {
    * 
    */
   void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy);
-  
+
   /**
    * Provides BLAS LEVEL 1: DAXPY. Call contains offset parameters.
    * See standard {@code daxpy} call for more information.
@@ -389,7 +389,7 @@ public interface BLASAPIInterface {
    * @param yOffset offset into the array y at which the operation should take place 
    * @param incy the increment between successive elements of 'y'
    */
-  void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy);  
+  void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy);
 
   /**
    * Provides BLAS LEVEL 1: DDOT.
@@ -438,7 +438,7 @@ public interface BLASAPIInterface {
    *
    */
   double ddot(int n, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy);
-  
+
   /**
    * Provides BLAS LEVEL 1: DNRM2
    * DNRM2 performs the following vector operation
@@ -593,6 +593,72 @@ public interface BLASAPIInterface {
   void dgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
 
   /**
+  *
+  * Provides BLAS LEVEL 2: DGBMV
+  * DGBMV  performs one of the following matrix vector operations
+  *
+  *  y := alpha*A*x + beta*y OR y := alpha*A^T*x + beta*y,
+  *
+  *  where alpha and beta are scalars, x and y are vectors and A is an
+  *  m by n band matrix with kl sub-diagonals and ku super-diagonals.
+  *  The ^T indicates transposition.
+  *
+  * The variable {@code char} denotes the operation to be undertaken.
+  * If trans is one of 'N' or 'n', the operation is y := alpha*A*x + beta*y
+  * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is y := alpha*A^T*x + beta*y 
+  *
+  * For information on the band storage format see http://www.netlib.org/lapack/lug/node124.html
+  *
+  * @param trans one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+  * @param m number of rows in matrix {@code aMatrix}
+  * @param n number of columns in matrix {@code aMatrix}
+  * @param kl the number of sub-diagonals in the matrix A, must satisfy kl >= 0.
+  * @param ku the number of sub-diagonals in the matrix A, must satisfy ku >= 0. 
+  * @param alpha scaling factor for the matrix vector product
+  * @param aMatrix the leading part of the "A" matrix of at least m by n entries
+  * @param lda the first dimension of aMatrix, must be at least kl+ku+1 and for most purposes will be.
+  * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+  * @param incx the increment between successive elements of 'x'
+  * @param beta scaling factor for the variable {@code y}
+  * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
+  * @param incy the increment between successive elements of 'x'
+  * 
+  * _Example_
+  * Input:
+  * trans = 'N'
+  * m=6
+  * n=5
+  * kl=2
+  * ku=1
+  * alpha=2.e0
+  * aMatrix = {-1,1,6,11,2,7,12,17,8,13,18,23,14,19,24,29,20,25,30,-1} // recall that certain values and be "undefined", we use the flag -1  
+  * lda = kl+ku+1
+  * x = {1,2,3,4,5}
+  * incx = 1
+  * beta = 5.e0
+  * y = {20,40,60,80,100,120}
+  * incy = 1
+  * 
+  * Call:
+  * dgbmv(trans, m, n, kl, ku, alpha, aMatrix, lda, x, incx, beta, y, incy);
+  * 
+  * Output:
+  * trans = 'N'
+  * m=6
+  * n=5
+  * alpha=2.e0
+  * aMatrix = {-1,1,6,11,2,7,12,17,8,13,18,23,14,19,24,29,20,25,30,-1}
+  * lda = kl+ku+1
+  * x = {1,2,3,4,5}
+  * incx = 1
+  * beta = 3.e0
+  * y = {110.00, 288.00, 560.00, 928.00, 1080.00, 1132.00}
+  * incy = 1
+  *  
+  */
+  void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
+
+  /**
    * 
    * Provides BLAS LEVEL 3: DGEMM
    * DGEMM performs the following matrix operations
@@ -618,6 +684,6 @@ public interface BLASAPIInterface {
    * @param cMatrix the leading part of the "C" matrix of at least dimension (LDC, n). Overwritten by the operation defined in the preamble on exit. 
    * @param ldc the first dimension of "C" at least max(1,m)
    */
-  void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix,  int ldb, double beta, double[] cMatrix, int ldc);
-  
+  void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc);
+
 }
