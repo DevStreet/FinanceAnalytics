@@ -3,7 +3,6 @@ package com.opengamma.integration.copiernew.nodepositionsecurity;
 import com.opengamma.id.ExternalIdSearch;
 import com.opengamma.id.ExternalIdSearchType;
 import com.opengamma.id.ObjectId;
-import com.opengamma.integration.copiernew.Copier;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;

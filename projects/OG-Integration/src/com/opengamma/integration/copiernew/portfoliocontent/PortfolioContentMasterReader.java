@@ -39,7 +39,6 @@ public class PortfolioContentMasterReader implements
     _securitySource = securitySource;
   }
 
-
   @Override
   public Iterator<PortfolioContent> iterator() {
 

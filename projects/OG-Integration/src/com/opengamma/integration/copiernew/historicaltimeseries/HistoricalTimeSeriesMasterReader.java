@@ -11,21 +11,26 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesGetFilter;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchRequest;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchResult;
-import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeries;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
+
 import com.opengamma.util.ArgumentChecker;
+import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
-import com.opengamma.util.tuple.ObjectsPair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public class HistoricalTimeSeriesMasterReader
-    implements Iterable<HistoricalTimeSeriesEntry> {
+public class HistoricalTimeSeriesMasterReader implements Iterable<HistoricalTimeSeriesEntry> {
 
+
+  private static final Logger s_logger = LoggerFactory.getLogger(HistoricalTimeSeriesMasterReader.class);
+
+  private HistoricalTimeSeriesInfoSearchRequest _historicalTimeSeriesInfoSearchRequestTemplate;
   private HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
-  private HistoricalTimeSeriesInfoSearchResult _historicalTimeSeriesInfoSearchResult;
   private HistoricalTimeSeriesGetFilter _historicalTimeSeriesGetFilter;
-  private int _bufferSize;
+  private int _datapointBufferSize;
 
   public HistoricalTimeSeriesMasterReader(HistoricalTimeSeriesMaster historicalTimeSeriesMaster) {
     this(historicalTimeSeriesMaster, null);
@@ -41,54 +46,95 @@ public class HistoricalTimeSeriesMasterReader
                                           HistoricalTimeSeriesInfoSearchRequest historicalTimeSeriesInfoSearchRequest,
                                           HistoricalTimeSeriesGetFilter historicalTimeSeriesGetFilter) {
     this(historicalTimeSeriesMaster, historicalTimeSeriesInfoSearchRequest, historicalTimeSeriesGetFilter,
-        HistoricalTimeSeriesDataPointMasterReader.DEFAULT_BUFFER_SIZE);
+        HistoricalTimeSeriesDataPointMasterReader.DEFAULT_BUFFER_SIZE, PagingRequest.DEFAULT_PAGING_SIZE);
   }
 
   public HistoricalTimeSeriesMasterReader(HistoricalTimeSeriesMaster historicalTimeSeriesMaster,
                                           HistoricalTimeSeriesInfoSearchRequest historicalTimeSeriesInfoSearchRequest,
                                           HistoricalTimeSeriesGetFilter historicalTimeSeriesGetFilter,
-                                          int bufferSize) {
+                                          int dataPointBufferSize, int bufferSize) {
     ArgumentChecker.notNull(historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
+    ArgumentChecker.notNegativeOrZero(dataPointBufferSize, "dataPointBufferSize");
     ArgumentChecker.notNegativeOrZero(bufferSize, "bufferSize");
 
     if (historicalTimeSeriesInfoSearchRequest == null) {
       historicalTimeSeriesInfoSearchRequest = new HistoricalTimeSeriesInfoSearchRequest();
+      historicalTimeSeriesInfoSearchRequest.setPagingRequest(PagingRequest.ofIndex(0, bufferSize));
     }
     if (historicalTimeSeriesGetFilter == null) {
       historicalTimeSeriesGetFilter = HistoricalTimeSeriesGetFilter.ofAll();
     }
-    _historicalTimeSeriesInfoSearchResult = historicalTimeSeriesMaster.search(historicalTimeSeriesInfoSearchRequest);
+    _historicalTimeSeriesInfoSearchRequestTemplate = historicalTimeSeriesInfoSearchRequest;
     _historicalTimeSeriesGetFilter = historicalTimeSeriesGetFilter;
     _historicalTimeSeriesMaster = historicalTimeSeriesMaster;
-    _bufferSize = bufferSize;
+    _datapointBufferSize = dataPointBufferSize;
   }
 
   @Override
   public Iterator<HistoricalTimeSeriesEntry> iterator() {
-
     return new Iterator<HistoricalTimeSeriesEntry>() {
-      Iterator<ManageableHistoricalTimeSeriesInfo> _iterator =
-          _historicalTimeSeriesInfoSearchResult.getInfoList().iterator();
-
+  
+      private int _nextPageIndex;
+      private HistoricalTimeSeriesInfoSearchResult _historicalTimeSeriesInfoSearchResult;
+      private Iterator<ManageableHistoricalTimeSeriesInfo> _iterator;
+  
+      {
+        _nextPageIndex = 0;
+        turnPage();
+      }
+  
       @Override
       public boolean hasNext() {
-        return _iterator.hasNext();
+        if (!_iterator.hasNext()) {
+          return !_historicalTimeSeriesInfoSearchResult.getPaging().isLastPage();
+        } else {
+          return true;
+        }
       }
-
+  
       @Override
       public HistoricalTimeSeriesEntry next() {
-        ManageableHistoricalTimeSeriesInfo info = _iterator.next();
-        Iterable<LocalDateDoubleTimeSeries> dataPointMasterReader =
-            new HistoricalTimeSeriesDataPointMasterReader(
-                _historicalTimeSeriesMaster, info.getUniqueId(), _historicalTimeSeriesGetFilter, _bufferSize
-            );
-        return new HistoricalTimeSeriesEntry(info, dataPointMasterReader);
+        while (true) {
+          try {
+            ManageableHistoricalTimeSeriesInfo info = _iterator.next();
+            Iterable<LocalDateDoubleTimeSeries> dataPointMasterReader =
+                new HistoricalTimeSeriesDataPointMasterReader(
+                    _historicalTimeSeriesMaster, info.getUniqueId(), _historicalTimeSeriesGetFilter, _datapointBufferSize
+                );
+            return new HistoricalTimeSeriesEntry(info, dataPointMasterReader);
+          } catch (NoSuchElementException e) {
+            if (!_historicalTimeSeriesInfoSearchResult.getPaging().isLastPage()) {
+              turnPage();
+            } else {
+              throw new NoSuchElementException();
+            }
+          }
+        }
       }
-
+  
       @Override
       public void remove() {
-        throw new OpenGammaRuntimeException("Remove operation is not supported");
+        throw new OpenGammaRuntimeException("Remove is not supported on this iterator");
       }
+  
+      private void turnPage() {
+        while (true) {
+          HistoricalTimeSeriesInfoSearchRequest historicalTimeSeriesInfoSearchRequest = _historicalTimeSeriesInfoSearchRequestTemplate;
+          historicalTimeSeriesInfoSearchRequest.setPagingRequest(
+              PagingRequest.ofIndex(_nextPageIndex,
+                  _historicalTimeSeriesInfoSearchRequestTemplate.getPagingRequest().getPagingSize()));
+          _nextPageIndex += _historicalTimeSeriesInfoSearchRequestTemplate.getPagingRequest().getPagingSize();
+          try {
+            _historicalTimeSeriesInfoSearchResult = _historicalTimeSeriesMaster.search(historicalTimeSeriesInfoSearchRequest);
+            _iterator = _historicalTimeSeriesInfoSearchResult.getInfoList().iterator();
+            return;
+          } catch (Throwable t) {
+            s_logger.error("Error performing historical time series master search: " + t.getMessage());
+          }
+        }
+      }
+  
     };
   }
+  
 }

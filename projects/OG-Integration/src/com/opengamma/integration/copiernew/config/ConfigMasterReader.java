@@ -11,47 +11,99 @@ import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
 import com.opengamma.master.config.ConfigSearchResult;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.tuple.ObjectsPair;
+import com.opengamma.util.paging.Paging;
+import com.opengamma.util.paging.PagingRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
 
-  private ConfigSearchResult<T> _configSearchResult;
+  private static final Logger s_logger = LoggerFactory.getLogger(ConfigMasterReader.class);
+
+  private ConfigMaster _configMaster;
+  private ConfigSearchRequest<T> _configSearchRequestTemplate;
 
   public ConfigMasterReader(ConfigMaster configMaster) {
     this(configMaster, null);
   }
 
   public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest<T> configSearchRequest) {
+    this(configMaster, configSearchRequest, PagingRequest.DEFAULT_PAGING_SIZE);
+  }
+
+  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest<T> configSearchRequest, int bufferSize) {
     ArgumentChecker.notNull(configMaster, "configMaster");
+    ArgumentChecker.notNegativeOrZero(bufferSize, "bufferSize");
     if (configSearchRequest == null) {
       configSearchRequest = new ConfigSearchRequest<T>();
+      configSearchRequest.setPagingRequest(PagingRequest.ofIndex(0, bufferSize));
     }
-    _configSearchResult = configMaster.search(configSearchRequest);
+    _configSearchRequestTemplate = configSearchRequest;
+    _configMaster = configMaster;
   }
 
   @Override
   public Iterator<ConfigEntry<T>> iterator() {
     return new Iterator<ConfigEntry<T>>() {
 
-      Iterator<ConfigDocument<T>> iterator = _configSearchResult.getDocuments().iterator();
+      private int _nextPageIndex;
+      private ConfigSearchResult<T> _configSearchResult;
+      private Iterator<ConfigDocument<T>> _iterator;
+
+      {
+        _nextPageIndex = 0;
+        turnPage();
+      }
 
       @Override
       public boolean hasNext() {
-        return iterator.hasNext();
+        if (!_iterator.hasNext()) {
+          return !_configSearchResult.getPaging().isLastPage();
+        } else {
+          return true;
+        }
       }
 
       @Override
       public ConfigEntry<T> next() {
-        ConfigDocument<T> doc = iterator.next();
-        return new ConfigEntry<T>(doc.getName(), doc.getValue(), doc.getUniqueId());
+        while (true) {
+          try {
+            ConfigDocument<T> doc = _iterator.next();
+            return new ConfigEntry<T>(doc.getName(), doc.getValue(), doc.getUniqueId());
+          } catch (NoSuchElementException e) {
+            if (!_configSearchResult.getPaging().isLastPage()) {
+              turnPage();
+            } else {
+              throw new NoSuchElementException();
+            }
+          }
+        }
       }
 
       @Override
       public void remove() {
         throw new OpenGammaRuntimeException("Remove is not supported on this iterator");
       }
+
+      private void turnPage() {
+        while (true) {
+          ConfigSearchRequest<T> configSearchRequest = _configSearchRequestTemplate;
+          configSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _configSearchRequestTemplate.getPagingRequest().getPagingSize()));
+          _nextPageIndex += _configSearchRequestTemplate.getPagingRequest().getPagingSize();
+          try {
+            _configSearchResult = _configMaster.search(configSearchRequest);
+            _iterator = _configSearchResult.getDocuments().iterator();
+            return;
+          } catch (Throwable t) {
+            s_logger.error("Error performing config master search: " + t.getMessage());
+          }
+        }
+      }
+
     };
   }
 }

@@ -50,6 +50,7 @@ import com.opengamma.master.position.impl.RemotePositionMaster;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.impl.RemoteSecurityMaster;
+import com.opengamma.util.paging.PagingRequest;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -151,6 +152,7 @@ public final class ReaderWriterUtils {
     try {
       Class<?> clazz = info.getSearchRequestClass();
       searchRequest = (AbstractSearchRequest) clazz.getConstructor().newInstance();
+      searchRequest.setPagingRequest(PagingRequest.ofIndex(0, PagingRequest.DEFAULT_PAGING_SIZE));
     } catch (Throwable t) {
       throw new OpenGammaRuntimeException(t.getMessage());
     }
