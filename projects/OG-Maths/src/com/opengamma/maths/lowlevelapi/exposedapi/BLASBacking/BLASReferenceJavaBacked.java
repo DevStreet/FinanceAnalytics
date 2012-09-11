@@ -5,20 +5,20 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dasum;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Daxpy;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dcopy;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Ddot;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dgemm;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dgemv;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dnrm2;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drot;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotg;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotm;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Drotmg;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dscal;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Dswap;
-import com.opengamma.maths.lowlevelapi.linearalgebra.referenceBLAS.Idamax;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dasum;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Daxpy;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dcopy;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Ddot;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dgemm;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dgemv;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dnrm2;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Drot;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Drotg;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Drotm;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Drotmg;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dscal;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dswap;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Idamax;
 
 /**
  * Hook up for the reference BLAS implementation

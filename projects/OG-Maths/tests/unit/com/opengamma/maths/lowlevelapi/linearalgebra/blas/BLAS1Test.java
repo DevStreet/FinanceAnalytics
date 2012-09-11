@@ -12,7 +12,7 @@ import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS1;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.BLAS1;
 
 /**
  * Tests the BLAS1 library

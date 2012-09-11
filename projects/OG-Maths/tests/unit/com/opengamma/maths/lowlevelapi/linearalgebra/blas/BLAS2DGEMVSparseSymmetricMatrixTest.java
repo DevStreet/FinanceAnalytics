@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.SparseSymmetricMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.BLAS2;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.BLAS2;
 
 /**
  * Tests DGEMV on Sparse symmetric matrices

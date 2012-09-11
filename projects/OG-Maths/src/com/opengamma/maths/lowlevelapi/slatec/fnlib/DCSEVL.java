@@ -6,7 +6,7 @@
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
  * Computes the n-term Chebychev series at point 'x'
