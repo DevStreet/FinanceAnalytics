@@ -944,7 +944,7 @@ public interface BLASAPIInterface {
    * the array, the first sub-diagonal starting at position 1 in row 2, and so on. The bottom right k by k triangle of the
    * array A is not referenced.
    * Note that when  DIAG = 'U' or 'u', the diagonal elements of A are not referenced either, but are assumed to be unity.
-   * @param lda the leading dimension of aMatrix (A), at least max(1,n)
+   * @param lda the leading dimension of aMatrix (A), at least (k+1)
    * @param x a vector of minimum dimension (n-1) * |incx| + 1.
    * @param incx the increment between successive elements of 'x'
    * 
