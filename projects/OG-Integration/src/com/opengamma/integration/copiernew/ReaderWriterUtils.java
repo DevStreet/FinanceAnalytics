@@ -6,8 +6,6 @@
 package com.opengamma.integration.copiernew;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.integration.copier.portfolio.writer.MasterPortfolioWriter;
-import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.integration.copiernew.config.ConfigMasterReader;
 import com.opengamma.integration.copiernew.config.ConfigMasterWriter;
 import com.opengamma.integration.copiernew.exchange.ExchangeMasterReader;
@@ -22,11 +20,6 @@ import com.opengamma.integration.copiernew.position.PositionMasterReader;
 import com.opengamma.integration.copiernew.position.PositionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterReader;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
-import com.opengamma.integration.copiernew.sheet.RowReader;
-import com.opengamma.integration.copiernew.sheet.RowWriter;
-import com.opengamma.integration.copiernew.sheet.SheetReader;
-import com.opengamma.integration.copiernew.sheet.SheetWriter;
-import com.opengamma.master.AbstractMaster;
 import com.opengamma.master.AbstractSearchRequest;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
@@ -52,8 +45,6 @@ import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.impl.RemoteSecurityMaster;
 import com.opengamma.util.paging.PagingRequest;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;

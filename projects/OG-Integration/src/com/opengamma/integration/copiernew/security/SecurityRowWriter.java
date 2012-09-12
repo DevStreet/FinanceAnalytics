@@ -5,21 +5,14 @@
  */
 package com.opengamma.integration.copiernew.security;
 
-import com.opengamma.financial.security.equity.EquitySecurity;
-import com.opengamma.financial.security.swap.*;
-import com.opengamma.integration.copiernew.sheet.JodaBeanRowUtils;
-import com.opengamma.integration.copiernew.sheet.RowWriter;
-import com.opengamma.master.position.ManageablePosition;
-import com.opengamma.master.position.ManageableTrade;
+import com.opengamma.integration.copiernew.external.JodaBeanRowUtils;
+import com.opengamma.integration.copiernew.external.RowWriter;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.util.ArgumentChecker;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 

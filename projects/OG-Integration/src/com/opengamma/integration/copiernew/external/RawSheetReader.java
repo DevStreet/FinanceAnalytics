@@ -4,7 +4,7 @@
  * Please see distribution for license.
  */
 
-package com.opengamma.integration.copiernew.sheet;
+package com.opengamma.integration.copiernew.external;
 
 import java.io.Closeable;
 import java.io.FileInputStream;

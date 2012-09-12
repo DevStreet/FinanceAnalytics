@@ -1,12 +1,9 @@
-package com.opengamma.integration.copiernew.sheet;
+package com.opengamma.integration.copiernew.external;
 
 import com.opengamma.integration.copiernew.Writeable;
-import com.opengamma.integration.copiernew.sheet.RawSheetWriter;
-import com.opengamma.integration.copiernew.sheet.RowWriter;
 import com.opengamma.util.ArgumentChecker;
 
 import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 import java.util.Map;
 

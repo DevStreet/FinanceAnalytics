@@ -5,8 +5,8 @@
  */
 package com.opengamma.integration.copiernew.exchange;
 
-import com.opengamma.integration.copiernew.sheet.JodaBeanRowUtils;
-import com.opengamma.integration.copiernew.sheet.RowWriter;
+import com.opengamma.integration.copiernew.external.JodaBeanRowUtils;
+import com.opengamma.integration.copiernew.external.RowWriter;
 import com.opengamma.master.exchange.ManageableExchange;
 
 import java.util.HashMap;

@@ -4,14 +4,10 @@
  * Please see distribution for license.
  */
 
-package com.opengamma.integration.copiernew.sheet;
+package com.opengamma.integration.copiernew.external;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.financial.conversion.JodaBeanConverters;
-import com.opengamma.financial.security.equity.EquitySecurity;
-import com.opengamma.financial.security.swap.*;
-import com.opengamma.master.position.ManageablePosition;
-import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.util.ArgumentChecker;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.beans.BeanBuilder;
@@ -23,7 +19,6 @@ import org.joda.beans.impl.direct.DirectMetaBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;

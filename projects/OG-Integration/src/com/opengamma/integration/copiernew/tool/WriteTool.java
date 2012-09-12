@@ -7,11 +7,6 @@ package com.opengamma.integration.copiernew.tool;
 
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.integration.copiernew.ReaderWriterUtils;
-import com.opengamma.integration.copiernew.Writeable;
-import com.opengamma.integration.copiernew.sheet.PrettyWriter;
-
-import java.io.IOException;
 
 public class WriteTool {
 

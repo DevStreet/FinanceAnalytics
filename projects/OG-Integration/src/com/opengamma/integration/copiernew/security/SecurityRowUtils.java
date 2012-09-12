@@ -17,7 +17,7 @@ import com.opengamma.financial.security.swap.Notional;
 import com.opengamma.financial.security.swap.SwapLeg;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.financial.security.swap.VarianceSwapLeg;
-import com.opengamma.integration.copiernew.sheet.JodaBeanRowUtils;
+import com.opengamma.integration.copiernew.external.JodaBeanRowUtils;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.security.ManageableSecurity;

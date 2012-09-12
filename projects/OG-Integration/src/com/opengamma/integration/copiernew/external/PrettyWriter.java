@@ -1,6 +1,5 @@
-package com.opengamma.integration.copiernew.sheet;
+package com.opengamma.integration.copiernew.external;
 
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.util.ArgumentChecker;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 
 public class PrettyWriter<E> implements Writeable<E>, Closeable {
 

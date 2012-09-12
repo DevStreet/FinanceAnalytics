@@ -4,14 +4,13 @@
  * Please see distribution for license.
  */
 
-package com.opengamma.integration.copiernew.sheet;
+package com.opengamma.integration.copiernew.external;
 
 import java.io.*;
 import java.util.Map;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.Writeable;
-import com.opengamma.util.ArgumentChecker;
 
 /**
  * This abstract class represents a sheet writer that, given a map from column names to data, writes out a row containing that
