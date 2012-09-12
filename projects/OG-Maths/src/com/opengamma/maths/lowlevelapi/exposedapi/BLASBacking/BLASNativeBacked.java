@@ -109,6 +109,11 @@ public class BLASNativeBacked extends BLASAbstractSuper implements BLASAPIInterf
   }
 
   @Override
+  public void dtrmv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx) {
+    OGBLASRawWrapper.dtrmv(new char[] {uplo}, new char[] {trans}, new char[] {diag}, new int[] {n}, aMatrix, new int[] {lda}, x, new int[] {incx});   
+  }  
+  
+  @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     OGBLASRawWrapper.dgemm(new char[] {transa }, new char[] {transb }, new int[] {m }, new int[] {n }, new int[] {k }, new double[] {alpha }, aMatrix, new int[] {lda }, bMatrix,
         new int[] {ldb }, new double[] {beta }, cMatrix, new int[] {ldc });
