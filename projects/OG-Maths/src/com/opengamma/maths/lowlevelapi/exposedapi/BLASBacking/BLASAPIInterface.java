@@ -782,7 +782,66 @@ public interface BLASAPIInterface {
   */
   void dsbmv(char uplo, int n, int k, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
 
-  
+  /**
+  *
+  * Provides BLAS LEVEL 2: DSPMV
+  * DSPMV  performs the following matrix vector operation
+  *
+  *  y := alpha*A*x + beta*y
+  *
+  * where alpha and beta are scalars, x and y are vectors and A is an
+  * n by n symmetric matrix, supplied in packed form.
+  *
+  * The first parameter "uplo" specifies whether the upper or lower triangular part
+  * of the array A is supplied as follows:
+  * UPLO = 'U' or 'u'   Only the upper triangular part of A is supplied.
+  * UPLO = 'L' or 'l'   Only the lower triangular part of A is supplied.
+  *
+  * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+  * @param n number of rows/columns in matrix {@code aMatrix}
+  * @param alpha scaling factor for the matrix vector product
+  * @param aMatrix of at least dimension  ( ( n*( n + 1 ) )/2 ). 
+  * Before entry with UPLO = 'U' or 'u', the array aMatrix must contain the upper triangular part of the symmetric matrix
+  * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 1, 2 )
+  * and A( 2, 2 ) respectively, and so on.
+  * Before entry with UPLO = 'L' or 'l', the array aMatrix must contain the lower triangular part of the symmetric matrix
+  * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 2, 1 )
+  * and A( 3, 1 ) respectively, and so on.
+  * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+  * @param incx the increment between successive elements of 'x'
+  * @param beta scaling factor for the variable {@code y}
+  * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
+  * @param incy the increment between successive elements of 'x'
+  * 
+  * _Example_
+  * Input:
+  * uplo = 'U'
+  * n=5
+  * alpha=2.e0
+  * aMatrix = {1,2,7,3,8,13,4,9,14,19,5,10,15,20,25}
+  * x = {1,2,3,4,5}
+  * incx = 1
+  * beta = 5.e0
+  * y = {20,40,60,80,100}
+  * incy = 1
+  * 
+  * Call:
+  * dspmv(uplo, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
+  * 
+  * Output:
+  * uplo = 'U'
+  * n=5
+  * alpha=2.e0
+  * aMatrix = {1,2,7,3,8,13,4,9,14,19,5,10,15,20,25}
+  * x = {1,2,3,4,5}
+  * incx = 1
+  * beta = 5.e0
+  * y = {210.00, 452.00, 678.00, 880.00, 1050.00}
+  * incy = 1
+  *  
+  */
+  void dspmv(char uplo, int n, double alpha, double[] aMatrix, double[] x, int incx, double beta, double[] y, int incy);
+
   /**
    * 
    * Provides BLAS LEVEL 3: DGEMM

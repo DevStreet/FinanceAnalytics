@@ -149,6 +149,11 @@ public class BLAS implements BLASAPIInterface {
   }
 
   @Override
+  public void dspmv(char uplo, int n, double alpha, double[] aMatrix, double[] x, int incx, double beta, double[] y, int incy) {
+    _localBLAS.dspmv(uplo, n, alpha, aMatrix, x, incx, beta, y, incy);
+  }
+
+  @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
