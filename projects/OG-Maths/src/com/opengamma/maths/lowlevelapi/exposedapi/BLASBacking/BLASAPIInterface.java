@@ -32,7 +32,7 @@ public interface BLASAPIInterface {
    * {@code z}=1 when {@code c} = 0 and {@code s}=1
    * | {@code z} |<1, {@code c} = sqrt(1 - {@code z} ^ 2) and {@code s} = {@code z}
    * | {@code z} |>1, {@code c} = 1/{@code z} and {@code s} = sqrt(1 - {@code c} ^ 2)
-   * This encoding is present as it forms an important time and space saving when computing succesive rotations.
+   * This encoding is present as it forms an important time and space saving when computing successive rotations.
    * 
    * {@code c} returns the cosine rotation angle as defined above
    * {@code s} returns the sine rotation angle as defined above
@@ -104,7 +104,7 @@ public interface BLASAPIInterface {
    * 
    * This routine is typically used when a sequence of rotations are required. A fairly standard case involves starting
    * with dd1 and dd2 set to 1.e0 and then as iterations progress they are subsequently fed back in as inputs for
-   * future iterations. Thus the scaling factors are folded as the interations proceed which means the computational
+   * future iterations. Thus the scaling factors are folded as the iterations proceed which means the computational
    * cost is closer to that of the standard rotation (in opposition to standard rotations plus manual scaling). 
    * 
    * _Example_
@@ -842,67 +842,140 @@ public interface BLASAPIInterface {
   */
   void dspmv(char uplo, int n, double alpha, double[] aMatrix, double[] x, int incx, double beta, double[] y, int incy);
 
- /**
-  * 
-  * Provides BLAS LEVEL 2: DTRMV
-  * DTRMV  performs one of the following matrix vector operations
-  * 
-  * x := A*x  or  x := A^T*x
-  *  where x is a vectors and A is an n by n unit or non-uni upper or lower triangular matrix.
-  *  The ^T indicates transposition.
-  *
-  * The variable {@code uplo} specifies whether A is an upper or lower triangular 
-  * triangular matrix:
-  * UPLO = 'U' or 'u'   A is an upper triangular matrix.
-  * UPLO = 'L' or 'l'   A is an lower triangular matrix.
-  * 
-  * The variable {@code trans} denotes the operation to be undertaken.
-  * If trans is one of 'N' or 'n', the operation is x := A*x
-  * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is x := A^T*x 
-  * 
-  * The variable {@code diag} specifies whether or not A is unit triangular as follows:
-  * diag = 'U' or 'u'   A is assumed to be unit triangular.
-  * diag = 'N' or 'n'   A is not assumed to be unit triangular.
-  * 
-  * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
-  * @param trans one of 'N' or 'n', 'T' or 't', or, 'C' or 'c'. See above.
-  * @param diag one of 'U' or 'u', 'N' or 'n'. See above.
-  * @param n the order of the matrix A. n>=0;
-  * @param aMatrix array of dimension (lda, n). 
-  * Before entry with  UPLO = 'U' or 'u', the leading n by n upper triangular part of the array A must contain the upper
-  * triangular matrix and the strictly lower triangular part of A is not referenced.
-  * Before entry with UPLO = 'L' or 'l', the leading n by n lower triangular part of the array A must contain the lower
-  * triangular matrix and the strictly upper triangular part of A is not referenced.
-  * Note that when  DIAG = 'U' or 'u', the diagonal elements of A are not referenced either, but are assumed to be unity.
-  * @param lda the leading dimension of aMatrix (A), at least max(1,n)
-  * @param x a vector of minimum dimension (n-1) * |incx| + 1.
-  * @param incx the increment between successive elements of 'x'
-  * 
-  * _Example_
-  * Input:
-  * uplo = 'U'
-  * trans = 'N'
-  * diag = 'N'
-  * n = 5
-  * aMatrix={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}
-  * lda = n
-  * x = {1,2,3,4,5}
-  * incx = 1;
-  * 
-  * Call:
-  * dtrmv(uplo,trans,diag,n,aMatrix,lda,x,incx)
-  * 
-  * Output
-  * uplo = 'U'
-  * trans = 'N'
-  * diag = 'N'
-  * n = 5
-  * aMatrix={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}
-  * lda = n
-  * x = {55,124,170,176,125}
-  * incx = 1;
-  * 
-  */
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DTRMV
+   * DTRMV  performs one of the following matrix vector operations
+   * 
+   * x := A*x  or  x := A^T*x
+   *  where x is a vectors and A is an n by n unit or non-unit upper or lower triangular matrix.
+   *  The ^T indicates transposition.
+   *
+   * The variable {@code uplo} specifies whether A is an upper or lower triangular 
+   * triangular matrix:
+   * UPLO = 'U' or 'u'   A is an upper triangular matrix.
+   * UPLO = 'L' or 'l'   A is an lower triangular matrix.
+   * 
+   * The variable {@code trans} denotes the operation to be undertaken.
+   * If trans is one of 'N' or 'n', the operation is x := A*x
+   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is x := A^T*x 
+   * 
+   * The variable {@code diag} specifies whether or not A is unit triangular as follows:
+   * diag = 'U' or 'u'   A is assumed to be unit triangular.
+   * diag = 'N' or 'n'   A is not assumed to be unit triangular.
+   * 
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param trans one of 'N' or 'n', 'T' or 't', or, 'C' or 'c'. See above.
+   * @param diag one of 'U' or 'u', 'N' or 'n'. See above.
+   * @param n the order of the matrix A. n>=0;
+   * @param k If UPLO = 'U' or 'u', k specifies the number of super-diagonals of the matrix A.
+   * If UPLO = 'L' or 'l', K specifies the number of sub-diagonals of the matrix A.
+   * K must satisfy  k >= 0
+   * @param aMatrix array of dimension (lda, n). 
+   * Before entry with  UPLO = 'U' or 'u', the leading n by n upper triangular part of the array A must contain the upper
+   * triangular matrix and the strictly lower triangular part of A is not referenced.
+   * Before entry with UPLO = 'L' or 'l', the leading n by n lower triangular part of the array A must contain the lower
+   * triangular matrix and the strictly upper triangular part of A is not referenced.
+   * Note that when  DIAG = 'U' or 'u', the diagonal elements of A are not referenced either, but are assumed to be unity.
+   * @param lda the leading dimension of aMatrix (A), at least max(1,n)
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * 
+   * _Example_
+   * Input:
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * k = 2
+   * aMatrix = {-1,-1,1,-1,2,7,3,8,13,9,14,19,15,20,25}
+   * lda = 3
+   * x = {1,2,3,4,5}
+   * incx = 1;
+   * 
+   * Call:
+   * dtrmv(uplo,trans,diag,n,aMatrix,lda,x,incx)
+   * 
+   * Output
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * k = 2
+   * aMatrix = {-1,-1,1,-1,2,7,3,8,13,9,14,19,15,20,25}
+   * lda = 3
+   * x = {14,74,170,176,125}
+   * incx = 1;
+   * 
+   */
+  void dtbmv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx);
+
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DTBMV
+   * DTBMV  performs one of the following matrix vector operations
+   * 
+   * x := A*x  or  x := A^T*x
+   *  where x is a vectors and A is an n by n unit or non-unit upper or lower triangular band matrix, with ( k + 1 ) diagonals.
+   *  The ^T indicates transposition.
+   *
+   * The variable {@code uplo} specifies whether A is an upper or lower triangular 
+   * triangular matrix:
+   * UPLO = 'U' or 'u'   A is an upper triangular matrix.
+   * UPLO = 'L' or 'l'   A is an lower triangular matrix.
+   * 
+   * The variable {@code trans} denotes the operation to be undertaken.
+   * If trans is one of 'N' or 'n', the operation is x := A*x
+   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is x := A^T*x 
+   * 
+   * The variable {@code diag} specifies whether or not A is unit triangular as follows:
+   * diag = 'U' or 'u'   A is assumed to be unit triangular.
+   * diag = 'N' or 'n'   A is not assumed to be unit triangular.
+   * 
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param trans one of 'N' or 'n', 'T' or 't', or, 'C' or 'c'. See above.
+   * @param diag one of 'U' or 'u', 'N' or 'n'. See above.
+   * @param n the order of the matrix A. n>=0;
+   * @param aMatrix array of dimension (lda, n). 
+   * Before entry with UPLO = 'U' or 'u', the leading ( k + 1 ) by n part of the array A must contain the upper triangular
+   * band part of the matrix of coefficients, supplied column by column, with the leading diagonal of the matrix in row
+   * ( k + 1 ) of the array, the first super-diagonal starting at position 2 in row k, and so on. The top left k by k triangle
+   * of the array A is not referenced.
+   * Before entry with UPLO = 'L' or 'l', the leading ( k + 1 ) by n part of the array A must contain the lower triangular
+   * band part of the matrix of coefficients, supplied column by column, with the leading diagonal of the matrix in row 1 of
+   * the array, the first sub-diagonal starting at position 1 in row 2, and so on. The bottom right k by k triangle of the
+   * array A is not referenced.
+   *
+   * Note that when  DIAG = 'U' or 'u', the diagonal elements of A are not referenced either, but are assumed to be unity.
+   * @param lda the leading dimension of aMatrix (A), at least (k+1)
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * 
+   * _Example_
+   * Input:
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * aMatrix={}
+   * lda = n
+   * x = {1,2,3,4,5}
+   * incx = 1;
+   * 
+   * Call:
+   * dtrmv(uplo,trans,diag,n,aMatrix,lda,x,incx)
+   * 
+   * Output
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * aMatrix={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}
+   * lda = n
+   * x = {55,124,170,176,125}
+   * incx = 1;
+   * 
+   */
   void dtrmv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx);
 
   /**

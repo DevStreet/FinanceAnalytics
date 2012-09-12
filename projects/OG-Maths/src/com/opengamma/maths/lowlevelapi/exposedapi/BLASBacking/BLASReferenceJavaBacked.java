@@ -22,6 +22,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dscal;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dswap;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsymv;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtbmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtrmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Idamax;
 
@@ -69,21 +70,21 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
     Daxpy.daxpy(n, alpha, x, 0, incx, y, 0, incy);
   }
-  
+
   @Override
   public void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
-    Daxpy.daxpy(n, alpha, x, xOffset, incx, y, yOffset, incy);    
-  }  
+    Daxpy.daxpy(n, alpha, x, xOffset, incx, y, yOffset, incy);
+  }
 
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
     return Ddot.ddot(n, x, 0, incx, y, 0, incy);
   }
-  
+
   @Override
   public double ddot(int n, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
     return Ddot.ddot(n, x, xOffset, incx, y, yOffset, incy);
-  }  
+  }
 
   @Override
   public double dnrm2(int n, double[] x, int incx) {
@@ -107,33 +108,37 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
 
   @Override
   public void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    Dgbmv.dgbmv(trans, m, n, kl, ku, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);    
-  }  
-  
+    Dgbmv.dgbmv(trans, m, n, kl, ku, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);
+  }
+
   @Override
   public void dsymv(char uplo, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
     Dsymv.dsymv(uplo, incy, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }  
+  }
 
   @Override
   public void dsbmv(char uplo, int n, int k, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
     Dsbmv.dsbmv(uplo, n, k, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);
   }
-  
+
   @Override
   public void dspmv(char uplo, int n, double alpha, double[] aMatrix, double[] x, int incx, double beta, double[] y, int incy) {
     Dspmv.dspmv(uplo, n, alpha, aMatrix, 0, x, 0, incx, beta, y, 0, incy);
-  }  
+  }
 
   @Override
   public void dtrmv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx) {
     Dtrmv.dtrmv(uplo, trans, diag, n, aMatrix, 0, lda, x, 0, incx);
   }
-  
+
+  @Override
+  public void dtbmv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
+    Dtbmv.dtbmv(uplo, trans, diag, n, k, aMatrix, 0, lda, x, 0, incx);
+  }
+
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     Dgemm.dgemm(transa, transb, m, n, k, alpha, aMatrix, 0, lda, bMatrix, 0, ldb, beta, cMatrix, 0, ldc);
   }
-
 
 }
