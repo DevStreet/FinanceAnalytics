@@ -651,12 +651,69 @@ public interface BLASAPIInterface {
   * lda = kl+ku+1
   * x = {1,2,3,4,5}
   * incx = 1
-  * beta = 3.e0
+  * beta = 5.e0
   * y = {110.00, 288.00, 560.00, 928.00, 1080.00, 1132.00}
   * incy = 1
   *  
   */
   void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
+
+  /**
+  *
+  * Provides BLAS LEVEL 2: DSYMV
+  * DGBMV  performs the following matrix vector operation
+  *
+  *  y := alpha*A*x + beta*y
+  *
+  *  where alpha and beta are scalars, x and y are vectors and A is an
+  *  n by n symmetric matrix.
+  *
+  * The first parameter "uplo" specifies whether the upper or lower triangular part
+  * of the array A is to be referenced as follows:
+  * UPLO = 'U' or 'u'   Only the upper triangular part of A is to be referenced.
+  * UPLO = 'L' or 'l'   Only the lower triangular part of A is to be referenced.
+  *
+  * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+  * @param n number of rows/columns in matrix {@code aMatrix}
+  * @param alpha scaling factor for the matrix vector product
+  * @param aMatrix the leading part of the "A" matrix of at least m by n entries
+  * @param lda the first dimension of aMatrix, must be at least max(1,n).
+  * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+  * @param incx the increment between successive elements of 'x'
+  * @param beta scaling factor for the variable {@code y}
+  * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
+  * @param incy the increment between successive elements of 'x'
+  * 
+  * _Example_
+  * Input:
+  * uplo = 'U'
+  * n=5
+  * alpha=2.e0
+  * aMatrix = {1,-1,-1,-1,-1,2,7,-1,-1,-1,3,8,13,-1,-1,4,9,14,19,-1,5,10,15,20,25} // recall that certain values and be "undefined", we use the flag -1  
+  * lda = n
+  * x = {1,2,3,4,5}
+  * incx = 1
+  * beta = 5.e0
+  * y = {20,40,60,80,100,120}
+  * incy = 1
+  * 
+  * Call:
+  * dgbmv(uplo, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
+  * 
+  * Output:
+  * uplo = 'U'
+  * n=5
+  * alpha=2.e0
+  * aMatrix = {1,-1,-1,-1,-1,2,7,-1,-1,-1,3,8,13,-1,-1,4,9,14,19,-1,5,10,15,20,25}
+  * lda = n
+  * x = {1,2,3,4,5}
+  * incx = 1
+  * beta = 5.e0
+  * y = {210.00, 452.00, 678.00, 880.00, 1050.00}
+  * incy = 1
+  *  
+  */
+  void dsymv(char uplo, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
 
   /**
    * 

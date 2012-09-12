@@ -78,9 +78,15 @@ public class BLASOGJavaBacked extends BLASAbstractSuper implements BLASAPIInterf
   @Override
   public void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
   }
+  
+  @Override
+  public void dsymv(char uplo, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
+  }  
 
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
   }
+
+
 
 }
