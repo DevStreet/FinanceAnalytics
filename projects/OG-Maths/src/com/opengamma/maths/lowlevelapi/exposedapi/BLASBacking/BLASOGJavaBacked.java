@@ -5,8 +5,6 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dgbmv;
-
 /**
  * 
  */
@@ -43,16 +41,16 @@ public class BLASOGJavaBacked extends BLASAbstractSuper implements BLASAPIInterf
   @Override
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
   }
-  
+
   @Override
   public void daxpy(int n, double alpha, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
-  }  
+  }
 
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
     return 0;
   }
-  
+
   @Override
   public double ddot(int n, double[] x, int xOffset, int incx, double[] y, int yOffset, int incy) {
     return 0;
@@ -76,21 +74,13 @@ public class BLASOGJavaBacked extends BLASAbstractSuper implements BLASAPIInterf
   @Override
   public void dgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
   }
-  
+
   @Override
   public void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    Dgbmv.dgbmv(trans, m, n, kl, ku, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);
-  } 
+  }
 
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
   }
-
-
-
-
-
-
-
 
 }

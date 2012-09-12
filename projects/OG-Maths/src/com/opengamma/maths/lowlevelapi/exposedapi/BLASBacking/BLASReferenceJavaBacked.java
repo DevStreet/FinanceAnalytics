@@ -9,6 +9,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dasum;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Daxpy;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dcopy;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Ddot;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dgbmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dgemm;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dgemv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dnrm2;
@@ -102,7 +103,7 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
 
   @Override
   public void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-
+    Dgbmv.dgbmv(trans, m, n, kl, ku, alpha, aMatrix, 0, lda, x, 0, incx, beta, y, 0, incy);    
   }  
   
   @Override
