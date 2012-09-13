@@ -1287,6 +1287,51 @@ public interface BLASAPIInterface {
    */
   void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda);
 
+  
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DSYR
+   * DSYR performs the rank 1 update operation
+   * A := alpha*x*x^T + A
+   * 
+   * where alpha is a scalar, x is an n element vector and A is an n by n symmetric matrix.
+   * The first parameter "uplo" specifies whether the upper or lower triangular part
+   * of the array A is to be referenced as follows:
+   * UPLO = 'U' or 'u'   Only the upper triangular part of A is to be referenced.
+   * UPLO = 'L' or 'l'   Only the lower triangular part of A is to be referenced.
+   *
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param n the order of the matrix {@code aMatrix}, n>0
+   * @param alpha scaling factor for the outer product
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * @param aMatrix the leading part of the "A" matrix of at least n by n entries
+   * @param lda the first dimension of aMatrix, max(1,{@code n}) 
+   * 
+   * _Example_
+   * Input:
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4, 5}
+   * incx = 1
+   * aMatrix = {1,-1,-1,-1,-1,2,7,-1,-1,-1,3,8,13,-1,-1,4,9,14,19,-1,5,10,15,20,25} // recall that certain values and be "undefined", we use the flag -1  
+   * lda = n
+   * 
+   * Call:
+   * dsyr(uplo, n, alpha, x, incx, aMatrix, lda);
+   * 
+   * Output:
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4,5}
+   * incx = 1
+   * aMatrix = {3,-1,-1,-,1,-1,6,15,-1,-1,-1,9,20,31,-1,-1,12,25,38,51,-1,15,30,45,60,75};
+   * lda = m 
+   *    
+   */
+  void dsyr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix, int lda);
+  
+  
   /**
    * 
    * Provides BLAS LEVEL 3: DGEMM
