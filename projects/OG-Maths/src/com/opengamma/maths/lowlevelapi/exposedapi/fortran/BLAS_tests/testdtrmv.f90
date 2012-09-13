@@ -10,7 +10,7 @@ parameter(n=5, incx=1)
 integer:: j, i
 double precision:: A(n,n), x(n), AT(n,n)
 character(2):: length
-external dspmv
+external dtrmv
 write(length,"(I2)")n
 
 !e some data for A
@@ -52,7 +52,7 @@ call  dtrmv("U","N","N",n,AT,n,x,incx);
 
 print*,""
 print*,"output"
-write(*,"(A2)")"y="
+write(*,"(A2)")"x="
 write(*,"("//trim(adjustl(length))//"(2X,F8.2))"),x
 
 end program testdtrmv
