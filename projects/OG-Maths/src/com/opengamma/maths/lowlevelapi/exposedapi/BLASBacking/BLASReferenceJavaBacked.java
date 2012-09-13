@@ -22,6 +22,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsbmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dscal;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspr;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspr2;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dswap;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsymv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsyr;
@@ -184,10 +185,15 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
     Dsyr2.dsyr2(uplo, n, alpha, x, 0, incx, y, 0, incy, aMatrix, 0, lda);
   }
 
+  @Override
+  public void dspr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix) {
+    Dspr2.dspr2(uplo, n, alpha, x, 0, incx, y, 0, incy, aMatrix, 0);
+  }  
   
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     Dgemm.dgemm(transa, transb, m, n, k, alpha, aMatrix, 0, lda, bMatrix, 0, ldb, beta, cMatrix, 0, ldc);
   }
+
 
 }

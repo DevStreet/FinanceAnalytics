@@ -1416,6 +1416,7 @@ public interface BLASAPIInterface {
    * 
    * _Example_
    * Input:
+   * uplo = 'U'
    * n=5
    * alpha=2.e0
    * x = {1,2,3,4,5}
@@ -1429,6 +1430,7 @@ public interface BLASAPIInterface {
    * dsyr2(uplo, n, alpha, x, incx, y, incy, aMatrix, lda);
    * 
    * Output:
+   * uplo = 'U'
    * n=5
    * alpha=2.e0
    * x = {1,2,3,4,5}
@@ -1440,6 +1442,61 @@ public interface BLASAPIInterface {
    *    
    */
   void dsyr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda);
+
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DSPR2
+   * DSPR2 performs the rank 1 update operation
+   * A := alpha*x*y^T + alpha*y*x^T A
+   * 
+   * where alpha is a scalar, x is an n element vector and A is an n by n symmetric matrix, supplied in packed form.
+   * The first parameter "uplo" specifies whether the upper or lower triangular part
+   * of the array A is to be referenced as follows:
+   * UPLO = 'U' or 'u'   Only the upper triangular part of A is supplied.
+   * UPLO = 'L' or 'l'   Only the lower triangular part of A is supplied.
+   *
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param n the order of the matrix {@code aMatrix}, n>0
+   * @param alpha scaling factor for the outer product
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * @param y a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incy the increment between successive elements of 'y'
+   * @param aMatrix of at least dimension  ( ( n*( n + 1 ) )/2 ). 
+   * Before entry with UPLO = 'U' or 'u', the array aMatrix must contain the upper triangular part of the symmetric matrix
+   * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 1, 2 )
+   * and A( 2, 2 ) respectively, and so on.  On exit, the array A is overwritten by the upper triangular part of the updated matrix.
+   * Before entry with UPLO = 'L' or 'l', the array aMatrix must contain the lower triangular part of the symmetric matrix
+   * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 2, 1 )
+   * and A( 3, 1 ) respectively, and so on. On exit, the array A is overwritten by the lower triangular part of the updated matrix.
+   * 
+   * _Example_
+   * Input:
+   * uplo = 'U'
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4,5}
+   * incx = 1
+   * y = {10,20,30,40,50,60,70,80,90,100}
+   * incy = 2 
+   * aMatrix = {1,2,7,3,8,13,4,9,14,19,5,10,15,20,25}  
+   * lda = n
+   * 
+   * Call:
+   * dspr(uplo, n, alpha, x, incx, y, incy, aMatrix, lda);
+   * 
+   * Output:
+   * uplo = 'U'
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4,5}
+   * incx = 1
+   * y = {10,20,30,40,50,60,70,80,90,100}
+   * incy = 2 
+   * aMatrix = {41,102,247,163,388,613,224,529,834,1139,285,670,1055,1440,1825}  
+   * lda = n   
+   */
+  void dspr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix);
 
   /**
    * 
