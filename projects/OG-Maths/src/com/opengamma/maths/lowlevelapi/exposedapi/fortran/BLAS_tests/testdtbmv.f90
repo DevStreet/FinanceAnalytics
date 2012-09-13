@@ -3,14 +3,14 @@
 ! 
 ! Please see distribution for license.
 !
-program testdtrmv
+program testdtbmv
 implicit none
 integer::  n, incx, k, lda
 parameter(n=5, incx=1, k=2, lda=k+1)
 integer:: j, i, zm
 double precision:: A(n,n), x(n), AB(lda,n)
 character(2):: length
-external dspmv
+external dtbmv
 write(length,"(I2)")n
 
 !e some data for A
@@ -53,7 +53,7 @@ call  dtbmv("U","N","N",n,k,AB,lda,x,incx)
 
 print*,""
 print*,"output"
-write(*,"(A2)")"y="
+write(*,"(A2)")"x="
 write(*,"("//trim(adjustl(length))//"(2X,F8.2))"),x
 
-end program testdtrmv
+end program testdtbmv
