@@ -961,7 +961,7 @@ public interface BLASAPIInterface {
    * incx = 1;
    * 
    * Call:
-   * dtbmv(uplo,trans,diag,n,aMatrix,lda,x,incx)
+   * dtbmv(uplo,trans,diag,n,k,aMatrix,lda,x,incx)
    * 
    * Output
    * uplo = 'U'
@@ -977,6 +977,73 @@ public interface BLASAPIInterface {
    */
   void dtbmv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx);
 
+  
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DTPMV
+   * DTPMV  performs one of the following matrix vector operations
+   * 
+   * x := A*x  or  x := A^T*x
+   *  where x is a vector and A is an n by n unit, or non-unit, upper or lower triangular matrix supplied in packed form.
+   *  The ^T indicates transposition.
+   *
+   * The variable {@code uplo} specifies whether A is an upper or lower triangular 
+   * triangular matrix:
+   * UPLO = 'U' or 'u'   A is an upper triangular matrix.
+   * UPLO = 'L' or 'l'   A is an lower triangular matrix.
+   * 
+   * The variable {@code trans} denotes the operation to be undertaken.
+   * If trans is one of 'N' or 'n', the operation is x := A*x
+   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is x := A^T*x 
+   * 
+   * The variable {@code diag} specifies whether or not A is unit triangular as follows:
+   * diag = 'U' or 'u'   A is assumed to be unit triangular.
+   * diag = 'N' or 'n'   A is not assumed to be unit triangular.
+   * 
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param trans one of 'N' or 'n', 'T' or 't', or, 'C' or 'c'. See above.
+   * @param diag one of 'U' or 'u', 'N' or 'n'. See above.
+   * @param n the order of the matrix A. n>=0;
+   * @param aMatrix of at least dimension  ( ( n*( n + 1 ) )/2 ). 
+   * Before entry with UPLO = 'U' or 'u', the array aMatrix must contain the upper triangular part of the symmetric matrix
+   * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 1, 2 )
+   * and A( 2, 2 ) respectively, and so on.
+   * Before entry with UPLO = 'L' or 'l', the array aMatrix must contain the lower triangular part of the symmetric matrix
+   * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 2, 1 )
+   * and A( 3, 1 ) respectively, and so on.
+   * Note that when  DIAG = 'U' or 'u', the diagonal elements of A are not referenced either, but are assumed to be unity.
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * 
+   * _Example_
+   * Input:
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * aMatrix={1,2,7,3,8,13,9,14,19,15,20,25}
+   * x = {1,2,3,4,5}
+   * incx = 1;
+   * 
+   * Call:
+   * dtpmv(uplo,trans,diag,n,aMatrix,x,incx)
+   * 
+   * Output
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * aMatrix={1,2,7,3,8,13,9,14,19,15,20,25}
+   * x = {55,124,170,176,125.00}
+   * incx = 1;
+   * 
+   */
+  void dtpmv(char uplo, char trans, char diag, int n,  double[] aMatrix, double[] x, int incx);
+
+  
+  
+  
+  
   /**
    * 
    * Provides BLAS LEVEL 3: DGEMM

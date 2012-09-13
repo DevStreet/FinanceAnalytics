@@ -103,14 +103,14 @@ public class BLASNetlibBacked extends BLASAbstractSuper implements BLASAPIInterf
 
   @Override
   public void dgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    _blas.dgemv(String.valueOf(trans) , m, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
+    _blas.dgemv(String.valueOf(trans), m, n, alpha, aMatrix, lda, x, incx, beta, y, incy);
   }
 
   @Override
   public void dgbmv(char trans, int m, int n, int kl, int ku, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
     _blas.dgbmv(String.valueOf(trans), m, n, kl, ku, alpha, aMatrix, lda, x, incx, beta, y, incy);
-  }  
-  
+  }
+
   @Override
   public void dsymv(char uplo, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
     _blas.dsymv(String.valueOf(uplo), n, alpha, aMatrix, lda, x, incx, beta, y, incy);
@@ -118,30 +118,31 @@ public class BLASNetlibBacked extends BLASAbstractSuper implements BLASAPIInterf
 
   @Override
   public void dsbmv(char uplo, int n, int k, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    _blas.dsbmv(String.valueOf(uplo), n, k, alpha, aMatrix, lda, x, incx, beta, y, incy);    
+    _blas.dsbmv(String.valueOf(uplo), n, k, alpha, aMatrix, lda, x, incx, beta, y, incy);
   }
-  
+
   @Override
   public void dspmv(char uplo, int n, double alpha, double[] aMatrix, double[] x, int incx, double beta, double[] y, int incy) {
     _blas.dspmv(String.valueOf(uplo), n, alpha, aMatrix, x, incx, beta, y, incy);
-  }  
+  }
 
   @Override
   public void dtrmv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx) {
     _blas.dtrmv(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, aMatrix, lda, x, incx);
   }
-  
+
   @Override
   public void dtbmv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
     _blas.dtbmv(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, k, aMatrix, lda, x, incx);
-  }  
-  
+  }
+
+  @Override
+  public void dtpmv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx) {
+    _blas.dtpmv(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, aMatrix, x, incx);
+  }
+
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _blas.dgemm(String.valueOf(transa), String.valueOf(transb), m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
-
-
-
-
 }
