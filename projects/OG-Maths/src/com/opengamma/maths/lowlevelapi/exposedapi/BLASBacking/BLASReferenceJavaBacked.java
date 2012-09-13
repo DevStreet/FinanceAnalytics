@@ -21,6 +21,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Drotmg;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsbmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dscal;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspmv;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspr;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dswap;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsymv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsyr;
@@ -170,6 +171,11 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   @Override
   public void dsyr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix, int lda) {
     Dsyr.dsyr(uplo, incx, alpha, x, n, incx, aMatrix, incx, lda);
+  }  
+
+  @Override
+  public void dspr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix) {
+    Dspr.dspr(uplo, incx, alpha, x, n, incx, aMatrix, incx);
   }  
   
   @Override

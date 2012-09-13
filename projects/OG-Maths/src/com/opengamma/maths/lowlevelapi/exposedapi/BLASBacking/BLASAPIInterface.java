@@ -1305,7 +1305,13 @@ public interface BLASAPIInterface {
    * @param alpha scaling factor for the outer product
    * @param x a vector of minimum dimension (n-1) * |incx| + 1.
    * @param incx the increment between successive elements of 'x'
-   * @param aMatrix the leading part of the "A" matrix of at least n by n entries
+   * @param aMatrix a matrix of at least dimension (lda, n ).
+   * Before entry with  UPLO = 'U' or 'u', the leading n by n upper triangular part of the array A must contain the upper
+   * triangular part of the symmetric matrix and the strictly lower triangular part of A is not referenced. On exit, the
+   * upper triangular part of the array A is overwritten by the upper triangular part of the updated matrix.
+   * Before entry with UPLO = 'L' or 'l', the leading n by n lower triangular part of the array A must contain the lower
+   * triangular part of the symmetric matrix and the strictly upper triangular part of A is not referenced. On exit, the
+   * lower triangular part of the array A is overwritten by the lower triangular part of the updated matrix. 
    * @param lda the first dimension of aMatrix, max(1,{@code n}) 
    * 
    * _Example_
@@ -1326,10 +1332,61 @@ public interface BLASAPIInterface {
    * x = {1,2,3,4,5}
    * incx = 1
    * aMatrix = {3,-1,-1,-,1,-1,6,15,-1,-1,-1,9,20,31,-1,-1,12,25,38,51,-1,15,30,45,60,75};
-   * lda = m 
+   * lda = n
    *    
    */
   void dsyr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix, int lda);
+  
+  
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DSPR
+   * DSYR performs the rank 1 update operation
+   * A := alpha*x*x^T + A
+   * 
+   * where alpha is a scalar, x is an n element vector and A is an n by n symmetric matrix, supplied in packed form.
+   * The first parameter "uplo" specifies whether the upper or lower triangular part
+   * of the array A is to be referenced as follows:
+   * UPLO = 'U' or 'u'   Only the upper triangular part of A is to be referenced.
+   * UPLO = 'L' or 'l'   Only the lower triangular part of A is to be referenced.
+   *
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param n the order of the matrix {@code aMatrix}, n>0
+   * @param alpha scaling factor for the outer product
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * @param aMatrix of at least dimension  ( ( n*( n + 1 ) )/2 ). 
+   * Before entry with UPLO = 'U' or 'u', the array aMatrix must contain the upper triangular part of the symmetric matrix
+   * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 1, 2 )
+   * and A( 2, 2 ) respectively, and so on.  On exit, the array A is overwritten by the upper triangular part of the updated matrix.
+   * Before entry with UPLO = 'L' or 'l', the array aMatrix must contain the lower triangular part of the symmetric matrix
+   * packed sequentially, column by column, so that aMatrix( 1 ) contains A( 1, 1 ), aMatrix( 2 ) and aMatrix( 3 ) contain A( 2, 1 )
+   * and A( 3, 1 ) respectively, and so on. On exit, the array A is overwritten by the lower triangular part of the updated matrix.
+   * 
+   * _Example_
+   * Input:
+   * uplo = 'U'
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4, 5}
+   * incx = 1
+   * aMatrix = {1,2,7,3,8,13,4,9,14,19,5,10,15,20,25}  
+   * lda = n
+   * 
+   * Call:
+   * dspr(uplo, n, alpha, x, incx, aMatrix, lda);
+   * 
+   * Output:
+   * uplo = 'U'
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4,5}
+   * incx = 1
+   * aMatrix = {3,6,15,9,20,31,12,25,38,51,15,30,45,60,75};
+   * lda = n
+   *    
+   */
+  void dspr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix);  
   
   
   /**

@@ -192,11 +192,15 @@ public class BLAS implements BLASAPIInterface {
   public void dsyr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix, int lda) {
     _localBLAS.dsyr(uplo, n, alpha, x, incx, aMatrix, lda);
   }  
+
+  @Override
+  public void dspr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix) {
+    _localBLAS.dspr(uplo, n, alpha, x, incx, aMatrix);
+  }  
   
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
-
 
 }
