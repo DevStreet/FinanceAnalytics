@@ -10,7 +10,7 @@ parameter(n=5, incx=1,incy=1)
 integer:: j, i, ptr
 double precision:: A(n,n), AP(((n*(n+1))/2)), x(n), y(n), alpha, beta
 character(2):: length1, length2
-external dspmv
+external dtpmv
 write(length1,"(I2)")((n*(n+1))/2)
 write(length2,"(I2)")n
 !e some data for A
