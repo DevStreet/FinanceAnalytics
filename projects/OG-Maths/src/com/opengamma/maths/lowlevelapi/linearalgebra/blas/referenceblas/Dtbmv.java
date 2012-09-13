@@ -10,8 +10,10 @@
 */
 package com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas;
 
+import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAPIInterface;
+
 /**
- * 
+ * Does DTBMV, See {@linkplain BLASAPIInterface}
  */
 public class Dtbmv {
   public static void dtbmv(char uplo, char trans, char diag, int n, int k, double[] a, int aOffset, int lda, double[] x, int xOffset, int incx) {
