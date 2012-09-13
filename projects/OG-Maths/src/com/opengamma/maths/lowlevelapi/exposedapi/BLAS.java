@@ -184,8 +184,15 @@ public class BLAS implements BLASAPIInterface {
   }
 
   @Override
+  public void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda) {
+    _localBLAS.dger(m, n, alpha, x, incx, y, incy, aMatrix, lda);
+  }  
+  
+  @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
+
+
 
 }

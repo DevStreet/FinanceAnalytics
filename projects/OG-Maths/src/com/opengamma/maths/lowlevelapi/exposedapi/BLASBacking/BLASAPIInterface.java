@@ -557,7 +557,7 @@ public interface BLASAPIInterface {
    * @param incx the increment between successive elements of 'x'
    * @param beta scaling factor for the variable {@code y}
    * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
-   * @param incy the increment between successive elements of 'x'
+   * @param incy the increment between successive elements of 'y'
    * 
    * _Example_
    * Input:
@@ -621,7 +621,7 @@ public interface BLASAPIInterface {
   * @param incx the increment between successive elements of 'x'
   * @param beta scaling factor for the variable {@code y}
   * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
-  * @param incy the increment between successive elements of 'x'
+  * @param incy the increment between successive elements of 'y'
   * 
   * _Example_
   * Input:
@@ -682,7 +682,7 @@ public interface BLASAPIInterface {
   * @param incx the increment between successive elements of 'x'
   * @param beta scaling factor for the variable {@code y}
   * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
-  * @param incy the increment between successive elements of 'x'
+  * @param incy the increment between successive elements of 'y'
   * 
   * _Example_
   * Input:
@@ -747,7 +747,7 @@ public interface BLASAPIInterface {
   * @param incx the increment between successive elements of 'x'
   * @param beta scaling factor for the variable {@code y}
   * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
-  * @param incy the increment between successive elements of 'x'
+  * @param incy the increment between successive elements of 'y'
   * 
   * _Example_
   * Input:
@@ -811,7 +811,7 @@ public interface BLASAPIInterface {
   * @param incx the increment between successive elements of 'x'
   * @param beta scaling factor for the variable {@code y}
   * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
-  * @param incy the increment between successive elements of 'x'
+  * @param incy the increment between successive elements of 'y'
   * 
   * _Example_
   * Input:
@@ -977,7 +977,6 @@ public interface BLASAPIInterface {
    */
   void dtbmv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx);
 
-  
   /**
    * 
    * Provides BLAS LEVEL 2: DTPMV
@@ -1038,7 +1037,7 @@ public interface BLASAPIInterface {
    * incx = 1;
    * 
    */
-  void dtpmv(char uplo, char trans, char diag, int n,  double[] aMatrix, double[] x, int incx);
+  void dtpmv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx);
 
   /**
    * 
@@ -1178,7 +1177,7 @@ public interface BLASAPIInterface {
    * 
    */
   void dtbsv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx);
-  
+
   /**
    * 
    * Provides BLAS LEVEL 2: DTPSV
@@ -1239,9 +1238,55 @@ public interface BLASAPIInterface {
    * incx = 1;
    * 
    */
-  void dtpsv(char uplo, char trans, char diag, int n,  double[] aMatrix, double[] x, int incx);
-  
-  
+  void dtpsv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx);
+
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DGER
+   * DGER performs the rank 1 update operation
+   * A := alpha*x*y^T + A
+   * 
+   * where alpha is a scalar, x is an m element vector, y is an n element vector and A is an m by n matrix.
+   *
+   * @param m number of rows in matrix {@code aMatrix}, m>0
+   * @param n number of columns in matrix {@code aMatrix}, n>0
+   * @param alpha scaling factor for the outer product
+   * @param x a vector of minimum dimension (m-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * @param y a vector of minimum dimension (n-1) * |incy| + 1. Overwritten on output. 
+   * @param incy the increment between successive elements of 'y'
+   * @param aMatrix the leading part of the "A" matrix of at least m by n entries
+   * @param lda the first dimension of aMatrix, max(1,{@code m}) 
+   * 
+   * _Example_
+   * Input:
+   * m=4
+   * n=3
+   * alpha=2.e0
+   * x = {1,2,3,4}
+   * incx = 1
+   * y = {20,40,60,80,100,120}
+   * incy = 2
+   * aMatrix = {1,4,7,10,2,5,8,11,3,6,9,12};
+   * lda = m
+   * 
+   * Call:
+   * dger(m, n, alpha, x, incx, y, incy, aMatrix, lda);
+   * 
+   * Output:
+   * m=4
+   * n=3
+   * alpha=2.e0
+   * x = {1,2,3,4}
+   * incx = 1
+   * y = {20,40,60,80,100,120}
+   * incy = 2
+   * aMatrix = {41,84,127,170,122,245,368,491,203,406,609,812};
+   * lda = m 
+   *    
+   */
+  void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda);
+
   /**
    * 
    * Provides BLAS LEVEL 3: DGEMM

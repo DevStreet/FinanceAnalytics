@@ -130,20 +130,23 @@ public class BLASNativeBacked extends BLASAbstractSuper implements BLASAPIInterf
 
   @Override
   public void dtbsv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
-    OGBLASRawWrapper.dtbsv(new char[] {uplo}, new char[] {trans}, new char[] {diag}, new int[] {n}, new int[] {k}, aMatrix, new int[] {lda}, x, new int[] {incx});
-  }  
-  
+    OGBLASRawWrapper.dtbsv(new char[] {uplo }, new char[] {trans }, new char[] {diag }, new int[] {n }, new int[] {k }, aMatrix, new int[] {lda }, x, new int[] {incx });
+  }
+
   @Override
   public void dtpsv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx) {
     OGBLASRawWrapper.dtpsv(new char[] {uplo }, new char[] {trans }, new char[] {diag }, new int[] {n }, aMatrix, x, new int[] {incx });
-  }  
-  
+  }
+
+  @Override
+  public void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda) {
+    OGBLASRawWrapper.dger(new int[] {m }, new int[] {n }, new double[] {alpha }, x, new int[] {incx }, y, new int[] {incy }, aMatrix, new int[] {lda });
+  }
+
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     OGBLASRawWrapper.dgemm(new char[] {transa }, new char[] {transb }, new int[] {m }, new int[] {n }, new int[] {k }, new double[] {alpha }, aMatrix, new int[] {lda }, bMatrix, new int[] {ldb },
         new double[] {beta }, cMatrix, new int[] {ldc });
   }
-
-
 
 }
