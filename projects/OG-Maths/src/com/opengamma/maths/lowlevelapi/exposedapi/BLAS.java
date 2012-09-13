@@ -161,22 +161,28 @@ public class BLAS implements BLASAPIInterface {
   @Override
   public void dtbmv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
     _localBLAS.dtbmv(uplo, trans, diag, n, k, aMatrix, lda, x, incx);
-  }  
+  }
+
   @Override
   public void dtpmv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx) {
     _localBLAS.dtpmv(uplo, trans, diag, n, aMatrix, x, incx);
   }
-  
+
   @Override
   public void dtrsv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx) {
-    _localBLAS.dtrsv(uplo, trans, diag, n, aMatrix, lda, x, incx);    
+    _localBLAS.dtrsv(uplo, trans, diag, n, aMatrix, lda, x, incx);
   }
 
   @Override
   public void dtbsv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
     _localBLAS.dtbsv(uplo, trans, diag, n, k, aMatrix, lda, x, incx);
-  }  
-  
+  }
+
+  @Override
+  public void dtpsv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx) {
+    _localBLAS.dtpsv(uplo, trans, diag, n, aMatrix, x, incx);
+  }
+
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);

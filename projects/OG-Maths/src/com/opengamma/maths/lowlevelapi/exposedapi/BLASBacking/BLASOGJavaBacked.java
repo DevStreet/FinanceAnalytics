@@ -112,9 +112,11 @@ public class BLASOGJavaBacked extends BLASAbstractSuper implements BLASAPIInterf
   }  
   
   @Override
+  public void dtpsv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx) {
+  }  
+  
+  @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
   }
-
-
 
 }
