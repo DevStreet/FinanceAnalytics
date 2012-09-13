@@ -1287,7 +1287,6 @@ public interface BLASAPIInterface {
    */
   void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda);
 
-  
   /**
    * 
    * Provides BLAS LEVEL 2: DSYR
@@ -1336,8 +1335,7 @@ public interface BLASAPIInterface {
    *    
    */
   void dsyr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix, int lda);
-  
-  
+
   /**
    * 
    * Provides BLAS LEVEL 2: DSPR
@@ -1386,9 +1384,63 @@ public interface BLASAPIInterface {
    * lda = n
    *    
    */
-  void dspr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix);  
-  
-  
+  void dspr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix);
+
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DSYR2
+   * DSYR2 performs the rank 2 update operation
+   * A := alpha*x*y^T + alpha*y*x^T A
+   * 
+   * where alpha is a scalar, x and y are n element vectors and A is an n by n symmetric matrix.
+   * The first parameter "uplo" specifies whether the upper or lower triangular part
+   * of the array A is to be referenced as follows:
+   * UPLO = 'U' or 'u'   Only the upper triangular part of A is to be referenced.
+   * UPLO = 'L' or 'l'   Only the lower triangular part of A is to be referenced.
+   *
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param n the order of the matrix {@code aMatrix}, n>0
+   * @param alpha scaling factor for the outer product
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incx the increment between successive elements of 'x'
+   * @param y a vector of minimum dimension (n-1) * |incx| + 1.
+   * @param incy the increment between successive elements of 'y'
+   * @param aMatrix a matrix of at least dimension (lda, n ).
+   * Before entry with  UPLO = 'U' or 'u', the leading n by n upper triangular part of the array A must contain the upper
+   * triangular part of the symmetric matrix and the strictly lower triangular part of A is not referenced. On exit, the
+   * upper triangular part of the array A is overwritten by the upper triangular part of the updated matrix.
+   * Before entry with UPLO = 'L' or 'l', the leading n by n lower triangular part of the array A must contain the lower
+   * triangular part of the symmetric matrix and the strictly upper triangular part of A is not referenced. On exit, the
+   * lower triangular part of the array A is overwritten by the lower triangular part of the updated matrix. 
+   * @param lda the first dimension of aMatrix, max(1,{@code n}) 
+   * 
+   * _Example_
+   * Input:
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4,5}
+   * incx = 1
+   * y = {10,20,30,40,50,60,70,80,90,100}
+   * incy = 2 
+   * aMatrix = {1,-1,-1,-1,-1,2,7,-1,-1,-1,3,8,13,-1,-1,4,9,14,19,-1,5,10,15,20,25} // recall that certain values and be "undefined", we use the flag -1  
+   * lda = n
+   * 
+   * Call:
+   * dsyr2(uplo, n, alpha, x, incx, y, incy, aMatrix, lda);
+   * 
+   * Output:
+   * n=5
+   * alpha=2.e0
+   * x = {1,2,3,4,5}
+   * incx = 1
+   * y = {10,20,30,40,50,60,70,80,90,100}
+   * incy = 2 
+   * aMatrix = {41,-1,-1,-1,-1,102,247,-1,-1,-1,163,388,613,-1,-1,244,529,834,1139,-1,285,670,1055,1440,1825} // recall that certain values and be "undefined", we use the flag -1  
+   * lda = n
+   *    
+   */
+  void dsyr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda);
+
   /**
    * 
    * Provides BLAS LEVEL 3: DGEMM

@@ -203,4 +203,9 @@ public class BLAS implements BLASAPIInterface {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
 
+  @Override
+  public void dsyr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda) {
+    _localBLAS.dsyr2(uplo, n, alpha, x, incx, y, incy, aMatrix, lda);
+  }
+
 }
