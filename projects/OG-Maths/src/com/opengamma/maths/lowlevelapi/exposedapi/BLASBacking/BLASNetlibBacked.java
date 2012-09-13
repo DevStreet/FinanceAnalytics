@@ -147,8 +147,14 @@ public class BLASNetlibBacked extends BLASAbstractSuper implements BLASAPIInterf
   }
 
   @Override
+  public void dtbsv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
+    _blas.dtbsv(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, k, aMatrix, lda, x, incx);
+  }
+    
+  @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _blas.dgemm(String.valueOf(transa), String.valueOf(transb), m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
+
 
 }

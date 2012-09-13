@@ -23,6 +23,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dspmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dswap;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dsymv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtbmv;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtbsv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtpmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtrmv;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dtrsv;
@@ -141,20 +142,21 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   @Override
   public void dtpmv(char uplo, char trans, char diag, int n, double[] aMatrix, double[] x, int incx) {
     Dtpmv.dtpmv(uplo, trans, diag, n, aMatrix, 0, x, 0, incx);
-  }  
+  }
 
   @Override
   public void dtrsv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx) {
     Dtrsv.dtrsv(uplo, trans, diag, n, aMatrix, 0, lda, x, 0, incx);
-  }  
-  
+  }
+
+  @Override
+  public void dtbsv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx) {
+    Dtbsv.dtbsv(uplo, trans, diag, n, k, aMatrix, 0, lda, x, 0, incx);
+  }
+
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     Dgemm.dgemm(transa, transb, m, n, k, alpha, aMatrix, 0, lda, bMatrix, 0, ldb, beta, cMatrix, 0, ldc);
   }
-
-
-
-
 
 }

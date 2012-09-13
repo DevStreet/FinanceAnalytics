@@ -1057,8 +1057,8 @@ public interface BLASAPIInterface {
    * UPLO = 'L' or 'l'   A is an lower triangular matrix.
    * 
    * The variable {@code trans} denotes the form of the system of equations to be solved.
-   * If trans is one of 'N' or 'n', the operation is A*x = b
-   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is A^T*x = b 
+   * If trans is one of 'N' or 'n', the operation is solve A*x = b for x
+   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is solve A^T*x = b for x
    * 
    * The variable {@code diag} specifies whether or not A is unit triangular as follows:
    * diag = 'U' or 'u'   A is assumed to be unit triangular.
@@ -1105,8 +1105,79 @@ public interface BLASAPIInterface {
    */
   void dtrsv(char uplo, char trans, char diag, int n, double[] aMatrix, int lda, double[] x, int incx);
 
-  
-  
+  /**
+   * 
+   * Provides BLAS LEVEL 2: DTBSV
+   * DTBSV  solves one of the systems of equations
+   * 
+   * A*x = b or  A^T*x = b
+   * where x and b are vectors and A is an n by n unit, or non-unit, upper or lower triangular band matrix, with ( k + 1 ) diagonals.
+   * The ^T indicates transposition.
+   *  
+   * No test for singularity or near-singularity is included. Such tests must be performed prior to calling this routine.
+   *
+   * The variable {@code uplo} specifies whether A is an upper or lower triangular 
+   * triangular matrix:
+   * UPLO = 'U' or 'u'   A is an upper triangular matrix.
+   * UPLO = 'L' or 'l'   A is an lower triangular matrix.
+   * 
+   * The variable {@code trans} denotes the operation to be undertaken.
+   * If trans is one of 'N' or 'n', the operation is solve A*x = b for x
+   * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is solve A^T*x = b for x 
+   * 
+   * The variable {@code diag} specifies whether or not A is unit triangular as follows:
+   * diag = 'U' or 'u'   A is assumed to be unit triangular.
+   * diag = 'N' or 'n'   A is not assumed to be unit triangular.
+   * 
+   * @param uplo one of 'U' or 'u', 'L' or 'l'. See above.
+   * @param trans one of 'N' or 'n', 'T' or 't', or, 'C' or 'c'. See above.
+   * @param diag one of 'U' or 'u', 'N' or 'n'. See above.
+   * @param n the order of the matrix A. n>=0;
+   * @param k If UPLO = 'U' or 'u', K specifies the number of super-diagonals of the matrix A.
+   * If UPLO = 'L' or 'l', K specifies the number of sub-diagonals of the matrix A.
+   * k must satisfy  k>=0
+   * @param aMatrix array of dimension (lda, n). 
+   * Before entry with UPLO = 'U' or 'u', the leading ( k + 1 ) by n part of the array A must contain the upper triangular
+   * band part of the matrix of coefficients, supplied column by column, with the leading diagonal of the matrix in row
+   * ( k + 1 ) of the array, the first super-diagonal starting at position 2 in row k, and so on. The top left k by k triangle
+   * of the array A is not referenced.
+   * Before entry with UPLO = 'L' or 'l', the leading ( k + 1 ) by n part of the array A must contain the lower triangular
+   * band part of the matrix of coefficients, supplied column by column, with the leading diagonal of the matrix in row 1 of
+   * the array, the first sub-diagonal starting at position 1 in row 2, and so on. The bottom right k by k triangle of the
+   * array A is not referenced.
+   * Note that when  DIAG = 'U' or 'u', the diagonal elements of A are not referenced either, but are assumed to be unity.
+   * @param lda the leading dimension of aMatrix (A), at least (k+1)
+   * @param x a vector of minimum dimension (n-1) * |incx| + 1. This is overwritten with the solution on exit.
+   * @param incx the increment between successive elements of 'x'
+   * 
+   * _Example_
+   * Input:
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * k = 2
+   * aMatrix={-1,-1,1,-1,2,7,3,8,13,9,14,19,15,20,25} // recall that certain values and be "undefined", we use the flag -1
+   * lda = 3
+   * x = {6,24,42,39,25 }
+   * incx = 1;
+   * 
+   * Call:
+   * dtbmv(uplo,trans,diag,n,k,aMatrix,lda,x,incx)
+   * 
+   * Output
+   * uplo = 'U'
+   * trans = 'N'
+   * diag = 'N'
+   * n = 5
+   * k = 2
+   * aMatrix={-1,-1,1,-1,2,7,3,8,13,9,14,19,15,20,25}
+   * lda = 3
+   * x = {1,1,1,1,1}
+   * incx = 1;
+   * 
+   */
+  void dtbsv(char uplo, char trans, char diag, int n, int k, double[] aMatrix, int lda, double[] x, int incx);
   
   /**
    * 
