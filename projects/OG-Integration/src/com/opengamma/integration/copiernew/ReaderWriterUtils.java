@@ -224,7 +224,7 @@ public final class ReaderWriterUtils {
     String classifier = splitAgain[1];
     String renameTemplate = splitAgain.length == 3 ? splitAgain[2] : null;
 
-    return getMasterWriter(type, classifier, baseUri, renameTemplate);
+    return getMasterWriter(baseUri, type, classifier, renameTemplate);
   }
 
 }
