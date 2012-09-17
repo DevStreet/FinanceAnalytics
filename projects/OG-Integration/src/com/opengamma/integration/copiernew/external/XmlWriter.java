@@ -11,6 +11,7 @@ import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.util.ArgumentChecker;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class XmlWriter<T extends Bean> implements Writeable<T> {
 
   public XmlWriter(OutputStream outputStream) {
     ArgumentChecker.notNull(outputStream, "outputStream");
-    _xStream = new XStream(new DomDriver());
+    _xStream = new XStream(new StaxDriver());
     try {
       _objectOutputStream = _xStream.createObjectOutputStream(outputStream);
     } catch (IOException e) {

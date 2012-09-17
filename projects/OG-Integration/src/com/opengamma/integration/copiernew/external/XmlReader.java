@@ -11,6 +11,7 @@ import com.opengamma.util.ArgumentChecker;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.StaxReader;
 import com.thoughtworks.xstream.io.xml.XppReader;
 import org.joda.beans.Bean;
@@ -32,7 +33,7 @@ public class XmlReader<T extends Bean> implements Iterable<T> {
 
   public XmlReader(InputStream inputStream) {
     ArgumentChecker.notNull(inputStream, "inputStream");
-    _xStream = new XStream(new DomDriver());
+    _xStream = new XStream(new StaxDriver());
 
     try {
       _objectInputStream = _xStream.createObjectInputStream(inputStream);
