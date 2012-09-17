@@ -15,7 +15,7 @@ public class RemoveTool {
   public static void main(String[] args) {
 
     if (args.length != 1) {
-      throw new OpenGammaRuntimeException("Usage: RmTool <uri>");
+      throw new OpenGammaRuntimeException("Usage: RemoveTool <uri>");
     }
 
     Iterable reader = ReaderWriterUtils.getMasterReader(args[0]);

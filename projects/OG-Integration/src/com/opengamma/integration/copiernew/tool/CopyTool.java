@@ -17,7 +17,7 @@ public class CopyTool {
   public static void main(String[] args) {
 
     if (args.length != 2) {
-      throw new OpenGammaRuntimeException("Usage: CpTool <source uri> <destination uri>");
+      throw new OpenGammaRuntimeException("Usage: CopyTool <source uri> <destination uri>");
     }
 
     Iterable reader = ReaderWriterUtils.getMasterReader(args[0]);
