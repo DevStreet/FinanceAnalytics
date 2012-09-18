@@ -186,9 +186,19 @@ public class Catchers {
    */
   public static void catchNull(Object someBlob, String varName) {
     if (someBlob == null) {
-      throw new MathsExceptionNullPointer("Object " + someBlob + " points to NULL. STOPPING");
+      throw new MathsExceptionNullPointer("Object " + varName + " points to NULL. STOPPING");
     }
   }
+  
+  /**
+   * Catches null pointer
+   * @param someBlob an object to check
+   */
+  public static void catchNull(Object someBlob) {
+    if (someBlob == null) {
+      throw new MathsExceptionNullPointer("Object ref " + someBlob + " points to NULL. STOPPING");
+    }
+  }  
 
   ///////////// Null from arg list
   /**
@@ -518,7 +528,7 @@ public class Catchers {
     if (aNumber >= aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than " + aValue + ". STOPPING");
     }
-  }  
+  }
 
   /**
    * Catches bad value from arg list
@@ -530,8 +540,8 @@ public class Catchers {
     if (aNumber >= aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than " + aValue + ". STOPPING");
     }
-  }    
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -542,8 +552,8 @@ public class Catchers {
     if (aNumber >= aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than " + aValue + ". STOPPING");
     }
-  }      
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -579,7 +589,7 @@ public class Catchers {
     if (aNumber > aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than or equal to " + aValue + ". STOPPING");
     }
-  }  
+  }
 
   /**
    * Catches bad value from arg list
@@ -591,8 +601,8 @@ public class Catchers {
     if (aNumber > aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than or equal to " + aValue + ". STOPPING");
     }
-  }    
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -603,8 +613,8 @@ public class Catchers {
     if (aNumber > aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than or equal to " + aValue + ". STOPPING");
     }
-  }      
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -616,7 +626,6 @@ public class Catchers {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be less than or equal to " + aValue + ". STOPPING");
     }
   }
-  
 
   // Catch bounds var1 should be Greater than var2
   /**
@@ -641,7 +650,7 @@ public class Catchers {
     if (aNumber <= aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than " + aValue + ". STOPPING");
     }
-  }  
+  }
 
   /**
    * Catches bad value from arg list
@@ -653,8 +662,8 @@ public class Catchers {
     if (aNumber <= aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than " + aValue + ". STOPPING");
     }
-  }    
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -665,8 +674,8 @@ public class Catchers {
     if (aNumber <= aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than " + aValue + ". STOPPING");
     }
-  }      
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -702,7 +711,7 @@ public class Catchers {
     if (aNumber < aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than or equal to " + aValue + ". STOPPING");
     }
-  }  
+  }
 
   /**
    * Catches bad value from arg list
@@ -714,8 +723,8 @@ public class Catchers {
     if (aNumber < aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than or equal to " + aValue + ". STOPPING");
     }
-  }    
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -726,8 +735,8 @@ public class Catchers {
     if (aNumber < aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than or equal to " + aValue + ". STOPPING");
     }
-  }      
-  
+  }
+
   /**
    * Catches bad value from arg list
    * @param aNumber the value to check
@@ -738,8 +747,8 @@ public class Catchers {
     if (aNumber < aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than or equal to " + aValue + ". STOPPING");
     }
-  }  
-  
+  }
+
   // Catch bad bounds/insufficient data
   /**
    * Catches insufficient data given to a routine
@@ -748,6 +757,7 @@ public class Catchers {
    * @param pos the position in the arg list
    */
   public static void catchInsufficientDataSizeFromArgList(double[] aMatrix, int expectedMinimumLength, int pos) {
+    catchNull(aMatrix);
     if (aMatrix.length < expectedMinimumLength) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " does not contain a sufficient quantity of data to continue. STOPPING");
     }
