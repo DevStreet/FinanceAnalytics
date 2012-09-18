@@ -6,6 +6,7 @@
 package com.opengamma.integration.copiernew.position;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.position.PositionSearchRequest;
 import com.opengamma.master.position.PositionSearchResult;
@@ -15,6 +16,7 @@ import com.opengamma.util.paging.PagingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -56,7 +58,7 @@ public class PositionMasterReader implements Iterable<ManageablePosition> {
       @Override
       public boolean hasNext() {
         if (!_iterator.hasNext()) {
-          return !_positionSearchResult.getPaging().isLastPage();
+          return (_positionSearchResult != null) && (!_positionSearchResult.getPaging().isLastPage());
         } else {
           return true;
         }
@@ -68,7 +70,7 @@ public class PositionMasterReader implements Iterable<ManageablePosition> {
           try {
             return _iterator.next();
           } catch (NoSuchElementException e) {
-            if (!_positionSearchResult.getPaging().isLastPage()) {
+            if ((_positionSearchResult != null) && (!_positionSearchResult.getPaging().isLastPage())) {
               turnPage();
             } else {
               throw new NoSuchElementException();
@@ -83,19 +85,17 @@ public class PositionMasterReader implements Iterable<ManageablePosition> {
       }
 
       private void turnPage() {
-        while (true) {
-          PositionSearchRequest positionSearchRequest = _positionSearchRequestTemplate;
-          positionSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _positionSearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _positionSearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _positionSearchResult = _positionMaster.search(positionSearchRequest);
-            _iterator = _positionSearchResult.getPositions().iterator();
-            return;
-          } catch (Throwable t) {
-            s_logger.error("Error performing position master search: " + t.getMessage());
-          }
+        PositionSearchRequest positionSearchRequest = _positionSearchRequestTemplate;
+        positionSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _positionSearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _positionSearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _positionSearchResult = _positionMaster.search(positionSearchRequest);
+          _iterator = _positionSearchResult.getPositions().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ManageablePosition>().iterator();
+          s_logger.error("Error performing position master search: " + t.getMessage());
         }
-      }
+    }
 
     };
   }

@@ -62,7 +62,7 @@ public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
       @Override
       public boolean hasNext() {
         if (!_iterator.hasNext()) {
-          return !_configSearchResult.getPaging().isLastPage();
+          return (_configSearchResult != null) && (!_configSearchResult.getPaging().isLastPage());
         } else {
           return true;
         }
@@ -75,7 +75,7 @@ public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
             ConfigDocument<T> doc = _iterator.next();
             return new ConfigEntry<T>(doc.getName(), doc.getValue(), doc.getUniqueId());
           } catch (NoSuchElementException e) {
-            if (!_configSearchResult.getPaging().isLastPage()) {
+            if ((_configSearchResult != null) && (!_configSearchResult.getPaging().isLastPage())) {
               turnPage();
             } else {
               throw new NoSuchElementException();
@@ -90,20 +90,17 @@ public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
       }
 
       private void turnPage() {
-        while (true) {
-          ConfigSearchRequest<T> configSearchRequest = _configSearchRequestTemplate;
-          configSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _configSearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _configSearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _configSearchResult = _configMaster.search(configSearchRequest);
-            _iterator = _configSearchResult.getDocuments().iterator();
-            return;
-          } catch (Throwable t) {
-            s_logger.error("Error performing config master search: " + t.getMessage());
-          }
+        ConfigSearchRequest<T> configSearchRequest = _configSearchRequestTemplate;
+        configSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _configSearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _configSearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _configSearchResult = _configMaster.search(configSearchRequest);
+          _iterator = _configSearchResult.getDocuments().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ConfigDocument<T>>().iterator();
+          s_logger.error("Error performing config master search: " + t.getMessage());
         }
       }
-
     };
   }
 }

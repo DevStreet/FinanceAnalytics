@@ -6,6 +6,7 @@
 package com.opengamma.integration.copiernew.holiday;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.holiday.HolidayMaster;
 import com.opengamma.master.holiday.HolidaySearchRequest;
 import com.opengamma.master.holiday.HolidaySearchRequest;
@@ -18,6 +19,7 @@ import com.opengamma.util.paging.PagingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -64,7 +66,7 @@ public class HolidayMasterReader implements Iterable<ManageableHoliday> {
       @Override
       public boolean hasNext() {
         if (!_iterator.hasNext()) {
-          return !_holidaySearchResult.getPaging().isLastPage();
+          return (_holidaySearchResult != null) && (!_holidaySearchResult.getPaging().isLastPage());
         } else {
           return true;
         }
@@ -76,7 +78,7 @@ public class HolidayMasterReader implements Iterable<ManageableHoliday> {
           try {
             return _iterator.next();
           } catch (NoSuchElementException e) {
-            if (!_holidaySearchResult.getPaging().isLastPage()) {
+            if ((_holidaySearchResult != null) && (!_holidaySearchResult.getPaging().isLastPage())) {
               turnPage();
             } else {
               throw new NoSuchElementException();
@@ -91,20 +93,17 @@ public class HolidayMasterReader implements Iterable<ManageableHoliday> {
       }
   
       private void turnPage() {
-        while (true) {
-          HolidaySearchRequest holidaySearchRequest = _holidaySearchRequestTemplate;
-          holidaySearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _holidaySearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _holidaySearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _holidaySearchResult = _holidayMaster.search(holidaySearchRequest);
-            _iterator = _holidaySearchResult.getHolidays().iterator();
-            return;
-          } catch (Throwable t) {
-            s_logger.error("Error performing holiday master search: " + t.getMessage());
-          }
+        HolidaySearchRequest holidaySearchRequest = _holidaySearchRequestTemplate;
+        holidaySearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _holidaySearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _holidaySearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _holidaySearchResult = _holidayMaster.search(holidaySearchRequest);
+          _iterator = _holidaySearchResult.getHolidays().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ManageableHoliday>().iterator();
+          s_logger.error("Error performing holiday master search: " + t.getMessage());
         }
       }
-  
     };
   }
   

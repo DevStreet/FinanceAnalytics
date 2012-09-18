@@ -6,6 +6,7 @@
 package com.opengamma.integration.copiernew.security;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.SecuritySearchResult;
@@ -15,6 +16,7 @@ import com.opengamma.util.paging.PagingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -61,7 +63,7 @@ public class SecurityMasterReader implements Iterable<ManageableSecurity> {
       @Override
       public boolean hasNext() {
         if (!_iterator.hasNext()) {
-          return !_securitySearchResult.getPaging().isLastPage();
+          return (_securitySearchResult != null) && (!_securitySearchResult.getPaging().isLastPage());
         } else {
           return true;
         }
@@ -73,7 +75,7 @@ public class SecurityMasterReader implements Iterable<ManageableSecurity> {
           try {
             return _iterator.next();
           } catch (NoSuchElementException e) {
-            if (!_securitySearchResult.getPaging().isLastPage()) {
+            if ((_securitySearchResult != null) && (!_securitySearchResult.getPaging().isLastPage())) {
               turnPage();
             } else {
               throw new NoSuchElementException();
@@ -97,6 +99,7 @@ public class SecurityMasterReader implements Iterable<ManageableSecurity> {
             _iterator = _securitySearchResult.getSecurities().iterator();
             return;
           } catch (Throwable t) {
+            _iterator = new ArrayList<ManageableSecurity>().iterator();
             s_logger.error("Error performing security master search: " + t.getMessage());
           }
         }

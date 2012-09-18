@@ -7,6 +7,7 @@ package com.opengamma.integration.copiernew.historicaltimeseries;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.historicaltimeseriesdatapoint.HistoricalTimeSeriesDataPointMasterReader;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesGetFilter;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchRequest;
@@ -19,6 +20,7 @@ import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -86,7 +88,7 @@ public class HistoricalTimeSeriesMasterReader implements Iterable<HistoricalTime
       @Override
       public boolean hasNext() {
         if (!_iterator.hasNext()) {
-          return !_historicalTimeSeriesInfoSearchResult.getPaging().isLastPage();
+          return (_historicalTimeSeriesInfoSearchResult != null) && (!_historicalTimeSeriesInfoSearchResult.getPaging().isLastPage());
         } else {
           return true;
         }
@@ -103,7 +105,7 @@ public class HistoricalTimeSeriesMasterReader implements Iterable<HistoricalTime
                 );
             return new HistoricalTimeSeriesEntry(info, dataPointMasterReader);
           } catch (NoSuchElementException e) {
-            if (!_historicalTimeSeriesInfoSearchResult.getPaging().isLastPage()) {
+            if ((_historicalTimeSeriesInfoSearchResult != null) && (!_historicalTimeSeriesInfoSearchResult.getPaging().isLastPage())) {
               turnPage();
             } else {
               throw new NoSuchElementException();
@@ -111,29 +113,26 @@ public class HistoricalTimeSeriesMasterReader implements Iterable<HistoricalTime
           }
         }
       }
-  
+
       @Override
       public void remove() {
         throw new OpenGammaRuntimeException("Remove is not supported on this iterator");
       }
   
       private void turnPage() {
-        while (true) {
-          HistoricalTimeSeriesInfoSearchRequest historicalTimeSeriesInfoSearchRequest = _historicalTimeSeriesInfoSearchRequestTemplate;
-          historicalTimeSeriesInfoSearchRequest.setPagingRequest(
-              PagingRequest.ofIndex(_nextPageIndex,
-                  _historicalTimeSeriesInfoSearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _historicalTimeSeriesInfoSearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _historicalTimeSeriesInfoSearchResult = _historicalTimeSeriesMaster.search(historicalTimeSeriesInfoSearchRequest);
-            _iterator = _historicalTimeSeriesInfoSearchResult.getInfoList().iterator();
-            return;
-          } catch (Throwable t) {
-            s_logger.error("Error performing historical time series master search: " + t.getMessage());
-          }
+        HistoricalTimeSeriesInfoSearchRequest historicalTimeSeriesInfoSearchRequest = _historicalTimeSeriesInfoSearchRequestTemplate;
+        historicalTimeSeriesInfoSearchRequest.setPagingRequest(
+            PagingRequest.ofIndex(_nextPageIndex,
+                _historicalTimeSeriesInfoSearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _historicalTimeSeriesInfoSearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _historicalTimeSeriesInfoSearchResult = _historicalTimeSeriesMaster.search(historicalTimeSeriesInfoSearchRequest);
+          _iterator = _historicalTimeSeriesInfoSearchResult.getInfoList().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ManageableHistoricalTimeSeriesInfo>().iterator();
+          s_logger.error("Error performing historical time series master search: " + t.getMessage());
         }
       }
-  
     };
   }
   

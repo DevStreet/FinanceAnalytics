@@ -6,6 +6,7 @@
 package com.opengamma.integration.copiernew.exchange;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.exchange.ExchangeMaster;
 import com.opengamma.master.exchange.ExchangeSearchRequest;
 import com.opengamma.master.exchange.ExchangeSearchResult;
@@ -15,6 +16,7 @@ import com.opengamma.util.paging.PagingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -60,7 +62,7 @@ public class ExchangeMasterReader implements Iterable<ManageableExchange> {
       @Override
       public boolean hasNext() {
         if (!_iterator.hasNext()) {
-          return !_exchangeSearchResult.getPaging().isLastPage();
+          return (_exchangeSearchResult != null) && (!_exchangeSearchResult.getPaging().isLastPage());
         } else {
           return true;
         }
@@ -72,7 +74,7 @@ public class ExchangeMasterReader implements Iterable<ManageableExchange> {
           try {
             return _iterator.next();
           } catch (NoSuchElementException e) {
-            if (!_exchangeSearchResult.getPaging().isLastPage()) {
+            if ((_exchangeSearchResult != null) && (!_exchangeSearchResult.getPaging().isLastPage())) {
               turnPage();
             } else {
               throw new NoSuchElementException();
@@ -87,20 +89,17 @@ public class ExchangeMasterReader implements Iterable<ManageableExchange> {
       }
 
       private void turnPage() {
-        while (true) {
-          ExchangeSearchRequest exchangeSearchRequest = _exchangeSearchRequestTemplate;
-          exchangeSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _exchangeSearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _exchangeSearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _exchangeSearchResult = _exchangeMaster.search(exchangeSearchRequest);
-            _iterator = _exchangeSearchResult.getExchanges().iterator();
-            return;
-          } catch (Throwable t) {
-            s_logger.error("Error performing exchange master search: " + t.getMessage());
-          }
+        ExchangeSearchRequest exchangeSearchRequest = _exchangeSearchRequestTemplate;
+        exchangeSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _exchangeSearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _exchangeSearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _exchangeSearchResult = _exchangeMaster.search(exchangeSearchRequest);
+          _iterator = _exchangeSearchResult.getExchanges().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ManageableExchange>().iterator();
+          s_logger.error("Error performing exchange master search: " + t.getMessage());
         }
       }
-
     };
   }
 
