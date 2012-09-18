@@ -22,18 +22,19 @@ public class ImportTool {
 
   public static void main(String[] args) {
 
-    if (args.length != 1) {
-      throw new OpenGammaRuntimeException("Usage: ImportTool <uri>");
+    if (args.length != 1 && args.length != 2) {
+      throw new OpenGammaRuntimeException("Usage: ImportTool <uri> [<filename>] ");
     }
 
-//    InputStream input;
-//    try {
-//      input = new FileInputStream("test.xml");
-//    } catch (FileNotFoundException e) {
-//      throw new OpenGammaRuntimeException(e.getMessage(), e);
-//    }
-//    Iterable reader = new XmlReader(input);
-    Iterable reader = new XmlReader(System.in);
+    InputStream input = System.in;
+    if (args.length == 2) {
+      try {
+        input = new FileInputStream(args[1]);
+      } catch (FileNotFoundException e) {
+        throw new OpenGammaRuntimeException("Could not open input file: " + e.getMessage());
+      }
+    }
+    Iterable reader = new XmlReader(input);
 
     // need options for different output formats: csv, xml, fudge, etc.
     Writeable writer = ReaderWriterUtils.getMasterWriter(args[0]);
