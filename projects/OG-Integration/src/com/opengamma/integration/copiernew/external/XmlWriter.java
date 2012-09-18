@@ -9,15 +9,11 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.integration.copiernew.Writeable;
 
 import com.opengamma.util.ArgumentChecker;
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.StreamException;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.io.xml.QNameMap;
+
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.StaxWriter;
-import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +22,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-public class XmlWriter<T extends Bean> implements Writeable<T> {
+public class XmlWriter<T> implements Writeable<T> {
 
   private static final Logger s_logger = LoggerFactory.getLogger(XmlWriter.class);
 
@@ -35,25 +31,27 @@ public class XmlWriter<T extends Bean> implements Writeable<T> {
 
   public XmlWriter(OutputStream outputStream) {
     ArgumentChecker.notNull(outputStream, "outputStream");
-    // http://old.nabble.com/PrettyPrintWriter-and-StaxDriver--td4079982.html (Jörg Schaible Apr 26, 2006)
-    _xStream = new XStream(new StaxDriver() {
-      public HierarchicalStreamWriter createWriter(OutputStream out) {
-        try {
-          return new StaxWriter(
-            getQnameMap(),
-            new IndentingXMLStreamWriter(getOutputFactory().createXMLStreamWriter(out)),
-            true,
-            isRepairingNamespace()
-          );
-        } catch (XMLStreamException e) {
-          throw new StreamException(e);
-        }
-      }
-    });
+    _xStream = new XStream(new StaxDriver());
+    // Format StAX driver output
+    // http://old.nabble.com/PrettyPrintWriter-and-StaxDriver--td4079982.html (posted by Jörg Schaible Apr 26, 2006)
+//    _xStream = new XStream(new StaxDriver() {
+//      public HierarchicalStreamWriter createWriter(OutputStream out) {
+//        try {
+//          return new StaxWriter(
+//            getQnameMap(),
+//            new IndentingXMLStreamWriter(getOutputFactory().createXMLStreamWriter(out)),
+//            true,
+//            isRepairingNamespace()
+//          );
+//        } catch (XMLStreamException e) {
+//          throw new OpenGammaRuntimeException(e.getMessage(), e);
+//        }
+//      }
+//    });
     try {
       _objectOutputStream = _xStream.createObjectOutputStream(outputStream);
     } catch (IOException e) {
-      throw new OpenGammaRuntimeException("Could not create an ObjectOutputStream");
+      throw new OpenGammaRuntimeException("Could not create an ObjectOutputStream", e);
     }
   }
 
