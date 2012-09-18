@@ -5,6 +5,7 @@
  */
 package com.opengamma.financial.analytics.ircurve;
 
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.time.Tenor;
 
 /**
@@ -16,6 +17,7 @@ public class PeriodicZeroDepositStrip extends CurveStrip {
 
   public PeriodicZeroDepositStrip(final int periodsPerYear, final Tenor curveNodePointTime, final String configurationName) {
     super(NewStripInstrumentType.PERIODIC_ZERO_DEPOSIT, curveNodePointTime, configurationName);
+    ArgumentChecker.isTrue(periodsPerYear > 0, "periods per year must be greater than zero");
     _periodsPerYear = periodsPerYear;
   }
 

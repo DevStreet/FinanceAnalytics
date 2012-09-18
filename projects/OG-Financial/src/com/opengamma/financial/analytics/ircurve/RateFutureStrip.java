@@ -53,7 +53,7 @@ public class RateFutureStrip extends CurveStrip {
   @Override
   public Tenor getEffectiveTenor() {
     final int months = (int) getFutureTenor().getPeriod().totalMonths();
-    return new Tenor(getCurveNodePointTime().getPeriod().plusMonths(months * getNumberOfFuturesAfterTenor()));
+    return new Tenor(getCurveNodePointTime().getPeriod().plusMonths(months * getNumberOfFuturesAfterTenor()).normalized());
   }
 
   @Override

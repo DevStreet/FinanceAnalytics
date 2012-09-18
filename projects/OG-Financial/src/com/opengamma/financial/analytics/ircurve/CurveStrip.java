@@ -68,6 +68,7 @@ public abstract class CurveStrip implements Serializable, Comparable<CurveStrip>
 
   @Override
   public int compareTo(final CurveStrip other) {
+    //TODO what to do when input is null? check javadocs
     final int result = getEffectiveTenor().getPeriod().toPeriodFields().toEstimatedDuration().compareTo(other.getEffectiveTenor().getPeriod().toPeriodFields().toEstimatedDuration());
     if (result != 0) {
       return result;

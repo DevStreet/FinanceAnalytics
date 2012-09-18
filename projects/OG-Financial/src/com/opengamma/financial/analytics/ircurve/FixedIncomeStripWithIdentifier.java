@@ -14,8 +14,9 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.util.time.Tenor;
 
 /**
- * 
+ * @deprecated FixedIncomeStrip is deprecated
  */
+@Deprecated
 public class FixedIncomeStripWithIdentifier implements Comparable<FixedIncomeStripWithIdentifier> {
   private final FixedIncomeStrip _strip;
   private final ExternalId _security;
@@ -27,6 +28,7 @@ public class FixedIncomeStripWithIdentifier implements Comparable<FixedIncomeStr
   public FixedIncomeStrip getStrip() {
     return _strip;
   }
+
   /**
    * Gets the strip instrument type.
    * @return the strip instrument type

@@ -152,6 +152,28 @@ import com.opengamma.util.time.Tenor;
 
   }
 
+  @FudgeBuilderFor(PeriodicZeroDepositStrip.class)
+  public static final class PeriodZeroDepositStripBuilder implements FudgeBuilder<PeriodicZeroDepositStrip> {
+    private static final String PERIODS_FIELD = "periods";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final PeriodicZeroDepositStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      message.add(PERIODS_FIELD, object.getPeriodsPerYear());
+      return message;
+    }
+
+    @Override
+    public PeriodicZeroDepositStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final int periodsPerYear = message.getInt(PERIODS_FIELD);
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new PeriodicZeroDepositStrip(periodsPerYear, curveNodePointTime, configurationName);
+    }
+  }
+
   @FudgeBuilderFor(RateStrip.class)
   public static final class RateStripBuilder implements FudgeBuilder<RateStrip> {
     private static final String RATE_TYPE_FIELD = "rateType";
@@ -171,6 +193,37 @@ import com.opengamma.util.time.Tenor;
       final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
       final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
       return new RateStrip(rateType, curveNodePointTime, configurationName);
+    }
+  }
+
+  @FudgeBuilderFor(RateFutureStrip.class)
+  public static final class RateFutureStripBuilder implements FudgeBuilder<RateFutureStrip> {
+    private static final String FUTURE_TYPE_FIELD = "futureType";
+    private static final String N_FIELD = "nFuture";
+    private static final String FUTURE_TENOR_FIELD = "futureTenor";
+    private static final String RATE_TENOR_FIELD = "rateTenor";
+
+    @Override
+    public MutableFudgeMsg buildMessage(final FudgeSerializer serializer, final RateFutureStrip object) {
+      final MutableFudgeMsg message = serializer.newMessage();
+      serializer.addToMessage(message, CURVE_NODE_FIELD, null, object.getCurveNodePointTime());
+      message.add(CONFIGURATION_NAME_FIELD, object.getConfigurationName());
+      message.add(FUTURE_TYPE_FIELD, object.getFutureType().name());
+      message.add(N_FIELD, object.getNumberOfFuturesAfterTenor());
+      serializer.addToMessage(message, FUTURE_TENOR_FIELD, null, object.getFutureTenor());
+      serializer.addToMessage(message, RATE_TENOR_FIELD, null, object.getRateTenor());
+      return message;
+    }
+
+    @Override
+    public RateFutureStrip buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
+      final FutureType futureType = FutureType.valueOf(message.getString(FUTURE_TYPE_FIELD));
+      final int nthFuture = message.getInt(N_FIELD);
+      final Tenor futureTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(FUTURE_TENOR_FIELD));
+      final Tenor rateTenor = deserializer.fieldValueToObject(Tenor.class, message.getByName(RATE_TENOR_FIELD));
+      final Tenor curveNodePointTime = deserializer.fieldValueToObject(Tenor.class, message.getByName(CURVE_NODE_FIELD));
+      final String configurationName = message.getString(CONFIGURATION_NAME_FIELD);
+      return new RateFutureStrip(futureType, nthFuture, futureTenor, rateTenor, curveNodePointTime, configurationName);
     }
   }
 

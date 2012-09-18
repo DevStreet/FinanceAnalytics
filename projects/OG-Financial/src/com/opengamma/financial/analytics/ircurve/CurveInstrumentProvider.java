@@ -11,8 +11,9 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.util.time.Tenor;
 
 /**
- * 
+ * @deprecated Being rewritten
  */
+@Deprecated
 public interface CurveInstrumentProvider {
 
   ExternalId getInstrument(LocalDate curveDate, Tenor tenor);

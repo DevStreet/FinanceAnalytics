@@ -49,8 +49,9 @@ import com.opengamma.util.time.DateUtils;
 import com.opengamma.util.time.Tenor;
 
 /**
- * Converts specifications into fully resolved security definitions
+ * @deprecated Converts specifications into fully resolved security definitions
  */
+@Deprecated
 public class FixedIncomeStripIdentifierAndMaturityBuilder {
 
   private static final LocalTime CASH_EXPIRY_TIME = LocalTime.of(11, 00);
@@ -413,8 +414,8 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     final SwapSecurity swap = new SwapSecurity(tradeDate, effectiveDate, maturityDate, counterparty, new FloatingInterestRateLeg(convention.getBasisSwapPayFloatingLegDayCount(),
         convention.getBasisSwapPayFloatingLegFrequency(), convention.getBasisSwapPayFloatingLegRegion(), convention.getBasisSwapPayFloatingLegBusinessDayConvention(), new InterestRateNotional(
             spec.getCurrency(), 1), false, payLegFloatRateBloombergTicker, FloatingRateType.IBOR), new FloatingSpreadIRLeg(convention.getBasisSwapReceiveFloatingLegDayCount(),
-                convention.getBasisSwapReceiveFloatingLegFrequency(), convention.getBasisSwapReceiveFloatingLegRegion(), convention.getBasisSwapReceiveFloatingLegBusinessDayConvention(),
-                new InterestRateNotional(spec.getCurrency(), 1), false, receiveLegFloatRateBloombergTicker, FloatingRateType.IBOR, spread));
+        convention.getBasisSwapReceiveFloatingLegFrequency(), convention.getBasisSwapReceiveFloatingLegRegion(), convention.getBasisSwapReceiveFloatingLegBusinessDayConvention(),
+        new InterestRateNotional(spec.getCurrency(), 1), false, receiveLegFloatRateBloombergTicker, FloatingRateType.IBOR, spread));
     swap.setExternalIdBundle(ExternalIdBundle.of(swapIdentifier));
     return swap;
   }

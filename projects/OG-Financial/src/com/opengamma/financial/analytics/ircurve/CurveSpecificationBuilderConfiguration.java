@@ -25,8 +25,9 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.util.time.Tenor;
 
 /**
- *
+ * @deprecated Use NewCurveSpecificationBuilderConfiguration
  */
+@Deprecated
 public class CurveSpecificationBuilderConfiguration {
 
   /**
@@ -34,12 +35,12 @@ public class CurveSpecificationBuilderConfiguration {
    */
   public static final List<String> s_curveSpecNames = getCurveSpecBuilderConfigurationNames();
 
-  private final Map<Tenor, CurveInstrumentProvider> _cashInstrumentProviders;
+  private final Map<Tenor, CurveInstrumentProvider> _cashInstrumentProviders; //
   private final Map<Tenor, CurveInstrumentProvider> _fra3MInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _fra6MInstrumentProviders;
-  private final Map<Tenor, CurveInstrumentProvider> _liborInstrumentProviders;
-  private final Map<Tenor, CurveInstrumentProvider> _euriborInstrumentProviders;
-  private final Map<Tenor, CurveInstrumentProvider> _cdorInstrumentProviders;
+  private final Map<Tenor, CurveInstrumentProvider> _liborInstrumentProviders; //
+  private final Map<Tenor, CurveInstrumentProvider> _euriborInstrumentProviders; //
+  private final Map<Tenor, CurveInstrumentProvider> _cdorInstrumentProviders; //
   private final Map<Tenor, CurveInstrumentProvider> _futureInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _swap12MInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _swap6MInstrumentProviders;
@@ -47,8 +48,8 @@ public class CurveSpecificationBuilderConfiguration {
   private final Map<Tenor, CurveInstrumentProvider> _basisSwapInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _tenorSwapInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _oisSwapInstrumentProviders;
-  private final Map<Tenor, CurveInstrumentProvider> _stiborInstrumentProviders;
-  private final Map<Tenor, CurveInstrumentProvider> _ciborInstrumentProviders;
+  private final Map<Tenor, CurveInstrumentProvider> _stiborInstrumentProviders; //
+  private final Map<Tenor, CurveInstrumentProvider> _ciborInstrumentProviders; //
   private final Map<Tenor, CurveInstrumentProvider> _simpleZeroDepositInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _periodicZeroDepositInstrumentProviders;
   private final Map<Tenor, CurveInstrumentProvider> _continuousZeroDepositInstrumentProviders;

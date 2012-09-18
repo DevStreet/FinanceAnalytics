@@ -9,8 +9,6 @@ package com.opengamma.financial.analytics.ircurve;
  * 
  */
 public enum NewStripInstrumentType {
-  /** Cash rate */
-  CASH,
   /** Forward-rate agreement */
   FRA,
   /** Interest-rate future */
