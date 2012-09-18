@@ -14,8 +14,8 @@ import com.opengamma.analytics.financial.credit.CreditRating;
 import com.opengamma.analytics.financial.credit.DebtSeniority;
 import com.opengamma.analytics.financial.credit.Region;
 import com.opengamma.analytics.financial.credit.RestructuringClause;
-import com.opengamma.analytics.financial.credit.ScheduleGenerationMethod;
 import com.opengamma.analytics.financial.credit.Sector;
+import com.opengamma.analytics.financial.credit.StubType;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
@@ -24,7 +24,7 @@ import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 
 /**
- *  Definition of a vanilla legacy Credit Default Swap contract (i.e. transacted prior to Big Bang of April 2009)
+ *  Definition of a vanilla Credit Default Swap contract
  */
 public class CreditDefaultSwapDefinition {
 
@@ -33,17 +33,15 @@ public class CreditDefaultSwapDefinition {
   // Cashflow Conventions are assumed to be as below
 
   // Notional amount > 0 always - long/short positions are captured by the setting of the 'BuySellProtection' flag
+  // This convention is chosen to avoid confusion about whether a negative notional means a long/short position etc
 
   // Buy protection   -> Pay premium leg, receive contingent leg  -> 'long' protection  -> 'short' credit risk
   // Sell protection  -> Receive premium leg, pay contingent leg  -> 'short' protection -> 'long' credit risk
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
-  // TODO : Allow the case valuationDate = startDate
-  // TODO : Allow the case effectiveDate = startDate
-  // TODO : Allow the case maturityDate = startDate (e.g. startDate = 21/03/YY, maturityDate = 21/03/YY but IMM adjusted maturityDate = 20/06/YY)
-  // TODO : Allow the case valuationDate = maturityDate (should return a MtM of zero)
-  // TODO : Allow the case valuationDate = effectiveDate
+  // TODO : Replace some of the argument checkers with notNegative e.g. notional, parSpread
+  // TODO : Extend this class definition to include standard CDS contracts (post big-bang) i.e. quoted spread etc
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -55,6 +53,7 @@ public class CreditDefaultSwapDefinition {
   // Identifiers for the (three) counterparties in the trade
   private final String _protectionBuyer;
   private final String _protectionSeller;
+
   private final String _referenceEntityTicker;
   private final String _referenceEntityShortName;
   private final String _referenceEntityREDCode;
@@ -89,7 +88,7 @@ public class CreditDefaultSwapDefinition {
   // The date of the contract inception
   private final ZonedDateTime _startDate;
 
-  // The effective date for protection to begin (usually T + 1 for legacy CDS)
+  // The effective date for protection to begin (usually T + 1d for a legacy CDS, T - 60d or T - 90d for a standard CDS)
   private final ZonedDateTime _effectiveDate;
 
   // The maturity date of the contract (when premium and protection coverage ceases)
@@ -99,30 +98,33 @@ public class CreditDefaultSwapDefinition {
   private final ZonedDateTime _valuationDate;
 
   // The method for generating the schedule of premium payments
-  private final ScheduleGenerationMethod _scheduleGenerationMethod;
+  private final StubType _stubType;
 
-  // The frequency of coupon payments (usually quarterly)
+  // The frequency of coupon payments (usually quarterly for legacy and standard CDS)
   private final PeriodFrequency _couponFrequency;
 
-  // Day-count convention (usually Act/360)
+  // Day-count convention (usually Act/360 for legacy and standard CDS)
   private final DayCount _daycountFractionConvention;
 
-  // Business day adjustment convention (usually following)
+  // Business day adjustment convention (usually following for legacy and standard CDS)
   private final BusinessDayConvention _businessdayAdjustmentConvention;
 
-  // Flag to determine if we business day adjust the final maturity date
+  // Flag to determine if we adjust the maturity date to fall on the next IMM date
+  private final boolean _immAdjustMaturityDate;
+
+  // Flag to determine if we business day adjust the final maturity date (not a feature of legacy or standard CDS)
   private final boolean _adjustMaturityDate;
 
   // The trade notional (in the trade currency), convention is that this will always be a positive amount
   private final double _notional;
 
-  // The quoted par spread of the trade (legacy CDS, no exchange of upfront)
-  private final double _parSpread;
+  // The coupon (in bps) to apply to the premium leg (for legacy CDS where there is no exchange of upfront this is the par spread)
+  private final double _premiumLegCoupon;
 
   // The recovery rate to be used in the calculation of the CDS MtM (can be different to the rate used to calibrate the survival curve)
   private final double _valuationRecoveryRate;
 
-  // The recovery rate to be used when calibrating the hazard rate term structure to the market par CDS spread quotes
+  // The recovery rate to be used when calibrating the hazard rate term structure to the market observed par CDS spread quotes
   private final double _curveRecoveryRate;
 
   // Flag to determine whether the accrued coupons should be included in the CDS premium leg calculation
@@ -154,13 +156,14 @@ public class CreditDefaultSwapDefinition {
       ZonedDateTime effectiveDate,
       ZonedDateTime maturityDate,
       ZonedDateTime valuationDate,
-      ScheduleGenerationMethod scheduleGenerationMethod,
+      StubType stubType,
       PeriodFrequency couponFrequency,
       DayCount daycountFractionConvention,
       BusinessDayConvention businessdayAdjustmentConvention,
+      boolean immAdjustMaturityDate,
       boolean adjustMaturityDate,
       double notional,
-      double parSpread,
+      double premiumLegCoupon,
       double valuationRecoveryRate,
       double curveRecoveryRate,
       boolean includeAccruedPremium) {
@@ -205,19 +208,19 @@ public class CreditDefaultSwapDefinition {
     ArgumentChecker.notNull(valuationDate, "Valuation date field is null");
 
     // Check the temporal ordering of the input dates (these are the unadjusted dates entered by the user)
-    ArgumentChecker.isTrue(startDate.isBefore(valuationDate), "Start date {} must be before valuation date {}", startDate, valuationDate);
-    ArgumentChecker.isTrue(startDate.isBefore(effectiveDate), "Start date {} must be before effective date {}", startDate, effectiveDate);
-    ArgumentChecker.isTrue(startDate.isBefore(maturityDate), "Start date {} must be before maturity date {}", startDate, maturityDate);
-    ArgumentChecker.isTrue(valuationDate.isBefore(maturityDate), "Valuation date {} must be before maturity date {}", valuationDate, maturityDate);
-    ArgumentChecker.isTrue(valuationDate.isAfter(effectiveDate), "Valuation date {} must be after effective date {}", valuationDate, effectiveDate);
+    ArgumentChecker.isTrue(!startDate.isAfter(valuationDate), "Start date {} must be on or before valuation date {}", startDate, valuationDate);
+    ArgumentChecker.isTrue(!startDate.isAfter(effectiveDate), "Start date {} must be on or before effective date {}", startDate, effectiveDate);
+    ArgumentChecker.isTrue(!startDate.isAfter(maturityDate), "Start date {} must be on or before maturity date {}", startDate, maturityDate);
+    ArgumentChecker.isTrue(!valuationDate.isAfter(maturityDate), "Valuation date {} must be on or before maturity date {}", valuationDate, maturityDate);
+    ArgumentChecker.isTrue(!valuationDate.isBefore(effectiveDate), "Valuation date {} must be on or after effective date {}", valuationDate, effectiveDate);
 
-    ArgumentChecker.notNull(scheduleGenerationMethod, "Schedule generation method field is null");
+    ArgumentChecker.notNull(stubType, "Stub Type method field is null");
     ArgumentChecker.notNull(couponFrequency, "Coupon frequency field is null");
     ArgumentChecker.notNull(daycountFractionConvention, "Daycount convention field is null");
     ArgumentChecker.notNull(businessdayAdjustmentConvention, "Business day adjustment convention field is null");
 
     ArgumentChecker.isTrue(notional >= 0.0, "Notional amount should be greater than or equal to zero");
-    ArgumentChecker.isTrue(parSpread >= 0.0, "CDS par spread should be greater than or equal to zero");
+    ArgumentChecker.isTrue(premiumLegCoupon >= 0.0, "CDS par spread should be greater than or equal to zero");
 
     ArgumentChecker.isTrue(valuationRecoveryRate >= 0.0, "Valuation recovery rate should be greater than or equal to 0%");
     ArgumentChecker.isTrue(valuationRecoveryRate <= 1.0, "Valuation recovery rate should be less than or equal to 100%");
@@ -254,14 +257,15 @@ public class CreditDefaultSwapDefinition {
     _maturityDate = maturityDate;
     _valuationDate = valuationDate;
 
-    _scheduleGenerationMethod = scheduleGenerationMethod;
+    _stubType = stubType;
     _couponFrequency = couponFrequency;
     _daycountFractionConvention = daycountFractionConvention;
     _businessdayAdjustmentConvention = businessdayAdjustmentConvention;
+    _immAdjustMaturityDate = immAdjustMaturityDate;
     _adjustMaturityDate = adjustMaturityDate;
 
     _notional = notional;
-    _parSpread = parSpread;
+    _premiumLegCoupon = premiumLegCoupon;
 
     _valuationRecoveryRate = valuationRecoveryRate;
     _curveRecoveryRate = curveRecoveryRate;
@@ -360,8 +364,8 @@ public class CreditDefaultSwapDefinition {
 
   //----------------------------------------------------------------------------------------------------------------------------------------
 
-  public ScheduleGenerationMethod getScheduleGenerationMethod() {
-    return _scheduleGenerationMethod;
+  public StubType getStubType() {
+    return _stubType;
   }
 
   public PeriodFrequency getCouponFrequency() {
@@ -376,6 +380,10 @@ public class CreditDefaultSwapDefinition {
     return _businessdayAdjustmentConvention;
   }
 
+  public boolean getIMMAdjustMaturityDate() {
+    return _immAdjustMaturityDate;
+  }
+
   public boolean getAdjustMaturityDate() {
     return _adjustMaturityDate;
   }
@@ -386,8 +394,8 @@ public class CreditDefaultSwapDefinition {
     return _notional;
   }
 
-  public double getParSpread() {
-    return _parSpread;
+  public double getPremiumLegCoupon() {
+    return _premiumLegCoupon;
   }
 
   public double getValuationRecoveryRate() {
@@ -410,6 +418,36 @@ public class CreditDefaultSwapDefinition {
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
+  // Builder method to allow the maturity of a CDS object to be modified (used during calibration of the survival curve)
+
+  public CreditDefaultSwapDefinition withMaturity(ZonedDateTime maturityDate) {
+
+    CreditDefaultSwapDefinition modifiedCDS = new CreditDefaultSwapDefinition(_buySellProtection, _protectionBuyer, _protectionSeller, _referenceEntityTicker,
+        _referenceEntityShortName, _referenceEntityREDCode, _currency, _debtSeniority, _restructuringClause, _compositeRating,
+        _impliedRating, _sector, _region, _country, _calendar, _startDate, _effectiveDate, maturityDate, _valuationDate, _stubType, _couponFrequency,
+        _daycountFractionConvention, _businessdayAdjustmentConvention, _immAdjustMaturityDate, _adjustMaturityDate, _notional, _premiumLegCoupon,
+        _valuationRecoveryRate, _curveRecoveryRate, _includeAccruedPremium);
+
+    return modifiedCDS;
+  }
+
+  // ----------------------------------------------------------------------------------------------------------------------------------------
+
+  // Builder method to allow the premium leg coupon of a CDS object to be modified (used during calibration of the survival curve)
+
+  public CreditDefaultSwapDefinition withSpread(double couponSpread) {
+
+    CreditDefaultSwapDefinition modifiedCDS = new CreditDefaultSwapDefinition(_buySellProtection, _protectionBuyer, _protectionSeller, _referenceEntityTicker,
+        _referenceEntityShortName, _referenceEntityREDCode, _currency, _debtSeniority, _restructuringClause, _compositeRating,
+        _impliedRating, _sector, _region, _country, _calendar, _startDate, _effectiveDate, _maturityDate, _valuationDate, _stubType, _couponFrequency,
+        _daycountFractionConvention, _businessdayAdjustmentConvention, _immAdjustMaturityDate, _adjustMaturityDate, _notional, couponSpread,
+        _valuationRecoveryRate, _curveRecoveryRate, _includeAccruedPremium);
+
+    return modifiedCDS;
+  }
+
+  // ----------------------------------------------------------------------------------------------------------------------------------------
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -422,7 +460,7 @@ public class CreditDefaultSwapDefinition {
     result = prime * result + (_includeAccruedPremium ? 1231 : 1237);
     temp = Double.doubleToLongBits(_notional);
     result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(_parSpread);
+    temp = Double.doubleToLongBits(_premiumLegCoupon);
     result = prime * result + (int) (temp ^ (temp >>> 32));
     temp = Double.doubleToLongBits(_valuationRecoveryRate);
     result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -516,7 +554,7 @@ public class CreditDefaultSwapDefinition {
       return false;
     }
 
-    if (Double.doubleToLongBits(_parSpread) != Double.doubleToLongBits(other._parSpread)) {
+    if (Double.doubleToLongBits(_premiumLegCoupon) != Double.doubleToLongBits(other._premiumLegCoupon)) {
       return false;
     }
 
@@ -548,7 +586,7 @@ public class CreditDefaultSwapDefinition {
       return false;
     }
 
-    if (_scheduleGenerationMethod != other._scheduleGenerationMethod) {
+    if (_stubType != other._stubType) {
       return false;
     }
 

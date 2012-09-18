@@ -57,30 +57,28 @@ public class CalibrateSurvivalCurveTest {
   private static final ZonedDateTime startDate = DateUtils.getUTCDate(2007, 10, 22);
   private static final ZonedDateTime effectiveDate = DateUtils.getUTCDate(2007, 10, 23);
   private static final ZonedDateTime maturityDate = DateUtils.getUTCDate(2012, 12, 20);
-  private static final ZonedDateTime valuationDate = DateUtils.getUTCDate(2009, 4, 25);
+  private static final ZonedDateTime valuationDate = DateUtils.getUTCDate(2007, 10, 23);
 
-  private static final ScheduleGenerationMethod scheduleGenerationMethod = ScheduleGenerationMethod.BACKWARD;
+  private static final StubType stubType = StubType.FRONTSHORT;
   private static final PeriodFrequency couponFrequency = PeriodFrequency.QUARTERLY;
   private static final DayCount daycountFractionConvention = DayCountFactory.INSTANCE.getDayCount("ACT/360");
   private static final BusinessDayConvention businessdayAdjustmentConvention = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following");
 
-  private static final boolean adjustMaturityDate = true;
+  private static final boolean immAdjustMaturityDate = false;
+  private static final boolean adjustMaturityDate = false;
 
   private static final double notional = 10000000.0;
-  private static final double parSpread = 60.0;
+  private static final double premiumLegCoupon = 60.0;
   private static final double valuationRecoveryRate = 0.40;
   private static final double curveRecoveryRate = 0.40;
-  private static final boolean includeAccruedPremium = true;
+  private static final boolean includeAccruedPremium = false;
 
   // Dummy yield curve
-  private static final double interestRate = 0.05;
-  private static final double[] TIME = new double[] {0, 3, 5, 10 };
-  private static final double[] RATES = new double[] {interestRate, interestRate, interestRate, interestRate };
+  private static final double interestRate = 0.0;
+  private static final double[] TIME = new double[] {0, 3, 5, 10, 15, 40 };
+  private static final double[] RATES = new double[] {interestRate, interestRate, interestRate, interestRate, interestRate, interestRate };
   private static final InterpolatedDoublesCurve R = InterpolatedDoublesCurve.from(TIME, RATES, new LinearInterpolator1D());
   private static final YieldCurve yieldCurve = YieldCurve.from(R);
-
-  // Construct a survival curve based on a flat hazard rate term structure (for testing purposes only)
-  private static final FlatSurvivalCurve survivalCurve = new FlatSurvivalCurve(parSpread, curveRecoveryRate);
 
   // ----------------------------------------------------------------------------------
 
@@ -104,13 +102,14 @@ public class CalibrateSurvivalCurveTest {
       effectiveDate,
       maturityDate,
       valuationDate,
-      scheduleGenerationMethod,
+      stubType,
       couponFrequency,
       daycountFractionConvention,
       businessdayAdjustmentConvention,
+      immAdjustMaturityDate,
       adjustMaturityDate,
       notional,
-      parSpread,
+      premiumLegCoupon,
       valuationRecoveryRate,
       curveRecoveryRate,
       includeAccruedPremium);
@@ -120,11 +119,49 @@ public class CalibrateSurvivalCurveTest {
   @Test
   public void testCalibrateSurvivalCurve() {
 
-    System.out.println("Running tests on survival curve construction ...");
+    final boolean outputResults = false;
 
-    //final CalibrateSurvivalCurve curve = new CalibrateSurvivalCurve();
+    int numberOfTenors = 10;
 
-    //double[][] calibratedSurvivalCurve = curve.getCalibratedSurvivalCurve(cds, null, null);
+    final ZonedDateTime[] tenors = new ZonedDateTime[numberOfTenors];
+
+    double[] marketSpreads = new double[numberOfTenors];
+
+    tenors[0] = DateUtils.getUTCDate(2008, 12, 20);
+    tenors[1] = DateUtils.getUTCDate(2009, 6, 20);
+    tenors[2] = DateUtils.getUTCDate(2010, 6, 20);
+    tenors[3] = DateUtils.getUTCDate(2011, 6, 20);
+    tenors[4] = DateUtils.getUTCDate(2012, 6, 20);
+    tenors[5] = DateUtils.getUTCDate(2014, 6, 20);
+    tenors[6] = DateUtils.getUTCDate(2017, 6, 20);
+    tenors[7] = DateUtils.getUTCDate(2022, 6, 20);
+    tenors[8] = DateUtils.getUTCDate(2030, 6, 20);
+    tenors[9] = DateUtils.getUTCDate(2040, 6, 20);
+
+    marketSpreads[0] = 50; //1774.0;
+    marketSpreads[1] = 60; //1805.0;
+    marketSpreads[2] = 50; //1856.0;
+    marketSpreads[3] = 60; //1994.0;
+    marketSpreads[4] = 50; //2045.0;
+    marketSpreads[5] = 40; //2141.0;
+    marketSpreads[6] = 50; //2243.0;
+    marketSpreads[7] = 60; //2559.0;
+    marketSpreads[8] = 50; //3072.0;
+    marketSpreads[9] = 60; //3865.0;
+
+    // Create a survival curve object
+    final CalibrateSurvivalCurve curve = new CalibrateSurvivalCurve();
+
+    // Calibrate the survival curve to the market observed par CDS spreads
+    double[] calibratedSurvivalCurve = curve.getCalibratedSurvivalCurve(cds, tenors, marketSpreads, yieldCurve);
+
+    if (outputResults) {
+      for (int i = 0; i < numberOfTenors; i++) {
+        System.out.println(calibratedSurvivalCurve[i]);
+      }
+    }
   }
+
   // ---------------------------------------------------------------------------------------
+
 }

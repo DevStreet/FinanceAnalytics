@@ -17,8 +17,8 @@ public class IMMDates {
 
   // ------------------------------------------------------------------------
 
-  // TODO : Check the level of access to these ctors/methods (private, public etc)
   // TODO : Remove the previous December date (not needed)
+  // TODO : Is there a better (more elegant) way of doing this?
 
   // ------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ public class IMMDates {
 
   // ------------------------------------------------------------------------
 
-  // IMM Date object constructor
+  // Public IMM Date object constructor
   public IMMDates(int year) {
 
     _immDatePreviousDecember = DateUtils.getUTCDate(year - 1, 12, 20);

@@ -53,8 +53,13 @@ public enum StripInstrumentType {
   PERIODIC_ZERO_DEPOSIT,
   /** Continuous zero deposit strip */
   CONTINUOUS_ZERO_DEPOSIT,
+<<<<<<< HEAD
   /** Rate strip */
   RATE,
   /** FX forward strip */
   FX_FORWARD
+=======
+  /** Spread strip */
+  SPREAD
+>>>>>>> develop
 }
