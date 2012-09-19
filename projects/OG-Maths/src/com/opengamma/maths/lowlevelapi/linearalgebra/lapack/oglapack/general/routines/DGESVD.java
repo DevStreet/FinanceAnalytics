@@ -3,11 +3,11 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.routines;
+package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.routines;
 
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.BLAS1;
-import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.types.SingularValueDecomposition.SingularValueDecompositionFullUSV;
+import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.types.SingularValueDecomposition.SingularValueDecompositionFullUSV;
 
 /**
  * Does svd, this is currently clunky as its being translated from a prototype I wrote in a rather nice vector language :)

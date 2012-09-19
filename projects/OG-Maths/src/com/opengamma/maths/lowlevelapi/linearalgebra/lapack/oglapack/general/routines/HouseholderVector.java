@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.routines;
+package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.routines;
 
 /**
  * 

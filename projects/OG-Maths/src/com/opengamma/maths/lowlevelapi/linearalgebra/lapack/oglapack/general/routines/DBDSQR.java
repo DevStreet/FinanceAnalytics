@@ -3,13 +3,13 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.routines;
+package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.routines;
 
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.MathsConstants;
-import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.auxiliary.DLARTG;
-import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.auxiliary.DLASV2;
+import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.auxiliary.DLARTG;
+import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.auxiliary.DLASV2;
 
 /**
  * Computes the singular values and possibly the singular vectors of   a bi-digaonal matrix.

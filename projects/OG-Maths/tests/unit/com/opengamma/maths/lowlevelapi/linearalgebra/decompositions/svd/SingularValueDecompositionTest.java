@@ -10,8 +10,8 @@ import org.testng.annotations.Test;
 import cern.colt.Arrays;
 
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.routines.DGESVD;
-import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.types.SingularValueDecomposition.SingularValueDecompositionFullUSV;
+import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.routines.DGESVD;
+import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.types.SingularValueDecomposition.SingularValueDecompositionFullUSV;
 
 /**
  * TODO: remove this comment: Currently being debugged!

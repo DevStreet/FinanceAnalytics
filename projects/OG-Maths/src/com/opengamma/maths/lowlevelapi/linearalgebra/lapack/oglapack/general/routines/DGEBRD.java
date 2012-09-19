@@ -3,12 +3,12 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.routines;
+package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.routines;
 
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.auxiliary.SanityChecker;
+import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.auxiliary.SanityChecker;
 
 /**
  * Bidiagonalises and m x n matrix A to upper bidiagonal matrix D through orthogonal transforms U and V such that

@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.types.BidiagonalisationDecomposition;
+package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.types.BidiagonalisationDecomposition;
 
 /**
  * Struct containing full bidiagonalisation decomposition results. To get this decomposition call non-fastpath methods in DGEBRD().

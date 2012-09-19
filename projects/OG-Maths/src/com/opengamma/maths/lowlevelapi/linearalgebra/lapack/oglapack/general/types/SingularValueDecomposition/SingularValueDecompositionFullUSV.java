@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.referencelapack.general.types.SingularValueDecomposition;
+package com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.types.SingularValueDecomposition;
 
 /**
  * Type safe SVD full result, does not reflect LAPACK naming as there are two drivers from which the SVD can be obtained (DGESVD and DGESDD).
