@@ -540,6 +540,7 @@ public class SwaptionPhysicalFixedIborLMMDDMethodTest {
     final SwapFixedIborDefinition swapAmortizedDefinition = new SwapFixedIborDefinition(new AnnuityCouponFixedDefinition(cpnFixed), new AnnuityCouponIborDefinition(cpnIbor, EURIBOR6M));
     final SwaptionPhysicalFixedIborDefinition swaptionAmortizedDefinition = SwaptionPhysicalFixedIborDefinition.from(EXPIRY_DATE, swapAmortizedDefinition, IS_LONG);
     final SwaptionPhysicalFixedIbor swaptionAmortized = swaptionAmortizedDefinition.toDerivative(REFERENCE_DATE, CURVES_NAME);
+
     // SABR parameters sensitivity (parallel shift check)
     PresentValueSABRSensitivityDataBundle pvss = METHOD_SABR_LMM_ATBEST.presentValueSABRSensitivity(swaptionAmortized, sabrBundle);
     final double[] shift = new double[] {0.0001, 0.0001, 0.0001};
@@ -558,6 +559,8 @@ public class SwaptionPhysicalFixedIborLMMDDMethodTest {
       sensiExpected[loopp] = (pvShiftPlus.getAmount() - pvShiftMinus.getAmount()) / (2 * shift[loopp]);
       assertEquals("SwaptionPhysicalFixedIborLMM: Calibration at best - SABR sensitivity " + loopp, sensiExpected[loopp], sensiComputed[loopp], toleranceSABRSensi[loopp]);
     }
+
+    // TODO: Curve sensitivity test
   }
 
 }

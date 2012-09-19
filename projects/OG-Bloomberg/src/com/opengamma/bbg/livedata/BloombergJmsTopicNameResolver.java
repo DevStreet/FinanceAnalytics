@@ -100,10 +100,10 @@ public class BloombergJmsTopicNameResolver extends AbstractResolver<JmsTopicName
   
   private String getJmsTopicName(JmsTopicNameResolveRequest request, ReferenceData result) {
     if (result == null) {
-      s_logger.info("No reference data available for " + request);
+      s_logger.info("No reference data available for {}", request);
       return null;
-    } else if (!result.getErrors().isEmpty()) {
-      s_logger.info("Failed to retrieve reference data for " + request + ": " + result.getErrors());
+    } else if (result.isIdentifierError()) {
+      s_logger.info("Failed to retrieve reference data for {}: {}", request, result.getErrors());
       return null;
     }
     FudgeMsg resultFields = result.getFieldValues();
