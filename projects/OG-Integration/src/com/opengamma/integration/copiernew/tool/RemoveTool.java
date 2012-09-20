@@ -5,14 +5,14 @@
  */
 package com.opengamma.integration.copiernew.tool;
 
-import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.component.tool.AbstractTool;
 import com.opengamma.component.tool.AbstractToolWithoutContext;
 import com.opengamma.integration.copiernew.Remover;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
+import com.opengamma.util.generate.scripts.Scriptable;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
+@Scriptable
 public class RemoveTool extends AbstractToolWithoutContext {
 
   public static void main(String[] args) {

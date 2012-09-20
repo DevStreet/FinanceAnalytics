@@ -6,15 +6,16 @@
 package com.opengamma.integration.copiernew.tool;
 
 
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.component.tool.AbstractToolWithoutContext;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
 import com.opengamma.integration.copiernew.Writeable;
+import com.opengamma.util.generate.scripts.Scriptable;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
 import java.io.IOException;
 
+@Scriptable
 public class CopyTool extends AbstractToolWithoutContext {
 
   public static void main(String[] args) {
