@@ -90,21 +90,17 @@ public class SecurityMasterReader implements Iterable<ManageableSecurity> {
       }
   
       private void turnPage() {
-        while (true) {
-          SecuritySearchRequest securitySearchRequest = _securitySearchRequestTemplate;
-          securitySearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _securitySearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _securitySearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _securitySearchResult = _securityMaster.search(securitySearchRequest);
-            _iterator = _securitySearchResult.getSecurities().iterator();
-            return;
-          } catch (Throwable t) {
-            _iterator = new ArrayList<ManageableSecurity>().iterator();
-            s_logger.error("Error performing security master search: " + t.getMessage());
-          }
+        SecuritySearchRequest securitySearchRequest = _securitySearchRequestTemplate;
+        securitySearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _securitySearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _securitySearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _securitySearchResult = _securityMaster.search(securitySearchRequest);
+          _iterator = _securitySearchResult.getSecurities().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ManageableSecurity>().iterator();
+          s_logger.error("Error performing security master search: " + t.getMessage());
         }
       }
-  
     };
   }
 

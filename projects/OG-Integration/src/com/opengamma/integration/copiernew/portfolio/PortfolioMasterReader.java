@@ -90,21 +90,17 @@ public class PortfolioMasterReader implements Iterable<ManageablePortfolio> {
       }
   
       private void turnPage() {
-        while (true) {
-          PortfolioSearchRequest portfolioSearchRequest = _portfolioSearchRequestTemplate;
-          portfolioSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _portfolioSearchRequestTemplate.getPagingRequest().getPagingSize()));
-          _nextPageIndex += _portfolioSearchRequestTemplate.getPagingRequest().getPagingSize();
-          try {
-            _portfolioSearchResult = _portfolioMaster.search(portfolioSearchRequest);
-            _iterator = _portfolioSearchResult.getPortfolios().iterator();
-            return;
-          } catch (Throwable t) {
-            _iterator = new ArrayList<ManageablePortfolio>().iterator();
-            s_logger.error("Error performing portfolio master search: " + t.getMessage());
-          }
+        PortfolioSearchRequest portfolioSearchRequest = _portfolioSearchRequestTemplate;
+        portfolioSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _portfolioSearchRequestTemplate.getPagingRequest().getPagingSize()));
+        _nextPageIndex += _portfolioSearchRequestTemplate.getPagingRequest().getPagingSize();
+        try {
+          _portfolioSearchResult = _portfolioMaster.search(portfolioSearchRequest);
+          _iterator = _portfolioSearchResult.getPortfolios().iterator();
+        } catch (Throwable t) {
+          _iterator = new ArrayList<ManageablePortfolio>().iterator();
+          s_logger.error("Error performing portfolio master search: " + t.getMessage());
         }
       }
-  
     };
   }
 
