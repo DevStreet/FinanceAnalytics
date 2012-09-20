@@ -5,23 +5,39 @@
  */
 package com.opengamma.integration.copiernew.tool;
 
-
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.component.tool.AbstractTool;
+import com.opengamma.component.tool.AbstractToolWithoutContext;
 import com.opengamma.integration.copiernew.Remover;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 
-public class RemoveTool {
+public class RemoveTool extends AbstractToolWithoutContext {
 
   public static void main(String[] args) {
+    new RemoveTool().initAndRun(args);
+    System.exit(0);
+  }
 
-    if (args.length != 1) {
-      throw new OpenGammaRuntimeException("Usage: RemoveTool <uri>");
+  @Override
+  protected void doRun() throws Exception {
+    if (getCommandLine().getArgs().length != 1) {
+      usage(createOptions());
+      return;
     }
 
-    Iterable reader = ReaderWriterUtils.getMasterReader(args[0]);
-    String[] split = ReaderWriterUtils.getUriParts(args[0]);
+    Iterable reader = ReaderWriterUtils.getMasterReader(getCommandLine().getArgs()[0]);
+    String[] split = ReaderWriterUtils.getUriParts(getCommandLine().getArgs()[0]);
     Remover remover = new Remover(ReaderWriterUtils.getRemoteMaster(split[0], split[1], split[2]));
-
     remover.delete(reader);
   }
+
+  @Override
+  protected void usage(Options options) {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.setWidth(120);
+    formatter.printHelp("java " + getEntryPointClass().getName() + " [OPTIONS] <Destination URI>", options);
+  }
+
 }

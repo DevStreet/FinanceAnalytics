@@ -7,21 +7,30 @@ package com.opengamma.integration.copiernew.tool;
 
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.component.tool.AbstractToolWithoutContext;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
 import com.opengamma.integration.copiernew.Writeable;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 
 import java.io.IOException;
 
-public class CopyTool {
+public class CopyTool extends AbstractToolWithoutContext {
 
   public static void main(String[] args) {
+    new CopyTool().initAndRun(args);
+    System.exit(0);
+  }
 
-    if (args.length != 2) {
-      throw new OpenGammaRuntimeException("Usage: CopyTool <source uri> <destination uri>");
+  @Override
+  protected void doRun() throws Exception {
+    if (getCommandLine().getArgs().length != 2) {
+      usage(createOptions());
+      return;
     }
 
-    Iterable reader = ReaderWriterUtils.getMasterReader(args[0]);
-    Writeable writer = ReaderWriterUtils.getMasterWriter(args[1]);
+    Iterable reader = ReaderWriterUtils.getMasterReader(getCommandLine().getArgs()[0]);
+    Writeable writer = ReaderWriterUtils.getMasterWriter(getCommandLine().getArgs()[1]);
     writer.addOrUpdate(reader);
 
     try {
@@ -29,7 +38,13 @@ public class CopyTool {
     } catch (IOException e) {
       e.printStackTrace();  // TODO
     }
+  }
 
+  @Override
+  protected void usage(Options options) {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.setWidth(120);
+    formatter.printHelp("java " + getEntryPointClass().getName() + " [OPTIONS] <Source URI> <Destination URI>", options);
   }
 }
 
