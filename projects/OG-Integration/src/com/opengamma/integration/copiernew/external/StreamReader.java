@@ -6,14 +6,10 @@
 package com.opengamma.integration.copiernew.external;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.util.ArgumentChecker;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.io.xml.StaxReader;
-import com.thoughtworks.xstream.io.xml.XppReader;
 import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +17,23 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
 import java.util.Iterator;
 
-public class XmlReader<T extends Bean> implements Iterable<T> {
+public class StreamReader<T extends Bean> implements Iterable<T> {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(XmlReader.class);
+  private static final Logger s_logger = LoggerFactory.getLogger(StreamReader.class);
 
   XStream _xStream;
   ObjectInputStream _objectInputStream;
 
-  public XmlReader(InputStream inputStream) {
+  public StreamReader(InputStream inputStream) {
+    this(inputStream, new StaxDriver());
+  }
+
+  public StreamReader(InputStream inputStream, HierarchicalStreamDriver driver) {
     ArgumentChecker.notNull(inputStream, "inputStream");
-    _xStream = new XStream(new StaxDriver());
+    ArgumentChecker.notNull(driver, "driver");
+    _xStream = new XStream(driver);
 
     try {
       _objectInputStream = _xStream.createObjectInputStream(inputStream);
@@ -41,7 +41,6 @@ public class XmlReader<T extends Bean> implements Iterable<T> {
       throw new OpenGammaRuntimeException("Could not create an ObjectInputStream");
     }
   }
-
 
   @Override
   public Iterator<T> iterator() {

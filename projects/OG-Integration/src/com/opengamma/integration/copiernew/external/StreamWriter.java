@@ -10,44 +10,47 @@ import com.opengamma.integration.copiernew.Writeable;
 
 import com.opengamma.util.ArgumentChecker;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.io.xml.StaxWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-public class XmlWriter<T> implements Writeable<T> {
+public class StreamWriter<T> implements Writeable<T> {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(XmlWriter.class);
+  private static final Logger s_logger = LoggerFactory.getLogger(StreamWriter.class);
 
   XStream _xStream;
   ObjectOutputStream _objectOutputStream;
 
-  public XmlWriter(OutputStream outputStream) {
-    ArgumentChecker.notNull(outputStream, "outputStream");
-    _xStream = new XStream(new StaxDriver());
-    // Format StAX driver output
-    // http://old.nabble.com/PrettyPrintWriter-and-StaxDriver--td4079982.html (posted by Jörg Schaible Apr 26, 2006)
-//    _xStream = new XStream(new StaxDriver() {
-//      public HierarchicalStreamWriter createWriter(OutputStream out) {
-//        try {
-//          return new StaxWriter(
-//            getQnameMap(),
-//            new IndentingXMLStreamWriter(getOutputFactory().createXMLStreamWriter(out)),
-//            true,
-//            isRepairingNamespace()
-//          );
-//        } catch (XMLStreamException e) {
-//          throw new OpenGammaRuntimeException(e.getMessage(), e);
+  public StreamWriter(OutputStream outputStream) {
+    this(outputStream, new StaxDriver()
+//      {
+//        public HierarchicalStreamWriter createWriter(OutputStream out) {
+//          try {
+//            return new StaxWriter(
+//              getQnameMap(),
+//              new IndentingXMLStreamWriter(getOutputFactory().createXMLStreamWriter(out)),
+//              true,
+//              isRepairingNamespace()
+//            );
+//          } catch (XMLStreamException e) {
+//            throw new OpenGammaRuntimeException(e.getMessage(), e);
+//          }
 //        }
 //      }
-//    });
+    );
+  }
+
+  public StreamWriter(OutputStream outputStream, HierarchicalStreamDriver driver) {
+    ArgumentChecker.notNull(outputStream, "outputStream");
+    ArgumentChecker.notNull(driver, "driver");
+    _xStream = new XStream(driver);
+
     try {
       _objectOutputStream = _xStream.createObjectOutputStream(outputStream);
     } catch (IOException e) {

@@ -6,40 +6,46 @@
 package com.opengamma.integration.copiernew.external;
 
 /**
- * Known sheet formats
+ * Known external formats
  */
-public enum SheetFormat {
+public enum ExternalFormat {
 
-  /** CSV sheet */
+  /** CSV */
   CSV, 
 
-  /** XLS sheet */
+  /** XLS */
   XLS, 
 
-  /** XLSX sheet */
+  /** XLSX */
   XLSX,
   
-  /** ZIP sheet */
+  /** ZIP */
   ZIP,
+
+  /** XML */
+  XML,
+
+  /** JSON */
+  JSON,
 
   /** Unknown sheet */
   UNKNOWN;
  
-  public static SheetFormat of(String filename) {
+  public static ExternalFormat of(String filename) {
     if (filename.lastIndexOf('.') < 0) {
-      return SheetFormat.UNKNOWN;
+      return ExternalFormat.UNKNOWN;
     }
     String extension = filename.substring(filename.lastIndexOf('.')).toLowerCase().trim();
     if (extension.equals(".csv")) {
-      return SheetFormat.CSV;
+      return ExternalFormat.CSV;
     } else if (extension.equals(".xls")) {
-      return SheetFormat.XLS;
+      return ExternalFormat.XLS;
     } else if (extension.equals(".xlsx")) {
-      return SheetFormat.XLSX;
+      return ExternalFormat.XLSX;
     } else if (extension.equals(".zip")) {
-      return SheetFormat.ZIP;
+      return ExternalFormat.ZIP;
     } else {
-      return SheetFormat.UNKNOWN;
+      return ExternalFormat.UNKNOWN;
     }
   }
 
