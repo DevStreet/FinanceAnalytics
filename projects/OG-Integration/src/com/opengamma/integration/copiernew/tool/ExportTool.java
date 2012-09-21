@@ -25,8 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-// TODO need options for different output formats: csv, xml, fudge, etc.
-
 @Scriptable
 public class ExportTool extends AbstractToolWithoutContext {
 
@@ -61,11 +59,11 @@ public class ExportTool extends AbstractToolWithoutContext {
 
     StreamWriter writer;
     if (!getCommandLine().hasOption(FORMAT_OPT)) {
-      writer = new StreamWriter(outputStream, new StaxDriver());
+      writer = new StreamWriter(outputStream);
     } else {
       String format = getCommandLine().getOptionValue(FORMAT_OPT).toLowerCase().trim();
       if (format.equals("xml")) {
-        writer = new StreamWriter(outputStream, new StaxDriver());
+        writer = new StreamWriter(outputStream);
       } else if (format.equals("json")) {
         writer = new StreamWriter(outputStream, new JettisonMappedXmlDriver());
       } else {

@@ -24,8 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-// TODO need options for different output formats: csv, xml, fudge, etc.
-
 @Scriptable
 public class ImportTool extends AbstractToolWithoutContext {
 

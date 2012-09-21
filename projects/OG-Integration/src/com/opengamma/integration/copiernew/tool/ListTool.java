@@ -9,6 +9,8 @@ package com.opengamma.integration.copiernew.tool;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.component.tool.AbstractToolWithoutContext;
 import com.opengamma.integration.copiernew.ReaderWriterUtils;
+import com.opengamma.integration.copiernew.Writeable;
+import com.opengamma.integration.copiernew.external.PrettyWriter;
 import com.opengamma.integration.copiernew.external.StreamWriter;
 import com.opengamma.util.generate.scripts.Scriptable;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
@@ -20,16 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-// TODO need options for different output formats: csv, xml, fudge, etc.
+import java.nio.channels.WritableByteChannel;
 
 @Scriptable
 public class ListTool extends AbstractToolWithoutContext {
-
-  /** File name option flag */
-  private static final String FILE_NAME_OPT = "f";
-  /** Export format option flag */
-  private static final String FORMAT_OPT = "t";
 
   public static void main(String[] args) {
     new ListTool().initAndRun(args);
@@ -44,61 +40,15 @@ public class ListTool extends AbstractToolWithoutContext {
       return;
     }
 
-    OutputStream outputStream;
-    if (getCommandLine().hasOption(FILE_NAME_OPT)) {
-      try {
-        outputStream = new FileOutputStream(getCommandLine().getOptionValue(FILE_NAME_OPT));
-      } catch (FileNotFoundException e) {
-        throw new OpenGammaRuntimeException("Could not open output file: " + e.getMessage());
-      }
-    } else {
-      outputStream = System.out;
-    }
-
-    StreamWriter writer;
-    if (!getCommandLine().hasOption(FORMAT_OPT)) {
-      writer = new StreamWriter(outputStream);
-    } else {
-      String format = getCommandLine().getOptionValue(FORMAT_OPT).toLowerCase().trim();
-      if (format.equals("xml")) {
-        writer = new StreamWriter(outputStream);
-      } else if (format.equals("json")) {
-        writer = new StreamWriter(outputStream, new JettisonMappedXmlDriver());
-      } else {
-        throw new OpenGammaRuntimeException("Unable to generate the specified format (" + format + ")");
-      }
-    }
+    Writeable writer = new PrettyWriter(System.out);
     Iterable reader = ReaderWriterUtils.getMasterReader(getCommandLine().getArgs()[0]);
     writer.addOrUpdate(reader);
 
     try {
       writer.flush();
-      writer.close();
     } catch (IOException e) {
       throw new OpenGammaRuntimeException("Could not flush and close output file: " + e.getMessage());
     }
-  }
-
-  @Override
-  protected Options createOptions() {
-
-    Options options = super.createOptions();
-
-    Option filenameOption = new Option(
-        FILE_NAME_OPT, "filename", true,
-        "The path to the file containing data to export (use standard output if not specified)"
-    );
-    filenameOption.setRequired(false);
-    options.addOption(filenameOption);
-
-    Option formatOption = new Option(
-        FORMAT_OPT, "format", true,
-        "The export format to use (xml, json)"
-    );
-    formatOption.setRequired(false);
-    options.addOption(formatOption);
-
-    return options;
   }
 
   @Override
