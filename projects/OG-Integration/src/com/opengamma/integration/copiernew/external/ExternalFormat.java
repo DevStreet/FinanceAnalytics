@@ -44,6 +44,10 @@ public enum ExternalFormat {
       return ExternalFormat.XLSX;
     } else if (extension.equals(".zip")) {
       return ExternalFormat.ZIP;
+    } else if (extension.equals(".xml")) {
+      return ExternalFormat.XML;
+    } else if (extension.equals(".json")) {
+      return ExternalFormat.JSON;
     } else {
       return ExternalFormat.UNKNOWN;
     }
