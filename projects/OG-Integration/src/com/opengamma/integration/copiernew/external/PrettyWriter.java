@@ -27,15 +27,26 @@ public class PrettyWriter<E> implements Writeable<E>, Closeable {
 
   @Override
   public void addOrUpdate(E datum) {
+    String name;
     try {
-      String name = (String) datum.getClass().getMethod("getName").invoke(datum);
-      UniqueId uniqueId = (UniqueId) datum.getClass().getMethod("getUniqueId").invoke(datum);
-      ExternalIdBundle externalIds = (ExternalIdBundle) datum.getClass().getMethod("getExternalIdBundle").invoke(datum);
-      _formatter.format("%-24s%-50s%s\n", uniqueId, name, externalIds);
-      _formatter.flush();
+      name = (String) datum.getClass().getMethod("getName").invoke(datum);
     } catch (Throwable t) {
-      s_logger.error("Could not write datum to output stream");
+      name = "-";
     }
+    UniqueId uniqueId;
+    try {
+      uniqueId = (UniqueId) datum.getClass().getMethod("getUniqueId").invoke(datum);
+    } catch (Throwable t) {
+      uniqueId = UniqueId.of("-", "-");
+    }
+    ExternalIdBundle externalIds;
+    try {
+      externalIds = (ExternalIdBundle) datum.getClass().getMethod("getExternalIdBundle").invoke(datum);
+    } catch (Throwable t) {
+      externalIds = ExternalIdBundle.of();
+    }
+    _formatter.format("%-24s%-50s%s\n", uniqueId, name, externalIds);
+    _formatter.flush();
   }
 
   @Override
