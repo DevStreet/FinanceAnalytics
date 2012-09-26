@@ -18,6 +18,8 @@ import com.opengamma.integration.copiernew.portfolio.PortfolioMasterReader;
 import com.opengamma.integration.copiernew.portfolio.PortfolioMasterWriter;
 import com.opengamma.integration.copiernew.position.PositionMasterReader;
 import com.opengamma.integration.copiernew.position.PositionMasterWriter;
+import com.opengamma.integration.copiernew.region.RegionMasterReader;
+import com.opengamma.integration.copiernew.region.RegionMasterWriter;
 import com.opengamma.integration.copiernew.security.SecurityMasterReader;
 import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
 import com.opengamma.master.AbstractSearchRequest;
@@ -40,6 +42,9 @@ import com.opengamma.master.portfolio.impl.RemotePortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.position.PositionSearchRequest;
 import com.opengamma.master.position.impl.RemotePositionMaster;
+import com.opengamma.master.region.RegionMaster;
+import com.opengamma.master.region.RegionSearchRequest;
+import com.opengamma.master.region.impl.RemoteRegionMaster;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.impl.RemoteSecurityMaster;
@@ -60,6 +65,7 @@ public final class ReaderWriterUtils {
     _masterClassInfos.put("holiday", new MasterClassInfo(HolidayMaster.class, RemoteHolidayMaster.class, HolidaySearchRequest.class, HolidayMasterReader.class, HolidayMasterWriter.class, "HolidayMaster"));
     _masterClassInfos.put("portfolio", new MasterClassInfo(PortfolioMaster.class, RemotePortfolioMaster.class, PortfolioSearchRequest.class, PortfolioMasterReader.class, PortfolioMasterWriter.class, "PortfolioMaster"));
     _masterClassInfos.put("position", new MasterClassInfo(PositionMaster.class, RemotePositionMaster.class, PositionSearchRequest.class, PositionMasterReader.class, PositionMasterWriter.class, "PositionMaster"));
+    _masterClassInfos.put("region", new MasterClassInfo(RegionMaster.class, RemoteRegionMaster.class, RegionSearchRequest.class, RegionMasterReader.class, RegionMasterWriter.class, "RegionMaster"));
     _masterClassInfos.put("security", new MasterClassInfo(SecurityMaster.class, RemoteSecurityMaster.class, SecuritySearchRequest.class, SecurityMasterReader.class, SecurityMasterWriter.class, "SecurityMaster"));
   }
 
