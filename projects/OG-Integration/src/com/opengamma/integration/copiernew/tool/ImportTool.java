@@ -82,14 +82,14 @@ public class ImportTool extends AbstractToolWithoutContext {
 
     Option filenameOption = new Option(
         FILE_NAME_OPT, "filename", true,
-        "The path to the file containing data to export (standard output if not specified)"
+        "The path to the file containing data to import (standard input if not specified)"
     );
     filenameOption.setRequired(false);
     options.addOption(filenameOption);
 
     Option formatOption = new Option(
         FORMAT_OPT, "format", true,
-        "The export format to use (xml, json)"
+        "The import format to use (xml, json)"
     );
     formatOption.setRequired(false);
     options.addOption(formatOption);

@@ -32,6 +32,12 @@ public class ExportTool extends AbstractToolWithoutContext {
   private static final String FILE_NAME_OPT = "f";
   /** Export format option flag */
   private static final String FORMAT_OPT = "t";
+  /** Filter by name option flag */
+  private static final String FILTER_NAME_OPT = "sn";
+  /** Filter by ID scheme option flag */
+  private static final String FILTER_IDSCHEME_OPT = "ss";
+  /** Filter by ID value option flag */
+  private static final String FILTER_IDVALUE_OPT = "sv";
 
   public static void main(String[] args) {
     new ExportTool().initAndRun(args);
@@ -99,6 +105,27 @@ public class ExportTool extends AbstractToolWithoutContext {
     );
     formatOption.setRequired(false);
     options.addOption(formatOption);
+
+    Option filterNameOption = new Option(
+        FILTER_NAME_OPT, "namefilter", true,
+        "Filter the exported data by name (wildcards accepted)"
+    );
+    filterNameOption.setRequired(false);
+    options.addOption(filterNameOption);
+
+    Option filterIdSchemeOption = new Option(
+        FILTER_IDSCHEME_OPT, "idschemefilter", true,
+        "Filter the exported data by ID scheme (wildcards accepted)"
+    );
+    filterIdSchemeOption.setRequired(false);
+    options.addOption(filterIdSchemeOption);
+
+    Option filterIdValueOption = new Option(
+        FILTER_IDVALUE_OPT, "idvaluefilter", true,
+        "Filter the exported data by ID value (wildcards accepted)"
+    );
+    filterIdValueOption.setRequired(false);
+    options.addOption(filterIdValueOption);
 
     return options;
   }
