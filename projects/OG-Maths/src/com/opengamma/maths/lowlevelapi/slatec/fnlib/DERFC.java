@@ -5,8 +5,6 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.DCSEVL;
-import com.opengamma.analytics.math.statistics.distribution.fnlib.INITDS;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionUnderflow;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
