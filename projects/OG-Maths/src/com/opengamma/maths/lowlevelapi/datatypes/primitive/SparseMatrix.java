@@ -278,8 +278,7 @@ public class SparseMatrix implements MatrixPrimitive {
   /**
    * {@inheritDoc}
    */
-  @Override
-  public boolean equals(Object obj) {
+  public boolean equals(SparseMatrix obj) {
     return _type.equals(obj);
   }
 

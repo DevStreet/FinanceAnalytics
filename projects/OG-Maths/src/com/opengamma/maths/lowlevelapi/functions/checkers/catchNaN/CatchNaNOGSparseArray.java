@@ -37,7 +37,7 @@ public final class CatchNaNOGSparseArray extends CatchNaNAbstract<OGSparseArray>
       final int columns = array1.getNumberOfColumns();
       for (int ir = 0; ir < columns; ir++) {
         for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
-          if (data[i] == Double.NaN) {
+          if (Double.isNaN(data[i])) {
             badrow = rowIdx[i];
             badcol = ir;
             break;

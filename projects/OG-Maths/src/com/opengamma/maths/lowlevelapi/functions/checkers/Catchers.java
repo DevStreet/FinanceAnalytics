@@ -798,7 +798,7 @@ public class Catchers {
    * @param aNumber a double
    */
   public static void catchNaN(double aNumber) {
-    if (aNumber == Double.NaN) {
+    if (Double.isNaN(aNumber)) {
       throw new MathsExceptionEncounteredNaN("On double value");
     }
   }
