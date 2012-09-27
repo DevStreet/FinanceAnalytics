@@ -42,7 +42,7 @@ public final class ErfcOGSparseArray extends ErfcAbstract<OGSparseArray> {
 
     for (int ir = 0; ir < columnsArray1; ir++) {
       for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
-        tmp[rowIdx[i] + ir * rowsArray1] = DERFC.getErfc(dataArray1[i]);
+        tmp[rowIdx[i] + ir * rowsArray1] = DERFC.derfc(dataArray1[i]);
       }
     }
 

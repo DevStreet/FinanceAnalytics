@@ -35,7 +35,7 @@ public final class ErfcOGDoubleArray extends ErfcAbstract<OGDoubleArray> {
     //TODO: check what SLATEC impl does with NaN/Inf & deal with underflow issues, exception currently thrown
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = DERFC.getErfc(dataArray1[i]);
+      tmp[i] = DERFC.derfc(dataArray1[i]);
     }
     return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
   }

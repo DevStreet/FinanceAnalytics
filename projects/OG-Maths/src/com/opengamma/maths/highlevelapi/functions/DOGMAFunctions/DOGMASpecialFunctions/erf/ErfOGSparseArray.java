@@ -5,10 +5,10 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erf;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.DERF;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 
 /**
  * Erf on Sparse
@@ -37,7 +37,7 @@ public final class ErfOGSparseArray extends ErfAbstract<OGSparseArray> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = DERF.getErf(dataArray1[i]);
+      tmp[i] = DERF.derf(dataArray1[i]);
     }
 
     return new OGSparseArray(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
