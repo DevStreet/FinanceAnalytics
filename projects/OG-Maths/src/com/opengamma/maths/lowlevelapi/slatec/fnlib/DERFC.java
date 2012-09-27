@@ -167,9 +167,9 @@ public class DERFC {
   private static double s_sqeps;
   static {
     s_eta = 0.1 * D1MACH.three(); // slight variation from F77 SLATEC, comparing using doubles opposed to floats
-    s_nterf = INITDS.getInitds(s_erfcs, 21, s_eta);
-    s_nterfc = INITDS.getInitds(s_erfccs, 59, s_eta);
-    s_nterc2 = INITDS.getInitds(s_erc2cs, 49, s_eta);
+    s_nterf = INITDS.initds(s_erfcs, 21, s_eta);
+    s_nterfc = INITDS.initds(s_erfccs, 59, s_eta);
+    s_nterc2 = INITDS.initds(s_erc2cs, 49, s_eta);
     s_xsml = -Math.sqrt(-Math.log(SQRTPI * D1MACH.three()));
     s_txmax = Math.sqrt(-Math.log(SQRTPI * D1MACH.one()));
     s_xmax = s_txmax - 0.5d * Math.log(s_txmax) / s_txmax - 0.01d;
@@ -181,7 +181,7 @@ public class DERFC {
    * @param x the position at which to evaluate the complimentary error function
    * @return the complimentary error function value at position 'x'
    */
-  public static double getErfc(final double x) {
+  public static double derfc(final double x) {
     double ret = 0;
     if (x <= s_xsml) {
       return 2.d;
@@ -195,15 +195,15 @@ public class DERFC {
         return (1d - 2d * x / SQRTPI);
       }
       if (y >= s_sqeps) {
-        return (1d - x * (1d + DCSEVL.getDCSEVL(2.d * x * x - 1.d, s_erfcs, s_nterf)));
+        return (1d - x * (1d + DCSEVL.dcsevl(2.d * x * x - 1.d, s_erfcs, s_nterf)));
       }
     }
     y = y * y;
     if (y <= 4d) {
-      ret = Math.exp(-y) / Math.abs(x) * (0.5d + DCSEVL.getDCSEVL((8.d / y - 5.d) / 3.d, s_erc2cs, s_nterc2));
+      ret = Math.exp(-y) / Math.abs(x) * (0.5d + DCSEVL.dcsevl((8.d / y - 5.d) / 3.d, s_erc2cs, s_nterc2));
     }
     if (y > 4d) {
-      ret = Math.exp(-y) / Math.abs(x) * (0.5d + DCSEVL.getDCSEVL((8.d / y - 1.d), s_erfccs, s_nterfc));
+      ret = Math.exp(-y) / Math.abs(x) * (0.5d + DCSEVL.dcsevl((8.d / y - 1.d), s_erfccs, s_nterfc));
     }
     if (x < 0d) {
       ret = 2d - ret;

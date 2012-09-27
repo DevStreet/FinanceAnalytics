@@ -18,37 +18,37 @@ public class DCSEVLTest {
 
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
   public void nullTest(){
-    DCSEVL.getDCSEVL(1, null, 5);    
+    DCSEVL.dcsevl(1, null, 5);    
   }
 
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
   public void negTermsTest(){
     double [] cs={1,2,3};
-    DCSEVL.getDCSEVL(1, cs, -1);    
+    DCSEVL.dcsevl(1, cs, -1);    
   }
 
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
   public void tooManyTermsTest(){
     double [] cs={1,2,3};
-    DCSEVL.getDCSEVL(1, cs, 1001);    
+    DCSEVL.dcsevl(1, cs, 1001);    
   }  
 
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
   public void outOfBoundsTest(){
     double [] cs={1,2,3};
-    DCSEVL.getDCSEVL(1.01, cs, 10);    
+    DCSEVL.dcsevl(1.01, cs, 10);    
   }  
   
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
   public void outMoreTermsTheCoeffs(){
     double [] cs={1,2,3};
-    DCSEVL.getDCSEVL(0.9, cs, 10);    
+    DCSEVL.dcsevl(0.9, cs, 10);    
   }    
   
   @Test
   public void checkCall(){
     double [] cs={1,2,3};
-    assertTrue(DCSEVL.getDCSEVL(0.9, cs, 3)==4.16);
+    assertTrue(DCSEVL.dcsevl(0.9, cs, 3)==4.16);
   }    
   
 }

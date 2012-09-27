@@ -9,8 +9,8 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.DERF;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+
 
 /**
  * Tests DERF
@@ -78,7 +78,7 @@ public class DERFTest {
   public void erfTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DERF.getErf(input[i]);
+      ans = DERF.derf(input[i]);
       assertTrue(Math.abs(answer[i] - ans) < 1e-14); // should get within this
     }
   }
@@ -86,11 +86,11 @@ public class DERFTest {
   @Test
   void erfEdgeCasesTest() {
     // 1
-    assertTrue(Math.abs(DERF.getErf(1) - .842700792949715d) < 1e-15);
+    assertTrue(Math.abs(DERF.derf(1) - .842700792949715d) < 1e-15);
     // -1
-    assertTrue(Math.abs(DERF.getErf(-1) + .842700792949715d) < 1e-15);
+    assertTrue(Math.abs(DERF.derf(-1) + .842700792949715d) < 1e-15);
     // 0.5(Machine precision/machine radix)
-    assertTrue(Math.abs(DERF.getErf(D1MACH.three() / 2) - 6.26376265908397e-17) < 1e-16);
+    assertTrue(Math.abs(DERF.derf(D1MACH.three() / 2) - 6.26376265908397e-17) < 1e-16);
   }
 
 }

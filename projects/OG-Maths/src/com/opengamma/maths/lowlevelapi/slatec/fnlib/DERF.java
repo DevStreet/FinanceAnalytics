@@ -46,7 +46,7 @@ public class DERF {
   private static double s_sqeps;
   private static int s_nterf;
   static {
-    s_nterf = INITDS.getInitds(ERFCS, 21, 0.1 * D1MACH.three());
+    s_nterf = INITDS.initds(ERFCS, 21, 0.1 * D1MACH.three());
     s_xbig = Math.sqrt(-Math.log(SQRTPI * D1MACH.three()));
     s_sqeps = Math.sqrt(2.0d * D1MACH.three());
   }
@@ -56,7 +56,7 @@ public class DERF {
    * @param x the position at which to evaluate the error function
    * @return the error function value at position 'x'
    */
-  public static double getErf(final double x) {
+  public static double derf(final double x) {
     double y = Math.abs(x);
     double derf = 0;
     if (y <= 1) {
@@ -64,11 +64,11 @@ public class DERF {
         derf = 2 * x * x / SQRTPI;
       }
       if (y > s_sqeps) {
-        derf = x * (1 + DCSEVL.getDCSEVL(2 * x * x - 1d, ERFCS, s_nterf));
+        derf = x * (1 + DCSEVL.dcsevl(2 * x * x - 1d, ERFCS, s_nterf));
       }
     } else {
       if (y <= s_xbig) {
-        derf = Math.copySign(1 - DERFC.getErfc(y), x);
+        derf = Math.copySign(1 - DERFC.derfc(y), x);
       }
       if (y > s_xbig) {
         derf = Math.copySign(1, x);

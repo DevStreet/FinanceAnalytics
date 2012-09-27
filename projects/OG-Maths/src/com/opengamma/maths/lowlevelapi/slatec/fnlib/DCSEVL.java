@@ -30,7 +30,7 @@ public class DCSEVL {
    * @param n the number of terms in the double[] cs
    * @return the evaluated series
    */
-  public static double getDCSEVL(double x, double[] cs, int n) {
+  public static double dcsevl(double x, double[] cs, int n) {
     if (cs == null) {
       throw new MathsExceptionIllegalArgument("DCSEVL: cs is null");
     }    
