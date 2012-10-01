@@ -66,9 +66,9 @@ public class DLNREL {
     s_dALNRCS[40] = +.17578597841760239233269760000000d - 29;
     s_dALNRCS[41] = -.33410026677731010351377066666666d - 30;
     s_dALNRCS[42] = +.63533936180236187354180266666666d - 31;
-    s_dNLNREL = INITDS.initds(s_dALNRCS, 43, 0.1 * (float) (D1MACH.three()));
+    s_dNLNREL = INITDS.initds(s_dALNRCS, 43, 0.1d * (float) (D1MACH.three()));
     s_dXMIN = -1.0d + Math.sqrt(D1MACH.four());
-    s_log = LoggerFactory.getLogger(D9LGMC.class);
+    s_log = LoggerFactory.getLogger(DLNREL.class);
   }
 
   public static double dlnrel(double x) {
@@ -80,9 +80,9 @@ public class DLNREL {
     }
 
     if (Math.abs(x) <= 0.375d) {
-      DLNREL = x * (1.D - x * DCSEVL.dcsevl(x / .375d, s_dALNRCS, s_dNLNREL));
+      DLNREL = x * (1.d - x * DCSEVL.dcsevl(x / 0.375d, s_dALNRCS, s_dNLNREL));
     } else {
-      DLNREL = Math.log(1.0D + x);
+      DLNREL = Math.log(1.d + x);
     }
     return DLNREL;
 
