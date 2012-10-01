@@ -103,7 +103,7 @@ public class DBINOMTest {
         exponent=Math.max(0,(int)Math.log10(DBINOM.dbinom(i, j)));
         if(exponent>14)
         {
-          exponent-=12;
+          exponent-=2;
         }       
         assertTrue(Math.abs(DBINOM.dbinom(i, j)-rangeTestAnswer[ptr])<=Math.pow(10,exponent));
         ptr++;
