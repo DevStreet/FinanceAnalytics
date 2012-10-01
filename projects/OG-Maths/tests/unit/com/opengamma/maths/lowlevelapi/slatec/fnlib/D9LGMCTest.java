@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
  * Tests D9LGMC from SLATEC
@@ -21,7 +22,7 @@ public class D9LGMCTest {
   private static double[] answer = new double[] {8.33056343336287079E-003, 8.33330555634914779E-004, 8.33333305555563529E-005, 8.33333333055555525E-006, 8.33333333330555698E-007,
       8.33333333333305723E-008, 8.33333333333333185E-009, 8.33333333333333351E-010, 8.33333333333333299E-011 };
 
-  private double fp_limit = 1e-7; // routine casts to float() so we can only assume the answer is correct to the safe cast level
+  private double fp_limit = D1MACH.four();
 
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void invalidInputTest() {

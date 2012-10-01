@@ -9,6 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+
 /**
  * Tests DLNREL
  */
@@ -20,18 +23,21 @@ public class DLNRELTest {
       -5.12932943875505226e-002, 0.0000000000000000, 4.87901641694319932e-002, 9.53101798043248377e-002, 0.13976194237515871, 0.18232155679395470, 0.22314355131420976, 0.26236426446749106,
       0.30010459245033805, 0.33647223662121289 };
 
-  private static double fp_limit = 1e-7; 
+  private static double fp_limit = D1MACH.four(); 
   
-  @Test
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void badInputTest() {
-
+    DLNREL.dlnrel(-1.1);
   }
 
+  @Test
+  public void deliberateUnderflowTest() {
+    DLNREL.dlnrel(-1+D1MACH.four());
+  }  
   
   @Test
   public void numberRangeTest() {
     for (int i = 0; i < x.length; i++) {
-      System.out.println("answer="+answer[i]+" . DLNREL.dlnrel(x[i])"+DLNREL.dlnrel(x[i]));
       assertTrue(Math.abs(DLNREL.dlnrel(x[i]) - answer[i]) < fp_limit);
     }
   }
