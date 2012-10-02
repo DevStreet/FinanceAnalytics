@@ -7,7 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMa
 
 import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
