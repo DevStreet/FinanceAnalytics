@@ -49,8 +49,10 @@ public class HolidayMasterWriter implements Writeable<ManageableHoliday> {
     }
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
     searchReq.setSortOrder(HolidaySearchSortOrder.VERSION_FROM_INSTANT_DESC);
-    ExternalIdSearch regionIdSearch = new ExternalIdSearch(holiday.getRegionExternalId());  // match any one of the IDs
-    searchReq.setRegionExternalIdSearch(regionIdSearch);
+    if (holiday.getRegionExternalId() != null) {
+      ExternalIdSearch regionIdSearch = new ExternalIdSearch(holiday.getRegionExternalId());  // match any one of the IDs
+      searchReq.setRegionExternalIdSearch(regionIdSearch);
+    }
     HolidaySearchResult searchResult = _holidayMaster.search(searchReq);
 
     if (searchResult.getDocuments().size() == 1) {
