@@ -6,6 +6,8 @@
 package com.opengamma.integration.copiernew.external;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.id.UniqueId;
+import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.integration.copiernew.Writeable;
 
 import com.opengamma.util.ArgumentChecker;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 
 public class StreamWriter<T> implements Writeable<T> {
 
@@ -60,6 +63,11 @@ public class StreamWriter<T> implements Writeable<T> {
 
   @Override
   public void addOrUpdate(T datum) {
+    try {
+      datum.getClass().getMethod("setUniqueId", UniqueId.class).invoke(datum, new Object[] {null});
+    } catch (Exception e) {
+      // do nothing
+    }
     try {
       _objectOutputStream.writeObject(datum);
     } catch (IOException e) {
