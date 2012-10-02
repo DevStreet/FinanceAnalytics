@@ -26,7 +26,11 @@ public class PositionMasterReader implements Iterable<ManageablePosition> {
 
   private PositionMaster _positionMaster;
   private PositionSearchRequest _positionSearchRequestTemplate;
-  
+
+  public PositionMasterReader(PositionMaster positionMaster) {
+    this(positionMaster, null);
+  }
+
   public PositionMasterReader(PositionMaster positionMaster, PositionSearchRequest positionSearchRequest) {
     this(positionMaster, positionSearchRequest, PagingRequest.DEFAULT_PAGING_SIZE);
   }
