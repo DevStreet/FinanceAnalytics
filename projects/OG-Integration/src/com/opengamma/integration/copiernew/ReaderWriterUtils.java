@@ -25,28 +25,36 @@ import com.opengamma.integration.copiernew.security.SecurityMasterWriter;
 import com.opengamma.master.AbstractSearchRequest;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
+import com.opengamma.master.config.impl.InMemoryConfigMaster;
 import com.opengamma.master.config.impl.RemoteConfigMaster;
 import com.opengamma.master.exchange.ExchangeMaster;
 import com.opengamma.master.exchange.ExchangeSearchRequest;
+import com.opengamma.master.exchange.impl.InMemoryExchangeMaster;
 import com.opengamma.master.exchange.impl.RemoteExchangeMaster;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchRequest;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
+import com.opengamma.master.historicaltimeseries.impl.InMemoryHistoricalTimeSeriesMaster;
 import com.opengamma.master.historicaltimeseries.impl.RemoteHistoricalTimeSeriesMaster;
 import com.opengamma.master.holiday.HolidayMaster;
 import com.opengamma.master.holiday.HolidaySearchRequest;
+import com.opengamma.master.holiday.impl.InMemoryHolidayMaster;
 import com.opengamma.master.holiday.impl.RemoteHolidayMaster;
 import com.opengamma.master.impl.AbstractRemoteMaster;
 import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.portfolio.PortfolioSearchRequest;
+import com.opengamma.master.portfolio.impl.InMemoryPortfolioMaster;
 import com.opengamma.master.portfolio.impl.RemotePortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.position.PositionSearchRequest;
+import com.opengamma.master.position.impl.InMemoryPositionMaster;
 import com.opengamma.master.position.impl.RemotePositionMaster;
 import com.opengamma.master.region.RegionMaster;
 import com.opengamma.master.region.RegionSearchRequest;
+import com.opengamma.master.region.impl.InMemoryRegionMaster;
 import com.opengamma.master.region.impl.RemoteRegionMaster;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.SecuritySearchRequest;
+import com.opengamma.master.security.impl.InMemorySecurityMaster;
 import com.opengamma.master.security.impl.RemoteSecurityMaster;
 import com.opengamma.util.paging.PagingRequest;
 
@@ -59,18 +67,75 @@ public final class ReaderWriterUtils {
   private static Map<String, MasterClassInfo> _masterClassInfos = new HashMap<String, MasterClassInfo>();
 
   static {
-    _masterClassInfos.put("config", new MasterClassInfo(ConfigMaster.class, RemoteConfigMaster.class, ConfigSearchRequest.class, ConfigMasterReader.class, ConfigMasterWriter.class, "ConfigMaster"));
-    _masterClassInfos.put("exchange", new MasterClassInfo(ExchangeMaster.class, RemoteExchangeMaster.class, ExchangeSearchRequest.class, ExchangeMasterReader.class, ExchangeMasterWriter.class, "ExchangeMaster"));
-    _masterClassInfos.put("historicaltimeseries", new MasterClassInfo(HistoricalTimeSeriesMaster.class, RemoteHistoricalTimeSeriesMaster.class, HistoricalTimeSeriesInfoSearchRequest.class, HistoricalTimeSeriesMasterReader.class, HistoricalTimeSeriesMasterWriter.class, "HistoricalTimeSeriesMaster"));
-    _masterClassInfos.put("holiday", new MasterClassInfo(HolidayMaster.class, RemoteHolidayMaster.class, HolidaySearchRequest.class, HolidayMasterReader.class, HolidayMasterWriter.class, "HolidayMaster"));
-    _masterClassInfos.put("portfolio", new MasterClassInfo(PortfolioMaster.class, RemotePortfolioMaster.class, PortfolioSearchRequest.class, PortfolioMasterReader.class, PortfolioMasterWriter.class, "PortfolioMaster"));
-    _masterClassInfos.put("position", new MasterClassInfo(PositionMaster.class, RemotePositionMaster.class, PositionSearchRequest.class, PositionMasterReader.class, PositionMasterWriter.class, "PositionMaster"));
-    _masterClassInfos.put("region", new MasterClassInfo(RegionMaster.class, RemoteRegionMaster.class, RegionSearchRequest.class, RegionMasterReader.class, RegionMasterWriter.class, "RegionMaster"));
-    _masterClassInfos.put("security", new MasterClassInfo(SecurityMaster.class, RemoteSecurityMaster.class, SecuritySearchRequest.class, SecurityMasterReader.class, SecurityMasterWriter.class, "SecurityMaster"));
+    _masterClassInfos.put("config", new MasterClassInfo(
+        ConfigMaster.class,
+        InMemoryConfigMaster.class,
+        RemoteConfigMaster.class,
+        ConfigSearchRequest.class,
+        ConfigMasterReader.class,
+        ConfigMasterWriter.class,
+        "ConfigMaster"));
+    _masterClassInfos.put("exchange", new MasterClassInfo(
+        ExchangeMaster.class,
+        InMemoryExchangeMaster.class,
+        RemoteExchangeMaster.class,
+        ExchangeSearchRequest.class,
+        ExchangeMasterReader.class,
+        ExchangeMasterWriter.class,
+        "ExchangeMaster"));
+    _masterClassInfos.put("historicaltimeseries", new MasterClassInfo(
+        HistoricalTimeSeriesMaster.class,
+        InMemoryHistoricalTimeSeriesMaster.class,
+        RemoteHistoricalTimeSeriesMaster.class,
+        HistoricalTimeSeriesInfoSearchRequest.class,
+        HistoricalTimeSeriesMasterReader.class,
+        HistoricalTimeSeriesMasterWriter.class,
+        "HistoricalTimeSeriesMaster"));
+    _masterClassInfos.put("holiday", new MasterClassInfo(
+        HolidayMaster.class,
+        InMemoryHolidayMaster.class,
+        RemoteHolidayMaster.class,
+        HolidaySearchRequest.class,
+        HolidayMasterReader.class,
+        HolidayMasterWriter.class,
+        "HolidayMaster"));
+    _masterClassInfos.put("portfolio", new MasterClassInfo(
+        PortfolioMaster.class,
+        InMemoryPortfolioMaster.class,
+        RemotePortfolioMaster.class,
+        PortfolioSearchRequest.class,
+        PortfolioMasterReader.class,
+        PortfolioMasterWriter.class,
+        "PortfolioMaster"));
+    _masterClassInfos.put("position", new MasterClassInfo(
+        PositionMaster.class,
+        InMemoryPositionMaster.class,
+        RemotePositionMaster.class,
+        PositionSearchRequest.class,
+        PositionMasterReader.class,
+        PositionMasterWriter.class,
+        "PositionMaster"));
+    _masterClassInfos.put("region", new MasterClassInfo(
+        RegionMaster.class,
+        InMemoryRegionMaster.class,
+        RemoteRegionMaster.class,
+        RegionSearchRequest.class,
+        RegionMasterReader.class,
+        RegionMasterWriter.class,
+        "RegionMaster"));
+    _masterClassInfos.put("security", new MasterClassInfo(
+        SecurityMaster.class,
+        InMemorySecurityMaster.class,
+        RemoteSecurityMaster.class,
+        SecuritySearchRequest.class,
+        SecurityMasterReader.class,
+        SecurityMasterWriter.class,
+        "SecurityMaster"));
   }
 
   public static class MasterClassInfo {
     private Class<?> _masterClass; // extends AbstractMaster not possible as ConfigMaster is not an AbstractMaster (!?)
+    private Class<?> _inMemoryMasterClass;
     private Class<? extends AbstractRemoteMaster> _remoteMasterClass;
     private Class<? extends AbstractSearchRequest> _searchRequestClass;
     private Class<? extends Iterable> _readerClass;
@@ -78,12 +143,14 @@ public final class ReaderWriterUtils {
     private String _uriSuffix;
 
     private MasterClassInfo(Class<?> masterClass,
+                            Class<?> inMemoryMasterClass,
                             Class<? extends AbstractRemoteMaster> remoteMasterClass,
                             Class<? extends AbstractSearchRequest> searchRequestClass,
                             Class<? extends Iterable> readerClass,
                             Class<? extends Writeable> writerClass,
                             String uriSuffix) {
       _masterClass = masterClass;
+      _inMemoryMasterClass = inMemoryMasterClass;
       _remoteMasterClass = remoteMasterClass;
       _searchRequestClass = searchRequestClass;
       _readerClass = readerClass;
@@ -93,6 +160,10 @@ public final class ReaderWriterUtils {
 
     public Class<?> getMasterClass() {
       return _masterClass;
+    }
+
+    public Class<?> getInMemoryMasterClass() {
+      return _inMemoryMasterClass;
     }
 
     public Class<? extends AbstractRemoteMaster> getRemoteMasterClass() {
@@ -114,6 +185,7 @@ public final class ReaderWriterUtils {
     public String getUriSuffix() {
       return _uriSuffix;
     }
+
   }
 
   public static Map<String,MasterClassInfo> getMasterClassInfos() {
