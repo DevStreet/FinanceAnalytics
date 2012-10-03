@@ -25,30 +25,6 @@ public class SvdSimpleTest {
   private static double[] s_data=new double[] {1,4,7,10,2,5,8,11,3,6,9,12};
   private static OGDoubleArray A = new OGDoubleArray(s_data, m, n);
   
-  static {
-  System.setProperty( "java.library.path", "/usr/local/lib/" );
-
-  Field fieldSysPath = null;
-  try {
-    fieldSysPath = ClassLoader.class.getDeclaredField( "sys_paths" );
-  } catch (NoSuchFieldException ex) {
-    // TODO Auto-generated catch block
-    ex.printStackTrace();
-  } catch (SecurityException ex) {
-    // TODO Auto-generated catch block
-    ex.printStackTrace();
-  }
-  fieldSysPath.setAccessible( true );
-  try {
-    fieldSysPath.set( null, null );
-  } catch (IllegalArgumentException ex) {
-    // TODO Auto-generated catch block
-    ex.printStackTrace();
-  } catch (IllegalAccessException ex) {
-    // TODO Auto-generated catch block
-    ex.printStackTrace();
-  }
-  }
   Svd mySVD = new Svd();
   
   @Test
