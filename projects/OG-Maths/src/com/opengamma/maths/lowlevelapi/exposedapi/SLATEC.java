@@ -22,11 +22,11 @@ public class SLATEC implements SLATECAPIInterface {
    */
   public enum backing {
     /**
-     * OG Java backed BLAS
+     * OG Java backed SLATEC
      */
     OGjava,
     /**
-     * OG Native backed BLAS
+     * OG Native backed SLATEC
      */
     OGnative
   }
