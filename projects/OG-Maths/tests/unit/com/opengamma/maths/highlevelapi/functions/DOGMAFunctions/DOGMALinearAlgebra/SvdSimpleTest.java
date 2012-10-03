@@ -5,15 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra;
 
-import java.lang.reflect.Field;
-
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.Rosser;
 
 /**
  * Simple svd test
