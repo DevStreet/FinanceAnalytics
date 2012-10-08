@@ -54,7 +54,7 @@ public class DOGMALinearAlgebra implements DOGMALinearAlgebraAPI {
 
     // test V
     if (required == compute.V || required == compute.UV || required == compute.SV || required == compute.USV) {
-      OGArraySuper<Number> tmp = result.getVT();
+      OGArraySuper<Number> tmp = result.getV();
       if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
         Catchers.catchNaN(tmp);
       }
