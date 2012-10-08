@@ -7,6 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlg
 
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 
@@ -24,6 +25,7 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
   }
 
   private LAPACK _localLAPACK = new LAPACK();
+  private TransposeOGDoubleArray transpose = TransposeOGDoubleArray.getInstance();
 
   @Override
   public OGSvdResult svd(OGDoubleArray array1, compute these) {
@@ -42,7 +44,7 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
     OGSvdResult result = null;
     OGDoubleArray resultU = null;
     OGDoubleArray resultS = null;
-    OGDoubleArray resultVT = null;
+    OGDoubleArray resultV = null;
     switch (these) {
       case U:
         break;
@@ -78,8 +80,10 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
           stmp[i * (m + 1)] = S[i];
         }
         resultS = new OGDoubleArray(stmp, m, n);
-        resultVT = new OGDoubleArray(VT, n, n);
-        result = new OGSvdResult(resultU, resultS, resultVT);
+        // rather inefficient but necessary evil for the minute
+        // TODO: in place transpose of column major array 
+        resultV = (OGDoubleArray) transpose.transpose(new OGDoubleArray(VT, n, n));
+        result = new OGSvdResult(resultU, resultS, resultV);
         break;
     }
 

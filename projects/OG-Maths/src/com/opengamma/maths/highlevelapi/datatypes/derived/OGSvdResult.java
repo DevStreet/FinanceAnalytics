@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.datatypes.derived;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotRequested;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd;
 
@@ -15,18 +16,18 @@ public class OGSvdResult {
 
   private OGDoubleArray _U; //CSIGNORE
   private OGDoubleArray _S; //CSIGNORE
-  private OGDoubleArray _VT; //CSIGNORE
+  private OGDoubleArray _V; //CSIGNORE
 
-/**
- * Constructs an SVD result, data is not copied just repointed as results are assumed to come from somewhere sane like {@link Svd}
- * @param U
- * @param S
- * @param VT
- */
-  public OGSvdResult(OGDoubleArray U, OGDoubleArray S, OGDoubleArray VT) { //CSIGNORE
+  /**
+   * Constructs an SVD result, data is not copied just repointed as results are assumed to come from somewhere sane like {@link Svd}
+   * @param U
+   * @param S
+   * @param V
+   */
+  public OGSvdResult(OGDoubleArray U, OGDoubleArray S, OGDoubleArray V) { //CSIGNORE
     _U = U;
     _S = S;
-    _VT = VT;
+    _V = V;
   }
 
   /**
@@ -34,6 +35,9 @@ public class OGSvdResult {
    * @return the matrix U.
    */
   public OGDoubleArray getU() {
+    if (_U == null) {
+      throw new MathsExceptionNotRequested("The matrix U was not requested to be computed at execution time.");
+    }
     return _U;
   }
 
@@ -42,15 +46,21 @@ public class OGSvdResult {
    * @return the matrix S
    */
   public OGDoubleArray getS() {
+    if (_S == null) {
+      throw new MathsExceptionNotRequested("The matrix S was not requested to be computed at execution time.");
+    }
     return _S;
   }
 
   /**
-   * Gets the matrix VT.
-   * @return the matrix VT
+   * Gets the matrix V.
+   * @return the matrix V
    */
-  public OGDoubleArray getVT() {
-    return _VT;
+  public OGDoubleArray getV() {
+    if (_V == null) {
+      throw new MathsExceptionNotRequested("The matrix V was not requested to be computed at execution time.");
+    }    
+    return _V;
   }
 
 }
