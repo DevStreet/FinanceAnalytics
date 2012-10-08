@@ -6,18 +6,22 @@
 package com.opengamma.maths.highlevelapi.functions;
 
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSortResult;
+import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAArithmetic;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAExponentsAndLogarithms;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMALinearAlgebra;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMARearrangingMatrices;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMASparseUtilities;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMASpecialFunctions;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMATrigonometry;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAUtilityFunctions;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAExponentsAndLogarithmsAPI;
+import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMALinearAlgebraAPI;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMARearrangingMatricesAPI;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMASparseUtilitiesAPI;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMASpecialFunctionsAPI;
@@ -28,7 +32,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAUtilityFu
  * The DOGMA language. The entry point for using all DOGMA functions from one place!
  */
 public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI, DOGMARearrangingMatricesAPI, DOGMASparseUtilitiesAPI, DOGMASpecialFunctionsAPI, DOGMATrigonometaryAPI,
-    DOGMAUtilityFunctionsAPI {
+    DOGMAUtilityFunctionsAPI, DOGMALinearAlgebraAPI {
   // impl blobs
   private static final DOGMAArithmetic DA = new DOGMAArithmetic();
   private static final DOGMAExponentsAndLogarithmsAPI DEAL = new DOGMAExponentsAndLogarithms();
@@ -37,6 +41,7 @@ public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI
   private static final DOGMASpecialFunctions DSF = new DOGMASpecialFunctions();
   private static final DOGMATrigonometry DT = new DOGMATrigonometry();
   private static final DOGMAUtilityFunctions DUF = new DOGMAUtilityFunctions();
+  private static final DOGMALinearAlgebra DLA = new DOGMALinearAlgebra();
 
   // From Arithmetic...
   @Override
@@ -379,5 +384,11 @@ public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI
   @Override
   public OGArraySuper<Number> dot(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
     return DUF.dot(array1, array2);
+  }
+
+  // the linear algebra functions api
+  @Override
+  public OGSvdResult svd(OGArraySuper<Number> array1, compute required) {
+    return DLA.svd(array1, required);
   }
 }
