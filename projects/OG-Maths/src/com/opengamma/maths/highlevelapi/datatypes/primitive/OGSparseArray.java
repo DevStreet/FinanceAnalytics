@@ -115,6 +115,8 @@ public class OGSparseArray extends OGArraySuper<Number> {
     _rows = rows;
     //TODO: Check columns == colPtr.length - 1
     _cols = columns;
+
+    _els = rows * columns;
   }
 
   public double[] getFullColumn(int index) {
@@ -193,12 +195,7 @@ public class OGSparseArray extends OGArraySuper<Number> {
 
   @Override
   public String toString() {
-    return "\nvalues=" + Arrays.toString(_values) +
-        "\nrowInd=" + Arrays.toString(_rowIdx) +
-        "\ncolPtr=" + Arrays.toString(_colPtr) +
-        "\ncols=" + _rows+
-        "\nrows=" + _cols+
-        "\nels=" + _els;
+    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _rows + "\nrows=" + _cols + "\nels=" + _els;
 
   }
 
