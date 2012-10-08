@@ -13,6 +13,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Rdivide;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Transpose;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -26,6 +27,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final Times _times = new Times();
   private Rdivide _rdivide = new Rdivide();
   private Mtimes _mtimes = new Mtimes();
+  private Transpose _transpose = new Transpose();
 
   /* ADD */
   @Override
@@ -254,7 +256,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   /* TRANSPOSE */
   @Override
   public OGArraySuper<Number> transpose(OGArraySuper<Number> array) {
-    throw new MathsExceptionNotImplemented("transpose not implemented yet");
+    return _transpose.transpose(array);
   }
 
 }
