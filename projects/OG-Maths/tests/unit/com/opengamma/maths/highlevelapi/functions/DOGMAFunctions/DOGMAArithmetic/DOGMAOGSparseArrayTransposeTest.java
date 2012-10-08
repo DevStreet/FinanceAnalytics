@@ -38,7 +38,6 @@ public class DOGMAOGSparseArrayTransposeTest {
   @Test
   public void testTranspose() {
     DA.transpose(array1);
-    System.out.println("SHOULD BE:" + array1transposed.toString());
     assertTrue(array1transposed.equals(DA.transpose(array1)));
   }
 
