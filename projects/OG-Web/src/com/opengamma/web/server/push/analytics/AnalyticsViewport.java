@@ -16,10 +16,10 @@ import com.opengamma.util.ArgumentChecker;
  */
 /* package */ abstract class AnalyticsViewport {
 
+  /** The ID that is sent to the client to notify it that the viewport's data has been updated. */
   protected final String _callbackId;
-
   /** Defines the extent of the viewport. */
-  protected ViewportSpecification _viewportSpec;
+  protected ViewportDefinition _viewportDefinition;
   /** The current viewport data. */
   protected ViewportResults _latestResults;
   /**
@@ -46,7 +46,6 @@ import com.opengamma.util.ArgumentChecker;
   /* package */ ViewportResults getData() {
     return _latestResults;
   }
-
 
   /**
    * @return The ID that is sent to the client to notify it that the viewport's data has been updated.

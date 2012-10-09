@@ -19,16 +19,16 @@ import com.opengamma.analytics.financial.instrument.index.IndexPrice;
 import com.opengamma.analytics.financial.instrument.inflation.CouponInflationZeroCouponInterpolationDefinition;
 import com.opengamma.analytics.financial.interestrate.PresentValueInflationCalculator;
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolation;
-import com.opengamma.analytics.financial.interestrate.market.MarketDiscountBundle;
-import com.opengamma.analytics.financial.interestrate.market.MarketDataSets;
-import com.opengamma.analytics.financial.interestrate.market.PresentValueCurveSensitivityMarket;
+import com.opengamma.analytics.financial.interestrate.market.MarketDiscountDataSets;
+import com.opengamma.analytics.financial.interestrate.market.description.CurveSensitivityMarket;
+import com.opengamma.analytics.financial.interestrate.market.description.MarketDiscountBundle;
 import com.opengamma.analytics.financial.interestrate.method.market.SensitivityFiniteDifferenceMarket;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.math.differentiation.FiniteDifferenceType;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
 import com.opengamma.financial.convention.calendar.Calendar;
-import com.opengamma.util.money.CurrencyAmount;
+import com.opengamma.util.money.MultipleCurrencyAmount;
 import com.opengamma.util.time.DateUtils;
 import com.opengamma.util.tuple.DoublesPair;
 
@@ -37,12 +37,12 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 public class CouponInflationZeroCouponInterpolationDiscountingMethodTest {
 
-  private static final MarketDiscountBundle MARKET = MarketDataSets.createMarket1();
-  private static final IndexPrice[] PRICE_INDEXES = MarketDataSets.getPriceIndexes();
+  private static final MarketDiscountBundle MARKET = MarketDiscountDataSets.createMarket1();
+  private static final IndexPrice[] PRICE_INDEXES = MarketDiscountDataSets.getPriceIndexes();
   private static final IndexPrice PRICE_INDEX_EUR = PRICE_INDEXES[0];
   //  private static final PriceIndex PRICE_INDEX_UK = PRICE_INDEXES[1];
   private static final IndexPrice PRICE_INDEX_US = PRICE_INDEXES[2];
-  private static final IborIndex[] IBOR_INDEXES = MarketDataSets.getIborIndexes();
+  private static final IborIndex[] IBOR_INDEXES = MarketDiscountDataSets.getIndexesIbor();
   private static final IborIndex EURIBOR3M = IBOR_INDEXES[0];
   //  private static final IborIndex EURIBOR6M = IBOR_INDEXES[1];
   private static final IborIndex USDLIBOR3M = IBOR_INDEXES[2];
@@ -67,13 +67,13 @@ public class CouponInflationZeroCouponInterpolationDiscountingMethodTest {
    * Tests the present value.
    */
   public void presentValue() {
-    CurrencyAmount pv = METHOD.presentValue(ZERO_COUPON_1, MARKET);
+    MultipleCurrencyAmount pv = METHOD.presentValue(ZERO_COUPON_1, MARKET);
     double df = MARKET.getCurve(ZERO_COUPON_1.getCurrency()).getDiscountFactor(ZERO_COUPON_1.getPaymentTime());
     double indexMonth0 = MARKET.getCurve(PRICE_INDEX_EUR).getPriceIndex(ZERO_COUPON_1.getReferenceEndTime()[0]);
     double indexMonth1 = MARKET.getCurve(PRICE_INDEX_EUR).getPriceIndex(ZERO_COUPON_1.getReferenceEndTime()[1]);
     double finalIndex = ZERO_COUPON_1_DEFINITION.getWeight() * indexMonth0 + (1 - ZERO_COUPON_1_DEFINITION.getWeight()) * indexMonth1;
     double pvExpected = (finalIndex / INDEX_MAY_2008_INT - 1) * df * NOTIONAL;
-    assertEquals("Zero-coupon inflation: Present value", pvExpected, pv.getAmount(), 1.0E-2);
+    assertEquals("Zero-coupon inflation: Present value", pvExpected, pv.getAmount(ZERO_COUPON_1.getCurrency()), 1.0E-2);
   }
 
   @Test
@@ -81,8 +81,8 @@ public class CouponInflationZeroCouponInterpolationDiscountingMethodTest {
    * Tests the present value: Method vs Calculator.
    */
   public void presentValueMethodVsCalculator() {
-    CurrencyAmount pvMethod = METHOD.presentValue(ZERO_COUPON_1, MARKET);
-    CurrencyAmount pvCalculator = PVIC.visit(ZERO_COUPON_1, MARKET);
+    MultipleCurrencyAmount pvMethod = METHOD.presentValue(ZERO_COUPON_1, MARKET);
+    MultipleCurrencyAmount pvCalculator = PVIC.visit(ZERO_COUPON_1, MARKET);
     assertEquals("Zero-coupon inflation: Present value", pvMethod, pvCalculator);
   }
 
@@ -91,7 +91,7 @@ public class CouponInflationZeroCouponInterpolationDiscountingMethodTest {
    * Test the present value curves sensitivity.
    */
   public void presentValueCurveSensitivity() {
-    final PresentValueCurveSensitivityMarket pvs = METHOD.presentValueCurveSensitivity(ZERO_COUPON_1, MARKET);
+    final CurveSensitivityMarket pvs = METHOD.presentValueCurveSensitivity(ZERO_COUPON_1, MARKET);
     pvs.cleaned();
     final double deltaTolerancePrice = 1.0E+1;
     //Testing note: Sensitivity is for a movement of 1. 1E+2 = 1 cent for a 1 bp move. Tolerance increased to cope with numerical imprecision of finite difference.
@@ -124,7 +124,7 @@ public class CouponInflationZeroCouponInterpolationDiscountingMethodTest {
    * Tests the present value for curves with seasonal adjustment.
    */
   public void presentValueSeasonality() {
-    MarketDiscountBundle marketSeason = MarketDataSets.createMarket2(PRICING_DATE);
+    MarketDiscountBundle marketSeason = MarketDiscountDataSets.createMarket2(PRICING_DATE);
     int tenorYear = 5;
     double notional = 100000000;
     ZonedDateTime settleDate = ScheduleCalculator.getAdjustedDate(PRICING_DATE, USDLIBOR3M.getSpotLag(), CALENDAR_USD);
@@ -134,12 +134,12 @@ public class CouponInflationZeroCouponInterpolationDiscountingMethodTest {
     CouponInflationZeroCouponInterpolationDefinition zeroCouponUsdDefinition = CouponInflationZeroCouponInterpolationDefinition.from(settleDate, paymentDate, notional, PRICE_INDEX_US, indexStart,
         MONTH_LAG, false);
     CouponInflationZeroCouponInterpolation zeroCouponUsd = zeroCouponUsdDefinition.toDerivative(PRICING_DATE, "not used");
-    CurrencyAmount pvInflation = METHOD.presentValue(zeroCouponUsd, marketSeason);
+    MultipleCurrencyAmount pvInflation = METHOD.presentValue(zeroCouponUsd, marketSeason);
     double df = MARKET.getCurve(zeroCouponUsd.getCurrency()).getDiscountFactor(zeroCouponUsd.getPaymentTime());
     double indexMonth0 = marketSeason.getCurve(PRICE_INDEX_US).getPriceIndex(zeroCouponUsd.getReferenceEndTime()[0]);
     double indexMonth1 = marketSeason.getCurve(PRICE_INDEX_US).getPriceIndex(zeroCouponUsd.getReferenceEndTime()[1]);
     double finalIndex = zeroCouponUsdDefinition.getWeight() * indexMonth0 + (1 - zeroCouponUsdDefinition.getWeight()) * indexMonth1;
     double pvExpected = (finalIndex / indexStart - 1) * df * notional;
-    assertEquals("PV in market with seasonal adjustment", pvExpected, pvInflation.getAmount(), 1E-2);
+    assertEquals("PV in market with seasonal adjustment", pvExpected, pvInflation.getAmount(zeroCouponUsd.getCurrency()), 1E-2);
   }
 }

@@ -30,11 +30,14 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <jar basedir="." includes="web-*/**" destfile="${project.build.directory}/og-web-resources.jar" />
-                <jar update="true" basedir="config" destfile="${project.build.directory}/og-web-resources.jar" />
+                <jar basedir="config" destfile="${project.build.directory}/og-web-resources.jar" />
                 <attachartifact file="${project.build.directory}/og-web-resources.jar" classifier="resources" type="jar" />
                 <zip basedir="web-engine" destfile="${project.build.directory}/web-engine.zip" />
                 <attachartifact file="${project.build.directory}/web-engine.zip" classifier="web-engine" type="zip" />
+                <zip basedir="web-sharedmasters" destfile="${project.build.directory}/web-sharedmasters.zip" />
+                <attachartifact file="${project.build.directory}/web-sharedmasters.zip" classifier="web-sharedmasters" type="zip" />
+                <zip basedir="web-marketdata" destfile="${project.build.directory}/web-marketdata.zip" />
+                <attachartifact file="${project.build.directory}/web-marketdata.zip" classifier="web-marketdata" type="zip" />
               </target>
             </configuration>
             <goals>
@@ -81,9 +84,5 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <properties>
-    <og-platform.basedir>${project.parent.basedir}/../..</og-platform.basedir>
-  </properties>
 
 </project>

@@ -31,7 +31,7 @@ import com.opengamma.analytics.financial.curve.building.CurveBuildingBlockBundle
 import com.opengamma.analytics.financial.curve.building.MultipleYieldCurveFinderGeneratorDataBundle;
 import com.opengamma.analytics.financial.curve.building.MultipleYieldCurveFinderGeneratorFunction;
 import com.opengamma.analytics.financial.curve.building.MultipleYieldCurveFinderGeneratorJacobian;
-import com.opengamma.analytics.financial.curve.generator.GeneratorCurve;
+import com.opengamma.analytics.financial.curve.generator.GeneratorYDCurve;
 import com.opengamma.analytics.financial.curve.generator.GeneratorCurveYieldInterpolated;
 import com.opengamma.analytics.financial.curve.sensitivity.ParameterSensitivity;
 import com.opengamma.analytics.financial.curve.sensitivity.ParameterSensitivityBlockCalculator;
@@ -44,15 +44,15 @@ import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefi
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDeposit;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
-import com.opengamma.analytics.financial.instrument.index.GeneratorFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorForexSwap;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapXCcyIborIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
+import com.opengamma.analytics.financial.instrument.index.IndexIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
-import com.opengamma.analytics.financial.instrument.index.generator.GeneratorSwapTestsMaster;
-import com.opengamma.analytics.financial.instrument.index.iborindex.IndexIborTestsMaster;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedONDefinition;
 import com.opengamma.analytics.financial.instrument.swap.SwapIborIborDefinition;
@@ -122,20 +122,20 @@ public class CurveConstructionXCcyTest {
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_1 = new GeneratorDepositON("USD Deposit ON", CCY_USD, CALENDAR, DAY_COUNT_CASH);
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_2 = new GeneratorDepositON("EUR Deposit ON", CCY_EUR, CALENDAR, DAY_COUNT_CASH);
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_3 = new GeneratorDepositON("JPY Deposit ON", CCY_JPY, CALENDAR, DAY_COUNT_CASH_3);
-  private static final GeneratorFixedON GENERATOR_OIS_1 = new GeneratorFixedON("USD1YFEDFUND", INDEX_ON_1, Period.ofMonths(12), DAY_COUNT_CASH, BDC, true, SPOT_LAG, SPOT_LAG);
+  private static final GeneratorSwapFixedON GENERATOR_OIS_1 = new GeneratorSwapFixedON("USD1YFEDFUND", INDEX_ON_1, Period.ofMonths(12), DAY_COUNT_CASH, BDC, true, SPOT_LAG, SPOT_LAG);
   private static final GeneratorForexSwap GENERATOR_FX_EURUSD = new GeneratorForexSwap("EURUSD", CCY_EUR, CCY_USD, CALENDAR, SPOT_LAG, BDC, true);
   private static final GeneratorForexSwap GENERATOR_FX_USDJPY = new GeneratorForexSwap("USDJPY", CCY_USD, CCY_JPY, CALENDAR, SPOT_LAG, BDC, true);
   private static final GeneratorDeposit GENERATOR_DEPOSIT_USD = new GeneratorDeposit("USD Deposit", CCY_USD, CALENDAR, SPOT_LAG, DAY_COUNT_CASH, BDC, true);
   private static final GeneratorDeposit GENERATOR_DEPOSIT_EUR = new GeneratorDeposit("EUR Deposit", CCY_EUR, CALENDAR, SPOT_LAG, DAY_COUNT_CASH, BDC, true);
   private static final GeneratorDeposit GENERATOR_DEPOSIT_JPY = new GeneratorDeposit("JPY Deposit", CCY_JPY, CALENDAR, SPOT_LAG, DAY_COUNT_CASH, BDC, true);
-  private static final GeneratorSwapTestsMaster GENERATOR_SWAP_MASTER = GeneratorSwapTestsMaster.getInstance();
+  private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
   private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M", CALENDAR);
   private static final GeneratorSwapFixedIbor EUR1YEURIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("EUR1YEURIBOR3M", CALENDAR);
   private static final GeneratorSwapFixedIbor JPY6MLIBOR6M = GENERATOR_SWAP_MASTER.getGenerator("JPY6MLIBOR6M", CALENDAR);
   private static final IborIndex USDLIBOR3M = USD6MLIBOR3M.getIborIndex();
   private static final IborIndex EURIBOR3M = EUR1YEURIBOR3M.getIborIndex();
   private static final IborIndex JPYLIBOR6M = JPY6MLIBOR6M.getIborIndex();
-  private static final IborIndex JPYLIBOR3M = IndexIborTestsMaster.getInstance().getIndex("JPYLIBOR3M", CALENDAR);
+  private static final IborIndex JPYLIBOR3M = IndexIborMaster.getInstance().getIndex("JPYLIBOR3M", CALENDAR);
   private static final GeneratorSwapXCcyIborIbor EURIBOR3MUSDLIBOR3M = new GeneratorSwapXCcyIborIbor("EURIBOR3MUSDLIBOR3M", EURIBOR3M, USDLIBOR3M); // Spread on EUR leg
   private static final GeneratorSwapXCcyIborIbor JPYLIBOR3MUSDLIBOR3M = new GeneratorSwapXCcyIborIbor("JPYLIBOR3MUSDLIBOR3M", JPYLIBOR3M, USDLIBOR3M); // Spread on JPY leg
   private static final GeneratorSwapXCcyIborIbor JPYLIBOR3MEURIBOR3M = new GeneratorSwapXCcyIborIbor("JPYLIBOR3MEURIBOR3M", JPYLIBOR3M, EURIBOR3M); // Spread on JPY leg
@@ -294,7 +294,7 @@ public class CurveConstructionXCcyTest {
   public static final int[] NB_UNITS = new int[] {3, 3, 1};
   public static final int NB_BLOCKS = NB_UNITS.length;
   public static final InstrumentDefinition<?>[][][][] DEFINITIONS_UNITS = new InstrumentDefinition<?>[NB_BLOCKS][][][];
-  public static final GeneratorCurve[][][] GENERATORS_UNITS = new GeneratorCurve[NB_BLOCKS][][];
+  public static final GeneratorYDCurve[][][] GENERATORS_UNITS = new GeneratorYDCurve[NB_BLOCKS][][];
   public static final String[][][] NAMES_UNITS = new String[NB_BLOCKS][][];
   public static final YieldCurveBundle KNOWN_DATA = new YieldCurveBundle(FX_MATRIX, CCY_MAP);
 
@@ -316,17 +316,17 @@ public class CurveConstructionXCcyTest {
     DEFINITIONS_UNITS[1][1] = new InstrumentDefinition<?>[][] {DEFINITIONS_FWD3_USD};
     DEFINITIONS_UNITS[1][2] = new InstrumentDefinition<?>[][] {DEFINITIONS_DSC_JPY, DEFINITIONS_FWD3_JPY, DEFINITIONS_FWD6_JPY};
     DEFINITIONS_UNITS[2][0] = new InstrumentDefinition<?>[][] {DEFINITIONS_DSC_USD, DEFINITIONS_FWD3_USD, DEFINITIONS_DSC_JPY, DEFINITIONS_FWD3_JPY, DEFINITIONS_FWD6_JPY};
-    GeneratorCurve genInt = new GeneratorCurveYieldInterpolated(MATURITY_CALCULATOR, INTERPOLATOR);
-    GENERATORS_UNITS[0] = new GeneratorCurve[NB_UNITS[0]][];
-    GENERATORS_UNITS[1] = new GeneratorCurve[NB_UNITS[1]][];
-    GENERATORS_UNITS[2] = new GeneratorCurve[NB_UNITS[2]][];
-    GENERATORS_UNITS[0][0] = new GeneratorCurve[] {genInt};
-    GENERATORS_UNITS[0][1] = new GeneratorCurve[] {genInt};
-    GENERATORS_UNITS[0][2] = new GeneratorCurve[] {genInt, genInt};
-    GENERATORS_UNITS[1][0] = new GeneratorCurve[] {genInt};
-    GENERATORS_UNITS[1][1] = new GeneratorCurve[] {genInt};
-    GENERATORS_UNITS[1][2] = new GeneratorCurve[] {genInt, genInt, genInt};
-    GENERATORS_UNITS[2][0] = new GeneratorCurve[] {genInt, genInt, genInt, genInt, genInt};
+    GeneratorYDCurve genInt = new GeneratorCurveYieldInterpolated(MATURITY_CALCULATOR, INTERPOLATOR);
+    GENERATORS_UNITS[0] = new GeneratorYDCurve[NB_UNITS[0]][];
+    GENERATORS_UNITS[1] = new GeneratorYDCurve[NB_UNITS[1]][];
+    GENERATORS_UNITS[2] = new GeneratorYDCurve[NB_UNITS[2]][];
+    GENERATORS_UNITS[0][0] = new GeneratorYDCurve[] {genInt};
+    GENERATORS_UNITS[0][1] = new GeneratorYDCurve[] {genInt};
+    GENERATORS_UNITS[0][2] = new GeneratorYDCurve[] {genInt, genInt};
+    GENERATORS_UNITS[1][0] = new GeneratorYDCurve[] {genInt};
+    GENERATORS_UNITS[1][1] = new GeneratorYDCurve[] {genInt};
+    GENERATORS_UNITS[1][2] = new GeneratorYDCurve[] {genInt, genInt, genInt};
+    GENERATORS_UNITS[2][0] = new GeneratorYDCurve[] {genInt, genInt, genInt, genInt, genInt};
     NAMES_UNITS[0] = new String[NB_UNITS[0]][];
     NAMES_UNITS[1] = new String[NB_UNITS[1]][];
     NAMES_UNITS[2] = new String[NB_UNITS[2]][];
@@ -543,7 +543,7 @@ public class CurveConstructionXCcyTest {
     return definitions;
   }
 
-  private static Pair<YieldCurveBundle, Double[]> makeUnit(InstrumentDerivative[] instruments, double[] initGuess, LinkedHashMap<String, GeneratorCurve> curveGenerators, YieldCurveBundle knownData,
+  private static Pair<YieldCurveBundle, Double[]> makeUnit(InstrumentDerivative[] instruments, double[] initGuess, LinkedHashMap<String, GeneratorYDCurve> curveGenerators, YieldCurveBundle knownData,
       final AbstractInstrumentDerivativeVisitor<YieldCurveBundle, Double> calculator, final AbstractInstrumentDerivativeVisitor<YieldCurveBundle, InterestRateCurveSensitivity> sensitivityCalculator) {
     final MultipleYieldCurveFinderGeneratorDataBundle data = new MultipleYieldCurveFinderGeneratorDataBundle(instruments, knownData, curveGenerators);
     final Function1D<DoubleMatrix1D, DoubleMatrix1D> curveCalculator = new MultipleYieldCurveFinderGeneratorFunction(calculator, data);
@@ -553,7 +553,7 @@ public class CurveConstructionXCcyTest {
     return new ObjectsPair<YieldCurveBundle, Double[]>(newCurves, ArrayUtils.toObject(parameters));
   }
 
-  private static DoubleMatrix2D[] makeCurveMatrix(InstrumentDerivative[] instrumentsTotal, LinkedHashMap<String, GeneratorCurve> curveGeneratorsTotal, int startBlock, int[] nbParameters,
+  private static DoubleMatrix2D[] makeCurveMatrix(InstrumentDerivative[] instrumentsTotal, LinkedHashMap<String, GeneratorYDCurve> curveGeneratorsTotal, int startBlock, int[] nbParameters,
       Double[] parametersTotal, YieldCurveBundle knownData, final AbstractInstrumentDerivativeVisitor<YieldCurveBundle, InterestRateCurveSensitivity> sensitivityCalculator) {
     final MultipleYieldCurveFinderGeneratorDataBundle data = new MultipleYieldCurveFinderGeneratorDataBundle(instrumentsTotal, knownData, curveGeneratorsTotal);
     final Function1D<DoubleMatrix1D, DoubleMatrix2D> jacobianCalculator = new MultipleYieldCurveFinderGeneratorJacobian(new ParameterSensitivityCalculator(sensitivityCalculator), data);
@@ -573,13 +573,13 @@ public class CurveConstructionXCcyTest {
     return result;
   }
 
-  private static Pair<YieldCurveBundle, CurveBuildingBlockBundle> makeCurves(final InstrumentDefinition<?>[][][] definitions, GeneratorCurve[][] curveGenerators, String[][] curveNames,
+  private static Pair<YieldCurveBundle, CurveBuildingBlockBundle> makeCurves(final InstrumentDefinition<?>[][][] definitions, GeneratorYDCurve[][] curveGenerators, String[][] curveNames,
       YieldCurveBundle knownData, final AbstractInstrumentDerivativeVisitor<YieldCurveBundle, Double> calculator,
       final AbstractInstrumentDerivativeVisitor<YieldCurveBundle, InterestRateCurveSensitivity> sensitivityCalculator, boolean withToday, int block) {
     int nbBlocks = curveGenerators.length;
     YieldCurveBundle knownSoFarData = knownData.copy();
     List<InstrumentDerivative> instrumentsSoFar = new ArrayList<InstrumentDerivative>();
-    LinkedHashMap<String, GeneratorCurve> generatorsSoFar = new LinkedHashMap<String, GeneratorCurve>();
+    LinkedHashMap<String, GeneratorYDCurve> generatorsSoFar = new LinkedHashMap<String, GeneratorYDCurve>();
     LinkedHashMap<String, Pair<CurveBuildingBlock, DoubleMatrix2D>> unitBundleSoFar = new LinkedHashMap<String, Pair<CurveBuildingBlock, DoubleMatrix2D>>();
     List<Double> parametersSoFar = new ArrayList<Double>();
     LinkedHashMap<String, Pair<Integer, Integer>> unitMap = new LinkedHashMap<String, Pair<Integer, Integer>>();
@@ -590,13 +590,13 @@ public class CurveConstructionXCcyTest {
       instrumentsSoFar.addAll(Arrays.asList(instruments));
       InstrumentDerivative[] instrumentsSoFarArray = instrumentsSoFar.toArray(new InstrumentDerivative[0]);
       double[] initGuess = initialGuess(definitions[loopunit]);
-      LinkedHashMap<String, GeneratorCurve> gen = new LinkedHashMap<String, GeneratorCurve>();
+      LinkedHashMap<String, GeneratorYDCurve> gen = new LinkedHashMap<String, GeneratorYDCurve>();
       int[] nbIns = new int[curveGenerators[loopunit].length];
       for (int loopcurve = 0; loopcurve < curveGenerators[loopunit].length; loopcurve++) {
         nbIns[loopcurve] = definitions[loopunit][loopcurve].length;
         InstrumentDerivative[] insCurve = new InstrumentDerivative[nbIns[loopcurve]];
         System.arraycopy(instruments, startBlock, insCurve, 0, nbIns[loopcurve]);
-        GeneratorCurve tmp = curveGenerators[loopunit][loopcurve].finalGenerator(insCurve);
+        GeneratorYDCurve tmp = curveGenerators[loopunit][loopcurve].finalGenerator(insCurve);
         gen.put(curveNames[loopunit][loopcurve], tmp);
         generatorsSoFar.put(curveNames[loopunit][loopcurve], tmp);
         unitMap.put(curveNames[loopunit][loopcurve], new ObjectsPair<Integer, Integer>(start + startBlock, nbIns[loopcurve]));

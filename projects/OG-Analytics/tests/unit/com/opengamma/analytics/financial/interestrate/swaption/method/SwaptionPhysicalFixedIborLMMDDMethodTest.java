@@ -15,15 +15,16 @@ import javax.time.calendar.ZonedDateTime;
 
 import org.testng.annotations.Test;
 
+import cern.colt.Arrays;
 import cern.jet.random.engine.MersenneTwister;
 
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
-import com.opengamma.analytics.financial.instrument.index.generator.GeneratorSwapTestsMaster;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.payment.PaymentDefinition;
@@ -78,7 +79,7 @@ import com.opengamma.util.tuple.DoublesPair;
 public class SwaptionPhysicalFixedIborLMMDDMethodTest {
 
   private static final Calendar TARGET = new MondayToFridayCalendar("TARGET");
-  private static final GeneratorSwapFixedIbor EUR1YEURIBOR6M = GeneratorSwapTestsMaster.getInstance().getGenerator("EUR1YEURIBOR6M", TARGET);
+  private static final GeneratorSwapFixedIbor EUR1YEURIBOR6M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("EUR1YEURIBOR6M", TARGET);
   private static final IborIndex EURIBOR6M = EUR1YEURIBOR6M.getIborIndex();
 
   // Swaption 5Yx5Y
@@ -319,7 +320,7 @@ public class SwaptionPhysicalFixedIborLMMDDMethodTest {
     System.out.println(nbTest + " swaption LMM approximation method - LMM volatility parameters sensitivity (20x2): " + (endTime - startTime) + " ms");
     // Performance note: LMM approximation - LMM sensi: 1-Sep-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 30 ms for 1000 swaptions.
 
-    System.out.println("Approximation: " + pvPayerLongApproximation.toString());
+    System.out.println("Approximation: " + Arrays.toString(pvPayerLongApproximation));
 
     final int nbTest2 = 10;
     final YieldAndDiscountCurve dsc = CURVES.getCurve(CURVES_NAME[0]);

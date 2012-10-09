@@ -10,6 +10,7 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.analytics.financial.credit.cds.ISDACDSDerivative;
 import com.opengamma.analytics.financial.forex.derivative.Forex;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableForward;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableOption;
@@ -41,6 +42,7 @@ import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumTransaction;
+import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
@@ -130,7 +132,7 @@ public class ForexDerivativeVisitorTest {
     testException(NDO, o);
     testException(FX_OPTION_DIGITAL);
     testException(FX_OPTION_DIGITAL, o);
-    final InstrumentDerivative[] forexArray = new InstrumentDerivative[] {FX, FX_SWAP };
+    final InstrumentDerivative[] forexArray = new InstrumentDerivative[] {FX, FX_SWAP};
     try {
       VISITOR_ABSTRACT.visit(forexArray[0]);
       assertTrue(false);
@@ -804,6 +806,27 @@ public class ForexDerivativeVisitorTest {
       // TODO Auto-generated method stub
       return null;
     }
+
+    @Override
+    public String visitCDSDerivative(ISDACDSDerivative cds, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCDSDerivative(ISDACDSDerivative cds) {
+      return null;
+    }
+
+    @Override
+    public String visitDeliverableSwapFuturesSecurity(DeliverableSwapFuturesSecurity futures, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitDeliverableSwapFuturesSecurity(DeliverableSwapFuturesSecurity futures) {
+      return null;
+    }
+
 
   }
 

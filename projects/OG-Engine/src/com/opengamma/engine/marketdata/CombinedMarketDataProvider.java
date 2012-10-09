@@ -14,11 +14,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.opengamma.engine.marketdata.availability.MarketDataAvailability;
+import com.google.common.collect.Sets;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
+import com.opengamma.engine.marketdata.availability.MarketDataNotSatisfiableException;
 import com.opengamma.engine.marketdata.spec.CombinedMarketDataSpecification;
 import com.opengamma.engine.marketdata.spec.MarketDataSpecification;
 import com.opengamma.engine.value.ValueRequirement;
+import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.livedata.UserPrincipal;
 
 /**
@@ -139,22 +141,43 @@ public class CombinedMarketDataProvider extends AbstractMarketDataProvider {
       private final MarketDataAvailabilityProvider _fallbackProvider = _fallBack.getAvailabilityProvider();
 
       @Override
-      public MarketDataAvailability getAvailability(final ValueRequirement requirement) {
-        final MarketDataAvailability preferred = _preferredProvider.getAvailability(requirement);
-        if (preferred == MarketDataAvailability.AVAILABLE) {
-          // preferred is available
-          _providerByRequirement.put(requirement, _preferred);
-          return preferred;
+      public ValueSpecification getAvailability(final ValueRequirement requirement) {
+        MarketDataNotSatisfiableException preferredMissing = null;
+        try {
+          final ValueSpecification preferred = _preferredProvider.getAvailability(requirement);
+          if (preferred != null) {
+            // preferred is available
+            _providerByRequirement.put(requirement, _preferred);
+            return preferred;
+          }
+        } catch (MarketDataNotSatisfiableException e) {
+          preferredMissing = e;
         }
-        final MarketDataAvailability fallback = _fallbackProvider.getAvailability(requirement);
-        if (fallback != MarketDataAvailability.NOT_AVAILABLE) {
-          // fallback is either available or missing
-          _providerByRequirement.put(requirement, _fallBack);
-          return fallback;
+        try {
+          final ValueSpecification fallback = _fallbackProvider.getAvailability(requirement);
+          if (fallback != null) {
+            // fallback is available
+            _providerByRequirement.put(requirement, _fallBack);
+            return fallback;
+          }
+        } catch (MarketDataNotSatisfiableException e) {
+          if (preferredMissing != null) {
+            // both are not available - use preferred
+            _providerByRequirement.put(requirement, _preferred);
+            throw preferredMissing;
+          } else {
+            // fallback is not available
+            _providerByRequirement.put(requirement, _fallBack);
+            throw e;
+          }
         }
         // preferred is either not available or missing
         _providerByRequirement.put(requirement, _preferred);
-        return preferred;
+        if (preferredMissing != null) {
+          throw preferredMissing;
+        } else {
+          return null;
+        }
       }
 
     };
@@ -165,15 +188,16 @@ public class CombinedMarketDataProvider extends AbstractMarketDataProvider {
     return new MarketDataPermissionProvider() {
       
       @Override
-      public boolean canAccessMarketData(UserPrincipal user, Set<ValueRequirement> requirements) {
+      public Set<ValueRequirement> checkMarketDataPermissions(UserPrincipal user, Set<ValueRequirement> requirements) {
         Map<MarketDataProvider, Set<ValueRequirement>> reqsByProvider = groupByProvider(requirements);
-        
+
+        Set<ValueRequirement> failures = Sets.newHashSet();
         for (Entry<MarketDataProvider, Set<ValueRequirement>> entry : reqsByProvider.entrySet()) {
-          if (!entry.getKey().getPermissionProvider().canAccessMarketData(user, entry.getValue())) {
-            return false;
-          }
+          MarketDataPermissionProvider permissionProvider = entry.getKey().getPermissionProvider();
+          Set<ValueRequirement> failed = permissionProvider.checkMarketDataPermissions(user, entry.getValue());
+          failures.addAll(failed);
         }
-        return true;
+        return failures;
       }
     };
   }

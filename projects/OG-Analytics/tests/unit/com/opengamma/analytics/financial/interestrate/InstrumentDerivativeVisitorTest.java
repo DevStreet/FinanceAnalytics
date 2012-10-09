@@ -7,10 +7,14 @@ package com.opengamma.analytics.financial.interestrate;
 
 import static org.testng.AssertJUnit.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.time.calendar.Period;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.analytics.financial.credit.cds.ISDACDSDerivative;
 import com.opengamma.analytics.financial.forex.derivative.Forex;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableForward;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableOption;
@@ -42,6 +46,7 @@ import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumTransaction;
+import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
@@ -92,9 +97,9 @@ public class InstrumentDerivativeVisitorTest {
   private static final IborIndex INDEX = new IborIndex(CUR, Period.ofMonths(3), 2, new MondayToFridayCalendar("A"), DayCountFactory.INSTANCE.getDayCount("30/360"),
       BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following"), true);
   private static final ForwardRateAgreement FRA = new ForwardRateAgreement(CUR, 1, CURVE_NAME, 1, 100000, INDEX, 1, 1, 1.25, 0.25, 0.04, CURVE_NAME);
-  private static final AnnuityCouponIbor FLOAT_LEG = new AnnuityCouponIbor(CUR, new double[] {1 }, INDEX, CURVE_NAME, CURVE_NAME, false);
-  private static final AnnuityCouponIbor FLOAT_LEG_2 = new AnnuityCouponIbor(CUR, new double[] {1 }, INDEX, CURVE_NAME, CURVE_NAME, true);
-  private static final AnnuityCouponFixed FIXED_LEG = new AnnuityCouponFixed(CUR, new double[] {1 }, 0.0, CURVE_NAME, true);
+  private static final AnnuityCouponIbor FLOAT_LEG = new AnnuityCouponIbor(CUR, new double[] {1}, INDEX, CURVE_NAME, CURVE_NAME, false);
+  private static final AnnuityCouponIbor FLOAT_LEG_2 = new AnnuityCouponIbor(CUR, new double[] {1}, INDEX, CURVE_NAME, CURVE_NAME, true);
+  private static final AnnuityCouponFixed FIXED_LEG = new AnnuityCouponFixed(CUR, new double[] {1}, 0.0, CURVE_NAME, true);
   private static final FixedFloatSwap SWAP = new FixedFloatSwap(FIXED_LEG, FLOAT_LEG);
   private static final TenorSwap<CouponIbor> TENOR_SWAP = new TenorSwap<CouponIbor>(FLOAT_LEG, FLOAT_LEG_2);
   private static final PaymentFixed FIXED_PAYMENT = new PaymentFixed(CUR, 1, 1, CURVE_NAME);
@@ -102,11 +107,11 @@ public class InstrumentDerivativeVisitorTest {
   private static final PaymentFixed FIXED_PAYMENT_2 = new PaymentFixed(CUR, 1, -1, CURVE_NAME);
   private static final CouponIborSpread LIBOR_PAYMENT_2 = new CouponIborSpread(CUR, 1.0, CURVE_NAME, 0, -1, 1, INDEX, 1, 1, 0, CURVE_NAME);
   //  private static final CouponFloating FLOATING_COUPON = new CouponFloating(CUR, 1, CURVE_NAME, 1, 1, 1);
-  private static final Annuity<Payment> GA = new Annuity<Payment>(new Payment[] {FIXED_PAYMENT, LIBOR_PAYMENT });
-  private static final Annuity<Payment> GA_2 = new Annuity<Payment>(new Payment[] {FIXED_PAYMENT_2, LIBOR_PAYMENT_2 });
+  private static final Annuity<Payment> GA = new Annuity<Payment>(new Payment[] {FIXED_PAYMENT, LIBOR_PAYMENT});
+  private static final Annuity<Payment> GA_2 = new Annuity<Payment>(new Payment[] {FIXED_PAYMENT_2, LIBOR_PAYMENT_2});
   private static final SwapFixedCoupon<CouponIbor> FCS = new SwapFixedCoupon<CouponIbor>(FIXED_LEG, FLOAT_LEG);
-  private static final AnnuityCouponFixed FCA = new AnnuityCouponFixed(CUR, new double[] {1 }, 0.05, CURVE_NAME, true);
-  private static final AnnuityCouponIbor FLA = new AnnuityCouponIbor(CUR, new double[] {1 }, INDEX, 0.05, CURVE_NAME, CURVE_NAME, true);
+  private static final AnnuityCouponFixed FCA = new AnnuityCouponFixed(CUR, new double[] {1}, 0.05, CURVE_NAME, true);
+  private static final AnnuityCouponIbor FLA = new AnnuityCouponIbor(CUR, new double[] {1}, INDEX, 0.05, CURVE_NAME, CURVE_NAME, true);
   private static final CouponFixed FCP = new CouponFixed(CUR, 1, CURVE_NAME, 1, 0.04);
   private static final Swap<Payment, Payment> FIXED_FIXED = new Swap<Payment, Payment>(GA, GA_2);
   private static final SwaptionCashFixedIbor SWAPTION_CASH = SwaptionInstrumentsDescriptionDataSet.createSwaptionCashFixedIbor();
@@ -292,13 +297,21 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public Class<?>[] visit(final InstrumentDerivative[] derivative, final Object data) {
-      return visit(derivative, data);
+    public Class<?>[] visit(final InstrumentDerivative[] derivatives, final Object data) {
+      List<Class<?>> results = new ArrayList<Class<?>>();
+      for (InstrumentDerivative derivative : derivatives) {
+        results.add(derivative.accept(this, data));
+      }
+      return results.toArray(new Class[0]);
     }
 
     @Override
-    public Class<?>[] visit(final InstrumentDerivative[] derivative) {
-      return visit(derivative);
+    public Class<?>[] visit(final InstrumentDerivative[] derivatives) {
+      List<Class<?>> results = new ArrayList<Class<?>>();
+      for (InstrumentDerivative derivative : derivatives) {
+        results.add(derivative.accept(this));
+      }
+      return results.toArray(new Class[0]);
     }
 
     @Override
@@ -727,7 +740,7 @@ public class InstrumentDerivativeVisitorTest {
     public Class<?> visitAnnuityCouponIborSpread(AnnuityCouponIborSpread annuity) {
       return null;
     }
-
+    
     @Override
     public Class<?> visitCouponIborCompounded(CouponIborCompounded payment) {
       // TODO Auto-generated method stub
@@ -737,6 +750,26 @@ public class InstrumentDerivativeVisitorTest {
     @Override
     public Class<?> visitCouponIborCompounded(CouponIborCompounded payment, Object data) {
       // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public Class<?> visitDeliverableSwapFuturesSecurity(DeliverableSwapFuturesSecurity futures, Object data) {
+      return null;
+    }
+
+    @Override
+    public Class<?> visitDeliverableSwapFuturesSecurity(DeliverableSwapFuturesSecurity futures) {
+      return null;
+    }
+
+    @Override
+    public Class<?> visitCDSDerivative(ISDACDSDerivative cds, Object data) {
+      return null;
+    }
+
+    @Override
+    public Class<?> visitCDSDerivative(ISDACDSDerivative cds) {
       return null;
     }
 

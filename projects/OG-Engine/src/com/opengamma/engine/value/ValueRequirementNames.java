@@ -101,8 +101,28 @@ public final class ValueRequirementNames {
    * A FX series for a security
    */
   public static final String HISTORICAL_FX_TIME_SERIES = "Historical FX Time Series";
-  ///// Curves
-
+  /**
+   * The cash-flows of a security or portfolio
+   */
+  public static final String FIXED_PAY_CASH_FLOWS = "Pay Fixed Cash-Flows";
+  /**
+   * The cash-flows of a security or portfolio
+   */
+  public static final String FIXED_RECEIVE_CASH_FLOWS = "Receive Fixed Cash-Flows";
+  /**
+   * The cash-flows of a security or portfolio
+   */
+  public static final String NETTED_FIXED_CASH_FLOWS = "Netted Fixed Cash-Flows";
+  /**
+   * The reset dates and indices of a security or portfolio
+   */
+  public static final String RESET_DATES = "Reset Dates";
+  /**
+   * The projected cash-flows of a security or portfolio
+   */
+  public static final String PROJECTED_CASH_FLOWS = "Projected Cash Flows";
+  
+  ///// Curves  
   /**
    * Curve containing (date, discount factor) pairs.
    */

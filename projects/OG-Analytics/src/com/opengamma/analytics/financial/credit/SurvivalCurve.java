@@ -5,36 +5,36 @@
  */
 package com.opengamma.analytics.financial.credit;
 
-import javax.time.calendar.ZonedDateTime;
+import com.opengamma.util.ArgumentChecker;
 
 /**
- * Class for constructing and querying a survival curve from a user-input set of tenors and hazard rates for these tenors
+ * Class for constructing and querying a survival curve object from a supplied set of tenors and hazard rates for these tenors
  */
 public class SurvivalCurve {
 
-  // TODO : Check the validity of the arguments in the ctor e.g. not null, equal number of tenors/spreads
-  // TODO : Is there a better way to overload the ctor (problem is the compiler complains about unassigned member variables)
-  // TODO : Do we even need the ZonedDateTime version of the ctor? Survival curve can function perfectly well with tenors as doubles
   // TODO : Check the getSurvivalProbability routine more carefully (the counter and the calculation itself)
   // TODO : Need to include the interpolator and extrapolators
+  // TODO : Add the arg checker to verify the input vectors are the same size
+  // TODO : This class needs revisiting - badly structured
 
   // --------------------------------------------------------------------------------------
 
   private final int _numberOfTenors;
 
-  private final ZonedDateTime[] _tenors;
-  private final double[] _tenorsAsDoubles;
+  private final double[] _tenors;
 
   private final double[] _hazardRates;
 
   // --------------------------------------------------------------------------------------
 
-  public SurvivalCurve(ZonedDateTime[] tenors, double[] hazardRates) {
+  public SurvivalCurve(double[] tenorsAsDoubles, double[] hazardRates) {
 
-    _numberOfTenors = tenors.length;
+    ArgumentChecker.notNull(tenorsAsDoubles, "Tenors as doubles field");
+    ArgumentChecker.notNull(hazardRates, "Hazard rates field");
 
-    _tenors = tenors;
-    _tenorsAsDoubles = null;
+    _numberOfTenors = tenorsAsDoubles.length;
+
+    _tenors = tenorsAsDoubles;
 
     _hazardRates = hazardRates;
 
@@ -42,39 +42,23 @@ public class SurvivalCurve {
 
   // --------------------------------------------------------------------------------------
 
-  public SurvivalCurve(double[] tenors, double[] hazardRates) {
-
-    _numberOfTenors = tenors.length;
-
-    _tenors = null;
-    _tenorsAsDoubles = tenors;
-
-    _hazardRates = hazardRates;
-
-  }
-
-  // --------------------------------------------------------------------------------------  
-
   public double getSurvivalProbability(double t) {
+
+    ArgumentChecker.notNegative(t, "time");
 
     int counter = 0;
 
-    while (t > this.getTenorsAsDoubles()[counter] && counter < this.getNumberOfTenors() - 1) {
+    while (t > this.getTenors()[counter] && counter < this.getNumberOfTenors() - 1) {
       counter++;
     }
 
-    /*
-    // Do we need this?
     if (counter > this.getNumberOfTenors()) {
       counter = this.getNumberOfTenors() - 1;
     }
-    */
 
-    double hazardRate = this.getHazardRates()[counter];
+    final double hazardRate = this.getHazardRates()[counter];
 
-    double survivalProbability = Math.exp(-hazardRate * t);
-
-    return survivalProbability;
+    return Math.exp(-hazardRate * t);
 
   }
 
@@ -84,7 +68,7 @@ public class SurvivalCurve {
     return _numberOfTenors;
   }
 
-  public ZonedDateTime[] getTenors() {
+  public double[] getTenors() {
     return _tenors;
   }
 
@@ -92,24 +76,16 @@ public class SurvivalCurve {
     return _hazardRates;
   }
 
-  public double[] getTenorsAsDoubles() {
-    return _tenorsAsDoubles;
-  }
-
   // --------------------------------------------------------------------------------------
 
-  public SurvivalCurve bootstrapHelperSurvivalCurve(ZonedDateTime[] tenors, double[] hazardRates) {
+  // Builder method to build a new SurvivalCurve object given the tenor and hazard rate inputs
 
-    SurvivalCurve modifiedSurvivalCurve = new SurvivalCurve(tenors, hazardRates);
+  public SurvivalCurve bootstrapHelperSurvivalCurve(double[] tenorsAsDoubles, double[] hazardRates) {
 
-    return modifiedSurvivalCurve;
-  }
+    ArgumentChecker.notNull(tenorsAsDoubles, "Tenors as doubles field");
+    ArgumentChecker.notNull(hazardRates, "Hazard rates field");
 
-  // --------------------------------------------------------------------------------------
-
-  public SurvivalCurve bootstrapHelperSurvivalCurve(double[] tenors, double[] hazardRates) {
-
-    SurvivalCurve modifiedSurvivalCurve = new SurvivalCurve(tenors, hazardRates);
+    SurvivalCurve modifiedSurvivalCurve = new SurvivalCurve(tenorsAsDoubles, hazardRates);
 
     return modifiedSurvivalCurve;
   }
