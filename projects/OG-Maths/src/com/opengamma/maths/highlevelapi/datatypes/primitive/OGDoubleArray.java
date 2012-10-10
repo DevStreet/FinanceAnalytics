@@ -144,16 +144,39 @@ public class OGDoubleArray extends OGArraySuper<Number> {
     return new OGDoubleArray(rowData, 1, _columns);
   }
 
+  public boolean fuzzyequals(OGDoubleArray obj, double tolerance) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    OGDoubleArray other = obj;
+    if (_columns != other._columns) {
+      return false;
+    }
+    if (_rows != other._rows) {
+      return false;
+    }
+    double[] objData = obj.getData();
+    for (int i = 0; i < _data.length; i++) {
+      if (Math.abs(_data[i] - objData[i]) > tolerance) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @Override
   public String toString() {
-    String str = "OGDoubleArray:" +
-        "\ndata = " + Arrays.toString(_data) +
-        "\nrows = " + _rows +
-        "\ncols = " + _columns;
+    String str = "OGDoubleArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";
     for (int i = 0; i < _rows; i++) {
       for (int j = 0; j < _columns; j++) {
-        str += String.format("%8.6f ", _data[j * _rows + i]);
+        str += String.format("%24.18f ", _data[j * _rows + i]);
       }
       str += String.format("\n");
     }
