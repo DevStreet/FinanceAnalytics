@@ -156,7 +156,14 @@ public class Catchers {
     if (thisArray == null) {
       throw new MathsExceptionNullPointer("Array " + varName + " points to NULL. STOPPING");
     }
+    for (int i = 0; i < thisArray.length; i++) {
+      if (thisArray[i] == null) {
+        throw new MathsExceptionNullPointer("Array " + varName + " has row " + i + " pointing to NULL. STOPPING");
+      }
+    }
   }
+  
+  
 
   /**
    * Catches null pointer
@@ -189,7 +196,7 @@ public class Catchers {
       throw new MathsExceptionNullPointer("Object " + varName + " points to NULL. STOPPING");
     }
   }
-  
+
   /**
    * Catches null pointer
    * @param someBlob an object to check
@@ -198,7 +205,7 @@ public class Catchers {
     if (someBlob == null) {
       throw new MathsExceptionNullPointer("Object ref " + someBlob + " points to NULL. STOPPING");
     }
-  }  
+  }
 
   ///////////// Null from arg list
   /**
@@ -275,6 +282,22 @@ public class Catchers {
   public static void catchNullFromArgList(Object someBlob, int pos) {
     if (someBlob == null) {
       throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
+    }
+  }
+
+  /**
+   * Catches null pointer
+   * @param thisArray the array to check
+   * @param pos the position in the arg list 
+   */
+  public static void catchNullFromArgList(double[][] thisArray, int pos) {
+    if (thisArray == null) {
+      throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
+    }
+    for (int i = 0; i < thisArray.length; i++) {
+      if (thisArray[i] == null) {
+        throw new MathsExceptionNullPointer("Argument passed in position " + pos + " has row " + i + " pointing to NULL. STOPPING");
+      }
     }
   }
 
