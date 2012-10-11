@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.datatypes;
+package com.opengamma.maths.highlevelapi.datatypes.primitive;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
 /**
- *
+ * Tests OGIndex
  */
 public class OGIndexTest {
 
