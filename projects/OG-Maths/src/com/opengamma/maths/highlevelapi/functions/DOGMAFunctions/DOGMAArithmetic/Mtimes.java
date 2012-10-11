@@ -51,7 +51,7 @@ public class Mtimes {
     ObjectsPair<Class<?>, Class<?>> combo = new ObjectsPair<Class<?>, Class<?>>(array1.getClass(), array2.getClass());
     MtimesAbstract<T, S> use = (MtimesAbstract<T, S>) s_functionPointers.get(combo);
     if (use == null) {
-      throw new MathsExceptionNotImplemented("Mtimes array class " + array1.getClass().toString() + " and " + array2.getClass().toString() + " is not yet implemented");
+      throw new MathsExceptionNotImplemented("Mtimes array " + array1.getClass().toString() + " and " + array2.getClass().toString() + " is not yet implemented");
     }
     return use.mtimes(array1, array2);
   }
