@@ -6,6 +6,7 @@
 package com.opengamma.maths.highlevelapi.datatypes.derived;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotRequested;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd;
 
@@ -15,7 +16,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlge
 public class OGSvdResult {
 
   private OGDoubleArray _U; //CSIGNORE
-  private OGDoubleArray _S; //CSIGNORE
+  private OGArraySuper<Number> _S; //CSIGNORE
   private OGDoubleArray _V; //CSIGNORE
 
   /**
@@ -24,7 +25,7 @@ public class OGSvdResult {
    * @param S
    * @param V
    */
-  public OGSvdResult(OGDoubleArray U, OGDoubleArray S, OGDoubleArray V) { //CSIGNORE
+  public OGSvdResult(OGDoubleArray U, OGArraySuper<Number> S, OGDoubleArray V) { //CSIGNORE
     _U = U;
     _S = S;
     _V = V;
@@ -45,7 +46,7 @@ public class OGSvdResult {
    * Gets the matrix S.
    * @return the matrix S
    */
-  public OGDoubleArray getS() {
+  public OGArraySuper<Number> getS() {
     if (_S == null) {
       throw new MathsExceptionNotRequested("The matrix S was not requested to be computed at execution time.");
     }
