@@ -15,9 +15,9 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlge
  */
 public class OGSvdResult {
 
-  private OGDoubleArray _U; //CSIGNORE
+  private OGArraySuper<Number> _U; //CSIGNORE
   private OGArraySuper<Number> _S; //CSIGNORE
-  private OGDoubleArray _V; //CSIGNORE
+  private OGArraySuper<Number> _V; //CSIGNORE
 
   /**
    * Constructs an SVD result, data is not copied just repointed as results are assumed to come from somewhere sane like {@link Svd}
@@ -25,7 +25,7 @@ public class OGSvdResult {
    * @param S
    * @param V
    */
-  public OGSvdResult(OGDoubleArray U, OGArraySuper<Number> S, OGDoubleArray V) { //CSIGNORE
+  public OGSvdResult(OGArraySuper<Number> U, OGArraySuper<Number> S, OGArraySuper<Number> V) { //CSIGNORE
     _U = U;
     _S = S;
     _V = V;
@@ -35,7 +35,7 @@ public class OGSvdResult {
    * Gets the matrix U.
    * @return the matrix U.
    */
-  public OGDoubleArray getU() {
+  public OGArraySuper<Number> getU() {
     if (_U == null) {
       throw new MathsExceptionNotRequested("The matrix U was not requested to be computed at execution time.");
     }
@@ -57,7 +57,7 @@ public class OGSvdResult {
    * Gets the matrix V.
    * @return the matrix V
    */
-  public OGDoubleArray getV() {
+  public OGArraySuper<Number> getV() {
     if (_V == null) {
       throw new MathsExceptionNotRequested("The matrix V was not requested to be computed at execution time.");
     }    
