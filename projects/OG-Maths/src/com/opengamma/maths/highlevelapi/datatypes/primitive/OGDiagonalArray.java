@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -41,7 +42,7 @@ public class OGDiagonalArray extends OGArraySuper<Number> {
    */
   public OGDiagonalArray(double[] diag, int rows, int columns) {
     if (diag == null) {
-      throw new MathsExceptionIllegalArgument("dataIn is null");
+      throw new MathsExceptionNullPointer("dataIn is null");
     }
     if (rows < 1) {
       throw new MathsExceptionIllegalArgument("Illegal number of rows specified. Value given was " + rows);
@@ -115,7 +116,7 @@ public class OGDiagonalArray extends OGArraySuper<Number> {
    * @param tolerance the tolerance for double precision comparison of the data elements in the array
    * @return true if they are considered equal in value, false otherwise
    */
-  public boolean fuzzyequals(OGDiagonalArray obj, double tolerance) {
+  public boolean fuzzyequals(Object obj, double tolerance) {
     if (this == obj) {
       return true;
     }
@@ -125,14 +126,14 @@ public class OGDiagonalArray extends OGArraySuper<Number> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGDiagonalArray other = obj;
+    OGDiagonalArray other = (OGDiagonalArray) obj;
     if (_columns != other._columns) {
       return false;
     }
     if (_rows != other._rows) {
       return false;
     }
-    double[] objData = obj.getData();
+    double[] objData = other.getData();
     for (int i = 0; i < _data.length; i++) {
       if (Math.abs(_data[i] - objData[i]) > tolerance) {
         return false;
@@ -147,10 +148,10 @@ public class OGDiagonalArray extends OGArraySuper<Number> {
       throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
     }
     if (indices[0] >= _rows) {
-      throw new MathsExceptionOutOfBounds("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
+      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
     }
     if (indices[1] >= _columns) {
-      throw new MathsExceptionOutOfBounds("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
+      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
     }
     double ret = 0; // default entry is 0
     if (indices[0] == indices[1]) {
