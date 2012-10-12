@@ -3,21 +3,20 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAArithmetic;
 
 /**
  * Tests OGDoubleArray transpose
  */
 public class DOGMAOGDoubleArrayTransposeTest {
 
-  DOGMAArithmetic DA = new DOGMAArithmetic();
+  TransposeOGDoubleArray t = TransposeOGDoubleArray.getInstance();
 
   int normalRows = 4;
   int normalCols = 3;
@@ -33,12 +32,12 @@ public class DOGMAOGDoubleArrayTransposeTest {
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void nullInTest() {
     OGDoubleArray tmp = null;
-    DA.transpose(tmp);
+    t.transpose(tmp);
   }
 
   @Test
   public void testTranspose() {
-    assertTrue(array1tranposed.equals(DA.transpose(array1)));
+    assertTrue(array1tranposed.equals(t.transpose(array1)));
   }
 
 }
