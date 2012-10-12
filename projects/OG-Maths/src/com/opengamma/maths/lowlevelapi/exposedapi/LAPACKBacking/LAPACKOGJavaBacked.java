@@ -14,4 +14,8 @@ public class LAPACKOGJavaBacked extends LAPACKAbstractSuper implements LAPACKAPI
   public void dgesvd(char jobu, char jobvt, int m, int n, double[] A, int lda, double[] S, double[] U, int ldu, double[] VT, int ldvt, double[] WORK, int lwork, int[] info) {
   }
 
+  @Override
+  public void zgesvd(char jobu, char jobvt, int m, int n, double[] A, int lda, double[] S, double[] U, int ldu, double[] VT, int ldvt, double[] WORK, int lwork, double[] RWORK, int[] info) {
+  }
+
 }

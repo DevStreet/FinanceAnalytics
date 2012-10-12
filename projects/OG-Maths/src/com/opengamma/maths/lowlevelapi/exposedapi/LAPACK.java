@@ -39,7 +39,7 @@ public class LAPACK implements LAPACKAPIInterface {
 
   // for now plumb in netlib
   public LAPACK() {
-    _localLAPACK = new LAPACKNetlibBacked();
+    _localLAPACK = new LAPACKNativeBacked();
   }
 
   public LAPACK(backing backedby) {
@@ -58,4 +58,9 @@ public class LAPACK implements LAPACKAPIInterface {
     _localLAPACK.dgesvd(jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
   }
 
+  @Override
+  public void zgesvd(char jobu, char jobvt, int m, int n, double[] A, int lda, double[] S, double[] U, int ldu, double[] VT, int ldvt, double[] WORK, int lwork, double[] RWORK, int[] info) { //CSIGNORE
+    _localLAPACK.zgesvd(jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
+  }
+  
 }
