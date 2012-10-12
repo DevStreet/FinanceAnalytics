@@ -12,7 +12,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
-import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK.backing;
 
 /**
  * SVD for OGDoubleArrays 
@@ -47,7 +46,7 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
     int[] info = new int[1];
     OGDoubleArray resultU = null;
     OGArraySuper<Number> resultS = null;
-    OGDoubleArray resultV = null;
+    OGArraySuper<Number> resultV = null;
     double[] pointLess = new double[1];  // this is to keep JNI happy, it doesn't consider "null" an array type
     switch (these) {
       case U:
@@ -61,14 +60,14 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
         U = pointLess;
         VT = pointLess;
         _localLAPACK.dgesvd('N', 'N', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
-        resultS = new OGDiagonalArray(S, m, n);
+        resultS = new OGDoubleArray(S, n, 1);
         break;
 
       case V:
         U = pointLess;
         VT = new double[n * n];
         _localLAPACK.dgesvd('N', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
-        resultV = (OGDoubleArray) _transpose.transpose(new OGDoubleArray(VT, n, n));
+        resultV = _transpose.transpose(new OGDoubleArray(VT, n, n));
         break;
 
       case US:
@@ -84,7 +83,7 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
         VT = new double[n * n];
         _localLAPACK.dgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
         resultU = new OGDoubleArray(U, m, m);
-        resultV = (OGDoubleArray) _transpose.transpose(new OGDoubleArray(VT, n, n));
+        resultV = _transpose.transpose(new OGDoubleArray(VT, n, n));
         break;
 
       case SV:
@@ -92,7 +91,7 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
         VT = new double[n * n];
         _localLAPACK.dgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
         resultS = new OGDiagonalArray(S, m, n);
-        resultV = (OGDoubleArray) _transpose.transpose(new OGDoubleArray(VT, n, n));
+        resultV = _transpose.transpose(new OGDoubleArray(VT, n, n));
         break;
 
       case USV:
@@ -103,7 +102,7 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
         resultS = new OGDiagonalArray(S, m, n);
         // rather inefficient but necessary evil for the minute
         // TODO: in place transpose of column major array 
-        resultV = (OGDoubleArray) _transpose.transpose(new OGDoubleArray(VT, n, n));
+        resultV = _transpose.transpose(new OGDoubleArray(VT, n, n));
         break;
     }
     return new OGSvdResult(resultU, resultS, resultV);

@@ -11,6 +11,7 @@ import java.util.Map;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 
 /**
@@ -58,6 +59,7 @@ public class Svd {
   private static Map<Class<?>, SvdAbstract<?>> s_functionPointers = new HashMap<Class<?>, SvdAbstract<?>>();
   static {
     s_functionPointers.put(OGDoubleArray.class, SvdOGDoubleArray.getInstance());
+    s_functionPointers.put(OGComplexArray.class, SvdOGComplexArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
