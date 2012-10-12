@@ -19,8 +19,7 @@ public class DenseMemoryManipulation {
    * @param dataIn a row major double[][] non ragged array
    * @return a column major double[] array
    */
-  public static double[] convertRowMajorDoublePointerToColumnMajorSinglePointer(double[][] dataIn)
-  {
+  public static double[] convertRowMajorDoublePointerToColumnMajorSinglePointer(double[][] dataIn) {
     if (MatrixPrimitiveUtils.isRagged(dataIn)) {
       throw new MathsExceptionIllegalArgument("Backing array is ragged");
     }
@@ -41,8 +40,7 @@ public class DenseMemoryManipulation {
    * @param dataIn a row major double[][] non ragged array
    * @return a row major double[] array
    */
-  public static double[] convertRowMajorDoublePointerToRowMajorSinglePointer(double[][] dataIn)
-  {
+  public static double[] convertRowMajorDoublePointerToRowMajorSinglePointer(double[][] dataIn) {
     if (MatrixPrimitiveUtils.isRagged(dataIn)) {
       throw new MathsExceptionIllegalArgument("Backing array is ragged");
     }
@@ -54,6 +52,91 @@ public class DenseMemoryManipulation {
       for (int j = 0; j < cols; j++) {
         tmp[i * cols + j] = dataIn[i][j];
       }
+    }
+    return tmp;
+  }
+
+  /**
+   * Converts a row major double pointer to a column major single pointer with odd elements set to 0 (for complex type purposes)
+   * @param dataIn a row major double[][] non ragged array
+   * @return a column major double[] array
+   */
+  public static double[] convertRowMajorDoublePointerToColumnMajorZeroInterleavedSinglePointer(double[][] dataIn) {
+    if (MatrixPrimitiveUtils.isRagged(dataIn)) {
+      throw new MathsExceptionIllegalArgument("Backing array is ragged");
+    }
+    int rows = dataIn.length;
+    int cols = dataIn[0].length;
+    double[] tmp = new double[2 * rows * cols];
+
+    int count = 0;
+    for (int i = 0; i < 2 * rows; i += 2) {
+      for (int j = 0; j < cols; j++) {
+        tmp[j * 2 * rows + i] = dataIn[count][j];
+      }
+      count++;
+    }
+    return tmp;
+  }
+
+  /**
+   * Converts a row major double pointer to a column major single pointer with even elements set to those in dataIn1 and odd elements set to dataIn2 (for complex type purposes)
+   * @param dataIn1 a row major double[][] non ragged array
+   * @param dataIn2 a row major double[][] non ragged array 
+   * @return a column major double[] array
+   */
+  public static double[] convertTwoRowMajorDoublePointerToColumnMajorInterleavedSinglePointer(double[][] dataIn1, double[][] dataIn2) {
+    if (MatrixPrimitiveUtils.isRagged(dataIn1)) {
+      throw new MathsExceptionIllegalArgument("Backing array is ragged");
+    }
+    if (MatrixPrimitiveUtils.isRagged(dataIn2)) {
+      throw new MathsExceptionIllegalArgument("Backing array is ragged");
+    }
+    int rows = dataIn1.length;
+    int cols = dataIn1[0].length;
+
+    if (dataIn2.length != rows) {
+      throw new MathsExceptionIllegalArgument("Number of rows in first array (" + rows + ") does not match number of rows in second (" + dataIn2.length + ")");
+    }
+    if (dataIn2[0].length != cols) {
+      throw new MathsExceptionIllegalArgument("Number of columns in first array (" + cols + ") does not match number of columns in second (" + dataIn2[0].length + ")");
+    }
+    double[] tmp = new double[2 * rows * cols];
+
+    int count = 0;
+    for (int i = 0; i < 2 * rows; i += 2) {
+      for (int j = 0; j < cols; j++) {
+        tmp[j * 2 * rows + i] = dataIn1[count][j];
+        tmp[j * 2 * rows + i + 1] = dataIn2[count][j];
+      }
+      count++;
+    }
+    return tmp;
+  }
+
+  public static double[] convertSinglePointerToZeroInterleavedSinglePointer(double[] dataIn) {
+    Catchers.catchNullFromArgList(dataIn, 1);
+    final int len = dataIn.length;
+    double[] tmp = new double[2 * len];
+    int ptr = 0;
+    for (int i = 0; i < 2 * len; i += 2) {
+      tmp[i] = dataIn[ptr++];
+    }
+    return tmp;
+  }
+
+  public static double[] convertTwoSinglePointersToInterleavedSinglePointer(double[] dataIn1, double[] dataIn2) {
+    Catchers.catchNullFromArgList(dataIn1, 1);
+    Catchers.catchNullFromArgList(dataIn2, 1);
+    final int len = dataIn1.length;
+    if (dataIn2.length != len) {
+      throw new MathsExceptionIllegalArgument("The lengths of the data provided by dataIn1 and dataIn2 are not the same.");
+    }
+    double[] tmp = new double[2 * len];
+    int ptr = 0;
+    for (int i = 0; i < 2 * len; i += 2) {
+      tmp[i] = dataIn1[ptr];
+      tmp[i + 1] = dataIn2[ptr++];
     }
     return tmp;
   }
@@ -83,7 +166,7 @@ public class DenseMemoryManipulation {
     System.arraycopy(dataIn, 0, tmp, 0, n);
     return tmp;
   }
-  
+
   /**
    * Copies and array
    * @param dataIn the data to copy
@@ -95,8 +178,8 @@ public class DenseMemoryManipulation {
     short[] tmp = new short[n];
     System.arraycopy(dataIn, 0, tmp, 0, n);
     return tmp;
-  }  
-    
+  }
+
   /**
    * Copies and array
    * @param dataIn the data to copy
@@ -109,7 +192,7 @@ public class DenseMemoryManipulation {
     System.arraycopy(dataIn, 0, tmp, 0, n);
     return tmp;
   }
-  
+
   /**
    * Copies and array
    * @param dataIn the data to copy
@@ -121,8 +204,8 @@ public class DenseMemoryManipulation {
     long[] tmp = new long[n];
     System.arraycopy(dataIn, 0, tmp, 0, n);
     return tmp;
-  }  
-  
+  }
+
   /**
    * Copies and array
    * @param dataIn the data to copy
@@ -134,8 +217,8 @@ public class DenseMemoryManipulation {
     float[] tmp = new float[n];
     System.arraycopy(dataIn, 0, tmp, 0, n);
     return tmp;
-  }  
-  
+  }
+
   /**
    * Copies and array
    * @param dataIn the data to copy
@@ -147,6 +230,6 @@ public class DenseMemoryManipulation {
     double[] tmp = new double[n];
     System.arraycopy(dataIn, 0, tmp, 0, n);
     return tmp;
-  }  
-  
+  }
+
 }
