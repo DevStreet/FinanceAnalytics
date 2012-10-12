@@ -11,10 +11,12 @@ import java.util.Map;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeAbstract;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGComplexArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDiagonalArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGSparseArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -32,6 +34,7 @@ public class Transpose {
     s_functionPointers.put(OGDoubleArray.class, TransposeOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, TransposeOGSparseArray.getInstance());
     s_functionPointers.put(OGComplexArray.class, TransposeOGComplexArray.getInstance());
+    s_functionPointers.put(OGDiagonalArray.class, TransposeOGDiagonalArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
