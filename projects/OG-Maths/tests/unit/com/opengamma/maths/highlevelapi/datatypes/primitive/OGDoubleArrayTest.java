@@ -188,7 +188,7 @@ public class OGDoubleArrayTest {
     D.getFullColumn(23);
   }  
 
-  // test get full row ok
+  // test get full col ok
   @Test
   public void testGetFullColumnOkIndexTest() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
@@ -263,28 +263,28 @@ public class OGDoubleArrayTest {
     assertTrue(D.equals(Diff));
   }      
   
-  // test equals obj points to obj
+  // test fuzzy equals obj points to obj
   @Test
   public void testFuzzyEqualsObjeqObj() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
     assertTrue(D.fuzzyequals(D,10*D1MACH.four()));
   }
 
-  // test equals obj not = null
+  // test fuzzy equals obj not = null
   @Test
   public void testFuzzyEqualsObjNull() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
     assertFalse(D.fuzzyequals(null,10*D1MACH.four()));
   }  
   
-  // test equals obj class different
+  // test fuzzy equals obj class different
   @Test
   public void testFuzzyEqualsObjDifferentClass() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
     assertFalse(D.fuzzyequals(new Double(1.),10*D1MACH.four()));
   }  
 
-  // test equals obj class ok, diff cols
+  // test fuzzy equals obj class ok, diff cols
   @Test
   public void testFuzzyEqualsObjDifferentCols() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
@@ -292,7 +292,7 @@ public class OGDoubleArrayTest {
     assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
   }    
   
-  // test equals obj class ok, same cols diff rows
+  // test fuzzy equals obj class ok, same cols diff rows
   @Test
   public void testFuzzyEqualsObjDifferentRows() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
@@ -300,7 +300,7 @@ public class OGDoubleArrayTest {
     assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
   }  
 
-  // test equals obj class ok, same cols same rows different data
+  // test fuzzy equals obj class ok, same cols same rows different data
   @Test
   public void testFuzzyEqualsObjDifferentData() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
@@ -308,7 +308,7 @@ public class OGDoubleArrayTest {
     assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
   }    
 
-  // test equals obj class ok, same cols same rows same data
+  // test fuzzy equals obj class ok, same cols same rows same data
   @Test
   public void testFuzzyEqualsObjStructurallyIdentical() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
