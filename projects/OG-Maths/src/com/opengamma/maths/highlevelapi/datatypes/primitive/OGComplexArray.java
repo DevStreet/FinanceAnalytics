@@ -10,6 +10,7 @@ import java.util.Arrays;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
@@ -41,14 +42,20 @@ public class OGComplexArray extends OGArraySuper<Number> {
   public OGComplexArray(double[][] realPart, double[][] imaginaryPart) {
     Catchers.catchNullFromArgList(realPart, 1);
     Catchers.catchNullFromArgList(imaginaryPart, 2);
+    if (MatrixPrimitiveUtils.isRagged(realPart)) {
+      throw new MathsExceptionIllegalArgument("Backing real array is ragged");
+    }
+    if (MatrixPrimitiveUtils.isRagged(imaginaryPart)) {
+      throw new MathsExceptionIllegalArgument("Backing imaginary array is ragged");
+    }
     _data = DenseMemoryManipulation.convertTwoRowMajorDoublePointerToColumnMajorInterleavedSinglePointer(realPart, imaginaryPart);
     _rows = realPart.length;
     _columns = realPart[0].length;
   }
 
   /**
-   * Takes a column major double[] and turns it into an OGComplexArray
-   * @param dataIn the backing data
+   * Takes a column major double[] and turns it into an OGComplexArray (imaginary part assumed to be zero)
+   * @param dataIn the real part data backing data
    * @param rows number of rows
    * @param columns number of columns
    */
@@ -100,21 +107,63 @@ public class OGComplexArray extends OGArraySuper<Number> {
       throw new MathsExceptionIllegalArgument("Number of rows and columns specified does not commute with the quantity of data supplied.\n Rows=" + rows + " Columns=" + columns + " Data length=" +
           realDatalen);
     }
-
-    _data = new double[2 * rows * columns];
     _data = DenseMemoryManipulation.convertTwoSinglePointersToInterleavedSinglePointer(realData, imagData);
     _rows = rows;
     _columns = columns;
   }
 
   /**
-   * @param number the single number in this array
+   * Construct from a row major (m * n)  array of ComplexTypes
+   * @param data a non ragged array of ComplexTypes
+   */
+  public OGComplexArray(ComplexType[][] data) {
+    Catchers.catchNullFromArgList(data, 1);
+    final int rows = data.length;
+    // check for nulls now
+    for (int i = 0; i < rows; i++) {
+      if (data[i] == null) {
+        throw new MathsExceptionNullPointer("Row " + i + " in data points to null");
+      }
+    }
+
+    final int columns = data[0].length;
+    _data = new double[2 * rows * columns];
+    int count = 0;
+    for (int i = 0; i < rows; i++) {
+      if (data[i].length != columns) {
+        throw new MathsExceptionIllegalArgument("The (m*n) array presented to the constructor must have a consistent row length, row 0 has " + columns + " elements row " + i + " has " +
+            data[i].length + " elements");
+      }
+      for (int j = 0; j < columns; j++) {
+        _data[j * 2 * rows + count] = data[i][j].getReal();
+        _data[j * 2 * rows + count + 1] = data[i][j].getImag();
+      }
+      count += 2;
+    }
+    _rows = rows;
+    _columns = columns;
+  }
+
+  /**
+   * @param number the single real number in this array
    */
   public OGComplexArray(double number) {
     _columns = 1;
     _rows = 1;
     _data = new double[2];
     _data[0] = number;
+  }
+
+  /**
+   * @param number a complex type to enter in this array
+   */
+  public OGComplexArray(ComplexType number) {
+    Catchers.catchNullFromArgList(number, 1);
+    _columns = 1;
+    _rows = 1;
+    _data = new double[2];
+    _data[0] = number.getReal();
+    _data[1] = number.getImag();
   }
 
   @Override
@@ -138,29 +187,34 @@ public class OGComplexArray extends OGArraySuper<Number> {
     if (indices[1] >= _columns) {
       throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
     }
-    return new ComplexType(indices[1] * _rows + indices[0], 0);
+    final int jmp = 2 * (indices[1] * _rows + indices[0]);
+    return new ComplexType(_data[jmp], _data[jmp + 1]);
   }
 
-  public OGDoubleArray getFullRow(int index) {
+  public OGComplexArray getFullRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_columns];
+    int count = 0;
+    double[] tmp = new double[_columns * 2];
+    int jmp;
     for (int i = 0; i < _columns; i++) {
-      tmp[i] = _data[i * _rows + index];
+      jmp = 2 * (i * _rows + index);
+      tmp[count] = _data[jmp];
+      tmp[count + 1] = _data[jmp + 1];
+      count += 2;
     }
-    return new OGDoubleArray(tmp, 1, _columns);
+    return new OGComplexArray(tmp, 1, _columns);
   }
 
-  public OGDoubleArray getFullColumn(int index) {
+  public OGComplexArray getFullColumn(int index) {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_rows];
-    for (int i = 0; i < _rows; i++) {
-      tmp[i] = _data[i + index * _rows];
-    }
-    return new OGDoubleArray(tmp, _rows, 1);
+    double[] tmp = new double[2 * _rows];
+    System.arraycopy(_data, 2 * index * _rows, tmp, 0, tmp.length);
+    return new OGComplexArray(tmp, _rows, 1);
+
   }
 
   /**
@@ -168,7 +222,7 @@ public class OGComplexArray extends OGArraySuper<Number> {
    * @return the number of elements in the matrix
    */
   public int getNumberOfElements() {
-    return _data.length;
+    return _rows * _columns;
   }
 
   /**
@@ -177,21 +231,6 @@ public class OGComplexArray extends OGArraySuper<Number> {
    */
   public double[] getData() {
     return _data;
-  }
-
-  public OGDoubleArray getRow(int i) {
-    if (i < 0) {
-      throw new MathsExceptionIllegalArgument("Specified row to get is illegal. Value given was " + i);
-    }
-    if (i >= _rows) {
-      throw new MathsExceptionIllegalArgument("Specified row to get is illegal. Value given was " + i);
-    }
-
-    double[] rowData = new double[_columns];
-    for (int k = 0; k < _columns; k++) {
-      rowData[k] = _data[k * _rows + i];
-    }
-    return new OGDoubleArray(rowData, 1, _columns);
   }
 
   /**
