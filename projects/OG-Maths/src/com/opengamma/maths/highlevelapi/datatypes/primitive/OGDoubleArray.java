@@ -131,20 +131,6 @@ public class OGDoubleArray extends OGArraySuper<Number> {
     return _data;
   }
 
-  public OGDoubleArray getRow(int i) {
-    if (i < 0) {
-      throw new MathsExceptionIllegalArgument("Specified row to get is illegal. Value given was " + i);
-    }
-    if (i >= _rows) {
-      throw new MathsExceptionIllegalArgument("Specified row to get is illegal. Value given was " + i);
-    }
-
-    double[] rowData = new double[_columns];
-    for (int k = 0; k < _columns; k++) {
-      rowData[k] = _data[k * _rows + i];
-    }
-    return new OGDoubleArray(rowData, 1, _columns);
-  }
 
   /**
    * Decide if this {@link OGDoubleArray} is equal to another {@link OGDoubleArray} with the addition of some numerical tolerance for floating point comparison
