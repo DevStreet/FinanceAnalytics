@@ -99,7 +99,7 @@ public class OGFunctions {
     catchNull(thisArray);
     double[][] answer = allocNewBasedOnSizeOf(thisArray);
     for (int i = 0; i < answer.length; i++) {
-      answer[i] = com.opengamma.maths.lowlevelapi.functions.utilities.Abs.stateless(thisArray.getRow(i).getData());
+      answer[i] = com.opengamma.maths.lowlevelapi.functions.utilities.Abs.stateless(thisArray.getFullRow(i).getData());
     }
     return new OGDoubleArray(answer);
   }
