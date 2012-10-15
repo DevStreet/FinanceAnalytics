@@ -67,7 +67,7 @@ public class ComplexType extends Number {
    * Get the real component of the number
    * @return the real component of the number
    */
-  double getReal() {
+  public double getReal() {
     return _data[0];
   }
 
@@ -75,7 +75,7 @@ public class ComplexType extends Number {
    * Get the real component of the number
    * @return the real component of the number
    */
-  double getImag() {
+  public double getImag() {
     return _data[1];
   }
 
