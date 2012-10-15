@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
