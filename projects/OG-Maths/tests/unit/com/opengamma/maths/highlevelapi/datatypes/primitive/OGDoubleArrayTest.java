@@ -243,7 +243,7 @@ public class OGDoubleArrayTest {
   @Test
   public void testEqualsObjDifferentRows() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
-    OGDoubleArray Diff = new OGDoubleArray(new double[][] {{1,2,3,4}});    
+    OGDoubleArray Diff = new OGDoubleArray(new double[][] {{1,2,3}});    
     assertFalse(D.equals(Diff));
   }  
 
@@ -296,7 +296,7 @@ public class OGDoubleArrayTest {
   @Test
   public void testFuzzyEqualsObjDifferentRows() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
-    OGDoubleArray Diff = new OGDoubleArray(new double[][] {{1,2,3,4}});    
+    OGDoubleArray Diff = new OGDoubleArray(new double[][] {{1,2,3}});    
     assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
   }  
 
@@ -323,7 +323,7 @@ public class OGDoubleArrayTest {
     D.hashCode();
   }
   
-  // test hash code
+  // test toString code
   @Test
   public void testToStringTest() {
     OGDoubleArray D = new OGDoubleArray(data4x3unwound, 4, 3);
