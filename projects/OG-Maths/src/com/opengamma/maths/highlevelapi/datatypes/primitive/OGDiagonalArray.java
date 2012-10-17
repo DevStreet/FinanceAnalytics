@@ -144,7 +144,7 @@ public class OGDiagonalArray extends OGArraySuper<Number> {
   @Override
   public Double getEntry(int... indices) {
     if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
+      throw new MathsExceptionIllegalArgument("OGDiagonalArray only has 2 indicies, more than 2 were given");
     }
     if (indices[0] >= _rows) {
       throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
