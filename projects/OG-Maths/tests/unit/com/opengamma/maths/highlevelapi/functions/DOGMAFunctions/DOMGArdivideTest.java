@@ -21,13 +21,15 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAA
  */
 public class DOMGArdivideTest {
   DOGMAArithmetic DA = new DOGMAArithmetic();
-
+  double NaN= Double.NaN;
+  
   // OGDoubles
   OGDoubleArray OGD1x1 = new OGDoubleArray(new double[][] {{10 } });
   OGDoubleArray OGD3x5A = new OGDoubleArray(new double[][] { {1, -2, 3, -4, 5 }, {-6, 7, -8, 9, -10 }, {11, -12, 13, -14, 15 } });
   OGDoubleArray OGD3x5B = new OGDoubleArray(new double[][] { {10, -20, 30, -40, 50 }, {-60, 70, -80, 90, -100 }, {110, -120, 130, -140, 150 } });
   OGDoubleArray OGD5x2 = new OGDoubleArray(new double[][] { {1, 2 }, {3, 4 }, {5, 6 }, {7, 8 }, {9, 10 } });
-
+  OGDoubleArray OGD3x5AwNaN =  new OGDoubleArray(new double[][] { {Double.NaN, -2, Double.NaN, -4, Double.NaN }, {-6, Double.NaN, -8, Double.NaN, -10 }, {Double.NaN, -12, Double.NaN, -14, Double.NaN } });
+  
   // OGSparse
   OGSparseArray OGS1x1 = new OGSparseArray(new double[][] {{10 } });
   OGSparseArray OGS3x5A = new OGSparseArray(new double[][] { {1, -2, 0, -4, 0 }, {0, 7, 0, 9, -10 }, {0, 0, 13, 0, 0 } });
@@ -62,6 +64,8 @@ public class DOMGArdivideTest {
   OGDoubleArray OGS3x5ArdivOGS3x5B = new OGDoubleArray(new double[][] { {0.10, 0.10, Double.NaN, 0.10, Double.NaN }, {Double.NaN, 0.10, -0.00, 0.10, 0.10 },
       {Double.NaN, Double.NaN, 0.10, Double.NaN, Double.NaN } });
 
+  OGDoubleArray OGD3x5AwNaNrdivideOGS3x5A = new OGDoubleArray(new double[] {NaN, Double.NEGATIVE_INFINITY, NaN, 1.0, NaN, Double.NEGATIVE_INFINITY, NaN, Double.NEGATIVE_INFINITY, NaN, 1.0, NaN, Double.NEGATIVE_INFINITY, NaN, 1.0, NaN},3,5);
+  
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput1okinput2() {
     DA.rdivide(null, new OGDoubleArray(1));
@@ -133,6 +137,13 @@ public class DOMGArdivideTest {
     assertTrue(tmp.equals(OGDAllNaN));
   }
 
+  @Test
+  public void testDoublerdivSparseIEEEArraywiseNaNdivisionTest() {
+    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5AwNaN, OGS3x5A);
+    assertTrue(tmp.equals(OGD3x5AwNaNrdivideOGS3x5A));
+  }
+  
+  
   // OGSparseArray and OGDoubleArray
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public void testOGSandOGDNonConformantArgsTest() {
