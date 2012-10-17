@@ -24,4 +24,15 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
         RWORK, info);
   }
 
+  @Override
+  public void dgetrf(int m, int n, double[] A, int lda, int[] ipiv, int[] info) {//CSIGNORE
+    OGLAPACKRawWrapper.dgetrf(new int[] {m }, new int[] {n }, A, new int[] {lda }, ipiv, info);
+  }
+
+  @Override
+  public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { // CSIGNORE
+    OGLAPACKRawWrapper.dgelsd(new int[] {m }, new int[] {n }, new int[] {nrhs }, A, new int[] {lda }, b, new int[] {ldb }, s, new double[] {rcond }, rank, work, new int[] {lwork },
+        iwork, info);
+  }
+
 }

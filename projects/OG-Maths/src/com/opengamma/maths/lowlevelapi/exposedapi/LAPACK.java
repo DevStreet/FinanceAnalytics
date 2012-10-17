@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi;
 
-
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKAPIInterface;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKAbstractSuper;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKNativeBacked;
@@ -34,7 +33,7 @@ public class LAPACK implements LAPACKAPIInterface {
     /**
      * Netlib f2j backed LAPACK
      */
-    Netlib    
+    Netlib
   }
 
   // for now plumb in netlib
@@ -62,5 +61,15 @@ public class LAPACK implements LAPACKAPIInterface {
   public void zgesvd(char jobu, char jobvt, int m, int n, double[] A, int lda, double[] S, double[] U, int ldu, double[] VT, int ldvt, double[] WORK, int lwork, double[] RWORK, int[] info) { //CSIGNORE
     _localLAPACK.zgesvd(jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
   }
-  
+
+  @Override
+  public void dgetrf(int m, int n, double[] A, int lda, int[] IPIV, int[] INFO) { //CSIGNORE
+    _localLAPACK.dgetrf(m, n, A, lda, IPIV, INFO);
+  }
+
+  @Override
+  public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { // CSIGNORE
+    _localLAPACK.dgelsd(m, n, nrhs, A, lda, b, ldb, s, rcond, rank, work, lwork, iwork, info);
+  }
+
 }
