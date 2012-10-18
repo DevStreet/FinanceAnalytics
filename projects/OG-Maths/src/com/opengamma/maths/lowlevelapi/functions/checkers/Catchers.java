@@ -301,6 +301,22 @@ public class Catchers {
     }
   }
 
+  /**
+   * Catches null pointer
+   * @param thisArray the array to check
+   * @param pos the position in the arg list 
+   */
+  public static void catchNullFromArgList(int[][] thisArray, int pos) {
+    if (thisArray == null) {
+      throw new MathsExceptionNullPointer("Argument passed in position " + pos + " points to NULL. STOPPING");
+    }
+    for (int i = 0; i < thisArray.length; i++) {
+      if (thisArray[i] == null) {
+        throw new MathsExceptionNullPointer("Argument passed in position " + pos + " has row " + i + " pointing to NULL. STOPPING");
+      }
+    }
+  }  
+  
   // Numeric catchers  
   // my kingdom for a template/macro  
 
