@@ -34,6 +34,27 @@ public class DenseMemoryManipulation {
     }
     return tmp;
   }
+  
+  /**
+   * Converts a row major int pointer to a column major single pointer
+   * @param dataIn a row major int[][] non ragged array
+   * @return a column major int[] array
+   */
+  public static int[] convertRowMajorIntPointerToColumnMajorSinglePointer(int[][] dataIn) {
+    if (MatrixPrimitiveUtils.isRagged(dataIn)) {
+      throw new MathsExceptionIllegalArgument("Backing array is ragged");
+    }
+    int rows = dataIn.length;
+    int cols = dataIn[0].length;
+    int[] tmp = new int[rows * cols];
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        tmp[j * rows + i] = dataIn[i][j];
+      }
+    }
+    return tmp;
+  }  
 
   /**
    * Converts a row major double pointer to a row major single pointer

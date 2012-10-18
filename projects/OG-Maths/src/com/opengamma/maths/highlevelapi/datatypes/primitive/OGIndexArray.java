@@ -7,10 +7,11 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
  * The OGIndex class provides access to the typically understood notion of a matrix, i.e. A Fully populated array.
@@ -19,7 +20,6 @@ public class OGIndexArray extends OGArraySuper<Integer> {
   private int[] _data;
   private int _rows;
   private int _columns;
-  private int[] _rowPtr;
 
   /**
    * Constructors
@@ -30,37 +30,21 @@ public class OGIndexArray extends OGArraySuper<Integer> {
    * @param aMatrix is an n columns x m rows matrix stored as a row major array of arrays
    */
   public OGIndexArray(int[][] aMatrix) {
-    // test if ragged
-    if (MatrixPrimitiveUtils.isRagged(aMatrix)) {
-      throw new NotImplementedException("Construction from ragged array not implemented");
-    }
-
+    Catchers.catchNullFromArgList(aMatrix, 1);
+    _data = DenseMemoryManipulation.convertRowMajorIntPointerToColumnMajorSinglePointer(aMatrix);
     _rows = aMatrix.length;
-    // test if square
-    if (MatrixPrimitiveUtils.isSquare(aMatrix)) {
-      _columns = _rows;
-    } else {
-      _columns = aMatrix[0].length;
-    }
-
-    //malloc
-    _data = new int[MatrixPrimitiveUtils.getNumberOfElementsInArray(aMatrix)];
-    _rowPtr = new int[aMatrix.length];
-
-    int ptr = 0;
-    // flatten the matrix
-    for (int i = 0; i < aMatrix.length; i++) {
-      _rowPtr[i] = ptr;
-      for (int j = 0; j < aMatrix[i].length; j++) {
-        _data[ptr] = aMatrix[i][j];
-        ptr++;
-      }
-    }
+    _columns = aMatrix[0].length;
   }
 
   /**
-   * Methods
+   * @param number the single number in this array
    */
+  public OGIndexArray(int number) {
+    _columns = 1;
+    _rows = 1;
+    _data = new int[1];
+    _data[0] = number;
+  }
 
   /**
    * Takes a column major int[] and turns it into an OGIndexArray
@@ -70,7 +54,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
    */
   public OGIndexArray(int[] dataIn, int rows, int columns) {
     if (dataIn == null) {
-      throw new MathsExceptionIllegalArgument("dataIn is null");
+      throw new MathsExceptionNullPointer("dataIn is null");
     }
     if (rows < 1) {
       throw new MathsExceptionIllegalArgument("Illegal number of rows specified. Value given was " + rows);
@@ -87,8 +71,10 @@ public class OGIndexArray extends OGArraySuper<Integer> {
     _rows = rows;
     _columns = columns;
   }
- 
 
+  /*
+   * Methods
+   */
   /**
    * Gets the number of elements in the matrix (full population assumed).
    * @return the number of elements in the matrix
@@ -103,44 +89,40 @@ public class OGIndexArray extends OGArraySuper<Integer> {
    * If a pair of indices are given, it assumes standard lookup behaviour and returns the index at the given matrix "coordinate".
    * @return the entry at index specified
    *    */
+  @Override
   public Integer getEntry(int... indices) {
     if (indices.length > 2) {
-      throw new IndexOutOfBoundsException("Trying to access a 2D array representation with tuple>2 is forbidden!");
-    } else if (indices.length == 2) {
-      return _data[_rowPtr[indices[0]] + indices[1]];
-    } else {
-      return _data[indices[0]];
+      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
     }
+    if (indices[0] >= _rows) {
+      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
+    }
+    if (indices[1] >= _columns) {
+      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
+    }
+    return _data[indices[1] * _rows + indices[0]];
   }
 
   public OGIndexArray getFullRow(int index) {
+    if (index < 0 || index >= _rows) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
     int[] tmp = new int[_columns];
     for (int i = 0; i < _columns; i++) {
-      tmp[i] = _data[_rowPtr[index] + i];
+      tmp[i] = _data[i * _rows + index];
     }
-    int[][] tmp2 = {tmp };
-    return new OGIndexArray(tmp2);
+    return new OGIndexArray(tmp, 1, _columns);
   }
 
   public OGIndexArray getFullColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
     int[] tmp = new int[_rows];
     for (int i = 0; i < _rows; i++) {
-      tmp[i] = _data[index + i * _columns];
+      tmp[i] = _data[i + index * _rows];
     }
-    int[][] tmp2 = {tmp };
-    return new OGIndexArray(tmp2);
-  }
-
-  public OGIndexArray getRowElements(int index) {
-    return this.getFullRow(index);
-  }
-
-  public OGIndexArray getColumnElements(int index) {
-    return this.getFullColumn(index);
-  }
-
-  public int getNumberOfNonZeroElements() {
-    return MatrixPrimitiveUtils.numberOfNonZeroElementsInVector(_data);
+    return new OGIndexArray(tmp, _rows, 1);
   }
 
   /**
@@ -168,39 +150,20 @@ public class OGIndexArray extends OGArraySuper<Integer> {
   }
 
   /**
-   * The to...'s
-   */
-
-  /**
-   * @return tmp an array of arrays row major representation of the OGIndex matrix
-   */
-  public int[][] toArray() {
-    int[][] tmp = new int[_rows][_columns];
-    for (int i = 0; i < _rows; i++) {
-      for (int j = 0; j < _columns; j++) {
-        tmp[i][j] = _data[_rowPtr[i] + j];
-      }
-    }
-    return tmp;
-  }
-
-
-  /**
    * ToString for pretty printing
    * @return A string representation of the matrix
    */
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
-    sb.append("\n{\n");
+    String str = "OGIndexArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
+    str = str + "\n====Pretty Print====\n";
     for (int i = 0; i < _rows; i++) {
       for (int j = 0; j < _columns; j++) {
-        sb.append(String.format("%12d ", _data[i * _columns + j]));
+        str += String.format("%24d ", _data[j * _rows + i]);
       }
-      sb.append("\n");
+      str += String.format("\n");
     }
-    sb.append("}");
-    return sb.toString();
+    return str;
   }
 
   @Override
@@ -209,7 +172,6 @@ public class OGIndexArray extends OGArraySuper<Integer> {
     int result = 1;
     result = prime * result + _columns;
     result = prime * result + Arrays.hashCode(_data);
-    result = prime * result + Arrays.hashCode(_rowPtr);
     result = prime * result + _rows;
     return result;
   }
