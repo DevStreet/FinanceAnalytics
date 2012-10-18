@@ -29,7 +29,7 @@ public final class TransposeOGPermutationArray extends TransposeAbstract<OGPermu
     // transpose of a permutation matrix is just looking up its own indices in itself a(i,j)=a(j,i) but we walk just once with compressed canonical vectors
     // so if you have permutation vector P, range=1:length(P), the range(P) gives the transpose permutation
     int[] data = array1.getData();
-    int dim = array1.getRows();
+    int dim = array1.getNumberOfRows();
 
     int[] tmp = new int[dim];
     for (int i = 0; i < dim; i++) {
