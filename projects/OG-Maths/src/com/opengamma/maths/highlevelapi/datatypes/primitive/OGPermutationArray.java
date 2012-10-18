@@ -19,6 +19,45 @@ public class OGPermutationArray extends OGArraySuper<Number> {
   private int _rows;
   private int _columns;
 
+  /**
+   * Construct from a row wise permutation index "p" such that "p*A" will permute A row wise
+   * @param permute the indices describing the permutation  
+   */
+  public OGPermutationArray(int[] permute) {
+    Catchers.catchNullFromArgList(permute, 1);
+    final int len = permute.length;
+    byte[] tmp = new byte[len];
+
+    // check the permutation is sane
+    for (int i = 0; i < len; i++) {
+      if (permute[i] >= len) {
+        throw new MathsExceptionIllegalArgument("The vector permute contains references to permutation indicies out of the dimension of the vector, cannot permute element " + permute[i] +
+            " of an array of length " + len + ".");
+      }
+      if (permute[i] < 0) {
+        throw new MathsExceptionIllegalArgument("The vector permute contains negative permutation indicies.");
+      }
+      if (tmp[permute[i]] == 1) {
+        throw new MathsExceptionIllegalArgument("The vector permute contains repeated permutation indicies and shouldn't!");
+      } else {
+        tmp[permute[i]] = 1;
+      }
+    }
+
+    _data = new int[len];
+    System.arraycopy(permute, 0, _data, 0, len);
+    _rows = len;
+    _columns = len;
+  }
+
+  /**
+   * Gets the data.
+   * @return the data
+   */
+  public int[] getData() {
+    return _data;
+  }
+
   @Override
   public int getNumberOfRows() {
     return _rows;
@@ -45,63 +84,6 @@ public class OGPermutationArray extends OGArraySuper<Number> {
       ret = 1;
     }
     return ret;
-  }
-
-  /**
-   * Construct from a row wise permutation index "p" such that "p*A" will permute A row wise
-   * @param permute the indices describing the permutation  
-   */
-  public OGPermutationArray(int[] permute) {
-    Catchers.catchNullFromArgList(permute, 1);
-    final int len = permute.length;
-    byte[] tmp = new byte[len];
-
-    // check the permutation is sane
-    for (int i = 0; i < len; i++) {
-      if (permute[i] >= len) {
-        throw new MathsExceptionIllegalArgument("The vector permute contains references to permutation indicies out of the dimension of the vector, cannot permute element " + permute[i] +
-            " of an array of length " + len + ".");
-      }
-      if (tmp[i] == 1) {
-        throw new MathsExceptionIllegalArgument("The vector permute contains repeated permutation indicies and shouldn't!");
-      } else {
-        tmp[i] = 1;
-      }
-    }
-    for (int i = 0; i < len; i++) {
-      if (tmp[i] != 1) {
-        throw new MathsExceptionIllegalArgument("The vector permute does not contains enough indicies to form a valid permutation.");
-      }
-    }
-
-    _data = new int[len];
-    System.arraycopy(permute, 0, _data, 0, len);
-    _rows = len;
-    _columns = len;
-  }
-
-  /**
-   * Gets the data.
-   * @return the data
-   */
-  public int[] getData() {
-    return _data;
-  }
-
-  /**
-   * Gets the rows.
-   * @return the rows
-   */
-  public int getRows() {
-    return _rows;
-  }
-
-  /**
-   * Gets the columns.
-   * @return the columns
-   */
-  public int getColumns() {
-    return _columns;
   }
 
   @Override
@@ -146,18 +128,13 @@ public class OGPermutationArray extends OGArraySuper<Number> {
       return false;
     }
     OGPermutationArray other = (OGPermutationArray) obj;
-    if (_columns != other._columns) {
+    if (_columns != other._columns) { // rows and cols are the same
       return false;
     }
-    if (_rows != other._rows) {
-      return false;
-    }    
     if (!Arrays.equals(_data, other._data)) {
       return false;
     }
     return true;
   }
 
-  
-  
 }
