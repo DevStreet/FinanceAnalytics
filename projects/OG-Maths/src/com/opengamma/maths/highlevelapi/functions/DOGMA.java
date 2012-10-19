@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions;
 
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSortResult;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
@@ -33,6 +34,16 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAUtilityFu
  */
 public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI, DOGMARearrangingMatricesAPI, DOGMASparseUtilitiesAPI, DOGMASpecialFunctionsAPI, DOGMATrigonometaryAPI,
     DOGMAUtilityFunctionsAPI, DOGMALinearAlgebraAPI {
+  /**
+   * The square root of minus one, the complex number <i>i</i>
+   */
+  public static final ComplexType i = ComplexType.I;  //CSIGNORE
+
+  /**
+   * Negated square root of minus one, the complex number <i>-i</i>
+   */
+  public static final ComplexType negative_i = ComplexType.NEGATIVE_I;  //CSIGNORE  
+  
   // impl blobs
   private static final DOGMAArithmetic DA = new DOGMAArithmetic();
   private static final DOGMAExponentsAndLogarithmsAPI DEAL = new DOGMAExponentsAndLogarithms();
