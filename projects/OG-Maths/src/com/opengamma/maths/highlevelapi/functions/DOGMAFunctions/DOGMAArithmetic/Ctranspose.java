@@ -11,10 +11,14 @@ import java.util.Map;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDiagonalArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGPermutationArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeAbstract;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -32,6 +36,8 @@ public class Ctranspose {
     s_functionPointers.put(OGDoubleArray.class, CtransposeOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, CtransposeOGSparseArray.getInstance());
     s_functionPointers.put(OGComplexArray.class, CtransposeOGComplexArray.getInstance());
+    s_functionPointers.put(OGPermutationArray.class, CtransposeOGPermutationArray.getInstance());
+    s_functionPointers.put(OGDiagonalArray.class, CtransposeOGDiagonalArray.getInstance());   
   }
 
   @SuppressWarnings("unchecked")
