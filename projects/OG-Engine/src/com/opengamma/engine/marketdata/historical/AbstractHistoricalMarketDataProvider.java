@@ -69,6 +69,10 @@ public abstract class AbstractHistoricalMarketDataProvider extends AbstractMarke
     this(historicalTimeSeriesSource, securitySource, null);
   }
 
+  public SecuritySource getSecuritySource() {
+    return _securitySource;
+  }
+
   //-------------------------------------------------------------------------
   @Override
   public void subscribe(ValueRequirement valueRequirement) {
@@ -173,7 +177,7 @@ public abstract class AbstractHistoricalMarketDataProvider extends AbstractMarke
       case SECURITY:
         final Security security;
         try {
-          security = _securitySource.getSecurity(requirement.getTargetSpecification().getUniqueId());
+          security = this.getSecuritySource().get(requirement.getTargetSpecification().getUniqueId());
         } catch (DataNotFoundException ex) {
           return null;
         }

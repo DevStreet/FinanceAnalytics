@@ -140,8 +140,8 @@ $.register_module({
                             rectangle = {top_left: (corner = grid.nearest_cell(x, y)), bottom_right: corner},
                             selection = grid.selector.selection(rectangle);
                         if (!selection || last_corner === (corner_cache = JSON.stringify(corner))) return;
-                        if (!(cell = grid.cell(transpose_selection.call(grid, selection)))) return;
-                        cell.top = corner.top - scroll_top + grid.meta.header_height;
+                        if (!(cell = grid.cell(selection))) return;
+                        cell.top = corner.top - scroll_top + grid.meta.header_height + grid.offset.top;
                         cell.right = corner.right - (page_x > fixed_width ? scroll_left : 0);
                         last_corner = corner_cache; last_x = page_x; last_y = page_y;
                         fire(grid.events.cellhoverin, cell);
@@ -181,11 +181,12 @@ $.register_module({
                     };
                 })(null));
             })();
-            grid.selector = new og.analytics.Selector(grid).on('select', function (raw) {
-                var cell, meta = grid.meta, selection = transpose_selection.call(grid, raw), events;
-                events = 1 === selection.rows.length && 1 === selection.cols.length && (cell = grid.cell(selection)) ?
-                    grid.events.cellselect : grid.events.rangeselect;
-                fire(events, selection);
+            grid.selector = new og.analytics.Selector(grid).on('select', function (selection) {
+                var cell, meta = grid.meta, events;
+                if (1 === selection.rows.length && 1 === selection.cols.length && (cell = grid.cell(selection)))
+                    fire(grid.events.cellselect, cell, selection);
+                else
+                    fire(grid.events.rangeselect, selection);
                 fire(grid.events.select, selection); // fire for single and multiple selections
             });
             if (config.cellmenu) try {cellmenu = new og.analytics.CellMenu(grid);}
@@ -198,6 +199,7 @@ $.register_module({
             grid.meta = meta;
             meta.row_height = row_height;
             meta.header_height =  (config.source.depgraph ? 0 : set_height) + title_height;
+            meta.scrollbar_size = scrollbar_size;
             grid.col_widths();
             columns.headers = [];
             columns.types = [];
@@ -207,7 +209,10 @@ $.register_module({
                 set.columns.forEach(function (col) {columns.headers.push(col.header); columns.types.push(col.type);});
             });
             unravel_structure.call(grid);
-            if (grid.elements.empty) init_elements.call(grid);
+            if (grid.elements.empty) {
+                grid.clipboard = new og.analytics.Clipboard(grid);
+                init_elements.call(grid);
+            }
             grid.resize();
         };
         var render_header = (function () {
@@ -280,13 +285,6 @@ $.register_module({
                 return (partial_width += set_width), css;
             });
         };
-        var transpose_selection = function (raw) {
-            var grid = this, meta = grid.meta;
-            return {
-                cols: raw.cols, rows: raw.rows.map(function (row) {return meta.available[row];}),
-                type: raw.cols.map(function (col) {return meta.columns.types[col];})
-            };
-        };
         var unravel_structure = (function () {
             var rep_str =  '&nbsp;&nbsp;&nbsp;', rep_memo = {}, cache, counter;
             var all = function (total) {
@@ -351,6 +349,7 @@ $.register_module({
             var grid = this, live = $(grid.id).length;
             if (grid.elements.empty || live) return true; // if elements collection is empty, grid is still loading
             try {grid.dataman.kill();} catch (error) {return false;}
+            try {grid.clipboard.dataman.kill();} catch (error) {return false;}
             try {grid.elements.style.remove();} catch (error) {return false;}
         };
         constructor.prototype.cell = function (selection) {
@@ -378,14 +377,29 @@ $.register_module({
             (last_set = scroll_cols[scroll_cols.length - 1].columns)[last_set.length - 1].width += remainder;
         };
         constructor.prototype.nearest_cell = function (x, y) {
-            var grid = this, top, bottom, lcv, scan = grid.meta.columns.scan.all, len = scan.length;
+            var grid = this, top, bottom, lcv, scan = grid.meta.columns.scan.all, len = scan.length,
+                row_height = grid.meta.row_height, grid_height = grid.meta.viewport.height;
             for (lcv = 0; lcv < len; lcv += 1) if (scan[lcv] > x) break;
-            bottom = (Math.floor(y / grid.meta.row_height) + 1) * grid.meta.row_height;
-            top = bottom - grid.meta.row_height;
+            bottom = (Math.floor(Math.max(0, Math.min(y, grid_height - row_height)) / row_height) + 1) * row_height;
+            top = bottom - row_height;
             return {top: top, bottom: bottom, left: scan[lcv - 1] || 0, right: scan[lcv]};
         };
         constructor.prototype.off = og.common.events.off;
         constructor.prototype.on = og.common.events.on;
+        constructor.prototype.range = function (selection) {
+            var grid = this, viewport = grid.meta.viewport, row_indices, col_indices, cols_len = viewport.cols.length,
+                types = [], available = !selection.rows.some(function (row) {return !~viewport.rows.indexOf(row);}) &&
+                    !selection.cols.some(function (col) {return !~viewport.cols.indexOf(col);});
+            if (!available) return null;
+            row_indices = selection.rows.map(function (row) {return viewport.rows.indexOf(row);});
+            col_indices = selection.cols.map(function (col) {return viewport.cols.indexOf(col);});
+            return row_indices.map(function (row_idx) {
+                return col_indices.map(function (col_idx, idx) {
+                    var cell = grid.data[row_idx * cols_len + col_idx];
+                    return {value: cell, type: cell.t || selection.type[idx]};
+                });
+            });
+        };
         constructor.prototype.resize = function (handler) {
             var grid = this, config = grid.config, meta = grid.meta, columns = meta.columns, id = grid.id, css, sheet,
                 width = grid.elements.parent.width(), data_width, height = grid.elements.parent.height(),
@@ -413,15 +427,18 @@ $.register_module({
                 .concat(columns.scan.scroll.map(function (val) {return val + columns.width.fixed;}));
             data_width = columns.scan.all[columns.scan.all.length - 1] + scrollbar_size;
             meta.rows = (meta.available = available(grid.meta)).length;
-            meta.viewport = {height: meta.rows * row_height, width: Math.min(width, data_width) - columns.width.fixed};
-            meta.visible_rows = Math.min(Math.ceil((height - header_height) / row_height), meta.rows);
+            meta.viewport = {
+                scroll_height: height - header_height, height: meta.rows * row_height,
+                width: Math.min(width, data_width) - columns.width.fixed
+            };
+            meta.visible_rows = Math.min(Math.ceil(meta.viewport.scroll_height / row_height), meta.rows);
             css = templates.css({
                 id: id, viewport_width: meta.viewport.width,
                 fixed_bg: background(columns.fixed, columns.width.fixed, 'ecf5fa'),
                 scroll_bg: background(columns.scroll, columns.width.scroll, 'ffffff'),
                 scroll_width: columns.width.scroll, fixed_width: columns.width.fixed + scrollbar_size,
                 scroll_left: columns.width.fixed,
-                height: height - header_height, header_height: header_height, row_height: row_height,
+                height: meta.viewport.scroll_height, header_height: header_height, row_height: row_height,
                 set_height: config.source.depgraph ? 0 : set_height,
                 columns: col_css(id, columns.fixed).concat(col_css(id, columns.scroll, meta.fixed_length)),
                 sets: set_css(id, columns.fixed).concat(set_css(id, columns.scroll, columns.fixed.length))

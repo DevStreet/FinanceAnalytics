@@ -106,7 +106,7 @@ public class ExampleEquityPortfolioLoader extends AbstractTool<IntegrationToolCo
     SecurityMaster secMaster = getToolContext().getSecurityMaster();
     for (UniqueId uniqueId : loadSecurities) {
       SecurityDocument securityDocument = secMaster.get(uniqueId);
-      EquitySecurity security = (EquitySecurity) securityDocument.getSecurity();
+      EquitySecurity security = (EquitySecurity) securityDocument.getObject();
       GICSCode gics = security.getGicsCode();
       if (gics == null || gics.isPartial()) {
         continue;

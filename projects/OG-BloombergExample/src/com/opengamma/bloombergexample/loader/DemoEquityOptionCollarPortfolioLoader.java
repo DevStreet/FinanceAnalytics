@@ -513,7 +513,7 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractTool<Integrat
   }
 
   private HistoricalTimeSeriesInfoDocument loadTimeSeries(HistoricalTimeSeriesInfoDocument timeSeriesInfo) {
-    ExternalIdBundle idBundle = timeSeriesInfo.getInfo().getExternalIdBundle().toBundle(LocalDate.now());
+    ExternalIdBundle idBundle = timeSeriesInfo.getObject().getExternalIdBundle().toBundle(LocalDate.now());
     return loadTimeSeries(idBundle);
   }
 
@@ -552,7 +552,7 @@ public class DemoEquityOptionCollarPortfolioLoader extends AbstractTool<Integrat
     if (loadedSec == null) {
       throw new OpenGammaRuntimeException("Failed to load security for " + ticker);
     }
-    return getToolContext().getSecurityMaster().get(loadedSec).getSecurity();
+    return getToolContext().getSecurityMaster().get(loadedSec).getObject();
   }
 
   /**

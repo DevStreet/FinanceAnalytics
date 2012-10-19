@@ -9,6 +9,7 @@ import javax.time.Instant;
 import javax.time.InstantProvider;
 
 import com.opengamma.core.config.ConfigSource;
+import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -28,9 +29,8 @@ public class ConfigDBCurveCalculationConfigSource implements CurveCalculationCon
   }
 
   @Override
-  public MultiCurveCalculationConfig getConfig(final String name, final InstantProvider versionAsOf) {
-    final Instant versionInstant = (versionAsOf != null) ? versionAsOf.toInstant() : null;
-    return _configSource.getByName(MultiCurveCalculationConfig.class, name, versionInstant);
+  public MultiCurveCalculationConfig getConfig(final String name, final VersionCorrection versionCorrection) {
+    return _configSource.getConfig(MultiCurveCalculationConfig.class, name, versionCorrection);
   }
 
 }
