@@ -7,7 +7,6 @@ package com.opengamma.maths.commonapi.numbers;
 
 import java.util.Arrays;
 
-import com.opengamma.analytics.math.number.ComplexNumber;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -19,15 +18,15 @@ public class ComplexType extends Number {
   /** 
    * Define complex <i>i</i>
    */
-  public static final ComplexNumber I = new ComplexNumber(0, 1);
+  public static final ComplexType I = new ComplexType(0, 1);
   /**
    * Define complex <i>-i</i>
    */
-  public static final ComplexNumber NEGATIVE_I = new ComplexNumber(0, -1);
+  public static final ComplexType NEGATIVE_I = new ComplexType(0, -1);
   /**
    * Define complex 0 + 0<i>i</i>
    */
-  public static final ComplexNumber ZERO = new ComplexNumber(0);
+  public static final ComplexType ZERO = new ComplexType(0);
 
   private double[] _data = new double[2];
 
