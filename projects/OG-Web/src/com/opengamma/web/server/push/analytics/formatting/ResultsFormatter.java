@@ -8,6 +8,9 @@ package com.opengamma.web.server.push.analytics.formatting;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opengamma.analytics.financial.forex.method.PresentValueForexBlackVolatilitySensitivity;
 import com.opengamma.analytics.financial.greeks.BucketedGreekResultCollection;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
@@ -17,6 +20,7 @@ import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilit
 import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurface;
 import com.opengamma.analytics.math.curve.DoublesCurve;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
+import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceData;
 import com.opengamma.engine.value.ValueSpecification;
@@ -26,6 +30,8 @@ import com.opengamma.engine.view.calcnode.MissingInput;
 import com.opengamma.financial.analytics.LabelledMatrix1D;
 import com.opengamma.financial.analytics.LabelledMatrix2D;
 import com.opengamma.financial.analytics.LabelledMatrix3D;
+import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationWithSecurities;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
 import com.opengamma.util.ClassMap;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.money.MultipleCurrencyAmount;
@@ -38,6 +44,8 @@ import com.opengamma.web.server.push.analytics.ValueTypes;
  * Data structures bigger than a single value are encoded as JSON.
  */
 public class ResultsFormatter {
+
+  private static final Logger s_logger = LoggerFactory.getLogger(ResultsFormatter.class);
 
   /** For formatting null values. */
   private final Formatter _nullFormatter = new NullFormatter();
@@ -53,8 +61,6 @@ public class ResultsFormatter {
     DoubleFormatter doubleFormatter = new DoubleFormatter(bigDecimalFormatter);
     CurrencyAmountFormatter currencyAmountFormatter = new CurrencyAmountFormatter(bigDecimalFormatter);
 
-    _formatters.put(Boolean.class, _defaultFormatter);
-    _formatters.put(String.class, _defaultFormatter);
     _formatters.put(Double.class, doubleFormatter);
     _formatters.put(BigDecimal.class, bigDecimalFormatter);
     _formatters.put(CurrencyAmount.class, currencyAmountFormatter);
@@ -80,6 +86,9 @@ public class ResultsFormatter {
     _formatters.put(Double[][].class, new DoubleObjectArrayFormatter());
     _formatters.put(List.class, new ListDoubleArrayFormatter());
     _formatters.put(PresentValueForexBlackVolatilitySensitivity.class, new PresentValueForexBlackVolatilitySensitivityFormatter());
+    _formatters.put(SnapshotDataBundle.class, new SnapshotDataBundleFormatter(doubleFormatter));
+    _formatters.put(InterpolatedYieldCurveSpecificationWithSecurities.class, new InterpolatedYieldCurveSpecificationWithSecuritiesFormatter());
+    _formatters.put(HistoricalTimeSeriesBundle.class, new HistoricalTimeSeriesBundleFormatter());
   }
 
   private Formatter getFormatter(Object value, ValueSpecification valueSpec) {
@@ -90,10 +99,27 @@ public class ResultsFormatter {
     } else {
       Class<?> type = ValueTypes.getTypeForValueName(valueSpec.getValueName());
       if (type != null) {
-        return getFormatterForType(type);
-      } else {
-        return getFormatterForType(value.getClass());
+        if (type.isInstance(value)) {
+          return getFormatterForType(type);
+        } else {
+          // this happens if ValueTypes has a type for a value name but the actual value produced has a different type.
+          // there are several possible causes:
+          //   1) the type produced for a value has been changed (e.g. the function that produces it has been modified)
+          //      but the ValueTypes config hasn't been updated to match
+          //   2) the type produced for the value can change from cycle to cycle. to fix this the ValueTypes config
+          //      should be modified to specify a supertype of all possible types. if there isn't a common supertype
+          //      with a formatter that works for all possible values then the value name can be removed from the
+          //      ValueTypes config. this will give the value name a type of UNKNOWN and the type and formatting will
+          //      be decided from the value after every cycle
+          //   3) the type produced for the value is always the same but the value is converted to a different type
+          //      by Fudge depending on the value. e.g. an integer will be encoded as a byte if it is small enough
+          //      but will be encoded as an integer if it won't fit into a byte. the fix for this scenario is the same
+          //      as #2 above
+          s_logger.warn("Unexpected type for value. Value name: '{}', expected type: {}, actual type: {}, value: {}",
+                        new Object[]{valueSpec.getValueName(), type.getName(), value.getClass().getName(), value});
+        }
       }
+      return getFormatterForType(value.getClass());
     }
   }
 

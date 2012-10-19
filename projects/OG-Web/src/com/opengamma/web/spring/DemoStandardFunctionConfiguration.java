@@ -48,9 +48,12 @@ import com.opengamma.financial.analytics.CurrencyPairsDefaults;
 import com.opengamma.financial.analytics.CurrencyPairsFunction;
 import com.opengamma.financial.analytics.DV01Function;
 import com.opengamma.financial.analytics.FilteringSummingFunction;
-import com.opengamma.financial.analytics.FixedCashFlowFunction;
+import com.opengamma.financial.analytics.FixedPayCashFlowFunction;
+import com.opengamma.financial.analytics.FixedReceiveCashFlowFunction;
+import com.opengamma.financial.analytics.FloatingResetsFunction;
 import com.opengamma.financial.analytics.LastHistoricalValueFunction;
 import com.opengamma.financial.analytics.MissingInputsFunction;
+import com.opengamma.financial.analytics.NettingFixedCashFlowFunction;
 import com.opengamma.financial.analytics.PositionScalingFunction;
 import com.opengamma.financial.analytics.PositionTradeScalingFunction;
 import com.opengamma.financial.analytics.SummingFunction;
@@ -88,6 +91,10 @@ import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOption
 import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackPresentValueFunction;
 import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackVegaFunction;
 import com.opengamma.financial.analytics.model.bondfutureoption.BondFutureOptionBlackYCNSFunction;
+import com.opengamma.financial.analytics.model.cds.ISDAApproxCDSPriceFlatSpreadFunction;
+import com.opengamma.financial.analytics.model.cds.ISDAApproxCDSPriceHazardCurveFunction;
+import com.opengamma.financial.analytics.model.cds.ISDAApproxDiscountCurveFunction;
+import com.opengamma.financial.analytics.model.cds.ISDAApproxFlatSpreadFunction;
 import com.opengamma.financial.analytics.model.curve.forward.ForwardCurveValuePropertyNames;
 import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveDefaults;
 import com.opengamma.financial.analytics.model.curve.interestrate.InterpolatedYieldCurveFunction;
@@ -112,6 +119,7 @@ import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOpt
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexOptionVommaFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionDefaultPropertiesFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionForwardValueFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionFundingCurveSensitivitiesFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionPresentValueFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionRhoFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotDeltaFunction;
@@ -119,6 +127,7 @@ import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVan
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotIndexFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionSpotVannaFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionVegaFunction;
+import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionVegaMatrixFunction;
 import com.opengamma.financial.analytics.model.equity.indexoption.EquityIndexVanillaBarrierOptionVommaFunction;
 import com.opengamma.financial.analytics.model.equity.portfoliotheory.CAPMBetaDefaultPropertiesPortfolioNodeFunction;
 import com.opengamma.financial.analytics.model.equity.portfoliotheory.CAPMBetaDefaultPropertiesPositionFunction;
@@ -526,6 +535,8 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.DAILY_PNL);
     //TODO PRESENT_VALUE_CURVE_SENSITIVITY
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_DELTA);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_GAMMA);
+    addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_VEGA);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_THETA);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_SPEED);
     addCurrencyConversionFunctions(functionConfigs, ValueRequirementNames.VALUE_VOMMA);
@@ -814,6 +825,12 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(AnalyticOptionDefaultCurveFunction.class, "FUNDING"));
     functionConfigs.add(functionConfiguration(AnalyticOptionDefaultCurveFunction.class, "SECONDARY"));
 
+    functionConfigs.add(functionConfiguration(ISDAApproxCDSPriceFlatSpreadFunction.class));
+    functionConfigs.add(functionConfiguration(ISDAApproxCDSPriceHazardCurveFunction.class));
+    functionConfigs.add(functionConfiguration(ISDAApproxFlatSpreadFunction.class));
+    functionConfigs.add(functionConfiguration(ISDAApproxDiscountCurveFunction.class));
+
+
     final RepositoryConfiguration repoConfig = new RepositoryConfiguration(functionConfigs);
 
     if (OUTPUT_REPO_CONFIGURATION) {
@@ -943,7 +960,9 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionSpotGammaFunction.class));
     functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionSpotVannaFunction.class));
     functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionVegaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionVegaMatrixFunction.class));
     functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionVommaFunction.class));
+    functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionFundingCurveSensitivitiesFunction.class));
     functionConfigs.add(functionConfiguration(EquityIndexVanillaBarrierOptionDefaultPropertiesFunction.class, "0.0", "0.001"));
 
   }
@@ -1004,12 +1023,12 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(FXOptionBlackVolatilitySurfaceForwardSlideThetaFunction.class));
     functionConfigs.add(functionConfiguration(FXOptionBlackYieldCurvesForwardSlideThetaFunction.class));
     functionConfigs.add(functionConfiguration(FXOptionBlackYCNSFunction.class));
-    functionConfigs.add(functionConfiguration(FXOptionBlackCurveDefaults.class, PriorityClass.BELOW_NORMAL.name(), "USD", "DefaultTwoCurveUSDConfig", "Discounting",
-        "EUR", "DefaultTwoCurveEURConfig", "Discounting", "CAD", "DefaultTwoCurveCADConfig", "Discounting", "AUD", "DefaultTwoCurveAUDConfig", "Discounting", "CHF",
+    functionConfigs.add(functionConfiguration(FXOptionBlackCurveDefaults.class, PriorityClass.NORMAL.name(), "USD", "DefaultTwoCurveUSDConfig", "Discounting", "EUR",
+        "DefaultTwoCurveEURConfig", "Discounting", "CAD", "DefaultTwoCurveCADConfig", "Discounting", "AUD", "DefaultTwoCurveAUDConfig", "Discounting", "CHF",
         "DefaultTwoCurveCHFConfig", "Discounting", "MXN", "DefaultCashCurveMXNConfig", "Cash", "JPY", "DefaultTwoCurveJPYConfig", "Discounting", "GBP",
         "DefaultTwoCurveGBPConfig", "Discounting", "NZD", "DefaultTwoCurveNZDConfig", "Discounting", "HUF", "DefaultCashCurveHUFConfig", "Cash", "KRW",
         "DefaultCashCurveKRWConfig", "Cash", "BRL", "DefaultCashCurveBRLConfig", "Cash", "HKD", "DefaultCashCurveHKDConfig", "Cash"));
-    functionConfigs.add(functionConfiguration(FXOptionBlackSurfaceDefaults.class, PriorityClass.BELOW_NORMAL.name(), DOUBLE_QUADRATIC, LINEAR_EXTRAPOLATOR,
+    functionConfigs.add(functionConfiguration(FXOptionBlackSurfaceDefaults.class, PriorityClass.NORMAL.name(), DOUBLE_QUADRATIC, LINEAR_EXTRAPOLATOR,
         LINEAR_EXTRAPOLATOR, "USD", "EUR", "TULLETT", "USD", "CAD", "TULLETT", "USD", "AUD", "TULLETT", "USD", "CHF", "TULLETT", "USD", "MXN", "TULLETT", "USD", "JPY",
         "TULLETT", "USD", "GBP", "TULLETT", "USD", "NZD", "TULLETT", "USD", "HUF", "TULLETT", "USD", "KRW", "TULLETT", "USD", "BRL", "TULLETT", "EUR", "CHF", "TULLETT",
         "USD", "HKD", "TULLETT"));
@@ -1554,8 +1573,12 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
     functionConfigs.add(functionConfiguration(InterestRateInstrumentPresentValueFunction.class));
     functionConfigs.add(functionConfiguration(InterestRateInstrumentPV01Function.class));
     functionConfigs.add(functionConfiguration(InterestRateInstrumentYieldCurveNodeSensitivitiesFunction.class));
-    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultPropertiesFunction.class, PriorityClass.BELOW_NORMAL.name(), "false", "EUR",
-        "DefaultTwoCurveEURConfig"));
+    functionConfigs.add(functionConfiguration(InterestRateInstrumentDefaultPropertiesFunction.class, PriorityClass.BELOW_NORMAL.name(), "false",
+        "EUR", "DefaultTwoCurveEURConfig",
+        "USD", "DefaultTwoCurveUSDConfig",
+        "CHF", "DefaultTwoCurveCHFConfig",
+        "JPY", "DefaultTwoCurveJPYConfig",
+        "GBP", "DefaultTwoCurveGBPConfig"));
   }
 
   private static void addDeprecatedFixedIncomeInstrumentCalculators(final List<FunctionConfiguration> functionConfigs) {
@@ -1632,9 +1655,18 @@ public class DemoStandardFunctionConfiguration extends SingletonFactoryBean<Repo
   }
 
   private static void addCashFlowFunctions(final List<FunctionConfiguration> functionConfigs) {
-    addSummingFunction(functionConfigs, ValueRequirementNames.FIXED_CASH_FLOWS);
-    addUnitScalingFunction(functionConfigs, ValueRequirementNames.FIXED_CASH_FLOWS);
-    functionConfigs.add(functionConfiguration(FixedCashFlowFunction.class));
+    addSummingFunction(functionConfigs, ValueRequirementNames.FIXED_PAY_CASH_FLOWS);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.FIXED_PAY_CASH_FLOWS);
+    addSummingFunction(functionConfigs, ValueRequirementNames.FIXED_RECEIVE_CASH_FLOWS);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.FIXED_RECEIVE_CASH_FLOWS);
+    addSummingFunction(functionConfigs, ValueRequirementNames.NETTED_FIXED_CASH_FLOWS);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.NETTED_FIXED_CASH_FLOWS);
+    addSummingFunction(functionConfigs, ValueRequirementNames.RESET_DATES);
+    addUnitScalingFunction(functionConfigs, ValueRequirementNames.RESET_DATES);
+    functionConfigs.add(functionConfiguration(FixedPayCashFlowFunction.class));
+    functionConfigs.add(functionConfiguration(FixedReceiveCashFlowFunction.class));
+    functionConfigs.add(functionConfiguration(NettingFixedCashFlowFunction.class));
+    functionConfigs.add(functionConfiguration(FloatingResetsFunction.class));
   }
 
   private static void addExternallyProvidedSensitivitiesFunctions(final List<FunctionConfiguration> functionConfigs) {

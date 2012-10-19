@@ -7,10 +7,14 @@ package com.opengamma.analytics.financial.interestrate;
 
 import static org.testng.AssertJUnit.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.time.calendar.Period;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.analytics.financial.credit.cds.ISDACDSDerivative;
 import com.opengamma.analytics.financial.forex.derivative.Forex;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableForward;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableOption;
@@ -293,13 +297,21 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public Class<?>[] visit(final InstrumentDerivative[] derivative, final Object data) {
-      return visit(derivative, data);
+    public Class<?>[] visit(final InstrumentDerivative[] derivatives, final Object data) {
+      List<Class<?>> results = new ArrayList<Class<?>>();
+      for (InstrumentDerivative derivative : derivatives) {
+        results.add(derivative.accept(this, data));
+      }
+      return results.toArray(new Class[0]);
     }
 
     @Override
-    public Class<?>[] visit(final InstrumentDerivative[] derivative) {
-      return visit(derivative);
+    public Class<?>[] visit(final InstrumentDerivative[] derivatives) {
+      List<Class<?>> results = new ArrayList<Class<?>>();
+      for (InstrumentDerivative derivative : derivatives) {
+        results.add(derivative.accept(this));
+      }
+      return results.toArray(new Class[0]);
     }
 
     @Override
@@ -728,7 +740,7 @@ public class InstrumentDerivativeVisitorTest {
     public Class<?> visitAnnuityCouponIborSpread(AnnuityCouponIborSpread annuity) {
       return null;
     }
-
+    
     @Override
     public Class<?> visitCouponIborCompounded(CouponIborCompounded payment) {
       // TODO Auto-generated method stub
@@ -748,6 +760,16 @@ public class InstrumentDerivativeVisitorTest {
 
     @Override
     public Class<?> visitDeliverableSwapFuturesSecurity(DeliverableSwapFuturesSecurity futures) {
+      return null;
+    }
+
+    @Override
+    public Class<?> visitCDSDerivative(ISDACDSDerivative cds, Object data) {
+      return null;
+    }
+
+    @Override
+    public Class<?> visitCDSDerivative(ISDACDSDerivative cds) {
       return null;
     }
 

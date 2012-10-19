@@ -10,41 +10,38 @@ import java.util.Map;
 
 import javax.time.calendar.LocalDate;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.PaymentScheduleMatrix;
-import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.money.CurrencyAmount;
 
 /**
  * 
  */
 public class PaymentScheduleMatrixConverter implements ResultConverter<PaymentScheduleMatrix> {
-  private final DoubleConverter _doubleConverter;
-
-  public PaymentScheduleMatrixConverter(final DoubleConverter doubleConverter) {
-    ArgumentChecker.notNull(doubleConverter, "double converter");
-    _doubleConverter = doubleConverter;
-  }
 
   @Override
   public Object convertForDisplay(final ResultConverterCache context, final ValueSpecification valueSpec, final PaymentScheduleMatrix value, final ConversionMode mode) {
     final Map<String, Object> result = new HashMap<String, Object>();
     final Map<String, Object> summary = new HashMap<String, Object>();
-    final int xValues = value.getDatesAsArray().length;
-    summary.put("rowCount", xValues);
-    summary.put("colCount", value.getMaxCurrencyAmounts());
+    final int rowCount = value.getDatesAsArray().length;
+    final int columnCount = value.getMaxCurrencyAmounts();
+    summary.put("rowCount", rowCount);
+    summary.put("colCount", columnCount);
     result.put("summary", summary);
     if (mode == ConversionMode.FULL) {
       final LocalDate[] dates = value.getDatesAsArray();
-      final CurrencyAmount[][] ca = value.getCurrencyAmountsAsArray();
-      final String[] xLabels = new String[dates.length];
-      final String[] yLabels = new String[value.getMaxCurrencyAmounts()];
-      final Object[][] amounts = new Object[dates.length][value.getMaxCurrencyAmounts()];
-      for (int i = 0; i < dates.length; i++) {
+      final String[][] ca = value.getCurrencyAmountsAsStringArray();
+      final String[] xLabels = new String[rowCount];
+      final String[] yLabels = new String[columnCount];
+      final Object[][] amounts = new Object[columnCount][rowCount];
+      for (int i = 0; i < rowCount; i++) {
         xLabels[i] = dates[i].toString();
-        for (int j = 0; j < value.getMaxCurrencyAmounts(); j++) {
-          yLabels[j] = "";
-          amounts[i][j] = _doubleConverter.convertForDisplay(context, valueSpec, ca[i][j], mode);
+        for (int j = 0; j < columnCount; j++) {
+          if (i == 0) {
+            yLabels[j] = StringUtils.EMPTY;
+          }
+          amounts[j][i] = ca[i][j].toString();
         }
       }
       result.put("x", xLabels);

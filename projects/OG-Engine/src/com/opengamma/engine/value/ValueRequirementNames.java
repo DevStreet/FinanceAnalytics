@@ -104,11 +104,19 @@ public final class ValueRequirementNames {
   /**
    * The cash-flows of a security or portfolio
    */
-  public static final String FIXED_CASH_FLOWS = "Fixed Cash flows";
+  public static final String FIXED_PAY_CASH_FLOWS = "Pay Fixed Cash-Flows";
+  /**
+   * The cash-flows of a security or portfolio
+   */
+  public static final String FIXED_RECEIVE_CASH_FLOWS = "Receive Fixed Cash-Flows";
+  /**
+   * The cash-flows of a security or portfolio
+   */
+  public static final String NETTED_FIXED_CASH_FLOWS = "Netted Fixed Cash-Flows";
   /**
    * The reset dates and indices of a security or portfolio
    */
-  public static final String RESETS = "Reset Dates";
+  public static final String RESET_DATES = "Reset Dates";
   /**
    * The projected cash-flows of a security or portfolio
    */

@@ -11,6 +11,7 @@ import com.opengamma.financial.security.bond.MunicipalBondSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.financial.security.cds.CDSSecurity;
 import com.opengamma.financial.security.deposit.ContinuousZeroDepositSecurity;
 import com.opengamma.financial.security.deposit.PeriodicZeroDepositSecurity;
 import com.opengamma.financial.security.deposit.SimpleZeroDepositSecurity;
@@ -54,24 +55,34 @@ public interface FinancialSecurityVisitor<T> extends FutureSecurityVisitor<T>, C
 
   // FUTURES ----------------------------------------------------------------------------
 
+  @Override
   T visitAgricultureFutureSecurity(AgricultureFutureSecurity security);
 
+  @Override
   T visitBondFutureSecurity(BondFutureSecurity security);
 
+  @Override
   T visitEquityIndexDividendFutureSecurity(EquityIndexDividendFutureSecurity security);
 
+  @Override
   T visitFXFutureSecurity(FXFutureSecurity security);
 
+  @Override
   T visitStockFutureSecurity(StockFutureSecurity security);
 
+  @Override
   T visitEquityFutureSecurity(EquityFutureSecurity security);
 
+  @Override
   T visitEnergyFutureSecurity(EnergyFutureSecurity security);
 
+  @Override
   T visitIndexFutureSecurity(IndexFutureSecurity security);
 
+  @Override
   T visitInterestRateFutureSecurity(InterestRateFutureSecurity security);
 
+  @Override
   T visitMetalFutureSecurity(MetalFutureSecurity security);
 
   // ------------------------------------------------------------------------------------
@@ -133,5 +144,7 @@ public interface FinancialSecurityVisitor<T> extends FutureSecurityVisitor<T>, C
   T visitSwapSecurity(SwapSecurity security);
 
   T visitSwaptionSecurity(SwaptionSecurity security);
+  
+  T visitCDSSecurity(CDSSecurity security);
 }
 

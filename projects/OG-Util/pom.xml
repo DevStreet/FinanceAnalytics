@@ -43,6 +43,10 @@
     </dependency>
 
     <dependency>
+      <groupId>com.opengamma</groupId>
+      <artifactId>elsql</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.fudgemsg</groupId>
       <artifactId>fudge-java</artifactId>
     </dependency>
@@ -235,9 +239,5 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <properties>
-    <og-platform.basedir>${project.parent.basedir}/../..</og-platform.basedir>
-  </properties>
 
 </project>

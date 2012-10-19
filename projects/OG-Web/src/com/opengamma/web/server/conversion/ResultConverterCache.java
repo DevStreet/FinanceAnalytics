@@ -30,6 +30,7 @@ import com.opengamma.financial.analytics.LabelledMatrix1D;
 import com.opengamma.financial.analytics.LabelledMatrix2D;
 import com.opengamma.financial.analytics.LabelledMatrix3D;
 import com.opengamma.financial.analytics.PaymentScheduleMatrix;
+import com.opengamma.financial.analytics.ResetScheduleMatrix;
 import com.opengamma.util.ClassMap;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.money.MultipleCurrencyAmount;
@@ -82,7 +83,8 @@ public class ResultConverterCache {
     registerConverter(Double[][].class, new DoubleObjectArrayConverter());
     registerConverter(List.class, new ListDoubleArrayConverter());
     registerConverter(PresentValueForexBlackVolatilitySensitivity.class, new PresentValueVolatilitySensitivityConverter(_doubleConverter));
-    registerConverter(PaymentScheduleMatrix.class, new PaymentScheduleMatrixConverter(_doubleConverter));
+    registerConverter(PaymentScheduleMatrix.class, new PaymentScheduleMatrixConverter());
+    registerConverter(ResetScheduleMatrix.class, new ResetScheduleMatrixConverter());
   }
 
   private <T> void registerConverter(final Class<T> clazz, final ResultConverter<? super T> converter) {

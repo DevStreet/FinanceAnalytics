@@ -98,7 +98,11 @@ public class ClientConnection implements ChangeListener, MasterChangeListener, U
       _connected = false;
       _timeoutTask.cancel();
       for (DisconnectionListener listener : _disconnectionListeners) {
-        listener.clientDisconnected();
+        try {
+          listener.clientDisconnected();
+        } catch (Exception e) {
+          s_logger.warn("Problem calling disconnection listener", e);
+        }
       }
     }
   }
@@ -220,7 +224,7 @@ public class ClientConnection implements ChangeListener, MasterChangeListener, U
    * entity {@link ObjectId}s.  TODO Need to check whether this is actually the case.
    * If not this could probably be scrapped.</p>
    */
-  private static class UrlMapping {
+  private static final class UrlMapping {
 
     private final Set<MasterType> _masterTypes;
     private final Set<ObjectId> _entityIds;

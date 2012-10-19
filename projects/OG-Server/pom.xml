@@ -30,11 +30,12 @@
           </execution>
         </executions>
         <configuration>
-          <templateFile>scripts-tools/script-template.ftl</templateFile>
+          <template>scripts-templates/script-template.ftl</template>
           <additionalScripts>
-            <param>scripts-tools/run-tool.sh</param>
+            <param>scripts-templates/run-tool.sh</param>
+            <param>scripts-templates/java-utils.sh</param>
           </additionalScripts>
-        </configuration>      
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -46,6 +47,8 @@
               <target>
                 <zip basedir="${project.build.directory}/scripts-tools" destfile="${project.build.directory}/scripts-tools.zip" />
                 <attachartifact file="${project.build.directory}/scripts-tools.zip" classifier="scripts-tools" type="zip" />
+                <zip basedir="scripts-templates" destfile="${project.build.directory}/scripts-templates.zip" />
+                <attachartifact file="${project.build.directory}/scripts-templates.zip" classifier="scripts-templates" type="zip" />
               </target>
             </configuration>
             <goals>
@@ -137,9 +140,5 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-
-  <properties>
-    <og-platform.basedir>${project.parent.basedir}/../..</og-platform.basedir>
-  </properties>
 
 </project>
