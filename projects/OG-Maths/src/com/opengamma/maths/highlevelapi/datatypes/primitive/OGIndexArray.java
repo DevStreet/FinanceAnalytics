@@ -9,14 +9,13 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
  * The OGIndex class provides access to the typically understood notion of a matrix, i.e. A Fully populated array.
  */
-public class OGIndexArray extends OGArraySuper<Integer> {
+public class OGIndexArray extends OGArraySuper<Number> {
   private int[] _data;
   private int _rows;
   private int _columns;
@@ -91,8 +90,8 @@ public class OGIndexArray extends OGArraySuper<Integer> {
    *    */
   @Override
   public Integer getEntry(int... indices) {
-    if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
+    if (indices.length != 2) {
+      throw new MathsExceptionIllegalArgument("OGIndexArray only has 2 indicies, more than 2 were given");
     }
     if (indices[0] >= _rows) {
       throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
