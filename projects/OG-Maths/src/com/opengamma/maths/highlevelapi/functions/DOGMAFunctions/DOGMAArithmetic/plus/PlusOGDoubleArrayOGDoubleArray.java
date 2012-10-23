@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * 
@@ -36,32 +37,33 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusMinusAbstract<OGDo
     int n = array1.getData().length;
     double[] tmp = new double[n];
     System.arraycopy(array1.getData(), 0, tmp, 0, n);
-
+    final double signval = Math.copySign(1, op);
     // Actually adding arrays
     if (rowsArray1 == 1 && columnsArray1 == 1) {
       n = array2.getData().length;
       tmp = new double[n];
       System.arraycopy(array2.getData(), 0, tmp, 0, n);
-      final double[] singleDouble = array1.getData();
-      final double deref = singleDouble[0];
+      final double singleDouble = array1.getData()[0] * signval;
       for (int i = 0; i < n; i++) {
-        tmp[i] = tmp[i] + op * deref;
+        tmp[i] += singleDouble;
       }
       retRows = rowsArray2;
       retCols = columnsArray2;
     } else if (rowsArray2 == 1 && columnsArray2 == 1) {
+
       n = array1.getData().length;
       tmp = new double[n];
       System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      final double[] singleDouble = array2.getData();
-      final double deref = singleDouble[0];
+      final double singleDouble = array2.getData()[0] * signval;
       for (int i = 0; i < n; i++) {
-        tmp[i] = tmp[i] + op * deref;
+        tmp[i] += singleDouble;
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
     } else {
-      _localblas.daxpy(n, (double) op, array2.getData(), 1, tmp, 1);
+      Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
+      Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
+      _localblas.daxpy(n, Math.copySign(1, op), array2.getData(), 1, tmp, 1);
       retRows = rowsArray1;
       retCols = columnsArray1;
     }

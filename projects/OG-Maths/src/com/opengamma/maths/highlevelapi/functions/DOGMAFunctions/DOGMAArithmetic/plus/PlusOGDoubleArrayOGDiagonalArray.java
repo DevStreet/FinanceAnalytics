@@ -38,6 +38,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray extends PlusMinusAbstract<OG
     double[] tmp = null;
 
     OGArraySuper<Number> retArray = null;
+    final double signval = Math.copySign(1, op);
 
     // Actually adding arrays
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the diag array a OGDoubleArray and ADD 
@@ -49,16 +50,16 @@ public final class PlusOGDoubleArrayOGDiagonalArray extends PlusMinusAbstract<OG
       retRows = rowsArray2;
       retCols = columnsArray2;
       for (int i = 0; i < data.length; i++) {
-        tmp[i * rowsArray2 + i] += Math.copySign(data[i], op);
+        tmp[i * rowsArray2 + i] += signval * data[i];
       }
       retArray = new OGDoubleArray(tmp, retRows, retCols);
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // diagonal array is actually a single number, so we can just deref and add
       final int n = array1.getData().length;
       tmp = new double[n];
       System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      final double singleDouble = array2.getData()[0];
+      final double singleDouble = array2.getData()[0] * signval;
       for (int i = 0; i < n; i++) {
-        tmp[i] += Math.copySign(singleDouble, op);
+        tmp[i] += singleDouble;
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
@@ -73,7 +74,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray extends PlusMinusAbstract<OG
       System.arraycopy(array1.getData(), 0, tmp, 0, n);
       final double[] data = array2.getData();
       for (int i = 0; i < data.length; i++) {
-        tmp[i * rowsArray1 + i] += Math.copySign(data[i], op);
+        tmp[i * rowsArray1 + i] += data[i] * signval;
       }
       retArray = new OGDoubleArray(tmp, retRows, retCols);
     }
