@@ -13,11 +13,13 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDiagonalArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGIndexArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGPermutationArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGSparseArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeAbstract;
@@ -25,6 +27,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Overloaded Conjugate Transpose
+ * TODO: possibly rewrite as an extension to transpose() to save repetition 
  */
 public class Ctranspose {
 
@@ -34,6 +37,7 @@ public class Ctranspose {
   private static Map<Class<?>, CtransposeAbstract<?>> s_functionPointers = new HashMap<Class<?>, CtransposeAbstract<?>>();
   static {
     s_functionPointers.put(OGDoubleArray.class, CtransposeOGDoubleArray.getInstance());
+    s_functionPointers.put(OGIndexArray.class, CtransposeOGIndexArray.getInstance());    
     s_functionPointers.put(OGSparseArray.class, CtransposeOGSparseArray.getInstance());
     s_functionPointers.put(OGComplexArray.class, CtransposeOGComplexArray.getInstance());
     s_functionPointers.put(OGPermutationArray.class, CtransposeOGPermutationArray.getInstance());
