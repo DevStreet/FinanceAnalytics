@@ -13,11 +13,11 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMASparseUti
  * 
  */
 public class DOGMASparseUtilities implements DOGMASparseUtilitiesAPI {
-  private final Full full = new Full();
+  private final Full _full = new Full();
 
   @Override
   public OGArraySuper<Number> full(OGArraySuper<Number> array) {
-    return full.full(array);
+    return _full.full(array);
   }
 
 }
