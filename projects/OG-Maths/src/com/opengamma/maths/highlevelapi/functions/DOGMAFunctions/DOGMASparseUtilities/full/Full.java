@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 
@@ -24,6 +27,9 @@ public class Full {
   static {
     s_functionPointers.put(OGDoubleArray.class, FullOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, FullOGSparseArray.getInstance());
+    s_functionPointers.put(OGDiagonalArray.class, FullOGDiagonalArray.getInstance());
+    s_functionPointers.put(OGPermutationArray.class, FullOGPermutationArray.getInstance());
+    s_functionPointers.put(OGComplexArray.class, FullOGComplexArray.getInstance());
   }
 
   @SuppressWarnings("unchecked")
