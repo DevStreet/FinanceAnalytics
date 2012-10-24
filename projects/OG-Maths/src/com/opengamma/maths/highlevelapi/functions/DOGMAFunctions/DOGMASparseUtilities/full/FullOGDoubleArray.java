@@ -23,11 +23,12 @@ public final class FullOGDoubleArray extends FullAbstract<OGDoubleArray> {
   private FullOGDoubleArray() {
   }
 
+  private static CopyOGDoubleArray s_copier = CopyOGDoubleArray.getInstance();  
+  
   @SuppressWarnings("unchecked")
   @Override
   public OGArraySuper<Number> full(OGDoubleArray array1) {
-    CopyOGDoubleArray tmp = CopyOGDoubleArray.getInstance();
-    return tmp.copy(array1);
+    return s_copier.copy(array1);
   }
 
 }
