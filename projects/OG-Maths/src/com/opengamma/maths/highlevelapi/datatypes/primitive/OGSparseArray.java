@@ -115,17 +115,39 @@ public class OGSparseArray extends OGArraySuper<Number> {
       throw new MathsExceptionIllegalArgument("Columns specified does not commute with length of colPtr. Length colPtr (-1)= " + (colPtr.length - 1) + ", columns given = " + columns + ".");
     }
 
+    if (rowIdx.length != values.length) {
+      throw new MathsExceptionIllegalArgument("Insufficient data or rowIdx values given, they should be the same but got rowIdx.length=" + rowIdx.length + "values.length=" + values.length + " .");
+    }
+
     final int vlen = values.length;
     _values = new double[vlen];
     System.arraycopy(values, 0, _values, 0, vlen);
 
     final int clen = colPtr.length;
     _colPtr = new int[clen];
-    System.arraycopy(colPtr, 0, _colPtr, 0, clen);
+    // check colptr is ascending
+
+    if (colPtr[0] < 0) {
+      throw new MathsExceptionIllegalArgument("Illegal value in colPtr[0], values should be zero or greater, bad value was " + colPtr[0]);
+    }
+    _colPtr[0] = colPtr[0];
+
+    for (int i = 1; i < clen; i++) {
+      if (colPtr[i] < colPtr[i - 1]) {
+        throw new MathsExceptionIllegalArgument("Illegal value in colPtr, values should be ascending or static, descending value referenced at position " + i + ", bad value was " + colPtr[i]);
+      }
+      _colPtr[i] = colPtr[i];
+    }
 
     final int rlen = rowIdx.length;
     _rowIdx = new int[rlen];
-    System.arraycopy(rowIdx, 0, _rowIdx, 0, rlen);
+    // check rowIdx isn't out of range whilst copying in
+    for (int i = 0; i < rlen; i++) {
+      if (rowIdx[i] > rows || rowIdx[i] < 0) {
+        throw new MathsExceptionIllegalArgument("Illegal value in rowIdx, row out of range referenced at position " + i + ", bad value was " + rowIdx[i]);
+      }
+      _rowIdx[i] = rowIdx[i];
+    }
 
     _rows = rows;
 

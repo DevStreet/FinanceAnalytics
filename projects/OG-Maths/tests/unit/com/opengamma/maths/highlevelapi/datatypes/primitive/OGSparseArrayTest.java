@@ -105,7 +105,43 @@ public class OGSparseArrayTest {
     new OGSparseArray(compressedColPtr, compressedRowIdx, compressedData, 4, 5);
   }
 
-  //  // sending in ok  int[], int[], double[], int, int  constructor
+  // sending in bad ColumnPtr  int[], int[], double[], int, int  constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrConstructorbadColPtrTooLongTest() {
+    OGSparseArray D = new OGSparseArray(new int[] {0, 2, 4, 5, 6, 7 }, compressedRowIdx, compressedData, 4, 4);
+  }
+
+  // sending in bad ColumnPtr  int[], int[], double[], int, int  constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrConstructorbadColPtrValuesAreNotIncreasingTest() {
+    OGSparseArray D = new OGSparseArray(new int[] {0, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
+  }
+
+  // sending in bad ColumnPtr  int[], int[], double[], int, int  constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrConstructorbadColPtrValuesIsNegativeTest() {
+    OGSparseArray D = new OGSparseArray(new int[] {-1, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
+  }  
+  
+  // sending in bad rowIdx  int[], int[], double[], int, int  constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrConstructorbadRowIdxTooHighTest() {
+    OGSparseArray D = new OGSparseArray(compressedColPtr, new int[] {0, 1, 0, 2, 1, 6, 3 }, compressedData, 4, 4);
+  }
+
+  // sending in bad rowIdx  int[], int[], double[], int, int  constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrConstructorbadRowIdxTooLowTest() {
+    OGSparseArray D = new OGSparseArray(compressedColPtr, new int[] {0, 1, 0, 2, 1, -1, 3 }, compressedData, 4, 4);
+  }
+
+  // sending in bad rowIdx  int[], int[], double[], int, int  constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrConstructorbadRowIdxLengthTest() {
+    OGSparseArray D = new OGSparseArray(compressedColPtr, new int[] {0, 1, 0, 2, 1, 1 }, compressedData, 4, 4);
+  }
+
+  // sending in ok  int[], int[], double[], int, int  constructor
   @Test
   public void testDoublePtrConstructorInternalDataTest() {
     OGSparseArray D = new OGSparseArray(compressedColPtr, compressedRowIdx, compressedData, 4, 4);
