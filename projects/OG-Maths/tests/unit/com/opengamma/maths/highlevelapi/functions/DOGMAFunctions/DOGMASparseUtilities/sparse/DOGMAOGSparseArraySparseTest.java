@@ -22,7 +22,7 @@ public class DOGMAOGSparseArraySparseTest {
   private static OGSparseArray sparseAnswer = new OGSparseArray(denseData);
 
   @Test
-  public static void diagToSparseTest() {
+  public static void sparseToSparseTest() {
     OGSparseArray p = new OGSparseArray(denseData);
     assertTrue(sparseAnswer.equals(s_s2s.sparse(p)));
   }
