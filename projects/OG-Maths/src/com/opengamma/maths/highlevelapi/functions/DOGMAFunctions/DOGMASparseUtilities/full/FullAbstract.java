@@ -11,7 +11,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 
 /**
- * Copy
+ * Full
  * @param <T> An OGArray type
  */
 public abstract class FullAbstract<T extends OGArraySuper<Number>> {
