@@ -102,9 +102,8 @@ public final class MtimesOGSparseArrayOGSparseArray extends MtimesAbstract<OGSpa
         }
 
       }
-      newColPtr[colsArray2] = newPtr;
+      newColPtr[colsArray2] = newPtr - 1;
       ret = new OGSparseArray(Arrays.copyOf(newColPtr, colsArray2 + 1), Arrays.copyOf(newRowIdx, newPtr), Arrays.copyOf(newData, newPtr), rowsArray1, colsArray2);
-
     }
     return ret;
   }
