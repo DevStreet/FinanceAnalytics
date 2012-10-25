@@ -24,7 +24,7 @@ public class Sparse {
    */
   private static Map<Class<?>, SparseAbstract<?>> s_functionPointers = new HashMap<Class<?>, SparseAbstract<?>>();
   static {
-//    s_functionPointers.put(OGDoubleArray.class, SparseOGDoubleArray.getInstance());
+    s_functionPointers.put(OGDoubleArray.class, SparseOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, SparseOGSparseArray.getInstance());
     s_functionPointers.put(OGDiagonalArray.class, SparseOGDiagonalArray.getInstance());
 //    s_functionPointers.put(OGPermutationArray.class, SparseOGPermutationArray.getInstance());
