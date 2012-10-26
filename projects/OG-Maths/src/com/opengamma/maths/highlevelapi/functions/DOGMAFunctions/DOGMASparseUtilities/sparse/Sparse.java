@@ -32,7 +32,7 @@ public class Sparse {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> full(T array1) {
+  public <T extends OGArraySuper<Number>> OGArraySuper<Number> sparse(T array1) {
     SparseAbstract<T> use = (SparseAbstract<T>) s_functionPointers.get(array1.getClass());
     return use.sparse(array1);
   }
