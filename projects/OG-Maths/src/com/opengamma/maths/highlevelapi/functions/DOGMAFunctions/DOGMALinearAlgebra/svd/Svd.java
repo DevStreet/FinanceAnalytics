@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
@@ -56,14 +56,14 @@ public class Svd {
   /**
    * hashmapped function pointers
    */
-  private static Map<Class<?>, SvdAbstract<?>> s_functionPointers = new HashMap<Class<?>, SvdAbstract<?>>();
+  private static Map<Class<?>, SvdAbstract<? extends OGArraySuper<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
     s_functionPointers.put(OGDoubleArray.class, SvdOGDoubleArray.getInstance());
     s_functionPointers.put(OGComplexArray.class, SvdOGComplexArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGSvdResult svd(T array1, compute these) {
+  public <T extends OGArraySuper<? extends Number>> OGSvdResult svd(T array1, compute these) {
     SvdAbstract<T> use = (SvdAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("svd() on array class " + array1.getClass().toString() + " is not yet implemented");

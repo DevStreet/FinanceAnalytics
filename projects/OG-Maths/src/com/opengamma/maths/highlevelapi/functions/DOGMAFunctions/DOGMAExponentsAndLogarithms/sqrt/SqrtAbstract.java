@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Sqrt
  * @param <T> An OGArray type
  */
-public abstract class SqrtAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> sqrt(T array1);
+public interface SqrtAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  T sqrt(T array1);
 }

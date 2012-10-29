@@ -16,7 +16,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * SVD for OGDoubleArrays 
  */
-public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
+public final class SvdOGDoubleArray implements SvdAbstract<OGDoubleArray> {
   private static SvdOGDoubleArray s_instance = new SvdOGDoubleArray();
 
   public static SvdOGDoubleArray getInstance() {
@@ -45,8 +45,8 @@ public final class SvdOGDoubleArray extends SvdAbstract<OGDoubleArray> {
     double[] WORK = new double[Math.max(1, lwork)]; //CSIGNORE
     int[] info = new int[1];
     OGDoubleArray resultU = null;
-    OGArraySuper<Number> resultS = null;
-    OGArraySuper<Number> resultV = null;
+    OGArraySuper<? extends Number> resultS = null;
+    OGArraySuper<? extends Number> resultV = null;
     double[] pointLess = new double[1];  // this is to keep JNI happy, it doesn't consider "null" an array type
     switch (these) {
       case U:

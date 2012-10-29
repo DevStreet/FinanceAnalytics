@@ -38,14 +38,15 @@ public class LAPACK implements LAPACKAPIInterface {
 
   // for now plumb in netlib
   public LAPACK() {
-    _localLAPACK = new LAPACKNativeBacked();
+//  _localLAPACK = new LAPACKNativeBacked();
+  _localLAPACK = new LAPACKNetlibBacked();
   }
 
   public LAPACK(backing backedby) {
     if (backedby == backing.OGjava) {
       _localLAPACK = new LAPACKOGJavaBacked();
-    } else if (backedby == backing.OGnative) {
-      _localLAPACK = new LAPACKNativeBacked();
+//    } else if (backedby == backing.OGnative) {
+//      _localLAPACK = new LAPACKNativeBacked();
     } else if (backedby == backing.Netlib) {
       _localLAPACK = new LAPACKNetlibBacked();
     }

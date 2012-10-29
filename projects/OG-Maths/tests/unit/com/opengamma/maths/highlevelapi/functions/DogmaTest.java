@@ -42,15 +42,15 @@ public class DogmaTest {
     System.out.println("Input = " + ogDoubleMatrixData3by5.toString());
 
     System.out.println("Input = " + ogDoubleMatrixData3by5.toString());
-    OGArraySuper<Number> answer = foo.plus(ogDoubleMatrixData3by5, ogDoubleMatrixData3by5);
-    OGArraySuper<Number> answer2 = foo.plus(answer, ogDoubleMatrixData3by5);
+    OGArraySuper<? extends Number> answer = foo.plus(ogDoubleMatrixData3by5, ogDoubleMatrixData3by5);
+    OGArraySuper<? extends Number> answer2 = foo.plus(answer, ogDoubleMatrixData3by5);
     System.out.println("Answer2 = " + answer2.toString());
-    OGArraySuper<Number> answer3 = foo.plus(answer2, 7.);
+    OGArraySuper<? extends Number> answer3 = foo.plus(answer2, 7.);
     System.out.println("Answer3 = " + answer3.toString());
     answer3 = foo.plus(answer3, answer3);
     System.out.println("Answer3 = " + answer3.toString());
 
-    OGArraySuper<Number> answer4 = foo.plus(answer3, answer3, answer3, answer3);
+    OGArraySuper<? extends Number> answer4 = foo.plus(answer3, answer3, answer3, answer3);
     System.out.println("Answer4 = " + answer4.toString());
 
     System.out.println("Sparse = " + ogSparseMatrixData3by5.toString());

@@ -50,8 +50,8 @@ public class BLAS implements BLASAPIInterface {
       _localBLAS = new BLASReferenceJavaBacked();
     } else if (backedby == backing.OGjava) {
       _localBLAS = new BLASOGJavaBacked();
-    } else if (backedby == backing.OGnative) {
-      _localBLAS = new BLASNativeBacked();
+//    } else if (backedby == backing.OGnative) {
+//      _localBLAS = new BLASNativeBacked();
     } else if (backedby == backing.Netlib) {
       _localBLAS = new BLASNetlibBacked();
     }

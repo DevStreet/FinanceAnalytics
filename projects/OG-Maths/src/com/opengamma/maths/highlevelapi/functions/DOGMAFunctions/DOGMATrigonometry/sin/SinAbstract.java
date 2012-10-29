@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.sin overload
  * @param <T> An OGArray type
  */
-public abstract class SinAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> sin(T array1);
+public interface SinAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> sin(T array1);
 }

@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.atan on OGSparse
  */
-public final class AtanOGSparseArray extends AtanAbstract<OGSparseArray> {
+public final class AtanOGSparseArray implements AtanAbstract<OGSparseArray> {
   private static AtanOGSparseArray s_instance = new AtanOGSparseArray();
 
   public static AtanOGSparseArray getInstance() {
@@ -22,7 +22,6 @@ public final class AtanOGSparseArray extends AtanAbstract<OGSparseArray> {
   private AtanOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray atan(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

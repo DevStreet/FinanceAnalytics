@@ -32,47 +32,47 @@ public class DOGMATrigonometry implements DOGMATrigonometaryAPI {
   private static final Tanh TANH = new Tanh();
 
   @Override
-  public OGArraySuper<Number> sin(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> sin(OGArraySuper<? extends Number> array1) {
     return SIN.sin(array1);
   }
 
   @Override
-  public OGArraySuper<Number> cos(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> cos(OGArraySuper<? extends Number> array1) {
     return COS.cos(array1);
   }
 
   @Override
-  public OGArraySuper<Number> tan(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> tan(OGArraySuper<? extends Number> array1) {
     return TAN.tan(array1);
   }
 
   @Override
-  public OGArraySuper<Number> asin(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> asin(OGArraySuper<? extends Number> array1) {
     return ASIN.asin(array1);
   }
 
   @Override
-  public OGArraySuper<Number> acos(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> acos(OGArraySuper<? extends Number> array1) {
     return ACOS.acos(array1);
   }
 
   @Override
-  public OGArraySuper<Number> atan(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> atan(OGArraySuper<? extends Number> array1) {
     return ATAN.atan(array1);
   }
 
   @Override
-  public OGArraySuper<Number> sinh(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> sinh(OGArraySuper<? extends Number> array1) {
     return SINH.sinh(array1);
   }
 
   @Override
-  public OGArraySuper<Number> cosh(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> cosh(OGArraySuper<? extends Number> array1) {
     return COSH.cosh(array1);
   }
 
   @Override
-  public OGArraySuper<Number> tanh(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> tanh(OGArraySuper<? extends Number> array1) {
     return TANH.tanh(array1);
   }
 

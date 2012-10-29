@@ -12,7 +12,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangin
 /**
  * Full's OGComplexArrays
  */
-public final class FullOGComplexArray extends FullAbstract<OGComplexArray> {
+public final class FullOGComplexArray implements FullAbstract<OGComplexArray> {
   private static FullOGComplexArray s_instance = new FullOGComplexArray();
 
   public static FullOGComplexArray getInstance() {
@@ -24,9 +24,8 @@ public final class FullOGComplexArray extends FullAbstract<OGComplexArray> {
 
   private static CopyOGComplexArray s_copier = CopyOGComplexArray.getInstance();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> full(OGComplexArray array1) {
+  public OGArraySuper<? extends Number> full(OGComplexArray array1) {
     return s_copier.copy(array1);
   }
 

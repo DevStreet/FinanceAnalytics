@@ -37,7 +37,7 @@ public final class CatchInf {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> void catchinf(T array1) {
+  public <T extends OGArraySuper<? extends Number>> void catchinf(T array1) {
     CatchInfAbstract<T> use = (CatchInfAbstract<T>) s_functionPointers.get(array1.getClass());
     use.catchinf(array1);
   }

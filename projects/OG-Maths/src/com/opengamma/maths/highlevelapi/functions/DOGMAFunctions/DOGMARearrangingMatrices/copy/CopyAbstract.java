@@ -14,7 +14,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Copy
  * @param <T> An OGArray type
  */
-public abstract class CopyAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> copy(T array1);
+public interface CopyAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  T copy(T array1);
 }
 

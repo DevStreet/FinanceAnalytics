@@ -5,13 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 
 /**
  * Copies OGDoubleArrays 
  */
-public final class CopyOGDoubleArray extends CopyAbstract<OGDoubleArray> {
+public final class CopyOGDoubleArray implements CopyAbstract<OGDoubleArray> {
   private static CopyOGDoubleArray s_instance = new CopyOGDoubleArray();
 
   public static CopyOGDoubleArray getInstance() {
@@ -21,9 +20,8 @@ public final class CopyOGDoubleArray extends CopyAbstract<OGDoubleArray> {
   private CopyOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> copy(OGDoubleArray array1) {
+  public OGDoubleArray copy(OGDoubleArray array1) {
     final int n = array1.getData().length;
     final double [] tmp = new double[n];
     final int rows = array1.getNumberOfRows();

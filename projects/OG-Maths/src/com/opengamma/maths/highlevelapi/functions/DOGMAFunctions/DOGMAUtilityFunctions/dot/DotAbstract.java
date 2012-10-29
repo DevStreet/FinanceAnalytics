@@ -12,6 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * @param <S> an array
  * @param <T> another array
  */
-public abstract class DotAbstract<S extends OGArraySuper<Number>, T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> dot(S array1, T array2);
+public interface DotAbstract<S extends OGArraySuper<? extends Number>, T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> dot(S array1, T array2);
 }

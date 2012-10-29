@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.atan on OGDouble
  */
-public final class AtanOGDoubleArray extends AtanAbstract<OGDoubleArray> {
+public final class AtanOGDoubleArray implements AtanAbstract<OGDoubleArray> {
   private static AtanOGDoubleArray s_instance = new AtanOGDoubleArray();
 
   public static AtanOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class AtanOGDoubleArray extends AtanAbstract<OGDoubleArray> {
   private AtanOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray atan(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

@@ -7,7 +7,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -15,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Adds {@link OGDoubleArray} to {@link OGDiagonalArray} 
  */
-public final class PlusOGDoubleArrayOGDiagonalArray extends PlusMinusAbstract<OGDoubleArray, OGDiagonalArray> {
+public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract<OGDoubleArray, OGDiagonalArray> {
   private static PlusOGDoubleArrayOGDiagonalArray s_instance = new PlusOGDoubleArrayOGDiagonalArray();
 
   public static PlusOGDoubleArrayOGDiagonalArray getInstance() {
@@ -25,9 +24,8 @@ public final class PlusOGDoubleArrayOGDiagonalArray extends PlusMinusAbstract<OG
   private PlusOGDoubleArrayOGDiagonalArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plusminus(OGDoubleArray array1, OGDiagonalArray array2, int op) {
+  public OGDoubleArray plusminus(OGDoubleArray array1, OGDiagonalArray array2, int op) {
 
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -37,7 +35,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray extends PlusMinusAbstract<OG
 
     double[] tmp = null;
 
-    OGArraySuper<Number> retArray = null;
+    OGDoubleArray retArray = null;
     final double signval = Math.copySign(1, op);
 
     // Actually adding arrays

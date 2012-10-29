@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGSparse / OGDouble
  */
-public final class RdivideOGSparseArrayOGDoubleArray extends RdivideAbstract<OGSparseArray, OGDoubleArray> {
+public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<OGSparseArray, OGDoubleArray> {
   private static RdivideOGSparseArrayOGDoubleArray s_instance = new RdivideOGSparseArrayOGDoubleArray();
 
   public static RdivideOGSparseArrayOGDoubleArray getInstance() {
@@ -25,9 +25,8 @@ public final class RdivideOGSparseArrayOGDoubleArray extends RdivideAbstract<OGS
   private RdivideOGSparseArrayOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> rdivide(OGSparseArray array1, OGDoubleArray array2) {
+  public OGArraySuper<? extends Number> rdivide(OGSparseArray array1, OGDoubleArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just div by that
@@ -45,7 +44,7 @@ public final class RdivideOGSparseArrayOGDoubleArray extends RdivideAbstract<OGS
     double[] tmp = null;
     int n;
     int denseOffset = 0;
-    OGArraySuper<Number> ret = null;
+    OGArraySuper<? extends Number> ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued SparseMatrix rdivide dense
       n = rowsArray2 * columnsArray2;

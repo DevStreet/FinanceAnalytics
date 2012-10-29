@@ -6,14 +6,13 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy;
 
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
  * Copies sparse arrays
  */
-public final class CopyOGSparseArray extends CopyAbstract<OGSparseArray> {
+public final class CopyOGSparseArray implements CopyAbstract<OGSparseArray> {
   private static CopyOGSparseArray s_instance = new CopyOGSparseArray();
 
   public static CopyOGSparseArray getInstance() {
@@ -23,9 +22,8 @@ public final class CopyOGSparseArray extends CopyAbstract<OGSparseArray> {
   private CopyOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> copy(OGSparseArray array1) {
+  public OGSparseArray copy(OGSparseArray array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     double [] values = DenseMemoryManipulation.memcpy(array1.getData());

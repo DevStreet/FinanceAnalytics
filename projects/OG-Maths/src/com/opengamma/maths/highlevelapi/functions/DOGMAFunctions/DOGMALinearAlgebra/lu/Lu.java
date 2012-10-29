@@ -50,7 +50,7 @@ public class Lu {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGLuResult lu(T array1, compute these) {
+  public <T extends OGArraySuper<? extends Number>> OGLuResult lu(T array1, compute these) {
     LuAbstract<T> use = (LuAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("lu() on array class " + array1.getClass().toString() + " is not yet implemented");

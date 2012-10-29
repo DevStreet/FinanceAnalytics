@@ -16,7 +16,7 @@ public class DOGMASparseUtilities implements DOGMASparseUtilitiesAPI {
   private final Full _full = new Full();
 
   @Override
-  public OGArraySuper<Number> full(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> full(OGArraySuper<? extends Number> array) {
     return _full.full(array);
   }
 

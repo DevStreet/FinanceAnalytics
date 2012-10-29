@@ -5,14 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 /**
  * Sparse's permutation arrays
  */
-public final class SparseOGPermutationArray extends SparseAbstract<OGPermutationArray> {
+public final class SparseOGPermutationArray implements SparseAbstract<OGPermutationArray> {
 
   private static SparseOGPermutationArray s_instance = new SparseOGPermutationArray();
 
@@ -23,9 +22,8 @@ public final class SparseOGPermutationArray extends SparseAbstract<OGPermutation
   private SparseOGPermutationArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> sparse(OGPermutationArray array1) {
+  public OGSparseArray sparse(OGPermutationArray array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final int[] data = array1.getData();

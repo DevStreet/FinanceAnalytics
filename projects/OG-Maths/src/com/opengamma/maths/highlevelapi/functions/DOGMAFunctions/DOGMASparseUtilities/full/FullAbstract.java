@@ -14,7 +14,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Full
  * @param <T> An OGArray type
  */
-public abstract class FullAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> full(T array1);
+public interface FullAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> full(T array1);
 }
 

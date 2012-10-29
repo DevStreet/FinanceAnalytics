@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.CopyOGDoubleArray;
 
@@ -13,7 +12,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangin
 /**
  * Full's OGDoubleArrays
  */
-public final class FullOGDoubleArray extends FullAbstract<OGDoubleArray> {
+public final class FullOGDoubleArray implements FullAbstract<OGDoubleArray> {
   private static FullOGDoubleArray s_instance = new FullOGDoubleArray();
 
   public static FullOGDoubleArray getInstance() {
@@ -25,9 +24,8 @@ public final class FullOGDoubleArray extends FullAbstract<OGDoubleArray> {
 
   private static CopyOGDoubleArray s_copier = CopyOGDoubleArray.getInstance();  
   
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> full(OGDoubleArray array1) {
+  public OGDoubleArray full(OGDoubleArray array1) {
     return s_copier.copy(array1);
   }
 

@@ -7,14 +7,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 /**
  * Sparse's a OGDoubleArray
  */
-public final class SparseOGDoubleArray extends SparseAbstract<OGDoubleArray> {
+public final class SparseOGDoubleArray implements SparseAbstract<OGDoubleArray> {
 
   private static SparseOGDoubleArray s_instance = new SparseOGDoubleArray();
 
@@ -25,9 +24,8 @@ public final class SparseOGDoubleArray extends SparseAbstract<OGDoubleArray> {
   private SparseOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> sparse(OGDoubleArray array1) {
+  public OGSparseArray sparse(OGDoubleArray array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final double[] data = array1.getData();
@@ -46,12 +44,12 @@ public final class SparseOGDoubleArray extends SparseAbstract<OGDoubleArray> {
     // we need unwind the array m into coordinate form
     int ptr = 0;
     int i;
-    int localMaxEntrisInACol;
+//    int localMaxEntrisInACol;
     double entry = 0;
     int ir;
     for (i = 0; i < cols; i++) {
       colPtrTmp[i] = ptr;
-      localMaxEntrisInACol = 0;
+//      localMaxEntrisInACol = 0;
       ir = i * rows;
       for (int j = 0; j < rows; j++) {
         entry = data[ir + j];
@@ -59,7 +57,7 @@ public final class SparseOGDoubleArray extends SparseAbstract<OGDoubleArray> {
           rowIdxTmp[ptr] = j;
           dataTmp[ptr] = entry;
           ptr++;
-          localMaxEntrisInACol++;
+//          localMaxEntrisInACol++;
         }
       }
 

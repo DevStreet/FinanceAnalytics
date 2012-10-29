@@ -12,7 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 /**
  * Adds OGDoubleArrays to OGSparseArrays   
  */
-public final class PlusOGSparseArrayOGDoubleArray extends PlusMinusAbstract<OGSparseArray, OGDoubleArray> {
+public final class PlusOGSparseArrayOGDoubleArray implements PlusMinusAbstract<OGSparseArray, OGDoubleArray> {
   private static PlusOGSparseArrayOGDoubleArray s_instance = new PlusOGSparseArrayOGDoubleArray();
 
   public static PlusOGSparseArrayOGDoubleArray getInstance() {
@@ -22,13 +22,10 @@ public final class PlusOGSparseArrayOGDoubleArray extends PlusMinusAbstract<OGSp
   private PlusOGSparseArrayOGDoubleArray() {
   }
 
-  
   private static PlusOGDoubleArrayOGSparseArray s_reverse = PlusOGDoubleArrayOGSparseArray.getInstance();
   
-  
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plusminus(OGSparseArray array1, OGDoubleArray array2, final int op) {
+  public OGArraySuper<? extends Number> plusminus(OGSparseArray array1, OGDoubleArray array2, final int op) {
     return s_reverse.plusminus(array2, array1, op);
   }
 

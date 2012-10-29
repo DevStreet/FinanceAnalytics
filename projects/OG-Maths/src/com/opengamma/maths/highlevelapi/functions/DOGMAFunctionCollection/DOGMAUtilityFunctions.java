@@ -14,8 +14,9 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAUtilityFu
  */
 public class DOGMAUtilityFunctions implements DOGMAUtilityFunctionsAPI {
   private Dot _dot = new Dot();
+  
   @Override
-  public OGArraySuper<Number> dot(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> dot(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return _dot.dot(array1, array2);
   }
 

@@ -5,14 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.horzcat;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Horzcat impl for horzcatting OGDouble OGDouble
  */
-public final class HorzcatOGDoubleArrayOGDoubleArray extends HorzcatAbstract<OGDoubleArray, OGDoubleArray> {
+public final class HorzcatOGDoubleArrayOGDoubleArray implements HorzcatAbstract<OGDoubleArray, OGDoubleArray> {
   private static HorzcatOGDoubleArrayOGDoubleArray s_instance = new HorzcatOGDoubleArrayOGDoubleArray();
 
   public static HorzcatOGDoubleArrayOGDoubleArray getInstance() {
@@ -23,7 +22,7 @@ public final class HorzcatOGDoubleArrayOGDoubleArray extends HorzcatAbstract<OGD
   }
 
   @Override
-  public OGArraySuper<Number> horzcat(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGDoubleArray horzcat(OGDoubleArray array1, OGDoubleArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     Catchers.catchBadCommute(array1.getNumberOfRows(), "array1", array2.getNumberOfRows(), "array2");

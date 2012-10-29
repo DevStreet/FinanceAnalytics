@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAUtilityFunctions.dot;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -13,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class DotOGDoubleArrayOGDoubleArray extends DotAbstract<OGDoubleArray, OGDoubleArray> {
+public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGDoubleArray, OGDoubleArray> {
   private static DotOGDoubleArrayOGDoubleArray s_instance = new DotOGDoubleArrayOGDoubleArray();
 
   public static DotOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,9 +24,8 @@ public final class DotOGDoubleArrayOGDoubleArray extends DotAbstract<OGDoubleArr
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> dot(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGDoubleArray dot(OGDoubleArray array1, OGDoubleArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     OGDoubleArray dot = null;

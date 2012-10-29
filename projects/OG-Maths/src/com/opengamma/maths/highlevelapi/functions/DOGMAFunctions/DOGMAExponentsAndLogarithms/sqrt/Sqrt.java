@@ -28,7 +28,7 @@ public class Sqrt {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> sqrt(T array1) {
+  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> sqrt(T array1) {
     SqrtAbstract<T> use = (SqrtAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("Sqrt() on array class " + array1.getClass().toString() + " is not yet implemented");

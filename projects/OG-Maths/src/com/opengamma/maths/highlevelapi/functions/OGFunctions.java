@@ -5,8 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions;
 
-import java.util.Arrays;
-
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;

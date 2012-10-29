@@ -5,14 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 /**
  * Full's OGSparseArrays
  */
-public final class FullOGSparseArray extends FullAbstract<OGSparseArray> {
+public final class FullOGSparseArray implements FullAbstract<OGSparseArray> {
   private static FullOGSparseArray s_instance = new FullOGSparseArray();
 
   public static FullOGSparseArray getInstance() {
@@ -22,9 +21,8 @@ public final class FullOGSparseArray extends FullAbstract<OGSparseArray> {
   private FullOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> full(OGSparseArray array1) {
+  public OGDoubleArray full(OGSparseArray array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final int[] colPtr = array1.getColumnPtr();

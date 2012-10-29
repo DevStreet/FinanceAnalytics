@@ -827,7 +827,7 @@ public class Catchers {
    * Catches NaNs in OGArraySuper types
    * @param array1 an OGArraySuper type
    */
-  public static void catchNaN(OGArraySuper<Number> array1) {
+  public static void catchNaN(OGArraySuper<? extends Number> array1) {
     CatchNaN catchnan = CatchNaN.getInstance();
     catchnan.catchnan(array1);
   }
@@ -848,7 +848,7 @@ public class Catchers {
    * Catches NaNs in OGArraySuper types
    * @param array1 an OGArraySuper type
    */
-  public static void catchInf(OGArraySuper<Number> array1) {
+  public static void catchInf(OGArraySuper<? extends Number> array1) {
     CatchInf catchinf = CatchInf.getInstance();
     catchinf.catchinf(array1);
   }

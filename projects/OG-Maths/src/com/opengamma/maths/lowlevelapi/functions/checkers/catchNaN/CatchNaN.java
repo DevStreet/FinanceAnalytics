@@ -37,7 +37,7 @@ public final class CatchNaN {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> void catchnan(T array1) {
+  public <T extends OGArraySuper<? extends Number>> void catchnan(T array1) {
     CatchNaNAbstract<T> use = (CatchNaNAbstract<T>) s_functionPointers.get(array1.getClass());
     use.catchnan(array1);
   }

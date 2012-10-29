@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * SVD for OGComplex 
  */
-public final class SvdOGComplexArray extends SvdAbstract<OGComplexArray> {
+public final class SvdOGComplexArray implements SvdAbstract<OGComplexArray> {
   private static SvdOGComplexArray s_instance = new SvdOGComplexArray();
 
   public static SvdOGComplexArray getInstance() {
@@ -47,8 +47,8 @@ public final class SvdOGComplexArray extends SvdAbstract<OGComplexArray> {
     double[] RWORK = new double[5 * Math.min(m, n)]; //CSIGNORE
     int[] info = new int[1];
     OGComplexArray resultU = null;
-    OGArraySuper<Number> resultS = null;
-    OGArraySuper<Number> resultV = null; // we leave this as a super type because it has to be transposed and as such is DOGMAtised and upcast, TODO: replace when we have in place transpose
+    OGArraySuper<? extends Number> resultS = null;
+    OGArraySuper<? extends Number> resultV = null; // we leave this as a super type because it has to be transposed and as such is DOGMAtised and upcast, TODO: replace when we have in place transpose
 
     double[] pointLess = new double[1];  // this is to keep JNI happy, it doesn't consider "null" an array type
     switch (these) {

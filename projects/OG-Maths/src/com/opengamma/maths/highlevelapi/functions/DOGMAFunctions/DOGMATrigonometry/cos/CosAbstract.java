@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.cos overload
  * @param <T> An OGArray type
  */
-public abstract class CosAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> cos(T array1);
+public interface CosAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> cos(T array1);
 }

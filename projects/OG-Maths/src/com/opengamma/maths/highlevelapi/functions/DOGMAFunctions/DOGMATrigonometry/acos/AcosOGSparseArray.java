@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.acos on OGSparse
  */
-public final class AcosOGSparseArray extends AcosAbstract<OGSparseArray> {
+public final class AcosOGSparseArray implements AcosAbstract<OGSparseArray> {
   private static AcosOGSparseArray s_instance = new AcosOGSparseArray();
 
   public static AcosOGSparseArray getInstance() {
@@ -24,7 +24,6 @@ public final class AcosOGSparseArray extends AcosAbstract<OGSparseArray> {
   private AcosOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray acos(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.tan on OGSparse
  */
-public final class TanOGSparseArray extends TanAbstract<OGSparseArray> {
+public final class TanOGSparseArray implements TanAbstract<OGSparseArray> {
   private static TanOGSparseArray s_instance = new TanOGSparseArray();
 
   public static TanOGSparseArray getInstance() {
@@ -22,7 +22,6 @@ public final class TanOGSparseArray extends TanAbstract<OGSparseArray> {
   private TanOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray tan(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

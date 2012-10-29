@@ -20,6 +20,6 @@ public interface DOGMALinearAlgebraAPI {
    * @param required the components of the SVD wanted by the user  
    * @return an {@link OGSvdResult} containing the components of the decomposition as specified by {@code required}
    */
-  OGSvdResult svd(OGArraySuper<Number> array1, compute required);
+  OGSvdResult svd(OGArraySuper<? extends Number> array1, compute required);
 
 }

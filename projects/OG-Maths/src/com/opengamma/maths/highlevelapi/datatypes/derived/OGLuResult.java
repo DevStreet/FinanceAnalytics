@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
  * Holds an LUP result 
  */
 public class OGLuResult {
-  private OGArraySuper<Number> _L; //CSIGNORE
-  private OGArraySuper<Number> _U; //CSIGNORE
+  private OGArraySuper<? extends Number> _L; //CSIGNORE
+  private OGArraySuper<? extends Number> _U; //CSIGNORE
   private OGPermutationArray _P; //CSIGNORE
 
   /**
@@ -23,7 +23,7 @@ public class OGLuResult {
    * @param U
    * @param P
    */
-  public OGLuResult(OGArraySuper<Number> L, OGArraySuper<Number> U, OGPermutationArray P) { //CSIGNORE
+  public OGLuResult(OGArraySuper<? extends Number> L, OGArraySuper<? extends Number> U, OGPermutationArray P) { //CSIGNORE
     _L = L;
     _U = U;
     _P = P;
@@ -33,7 +33,7 @@ public class OGLuResult {
    * Gets the matrix L.
    * @return the matrix L
    */
-  public OGArraySuper<Number> getL() {
+  public OGArraySuper<? extends Number> getL() {
     if (_L == null) {
       throw new MathsExceptionNotRequested("The matrix L was not requested to be computed at execution time.");
     }
@@ -44,7 +44,7 @@ public class OGLuResult {
    * Gets the matrix U.
    * @return the matrix U.
    */
-  public OGArraySuper<Number> getU() {
+  public OGArraySuper<? extends Number> getU() {
     if (_U == null) {
       throw new MathsExceptionNotRequested("The matrix U was not requested to be computed at execution time.");
     }

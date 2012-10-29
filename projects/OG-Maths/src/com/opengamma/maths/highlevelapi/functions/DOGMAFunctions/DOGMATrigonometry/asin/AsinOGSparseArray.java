@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.asin on OGSparse
  */
-public final class AsinOGSparseArray extends AsinAbstract<OGSparseArray> {
+public final class AsinOGSparseArray implements AsinAbstract<OGSparseArray> {
   private static AsinOGSparseArray s_instance = new AsinOGSparseArray();
 
   public static AsinOGSparseArray getInstance() {
@@ -22,7 +22,6 @@ public final class AsinOGSparseArray extends AsinAbstract<OGSparseArray> {
   private AsinOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray asin(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

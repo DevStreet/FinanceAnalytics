@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.tanh on OGSparse
  */
-public final class TanhOGSparseArray extends TanhAbstract<OGSparseArray> {
+public final class TanhOGSparseArray implements TanhAbstract<OGSparseArray> {
   private static TanhOGSparseArray s_instance = new TanhOGSparseArray();
 
   public static TanhOGSparseArray getInstance() {
@@ -22,7 +22,6 @@ public final class TanhOGSparseArray extends TanhAbstract<OGSparseArray> {
   private TanhOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray tanh(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

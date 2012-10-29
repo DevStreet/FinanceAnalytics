@@ -18,13 +18,13 @@ public interface DOGMAIOAPI {
    * @param aMatrix a matrix to convert
    * @return an OGArraySuper type depending on the data in aMatrix
    */
-  OGArraySuper<Number> smartImport(double[][] aMatrix);
+  OGArraySuper<? extends Number> smartImport(double[][] aMatrix);
 
   /**
    * @param aVector a vector
    * @param o the orientation the vector should be
    * @return an OGArraySuper type 
    */
-  OGArraySuper<Number> smartImport(double[] aVector, orientation o);
+  OGArraySuper<? extends Number> smartImport(double[] aVector, orientation o);
 
 }

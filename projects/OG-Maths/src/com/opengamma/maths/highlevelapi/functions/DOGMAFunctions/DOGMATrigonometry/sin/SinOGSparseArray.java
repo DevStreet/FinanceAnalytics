@@ -12,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.sin on OGSparse
  */
-public final class SinOGSparseArray extends SinAbstract<OGSparseArray> {
+public final class SinOGSparseArray implements SinAbstract<OGSparseArray> {
   private static SinOGSparseArray s_instance = new SinOGSparseArray();
 
   public static SinOGSparseArray getInstance() {
@@ -22,7 +22,6 @@ public final class SinOGSparseArray extends SinAbstract<OGSparseArray> {
   private SinOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray sin(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

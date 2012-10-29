@@ -7,6 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.Erf;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.Erfc;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMASpecialFunctionsAPI;
 
 /**
@@ -14,14 +15,15 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMASpecialFu
  */
 public class DOGMASpecialFunctions implements DOGMASpecialFunctionsAPI {
   private static final Erf ERF = new Erf();
+  private static final Erfc ERFC = new Erfc();
 
   @Override
-  public OGArraySuper<Number> erf(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> erf(OGArraySuper<? extends Number> array1) {
     return ERF.erf(array1);
   }
 
   @Override
-  public OGArraySuper<Number> erfc(OGArraySuper<Number> array1) {
-    return null;
+  public OGArraySuper<? extends Number> erfc(OGArraySuper<? extends Number> array1) {
+    return ERFC.erfc(array1);
   }
 }

@@ -85,25 +85,25 @@ public class DOMGArdivideTest {
 
   @Test
   public void testDouble3x5ArdivDouble1x1Test() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, OGD1x1);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, OGD1x1);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble1x1rdivDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD1x1, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD1x1, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGD3x5A));
   }
 
   @Test
   public void testDouble3x5ArdivDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5Ardiv3x5A));
   }
 
   @Test
   public void testDouble3x5ArdivDouble3x5BTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, OGD3x5B);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, OGD3x5B);
     assertTrue(tmp.equals(OGD3x5Ardiv3x5B));
   }
 
@@ -115,31 +115,31 @@ public class DOMGArdivideTest {
 
   @Test
   public void testDouble3x5ArdivSparse1x1Test() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, OGS1x1);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, OGS1x1);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble1x1rdivSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD1x1, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD1x1, OGS3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGS3x5A));
   }
 
   @Test
   public void testDouble3x5ArdivSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, OGS3x5A);
     assertTrue(tmp.equals(OGD3x5ArdivOGS3x5A));
   }
 
   @Test
   public void testDoublerdivSparseIEEENaNdivisionTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(new OGDoubleArray(Double.NaN), OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(new OGDoubleArray(Double.NaN), OGS3x5A);
     assertTrue(tmp.equals(OGDAllNaN));
   }
 
   @Test
   public void testDoublerdivSparseIEEEArraywiseNaNdivisionTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5AwNaN, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5AwNaN, OGS3x5A);
     assertTrue(tmp.equals(OGD3x5AwNaNrdivideOGS3x5A));
   }
   
@@ -152,19 +152,19 @@ public class DOMGArdivideTest {
 
   @Test
   public void testSparse3x5ArdivDouble1x1Test() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS3x5A, OGD1x1);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS3x5A, OGD1x1);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testSparse1x1rdivDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS1x1, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS1x1, OGD3x5A);
     assertTrue(tmp.equals(OGS1x1rdivOGD3x5));
   }
 
   @Test
   public void testSparse3x5ArdivDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS3x5A, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS3x5A, OGD3x5A);
     assertTrue(tmp.equals(OGS3x5ArdivOGD3x5A));
   }
 
@@ -176,19 +176,19 @@ public class DOMGArdivideTest {
 
   @Test
   public void testSparse3x5ArdivSparse1x1Test() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS3x5A, OGD1x1);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS3x5A, OGD1x1);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testSparse1x1rdivSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS1x1, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS1x1, OGD3x5A);
     assertTrue(tmp.equals(OGS1x1rdivOGD3x5));
   }
 
   @Test
   public void testSparse3x5ArdivSparse3x5BTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS3x5A, OGS3x5B);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS3x5A, OGS3x5B);
     assertTrue(tmp.equals(OGS3x5ArdivOGS3x5B));
   }
 
@@ -196,49 +196,49 @@ public class DOMGArdivideTest {
   // OGDoubleArray operate on natives
   @Test
   public void testDouble3x5ArdividedoubleTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, 10.e0);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, 10.e0);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble3x5ArdivideintTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGD3x5A, 10);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGD3x5A, 10);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testdoublerdivideDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(10.e0, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(10.e0, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGD3x5A));
   }
 
   @Test
   public void testintrdivideDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(10, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(10, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGD3x5A));
   }
   // OGSparseArray operate on natives
   @Test
   public void testSparse3x5ArdividedoubleTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS3x5A, 10.e0);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS3x5A, 10.e0);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testSparse3x5ArdivideintTest() {
-    OGArraySuper<Number> tmp = DA.rdivide(OGS3x5A, 10);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(OGS3x5A, 10);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testdoublerdivideSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(10.e0, OGS3x5A); 
+    OGArraySuper<? extends Number> tmp = DA.rdivide(10.e0, OGS3x5A); 
     assertTrue(tmp.equals(OGD1x1rdivOGS3x5A));
   }
 
   @Test
   public void testintrdivideSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.rdivide(10, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.rdivide(10, OGS3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGS3x5A));
   }  
   

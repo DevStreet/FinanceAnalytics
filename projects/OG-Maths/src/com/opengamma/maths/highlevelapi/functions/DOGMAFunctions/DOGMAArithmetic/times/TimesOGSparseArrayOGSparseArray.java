@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGSparse * OGSparse
  */
-public final class TimesOGSparseArrayOGSparseArray extends TimesAbstract<OGSparseArray, OGSparseArray> {
+public final class TimesOGSparseArrayOGSparseArray implements TimesAbstract<OGSparseArray, OGSparseArray> {
   private static TimesOGSparseArrayOGSparseArray s_instance = new TimesOGSparseArrayOGSparseArray();
 
   public static TimesOGSparseArrayOGSparseArray getInstance() {
@@ -27,9 +27,8 @@ public final class TimesOGSparseArrayOGSparseArray extends TimesAbstract<OGSpars
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> times(OGSparseArray array1, OGSparseArray array2) {
+  public OGArraySuper<? extends Number> times(OGSparseArray array1, OGSparseArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -42,7 +41,7 @@ public final class TimesOGSparseArrayOGSparseArray extends TimesAbstract<OGSpars
 
     double[] tmp = null;
     int n;
-    OGArraySuper<Number> ret = null;
+    OGArraySuper<? extends Number> ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued Sparse times Sparse = scaled Sparse 
       n = array2.getData().length;

@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -13,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Element wise multiply 
  */
-public final class TimesOGDoubleArrayOGDoubleArray extends TimesAbstract<OGDoubleArray, OGDoubleArray> {
+public final class TimesOGDoubleArrayOGDoubleArray implements TimesAbstract<OGDoubleArray, OGDoubleArray> {
   private static TimesOGDoubleArrayOGDoubleArray s_instance = new TimesOGDoubleArrayOGDoubleArray();
 
   public static TimesOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,9 +24,8 @@ public final class TimesOGDoubleArrayOGDoubleArray extends TimesAbstract<OGDoubl
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> times(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGDoubleArray times(OGDoubleArray array1, OGDoubleArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that

@@ -16,7 +16,7 @@ public class DOGMAExponentsAndLogarithms implements DOGMAExponentsAndLogarithmsA
   private Sqrt _sqrt = new Sqrt();
   
   @Override
-  public OGArraySuper<Number> sqrt(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> sqrt(OGArraySuper<? extends Number> array1) {
     return _sqrt.sqrt(array1);
   }
 

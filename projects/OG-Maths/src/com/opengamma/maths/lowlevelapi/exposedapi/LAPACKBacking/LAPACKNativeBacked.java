@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 
-import com.opengamma.maths.nativewrappers.OGLAPACKRawWrapper;
+//import com.opengamma.maths.nativewrappers.OGLAPACKRawWrapper;
 
 /**
  * Native library backed LAPACK
  */
-public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPIInterface {
+public class LAPACKNativeBacked {/*extends LAPACKAbstractSuper implements LAPACKAPIInterface {
 
   @Override
   public void dgesvd(char jobu, char jobvt, int m, int n, double[] A, int lda, double[] S, double[] U, int ldu, double[] VT, int ldvt, double[] WORK, int lwork, int[] info) { // CSIGNORE
@@ -34,5 +34,5 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
     OGLAPACKRawWrapper.dgelsd(new int[] {m }, new int[] {n }, new int[] {nrhs }, A, new int[] {lda }, b, new int[] {ldb }, s, new double[] {rcond }, rank, work, new int[] {lwork },
         iwork, info);
   }
-
+*/
 }

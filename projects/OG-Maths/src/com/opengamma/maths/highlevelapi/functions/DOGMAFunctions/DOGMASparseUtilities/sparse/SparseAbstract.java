@@ -11,7 +11,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Sparse
  * @param <T> An OGArray type
  */
-public abstract class SparseAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> sparse(T array1);
+public interface SparseAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> sparse(T array1);
 
 }

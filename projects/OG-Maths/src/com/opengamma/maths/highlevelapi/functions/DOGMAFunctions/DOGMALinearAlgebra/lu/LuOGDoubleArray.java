@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * Does LU/LUP on OGDoubleArrays 
  */
-public final class LuOGDoubleArray extends LuAbstract<OGDoubleArray> {
+public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
   private static LuOGDoubleArray s_instance = new LuOGDoubleArray();
   private static Logger s_log = LoggerFactory.getLogger(LuOGDoubleArray.class);
 

@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * erfc
  * @param <T> An OGArray type
  */
-public abstract class ErfcAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> erfc(T array1);
+public interface ErfcAbstract<T extends OGArraySuper<? extends Number>> {
+ 
+  OGArraySuper<? extends Number> erfc(T array1);
 }

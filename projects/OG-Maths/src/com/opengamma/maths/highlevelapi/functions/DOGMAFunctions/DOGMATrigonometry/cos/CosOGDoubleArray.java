@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class CosOGDoubleArray extends CosAbstract<OGDoubleArray> {
+public final class CosOGDoubleArray implements CosAbstract<OGDoubleArray> {
   private static CosOGDoubleArray s_instance = new CosOGDoubleArray();
 
   public static CosOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class CosOGDoubleArray extends CosAbstract<OGDoubleArray> {
   private CosOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray cos(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

@@ -11,6 +11,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Catches NaNs
  * @param <T> An OGArray type
  */
-public abstract class CatchNaNAbstract<T extends OGArraySuper<Number>> {
+public abstract class CatchNaNAbstract<T extends OGArraySuper<? extends Number>> {
   public abstract void catchnan(T array1);
 }

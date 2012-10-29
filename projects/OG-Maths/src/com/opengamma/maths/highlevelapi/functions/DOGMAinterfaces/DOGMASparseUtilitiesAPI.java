@@ -16,6 +16,6 @@ public interface DOGMASparseUtilitiesAPI {
    * @param array a matrix to turn into a full matrix
    * @return a full matrix
    */
-  OGArraySuper<Number> full(OGArraySuper<Number> array);
+  OGArraySuper<? extends Number> full(OGArraySuper<? extends Number> array);
 
 }

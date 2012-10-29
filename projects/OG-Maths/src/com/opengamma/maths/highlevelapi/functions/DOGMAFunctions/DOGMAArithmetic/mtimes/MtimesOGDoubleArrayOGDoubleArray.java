@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -13,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGDoubleArrayOGDoubleArray extends MtimesAbstract<OGDoubleArray, OGDoubleArray> {
+public final class MtimesOGDoubleArrayOGDoubleArray implements MtimesAbstract<OGDoubleArray, OGDoubleArray> {
   private static MtimesOGDoubleArrayOGDoubleArray s_instance = new MtimesOGDoubleArrayOGDoubleArray();
 
   public static MtimesOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,9 +24,8 @@ public final class MtimesOGDoubleArrayOGDoubleArray extends MtimesAbstract<OGDou
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> mtimes(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGDoubleArray mtimes(OGDoubleArray array1, OGDoubleArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -40,7 +38,7 @@ public final class MtimesOGDoubleArrayOGDoubleArray extends MtimesAbstract<OGDou
 
     double[] tmp = null;
     int n = 0;
-    OGArraySuper<Number> ret = null;
+    OGDoubleArray ret = null;
 
     if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * matrix
       final double deref = data1[0];

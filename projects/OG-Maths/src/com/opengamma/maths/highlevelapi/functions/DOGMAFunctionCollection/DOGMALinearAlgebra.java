@@ -21,7 +21,7 @@ public class DOGMALinearAlgebra implements DOGMALinearAlgebraAPI {
   private static final Svd SVD = new Svd();
 
   @Override
-  public OGSvdResult svd(OGArraySuper<Number> array1, compute required) {
+  public OGSvdResult svd(OGArraySuper<? extends Number> array1, compute required) {
     if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
       Catchers.catchNaN(array1);
     }
@@ -32,7 +32,7 @@ public class DOGMALinearAlgebra implements DOGMALinearAlgebraAPI {
 
     // test U
     if (required == compute.U || required == compute.US || required == compute.UV || required == compute.USV) {
-      OGArraySuper<Number> tmp = result.getU();
+      OGArraySuper<? extends Number> tmp = result.getU();
       if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
         Catchers.catchNaN(tmp);
       }
@@ -43,7 +43,7 @@ public class DOGMALinearAlgebra implements DOGMALinearAlgebraAPI {
 
     // test S
     if (required == compute.S || required == compute.US || required == compute.SV || required == compute.USV) {
-      OGArraySuper<Number> tmp = result.getS();
+      OGArraySuper<? extends Number> tmp = result.getS();
       if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
         Catchers.catchNaN(tmp);
       }
@@ -54,7 +54,7 @@ public class DOGMALinearAlgebra implements DOGMALinearAlgebraAPI {
 
     // test V
     if (required == compute.V || required == compute.UV || required == compute.SV || required == compute.USV) {
-      OGArraySuper<Number> tmp = result.getV();
+      OGArraySuper<? extends Number> tmp = result.getV();
       if (DOGMAconfig.getHaltOnNaNOnFunctionExit()) {
         Catchers.catchNaN(tmp);
       }

@@ -18,5 +18,5 @@ public interface DOGMAUtilityFunctionsAPI {
    * @param array2 the second array
    * @return the dot product array1 and array2, if the inputs are arrays the dot products are calculated along the first dimension greater than 1
    */
-  OGArraySuper<Number> dot(OGArraySuper<Number> array1, OGArraySuper<Number> array2);
+  OGArraySuper<? extends Number> dot(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2);
 }

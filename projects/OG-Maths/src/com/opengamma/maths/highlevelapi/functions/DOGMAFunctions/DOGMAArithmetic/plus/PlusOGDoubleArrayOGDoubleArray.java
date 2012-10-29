@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -13,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class PlusOGDoubleArrayOGDoubleArray extends PlusMinusAbstract<OGDoubleArray, OGDoubleArray> {
+public final class PlusOGDoubleArrayOGDoubleArray implements PlusMinusAbstract<OGDoubleArray, OGDoubleArray> {
   private static PlusOGDoubleArrayOGDoubleArray s_instance = new PlusOGDoubleArrayOGDoubleArray();
 
   public static PlusOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,9 +24,8 @@ public final class PlusOGDoubleArrayOGDoubleArray extends PlusMinusAbstract<OGDo
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plusminus(OGDoubleArray array1, OGDoubleArray array2, final int op) {
+  public OGDoubleArray plusminus(OGDoubleArray array1, OGDoubleArray array2, final int op) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();

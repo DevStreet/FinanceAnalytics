@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
@@ -25,14 +25,14 @@ public class Cos {
   /**
    * hashmapped function pointers
    */
-  private static Map<Class<?>, CosAbstract<?>> s_functionPointers = new HashMap<Class<?>, CosAbstract<?>>();
+  private static Map<Class<?>, CosAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
     s_functionPointers.put(OGDoubleArray.class, CosOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, CosOGSparseArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> cos(T array1) {
+  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> cos(T array1) {
     Catchers.catchNullFromArgList(array1, 1);
     CosAbstract<T> use = (CosAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {

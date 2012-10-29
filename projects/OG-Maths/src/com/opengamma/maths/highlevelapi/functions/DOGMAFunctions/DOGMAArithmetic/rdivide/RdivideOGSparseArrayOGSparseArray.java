@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 /**
  * Does elementwise OGSparse * OGSparse
  */
-public final class RdivideOGSparseArrayOGSparseArray extends RdivideAbstract<OGSparseArray, OGSparseArray> {
+public final class RdivideOGSparseArrayOGSparseArray implements RdivideAbstract<OGSparseArray, OGSparseArray> {
   private static RdivideOGSparseArrayOGSparseArray s_instance = new RdivideOGSparseArrayOGSparseArray();
 
   public static RdivideOGSparseArrayOGSparseArray getInstance() {
@@ -24,10 +24,8 @@ public final class RdivideOGSparseArrayOGSparseArray extends RdivideAbstract<OGS
   private RdivideOGSparseArrayOGSparseArray() {
   }
 
-  
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> rdivide(OGSparseArray array1, OGSparseArray array2) {
+  public OGArraySuper<? extends Number> rdivide(OGSparseArray array1, OGSparseArray array2) {
 
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -45,7 +43,7 @@ public final class RdivideOGSparseArrayOGSparseArray extends RdivideAbstract<OGS
     int n;
     int denseOffset;
     int ptr = 0;
-    OGArraySuper<Number> ret = null;
+    OGArraySuper<? extends Number> ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued Sparse rdiv Sparse  
       retRows = rowsArray2;

@@ -33,7 +33,7 @@ public class SvdSimpleTest {
     System.out.println(result.getU().toString());
     System.out.println(result.getS().toString());
     System.out.println(result.getV().toString());
-    OGArraySuper<Number> tmp = DOGMA.mtimes(result.getU(),result.getS(),DOGMA.transpose(result.getV()));
+    OGArraySuper<? extends Number> tmp = DOGMA.mtimes(result.getU(),result.getS(),DOGMA.transpose(result.getV()));
     System.out.println(tmp.toString());
   }
 

@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGDoubleArrayOGSparseArray extends MtimesAbstract<OGDoubleArray, OGSparseArray> {
+public final class MtimesOGDoubleArrayOGSparseArray implements MtimesAbstract<OGDoubleArray, OGSparseArray> {
   private static MtimesOGDoubleArrayOGSparseArray s_instance = new MtimesOGDoubleArrayOGSparseArray();
 
   public static MtimesOGDoubleArrayOGSparseArray getInstance() {
@@ -26,9 +26,8 @@ public final class MtimesOGDoubleArrayOGSparseArray extends MtimesAbstract<OGDou
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> mtimes(OGDoubleArray array1, OGSparseArray array2) {
+  public OGArraySuper<? extends Number> mtimes(OGDoubleArray array1, OGSparseArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -43,7 +42,7 @@ public final class MtimesOGDoubleArrayOGSparseArray extends MtimesAbstract<OGDou
 
     double[] tmp = null;
     int n = 0;
-    OGArraySuper<Number> ret = null;
+    OGArraySuper<? extends Number> ret = null;
 
     if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * sparse matrix
       final double deref = data1[0];

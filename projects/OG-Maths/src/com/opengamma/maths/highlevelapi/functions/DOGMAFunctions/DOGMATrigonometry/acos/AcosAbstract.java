@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.acos overload
  * @param <T> An OGArray type
  */
-public abstract class AcosAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> acos(T array1);
+public interface AcosAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> acos(T array1);
 }
