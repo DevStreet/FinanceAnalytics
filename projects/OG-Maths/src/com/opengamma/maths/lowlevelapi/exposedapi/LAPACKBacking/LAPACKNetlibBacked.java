@@ -8,6 +8,7 @@ package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 import org.netlib.lapack.Dgelsd;
 import org.netlib.lapack.Dgesvd;
 import org.netlib.lapack.Dgetrf;
+import org.netlib.lapack.Dtrtrs;
 import org.netlib.util.intW;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
@@ -42,6 +43,13 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     intW infoderef = new intW(info[0]);
     Dgelsd.dgelsd(m, n, nrhs, A, 0, lda, b, 0, ldb, s, 0, rcond, rankderef, work, 0, lwork, iwork, 0, infoderef);
     rank[0] = rankderef.val;
+    info[0] = infoderef.val;
+  }
+
+  @Override
+  public void dtrtrs(char uplo, char trans, char diag, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info) {
+    intW infoderef = new intW(info[0]);
+    Dtrtrs.dtrtrs(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, nrhs, a, 0, lda, b, 0, ldb, infoderef);
     info[0] = infoderef.val;
   }
 

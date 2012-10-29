@@ -79,4 +79,7 @@ public interface LAPACKAPIInterface {
   // linear least squares
   void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info); //CSIGNORE
 
+  // triangular solve
+  void dtrtrs(char uplo, char trans, char diag, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info);
+
 }

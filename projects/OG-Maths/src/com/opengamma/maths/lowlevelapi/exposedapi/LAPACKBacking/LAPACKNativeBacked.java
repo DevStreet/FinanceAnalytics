@@ -9,6 +9,7 @@ import com.opengamma.maths.nativewrappers.OGLAPACKRawWrapper;
 
 /**
  * Native library backed LAPACK
+ * TODO: enumerate the char pointers
  */
 public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPIInterface {
 
@@ -33,6 +34,11 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
   public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { // CSIGNORE
     OGLAPACKRawWrapper.dgelsd(new int[] {m }, new int[] {n }, new int[] {nrhs }, A, new int[] {lda }, b, new int[] {ldb }, s, new double[] {rcond }, rank, work, new int[] {lwork },
         iwork, info);
+  }
+
+  @Override
+  public void dtrtrs(char uplo, char trans, char diag, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info) {
+    OGLAPACKRawWrapper.dtrtrs(new char[] {uplo}, new char[] {trans}, new char[] {diag}, new int[] {n}, new int[] {nrhs}, a, new int[] {lda}, b, new int[] {ldb}, info);
   }
 
 }

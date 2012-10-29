@@ -38,7 +38,7 @@ public class LAPACK implements LAPACKAPIInterface {
 
   // for now plumb in netlib
   public LAPACK() {
-    _localLAPACK = new LAPACKNativeBacked();
+    _localLAPACK = new LAPACKNetlibBacked();
   }
 
   public LAPACK(backing backedby) {
@@ -70,6 +70,11 @@ public class LAPACK implements LAPACKAPIInterface {
   @Override
   public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { // CSIGNORE
     _localLAPACK.dgelsd(m, n, nrhs, A, lda, b, ldb, s, rcond, rank, work, lwork, iwork, info);
+  }
+
+  @Override
+  public void dtrtrs(char uplo, char trans, char diag, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info) {
+    _localLAPACK.dtrtrs(uplo, trans, diag, n, nrhs, a, lda, b, ldb, info);
   }
 
 }
