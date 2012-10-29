@@ -38,7 +38,7 @@ public final class SparseOGDiagonalArray extends SparseAbstract<OGDiagonalArray>
       tmpColPtr[i] = i;
     }
     for (int i = data.length; i < cols + 1; i++) {
-      tmpColPtr[i] = rows;
+      tmpColPtr[i] = data.length;
     }
 
     int[] tmpRowIdx = new int[data.length];
