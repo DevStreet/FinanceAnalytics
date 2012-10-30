@@ -15,7 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 /**
  * Tests adding/subtracting Diagonal and Full Arrays 
  */
-public class PlusOGDiagonalArrayOGDoubleArrayTest {
+public class PlusOGDiagonalMatrixOGMatrixTest {
 
   static double[] _data4x3 = new double[] {1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12 };
   static double[] _datadiag = new double[] {10, 20, 30 };
