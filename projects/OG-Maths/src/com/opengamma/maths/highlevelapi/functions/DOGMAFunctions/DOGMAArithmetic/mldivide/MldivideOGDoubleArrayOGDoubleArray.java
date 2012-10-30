@@ -63,7 +63,7 @@ public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGD
           return new OGDoubleArray(data2, rows2, cols2);
         }
       } else { // see if it's Hermitian (symmetric in the real case)
-        if (isHermitian(data1, rows1, cols1)) {
+        if (isSymmetric(data1, rows1, cols1)) {
           // cholesky decompose, shove in lower triangle
           _lapack.dpotrf('L', rows1, data1, rows1, info);
           if (info[0] == 0) { // cholesky factorisation was ok, its in the lower triangle, back solve based on this 
@@ -132,7 +132,7 @@ public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGD
     return new OGDoubleArray(Arrays.copyOf(data2, cols1 * cols2), cols1, cols2);
   }
 
-  private boolean isHermitian(double[] data, int rows, int cols) {
+  private boolean isSymmetric(double[] data, int rows, int cols) {
     int ir;
     for (int i = 0; i < cols; i++) {
       ir = i * rows;
