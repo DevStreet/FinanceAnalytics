@@ -10,25 +10,29 @@ import java.util.List;
 import java.util.Map;
 
 import com.opengamma.core.change.ChangeManager;
-import com.opengamma.core.marketdatasnapshot.impl.ManageableMarketDataSnapshot;
 import com.opengamma.id.ObjectIdentifiable;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.AbstractChangeProvidingMaster;
 import com.opengamma.master.ChangeProvidingDecorator;
-import com.opengamma.master.marketdatasnapshot.*;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotDocument;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotHistoryRequest;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotHistoryResult;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotMaster;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotSearchRequest;
+import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotSearchResult;
 
 /**
  * Wraps a snapshot master to trap calls to record user based information to allow clean up and
  * hooks for access control logics if needed.
  */
-public class FinancialUserSnapshotMaster extends AbstractFinancialUserMaster<ManageableMarketDataSnapshot, MarketDataSnapshotDocument> implements MarketDataSnapshotMaster {
+public class FinancialUserSnapshotMaster extends AbstractFinancialUserMaster<MarketDataSnapshotDocument> implements MarketDataSnapshotMaster {
 
   /**
    * The underlying master.
    */
   private final MarketDataSnapshotMaster _underlying;
-  private final AbstractChangeProvidingMaster<ManageableMarketDataSnapshot, MarketDataSnapshotDocument> _changeProvidingMaster;
+  private final AbstractChangeProvidingMaster<MarketDataSnapshotDocument> _changeProvidingMaster;
 
 
   /**

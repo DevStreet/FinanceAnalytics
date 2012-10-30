@@ -7,13 +7,18 @@ package com.opengamma.financial.analytics.ircurve.rest;
 
 import java.util.List;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveDefinitionMaster;
-import com.opengamma.financial.analytics.ircurve.YieldCurveDefinition;
 import com.opengamma.financial.analytics.ircurve.YieldCurveDefinitionDocument;
 import com.opengamma.id.ObjectId;
 import com.opengamma.master.AbstractDocumentDataResource;
@@ -22,7 +27,7 @@ import com.opengamma.util.ArgumentChecker;
 /**
  * RESTful resource for a yield curve definition.
  */
-public class DataInterpolatedYieldCurveDefinitionResource extends AbstractDocumentDataResource<YieldCurveDefinition, YieldCurveDefinitionDocument> {
+public class DataInterpolatedYieldCurveDefinitionResource extends AbstractDocumentDataResource<YieldCurveDefinitionDocument> {
 
   /**
    * The parent resource.
@@ -55,7 +60,6 @@ public class DataInterpolatedYieldCurveDefinitionResource extends AbstractDocume
   }
 
   //-------------------------------------------------------------------------
-
   /**
    * Gets the parent resource.
    *
@@ -75,7 +79,6 @@ public class DataInterpolatedYieldCurveDefinitionResource extends AbstractDocume
   }
 
   //-------------------------------------------------------------------------
-
   /**
    * Gets the definition master.
    *

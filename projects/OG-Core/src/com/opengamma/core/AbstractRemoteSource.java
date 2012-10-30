@@ -12,22 +12,17 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.opengamma.DataNotFoundException;
-import com.opengamma.core.Source;
-import com.opengamma.core.region.Region;
 import com.opengamma.id.UniqueId;
-import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.util.PublicSPI;
 import com.opengamma.util.rest.AbstractRemoteClient;
 
 /**
  * An abstract source built on top of an underlying master.
  *
- * @param <D>  the type of the document
- * @param <M>  the type of the master
+ * @param <T> the type returned by the source
  */
 @PublicSPI
 public abstract class AbstractRemoteSource<T> extends AbstractRemoteClient implements Source<T> {
-
 
   /**
    * Creates an instance.
@@ -38,6 +33,7 @@ public abstract class AbstractRemoteSource<T> extends AbstractRemoteClient imple
     super(baseUri);
   }
 
+  //-------------------------------------------------------------------------
   @Override
   public Map<UniqueId, T> get(Collection<UniqueId> uniqueIds) {
     Map<UniqueId, T> result = newHashMap();
@@ -51,4 +47,5 @@ public abstract class AbstractRemoteSource<T> extends AbstractRemoteClient imple
     }
     return result;
   }
+
 }

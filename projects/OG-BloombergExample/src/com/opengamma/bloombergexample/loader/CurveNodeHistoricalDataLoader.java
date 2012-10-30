@@ -9,7 +9,11 @@ package com.opengamma.bloombergexample.loader;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.opengamma.util.functional.Functional.map;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.time.calendar.Clock;
 import javax.time.calendar.LocalDate;
@@ -22,7 +26,13 @@ import com.opengamma.component.tool.AbstractTool;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.config.impl.ConfigItem;
 import com.opengamma.core.id.ExternalSchemes;
-import com.opengamma.financial.analytics.ircurve.*;
+import com.opengamma.financial.analytics.ircurve.ConfigDBInterpolatedYieldCurveSpecificationBuilder;
+import com.opengamma.financial.analytics.ircurve.FixedIncomeStripWithIdentifier;
+import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecification;
+import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationBuilder;
+import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.YieldCurveConfigPopulator;
+import com.opengamma.financial.analytics.ircurve.YieldCurveDefinition;
 import com.opengamma.financial.convention.ConventionBundle;
 import com.opengamma.financial.convention.ConventionBundleMaster;
 import com.opengamma.financial.convention.DefaultConventionBundleSource;
@@ -31,9 +41,10 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.integration.tool.IntegrationToolContext;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
-import com.opengamma.master.config.impl.ConfigMasterIterator;
+import com.opengamma.master.config.impl.ConfigSearchIterator;
 import com.opengamma.util.functional.Function1;
 import com.opengamma.util.generate.scripts.Scriptable;
 import com.opengamma.util.money.Currency;
@@ -174,8 +185,8 @@ public class CurveNodeHistoricalDataLoader extends AbstractTool<IntegrationToolC
     List<YieldCurveDefinition> results = new ArrayList<YieldCurveDefinition>();
     ConfigSearchRequest<YieldCurveDefinition> request = new ConfigSearchRequest<YieldCurveDefinition>(YieldCurveDefinition.class);
     request.setName(nameExpr);
-    for (ConfigItem<YieldCurveDefinition> item : ConfigMasterIterator.iterable(configMaster, request)) {
-      results.add(item.getValue());
+    for (ConfigDocument doc : ConfigSearchIterator.iterable(configMaster, request)) {
+      results.add((YieldCurveDefinition) doc.getConfig().getValue());
     }
     return results;
   }

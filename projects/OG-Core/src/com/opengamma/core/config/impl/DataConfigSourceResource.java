@@ -9,7 +9,11 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -22,7 +26,6 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ReflectionUtils;
-import com.opengamma.util.fudgemsg.FudgeListWrapper;
 import com.opengamma.util.rest.AbstractDataResource;
 
 /**
@@ -144,10 +147,10 @@ public class DataConfigSourceResource extends AbstractDataResource {
     final Class<?> type = ReflectionUtils.loadClass(typeStr);
     if (versionCorrectionStr != null) {
       final VersionCorrection versionCorrection = VersionCorrection.parse(versionCorrectionStr);
-      ConfigItem result = getConfigSource().get(type, name, versionCorrection);
+      ConfigItem<?> result = getConfigSource().get(type, name, versionCorrection);
       return responseOkFudge(result);
     } else {
-      ConfigItem result = getConfigSource().get(type, name, VersionCorrection.LATEST);
+      ConfigItem<?> result = getConfigSource().get(type, name, VersionCorrection.LATEST);
       return responseOkFudge(result);
     }
   }
@@ -216,6 +219,7 @@ public class DataConfigSourceResource extends AbstractDataResource {
     return bld.build();
   }
 
+  // TODO: put is not a RESTful URI!
   @PUT
   @Path("put")
   public Response put(
@@ -237,4 +241,5 @@ public class DataConfigSourceResource extends AbstractDataResource {
     UriBuilder bld = UriBuilder.fromUri(baseUri).path("put");
     return bld.build();
   }
+
 }

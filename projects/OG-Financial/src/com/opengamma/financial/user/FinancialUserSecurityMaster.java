@@ -15,19 +15,26 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.AbstractChangeProvidingMaster;
 import com.opengamma.master.ChangeProvidingDecorator;
-import com.opengamma.master.security.*;
+import com.opengamma.master.security.SecurityDocument;
+import com.opengamma.master.security.SecurityHistoryRequest;
+import com.opengamma.master.security.SecurityHistoryResult;
+import com.opengamma.master.security.SecurityMaster;
+import com.opengamma.master.security.SecurityMetaDataRequest;
+import com.opengamma.master.security.SecurityMetaDataResult;
+import com.opengamma.master.security.SecuritySearchRequest;
+import com.opengamma.master.security.SecuritySearchResult;
 
 /**
  * Wraps a security master to trap calls to record user based information to allow clean up and
  * hooks for access control logics if needed.
  */
-public class FinancialUserSecurityMaster extends AbstractFinancialUserMaster<ManageableSecurity, SecurityDocument> implements SecurityMaster {
+public class FinancialUserSecurityMaster extends AbstractFinancialUserMaster<SecurityDocument> implements SecurityMaster {
 
   /**
    * The underlying master.
    */
   private final SecurityMaster _underlying;
-  private final AbstractChangeProvidingMaster<ManageableSecurity, SecurityDocument> _changeProvidingMaster;
+  private final AbstractChangeProvidingMaster<SecurityDocument> _changeProvidingMaster;
 
   /**
    * Creates an instance.

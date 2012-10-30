@@ -24,7 +24,6 @@ import com.opengamma.DataNotFoundException;
 import com.opengamma.core.config.impl.ConfigItem;
 import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.id.UniqueId;
-import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
 import com.opengamma.master.config.ConfigSearchResult;
@@ -97,7 +96,7 @@ public class ConfigSaver {
       try {
         PortfolioDocument portfolioDocument = _portfolioMaster.get(uniqueId);
         if (portfolioDocument != null) {
-          return portfolioDocument.getObject().getName();
+          return portfolioDocument.getPortfolio().getName();
         }
       } catch (DataNotFoundException dnfe) {
         if (_verbose) {
@@ -138,19 +137,17 @@ public class ConfigSaver {
     return configsToSave;
   }
 
-  @SuppressWarnings("unchecked")
   private List<ConfigEntry> getConfigs(Class<?> type, String name) {
     ConfigSearchRequest<Object> searchReq = new ConfigSearchRequest<Object>();
-    searchReq.setType((Class<Object>) type);
+    searchReq.setType(type);
     searchReq.setName(name);
     ConfigSearchResult<Object> searchResult = _configMaster.search(searchReq);
     return docsToConfigEntries(searchResult);
   }
   
-  @SuppressWarnings({"unchecked"})
   private List<ConfigEntry> getConfigs(Class<?> type) {
     ConfigSearchRequest<Object> searchReq = new ConfigSearchRequest<Object>();
-    searchReq.setType((Class<Object>) type);
+    searchReq.setType(type);
     ConfigSearchResult<Object> searchResult = _configMaster.search(searchReq);
     return docsToConfigEntries(searchResult);    
   }

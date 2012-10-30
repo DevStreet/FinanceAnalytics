@@ -106,7 +106,6 @@ public class DataConfigResource extends AbstractDataResource {
     return responseOkFudge(result);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})  // necessary to stop Jersey issuing warnings due to <?>
   @POST
   public Response update(@Context UriInfo uriInfo, ConfigDocument request) {
     if (getUrlConfigId().equals(request.getUniqueId().getObjectId()) == false) {
@@ -142,23 +141,9 @@ public class DataConfigResource extends AbstractDataResource {
     return responseOkFudge(result);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})  // necessary to stop Jersey issuing warnings due to <?>
   @POST
   @Path("versions/{versionId}")
-  public Response correct(@Context UriInfo uriInfo, @PathParam("versionId") String versionId, ConfigDocument request) {
-    UniqueId uniqueId = getUrlConfigId().atVersion(versionId);
-    if (!uniqueId.equals(request.getUniqueId())) {
-      throw new IllegalArgumentException("Document uniqueId does not match URI");
-    }
-    ConfigDocument result = getConfigMaster().correct(request);
-    URI uri = uriVersion(uriInfo.getBaseUri(), result.getUniqueId());
-    return responseCreatedFudge(uri, result);
-  }
-
-  @SuppressWarnings({"rawtypes", "unchecked"})  // necessary to stop Jersey issuing warnings due to <?>
-  @POST
-  @Path("versions/{versionId}")
-  public Response addVersion(@Context UriInfo uriInfo, @PathParam("versionId") String versionId, ConfigDocument document) {
+  public Response correct(@Context UriInfo uriInfo, @PathParam("versionId") String versionId, ConfigDocument document) {
     UniqueId uniqueId = getUrlConfigId().atVersion(versionId);
     if (!uniqueId.equals(document.getUniqueId())) {
       throw new IllegalArgumentException("Document uniqueId does not match URI");
@@ -168,7 +153,6 @@ public class DataConfigResource extends AbstractDataResource {
     return responseCreatedFudge(uri, result);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})  // necessary to stop Jersey issuing warnings due to <?>
   @PUT
   @Path("versions/{versionId}")
   public Response replaceVersion(@PathParam("versionId") String versionId, List<ConfigDocument> replacementDocuments) {
@@ -207,7 +191,7 @@ public class DataConfigResource extends AbstractDataResource {
     if (vc != null) {
       bld.queryParam("versionAsOf", vc.getVersionAsOfString());
       bld.queryParam("correctedTo", vc.getCorrectedToString());
-    }    
+    }
     return bld.build(objectId.getObjectId());
   }
 
@@ -221,7 +205,6 @@ public class DataConfigResource extends AbstractDataResource {
    * @return the URI, not null
    */
   // TODO replace it with something better
-  @Deprecated
   public static URI uriAll(URI baseUri, ObjectIdentifiable objectId, VersionCorrection vc, Class<?> type) {
     UriBuilder bld = UriBuilder.fromUri(baseUri).path("/configs/{configId}/all");
     if (vc != null) {

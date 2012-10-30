@@ -15,8 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
-import com.opengamma.core.config.impl.ConfigItem;
-import com.opengamma.engine.function.config.*;
+import com.opengamma.engine.function.config.FunctionConfiguration;
+import com.opengamma.engine.function.config.ParameterizedFunctionConfiguration;
+import com.opengamma.engine.function.config.RepositoryConfiguration;
+import com.opengamma.engine.function.config.RepositoryConfigurationSource;
+import com.opengamma.engine.function.config.SimpleRepositoryConfigurationSource;
+import com.opengamma.engine.function.config.StaticFunctionConfiguration;
 import com.opengamma.financial.analytics.ircurve.YieldCurveDefinition;
 import com.opengamma.financial.analytics.ircurve.YieldCurveInterpolatingFunction;
 import com.opengamma.financial.analytics.ircurve.YieldCurveMarketDataFunction;
@@ -28,9 +32,10 @@ import com.opengamma.financial.analytics.model.curve.interestrate.MultiYieldCurv
 import com.opengamma.financial.analytics.model.curve.interestrate.MultiYieldCurvePresentValueMethodFunction;
 import com.opengamma.financial.analytics.model.curve.interestrate.YieldCurveDefaults;
 import com.opengamma.financial.convention.ConventionBundleSource;
+import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
-import com.opengamma.master.config.ConfigSearchResult;
+import com.opengamma.master.config.impl.ConfigSearchIterator;
 import com.opengamma.util.SingletonFactoryBean;
 
 /**
@@ -40,9 +45,16 @@ import com.opengamma.util.SingletonFactoryBean;
  */
 public class ExampleCurveFunctionConfiguration extends SingletonFactoryBean<RepositoryConfigurationSource> {
 
+  /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(ExampleCurveFunctionConfiguration.class);
 
+  /**
+   * The config master.
+   */
   private ConfigMaster _configMaster;
+  /**
+   * The convention bundle source.
+   */
   @SuppressWarnings("unused")
   private ConventionBundleSource _conventionBundleSource; //TODO not sure if we'll need this in the future
 
@@ -62,9 +74,7 @@ public class ExampleCurveFunctionConfiguration extends SingletonFactoryBean<Repo
       // tightly coupled to the ConfigDbInterpolatedYieldCurveSource and MarketInstrumentImpliedYieldCurveFunction classes
       final ConfigSearchRequest<YieldCurveDefinition> searchRequest = new ConfigSearchRequest<YieldCurveDefinition>();
       searchRequest.setType(YieldCurveDefinition.class);
-
-      final ConfigSearchResult<YieldCurveDefinition> searchResult = _configMaster.search(searchRequest);
-      for (final ConfigItem<YieldCurveDefinition> configDocument : searchResult.getValues()) {
+      for (final ConfigDocument configDocument : ConfigSearchIterator.iterable(_configMaster, searchRequest)) {
         final String documentName = configDocument.getName();
         final int underscore = documentName.lastIndexOf('_');
         if (underscore <= 0) {

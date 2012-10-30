@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.google.common.collect.MapMaker;
-import com.sun.jersey.api.client.GenericType;
 
 /**
  * Implementation of {@link com.opengamma.util.map.Map2} backed by a standard {@link java.util.concurrent.ConcurrentHashMap}.
@@ -32,7 +31,8 @@ public class HashDeepMap2<K1, K2, V> implements DeepMap2<K1, K2, V> {
   private final ConcurrentMap<K1, K1> _keys = new ConcurrentHashMap<K1, K1>();
 
   private K1 borrowKey(final K1 key) {
-    return _keys.putIfAbsent(key, key);
+    K1 old = _keys.putIfAbsent(key, key);
+    return (old != null ? old : key);
   }
 
   private void returnKey(final K1 key) {

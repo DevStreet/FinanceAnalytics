@@ -20,6 +20,7 @@ import com.opengamma.maths.lowlevelapi.datatypes.primitive.CompressedSparseColum
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.CompressedSparseRowFormatMatrix;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseSymmetricMatrix;
+import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitive;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.PackedMatrix;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.SparseCoordinateFormatMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.blas2kernelabstractions.BLAS2DGEMVKernelAbstraction;

@@ -5,13 +5,7 @@
  */
 package com.opengamma.core.security;
 
-import java.util.Collection;
-
-import com.opengamma.core.Source;
 import com.opengamma.core.SourceWithExternalBundle;
-import com.opengamma.core.change.ChangeProvider;
-import com.opengamma.id.ExternalIdBundle;
-import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.PublicSPI;
 
 /**
@@ -25,5 +19,5 @@ import com.opengamma.util.PublicSPI;
  */
 @PublicSPI
 public interface SecuritySource extends SourceWithExternalBundle<Security> {
-  
+
 }
