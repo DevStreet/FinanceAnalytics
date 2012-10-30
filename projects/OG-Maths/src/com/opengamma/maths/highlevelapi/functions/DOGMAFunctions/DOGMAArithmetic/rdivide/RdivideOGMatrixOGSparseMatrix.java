@@ -14,14 +14,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGDouble / OGSparse
  */
-public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<OGMatrix, OGSparseMatrix> {
-  private static RdivideOGDoubleArrayOGSparseArray s_instance = new RdivideOGDoubleArrayOGSparseArray();
+public final class RdivideOGMatrixOGSparseMatrix implements RdivideAbstract<OGMatrix, OGSparseMatrix> {
+  private static RdivideOGMatrixOGSparseMatrix s_instance = new RdivideOGMatrixOGSparseMatrix();
 
-  public static RdivideOGDoubleArrayOGSparseArray getInstance() {
+  public static RdivideOGMatrixOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private RdivideOGDoubleArrayOGSparseArray() {
+  private RdivideOGMatrixOGSparseMatrix() {
   }
 
   @Override

@@ -13,14 +13,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does rdivide on OGDouble pairings
  */
-public final class RdivideOGDoubleArrayOGDoubleArray implements RdivideAbstract<OGMatrix, OGMatrix> {
-  private static RdivideOGDoubleArrayOGDoubleArray s_instance = new RdivideOGDoubleArrayOGDoubleArray();
+public final class RdivideOGMatrixOGMatrix implements RdivideAbstract<OGMatrix, OGMatrix> {
+  private static RdivideOGMatrixOGMatrix s_instance = new RdivideOGMatrixOGMatrix();
 
-  public static RdivideOGDoubleArrayOGDoubleArray getInstance() {
+  public static RdivideOGMatrixOGMatrix getInstance() {
     return s_instance;
   }
 
-  private RdivideOGDoubleArrayOGDoubleArray() {
+  private RdivideOGMatrixOGMatrix() {
   }
 
   @Override

@@ -14,10 +14,10 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGDoubleArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGDoubleArrayOGSparseArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGSparseArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGSparseArrayOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGMatrixOGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGSparseMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideOGSparseMatrixOGSparseMatrix;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -33,10 +33,10 @@ public class Rdivide {
     Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGSparseMatrix.class);
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGMatrix.class);
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGSparseMatrix.class);
-    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, RdivideOGDoubleArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, RdivideOGDoubleArrayOGSparseArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, RdivideOGSparseArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGSparseArray, RdivideOGSparseArrayOGSparseArray.getInstance());         
+    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, RdivideOGMatrixOGMatrix.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, RdivideOGMatrixOGSparseMatrix.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, RdivideOGSparseMatrixOGMatrix.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGSparseArray, RdivideOGSparseMatrixOGSparseMatrix.getInstance());         
   }
 
   @SuppressWarnings("unchecked")
