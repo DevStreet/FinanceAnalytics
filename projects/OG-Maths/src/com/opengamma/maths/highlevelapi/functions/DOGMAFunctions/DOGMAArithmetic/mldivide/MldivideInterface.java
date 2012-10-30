@@ -10,6 +10,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 /**
  * 
  */
-public interface MldivideInterface<T extends OGArraySuper<Number>, S extends OGArraySuper<Number>> {
+public interface MldivideInterface<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
   public <U extends Number> OGArraySuper<U > mldivide(T array1, S array2);
 }
