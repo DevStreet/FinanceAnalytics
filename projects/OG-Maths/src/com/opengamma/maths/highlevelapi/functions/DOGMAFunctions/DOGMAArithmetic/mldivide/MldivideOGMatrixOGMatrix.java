@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Generalised linear system solver. Does the classic "backslash" operation found in a number of languages.
  */
-public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGMatrix, OGMatrix> {
+public class MldivideOGMatrixOGMatrix implements MldivideInterface<OGMatrix, OGMatrix> {
 
   private LAPACK _lapack = new LAPACK();
 

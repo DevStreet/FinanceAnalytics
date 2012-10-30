@@ -27,7 +27,7 @@ public class MldivideOGDoubleArrayOGDoubleArrayTest {
   OGMatrix A4 = new OGMatrix(A_rectangular);
   OGMatrix B1 = new OGMatrix(B_rectangular);
 
-  private MldivideOGDoubleArrayOGDoubleArray mldivide = new MldivideOGDoubleArrayOGDoubleArray();
+  private MldivideOGMatrixOGMatrix mldivide = new MldivideOGMatrixOGMatrix();
 
   @Test
   public void aTest() {
