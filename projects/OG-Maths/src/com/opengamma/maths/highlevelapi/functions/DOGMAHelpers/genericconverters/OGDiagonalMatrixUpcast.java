@@ -12,15 +12,15 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtil
 /**
  * 
  */
-public final class OGDiagonalUpcast implements GenericUpcast<OGDiagonalMatrix, OGSparseMatrix> {
+public final class OGDiagonalMatrixUpcast implements GenericUpcast<OGDiagonalMatrix, OGSparseMatrix> {
   private static SparseOGDiagonalMatrix s_sparse = SparseOGDiagonalMatrix.getInstance();
-  private static OGDiagonalUpcast s_instance = new OGDiagonalUpcast();
+  private static OGDiagonalMatrixUpcast s_instance = new OGDiagonalMatrixUpcast();
 
-  public static OGDiagonalUpcast getInstance() {
+  public static OGDiagonalMatrixUpcast getInstance() {
     return s_instance;
   }
 
-  private OGDiagonalUpcast() {
+  private OGDiagonalMatrixUpcast() {
   }
 
   @Override

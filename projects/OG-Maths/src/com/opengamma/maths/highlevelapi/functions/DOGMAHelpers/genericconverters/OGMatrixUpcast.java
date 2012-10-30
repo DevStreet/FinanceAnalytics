@@ -10,14 +10,14 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 /**
  * 
  */
-public final class OGDoubleArrayUpcast implements GenericUpcast<OGMatrix, OGMatrix> {
-  private static OGDoubleArrayUpcast s_instance = new OGDoubleArrayUpcast();
+public final class OGMatrixUpcast implements GenericUpcast<OGMatrix, OGMatrix> {
+  private static OGMatrixUpcast s_instance = new OGMatrixUpcast();
 
-  public static OGDoubleArrayUpcast getInstance() {
+  public static OGMatrixUpcast getInstance() {
     return s_instance;
   }
 
-  private OGDoubleArrayUpcast() {
+  private OGMatrixUpcast() {
   }
 
   @Override

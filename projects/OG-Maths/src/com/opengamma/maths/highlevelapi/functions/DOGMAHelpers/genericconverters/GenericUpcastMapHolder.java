@@ -24,9 +24,9 @@ public final class GenericUpcastMapHolder {
 
   public OGArray<? extends Number> upcast(OGArray<? extends Number> array) {
     if (array instanceof OGDiagonalMatrix) {
-      return OGDiagonalUpcast.getInstance().from((OGDiagonalMatrix) array);
+      return OGDiagonalMatrixUpcast.getInstance().from((OGDiagonalMatrix) array);
     } else if (array instanceof OGMatrix) {
-      return OGDoubleArrayUpcast.getInstance().from((OGMatrix) array);
+      return OGMatrixUpcast.getInstance().from((OGMatrix) array);
     }
     throw new IllegalStateException();
   }
