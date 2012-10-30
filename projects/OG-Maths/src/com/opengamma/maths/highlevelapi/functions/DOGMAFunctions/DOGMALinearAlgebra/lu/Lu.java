@@ -46,7 +46,7 @@ public class Lu {
    */
   private static Map<Class<?>, LuAbstract<?>> s_functionPointers = new HashMap<Class<?>, LuAbstract<?>>();
   static {
-    s_functionPointers.put(OGMatrix.class, LuOGDoubleArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, LuOGMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

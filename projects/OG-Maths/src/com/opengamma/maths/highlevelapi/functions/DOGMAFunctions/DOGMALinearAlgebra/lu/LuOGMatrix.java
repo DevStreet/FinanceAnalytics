@@ -17,15 +17,15 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * Does LU/LUP on OGDoubleArrays 
  */
-public final class LuOGDoubleArray implements LuAbstract<OGMatrix> {
-  private static LuOGDoubleArray s_instance = new LuOGDoubleArray();
-  private static Logger s_log = LoggerFactory.getLogger(LuOGDoubleArray.class);
+public final class LuOGMatrix implements LuAbstract<OGMatrix> {
+  private static LuOGMatrix s_instance = new LuOGMatrix();
+  private static Logger s_log = LoggerFactory.getLogger(LuOGMatrix.class);
 
-  public static LuOGDoubleArray getInstance() {
+  public static LuOGMatrix getInstance() {
     return s_instance;
   }
 
-  private LuOGDoubleArray() {
+  private LuOGMatrix() {
   }
 
   private LAPACK _localLAPACK = new LAPACK();
