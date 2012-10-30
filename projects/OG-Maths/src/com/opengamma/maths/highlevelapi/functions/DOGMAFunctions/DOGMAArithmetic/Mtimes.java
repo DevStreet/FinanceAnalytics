@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesAbstract;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGDoubleArrayOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGDoubleArrayOGSparseArray;
@@ -29,10 +29,10 @@ public class Mtimes {
    */
   private static Map<Pair<?, ?>, MtimesAbstract<?, ?>> s_functionPointers = new HashMap<Pair<?, ?>, MtimesAbstract<?, ?>>();
   static {
-    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGDoubleArray.class, OGDoubleArray.class);
-    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGDoubleArray.class, OGSparseArray.class);
-    Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseArray.class, OGDoubleArray.class);
-    Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseArray.class, OGSparseArray.class);
+    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGSparseMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGSparseMatrix.class);
     s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, MtimesOGDoubleArrayOGDoubleArray.getInstance());
     s_functionPointers.put(pairOGDoubleArrayOGSparseArray, MtimesOGDoubleArrayOGSparseArray.getInstance());
     s_functionPointers.put(pairOGSparseArrayOGDoubleArray, MtimesOGSparseArrayOGDoubleArray.getInstance());
@@ -40,19 +40,19 @@ public class Mtimes {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> mtimes(T array1, S array2) {
+  public <T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> OGArray<? extends Number> mtimes(T array1, S array2) {
     if (array1 == null) {
       throw new MathsExceptionNullPointer("Null pointer passed in argument 1");
     }
     if (array2 == null) {
       throw new MathsExceptionNullPointer("Null pointer passed in argument 2");
     }
-    OGArraySuper<? extends Number> ret = null;
+    OGArray<? extends Number> ret = null;
     Pair<Class<?>, Class<?>> combo = Pair.<Class<?>, Class<?>>of(array1.getClass(), array2.getClass());
     MtimesAbstract<T, S> use = (MtimesAbstract<T, S>) s_functionPointers.get(combo);
     if (use == null) {
-      OGArraySuper<? extends Number> array1casted = GenericUpcastMapHolder.getInstance().upcast(array1);
-      OGArraySuper<? extends Number> array2casted = GenericUpcastMapHolder.getInstance().upcast(array2);
+      OGArray<? extends Number> array1casted = GenericUpcastMapHolder.getInstance().upcast(array1);
+      OGArray<? extends Number> array2casted = GenericUpcastMapHolder.getInstance().upcast(array2);
       combo = Pair.<Class<?>, Class<?>>of(array1casted.getClass(), array2casted.getClass());
       use = (MtimesAbstract<T, S>) s_functionPointers.get(combo);
       ret = mtimes(array1casted, array2casted); // call back with things we now know about

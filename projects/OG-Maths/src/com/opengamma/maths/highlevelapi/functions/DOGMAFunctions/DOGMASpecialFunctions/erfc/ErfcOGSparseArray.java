@@ -7,15 +7,15 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFu
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
 
 /**
  * Erfc on Sparse
  */
-public final class ErfcOGSparseArray implements ErfcAbstract<OGSparseArray> {
+public final class ErfcOGSparseArray implements ErfcAbstract<OGSparseMatrix> {
   private static ErfcOGSparseArray s_instance = new ErfcOGSparseArray();
 
   public static ErfcOGSparseArray getInstance() {
@@ -26,7 +26,7 @@ public final class ErfcOGSparseArray implements ErfcAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGDoubleArray erfc(OGSparseArray array1) {
+  public OGMatrix erfc(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -44,6 +44,6 @@ public final class ErfcOGSparseArray implements ErfcAbstract<OGSparseArray> {
       }
     }
 
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 }

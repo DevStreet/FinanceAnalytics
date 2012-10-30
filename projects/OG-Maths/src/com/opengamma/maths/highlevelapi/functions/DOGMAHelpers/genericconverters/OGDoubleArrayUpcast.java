@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAHelpers.genericconverters;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * 
  */
-public final class OGDoubleArrayUpcast implements GenericUpcast<OGDoubleArray, OGDoubleArray> {
+public final class OGDoubleArrayUpcast implements GenericUpcast<OGMatrix, OGMatrix> {
   private static OGDoubleArrayUpcast s_instance = new OGDoubleArrayUpcast();
 
   public static OGDoubleArrayUpcast getInstance() {
@@ -21,7 +21,7 @@ public final class OGDoubleArrayUpcast implements GenericUpcast<OGDoubleArray, O
   }
 
   @Override
-  public OGDoubleArray from(OGDoubleArray array) {
+  public OGMatrix from(OGMatrix array) {
     return array;
   }
 }

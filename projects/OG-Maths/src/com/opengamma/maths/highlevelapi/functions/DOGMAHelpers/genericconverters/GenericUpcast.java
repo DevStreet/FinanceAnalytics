@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAHelpers.genericconverters;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * @param <T>
  * @param <U>
  */
-public interface GenericUpcast<T extends OGArraySuper<? extends Number>, U extends OGArraySuper<? extends Number>> {
+public interface GenericUpcast<T extends OGArray<? extends Number>, U extends OGArray<? extends Number>> {
   
   U from(T array);
 }

@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 
 /**
  * Tests OGIndexArray conjugate transpose
@@ -21,17 +21,17 @@ public class DOGMAOGIndexArrayCtransposeTest {
   int normalRows = 4;
   int normalCols = 3;
   int[] _data = new int[] {1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12 };
-  OGIndexArray array1 = new OGIndexArray(_data, normalRows, normalCols);
+  OGIndexMatrix array1 = new OGIndexMatrix(_data, normalRows, normalCols);
 
 
   int transposedRows = 3;
   int transposedCols = 4;
   int[] _dataTransposed = new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };  
-  OGIndexArray array1tranposed = new OGIndexArray(_dataTransposed, transposedRows, transposedCols);
+  OGIndexMatrix array1tranposed = new OGIndexMatrix(_dataTransposed, transposedRows, transposedCols);
   
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void nullInTest() {
-    OGIndexArray tmp = null;
+    OGIndexMatrix tmp = null;
     ct.ctranspose(tmp);
   }
 

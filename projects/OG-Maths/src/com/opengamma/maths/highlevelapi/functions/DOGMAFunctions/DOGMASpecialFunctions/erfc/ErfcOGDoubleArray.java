@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
 
 /**
  * Does erfc on OGDoubleArray
  */
-public final class ErfcOGDoubleArray implements ErfcAbstract<OGDoubleArray> {
+public final class ErfcOGDoubleArray implements ErfcAbstract<OGMatrix> {
   private static ErfcOGDoubleArray s_instance = new ErfcOGDoubleArray();
 
   public static ErfcOGDoubleArray getInstance() {
@@ -23,7 +23,7 @@ public final class ErfcOGDoubleArray implements ErfcAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray erfc(OGDoubleArray array1) {
+  public OGMatrix erfc(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -35,6 +35,6 @@ public final class ErfcOGDoubleArray implements ErfcAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = DERFC.derfc(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 }

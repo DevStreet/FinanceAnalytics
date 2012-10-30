@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DBINOM;
 
@@ -23,7 +23,7 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DBINOM;
  */
 public class Invhilb {
 
-  public static OGDoubleArray invhilb(int n) {
+  public static OGMatrix invhilb(int n) {
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(n, 1);
     double[] data = new double[n * n];
     double[] factors = new double[n];
@@ -56,7 +56,7 @@ public class Invhilb {
       }
     }
     // return
-    OGDoubleArray tmp = new OGDoubleArray(data, n, n);
+    OGMatrix tmp = new OGMatrix(data, n, n);
     return tmp;
   }
 

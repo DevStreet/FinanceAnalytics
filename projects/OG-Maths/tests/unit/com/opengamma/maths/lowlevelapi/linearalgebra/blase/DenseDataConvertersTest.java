@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * tests the dense data converters for BLAS/LAPACK storage schemes "Packed" and "Banded"

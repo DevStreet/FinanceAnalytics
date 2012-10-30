@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.atan on OGSparse
  */
-public final class AtanOGSparseArray implements AtanAbstract<OGSparseArray> {
+public final class AtanOGSparseArray implements AtanAbstract<OGSparseMatrix> {
   private static AtanOGSparseArray s_instance = new AtanOGSparseArray();
 
   public static AtanOGSparseArray getInstance() {
@@ -23,7 +23,7 @@ public final class AtanOGSparseArray implements AtanAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGDoubleArray atan(OGSparseArray array1) {
+  public OGMatrix atan(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -40,7 +40,7 @@ public final class AtanOGSparseArray implements AtanAbstract<OGSparseArray> {
       }
     }
 
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

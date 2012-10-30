@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Transpose for {@link OGPermutationArray}
+ * Transpose for {@link OGPermutationMatrix}
  */
-public final class TransposeOGPermutationArray implements TransposeAbstract<OGPermutationArray> {
+public final class TransposeOGPermutationArray implements TransposeAbstract<OGPermutationMatrix> {
   private static TransposeOGPermutationArray s_instance = new TransposeOGPermutationArray();
 
   public static TransposeOGPermutationArray getInstance() {
@@ -22,7 +22,7 @@ public final class TransposeOGPermutationArray implements TransposeAbstract<OGPe
   }
 
   @Override
-  public OGPermutationArray transpose(OGPermutationArray array1) {
+  public OGPermutationMatrix transpose(OGPermutationMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     // transpose of a permutation matrix is just looking up its own indices in itself a(i,j)=a(j,i) but we walk just once with compressed canonical vectors
     // so if you have permutation vector P, range=1:length(P), the range(P) gives the transpose permutation
@@ -33,6 +33,6 @@ public final class TransposeOGPermutationArray implements TransposeAbstract<OGPe
     for (int i = 0; i < dim; i++) {
       tmp[data[i]] = i;
     }
-    return new OGPermutationArray(tmp);
+    return new OGPermutationMatrix(tmp);
   }
 }

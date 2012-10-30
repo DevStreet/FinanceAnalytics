@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -21,7 +21,7 @@ public class Hilb {
    * @param n the order
    * @return a Hilbert matrix of order "n"
    */
-  public static OGDoubleArray hilb(int n) {
+  public static OGMatrix hilb(int n) {
     Catchers.catchValueShouldNotBeNegativeFromArgList(n, 1);
     double[] data = new double[n * n];
     for (int i = 0; i < n; i++) {
@@ -29,7 +29,7 @@ public class Hilb {
         data[i * n + j] = 1.d / (i + j + 1);
       }
     }
-    OGDoubleArray tmp = new OGDoubleArray(data, n, n);
+    OGMatrix tmp = new OGMatrix(data, n, n);
     return tmp;
   }
 

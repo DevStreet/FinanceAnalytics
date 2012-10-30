@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public class OGSparseArray extends OGArraySuper<Double> {
+public class OGSparseMatrix extends OGArray<Double> {
 
   private double[] _values;
   private int[] _colPtr;
@@ -30,7 +30,7 @@ public class OGSparseArray extends OGArraySuper<Double> {
    * Construct from double[][]
    * @param matrix is a double[][]
    */
-  public OGSparseArray(double[][] matrix) {
+  public OGSparseMatrix(double[][] matrix) {
     Catchers.catchNullFromArgList(matrix, 1);
     if (MatrixPrimitiveUtils.isRagged(matrix)) {
       throw new MathsExceptionIllegalArgument("Matrix representation must not be ragged, i.e. all rows must be the same length");
@@ -100,7 +100,7 @@ public class OGSparseArray extends OGArraySuper<Double> {
    * @param rows the number of rows
    * @param columns the number of columns
    */
-  public OGSparseArray(int[] colPtr, int[] rowIdx, double[] values, int rows, int columns) {
+  public OGSparseMatrix(int[] colPtr, int[] rowIdx, double[] values, int rows, int columns) {
     Catchers.catchNullFromArgList(colPtr, 1);
     Catchers.catchNullFromArgList(rowIdx, 2);
     Catchers.catchNullFromArgList(values, 3);
@@ -156,7 +156,7 @@ public class OGSparseArray extends OGArraySuper<Double> {
     _els = rows * columns;
   }
 
-  public OGDoubleArray getFullColumn(int index) {
+  public OGMatrix getFullColumn(int index) {
     if (index < 0 || index >= _cols) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -164,10 +164,10 @@ public class OGSparseArray extends OGArraySuper<Double> {
     for (int i = _colPtr[index]; i < _colPtr[index + 1]; i++) { // loops through elements of correct column
       tmp[_rowIdx[i]] = _values[i];
     }
-    return new OGDoubleArray(tmp, _rows, 1);
+    return new OGMatrix(tmp, _rows, 1);
   }
 
-  public OGDoubleArray getFullRow(int index) { // getting rows in CSC form is generally bad
+  public OGMatrix getFullRow(int index) { // getting rows in CSC form is generally bad
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -175,7 +175,7 @@ public class OGSparseArray extends OGArraySuper<Double> {
     for (int i = 0; i < _rows; i++) {
       tmp[i] = this.getEntry(index, i);
     }
-    return new OGDoubleArray(tmp, 1, _cols);
+    return new OGMatrix(tmp, 1, _cols);
   }
 
   public int getNumberOfNonZeroElements() {
@@ -244,8 +244,8 @@ public class OGSparseArray extends OGArraySuper<Double> {
   }
 
   /**
-   * Decide if this {@link OGSparseArray} is equal to another {@link OGSparseArray} with the addition of some numerical tolerance for floating point comparison
-   * @param obj the {@link OGSparseArray} against which a comparison is to be drawn
+   * Decide if this {@link OGSparseMatrix} is equal to another {@link OGSparseMatrix} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGSparseMatrix} against which a comparison is to be drawn
    * @param tolerance the tolerance for double precision comparison of the data elements in the array
    * @return true if they are considered equal in value, false otherwise
    */
@@ -259,7 +259,7 @@ public class OGSparseArray extends OGArraySuper<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGSparseArray other = (OGSparseArray) obj;
+    OGSparseMatrix other = (OGSparseMatrix) obj;
     if (_cols != other.getNumberOfColumns()) {
       return false;
     }
@@ -305,7 +305,7 @@ public class OGSparseArray extends OGArraySuper<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGSparseArray other = (OGSparseArray) obj;
+    OGSparseMatrix other = (OGSparseMatrix) obj;
     if (_cols != other.getNumberOfColumns()) {
       return false;
     }

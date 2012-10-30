@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.sinh overload
  * @param <T> An OGArray type
  */
-public interface SinhAbstract<T extends OGArraySuper<? extends Number>> {
+public interface SinhAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> sinh(T array1);
+  OGArray<? extends Number> sinh(T array1);
 }

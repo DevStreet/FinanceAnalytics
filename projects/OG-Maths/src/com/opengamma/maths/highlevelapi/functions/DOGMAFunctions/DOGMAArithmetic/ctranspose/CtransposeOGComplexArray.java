@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Conjugate Transposes an OGComplexArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class CtransposeOGComplexArray implements CtransposeAbstract<OGComplexArray> {
+public final class CtransposeOGComplexArray implements CtransposeAbstract<OGComplexMatrix> {
   private static CtransposeOGComplexArray s_instance = new CtransposeOGComplexArray();
 
   public static CtransposeOGComplexArray getInstance() {
@@ -23,7 +23,7 @@ public final class CtransposeOGComplexArray implements CtransposeAbstract<OGComp
   }
 
   @Override
-  public OGComplexArray ctranspose(OGComplexArray array1) {
+  public OGComplexMatrix ctranspose(OGComplexMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -42,6 +42,6 @@ public final class CtransposeOGComplexArray implements CtransposeAbstract<OGComp
         tmp[jcolpix2 + 1] = -data[irpj + 1]; // negate imaginary
       }
     }
-    return new OGComplexArray(tmp, retRows, retCols);
+    return new OGComplexMatrix(tmp, retRows, retCols);
   }
 }

@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.sin overload
  * @param <T> An OGArray type
  */
-public interface SinAbstract<T extends OGArraySuper<? extends Number>> {
+public interface SinAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> sin(T array1);
+  OGArray<? extends Number> sin(T array1);
 }

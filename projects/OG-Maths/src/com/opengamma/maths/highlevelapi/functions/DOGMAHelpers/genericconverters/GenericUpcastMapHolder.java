@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAHelpers.genericconverters;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * 
@@ -22,11 +22,11 @@ public final class GenericUpcastMapHolder {
   private GenericUpcastMapHolder() {
   }
 
-  public OGArraySuper<? extends Number> upcast(OGArraySuper<? extends Number> array) {
-    if (array instanceof OGDiagonalArray) {
-      return OGDiagonalUpcast.getInstance().from((OGDiagonalArray) array);
-    } else if (array instanceof OGDoubleArray) {
-      return OGDoubleArrayUpcast.getInstance().from((OGDoubleArray) array);
+  public OGArray<? extends Number> upcast(OGArray<? extends Number> array) {
+    if (array instanceof OGDiagonalMatrix) {
+      return OGDiagonalUpcast.getInstance().from((OGDiagonalMatrix) array);
+    } else if (array instanceof OGMatrix) {
+      return OGDoubleArrayUpcast.getInstance().from((OGMatrix) array);
     }
     throw new IllegalStateException();
   }

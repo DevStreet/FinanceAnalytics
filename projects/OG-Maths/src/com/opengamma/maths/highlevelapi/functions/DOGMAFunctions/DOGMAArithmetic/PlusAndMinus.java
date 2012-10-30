@@ -10,10 +10,10 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusMinusAbstract;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDiagonalArrayOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDoubleArrayOGDiagonalArray;
@@ -34,12 +34,12 @@ public class PlusAndMinus {
    */
   private static Map<Pair<Class<?>, Class<?>>, PlusMinusAbstract<?, ?>> s_functionPointers = Maps.newHashMap();
   static {
-    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGDoubleArray.class, OGDoubleArray.class);
-    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGDoubleArray.class, OGSparseArray.class);
-    Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseArray.class, OGDoubleArray.class);
-    Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseArray.class, OGSparseArray.class);
-    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDiagonalArray = Pair.<Class<?>, Class<?>>of(OGDoubleArray.class, OGDiagonalArray.class);
-    Pair<Class<?>, Class<?>> pairOGDiagonalArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGDiagonalArray.class, OGDoubleArray.class);
+    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGSparseMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGSparseMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDiagonalArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGDiagonalMatrix.class);
+    Pair<Class<?>, Class<?>> pairOGDiagonalArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGDiagonalMatrix.class, OGMatrix.class);
     s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, PlusOGDoubleArrayOGDoubleArray.getInstance());
     s_functionPointers.put(pairOGDoubleArrayOGSparseArray, PlusOGDoubleArrayOGSparseArray.getInstance());
     s_functionPointers.put(pairOGSparseArrayOGDoubleArray, PlusOGSparseArrayOGDoubleArray.getInstance());
@@ -49,7 +49,7 @@ public class PlusAndMinus {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> plus(T array1, S array2) {
+  public <T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> OGArray<? extends Number> plus(T array1, S array2) {
     if (array1 == null) {
       throw new MathsExceptionNullPointer("Null pointer passed in argument 1");
     }
@@ -65,7 +65,7 @@ public class PlusAndMinus {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> minus(T array1, S array2) {
+  public <T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> OGArray<? extends Number> minus(T array1, S array2) {
     if (array1 == null) {
       throw new MathsExceptionNullPointer("Null pointer passed in argument 1");
     }

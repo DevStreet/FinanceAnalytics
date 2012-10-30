@@ -16,7 +16,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
  * High level API.
  * Dense matrix backed array magic.
  */
-public class OGDoubleArray extends OGArraySuper<Double> {
+public class OGMatrix extends OGArray<Double> {
 
   private double[] _data;
   private int _columns;
@@ -26,7 +26,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
    * Takes a row major java double[][] and turns it into an OGDoubleArray
    * @param dataIn a row major java double[][] 
    */
-  public OGDoubleArray(double[][] dataIn) {
+  public OGMatrix(double[][] dataIn) {
     Catchers.catchNullFromArgList(dataIn, 1);
     _data = DenseMemoryManipulation.convertRowMajorDoublePointerToColumnMajorSinglePointer(dataIn);
     _rows = dataIn.length;
@@ -39,7 +39,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
    * @param rows number of rows
    * @param columns number of columns
    */
-  public OGDoubleArray(double[] dataIn, int rows, int columns) {
+  public OGMatrix(double[] dataIn, int rows, int columns) {
     if (dataIn == null) {
       throw new MathsExceptionNullPointer("dataIn is null");
     }
@@ -62,7 +62,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
   /**
    * @param number the single number in this array
    */
-  public OGDoubleArray(double number) {
+  public OGMatrix(double number) {
     _columns = 1;
     _rows = 1;
     _data = new double[1];
@@ -93,7 +93,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
     return _data[indices[1] * _rows + indices[0]];
   }
 
-  public OGDoubleArray getFullRow(int index) {
+  public OGMatrix getFullRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -101,10 +101,10 @@ public class OGDoubleArray extends OGArraySuper<Double> {
     for (int i = 0; i < _columns; i++) {
       tmp[i] = _data[i * _rows + index];
     }
-    return new OGDoubleArray(tmp, 1, _columns);
+    return new OGMatrix(tmp, 1, _columns);
   }
 
-  public OGDoubleArray getFullColumn(int index) {
+  public OGMatrix getFullColumn(int index) {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -112,7 +112,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
     for (int i = 0; i < _rows; i++) {
       tmp[i] = _data[i + index * _rows];
     }
-    return new OGDoubleArray(tmp, _rows, 1);
+    return new OGMatrix(tmp, _rows, 1);
   }
 
   /**
@@ -133,8 +133,8 @@ public class OGDoubleArray extends OGArraySuper<Double> {
 
 
   /**
-   * Decide if this {@link OGDoubleArray} is equal to another {@link OGDoubleArray} with the addition of some numerical tolerance for floating point comparison
-   * @param obj the {@link OGDoubleArray} against which a comparison is to be drawn
+   * Decide if this {@link OGMatrix} is equal to another {@link OGMatrix} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGMatrix} against which a comparison is to be drawn
    * @param tolerance the tolerance for double precision comparison of the data elements in the array
    * @return true if they are considered equal in value, false otherwise
    */
@@ -148,7 +148,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGDoubleArray other = (OGDoubleArray) obj;
+    OGMatrix other = (OGMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }
@@ -198,7 +198,7 @@ public class OGDoubleArray extends OGArraySuper<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGDoubleArray other = (OGDoubleArray) obj;
+    OGMatrix other = (OGMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }

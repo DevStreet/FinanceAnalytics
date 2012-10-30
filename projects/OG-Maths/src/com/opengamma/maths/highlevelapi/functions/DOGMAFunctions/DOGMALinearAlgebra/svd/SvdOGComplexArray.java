@@ -6,10 +6,10 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd;
 
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * SVD for OGComplex 
  */
-public final class SvdOGComplexArray implements SvdAbstract<OGComplexArray> {
+public final class SvdOGComplexArray implements SvdAbstract<OGComplexMatrix> {
   private static SvdOGComplexArray s_instance = new SvdOGComplexArray();
 
   public static SvdOGComplexArray getInstance() {
@@ -31,7 +31,7 @@ public final class SvdOGComplexArray implements SvdAbstract<OGComplexArray> {
   private CtransposeOGComplexArray _cmplxtranspose = CtransposeOGComplexArray.getInstance();
 
   @Override
-  public OGSvdResult svd(OGComplexArray array1, compute these) {
+  public OGSvdResult svd(OGComplexMatrix array1, compute these) {
     final int m = array1.getNumberOfRows();
     final int n = array1.getNumberOfColumns();
     final int lda = Math.max(1, m);
@@ -46,9 +46,9 @@ public final class SvdOGComplexArray implements SvdAbstract<OGComplexArray> {
     double[] WORK = new double[2 * Math.max(1, lwork)]; // 2x is complex //CSIGNORE
     double[] RWORK = new double[5 * Math.min(m, n)]; //CSIGNORE
     int[] info = new int[1];
-    OGComplexArray resultU = null;
-    OGArraySuper<? extends Number> resultS = null;
-    OGArraySuper<? extends Number> resultV = null; // we leave this as a super type because it has to be transposed and as such is DOGMAtised and upcast, TODO: replace when we have in place transpose
+    OGComplexMatrix resultU = null;
+    OGArray<? extends Number> resultS = null;
+    OGArray<? extends Number> resultV = null; // we leave this as a super type because it has to be transposed and as such is DOGMAtised and upcast, TODO: replace when we have in place transpose
 
     double[] pointLess = new double[1];  // this is to keep JNI happy, it doesn't consider "null" an array type
     switch (these) {
@@ -56,45 +56,45 @@ public final class SvdOGComplexArray implements SvdAbstract<OGComplexArray> {
         U = new double[lda * m];
         VT = pointLess;
         _localLAPACK.zgesvd('A', 'N', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultU = new OGComplexArray(U, m, m);
+        resultU = new OGComplexMatrix(U, m, m);
         break;
 
       case S:
         U = pointLess;
         VT = pointLess;
         _localLAPACK.zgesvd('N', 'N', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultS = new OGDoubleArray(S, n, 1);
+        resultS = new OGMatrix(S, n, 1);
         break;
 
       case V:
         U = pointLess;
         VT = new double[n * n];
         _localLAPACK.zgesvd('N', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultV = _cmplxtranspose.ctranspose(new OGComplexArray(VT, n, n));
+        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
         break;
 
       case US:
         U = new double[lda * m];
         VT = pointLess;
         _localLAPACK.zgesvd('A', 'N', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultU = new OGComplexArray(U, m, m);
-        resultS = new OGDiagonalArray(S, m, n);
+        resultU = new OGComplexMatrix(U, m, m);
+        resultS = new OGDiagonalMatrix(S, m, n);
         break;
 
       case UV:
         U = new double[lda * m];
         VT = new double[n * n];
         _localLAPACK.zgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultU = new OGComplexArray(U, m, m);
-        resultV = _cmplxtranspose.ctranspose(new OGComplexArray(VT, n, n));
+        resultU = new OGComplexMatrix(U, m, m);
+        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
         break;
 
       case SV:
         U = pointLess;
         VT = new double[n * n];
         _localLAPACK.zgesvd('N', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultS = new OGDiagonalArray(S, m, n);
-        resultV = _cmplxtranspose.ctranspose(new OGComplexArray(VT, n, n));
+        resultS = new OGDiagonalMatrix(S, m, n);
+        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
         break;
 
       case USV:
@@ -102,11 +102,11 @@ public final class SvdOGComplexArray implements SvdAbstract<OGComplexArray> {
         U = new double[lda * m * 2];
         VT = new double[ldvt * n * 2];
         _localLAPACK.zgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultU = new OGComplexArray(U, m, m);
-        resultS = new OGDiagonalArray(S, m, n);
+        resultU = new OGComplexMatrix(U, m, m);
+        resultS = new OGDiagonalMatrix(S, m, n);
         // rather inefficient but necessary evil for the minute
         // TODO: in place transpose of column major array 
-        resultV = _cmplxtranspose.ctranspose(new OGComplexArray(VT, n, n));
+        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
         break;
     }
     return new OGSvdResult(resultU, resultS, resultV);

@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.horzcat;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Horzcat impl for horzcatting OGDouble OGDouble
  */
-public final class HorzcatOGDoubleArrayOGDoubleArray implements HorzcatAbstract<OGDoubleArray, OGDoubleArray> {
+public final class HorzcatOGDoubleArrayOGDoubleArray implements HorzcatAbstract<OGMatrix, OGMatrix> {
   private static HorzcatOGDoubleArrayOGDoubleArray s_instance = new HorzcatOGDoubleArrayOGDoubleArray();
 
   public static HorzcatOGDoubleArrayOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class HorzcatOGDoubleArrayOGDoubleArray implements HorzcatAbstract<
   }
 
   @Override
-  public OGDoubleArray horzcat(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGMatrix horzcat(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     Catchers.catchBadCommute(array1.getNumberOfRows(), "array1", array2.getNumberOfRows(), "array2");
@@ -36,7 +36,7 @@ public final class HorzcatOGDoubleArrayOGDoubleArray implements HorzcatAbstract<
     double[] tmp = new double[baseRows * colCount];
     // memcpy to end
     System.arraycopy(array2.getData(), 0, tmp, cols1, cols2);
-    return new OGDoubleArray(tmp, baseRows, colCount);
+    return new OGMatrix(tmp, baseRows, colCount);
   }
 
 }

@@ -9,9 +9,9 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcAbstract;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcOGSparseArray;
@@ -25,12 +25,12 @@ public class Erfc {
    */
   private static Map<Class<?>, ErfcAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGDoubleArray.class, ErfcOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseArray.class, ErfcOGSparseArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, ErfcOGDoubleArray.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, ErfcOGSparseArray.getInstance());
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> erfc(T array1) {
+  public <T extends OGArray<? extends Number>> OGArray<? extends Number> erfc(T array1) {
     ErfcAbstract<T> use = (ErfcAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("Erf() on array class " + array1.getClass().toString() + " is not yet implemented");

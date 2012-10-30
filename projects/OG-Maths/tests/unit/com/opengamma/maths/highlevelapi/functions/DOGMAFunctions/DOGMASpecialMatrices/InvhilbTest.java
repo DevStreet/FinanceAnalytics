@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
@@ -49,19 +49,19 @@ public class InvhilbTest {
   
   @Test
   public void simple2x2Test() {
-    OGDoubleArray tmp = Invhilb.invhilb(2);
+    OGMatrix tmp = Invhilb.invhilb(2);
     assertArrayEquals(tmp.getData(),invhilb2x2,10*D1MACH.four());
   }
 
   @Test
   public void simple10x10Test() {
-    OGDoubleArray tmp = Invhilb.invhilb(10);
+    OGMatrix tmp = Invhilb.invhilb(10);
     assertArrayEquals(tmp.getData(),invhilb10x10,10*D1MACH.four());
   }  
   
   @Test
   public void hilbSimple1x1Test() {
-    OGDoubleArray tmp = Invhilb.invhilb(1);
+    OGMatrix tmp = Invhilb.invhilb(1);
     assertArrayEquals(tmp.getData(),new double[] {1},10*D1MACH.four());
   }  
   

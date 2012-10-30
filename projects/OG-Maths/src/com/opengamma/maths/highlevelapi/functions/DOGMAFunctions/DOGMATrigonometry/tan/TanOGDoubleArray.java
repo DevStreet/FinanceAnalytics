@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.tan on OGDouble
  */
-public final class TanOGDoubleArray implements TanAbstract<OGDoubleArray> {
+public final class TanOGDoubleArray implements TanAbstract<OGMatrix> {
   private static TanOGDoubleArray s_instance = new TanOGDoubleArray();
 
   public static TanOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class TanOGDoubleArray implements TanAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray tan(OGDoubleArray array1) {
+  public OGMatrix tan(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,7 +34,7 @@ public final class TanOGDoubleArray implements TanAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = Math.tan(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

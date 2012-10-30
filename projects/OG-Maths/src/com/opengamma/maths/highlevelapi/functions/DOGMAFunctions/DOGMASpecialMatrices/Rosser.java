@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * Provides the Rosser matrix. A matrix designed to be particularly useful when testing symmetric eigenvalue routines.
@@ -21,8 +21,8 @@ public class Rosser {
    * Returns the Rosser matrix
    * @return the Rosser matrix
    */
-  public static OGDoubleArray rosser() {
-    return new OGDoubleArray(s_rosserData, 8, 8);
+  public static OGMatrix rosser() {
+    return new OGMatrix(s_rosserData, 8, 8);
   }
 
 }

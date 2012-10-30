@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.atan overload
  * @param <T> An OGArray type
  */
-public interface AtanAbstract<T extends OGArraySuper<? extends Number>> {
+public interface AtanAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> atan(T array1);
+  OGArray<? extends Number> atan(T array1);
 }

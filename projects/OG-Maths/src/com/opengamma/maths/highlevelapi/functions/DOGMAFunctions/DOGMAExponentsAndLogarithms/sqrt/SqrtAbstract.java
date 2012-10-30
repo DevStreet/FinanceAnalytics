@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponentsAndLogarithms.sqrt;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Sqrt
  * @param <T> An OGArray type
  */
-public interface SqrtAbstract<T extends OGArraySuper<? extends Number>> {
+public interface SqrtAbstract<T extends OGArray<? extends Number>> {
   
   T sqrt(T array1);
 }

@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Sparse
  * @param <T> An OGArray type
  */
-public interface SparseAbstract<T extends OGArraySuper<? extends Number>> {
+public interface SparseAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> sparse(T array1);
+  OGArray<? extends Number> sparse(T array1);
 
 }

@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * DOGMA Utility functions
@@ -18,5 +18,5 @@ public interface DOGMAUtilityFunctionsAPI {
    * @param array2 the second array
    * @return the dot product array1 and array2, if the inputs are arrays the dot products are calculated along the first dimension greater than 1
    */
-  OGArraySuper<? extends Number> dot(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2);
+  OGArray<? extends Number> dot(OGArray<? extends Number> array1, OGArray<? extends Number> array2);
 }

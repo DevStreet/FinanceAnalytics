@@ -20,8 +20,8 @@ import static com.opengamma.maths.highlevelapi.functions.OGFunctions.vertcat;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 
 /**
  * tests functions on OGArray
@@ -39,24 +39,24 @@ public class OGFunctionsTest {
   final double[][] doubleShortVectorData = {{1, 2, 3 } };
   final double[][] doubleShortVectorTransposeData = { {1 }, {2 }, {3 } };
   final double[][] doubleVectorTransposeData = {{1, 2, 3, 4, 5 } };
-  final OGDoubleArray ogDoubleMatrixData = new OGDoubleArray(doubleMatrixData);
-  final OGDoubleArray ogDoubleRepeatMatrixData = new OGDoubleArray(doubleRepeatMatrixData);
-  final OGDoubleArray ogDoubleRepeatMatrixUniqueData = new OGDoubleArray(doubleRepeatMatrixUniqueData);
-  final OGDoubleArray ogDoubleAbsMatrixData = new OGDoubleArray(doubleAbsMatrixData);
-  final OGDoubleArray ogDoubleMatrixTranposeData = new OGDoubleArray(doubleMatrixTranposeData);
-  final OGDoubleArray ogDoubleMatrixDataReshape = new OGDoubleArray(doubleMatrixDataReshape);
+  final OGMatrix ogDoubleMatrixData = new OGMatrix(doubleMatrixData);
+  final OGMatrix ogDoubleRepeatMatrixData = new OGMatrix(doubleRepeatMatrixData);
+  final OGMatrix ogDoubleRepeatMatrixUniqueData = new OGMatrix(doubleRepeatMatrixUniqueData);
+  final OGMatrix ogDoubleAbsMatrixData = new OGMatrix(doubleAbsMatrixData);
+  final OGMatrix ogDoubleMatrixTranposeData = new OGMatrix(doubleMatrixTranposeData);
+  final OGMatrix ogDoubleMatrixDataReshape = new OGMatrix(doubleMatrixDataReshape);
 
-  final OGDoubleArray ogDoubleVectorData = new OGDoubleArray(doubleVectorData);
-  final OGDoubleArray ogDoubleShortVectorData = new OGDoubleArray(doubleShortVectorData);
-  final OGDoubleArray ogDoubleVectorTranposeData = new OGDoubleArray(doubleVectorTransposeData);
-  final OGDoubleArray ogDoubleShortTransposeVectorData = new OGDoubleArray(doubleShortVectorTransposeData);
+  final OGMatrix ogDoubleVectorData = new OGMatrix(doubleVectorData);
+  final OGMatrix ogDoubleShortVectorData = new OGMatrix(doubleShortVectorData);
+  final OGMatrix ogDoubleVectorTranposeData = new OGMatrix(doubleVectorTransposeData);
+  final OGMatrix ogDoubleShortTransposeVectorData = new OGMatrix(doubleShortVectorTransposeData);
 
   final int[][] intMatrixData = { {1, -2, 3, -4, 5 }, {-6, 7, -8, 9, -10 }, {11, -12, 13, -14, 15 } };
   final int[][] intRepeatMatrixData = { {1, 1, 3, -4, 5 }, {7, 7, -8, 9, -10 }, {11, -12, 13, -14, 15 } };
   final int[][] intRepeatMatrixUniqueData = {{-14, -12, -10, -8, -4, 1, 3, 5, 7, 9, 11, 13, 15 } };
-  final OGIndexArray ogIntMatrixData = new OGIndexArray(intMatrixData);
-  final OGIndexArray ogIntRepeatMatrixData = new OGIndexArray(intRepeatMatrixData);
-  final OGIndexArray ogIntRepeatMatrixUniqueData = new OGIndexArray(intRepeatMatrixUniqueData);
+  final OGIndexMatrix ogIntMatrixData = new OGIndexMatrix(intMatrixData);
+  final OGIndexMatrix ogIntRepeatMatrixData = new OGIndexMatrix(intRepeatMatrixData);
+  final OGIndexMatrix ogIntRepeatMatrixUniqueData = new OGIndexMatrix(intRepeatMatrixUniqueData);
 
   /* TEST OGArray */
   @Test
@@ -66,7 +66,7 @@ public class OGFunctionsTest {
 
   @Test
   public void testMultiply() {
-    OGDoubleArray Result;
+    OGMatrix Result;
     Result = multiply(ogDoubleMatrixData, ogDoubleVectorData); // mat * vec
     System.out.println(Result.toString());
 

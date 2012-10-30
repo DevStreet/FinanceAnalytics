@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide.RdivideAbstract;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
@@ -31,7 +31,7 @@ public class RdivideFastMath {
 //  }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> rdivide(T array1, S array2) {
+  public <T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> OGArray<? extends Number> rdivide(T array1, S array2) {
     if (array1 == null) {
       throw new MathsExceptionNullPointer("Null pointer passed in argument 1");
     }

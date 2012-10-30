@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * 
  */
-public final class CosOGDoubleArray implements CosAbstract<OGDoubleArray> {
+public final class CosOGDoubleArray implements CosAbstract<OGMatrix> {
   private static CosOGDoubleArray s_instance = new CosOGDoubleArray();
 
   public static CosOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class CosOGDoubleArray implements CosAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray cos(OGDoubleArray array1) {
+  public OGMatrix cos(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,7 +34,7 @@ public final class CosOGDoubleArray implements CosAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = Math.cos(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

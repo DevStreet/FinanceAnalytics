@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Class holder for the transpose operation
  * @param <T> An OGArray type
  */
-public interface CtransposeAbstract<T extends OGArraySuper<? extends Number>> {
+public interface CtransposeAbstract<T extends OGArray<? extends Number>> {
   
   T ctranspose(T array1);
 }

@@ -8,8 +8,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.Full;
 
 /**
@@ -25,13 +25,13 @@ public class DOGMAOGPermutationArraySparseTest {
       {0.0000000000000000, 1.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000 },
       {0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 1.0000000000000000, 0.0000000000000000 } };
 
-  private static OGSparseArray sparseAnswer = new OGSparseArray(denseAnswer);
+  private static OGSparseMatrix sparseAnswer = new OGSparseMatrix(denseAnswer);
 
   static Full f = new Full();
   
   @Test
   public static void permutationToSparseTest() {
-    OGPermutationArray p = new OGPermutationArray(_data);
+    OGPermutationMatrix p = new OGPermutationMatrix(_data);
     assertTrue(sparseAnswer.equals(s_d2s.sparse(p)));
   }
 

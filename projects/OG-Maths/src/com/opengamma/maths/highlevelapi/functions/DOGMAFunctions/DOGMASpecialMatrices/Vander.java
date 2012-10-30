@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -20,7 +20,7 @@ public class Vander {
    * @param n the order
    * @return a Vandermonde matrix based on aMatrix of order "n"
    */
-  public static OGDoubleArray vander(OGDoubleArray aMatrix, int n) {
+  public static OGMatrix vander(OGMatrix aMatrix, int n) {
     Catchers.catchNull(aMatrix);
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(n, 2);
     // make sure the array is a vector
@@ -59,7 +59,7 @@ public class Vander {
         }
       }
     }
-    return new OGDoubleArray(data, len, n);
+    return new OGMatrix(data, len, n);
   }
 
   /**
@@ -67,7 +67,7 @@ public class Vander {
    * @param aMatrix a vector of values to act as the base for the polynomial form, orientation invariant
    * @return a Vandermonde matrix based on aMatrix of order "n"
    */
-  public static OGDoubleArray vander(OGDoubleArray aMatrix) {
+  public static OGMatrix vander(OGMatrix aMatrix) {
     return Vander.vander(aMatrix, Math.max(aMatrix.getNumberOfRows(), aMatrix.getNumberOfColumns()));
   }
 }

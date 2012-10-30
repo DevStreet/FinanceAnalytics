@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.acos on OGDouble
  */
-public final class AcosOGDoubleArray implements AcosAbstract<OGDoubleArray> {
+public final class AcosOGDoubleArray implements AcosAbstract<OGMatrix> {
   private static AcosOGDoubleArray s_instance = new AcosOGDoubleArray();
 
   public static AcosOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class AcosOGDoubleArray implements AcosAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray acos(OGDoubleArray array1) {
+  public OGMatrix acos(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,7 +34,7 @@ public final class AcosOGDoubleArray implements AcosAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = Math.acos(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

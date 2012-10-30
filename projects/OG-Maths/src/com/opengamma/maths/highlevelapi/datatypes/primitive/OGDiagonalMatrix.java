@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Holds a "diagonal" array
  */
-public class OGDiagonalArray extends OGArraySuper<Double> {
+public class OGDiagonalMatrix extends OGArray<Double> {
 
   private double[] _data;
   private int _columns;
@@ -24,7 +24,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
    * Places the elements of an array "diag" of length "n" on the diagonal of a matrix of dimension [n * n]
    * @param diag the elements to be placed on the diagonal
    */
-  public OGDiagonalArray(double[] diag) {
+  public OGDiagonalMatrix(double[] diag) {
     Catchers.catchNullFromArgList(diag, 1);
     int n = diag.length;
     _rows = n;
@@ -39,7 +39,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
    * @param rows number of rows (if less than "n", diag is truncated to fit)
    * @param columns number of columns (if less than "n", diag is truncated to fit)
    */
-  public OGDiagonalArray(double[] diag, int rows, int columns) {
+  public OGDiagonalMatrix(double[] diag, int rows, int columns) {
     if (diag == null) {
       throw new MathsExceptionNullPointer("dataIn is null");
     }
@@ -63,7 +63,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
    * @param rows number of rows
    * @param columns number of columns
    */
-  public OGDiagonalArray(double diag, int rows, int columns) {
+  public OGDiagonalMatrix(double diag, int rows, int columns) {
     if (rows < 1) {
       throw new MathsExceptionIllegalArgument("Illegal number of rows specified. Value given was " + rows);
     }
@@ -81,7 +81,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
    * Places the "diag" as the first element on the diagonal of a matrix of dimension [1 * 1]
    * @param diag the element to be placed on in the first entry of the diagonal
    */
-  public OGDiagonalArray(double diag) {
+  public OGDiagonalMatrix(double diag) {
     this(diag, 1, 1);
   }
 
@@ -89,7 +89,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
    * Places the "diag" as the first element on the diagonal of a matrix of dimension [1 * 1]
    * @param diag the element to be placed on in the first entry of the diagonal
    */
-  public OGDiagonalArray(int diag) {
+  public OGDiagonalMatrix(int diag) {
     this((double) diag, 1, 1);
   }
 
@@ -110,8 +110,8 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
   }
 
   /**
-   * Decide if this {@link OGDiagonalArray} is equal to another {@link OGDiagonalArray} with the addition of some numerical tolerance for floating point comparison
-   * @param obj the {@link OGDiagonalArray} against which a comparison is to be drawn
+   * Decide if this {@link OGDiagonalMatrix} is equal to another {@link OGDiagonalMatrix} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGDiagonalMatrix} against which a comparison is to be drawn
    * @param tolerance the tolerance for double precision comparison of the data elements in the array
    * @return true if they are considered equal in value, false otherwise
    */
@@ -125,7 +125,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGDiagonalArray other = (OGDiagonalArray) obj;
+    OGDiagonalMatrix other = (OGDiagonalMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }
@@ -198,7 +198,7 @@ public class OGDiagonalArray extends OGArraySuper<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGDiagonalArray other = (OGDiagonalArray) obj;
+    OGDiagonalMatrix other = (OGDiagonalMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }

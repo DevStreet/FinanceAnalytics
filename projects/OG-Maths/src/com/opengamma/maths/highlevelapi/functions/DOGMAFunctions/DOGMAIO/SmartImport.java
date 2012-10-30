@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIO;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAIO.orientation;
 import com.opengamma.maths.lowlevelapi.io.smartImport.SnortDataProperties;
 
@@ -16,21 +16,21 @@ import com.opengamma.maths.lowlevelapi.io.smartImport.SnortDataProperties;
  */
 public class SmartImport {
 
-  public OGArraySuper<Double> fromNativeDoubleDouble(double[][] aMatrix) {
+  public OGArray<Double> fromNativeDoubleDouble(double[][] aMatrix) {
     SnortDataProperties snorter = new SnortDataProperties(aMatrix);
 
-    OGArraySuper<Double> ret = null;
+    OGArray<Double> ret = null;
 
     switch (snorter.getMatrixType()) {
       case upperTriangular:
       case lowerTriangular:
       case dense:
-        ret = new OGDoubleArray(aMatrix);
+        ret = new OGMatrix(aMatrix);
         break;
       case diagonal:
       case identity:
       case sparse:
-        ret = new OGSparseArray(aMatrix);
+        ret = new OGSparseMatrix(aMatrix);
         break;
       default:
     }
@@ -42,14 +42,14 @@ public class SmartImport {
    * @param o the orientation the vector should be
    * @return an OGArraySuper type 
    */
-  public OGArraySuper<Double> fromNativeDouble(double[] aVector, orientation o) {
-    OGArraySuper<Double> ret = null;
+  public OGArray<Double> fromNativeDouble(double[] aVector, orientation o) {
+    OGArray<Double> ret = null;
     switch (o) {
       case row:
-        ret = new OGDoubleArray(aVector, 1, aVector.length);
+        ret = new OGMatrix(aVector, 1, aVector.length);
         break;
       case column:
-        ret = new OGDoubleArray(aVector, aVector.length, 1);
+        ret = new OGMatrix(aVector, aVector.length, 1);
         break;
     }
     return ret;

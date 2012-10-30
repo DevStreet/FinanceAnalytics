@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.datatypes.derived;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 
 /**
  * Holds the result of applying a sort() function to some data
@@ -13,7 +13,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexArray;
  */
 public class OGSortResult<T> {
   private T _sortedArray;
-  private OGIndexArray _index;
+  private OGIndexMatrix _index;
 
   /**
    * Gets the sortedArray.
@@ -27,7 +27,7 @@ public class OGSortResult<T> {
    * Gets the sort order index.
    * @return the sort order index
    */
-  public OGIndexArray getIndex() {
+  public OGIndexMatrix getIndex() {
     return _index;
   }
   

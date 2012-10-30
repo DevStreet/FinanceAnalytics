@@ -5,16 +5,16 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<OGDiagonalArray, OGDoubleArray> {
+public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<OGDiagonalMatrix, OGMatrix> {
   private static MtimesOGDiagonalArrayOGDoubleArray s_instance = new MtimesOGDiagonalArrayOGDoubleArray();
 
   public static MtimesOGDiagonalArrayOGDoubleArray getInstance() {
@@ -27,7 +27,7 @@ public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGArraySuper<? extends Number> mtimes(OGDiagonalArray array1, OGDoubleArray array2) {
+  public OGArray<? extends Number> mtimes(OGDiagonalMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -40,7 +40,7 @@ public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<
 
     double[] tmp = null;
     int n = 0;
-    OGArraySuper<? extends Number> ret = null;
+    OGArray<? extends Number> ret = null;
 
     if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * matrix, scalar diagonal, matrix dense
       final double deref = data1[0];
@@ -55,7 +55,7 @@ public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<
         System.arraycopy(data2, 0, tmp, 0, n);
         _localblas.dscal(n, deref, tmp, 1);
       }
-      ret = new OGDoubleArray(tmp, rowsArray2, colsArray2);
+      ret = new OGMatrix(tmp, rowsArray2, colsArray2);
     } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have matrix * scalar, matrix diagonal, scalar dense
       final double deref = data2[0];
       if (Double.isNaN(deref)) { // if NaN in Dense matrix, diagonal matrix becomes all NaN, therefore returns as dense
@@ -64,13 +64,13 @@ public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<
         for (int i = 0; i < n; i++) {
           tmp[i] = Double.NaN;
         }
-        ret = new OGDoubleArray(tmp, rowsArray1, colsArray1);
+        ret = new OGMatrix(tmp, rowsArray1, colsArray1);
       } else {
         n = data1.length;
         tmp = new double[n];
         System.arraycopy(data1, 0, tmp, 0, n);
         _localblas.dscal(n, deref, tmp, 1);
-        ret = new OGDiagonalArray(tmp, rowsArray1, colsArray1);
+        ret = new OGDiagonalMatrix(tmp, rowsArray1, colsArray1);
       }
 
     } else {
@@ -86,7 +86,7 @@ public final class MtimesOGDiagonalArrayOGDoubleArray implements MtimesAbstract<
           cMatrix[i * fm + j] = data1[j] * data2[i * rowsArray2 + j];
         }
       }
-      ret = new OGDoubleArray(cMatrix, fm, fn);
+      ret = new OGMatrix(cMatrix, fm, fn);
     }
     return ret;
   }

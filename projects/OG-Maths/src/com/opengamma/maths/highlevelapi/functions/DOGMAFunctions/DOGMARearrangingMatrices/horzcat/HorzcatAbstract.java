@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.horzcat;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Horzcat
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public interface HorzcatAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+public interface HorzcatAbstract<T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> horzcat(T array1, S array2);
+  OGArray<? extends Number> horzcat(T array1, S array2);
 }

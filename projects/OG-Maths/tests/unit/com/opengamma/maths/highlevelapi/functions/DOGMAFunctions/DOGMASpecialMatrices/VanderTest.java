@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
@@ -20,7 +20,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
  */
 public class VanderTest {
   private static double[] _data3 = new double[] {2, 3, 4 };
-  private static OGDoubleArray tmp3 = new OGDoubleArray(_data3, 3, 1);
+  private static OGMatrix tmp3 = new OGMatrix(_data3, 3, 1);
   private static double[] answer3_pick1 = new double[] {1, 1, 1 };
   private static double[] answer3_pick2 = new double[] {2, 3, 4, 1, 1, 1 };
   private static double[] answer3_pick3 = new double[] {4, 9, 16, 2, 3, 4, 1, 1, 1 };
@@ -29,12 +29,12 @@ public class VanderTest {
 
   
   private static double[] _data5 = new double[] {1, 2, 3, 5, 8 };
-  private static OGDoubleArray tmp5 = new OGDoubleArray(_data5, 1, 5);  
+  private static OGMatrix tmp5 = new OGMatrix(_data5, 1, 5);  
   private static double[] answer5_pick6 = new double[]{1,32,243,3125,32768,1,16,81,625,4096,1,8,27,125,512,1,4,9,25,64,1,2,3,5,8,1,1,1,1,1}; 
   
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public static void nullMatrix() {
-    OGDoubleArray tmp = null;
+    OGMatrix tmp = null;
     Vander.vander(tmp, 1);
   }
 
@@ -45,13 +45,13 @@ public class VanderTest {
   
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public static void badMatrixOKPick() {
-    Vander.vander(new OGDoubleArray(new double[][] {{1,2},{3,4}}) , 1);
+    Vander.vander(new OGMatrix(new double[][] {{1,2},{3,4}}) , 1);
   }
   
   @Test
   public static void simple3_pick1Test() {
     int n = 1;
-    OGDoubleArray tmp = Vander.vander(tmp3, n);
+    OGMatrix tmp = Vander.vander(tmp3, n);
     assertArrayEquals(tmp.getData(), answer3_pick1, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 3);
@@ -60,7 +60,7 @@ public class VanderTest {
   @Test
   public static void simple3_pick2Test() {
     int n = 2;
-    OGDoubleArray tmp = Vander.vander(tmp3, n);
+    OGMatrix tmp = Vander.vander(tmp3, n);
     assertArrayEquals(tmp.getData(), answer3_pick2, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 3);
@@ -69,7 +69,7 @@ public class VanderTest {
   @Test
   public static void simple3_pick3Test() {
     int n = 3;
-    OGDoubleArray tmp = Vander.vander(tmp3, n);
+    OGMatrix tmp = Vander.vander(tmp3, n);
     assertArrayEquals(tmp.getData(), answer3_pick3, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 3);
@@ -78,7 +78,7 @@ public class VanderTest {
   @Test
   public static void simple3_pick4Test() {
     int n = 4;
-    OGDoubleArray tmp = Vander.vander(tmp3, n);
+    OGMatrix tmp = Vander.vander(tmp3, n);
     assertArrayEquals(tmp.getData(), answer3_pick4, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 3);
@@ -87,7 +87,7 @@ public class VanderTest {
   @Test
   public static void simple3_pick10Test() {
     int n = 10;
-    OGDoubleArray tmp = Vander.vander(tmp3, n);
+    OGMatrix tmp = Vander.vander(tmp3, n);
     assertArrayEquals(tmp.getData(), answer3_pick10, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 3);
@@ -96,7 +96,7 @@ public class VanderTest {
   @Test
   public static void simple5_pick6Test() {
     int n = 6;
-    OGDoubleArray tmp = Vander.vander(tmp5, n);
+    OGMatrix tmp = Vander.vander(tmp5, n);
     assertArrayEquals(tmp.getData(), answer5_pick6, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 5);
@@ -107,7 +107,7 @@ public class VanderTest {
   @Test
   public static void simple3_pickBasedonVectorTest() {
     int n = 3;
-    OGDoubleArray tmp = Vander.vander(tmp3);
+    OGMatrix tmp = Vander.vander(tmp3);
     assertArrayEquals(tmp.getData(), answer3_pick3, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == 3);

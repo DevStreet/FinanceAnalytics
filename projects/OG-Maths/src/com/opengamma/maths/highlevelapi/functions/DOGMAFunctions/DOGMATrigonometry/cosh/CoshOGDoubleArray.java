@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cosh;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * 
  */
-public final class CoshOGDoubleArray implements CoshAbstract<OGDoubleArray> {
+public final class CoshOGDoubleArray implements CoshAbstract<OGMatrix> {
   private static CoshOGDoubleArray s_instance = new CoshOGDoubleArray();
 
   public static CoshOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class CoshOGDoubleArray implements CoshAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray cosh(OGDoubleArray array1) {
+  public OGMatrix cosh(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,7 +34,7 @@ public final class CoshOGDoubleArray implements CoshAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = Math.cosh(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

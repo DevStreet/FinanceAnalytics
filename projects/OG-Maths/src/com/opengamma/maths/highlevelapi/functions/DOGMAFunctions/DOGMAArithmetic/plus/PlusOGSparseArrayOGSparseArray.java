@@ -7,15 +7,15 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<OGSparseArray, OGSparseArray> {
+public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<OGSparseMatrix, OGSparseMatrix> {
   private static PlusOGSparseArrayOGSparseArray s_instance = new PlusOGSparseArrayOGSparseArray();
 
   public static PlusOGSparseArrayOGSparseArray getInstance() {
@@ -26,7 +26,7 @@ public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<O
   }
 
   @Override
-  public OGArraySuper<? extends Number> plusminus(OGSparseArray array1, OGSparseArray array2, final int op) {
+  public OGArray<? extends Number> plusminus(OGSparseMatrix array1, OGSparseMatrix array2, final int op) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -38,13 +38,13 @@ public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<O
 
     double[] tmp = null;
 
-    OGArraySuper<? extends Number> retArray = null;
+    OGArray<? extends Number> retArray = null;
 
     // Actually adding arrays
 
     // One array is actually a single number, so we make the an OGDoubleArray and ADD
     boolean single = false;
-    OGSparseArray singleNumber = null, fullSparse = null;
+    OGSparseMatrix singleNumber = null, fullSparse = null;
     if ((rowsArray1 == 1 && columnsArray1 == 1) || (rowsArray2 == 1 && columnsArray2 == 1)) {
       single = true;
       if (rowsArray1 == 1) {
@@ -71,7 +71,7 @@ public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<O
           tmp[rowIdx[i] + ir * retRows] += op * data[i];
         }
       }
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
     } else { // Both arrays are full dimension, do sparse add    
       retRows = rowsArray1;
       retCols = columnsArray1;
@@ -145,7 +145,7 @@ public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<O
 
       }
       newColptr[retCols] = ptr;
-      retArray = new OGSparseArray(Arrays.copyOf(newColptr, retCols + 1), Arrays.copyOf(newRowIdx, ptr), Arrays.copyOf(tmp, ptr), retRows, retCols);
+      retArray = new OGSparseMatrix(Arrays.copyOf(newColptr, retCols + 1), Arrays.copyOf(newRowIdx, ptr), Arrays.copyOf(tmp, ptr), retRows, retCols);
     }
     return retArray;
   }

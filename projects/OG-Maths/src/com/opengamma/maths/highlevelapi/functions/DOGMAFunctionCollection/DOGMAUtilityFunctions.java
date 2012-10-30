@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAUtilityFunctions.dot.Dot;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAUtilityFunctionsAPI;
 
@@ -16,7 +16,7 @@ public class DOGMAUtilityFunctions implements DOGMAUtilityFunctionsAPI {
   private Dot _dot = new Dot();
   
   @Override
-  public OGArraySuper<? extends Number> dot(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
+  public OGArray<? extends Number> dot(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
     return _dot.dot(array1, array2);
   }
 

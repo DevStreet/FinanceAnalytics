@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Contains information about permutation patterns in a 2D matrix
  * Underneath it's essentially a vector
  */
-public class OGPermutationArray extends OGArraySuper<Integer> {
+public class OGPermutationMatrix extends OGArray<Integer> {
   private int[] _data;
   private int _rows;
   private int _columns;
@@ -23,7 +23,7 @@ public class OGPermutationArray extends OGArraySuper<Integer> {
    * Construct from a row wise permutation index "p" such that "p*A" will permute A row wise
    * @param permute the indices describing the permutation  
    */
-  public OGPermutationArray(int[] permute) {
+  public OGPermutationMatrix(int[] permute) {
     Catchers.catchNullFromArgList(permute, 1);
     final int len = permute.length;
     byte[] tmp = new byte[len];
@@ -127,7 +127,7 @@ public class OGPermutationArray extends OGArraySuper<Integer> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGPermutationArray other = (OGPermutationArray) obj;
+    OGPermutationMatrix other = (OGPermutationMatrix) obj;
     if (_columns != other._columns) { // rows and cols are the same
       return false;
     }

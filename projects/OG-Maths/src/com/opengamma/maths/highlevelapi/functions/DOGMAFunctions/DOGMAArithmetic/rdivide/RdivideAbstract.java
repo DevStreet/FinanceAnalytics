@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Does rdivide
@@ -13,7 +13,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public interface RdivideAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+public interface RdivideAbstract<T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> rdivide(T array1, S array2);
+  OGArray<? extends Number> rdivide(T array1, S array2);
 }

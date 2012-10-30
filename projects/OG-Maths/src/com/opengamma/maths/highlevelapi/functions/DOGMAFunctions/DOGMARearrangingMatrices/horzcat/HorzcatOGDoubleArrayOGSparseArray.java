@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.horzcat;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * HCats a sparse array to a dense 
  */
-public final class HorzcatOGDoubleArrayOGSparseArray implements HorzcatAbstract<OGDoubleArray, OGSparseArray> {
+public final class HorzcatOGDoubleArrayOGSparseArray implements HorzcatAbstract<OGMatrix, OGSparseMatrix> {
   private static HorzcatOGDoubleArrayOGSparseArray s_instance = new HorzcatOGDoubleArrayOGSparseArray();
 
   public static HorzcatOGDoubleArrayOGSparseArray getInstance() {
@@ -23,7 +23,7 @@ public final class HorzcatOGDoubleArrayOGSparseArray implements HorzcatAbstract<
   }
 
   @Override
-  public OGSparseArray horzcat(OGDoubleArray array1, OGSparseArray array2) {
+  public OGSparseMatrix horzcat(OGMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     Catchers.catchBadCommute(array1.getNumberOfRows(), "array1", array2.getNumberOfRows(), "array2");
@@ -65,7 +65,7 @@ public final class HorzcatOGDoubleArrayOGSparseArray implements HorzcatAbstract<
       colPtrTmp[columnsArray1 + i] = denseData.length + colPtr[i];
     }
 
-    return new OGSparseArray(colPtrTmp, rowIdxTmp, tmpData, rowsArray1, columnsArray1 + columnsArray2);
+    return new OGSparseMatrix(colPtrTmp, rowIdxTmp, tmpData, rowsArray1, columnsArray1 + columnsArray2);
 
   }
 }

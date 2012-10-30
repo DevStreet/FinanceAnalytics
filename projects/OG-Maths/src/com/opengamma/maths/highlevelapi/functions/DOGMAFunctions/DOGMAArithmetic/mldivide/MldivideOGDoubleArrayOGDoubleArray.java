@@ -8,19 +8,19 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Generalised linear system solver. Does the classic "backslash" operation found in a number of languages.
  */
-public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGDoubleArray, OGDoubleArray> {
+public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGMatrix, OGMatrix> {
 
   private LAPACK _lapack = new LAPACK();
 
   @Override
-  public OGDoubleArray mldivide(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGMatrix mldivide(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     int len;
@@ -60,7 +60,7 @@ public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGD
       if (tri != 'N') {
         _lapack.dtrtrs(tri, 'N', diag, rows1, cols2, data1, rows1, data2, rows2, info);
         if (info[0] == 0) { // triangular solve was ok
-          return new OGDoubleArray(data2, rows2, cols2);
+          return new OGMatrix(data2, rows2, cols2);
         }
       } else { // see if it's Hermitian (symmetric in the real case)
         if (isSymmetric(data1, rows1, cols1)) {
@@ -69,7 +69,7 @@ public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGD
           if (info[0] == 0) { // cholesky factorisation was ok, its in the lower triangle, back solve based on this 
             _lapack.dpotrf('L', rows1, data1, rows1, info);
             if (info[0] == 0) {  // went ok with backsolve so return 
-              return new OGDoubleArray(data2, rows2, cols2);
+              return new OGMatrix(data2, rows2, cols2);
             }
           }
         } else { // try solving with generalised LUP solver
@@ -80,7 +80,7 @@ public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGD
             // back solve dgetrs()
             _lapack.dgetrs('N', cols1, cols2, data1, cols1, ipiv, data2, cols1, info);
             if (info[0] == 0) {
-              return new OGDoubleArray(data2, rows2, cols2);
+              return new OGMatrix(data2, rows2, cols2);
             }
           }
         }
@@ -129,7 +129,7 @@ public class MldivideOGDoubleArrayOGDoubleArray implements MldivideInterface<OGD
     if (info[0] != 0) {
       // LOG it broke
     }
-    return new OGDoubleArray(Arrays.copyOf(data2, cols1 * cols2), cols1, cols2);
+    return new OGMatrix(Arrays.copyOf(data2, cols1 * cols2), cols1, cols2);
   }
 
   private boolean isSymmetric(double[] data, int rows, int cols) {

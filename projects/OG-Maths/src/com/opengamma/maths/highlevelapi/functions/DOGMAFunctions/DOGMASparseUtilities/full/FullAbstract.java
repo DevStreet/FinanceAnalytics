@@ -8,14 +8,14 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 /**
  * Returns a fully populated array
  */
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Full
  * @param <T> An OGArray type
  */
-public interface FullAbstract<T extends OGArraySuper<? extends Number>> {
+public interface FullAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> full(T array1);
+  OGArray<? extends Number> full(T array1);
 }
 

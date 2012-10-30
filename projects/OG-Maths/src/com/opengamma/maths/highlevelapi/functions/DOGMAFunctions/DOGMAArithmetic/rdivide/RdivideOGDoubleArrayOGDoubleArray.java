@@ -7,13 +7,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does rdivide on OGDouble pairings
  */
-public final class RdivideOGDoubleArrayOGDoubleArray implements RdivideAbstract<OGDoubleArray, OGDoubleArray> {
+public final class RdivideOGDoubleArrayOGDoubleArray implements RdivideAbstract<OGMatrix, OGMatrix> {
   private static RdivideOGDoubleArrayOGDoubleArray s_instance = new RdivideOGDoubleArrayOGDoubleArray();
 
   public static RdivideOGDoubleArrayOGDoubleArray getInstance() {
@@ -24,7 +24,7 @@ public final class RdivideOGDoubleArrayOGDoubleArray implements RdivideAbstract<
   }
 
   @Override
-  public OGDoubleArray rdivide(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGMatrix rdivide(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -78,6 +78,6 @@ public final class RdivideOGDoubleArrayOGDoubleArray implements RdivideAbstract<
         tmp[i] /= dat2[i];
       }
     }
-    return new OGDoubleArray(tmp, retRows, retCols);
+    return new OGMatrix(tmp, retRows, retCols);
   }
 }

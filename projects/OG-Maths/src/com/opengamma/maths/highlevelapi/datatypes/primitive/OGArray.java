@@ -9,6 +9,6 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
  * Super class for all array types
  * @param <T>
  */
-public abstract class OGArraySuper<T extends Number> implements OGArrayInterface<T> {
+public abstract class OGArray<T extends Number> implements OGArrayInterface<T> {
  
 }

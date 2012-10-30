@@ -8,13 +8,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangi
 /**
  * 
  */
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Copy
  * @param <T> An OGArray type
  */
-public interface CopyAbstract<T extends OGArraySuper<? extends Number>> {
+public interface CopyAbstract<T extends OGArray<? extends Number>> {
   
   T copy(T array1);
 }

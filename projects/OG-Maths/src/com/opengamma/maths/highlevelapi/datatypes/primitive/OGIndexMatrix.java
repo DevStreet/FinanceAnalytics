@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 /**
  * The OGIndex class provides access to the typically understood notion of a matrix, i.e. A Fully populated array.
  */
-public class OGIndexArray extends OGArraySuper<Integer> {
+public class OGIndexMatrix extends OGArray<Integer> {
   private int[] _data;
   private int _rows;
   private int _columns;
@@ -28,7 +28,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
    * Constructs from an array of arrays representation
    * @param aMatrix is an n columns x m rows matrix stored as a row major array of arrays
    */
-  public OGIndexArray(int[][] aMatrix) {
+  public OGIndexMatrix(int[][] aMatrix) {
     Catchers.catchNullFromArgList(aMatrix, 1);
     _data = DenseMemoryManipulation.convertRowMajorIntPointerToColumnMajorSinglePointer(aMatrix);
     _rows = aMatrix.length;
@@ -38,7 +38,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
   /**
    * @param number the single number in this array
    */
-  public OGIndexArray(int number) {
+  public OGIndexMatrix(int number) {
     _columns = 1;
     _rows = 1;
     _data = new int[1];
@@ -51,7 +51,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
    * @param rows number of rows
    * @param columns number of columns
    */
-  public OGIndexArray(int[] dataIn, int rows, int columns) {
+  public OGIndexMatrix(int[] dataIn, int rows, int columns) {
     if (dataIn == null) {
       throw new MathsExceptionNullPointer("dataIn is null");
     }
@@ -102,7 +102,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
     return _data[indices[1] * _rows + indices[0]];
   }
 
-  public OGIndexArray getFullRow(int index) {
+  public OGIndexMatrix getFullRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -110,10 +110,10 @@ public class OGIndexArray extends OGArraySuper<Integer> {
     for (int i = 0; i < _columns; i++) {
       tmp[i] = _data[i * _rows + index];
     }
-    return new OGIndexArray(tmp, 1, _columns);
+    return new OGIndexMatrix(tmp, 1, _columns);
   }
 
-  public OGIndexArray getFullColumn(int index) {
+  public OGIndexMatrix getFullColumn(int index) {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -121,7 +121,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
     for (int i = 0; i < _rows; i++) {
       tmp[i] = _data[i + index * _rows];
     }
-    return new OGIndexArray(tmp, _rows, 1);
+    return new OGIndexMatrix(tmp, _rows, 1);
   }
 
   /**
@@ -186,7 +186,7 @@ public class OGIndexArray extends OGArraySuper<Integer> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGIndexArray other = (OGIndexArray) obj;
+    OGIndexMatrix other = (OGIndexMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }

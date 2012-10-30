@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Element wise multiply 
  */
-public final class TimesOGDoubleArrayOGDoubleArray implements TimesAbstract<OGDoubleArray, OGDoubleArray> {
+public final class TimesOGDoubleArrayOGDoubleArray implements TimesAbstract<OGMatrix, OGMatrix> {
   private static TimesOGDoubleArrayOGDoubleArray s_instance = new TimesOGDoubleArrayOGDoubleArray();
 
   public static TimesOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,7 +25,7 @@ public final class TimesOGDoubleArrayOGDoubleArray implements TimesAbstract<OGDo
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGDoubleArray times(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGMatrix times(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -73,7 +73,7 @@ public final class TimesOGDoubleArrayOGDoubleArray implements TimesAbstract<OGDo
         tmp[i] *= dat2[i];
       }     
     }
-    return new OGDoubleArray(tmp, retRows, retCols);
+    return new OGMatrix(tmp, retRows, retCols);
   }
 
 }

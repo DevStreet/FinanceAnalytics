@@ -10,8 +10,8 @@ import java.util.Map;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGLuResult;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * Overloaded LU decomposition
@@ -46,11 +46,11 @@ public class Lu {
    */
   private static Map<Class<?>, LuAbstract<?>> s_functionPointers = new HashMap<Class<?>, LuAbstract<?>>();
   static {
-    s_functionPointers.put(OGDoubleArray.class, LuOGDoubleArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, LuOGDoubleArray.getInstance());
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>> OGLuResult lu(T array1, compute these) {
+  public <T extends OGArray<? extends Number>> OGLuResult lu(T array1, compute these) {
     LuAbstract<T> use = (LuAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("lu() on array class " + array1.getClass().toString() + " is not yet implemented");

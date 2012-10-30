@@ -9,9 +9,9 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin.SinAbstract;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin.SinOGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin.SinOGSparseArray;
@@ -27,12 +27,12 @@ public class Sin {
    */
   private static Map<Class<?>, SinAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGDoubleArray.class, SinOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseArray.class, SinOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, SinOGDoubleArray.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, SinOGSparseArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> sin(T array1) {
+  public <T extends OGArray<? extends Number>> OGArray<? extends Number> sin(T array1) {
     Catchers.catchNullFromArgList(array1, 1);
     SinAbstract<T> use = (SinAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {

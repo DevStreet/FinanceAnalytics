@@ -7,14 +7,14 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OGSparseArray, OGSparseArray> {
+public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OGSparseMatrix, OGSparseMatrix> {
   private static MtimesOGSparseArrayOGSparseArray s_instance = new MtimesOGSparseArrayOGSparseArray();
 
   public static MtimesOGSparseArrayOGSparseArray getInstance() {
@@ -27,7 +27,7 @@ public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OG
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGSparseArray mtimes(OGSparseArray array1, OGSparseArray array2) {
+  public OGSparseMatrix mtimes(OGSparseMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -44,7 +44,7 @@ public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OG
     int ptr = 0;
     double[] tmp = null;
     int n = 0;
-    OGSparseArray ret = null;
+    OGSparseMatrix ret = null;
 
     if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * sparse matrix
       final double deref = data1[0];
@@ -52,14 +52,14 @@ public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OG
       tmp = new double[n];
       System.arraycopy(data2, 0, tmp, 0, n);
       _localblas.dscal(n, deref, tmp, 1);
-      ret = new OGSparseArray(colPtr2, rowIdx2, tmp, rowsArray2, colsArray2);
+      ret = new OGSparseMatrix(colPtr2, rowIdx2, tmp, rowsArray2, colsArray2);
     } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have sparse matrix * scalar
       final double deref = data2[0];
       n = data1.length;
       tmp = new double[n];
       System.arraycopy(data1, 0, tmp, 0, n);
       _localblas.dscal(n, deref, tmp, 1);
-      ret = new OGSparseArray(colPtr1, rowIdx1, tmp, rowsArray1, colsArray1);
+      ret = new OGSparseMatrix(colPtr1, rowIdx1, tmp, rowsArray1, colsArray1);
     } else {
       Catchers.catchBadCommute(colsArray1, "Columns in first array", rowsArray2, "Rows in second array");
       // TODO: refactor these calls into a SparseBLAS.
@@ -101,7 +101,7 @@ public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OG
 
       }
       newColPtr[colsArray2] = newPtr - 1;
-      ret = new OGSparseArray(Arrays.copyOf(newColPtr, colsArray2 + 1), Arrays.copyOf(newRowIdx, newPtr), Arrays.copyOf(newData, newPtr), rowsArray1, colsArray2);
+      ret = new OGSparseMatrix(Arrays.copyOf(newColPtr, colsArray2 + 1), Arrays.copyOf(newRowIdx, newPtr), Arrays.copyOf(newData, newPtr), rowsArray1, colsArray2);
     }
     return ret;
   }

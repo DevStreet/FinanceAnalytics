@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * Full's OGDiagonalArrays
  */
-public final class FullOGDiagonalArray implements FullAbstract<OGDiagonalArray> {
+public final class FullOGDiagonalArray implements FullAbstract<OGDiagonalMatrix> {
 
   private static FullOGDiagonalArray s_instance = new FullOGDiagonalArray();
 
@@ -23,7 +23,7 @@ public final class FullOGDiagonalArray implements FullAbstract<OGDiagonalArray> 
   }
 
   @Override
-  public OGDoubleArray full(OGDiagonalArray array1) {
+  public OGMatrix full(OGDiagonalMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final double[] data = array1.getData();
@@ -31,7 +31,7 @@ public final class FullOGDiagonalArray implements FullAbstract<OGDiagonalArray> 
     for (int i = 0; i < data.length; i++) {
       tmp[i * rows + i] = data[i];
     }
-    return new OGDoubleArray(tmp, rows, cols);
+    return new OGMatrix(tmp, rows, cols);
   }
 
 }

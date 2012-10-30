@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAUtilityFunctions.dot;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Computes dot products
  * @param <S> an array
  * @param <T> another array
  */
-public interface DotAbstract<S extends OGArraySuper<? extends Number>, T extends OGArraySuper<? extends Number>> {
+public interface DotAbstract<S extends OGArray<? extends Number>, T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> dot(S array1, T array2);
+  OGArray<? extends Number> dot(S array1, T array2);
 }

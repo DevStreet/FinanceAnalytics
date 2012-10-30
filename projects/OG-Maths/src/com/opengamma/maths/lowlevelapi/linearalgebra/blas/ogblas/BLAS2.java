@@ -15,7 +15,7 @@ import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitive;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.CompressedSparseColumnFormatMatrix;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.CompressedSparseRowFormatMatrix;
 import com.opengamma.maths.lowlevelapi.datatypes.primitive.DenseMatrix;
@@ -65,7 +65,7 @@ public class BLAS2 {
    */
   private static Map<Class<?>, BLAS2DGEMVKernelAbstraction<?>> s_dgemvFunctionPointers = new HashMap<Class<?>, BLAS2DGEMVKernelAbstraction<?>>();
   static {
-    s_dgemvFunctionPointers.put(OGDoubleArray.class, DGEMVForDenseMatrix.getInstance()); // this is the wrapper for the high level API
+    s_dgemvFunctionPointers.put(OGMatrix.class, DGEMVForDenseMatrix.getInstance()); // this is the wrapper for the high level API
 
     s_dgemvFunctionPointers.put(DenseMatrix.class, DGEMVForDenseMatrix.getInstance());
     s_dgemvFunctionPointers.put(CompressedSparseRowFormatMatrix.class, DGEMVForCSRMatrix.getInstance());

@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.atan on OGDouble
  */
-public final class AtanOGDoubleArray implements AtanAbstract<OGDoubleArray> {
+public final class AtanOGDoubleArray implements AtanAbstract<OGMatrix> {
   private static AtanOGDoubleArray s_instance = new AtanOGDoubleArray();
 
   public static AtanOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class AtanOGDoubleArray implements AtanAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray atan(OGDoubleArray array1) {
+  public OGMatrix atan(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,7 +34,7 @@ public final class AtanOGDoubleArray implements AtanAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = Math.atan(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

@@ -6,13 +6,13 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponentsAndLogarithms.sqrt;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * does sqrt
  */
-public final class SqrtOGSparseArray implements SqrtAbstract<OGSparseArray> {
+public final class SqrtOGSparseArray implements SqrtAbstract<OGSparseMatrix> {
   private static SqrtOGSparseArray s_instance = new SqrtOGSparseArray();
 
   public static SqrtOGSparseArray getInstance() {
@@ -23,7 +23,7 @@ public final class SqrtOGSparseArray implements SqrtAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGSparseArray sqrt(OGSparseArray array1) {
+  public OGSparseMatrix sqrt(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -42,6 +42,6 @@ public final class SqrtOGSparseArray implements SqrtAbstract<OGSparseArray> {
       }
     }
     
-    return new OGSparseArray(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+    return new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
   }
 }

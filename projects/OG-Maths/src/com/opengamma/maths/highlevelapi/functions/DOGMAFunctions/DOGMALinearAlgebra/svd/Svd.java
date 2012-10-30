@@ -10,9 +10,9 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * Overloaded Svd
@@ -56,14 +56,14 @@ public class Svd {
   /**
    * hashmapped function pointers
    */
-  private static Map<Class<?>, SvdAbstract<? extends OGArraySuper<? extends Number>>> s_functionPointers = Maps.newHashMap();
+  private static Map<Class<?>, SvdAbstract<? extends OGArray<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGDoubleArray.class, SvdOGDoubleArray.getInstance());
-    s_functionPointers.put(OGComplexArray.class, SvdOGComplexArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, SvdOGDoubleArray.getInstance());
+    s_functionPointers.put(OGComplexMatrix.class, SvdOGComplexArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>> OGSvdResult svd(T array1, compute these) {
+  public <T extends OGArray<? extends Number>> OGSvdResult svd(T array1, compute these) {
     SvdAbstract<T> use = (SvdAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("svd() on array class " + array1.getClass().toString() + " is not yet implemented");

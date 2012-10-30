@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * 
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public interface PlusMinusAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+public interface PlusMinusAbstract<T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> plusminus(T array1, S array2, int op);
+  OGArray<? extends Number> plusminus(T array1, S array2, int op);
 }

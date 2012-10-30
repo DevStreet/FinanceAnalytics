@@ -7,14 +7,14 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Adds {@link OGDoubleArray} to {@link OGDiagonalArray} 
+ * Adds {@link OGMatrix} to {@link OGDiagonalMatrix} 
  */
-public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract<OGDoubleArray, OGDiagonalArray> {
+public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract<OGMatrix, OGDiagonalMatrix> {
   private static PlusOGDoubleArrayOGDiagonalArray s_instance = new PlusOGDoubleArrayOGDiagonalArray();
 
   public static PlusOGDoubleArrayOGDiagonalArray getInstance() {
@@ -25,7 +25,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract
   }
 
   @Override
-  public OGDoubleArray plusminus(OGDoubleArray array1, OGDiagonalArray array2, int op) {
+  public OGMatrix plusminus(OGMatrix array1, OGDiagonalMatrix array2, int op) {
 
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -35,7 +35,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract
 
     double[] tmp = null;
 
-    OGDoubleArray retArray = null;
+    OGMatrix retArray = null;
     final double signval = Math.copySign(1, op);
 
     // Actually adding arrays
@@ -50,7 +50,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract
       for (int i = 0; i < data.length; i++) {
         tmp[i * rowsArray2 + i] += signval * data[i];
       }
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // diagonal array is actually a single number, so we can just deref and add
       final int n = array1.getData().length;
       tmp = new double[n];
@@ -61,7 +61,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
     } else { // Both arrays are full dimension, do diagonal add 
       Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
       Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
@@ -74,7 +74,7 @@ public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract
       for (int i = 0; i < data.length; i++) {
         tmp[i * rowsArray1 + i] += data[i] * signval;
       }
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
     }
     return retArray;
   }

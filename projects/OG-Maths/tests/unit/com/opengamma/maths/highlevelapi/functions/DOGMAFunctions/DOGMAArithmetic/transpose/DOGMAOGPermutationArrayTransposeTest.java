@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 
 /**
  * Tests OGPermutation transpose
@@ -20,13 +20,13 @@ public class DOGMAOGPermutationArrayTransposeTest {
 
   int[] _data = new int[] {0,3,6,9,1,4,7,10,2,5,8,11};
   int[] _transposedata = new int [] {0,4,8,1,5,9,2,6,10,3,7,11};
-  OGPermutationArray array1 = new OGPermutationArray(_data);
+  OGPermutationMatrix array1 = new OGPermutationMatrix(_data);
 
-  OGPermutationArray array1tranposed = new OGPermutationArray(_transposedata);
+  OGPermutationMatrix array1tranposed = new OGPermutationMatrix(_transposedata);
   
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void nullInTest() {
-    OGPermutationArray tmp = null;
+    OGPermutationMatrix tmp = null;
     t.transpose(tmp);
   }
 
@@ -37,7 +37,7 @@ public class DOGMAOGPermutationArrayTransposeTest {
 
   @Test
   public void testTransposeEqTransposeTransposed() {  
-    assertTrue(array1.equals(t.transpose((OGPermutationArray) t.transpose(array1))));
+    assertTrue(array1.equals(t.transpose((OGPermutationMatrix) t.transpose(array1))));
   }  
   
 }

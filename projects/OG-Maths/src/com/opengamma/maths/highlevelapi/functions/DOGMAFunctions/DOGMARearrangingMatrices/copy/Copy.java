@@ -8,9 +8,9 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangi
 import java.util.HashMap;
 import java.util.Map;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Overloaded Copy
@@ -22,12 +22,12 @@ public class Copy {
    */
   private static Map<Class<?>, CopyAbstract<?>> s_functionPointers = new HashMap<Class<?>, CopyAbstract<?>>();
   static {
-    s_functionPointers.put(OGDoubleArray.class, CopyOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseArray.class, CopyOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, CopyOGDoubleArray.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, CopyOGSparseArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> copy(T array1) {
+  public <T extends OGArray<? extends Number>> OGArray<? extends Number> copy(T array1) {
     CopyAbstract<T> use = (CopyAbstract<T>) s_functionPointers.get(array1.getClass());
     return use.copy(array1);
   }

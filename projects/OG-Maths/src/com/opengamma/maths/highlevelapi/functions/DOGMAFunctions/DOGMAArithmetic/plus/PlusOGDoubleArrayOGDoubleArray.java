@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * 
  */
-public final class PlusOGDoubleArrayOGDoubleArray implements PlusMinusAbstract<OGDoubleArray, OGDoubleArray> {
+public final class PlusOGDoubleArrayOGDoubleArray implements PlusMinusAbstract<OGMatrix, OGMatrix> {
   private static PlusOGDoubleArrayOGDoubleArray s_instance = new PlusOGDoubleArrayOGDoubleArray();
 
   public static PlusOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,7 +25,7 @@ public final class PlusOGDoubleArrayOGDoubleArray implements PlusMinusAbstract<O
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGDoubleArray plusminus(OGDoubleArray array1, OGDoubleArray array2, final int op) {
+  public OGMatrix plusminus(OGMatrix array1, OGMatrix array2, final int op) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -65,6 +65,6 @@ public final class PlusOGDoubleArrayOGDoubleArray implements PlusMinusAbstract<O
       retRows = rowsArray1;
       retCols = columnsArray1;
     }
-    return new OGDoubleArray(tmp, retRows, retCols);
+    return new OGMatrix(tmp, retRows, retCols);
   }
 }

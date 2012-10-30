@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponentsAndLogarithms.sqrt.Sqrt;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAExponentsAndLogarithmsAPI;
 
@@ -16,7 +16,7 @@ public class DOGMAExponentsAndLogarithms implements DOGMAExponentsAndLogarithmsA
   private Sqrt _sqrt = new Sqrt();
   
   @Override
-  public OGArraySuper<? extends Number> sqrt(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> sqrt(OGArray<? extends Number> array1) {
     return _sqrt.sqrt(array1);
   }
 

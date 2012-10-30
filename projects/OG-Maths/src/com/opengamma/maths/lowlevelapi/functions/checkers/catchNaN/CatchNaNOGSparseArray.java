@@ -6,14 +6,14 @@
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.iss.IsNaN;
 
 /**
  * 
  */
-public final class CatchNaNOGSparseArray extends CatchNaNAbstract<OGSparseArray> {
+public final class CatchNaNOGSparseArray extends CatchNaNAbstract<OGSparseMatrix> {
   private static CatchNaNOGSparseArray s_instance = new CatchNaNOGSparseArray();
 
   public static CatchNaNOGSparseArray getInstance() {
@@ -24,7 +24,7 @@ public final class CatchNaNOGSparseArray extends CatchNaNAbstract<OGSparseArray>
   }
 
   @Override
-  public void catchnan(OGSparseArray array1) {
+  public void catchnan(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     boolean ret;
     final double[] data = array1.getData();

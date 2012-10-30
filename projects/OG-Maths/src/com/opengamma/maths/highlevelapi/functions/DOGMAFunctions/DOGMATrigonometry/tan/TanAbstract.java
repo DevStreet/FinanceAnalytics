@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.tan overload
  * @param <T> An OGArray type
  */
-public interface TanAbstract<T extends OGArraySuper<? extends Number>> {
+public interface TanAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> tan(T array1);
+  OGArray<? extends Number> tan(T array1);
 }

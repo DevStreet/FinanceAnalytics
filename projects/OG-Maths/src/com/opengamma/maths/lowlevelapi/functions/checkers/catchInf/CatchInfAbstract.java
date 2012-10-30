@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchInf;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Catches Infss
  * @param <T> An OGArray type
  */
-public abstract class CatchInfAbstract<T extends OGArraySuper<? extends Number>> {
+public abstract class CatchInfAbstract<T extends OGArray<? extends Number>> {
   public abstract void catchinf(T array1);
 }

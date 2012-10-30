@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIO.SmartImport;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAIOAPI;
 
@@ -27,16 +27,16 @@ public class DOGMAIO implements DOGMAIOAPI {
   }
 
   @Override
-  public OGArraySuper<Double> smartImport(double[][] aMatrix) {
+  public OGArray<Double> smartImport(double[][] aMatrix) {
     return _si.fromNativeDoubleDouble(aMatrix);
   }
 
   @Override
-  public OGArraySuper<Double> smartImport(double[] aMatrix, orientation o) {
+  public OGArray<Double> smartImport(double[] aMatrix, orientation o) {
     return _si.fromNativeDouble(aMatrix, o);
   }
 
-  public OGArraySuper<Double> smartImport(double[] aMatrix) {   
+  public OGArray<Double> smartImport(double[] aMatrix) {   
     return _si.fromNativeDouble(aMatrix, orientation.column);
   }  
   

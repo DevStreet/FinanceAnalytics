@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Adds OGDoubleArrays to OGSparseArrays   
  */
-public final class PlusOGSparseArrayOGDoubleArray implements PlusMinusAbstract<OGSparseArray, OGDoubleArray> {
+public final class PlusOGSparseArrayOGDoubleArray implements PlusMinusAbstract<OGSparseMatrix, OGMatrix> {
   private static PlusOGSparseArrayOGDoubleArray s_instance = new PlusOGSparseArrayOGDoubleArray();
 
   public static PlusOGSparseArrayOGDoubleArray getInstance() {
@@ -25,7 +25,7 @@ public final class PlusOGSparseArrayOGDoubleArray implements PlusMinusAbstract<O
   private static PlusOGDoubleArrayOGSparseArray s_reverse = PlusOGDoubleArrayOGSparseArray.getInstance();
   
   @Override
-  public OGArraySuper<? extends Number> plusminus(OGSparseArray array1, OGDoubleArray array2, final int op) {
+  public OGArray<? extends Number> plusminus(OGSparseMatrix array1, OGMatrix array2, final int op) {
     return s_reverse.plusminus(array2, array1, op);
   }
 

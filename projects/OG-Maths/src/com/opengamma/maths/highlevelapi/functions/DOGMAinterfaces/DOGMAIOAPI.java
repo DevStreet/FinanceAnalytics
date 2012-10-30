@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAIO.orientation;
 
 /**
@@ -18,13 +18,13 @@ public interface DOGMAIOAPI {
    * @param aMatrix a matrix to convert
    * @return an OGArraySuper type depending on the data in aMatrix
    */
-  OGArraySuper<? extends Number> smartImport(double[][] aMatrix);
+  OGArray<? extends Number> smartImport(double[][] aMatrix);
 
   /**
    * @param aVector a vector
    * @param o the orientation the vector should be
    * @return an OGArraySuper type 
    */
-  OGArraySuper<? extends Number> smartImport(double[] aVector, orientation o);
+  OGArray<? extends Number> smartImport(double[] aVector, orientation o);
 
 }

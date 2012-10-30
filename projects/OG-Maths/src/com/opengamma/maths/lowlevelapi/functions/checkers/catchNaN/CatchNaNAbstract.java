@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Catches NaNs
  * @param <T> An OGArray type
  */
-public abstract class CatchNaNAbstract<T extends OGArraySuper<? extends Number>> {
+public abstract class CatchNaNAbstract<T extends OGArray<? extends Number>> {
   public abstract void catchnan(T array1);
 }

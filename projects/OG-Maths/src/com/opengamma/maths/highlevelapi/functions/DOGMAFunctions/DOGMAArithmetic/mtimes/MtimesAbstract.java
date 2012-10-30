@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Mathematical multiply
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public interface MtimesAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+public interface MtimesAbstract<T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> mtimes(T array1, S array2);
+  OGArray<? extends Number> mtimes(T array1, S array2);
 }

@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.asin;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.asin on OGSparse
  */
-public final class AsinOGSparseArray implements AsinAbstract<OGSparseArray> {
+public final class AsinOGSparseArray implements AsinAbstract<OGSparseMatrix> {
   private static AsinOGSparseArray s_instance = new AsinOGSparseArray();
 
   public static AsinOGSparseArray getInstance() {
@@ -23,7 +23,7 @@ public final class AsinOGSparseArray implements AsinAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGDoubleArray asin(OGSparseArray array1) {
+  public OGMatrix asin(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -40,7 +40,7 @@ public final class AsinOGSparseArray implements AsinAbstract<OGSparseArray> {
       }
     }
 
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

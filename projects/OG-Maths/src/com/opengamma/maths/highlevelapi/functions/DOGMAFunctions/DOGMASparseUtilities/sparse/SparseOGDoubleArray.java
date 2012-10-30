@@ -7,13 +7,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Sparse's a OGDoubleArray
  */
-public final class SparseOGDoubleArray implements SparseAbstract<OGDoubleArray> {
+public final class SparseOGDoubleArray implements SparseAbstract<OGMatrix> {
 
   private static SparseOGDoubleArray s_instance = new SparseOGDoubleArray();
 
@@ -25,7 +25,7 @@ public final class SparseOGDoubleArray implements SparseAbstract<OGDoubleArray> 
   }
 
   @Override
-  public OGSparseArray sparse(OGDoubleArray array1) {
+  public OGSparseMatrix sparse(OGMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final double[] data = array1.getData();
@@ -68,7 +68,7 @@ public final class SparseOGDoubleArray implements SparseAbstract<OGDoubleArray> 
     values = Arrays.copyOfRange(dataTmp, 0, ptr);
     colPtr = Arrays.copyOfRange(colPtrTmp, 0, i + 1); // yes, the +1 is correct, it allows the computation of the number of elements in the final row!
     rowIdx = Arrays.copyOfRange(rowIdxTmp, 0, ptr);
-    return new OGSparseArray(colPtr, rowIdx, values, rows, cols);
+    return new OGSparseMatrix(colPtr, rowIdx, values, rows, cols);
   }
 
 }

@@ -7,14 +7,14 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does elementwise OGDouble / OGSparse
  */
-public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<OGDoubleArray, OGSparseArray> {
+public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<OGMatrix, OGSparseMatrix> {
   private static RdivideOGDoubleArrayOGSparseArray s_instance = new RdivideOGDoubleArrayOGSparseArray();
 
   public static RdivideOGDoubleArrayOGSparseArray getInstance() {
@@ -25,7 +25,7 @@ public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<
   }
 
   @Override
-  public OGDoubleArray rdivide(OGDoubleArray array1, OGSparseArray array2) {
+  public OGMatrix rdivide(OGMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -43,7 +43,7 @@ public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<
     double[] tmp = null;
     int n;
     int denseOffset = 0;
-    OGDoubleArray ret = null;
+    OGMatrix ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued DenseMatrix rdivide Sparse
       n = rowsArray2 * columnsArray2;
@@ -63,7 +63,7 @@ public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<
           ptr++;
         }
       }
-      ret = new OGDoubleArray(tmp, retRows, retCols);
+      ret = new OGMatrix(tmp, retRows, retCols);
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Dense matrix rdiv Single valued sparse 
       n = denseData.length;
       tmp = new double[n];
@@ -74,7 +74,7 @@ public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
-      ret = new OGDoubleArray(tmp, retRows, retCols);
+      ret = new OGMatrix(tmp, retRows, retCols);
     } else { // Dense / Sparse -> Infs and divisions
       Catchers.catchBadCommute(rowsArray1, "Rows in arg 1", rowsArray2, "Rows in arg 2");
       Catchers.catchBadCommute(columnsArray1, "Columns in arg 1", columnsArray2, "Columns in arg 2");
@@ -97,7 +97,7 @@ public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<
           ptr++;
         }
       }
-      ret = new OGDoubleArray(tmp, retRows, retCols);
+      ret = new OGMatrix(tmp, retRows, retCols);
     }
     return ret;
   }

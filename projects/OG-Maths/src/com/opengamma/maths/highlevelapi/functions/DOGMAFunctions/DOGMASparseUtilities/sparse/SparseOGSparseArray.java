@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Sparse's a sparse array
  */
-public final class SparseOGSparseArray implements SparseAbstract<OGSparseArray> {
+public final class SparseOGSparseArray implements SparseAbstract<OGSparseMatrix> {
 
   private static SparseOGSparseArray s_instance = new SparseOGSparseArray();
 
@@ -22,7 +22,7 @@ public final class SparseOGSparseArray implements SparseAbstract<OGSparseArray> 
   }
 
   @Override
-  public OGSparseArray sparse(OGSparseArray array1) {
+  public OGSparseMatrix sparse(OGSparseMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();    
     final double[] data = array1.getData();
@@ -38,7 +38,7 @@ public final class SparseOGSparseArray implements SparseAbstract<OGSparseArray> 
     final int[]tmpRowIdx = new int[rowIdx.length];
     System.arraycopy(rowIdx, 0, tmpRowIdx, 0, rowIdx.length);    
     
-    return new OGSparseArray(tmpColPtr, tmpRowIdx, tmpData, rows, cols);
+    return new OGSparseMatrix(tmpColPtr, tmpRowIdx, tmpData, rows, cols);
   }
 
 }

@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Does elementwise OGSparse * OGDouble
  */
-public final class TimesOGSparseArrayOGDoubleArray implements TimesAbstract<OGSparseArray, OGDoubleArray> {
+public final class TimesOGSparseArrayOGDoubleArray implements TimesAbstract<OGSparseMatrix, OGMatrix> {
   private static TimesOGSparseArrayOGDoubleArray s_instance = new TimesOGSparseArrayOGDoubleArray();
 
   public static TimesOGSparseArrayOGDoubleArray getInstance() {
@@ -27,7 +27,7 @@ public final class TimesOGSparseArrayOGDoubleArray implements TimesAbstract<OGSp
   
   
   @Override
-  public OGArraySuper<? extends Number> times(OGSparseArray array1, OGDoubleArray array2) {
+  public OGArray<? extends Number> times(OGSparseMatrix array1, OGMatrix array2) {
     return s_reverse.times(array2, array1);
   }
 

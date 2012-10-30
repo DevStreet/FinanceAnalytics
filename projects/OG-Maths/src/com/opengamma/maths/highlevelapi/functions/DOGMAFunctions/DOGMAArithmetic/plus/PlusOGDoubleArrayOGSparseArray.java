@@ -7,13 +7,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<OGDoubleArray, OGSparseArray> {
+public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<OGMatrix, OGSparseMatrix> {
   private static PlusOGDoubleArrayOGSparseArray s_instance = new PlusOGDoubleArrayOGSparseArray();
 
   public static PlusOGDoubleArrayOGSparseArray getInstance() {
@@ -24,7 +24,7 @@ public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<O
   }
 
   @Override
-  public OGDoubleArray plusminus(OGDoubleArray array1, OGSparseArray array2, final int op) {
+  public OGMatrix plusminus(OGMatrix array1, OGSparseMatrix array2, final int op) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -33,7 +33,7 @@ public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<O
 
     double[] tmp = null;
 
-    OGDoubleArray retArray = null;
+    OGMatrix retArray = null;
 
     // Actually adding arrays
 
@@ -52,7 +52,7 @@ public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<O
           tmp[rowIdx[i] + ir * rowsArray2] +=  op * data[i];
         }
       }
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
 
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Sparse array is actually a single number, so we can just deref and add
       final int n = array1.getData().length;
@@ -65,7 +65,7 @@ public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<O
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
     } else { // Both arrays are full dimension, do sparse add    
       retRows = rowsArray1;
       retCols = columnsArray1;
@@ -80,7 +80,7 @@ public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<O
           tmp[rowIdx[i] + ir * retRows] += op * data[i];
         }
       }
-      retArray = new OGDoubleArray(tmp, retRows, retCols);
+      retArray = new OGMatrix(tmp, retRows, retCols);
     }
     return retArray;
   }

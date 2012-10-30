@@ -8,7 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * Tests full(OGDoubleArray) 
@@ -20,8 +20,8 @@ public class DOGMAOGDoubleArrayFullTest {
   @Test
   public static void fullTest() {
     double[] data=new double[] {1.00, 4.00, 7.00, 10.00, 2.00, 5.00, 8.00, 11.00, 3.00, 6.00, 9.00, 12.00 };
-    OGDoubleArray answer = new OGDoubleArray(data, 4, 3);
-    OGDoubleArray p = new OGDoubleArray(data, 4, 3);    
+    OGMatrix answer = new OGMatrix(data, 4, 3);
+    OGMatrix p = new OGMatrix(data, 4, 3);    
     assertTrue(answer.equals(f.full(p)));
   }
 }

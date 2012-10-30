@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAUtilityFunctions.dot;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * 
  */
-public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGDoubleArray, OGDoubleArray> {
+public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGMatrix, OGMatrix> {
   private static DotOGDoubleArrayOGDoubleArray s_instance = new DotOGDoubleArrayOGDoubleArray();
 
   public static DotOGDoubleArrayOGDoubleArray getInstance() {
@@ -25,10 +25,10 @@ public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGDouble
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGDoubleArray dot(OGDoubleArray array1, OGDoubleArray array2) {
+  public OGMatrix dot(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
-    OGDoubleArray dot = null;
+    OGMatrix dot = null;
     final int rowsArray1 = array1.getNumberOfRows();
     final int columnsArray1 = array1.getNumberOfColumns();
     final int rowsArray2 = array2.getNumberOfRows();
@@ -42,7 +42,7 @@ public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGDouble
 
     // check the commute. They must be either 2 vectors *or* the same size.
     if (lenArray1 == lenArray2) { // we have 2 vectors the same length
-      dot = new OGDoubleArray(_localblas.ddot(lenArray1, dataArray1, 1, dataArray2, 1));
+      dot = new OGMatrix(_localblas.ddot(lenArray1, dataArray1, 1, dataArray2, 1));
     } else if ((rowsArray1 == rowsArray2) && (columnsArray1 == columnsArray2)) {
       int retRows = 1;
       int retCols = columnsArray1;
@@ -52,7 +52,7 @@ public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGDouble
         jmp = i * rowsArray1;
         tmp[i] = _localblas.ddot(rowsArray1, dataArray1, jmp, 1, dataArray2, jmp, 1);
       }
-      dot = new OGDoubleArray(tmp, retRows, retCols);
+      dot = new OGMatrix(tmp, retRows, retCols);
     } else {
       Catchers.catchBadCommute("Arrays must be the same size for vectorised dot product. Array1 is [" + rowsArray1 + "," + columnsArray1 + "], Array2 is [" + rowsArray2 + "," + columnsArray2 + "]");
     }

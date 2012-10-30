@@ -10,7 +10,7 @@ import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
@@ -24,7 +24,7 @@ public class RosserTest {
   @Test
   public static void testRosser() {
     final int n = 8;
-    OGDoubleArray tmp = Rosser.rosser();
+    OGMatrix tmp = Rosser.rosser();
     assertArrayEquals(tmp.getData(), s_theRosserData, D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);

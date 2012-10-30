@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cosh;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.cosh overload
  * @param <T> An OGArray type
  */
-public interface CoshAbstract<T extends OGArraySuper<? extends Number>> {
+public interface CoshAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> cosh(T array1);
+  OGArray<? extends Number> cosh(T array1);
 }

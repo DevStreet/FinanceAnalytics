@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.tan on OGSparse
  */
-public final class TanOGSparseArray implements TanAbstract<OGSparseArray> {
+public final class TanOGSparseArray implements TanAbstract<OGSparseMatrix> {
   private static TanOGSparseArray s_instance = new TanOGSparseArray();
 
   public static TanOGSparseArray getInstance() {
@@ -23,7 +23,7 @@ public final class TanOGSparseArray implements TanAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGDoubleArray tan(OGSparseArray array1) {
+  public OGMatrix tan(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -40,7 +40,7 @@ public final class TanOGSparseArray implements TanAbstract<OGSparseArray> {
       }
     }
 
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

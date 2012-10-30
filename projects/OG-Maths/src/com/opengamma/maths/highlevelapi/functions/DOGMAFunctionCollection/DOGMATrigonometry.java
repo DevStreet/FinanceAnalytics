@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.Acos;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.Asin;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.Atan;
@@ -32,47 +32,47 @@ public class DOGMATrigonometry implements DOGMATrigonometaryAPI {
   private static final Tanh TANH = new Tanh();
 
   @Override
-  public OGArraySuper<? extends Number> sin(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> sin(OGArray<? extends Number> array1) {
     return SIN.sin(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> cos(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> cos(OGArray<? extends Number> array1) {
     return COS.cos(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> tan(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> tan(OGArray<? extends Number> array1) {
     return TAN.tan(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> asin(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> asin(OGArray<? extends Number> array1) {
     return ASIN.asin(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> acos(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> acos(OGArray<? extends Number> array1) {
     return ACOS.acos(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> atan(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> atan(OGArray<? extends Number> array1) {
     return ATAN.atan(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> sinh(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> sinh(OGArray<? extends Number> array1) {
     return SINH.sinh(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> cosh(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> cosh(OGArray<? extends Number> array1) {
     return COSH.cosh(array1);
   }
 
   @Override
-  public OGArraySuper<? extends Number> tanh(OGArraySuper<? extends Number> array1) {
+  public OGArray<? extends Number> tanh(OGArray<? extends Number> array1) {
     return TANH.tanh(array1);
   }
 

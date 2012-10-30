@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.sin on OGDouble
  */
-public final class SinOGDoubleArray implements SinAbstract<OGDoubleArray> {
+public final class SinOGDoubleArray implements SinAbstract<OGMatrix> {
   private static SinOGDoubleArray s_instance = new SinOGDoubleArray();
 
   public static SinOGDoubleArray getInstance() {
@@ -22,7 +22,7 @@ public final class SinOGDoubleArray implements SinAbstract<OGDoubleArray> {
   }
 
   @Override
-  public OGDoubleArray sin(OGDoubleArray array1) {
+  public OGMatrix sin(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,7 +34,7 @@ public final class SinOGDoubleArray implements SinAbstract<OGDoubleArray> {
     for (int i = 0; i < n; i++) {
       tmp[i] = Math.sin(dataArray1[i]);
     }
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

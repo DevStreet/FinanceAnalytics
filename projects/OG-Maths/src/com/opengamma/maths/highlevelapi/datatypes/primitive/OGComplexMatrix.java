@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 /**
  * OGComplex Array type (essentially an interleaved OGDoubleArray, byte aligned contiguous malloc of backing data required and assumed
  */
-public class OGComplexArray extends OGArraySuper<ComplexType> {
+public class OGComplexMatrix extends OGArray<ComplexType> {
 
   private double[] _data;
   private int _columns;
@@ -27,7 +27,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
    * Takes a row major java double[][] and turns it into an OGComplexArray
    * @param dataIn a row major java double[][] 
    */
-  public OGComplexArray(double[][] dataIn) {
+  public OGComplexMatrix(double[][] dataIn) {
     Catchers.catchNullFromArgList(dataIn, 1);
     _data = DenseMemoryManipulation.convertRowMajorDoublePointerToColumnMajorZeroInterleavedSinglePointer(dataIn);
     _rows = dataIn.length;
@@ -39,7 +39,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
    * @param realPart a row major java double[][] that is to be the real part of a complex array
    * @param imaginaryPart a row major java double[][] that is to be the imaginary part of a complex array
    */
-  public OGComplexArray(double[][] realPart, double[][] imaginaryPart) {
+  public OGComplexMatrix(double[][] realPart, double[][] imaginaryPart) {
     Catchers.catchNullFromArgList(realPart, 1);
     Catchers.catchNullFromArgList(imaginaryPart, 2);
     if (MatrixPrimitiveUtils.isRagged(realPart)) {
@@ -59,7 +59,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
    * @param rows number of rows
    * @param columns number of columns
    */
-  public OGComplexArray(double[] dataIn, int rows, int columns) {
+  public OGComplexMatrix(double[] dataIn, int rows, int columns) {
     if (dataIn == null) {
       throw new MathsExceptionNullPointer("dataIn is null");
     }
@@ -92,7 +92,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
    * @param rows number of rows
    * @param columns number of columns
    */
-  public OGComplexArray(double[] realData, double[] imagData, int rows, int columns) {
+  public OGComplexMatrix(double[] realData, double[] imagData, int rows, int columns) {
     Catchers.catchNullFromArgList(realData, 1);
     Catchers.catchNullFromArgList(imagData, 2);
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(rows, 3);
@@ -116,7 +116,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
    * Construct from a row major (m * n)  array of ComplexTypes
    * @param data a non ragged array of ComplexTypes
    */
-  public OGComplexArray(ComplexType[][] data) {
+  public OGComplexMatrix(ComplexType[][] data) {
     Catchers.catchNullFromArgList(data, 1);
     final int rows = data.length;
     // check for nulls now
@@ -147,7 +147,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
   /**
    * @param number the single real number in this array
    */
-  public OGComplexArray(double number) {
+  public OGComplexMatrix(double number) {
     _columns = 1;
     _rows = 1;
     _data = new double[2];
@@ -157,7 +157,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
   /**
    * @param number a complex type to enter in this array
    */
-  public OGComplexArray(ComplexType number) {
+  public OGComplexMatrix(ComplexType number) {
     Catchers.catchNullFromArgList(number, 1);
     _columns = 1;
     _rows = 1;
@@ -191,7 +191,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
     return new ComplexType(_data[jmp], _data[jmp + 1]);
   }
 
-  public OGComplexArray getFullRow(int index) {
+  public OGComplexMatrix getFullRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
@@ -204,16 +204,16 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
       tmp[count + 1] = _data[jmp + 1];
       count += 2;
     }
-    return new OGComplexArray(tmp, 1, _columns);
+    return new OGComplexMatrix(tmp, 1, _columns);
   }
 
-  public OGComplexArray getFullColumn(int index) {
+  public OGComplexMatrix getFullColumn(int index) {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
     double[] tmp = new double[2 * _rows];
     System.arraycopy(_data, 2 * index * _rows, tmp, 0, tmp.length);
-    return new OGComplexArray(tmp, _rows, 1);
+    return new OGComplexMatrix(tmp, _rows, 1);
 
   }
 
@@ -234,8 +234,8 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
   }
 
   /**
-   * Decide if this {@link OGDoubleArray} is equal to another {@link OGDoubleArray} with the addition of some numerical tolerance for floating point comparison
-   * @param obj the {@link OGDoubleArray} against which a comparison is to be drawn
+   * Decide if this {@link OGMatrix} is equal to another {@link OGMatrix} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGMatrix} against which a comparison is to be drawn
    * @param tolerance the tolerance for double precision comparison of the data elements in the array
    * @return true if they are considered equal in value, false otherwise
    */
@@ -249,7 +249,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGComplexArray other = (OGComplexArray) obj;
+    OGComplexMatrix other = (OGComplexMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }
@@ -303,7 +303,7 @@ public class OGComplexArray extends OGArraySuper<ComplexType> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGComplexArray other = (OGComplexArray) obj;
+    OGComplexMatrix other = (OGComplexMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }

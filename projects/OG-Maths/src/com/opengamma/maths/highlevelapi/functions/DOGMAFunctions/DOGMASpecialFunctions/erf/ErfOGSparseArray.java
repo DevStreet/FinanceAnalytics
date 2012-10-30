@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erf;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 
 /**
  * Erf on Sparse
  */
-public final class ErfOGSparseArray implements ErfAbstract<OGSparseArray> {
+public final class ErfOGSparseArray implements ErfAbstract<OGSparseMatrix> {
   private static ErfOGSparseArray s_instance = new ErfOGSparseArray();
 
   public static ErfOGSparseArray getInstance() {
@@ -23,7 +23,7 @@ public final class ErfOGSparseArray implements ErfAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGSparseArray erf(OGSparseArray array1) {
+  public OGSparseMatrix erf(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -38,6 +38,6 @@ public final class ErfOGSparseArray implements ErfAbstract<OGSparseArray> {
       tmp[i] = DERF.derf(dataArray1[i]);
     }
 
-    return new OGSparseArray(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+    return new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
   }
 }

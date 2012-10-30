@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * erfc
  * @param <T> An OGArray type
  */
-public interface ErfcAbstract<T extends OGArraySuper<? extends Number>> {
+public interface ErfcAbstract<T extends OGArray<? extends Number>> {
  
-  OGArraySuper<? extends Number> erfc(T array1);
+  OGArray<? extends Number> erfc(T array1);
 }

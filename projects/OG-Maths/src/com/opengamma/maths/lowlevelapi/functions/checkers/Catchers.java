@@ -10,7 +10,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.catchInf.CatchInf;
 import com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN.CatchNaN;
 
@@ -827,7 +827,7 @@ public class Catchers {
    * Catches NaNs in OGArraySuper types
    * @param array1 an OGArraySuper type
    */
-  public static void catchNaN(OGArraySuper<? extends Number> array1) {
+  public static void catchNaN(OGArray<? extends Number> array1) {
     CatchNaN catchnan = CatchNaN.getInstance();
     catchnan.catchnan(array1);
   }
@@ -848,7 +848,7 @@ public class Catchers {
    * Catches NaNs in OGArraySuper types
    * @param array1 an OGArraySuper type
    */
-  public static void catchInf(OGArraySuper<? extends Number> array1) {
+  public static void catchInf(OGArray<? extends Number> array1) {
     CatchInf catchinf = CatchInf.getInstance();
     catchinf.catchinf(array1);
   }

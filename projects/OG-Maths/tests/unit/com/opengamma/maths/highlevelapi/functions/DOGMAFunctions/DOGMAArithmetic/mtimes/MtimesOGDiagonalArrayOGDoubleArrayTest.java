@@ -9,9 +9,9 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMA;
 
 /**
@@ -33,30 +33,30 @@ public class MtimesOGDiagonalArrayOGDoubleArrayTest {
   double[] _dataC4x6TimesVector6x1 = new double[] {1,4,9,0};
   
   double[] _dataC4x6TimesSingle = new double[] {7, 14, 21 };
-  OGDoubleArray OGD1x1 = new OGDoubleArray(single);
-  OGDoubleArray OGD1x1NaN = new OGDoubleArray(NaN);
-  OGDoubleArray OGDA6x3 = new OGDoubleArray(_dataD6x3);
-  OGDoubleArray OGDA6x4 = new OGDoubleArray(_dataD6x4);
-  OGDoubleArray OGC3x6timesD = new OGDoubleArray(_dataC3x6timesD);
-  OGDoubleArray OGC4x6timesD = new OGDoubleArray(_dataC4x6timesD);
-  OGDoubleArray OGSingleTimesD = new OGDoubleArray(_dataSingleTimesD);
-  OGDoubleArray OGSingleNaNTimesD = new OGDoubleArray(_dataSingleNaNTimesD);
-  OGDoubleArray OGVector6x1 = new OGDoubleArray(_dataVector6x1,6,1);
-  OGDoubleArray OGC4x6TimesSingleNaN = new OGDoubleArray(_dataC4x6TimesSingleNaN);
-  OGDoubleArray OGC4x6TimesVector6x1 = new OGDoubleArray(_dataC4x6TimesVector6x1,4,1);
+  OGMatrix OGD1x1 = new OGMatrix(single);
+  OGMatrix OGD1x1NaN = new OGMatrix(NaN);
+  OGMatrix OGDA6x3 = new OGMatrix(_dataD6x3);
+  OGMatrix OGDA6x4 = new OGMatrix(_dataD6x4);
+  OGMatrix OGC3x6timesD = new OGMatrix(_dataC3x6timesD);
+  OGMatrix OGC4x6timesD = new OGMatrix(_dataC4x6timesD);
+  OGMatrix OGSingleTimesD = new OGMatrix(_dataSingleTimesD);
+  OGMatrix OGSingleNaNTimesD = new OGMatrix(_dataSingleNaNTimesD);
+  OGMatrix OGVector6x1 = new OGMatrix(_dataVector6x1,6,1);
+  OGMatrix OGC4x6TimesSingleNaN = new OGMatrix(_dataC4x6TimesSingleNaN);
+  OGMatrix OGC4x6TimesVector6x1 = new OGMatrix(_dataC4x6TimesVector6x1,4,1);
   
-  OGDiagonalArray OGDiag1x1 = new OGDiagonalArray(single);
-  OGDiagonalArray OGDiag1x1NaN = new OGDiagonalArray(NaN);
-  OGDiagonalArray OGDiag3x6 = new OGDiagonalArray(_dataC, 3, 6);
-  OGDiagonalArray OGDiag4x6 = new OGDiagonalArray(_dataC, 4, 6);
-  OGDiagonalArray OGDiag6x4 = new OGDiagonalArray(_dataC, 6, 4);
-  OGDiagonalArray OGDiag6x2 = new OGDiagonalArray(_dataC, 6, 2);
-  OGDiagonalArray OGDiag4x6TimesSingle = new OGDiagonalArray(_dataC4x6TimesSingle, 4, 6);
+  OGDiagonalMatrix OGDiag1x1 = new OGDiagonalMatrix(single);
+  OGDiagonalMatrix OGDiag1x1NaN = new OGDiagonalMatrix(NaN);
+  OGDiagonalMatrix OGDiag3x6 = new OGDiagonalMatrix(_dataC, 3, 6);
+  OGDiagonalMatrix OGDiag4x6 = new OGDiagonalMatrix(_dataC, 4, 6);
+  OGDiagonalMatrix OGDiag6x4 = new OGDiagonalMatrix(_dataC, 6, 4);
+  OGDiagonalMatrix OGDiag6x2 = new OGDiagonalMatrix(_dataC, 6, 2);
+  OGDiagonalMatrix OGDiag4x6TimesSingle = new OGDiagonalMatrix(_dataC4x6TimesSingle, 4, 6);
 
   MtimesOGDiagonalArrayOGDoubleArray mtimes = MtimesOGDiagonalArrayOGDoubleArray.getInstance();
 
   DOGMA dogma = new DOGMA();
-  OGArraySuper<? extends Number> tmp;
+  OGArray<? extends Number> tmp;
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void null1Test() {

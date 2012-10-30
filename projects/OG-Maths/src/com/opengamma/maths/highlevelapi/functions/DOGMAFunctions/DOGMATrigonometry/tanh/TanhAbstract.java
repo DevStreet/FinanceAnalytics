@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tanh;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.tanh overload
  * @param <T> An OGArray type
  */
-public interface TanhAbstract<T extends OGArraySuper<? extends Number>> {
+public interface TanhAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> tanh(T array1);
+  OGArray<? extends Number> tanh(T array1);
 }

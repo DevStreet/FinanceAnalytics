@@ -7,15 +7,15 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does elementwise OGSparse / OGDouble
  */
-public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<OGSparseArray, OGDoubleArray> {
+public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<OGSparseMatrix, OGMatrix> {
   private static RdivideOGSparseArrayOGDoubleArray s_instance = new RdivideOGSparseArrayOGDoubleArray();
 
   public static RdivideOGSparseArrayOGDoubleArray getInstance() {
@@ -26,7 +26,7 @@ public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<
   }
 
   @Override
-  public OGArraySuper<? extends Number> rdivide(OGSparseArray array1, OGDoubleArray array2) {
+  public OGArray<? extends Number> rdivide(OGSparseMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just div by that
@@ -44,7 +44,7 @@ public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<
     double[] tmp = null;
     int n;
     int denseOffset = 0;
-    OGArraySuper<? extends Number> ret = null;
+    OGArray<? extends Number> ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued SparseMatrix rdivide dense
       n = rowsArray2 * columnsArray2;
@@ -56,7 +56,7 @@ public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<
       }
       retRows = rowsArray2;
       retCols = columnsArray2;
-      ret = new OGDoubleArray(tmp, retRows, retCols);
+      ret = new OGMatrix(tmp, retRows, retCols);
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Sparse matrix rdivide single dense
       n = sparseData.length;
       tmp = new double[n];
@@ -67,7 +67,7 @@ public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
-      ret = new OGSparseArray(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+      ret = new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
     } else { // Sparse/Dense, ignore division in sparse 0 spaces 
       Catchers.catchBadCommute(rowsArray1, "Rows in arg 1", rowsArray2, "Rows in arg 2");
       Catchers.catchBadCommute(columnsArray1, "Columns in arg 1", columnsArray2, "Columns in arg 2");
@@ -83,7 +83,7 @@ public final class RdivideOGSparseArrayOGDoubleArray implements RdivideAbstract<
           ptr++;
         }
       }
-      ret = new OGSparseArray(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+      ret = new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
     }
     return ret;
   }

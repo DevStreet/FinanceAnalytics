@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Overloaded Sqrt
@@ -23,12 +23,12 @@ public class Sqrt {
    */
   private static Map<Class<?>, SqrtAbstract<?>> s_functionPointers = new HashMap<Class<?>, SqrtAbstract<?>>();
   static {
-    s_functionPointers.put(OGDoubleArray.class, SqrtOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseArray.class, SqrtOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, SqrtOGDoubleArray.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, SqrtOGSparseArray.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> sqrt(T array1) {
+  public <T extends OGArray<? extends Number>> OGArray<? extends Number> sqrt(T array1) {
     SqrtAbstract<T> use = (SqrtAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {
       throw new MathsExceptionNotImplemented("Sqrt() on array class " + array1.getClass().toString() + " is not yet implemented");

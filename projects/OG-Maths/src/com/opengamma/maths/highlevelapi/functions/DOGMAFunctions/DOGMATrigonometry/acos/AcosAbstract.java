@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Math.acos overload
  * @param <T> An OGArray type
  */
-public interface AcosAbstract<T extends OGArraySuper<? extends Number>> {
+public interface AcosAbstract<T extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> acos(T array1);
+  OGArray<? extends Number> acos(T array1);
 }

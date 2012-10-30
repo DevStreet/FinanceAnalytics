@@ -5,16 +5,16 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does elementwise OGDouble * OGSparse
  */
-public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDoubleArray, OGSparseArray> {
+public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGMatrix, OGSparseMatrix> {
   private static TimesOGDoubleArrayOGSparseArray s_instance = new TimesOGDoubleArrayOGSparseArray();
 
   public static TimesOGDoubleArrayOGSparseArray getInstance() {
@@ -27,7 +27,7 @@ public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDo
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGArraySuper<? extends Number> times(OGDoubleArray array1, OGSparseArray array2) {
+  public OGArray<? extends Number> times(OGMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -40,7 +40,7 @@ public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDo
 
     double[] tmp = null;
     int n;
-    OGArraySuper<? extends Number> ret = null;
+    OGArray<? extends Number> ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued DenseMatrix times Sparse = scaled Sparse 
       n = array2.getData().length;
@@ -52,7 +52,7 @@ public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDo
       retRows = rowsArray2;
       retCols = columnsArray2;
 
-      ret = new OGSparseArray(array2.getColumnPtr(), array2.getRowIndex(), tmp, retRows, retCols);
+      ret = new OGSparseMatrix(array2.getColumnPtr(), array2.getRowIndex(), tmp, retRows, retCols);
 
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Dense matrix times Single valued sparse = scaled dense
       n = array1.getData().length;
@@ -63,7 +63,7 @@ public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDo
       _localblas.dscal(n, deref, tmp, 1);
       retRows = rowsArray1;
       retCols = columnsArray1;
-      ret = new OGDoubleArray(tmp, retRows, retCols);
+      ret = new OGMatrix(tmp, retRows, retCols);
 
     } else { // ew mul. Dense * Sparse -> Sparse scaled by dense entries
       Catchers.catchBadCommute(columnsArray1, "Columns in first array", columnsArray2, "Columns in second array");
@@ -86,7 +86,7 @@ public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDo
           ptr++;
         }
       }
-      ret = new OGSparseArray(array2.getColumnPtr(), array2.getRowIndex(), tmp, retRows, retCols);
+      ret = new OGSparseMatrix(array2.getColumnPtr(), array2.getRowIndex(), tmp, retRows, retCols);
     }
     return ret;
   }

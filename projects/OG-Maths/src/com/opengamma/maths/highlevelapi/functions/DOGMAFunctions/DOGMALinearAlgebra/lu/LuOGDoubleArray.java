@@ -9,15 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGLuResult;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.lu.Lu.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 
 /**
  * Does LU/LUP on OGDoubleArrays 
  */
-public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
+public final class LuOGDoubleArray implements LuAbstract<OGMatrix> {
   private static LuOGDoubleArray s_instance = new LuOGDoubleArray();
   private static Logger s_log = LoggerFactory.getLogger(LuOGDoubleArray.class);
 
@@ -31,7 +31,7 @@ public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
   private LAPACK _localLAPACK = new LAPACK();
 
   @Override
-  public OGLuResult lu(OGDoubleArray array1, compute these) {
+  public OGLuResult lu(OGMatrix array1, compute these) {
     final int m = array1.getNumberOfRows();
     final int n = array1.getNumberOfColumns();
     final int lda = Math.max(1, m);
@@ -46,9 +46,9 @@ public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
     int[] P = null;//CSIGNORE
 
     // return stores
-    OGDoubleArray retL = null;
-    OGDoubleArray retU = null;
-    OGPermutationArray retP = null;
+    OGMatrix retL = null;
+    OGMatrix retU = null;
+    OGPermutationMatrix retP = null;
 
     // the LAPACK call
     _localLAPACK.dgetrf(m, n, A, lda, ipiv, info);
@@ -63,11 +63,11 @@ public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
     switch (these) {
       case L:
         L = extractL(A, m, n);
-        retL = new OGDoubleArray(L, m, n);
+        retL = new OGMatrix(L, m, n);
         break;
       case U:
         U = extractU(A, n);
-        retU = new OGDoubleArray(U, n, n);
+        retU = new OGMatrix(U, n, n);
         break;
       case LU:
         double[] localL;
@@ -77,9 +77,9 @@ public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
         P = piv2perm(ipiv, m);
         // apply pivot to L so that L*U=A, i.e. we multiply transpose(P)*L, this is a stride hating row permutation, grrrr
         L = permuteL(localL, m, n, P);
-        retL = new OGDoubleArray(L, m, n);
-        retU = new OGDoubleArray(U, n, n);
-        retP = new OGPermutationArray(P);
+        retL = new OGMatrix(L, m, n);
+        retU = new OGMatrix(U, n, n);
+        retP = new OGPermutationMatrix(P);
         break;
       case LUP:
         L = new double[m * n];
@@ -87,9 +87,9 @@ public final class LuOGDoubleArray implements LuAbstract<OGDoubleArray> {
         processLU(A, m, n, L, U);
         P = piv2perm(ipiv, m);
         // done, we want L*U=A*P so that transpose(P)*L*U=A
-        retL = new OGDoubleArray(L, m, n);
-        retU = new OGDoubleArray(U, n, n);
-        retP = new OGPermutationArray(P);
+        retL = new OGMatrix(L, m, n);
+        retU = new OGMatrix(U, n, n);
+        retP = new OGPermutationMatrix(P);
         break;
 
     }

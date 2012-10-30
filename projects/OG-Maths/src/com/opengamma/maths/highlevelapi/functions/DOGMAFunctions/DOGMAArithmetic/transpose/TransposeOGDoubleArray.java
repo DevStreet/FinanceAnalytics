@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Transposes an OGDoubleArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class TransposeOGDoubleArray implements TransposeAbstract<OGDoubleArray> {
+public final class TransposeOGDoubleArray implements TransposeAbstract<OGMatrix> {
   private static TransposeOGDoubleArray s_instance = new TransposeOGDoubleArray();
 
   public static TransposeOGDoubleArray getInstance() {
@@ -23,7 +23,7 @@ public final class TransposeOGDoubleArray implements TransposeAbstract<OGDoubleA
   }
 
   @Override
-  public OGDoubleArray transpose(OGDoubleArray array1) {
+  public OGMatrix transpose(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -38,7 +38,7 @@ public final class TransposeOGDoubleArray implements TransposeAbstract<OGDoubleA
         tmp[j * columnsArray1 + i] = data[ir + j];
       }
     }
-    return new OGDoubleArray(tmp, retRows, retCols);
+    return new OGMatrix(tmp, retRows, retCols);
   }
 
 }

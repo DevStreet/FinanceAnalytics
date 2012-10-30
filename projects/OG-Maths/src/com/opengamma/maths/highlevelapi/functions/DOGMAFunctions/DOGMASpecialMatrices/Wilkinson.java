@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -21,7 +21,7 @@ public class Wilkinson {
    * @param n the order of the matrix required
    * @return the order "n" Wilkinson matrix
    */
-  public static OGDoubleArray wilkinson(final int n) {
+  public static OGMatrix wilkinson(final int n) {
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(n, 1);
     final int nn = n * n;
     double[] data = new double[nn];
@@ -47,7 +47,7 @@ public class Wilkinson {
       data[nn - 2] = 1;
     }
     // return
-    OGDoubleArray tmp = new OGDoubleArray(data, n, n);
+    OGMatrix tmp = new OGMatrix(data, n, n);
     return tmp;
   }
 

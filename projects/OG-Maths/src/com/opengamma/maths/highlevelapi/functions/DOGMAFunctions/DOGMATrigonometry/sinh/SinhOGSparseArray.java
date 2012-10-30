@@ -6,14 +6,14 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh;
 
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Math.sinh on OGSparse
  */
-public final class SinhOGSparseArray implements SinhAbstract<OGSparseArray> {
+public final class SinhOGSparseArray implements SinhAbstract<OGSparseMatrix> {
   private static SinhOGSparseArray s_instance = new SinhOGSparseArray();
 
   public static SinhOGSparseArray getInstance() {
@@ -24,7 +24,7 @@ public final class SinhOGSparseArray implements SinhAbstract<OGSparseArray> {
   }
 
   @Override
-  public OGDoubleArray sinh(OGSparseArray array1) {
+  public OGMatrix sinh(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -41,7 +41,7 @@ public final class SinhOGSparseArray implements SinhAbstract<OGSparseArray> {
       }
     }
 
-    return new OGDoubleArray(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 
 }

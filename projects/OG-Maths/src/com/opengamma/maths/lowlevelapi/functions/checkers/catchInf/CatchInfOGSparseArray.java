@@ -6,14 +6,14 @@
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchInf;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredInf;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.iss.IsInf;
 
 /**
  * 
  */
-public final class CatchInfOGSparseArray extends CatchInfAbstract<OGSparseArray> {
+public final class CatchInfOGSparseArray extends CatchInfAbstract<OGSparseMatrix> {
   private static CatchInfOGSparseArray s_instance = new CatchInfOGSparseArray();
 
   public static CatchInfOGSparseArray getInstance() {
@@ -24,7 +24,7 @@ public final class CatchInfOGSparseArray extends CatchInfAbstract<OGSparseArray>
   }
 
   @Override
-  public void catchinf(OGSparseArray array1) {
+  public void catchinf(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     boolean ret;
     final double[] data = array1.getData();

@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces;
 
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 
 /**
@@ -20,6 +20,6 @@ public interface DOGMALinearAlgebraAPI {
    * @param required the components of the SVD wanted by the user  
    * @return an {@link OGSvdResult} containing the components of the decomposition as specified by {@code required}
    */
-  OGSvdResult svd(OGArraySuper<? extends Number> array1, compute required);
+  OGSvdResult svd(OGArray<? extends Number> array1, compute required);
 
 }

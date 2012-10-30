@@ -5,16 +5,16 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OGSparseArray, OGDoubleArray> {
+public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OGSparseMatrix, OGMatrix> {
   private static MtimesOGSparseArrayOGDoubleArray s_instance = new MtimesOGSparseArrayOGDoubleArray();
 
   public static MtimesOGSparseArrayOGDoubleArray getInstance() {
@@ -27,7 +27,7 @@ public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OG
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGArraySuper<? extends Number> mtimes(OGSparseArray array1, OGDoubleArray array2) {
+  public OGArray<? extends Number> mtimes(OGSparseMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -42,7 +42,7 @@ public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OG
 
     double[] tmp = null;
     int n = 0;
-    OGArraySuper<? extends Number> ret = null;
+    OGArray<? extends Number> ret = null;
 
     if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * dense matrix
       final double deref = data1[0];
@@ -50,14 +50,14 @@ public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OG
       tmp = new double[n];
       System.arraycopy(data2, 0, tmp, 0, n);
       _localblas.dscal(n, deref, tmp, 1);
-      ret = new OGDoubleArray(tmp, rowsArray2, colsArray2);
+      ret = new OGMatrix(tmp, rowsArray2, colsArray2);
     } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have sparse matrix * dense scalar
       final double deref = data2[0];
       n = data1.length;
       tmp = new double[n];
       System.arraycopy(data1, 0, tmp, 0, n);
       _localblas.dscal(n, deref, tmp, 1);
-      ret = new OGSparseArray(colPtr1, rowIdx1, tmp, rowsArray1, colsArray1);
+      ret = new OGSparseMatrix(colPtr1, rowIdx1, tmp, rowsArray1, colsArray1);
     } else {
       Catchers.catchBadCommute(colsArray1, "Columns in first array", rowsArray2, "Rows in second array");
       // TODO: refactor these calls into a SparseBLAS.
@@ -70,7 +70,7 @@ public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OG
             ptr++;
           }
         }
-        ret = new OGDoubleArray(tmp, rowsArray1, 1);
+        ret = new OGMatrix(tmp, rowsArray1, 1);
       } else {
         final int fm = rowsArray1;
         final int fn = colsArray2;
@@ -90,7 +90,7 @@ public final class MtimesOGSparseArrayOGDoubleArray implements MtimesAbstract<OG
             }
           }
         }
-        ret = new OGDoubleArray(cMatrix, fm, fn);
+        ret = new OGMatrix(cMatrix, fm, fn);
 
       }
     }

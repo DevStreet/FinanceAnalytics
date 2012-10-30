@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Element wise multiply
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public interface TimesAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+public interface TimesAbstract<T extends OGArray<? extends Number>, S extends OGArray<? extends Number>> {
   
-  OGArraySuper<? extends Number> times(T array1, S array2);
+  OGArray<? extends Number> times(T array1, S array2);
 }
