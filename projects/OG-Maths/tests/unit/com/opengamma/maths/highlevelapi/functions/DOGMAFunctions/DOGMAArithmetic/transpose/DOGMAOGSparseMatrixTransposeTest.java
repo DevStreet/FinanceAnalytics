@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Tests OGDoubleArray transpose
  */
-public class DOGMAOGSparseArrayTransposeTest {
+public class DOGMAOGSparseMatrixTransposeTest {
 
   TransposeOGSparseMatrix t = TransposeOGSparseMatrix.getInstance();
 

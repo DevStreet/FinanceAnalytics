@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 /**
  * Tests OGComplexArray transpose
  */
-public class DOGMAOGComplexArrayTransposeTest {
+public class DOGMAOGComplexMatrixTransposeTest {
 
   TransposeOGComplexMatrix t = TransposeOGComplexMatrix.getInstance();
 

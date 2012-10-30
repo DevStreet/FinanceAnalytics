@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 /**
  * Tests OGDoubleArray transpose
  */
-public class DOGMAOGDiagonalArrayTransposeTest {
+public class DOGMAOGDiagonalMatrixTransposeTest {
 
   TransposeOGDiagonalMatrix t = TransposeOGDiagonalMatrix.getInstance();
 
