@@ -10,7 +10,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 
@@ -28,7 +28,7 @@ public final class SvdOGComplexArray implements SvdAbstract<OGComplexMatrix> {
   }
 
   private LAPACK _localLAPACK = new LAPACK();
-  private CtransposeOGComplexArray _cmplxtranspose = CtransposeOGComplexArray.getInstance();
+  private CtransposeOGComplexMatrix _cmplxtranspose = CtransposeOGComplexMatrix.getInstance();
 
   @Override
   public OGSvdResult svd(OGComplexMatrix array1, compute these) {

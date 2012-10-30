@@ -17,7 +17,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
  */
 public class DOGMAOGComplexArrayCtransposeTest {
 
-  CtransposeOGComplexArray ct = CtransposeOGComplexArray.getInstance();
+  CtransposeOGComplexMatrix ct = CtransposeOGComplexMatrix.getInstance();
 
   int normalRows = 4;
   int normalCols = 3;

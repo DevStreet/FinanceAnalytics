@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Conjugate transposes an OGSparseArray
  */
-public final class CtransposeOGSparseArray implements CtransposeAbstract<OGSparseMatrix> {
-  private static CtransposeOGSparseArray s_instance = new CtransposeOGSparseArray();
+public final class CtransposeOGSparseMatrix implements CtransposeAbstract<OGSparseMatrix> {
+  private static CtransposeOGSparseMatrix s_instance = new CtransposeOGSparseMatrix();
 
-  public static CtransposeOGSparseArray getInstance() {
+  public static CtransposeOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private CtransposeOGSparseArray() {
+  private CtransposeOGSparseMatrix() {
   }
 
   private TransposeOGSparseArray _transpose = TransposeOGSparseArray.getInstance();

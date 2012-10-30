@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  */
 public class DOGMAOGSparseArrayCtransposeTest {
 
-  CtransposeOGSparseArray t = CtransposeOGSparseArray.getInstance();
+  CtransposeOGSparseMatrix t = CtransposeOGSparseMatrix.getInstance();
 
   int normalRows = 4;
   int normalCols = 3;

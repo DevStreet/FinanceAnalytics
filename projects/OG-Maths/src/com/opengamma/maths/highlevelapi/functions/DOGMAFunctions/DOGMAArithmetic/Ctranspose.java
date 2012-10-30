@@ -17,12 +17,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDiagonalArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDoubleArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGIndexArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGPermutationArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGPermutationMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -36,12 +36,12 @@ public class Ctranspose {
    */
   private static Map<Class<? extends OGArray<? extends Number>>, CtransposeAbstract<? extends OGArray<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, CtransposeOGDoubleArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, CtransposeOGMatrix.getInstance());
     s_functionPointers.put(OGIndexMatrix.class, CtransposeOGIndexArray.getInstance());    
-    s_functionPointers.put(OGSparseMatrix.class, CtransposeOGSparseArray.getInstance());
-    s_functionPointers.put(OGComplexMatrix.class, CtransposeOGComplexArray.getInstance());
-    s_functionPointers.put(OGPermutationMatrix.class, CtransposeOGPermutationArray.getInstance());
-    s_functionPointers.put(OGDiagonalMatrix.class, CtransposeOGDiagonalArray.getInstance());   
+    s_functionPointers.put(OGSparseMatrix.class, CtransposeOGSparseMatrix.getInstance());
+    s_functionPointers.put(OGComplexMatrix.class, CtransposeOGComplexMatrix.getInstance());
+    s_functionPointers.put(OGPermutationMatrix.class, CtransposeOGPermutationMatrix.getInstance());
+    s_functionPointers.put(OGDiagonalMatrix.class, CtransposeOGDiagonalMatrix.getInstance());   
   }
 
   @SuppressWarnings("unchecked")

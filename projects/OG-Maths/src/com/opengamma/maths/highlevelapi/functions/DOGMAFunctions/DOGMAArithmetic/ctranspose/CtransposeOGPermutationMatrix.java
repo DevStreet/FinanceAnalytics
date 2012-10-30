@@ -11,14 +11,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Transpose for {@link OGPermutationMatrix}
  */
-public final class CtransposeOGPermutationArray implements CtransposeAbstract<OGPermutationMatrix> {
-  private static CtransposeOGPermutationArray s_instance = new CtransposeOGPermutationArray();
+public final class CtransposeOGPermutationMatrix implements CtransposeAbstract<OGPermutationMatrix> {
+  private static CtransposeOGPermutationMatrix s_instance = new CtransposeOGPermutationMatrix();
 
-  public static CtransposeOGPermutationArray getInstance() {
+  public static CtransposeOGPermutationMatrix getInstance() {
     return s_instance;
   }
 
-  private CtransposeOGPermutationArray() {
+  private CtransposeOGPermutationMatrix() {
   }
 
   @Override

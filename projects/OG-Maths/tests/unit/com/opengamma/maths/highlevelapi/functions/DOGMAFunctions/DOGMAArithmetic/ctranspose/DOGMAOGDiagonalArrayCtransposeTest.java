@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
  */
 public class DOGMAOGDiagonalArrayCtransposeTest {
 
-  CtransposeOGDiagonalArray t = CtransposeOGDiagonalArray.getInstance();
+  CtransposeOGDiagonalMatrix t = CtransposeOGDiagonalMatrix.getInstance();
 
   int normalRows = 4;
   int normalCols = 3;
