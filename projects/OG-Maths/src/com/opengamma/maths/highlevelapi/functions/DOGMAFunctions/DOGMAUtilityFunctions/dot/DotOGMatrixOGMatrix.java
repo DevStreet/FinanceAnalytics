@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class DotOGDoubleArrayOGDoubleArray implements DotAbstract<OGMatrix, OGMatrix> {
-  private static DotOGDoubleArrayOGDoubleArray s_instance = new DotOGDoubleArrayOGDoubleArray();
+public final class DotOGMatrixOGMatrix implements DotAbstract<OGMatrix, OGMatrix> {
+  private static DotOGMatrixOGMatrix s_instance = new DotOGMatrixOGMatrix();
 
-  public static DotOGDoubleArrayOGDoubleArray getInstance() {
+  public static DotOGMatrixOGMatrix getInstance() {
     return s_instance;
   }
 
-  private DotOGDoubleArrayOGDoubleArray() {
+  private DotOGMatrixOGMatrix() {
   }
 
   private BLAS _localblas = new BLAS();

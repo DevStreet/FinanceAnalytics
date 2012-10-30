@@ -28,7 +28,7 @@ public class Dot {
 //    Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGDoubleArray.class, OGSparseArray.class);
 //    Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseArray.class, OGDoubleArray.class);
 //    Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseArray.class, OGSparseArray.class);    
-    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, DotOGDoubleArrayOGDoubleArray.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, DotOGMatrixOGMatrix.getInstance());
 //    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, DotOGDoubleArrayOGSparseArray.getInstance());
 //    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, DotOGSparseArrayOGDoubleArray.getInstance());         
 //    s_functionPointers.put(pairOGSparseArrayOGSparseArray, DotOGSparseArrayOGSparseArray.getInstance());        
