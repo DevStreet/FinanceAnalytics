@@ -17,7 +17,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  */
 public class DOGMAOGDiagonalArraySparseTest {
 
-  private static SparseOGDiagonalArray s_d2s = SparseOGDiagonalArray.getInstance();
+  private static SparseOGDiagonalMatrix s_d2s = SparseOGDiagonalMatrix.getInstance();
   static double[] _data = new double[] {1, 2, 3, 4, 5 };
   private static double[][] denseAnswer = { {1.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000 },
       {0.0000000000000000, 2.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000 },

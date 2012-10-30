@@ -5,43 +5,43 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
- * Sparse's a sparse array
+ * Sparse's permutation arrays
  */
-public final class SparseOGDiagonalArray implements SparseAbstract<OGDiagonalMatrix> {
+public final class SparseOGPermutationMatrix implements SparseAbstract<OGPermutationMatrix> {
 
-  private static SparseOGDiagonalArray s_instance = new SparseOGDiagonalArray();
+  private static SparseOGPermutationMatrix s_instance = new SparseOGPermutationMatrix();
 
-  public static SparseOGDiagonalArray getInstance() {
+  public static SparseOGPermutationMatrix getInstance() {
     return s_instance;
   }
 
-  private SparseOGDiagonalArray() {
+  private SparseOGPermutationMatrix() {
   }
 
   @Override
-  public OGSparseMatrix sparse(OGDiagonalMatrix array1) {
+  public OGSparseMatrix sparse(OGPermutationMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
-    final double[] data = array1.getData();
+    final int[] data = array1.getData();
 
     final double[] tmpData = new double[data.length];
-    System.arraycopy(data, 0, tmpData, 0, data.length);
+    for (int i = 0; i < data.length; i++) {
+      tmpData[i] = 1;
+    }
 
     int[] tmpColPtr = new int[cols + 1];
     for (int i = 0; i < data.length; i++) {
       tmpColPtr[i] = i;
     }
-    for (int i = data.length; i < cols + 1; i++) {
-      tmpColPtr[i] = data.length;
-    }
+    tmpColPtr[cols] = rows;
 
     int[] tmpRowIdx = new int[data.length];
-    for (int i = 0; i < data.length; i++) {
-      tmpRowIdx[i] = i;
+    for (int i = 0; i < rows; i++) {
+      tmpRowIdx[i] = data[i];
     }
 
     return new OGSparseMatrix(tmpColPtr, tmpRowIdx, tmpData, rows, cols);

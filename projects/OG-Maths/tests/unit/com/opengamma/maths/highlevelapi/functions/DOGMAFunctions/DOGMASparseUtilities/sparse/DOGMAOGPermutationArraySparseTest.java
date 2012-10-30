@@ -17,7 +17,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtil
  */
 public class DOGMAOGPermutationArraySparseTest {
 
-  private static SparseOGPermutationArray s_d2s = SparseOGPermutationArray.getInstance();
+  private static SparseOGPermutationMatrix s_d2s = SparseOGPermutationMatrix.getInstance();
   static int[] _data = new int[] {2, 3, 1, 4, 0 };
   private static double[][] denseAnswer = { {0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 1.0000000000000000 },
       {0.0000000000000000, 0.0000000000000000, 1.0000000000000000, 0.0000000000000000, 0.0000000000000000 },

@@ -22,11 +22,11 @@ public class Sparse {
    */
   private static Map<Class<?>, SparseAbstract<? extends OGArray<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, SparseOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, SparseOGSparseArray.getInstance());
-    s_functionPointers.put(OGDiagonalMatrix.class, SparseOGDiagonalArray.getInstance());
-//    s_functionPointers.put(OGPermutationArray.class, SparseOGPermutationArray.getInstance());
-//    s_functionPointers.put(OGComplexArray.class, SparseOGComplexArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, SparseOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, SparseOGSparseMatrix.getInstance());
+    s_functionPointers.put(OGDiagonalMatrix.class, SparseOGDiagonalMatrix.getInstance());
+//    s_functionPointers.put(OGPermutationArray.class, SparseOGPermutationMatrix.getInstance());
+//    s_functionPointers.put(OGComplexArray.class, SparseOGComplexMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

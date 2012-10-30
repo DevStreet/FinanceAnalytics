@@ -8,6 +8,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 /**
  * 
  */
-public class SparseOGComplexArray {
+public class SparseOGComplexMatrix {
 
 }

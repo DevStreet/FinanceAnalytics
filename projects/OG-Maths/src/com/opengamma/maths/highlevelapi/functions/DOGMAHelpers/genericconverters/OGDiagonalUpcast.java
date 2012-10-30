@@ -7,13 +7,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAHelpers.genericconverter
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse.SparseOGDiagonalArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse.SparseOGDiagonalMatrix;
 
 /**
  * 
  */
 public final class OGDiagonalUpcast implements GenericUpcast<OGDiagonalMatrix, OGSparseMatrix> {
-  private static SparseOGDiagonalArray s_sparse = SparseOGDiagonalArray.getInstance();
+  private static SparseOGDiagonalMatrix s_sparse = SparseOGDiagonalMatrix.getInstance();
   private static OGDiagonalUpcast s_instance = new OGDiagonalUpcast();
 
   public static OGDiagonalUpcast getInstance() {

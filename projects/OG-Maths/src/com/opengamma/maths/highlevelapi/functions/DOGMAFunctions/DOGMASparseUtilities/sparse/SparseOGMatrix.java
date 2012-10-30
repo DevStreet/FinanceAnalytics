@@ -13,15 +13,15 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Sparse's a OGDoubleArray
  */
-public final class SparseOGDoubleArray implements SparseAbstract<OGMatrix> {
+public final class SparseOGMatrix implements SparseAbstract<OGMatrix> {
 
-  private static SparseOGDoubleArray s_instance = new SparseOGDoubleArray();
+  private static SparseOGMatrix s_instance = new SparseOGMatrix();
 
-  public static SparseOGDoubleArray getInstance() {
+  public static SparseOGMatrix getInstance() {
     return s_instance;
   }
 
-  private SparseOGDoubleArray() {
+  private SparseOGMatrix() {
   }
 
   @Override
