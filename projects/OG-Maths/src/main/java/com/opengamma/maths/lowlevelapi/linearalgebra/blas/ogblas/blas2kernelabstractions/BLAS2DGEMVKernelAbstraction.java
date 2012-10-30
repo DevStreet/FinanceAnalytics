@@ -6,6 +6,7 @@
 package com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.blas2kernelabstractions;
 
 import com.opengamma.analytics.math.matrix.Matrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * BLAS2*KernelAbstraction classes are used to kinda emulate function pointer passing.
@@ -20,7 +21,7 @@ import com.opengamma.analytics.math.matrix.Matrix;
  * underscores in to split out the mathematical operations they perform for ease of reading.
  *
  */
-public abstract class BLAS2DGEMVKernelAbstraction<T extends Matrix<Double>> {
+public abstract class BLAS2DGEMVKernelAbstraction<T extends OGMatrix> {
   //public abstract  class  BLAS2DGEMVKernelAbstraction {
   /* Stateless manipulators */
   //  {
