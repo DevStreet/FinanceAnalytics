@@ -17,7 +17,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 /**
  * Tests the OGIndexArray Class
  */
-public class OGIndexTest {
+public class OGIndexMatrixTest {
 
   int[][] data4x3 = new int[][] { {1, 2, 3 }, {4, 5, 6 }, {7, 8, 9 }, {10, 11, 12 } };
   int[] data4x3unwound = new int[] {1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12 };

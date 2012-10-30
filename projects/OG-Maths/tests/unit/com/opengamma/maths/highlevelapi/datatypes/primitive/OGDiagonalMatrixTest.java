@@ -18,7 +18,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
 /**
  * Tests the {@link OGDiagonalMatrix} Class
  */
-public class OGDiagonalArrayTest {
+public class OGDiagonalMatrixTest {
 
   double[] data4x3diagd = new double[] {1, 2, 3 };
   double[][] data4x3full = new double[][] { {1.00, 0.00, 0.00 }, {0.00, 2.00, 0.00 }, {0.00, 0.00, 3.00 }, {0.00, 0.00, 0.00 } };

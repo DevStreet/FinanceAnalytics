@@ -21,7 +21,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
 /**
  * Tests the OGComlpexArray class 
  */
-public class OGComplexArrayTest {
+public class OGComplexMatrixTest {
 
   double[][] realdata4x3 = new double[][] { {1.00, 2.00, 3.00 }, {4.00, 5.00, 6.00 }, {7.00, 8.00, 9.00 }, {10.00, 11.00, 12.00 } };
   double[] realdata4x3unwound = new double[] {1.00, 4.00, 7.00, 10.00, 2.00, 5.00, 8.00, 11.00, 3.00, 6.00, 9.00, 12.00 };

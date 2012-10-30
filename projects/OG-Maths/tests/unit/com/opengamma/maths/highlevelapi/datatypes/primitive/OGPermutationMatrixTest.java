@@ -16,7 +16,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 /**
  * Tests the OGPermutation Array class
  */
-public class OGPermutationArrayTest {
+public class OGPermutationMatrixTest {
 
   int[] data = new int[] {3, 1, 2, 4, 0 };
   int[][] fullData = new int[][] {

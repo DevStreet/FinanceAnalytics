@@ -18,7 +18,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
 /**
  * Tests the OGDoubleArray Class
  */
-public class OGSparseArrayTest {
+public class OGSparseMatrixTest {
 
   double[][] data = { {1, 2, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } };
   double[] compressedData = {1.0, 3.0, 2.0, 5.0, 4.0, 6.0, 7.0 };
@@ -108,37 +108,37 @@ public class OGSparseArrayTest {
   // sending in bad ColumnPtr  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadColPtrTooLongTest() {
-    OGSparseMatrix D = new OGSparseMatrix(new int[] {0, 2, 4, 5, 6, 7 }, compressedRowIdx, compressedData, 4, 4);
+    new OGSparseMatrix(new int[] {0, 2, 4, 5, 6, 7 }, compressedRowIdx, compressedData, 4, 4);
   }
 
   // sending in bad ColumnPtr  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadColPtrValuesAreNotIncreasingTest() {
-    OGSparseMatrix D = new OGSparseMatrix(new int[] {0, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
+    new OGSparseMatrix(new int[] {0, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
   }
 
   // sending in bad ColumnPtr  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadColPtrValuesIsNegativeTest() {
-    OGSparseMatrix D = new OGSparseMatrix(new int[] {-1, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
+    new OGSparseMatrix(new int[] {-1, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
   }  
   
   // sending in bad rowIdx  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadRowIdxTooHighTest() {
-    OGSparseMatrix D = new OGSparseMatrix(compressedColPtr, new int[] {0, 1, 0, 2, 1, 6, 3 }, compressedData, 4, 4);
+    new OGSparseMatrix(compressedColPtr, new int[] {0, 1, 0, 2, 1, 6, 3 }, compressedData, 4, 4);
   }
 
   // sending in bad rowIdx  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadRowIdxTooLowTest() {
-    OGSparseMatrix D = new OGSparseMatrix(compressedColPtr, new int[] {0, 1, 0, 2, 1, -1, 3 }, compressedData, 4, 4);
+    new OGSparseMatrix(compressedColPtr, new int[] {0, 1, 0, 2, 1, -1, 3 }, compressedData, 4, 4);
   }
 
   // sending in bad rowIdx  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadRowIdxLengthTest() {
-    OGSparseMatrix D = new OGSparseMatrix(compressedColPtr, new int[] {0, 1, 0, 2, 1, 1 }, compressedData, 4, 4);
+    new OGSparseMatrix(compressedColPtr, new int[] {0, 1, 0, 2, 1, 1 }, compressedData, 4, 4);
   }
 
   // sending in ok  int[], int[], double[], int, int  constructor
