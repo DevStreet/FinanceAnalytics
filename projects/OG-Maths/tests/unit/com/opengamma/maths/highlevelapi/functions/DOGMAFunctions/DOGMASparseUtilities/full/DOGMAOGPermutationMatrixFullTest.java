@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 /**
  * tests full(permutation array) 
  */
-public class DOGMAOGPermutationArrayFullTest {
+public class DOGMAOGPermutationMatrixFullTest {
 
   private static FullOGPermutationMatrix f = FullOGPermutationMatrix.getInstance();
 

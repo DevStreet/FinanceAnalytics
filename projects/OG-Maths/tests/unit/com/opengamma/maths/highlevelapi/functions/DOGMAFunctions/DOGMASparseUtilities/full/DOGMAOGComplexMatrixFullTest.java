@@ -13,7 +13,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 /**
  * Tests full(OGDoubleArray) 
  */
-public class DOGMAOGComplexArrayFullTest {
+public class DOGMAOGComplexMatrixFullTest {
 
   private static FullOGComplexMatrix f = FullOGComplexMatrix.getInstance();
 
