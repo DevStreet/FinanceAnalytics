@@ -15,7 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * tests sparse on diag type
  */
-public class DOGMAOGDiagonalArraySparseTest {
+public class DOGMAOGDiagonalMatrixSparseTest {
 
   private static SparseOGDiagonalMatrix s_d2s = SparseOGDiagonalMatrix.getInstance();
   static double[] _data = new double[] {1, 2, 3, 4, 5 };

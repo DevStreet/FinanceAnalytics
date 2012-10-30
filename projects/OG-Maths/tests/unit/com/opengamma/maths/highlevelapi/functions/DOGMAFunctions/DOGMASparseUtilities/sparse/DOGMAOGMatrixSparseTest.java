@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * tests double ton sparse type
  */
-public class DOGMAOGDoubleArraySparseTest {
+public class DOGMAOGMatrixSparseTest {
 
   private static SparseOGSparseMatrix s_d2s = SparseOGSparseMatrix.getInstance();
   private static double[][] denseData = {{      0.0000000000000000,      0.0000000000000000,      0.0000000000000000,      0.0000000000000000,      3.0000000000000000},{      0.0000000000000000,      0.0000000000000000,     10.0000000000000000,      0.0000000000000000,      2.0000000000000000},{     10.0000000000000000,      0.0000000000000000,      4.0000000000000000,      1.0000000000000000,      0.0000000000000000},{      5.0000000000000000,      1.0000000000000000,      8.0000000000000000,      0.0000000000000000,      5.0000000000000000},{     10.0000000000000000,      0.0000000000000000,      0.0000000000000000,      0.0000000000000000,      0.0000000000000000}};
