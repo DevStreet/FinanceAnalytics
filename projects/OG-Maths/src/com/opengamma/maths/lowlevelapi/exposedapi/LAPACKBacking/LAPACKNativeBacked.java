@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 
-//import com.opengamma.maths.nativewrappers.OGLAPACKRawWrapper;
+import com.opengamma.maths.nativewrappers.OGLAPACKRawWrapper;
 
 /**
  * Native library backed LAPACK
  * TODO: enumerate the char pointers
  */
-public class LAPACKNativeBacked {/*extends LAPACKAbstractSuper implements LAPACKAPIInterface {
+public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPIInterface {
 
   @Override
   public void dgesvd(char jobu, char jobvt, int m, int n, double[] A, int lda, double[] S, double[] U, int ldu, double[] VT, int ldvt, double[] WORK, int lwork, int[] info) { // CSIGNORE
@@ -59,5 +59,4 @@ public class LAPACKNativeBacked {/*extends LAPACKAbstractSuper implements LAPACK
   public int ilaenv(int ispec, char[] name, char[] opts, int n1, int n2, int n3, int n4) {
     return OGLAPACKRawWrapper.ilaenv(new int[] {ispec}, name, opts, new int[] {n1},  new int[] {n2},  new int[] {n3},  new int[] {n4});
   }
-*/
 }

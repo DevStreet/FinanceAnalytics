@@ -38,8 +38,8 @@ public class SLATEC implements SLATECAPIInterface {
   public SLATEC(backing backedby) {
     if (backedby == backing.OGjava) {
       _localSLATEC = new SLATECOGJavaBacked();
-//    } else if (backedby == backing.OGnative) {
-//      _localSLATEC = new SLATECNativeBacked();
+    } else if (backedby == backing.OGnative) {
+      _localSLATEC = new SLATECNativeBacked();
     }
 
   }

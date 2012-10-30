@@ -6,11 +6,11 @@
 package com.opengamma.maths.lowlevelapi.exposedapi;
 
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAPIInterface;
+import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAbstractSuper;
+import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASNativeBacked;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASNetlibBacked;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASOGJavaBacked;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASReferenceJavaBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASNativeBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAbstractSuper;
 
 /**
  * Provides a unified interface to BLASs
@@ -50,8 +50,8 @@ public class BLAS implements BLASAPIInterface {
       _localBLAS = new BLASReferenceJavaBacked();
     } else if (backedby == backing.OGjava) {
       _localBLAS = new BLASOGJavaBacked();
-//    } else if (backedby == backing.OGnative) {
-//      _localBLAS = new BLASNativeBacked();
+    } else if (backedby == backing.OGnative) {
+      _localBLAS = new BLASNativeBacked();
     } else if (backedby == backing.Netlib) {
       _localBLAS = new BLASNetlibBacked();
     }
