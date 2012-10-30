@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 /**
  * Copies sparse arrays
  */
-public final class CopyOGSparseArray implements CopyAbstract<OGSparseMatrix> {
-  private static CopyOGSparseArray s_instance = new CopyOGSparseArray();
+public final class CopyOGSparseMatrix implements CopyAbstract<OGSparseMatrix> {
+  private static CopyOGSparseMatrix s_instance = new CopyOGSparseMatrix();
 
-  public static CopyOGSparseArray getInstance() {
+  public static CopyOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private CopyOGSparseArray() {
+  private CopyOGSparseMatrix() {
   }
 
   @Override

@@ -5,29 +5,29 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 
 /**
- * Copies OGDoubleArrays 
+ * Copies OGComplexArrays 
  */
-public final class CopyOGDoubleArray implements CopyAbstract<OGMatrix> {
-  private static CopyOGDoubleArray s_instance = new CopyOGDoubleArray();
+public final class CopyOGComplexMatrix implements CopyAbstract<OGComplexMatrix> {
+  private static CopyOGComplexMatrix s_instance = new CopyOGComplexMatrix();
 
-  public static CopyOGDoubleArray getInstance() {
+  public static CopyOGComplexMatrix getInstance() {
     return s_instance;
   }
 
-  private CopyOGDoubleArray() {
+  private CopyOGComplexMatrix() {
   }
 
   @Override
-  public OGMatrix copy(OGMatrix array1) {
+  public OGComplexMatrix copy(OGComplexMatrix array1) {
     final int n = array1.getData().length;
     final double [] tmp = new double[n];
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     System.arraycopy(array1.getData(), 0, tmp, 0, n);
-    return new OGMatrix(tmp, rows, cols);
+    return new OGComplexMatrix(tmp, rows, cols);
   }
 
 }

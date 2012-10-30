@@ -22,8 +22,8 @@ public class Copy {
    */
   private static Map<Class<?>, CopyAbstract<?>> s_functionPointers = new HashMap<Class<?>, CopyAbstract<?>>();
   static {
-    s_functionPointers.put(OGMatrix.class, CopyOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, CopyOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, CopyOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, CopyOGSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
