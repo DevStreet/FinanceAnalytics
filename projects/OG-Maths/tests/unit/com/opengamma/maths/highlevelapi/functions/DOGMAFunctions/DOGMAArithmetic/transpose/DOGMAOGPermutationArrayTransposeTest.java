@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
  */
 public class DOGMAOGPermutationArrayTransposeTest {
 
-  TransposeOGPermutationArray t = TransposeOGPermutationArray.getInstance();
+  TransposeOGPermutationMatrix t = TransposeOGPermutationMatrix.getInstance();
 
   int[] _data = new int[] {0,3,6,9,1,4,7,10,2,5,8,11};
   int[] _transposedata = new int [] {0,4,8,1,5,9,2,6,10,3,7,11};

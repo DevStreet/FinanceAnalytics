@@ -5,31 +5,31 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Transposes an OGIndexArray
+ * Transposes an OGDoubleArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class TransposeOGIndexArray implements TransposeAbstract<OGIndexMatrix> {
-  private static TransposeOGIndexArray s_instance = new TransposeOGIndexArray();
+public final class TransposeOGMatrix implements TransposeAbstract<OGMatrix> {
+  private static TransposeOGMatrix s_instance = new TransposeOGMatrix();
 
-  public static TransposeOGIndexArray getInstance() {
+  public static TransposeOGMatrix getInstance() {
     return s_instance;
   }
 
-  private TransposeOGIndexArray() {
+  private TransposeOGMatrix() {
   }
 
   @Override
-  public OGIndexMatrix transpose(OGIndexMatrix array1) {
+  public OGMatrix transpose(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int retRows = columnsArray1, retCols = rowsArray1;
-    int[] data = array1.getData();
-    int[] tmp = new int[rowsArray1 * columnsArray1];
+    double[] data = array1.getData();
+    double[] tmp = new double[rowsArray1 * columnsArray1];
 
     int ir;
     for (int i = 0; i < columnsArray1; i++) {
@@ -38,7 +38,7 @@ public final class TransposeOGIndexArray implements TransposeAbstract<OGIndexMat
         tmp[j * columnsArray1 + i] = data[ir + j];
       }
     }
-    return new OGIndexMatrix(tmp, retRows, retCols);
+    return new OGMatrix(tmp, retRows, retCols);
   }
 
 }

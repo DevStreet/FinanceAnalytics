@@ -17,12 +17,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGComplexArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDiagonalArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGIndexArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGPermutationArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGComplexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGIndexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGPermutationMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -35,12 +35,12 @@ public class Transpose {
    */
   private static Map<Class<?>, TransposeAbstract<?>> s_functionPointers = new HashMap<Class<?>, TransposeAbstract<?>>();
   static {
-    s_functionPointers.put(OGMatrix.class, TransposeOGDoubleArray.getInstance());
-    s_functionPointers.put(OGIndexMatrix.class, TransposeOGIndexArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, TransposeOGSparseArray.getInstance());
-    s_functionPointers.put(OGComplexMatrix.class, TransposeOGComplexArray.getInstance());
-    s_functionPointers.put(OGDiagonalMatrix.class, TransposeOGDiagonalArray.getInstance());
-    s_functionPointers.put(OGPermutationMatrix.class, TransposeOGPermutationArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, TransposeOGMatrix.getInstance());
+    s_functionPointers.put(OGIndexMatrix.class, TransposeOGIndexMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, TransposeOGSparseMatrix.getInstance());
+    s_functionPointers.put(OGComplexMatrix.class, TransposeOGComplexMatrix.getInstance());
+    s_functionPointers.put(OGDiagonalMatrix.class, TransposeOGDiagonalMatrix.getInstance());
+    s_functionPointers.put(OGPermutationMatrix.class, TransposeOGPermutationMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

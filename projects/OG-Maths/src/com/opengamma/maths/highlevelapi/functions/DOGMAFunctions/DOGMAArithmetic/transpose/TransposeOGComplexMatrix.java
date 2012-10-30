@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Transposes an OGComplexArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class TransposeOGComplexArray implements TransposeAbstract<OGComplexMatrix> {
-  private static TransposeOGComplexArray s_instance = new TransposeOGComplexArray();
+public final class TransposeOGComplexMatrix implements TransposeAbstract<OGComplexMatrix> {
+  private static TransposeOGComplexMatrix s_instance = new TransposeOGComplexMatrix();
 
-  public static TransposeOGComplexArray getInstance() {
+  public static TransposeOGComplexMatrix getInstance() {
     return s_instance;
   }
 
-  private TransposeOGComplexArray() {
+  private TransposeOGComplexMatrix() {
   }
 
   @Override

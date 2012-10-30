@@ -11,14 +11,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Transposes an OGSparseArray
  */
-public final class TransposeOGSparseArray implements TransposeAbstract<OGSparseMatrix> {
-  private static TransposeOGSparseArray s_instance = new TransposeOGSparseArray();
+public final class TransposeOGSparseMatrix implements TransposeAbstract<OGSparseMatrix> {
+  private static TransposeOGSparseMatrix s_instance = new TransposeOGSparseMatrix();
 
-  public static TransposeOGSparseArray getInstance() {
+  public static TransposeOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private TransposeOGSparseArray() {
+  private TransposeOGSparseMatrix() {
   }
 
   @Override

@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Transposes an OGDiagonalArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class TransposeOGDiagonalArray implements TransposeAbstract<OGDiagonalMatrix> {
-  private static TransposeOGDiagonalArray s_instance = new TransposeOGDiagonalArray();
+public final class TransposeOGDiagonalMatrix implements TransposeAbstract<OGDiagonalMatrix> {
+  private static TransposeOGDiagonalMatrix s_instance = new TransposeOGDiagonalMatrix();
 
-  public static TransposeOGDiagonalArray getInstance() {
+  public static TransposeOGDiagonalMatrix getInstance() {
     return s_instance;
   }
 
-  private TransposeOGDiagonalArray() {
+  private TransposeOGDiagonalMatrix() {
   }
 
   @Override

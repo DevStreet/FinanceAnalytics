@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGIndexArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGIndexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -23,7 +23,7 @@ public final class CtransposeOGIndexArray implements CtransposeAbstract<OGIndexM
   private CtransposeOGIndexArray() {
   }
   
-  private TransposeOGIndexArray _transpose = TransposeOGIndexArray.getInstance();
+  private TransposeOGIndexMatrix _transpose = TransposeOGIndexMatrix.getInstance();
 
 
   @Override

@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -22,7 +22,7 @@ public final class CtransposeOGSparseMatrix implements CtransposeAbstract<OGSpar
   private CtransposeOGSparseMatrix() {
   }
 
-  private TransposeOGSparseArray _transpose = TransposeOGSparseArray.getInstance();
+  private TransposeOGSparseMatrix _transpose = TransposeOGSparseMatrix.getInstance();
 
   @Override
   public OGSparseMatrix ctranspose(OGSparseMatrix array1) {
