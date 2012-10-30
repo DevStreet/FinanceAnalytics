@@ -5,14 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Transposes an OGSparseArray
  */
-public final class TransposeOGSparseArray extends TransposeAbstract<OGSparseArray> {
+public final class TransposeOGSparseArray implements TransposeAbstract<OGSparseArray> {
   private static TransposeOGSparseArray s_instance = new TransposeOGSparseArray();
 
   public static TransposeOGSparseArray getInstance() {
@@ -22,9 +21,8 @@ public final class TransposeOGSparseArray extends TransposeAbstract<OGSparseArra
   private TransposeOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> transpose(OGSparseArray array1) {
+  public OGSparseArray transpose(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();

@@ -12,7 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 /**
  * Does elementwise OGSparse * OGDouble
  */
-public final class TimesOGSparseArrayOGDoubleArray extends TimesAbstract<OGSparseArray, OGDoubleArray> {
+public final class TimesOGSparseArrayOGDoubleArray implements TimesAbstract<OGSparseArray, OGDoubleArray> {
   private static TimesOGSparseArrayOGDoubleArray s_instance = new TimesOGSparseArrayOGDoubleArray();
 
   public static TimesOGSparseArrayOGDoubleArray getInstance() {
@@ -26,9 +26,8 @@ public final class TimesOGSparseArrayOGDoubleArray extends TimesAbstract<OGSpars
   private static TimesOGDoubleArrayOGSparseArray s_reverse = TimesOGDoubleArrayOGSparseArray.getInstance();
   
   
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> times(OGSparseArray array1, OGDoubleArray array2) {
+  public OGArraySuper<? extends Number> times(OGSparseArray array1, OGDoubleArray array2) {
     return s_reverse.times(array2, array1);
   }
 

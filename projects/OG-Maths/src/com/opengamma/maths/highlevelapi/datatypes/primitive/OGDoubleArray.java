@@ -16,7 +16,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
  * High level API.
  * Dense matrix backed array magic.
  */
-public class OGDoubleArray extends OGArraySuper<Number> {
+public class OGDoubleArray extends OGArraySuper<Double> {
 
   private double[] _data;
   private int _columns;

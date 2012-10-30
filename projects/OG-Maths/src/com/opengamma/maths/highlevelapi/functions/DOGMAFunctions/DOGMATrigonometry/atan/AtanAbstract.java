@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.atan overload
  * @param <T> An OGArray type
  */
-public abstract class AtanAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> atan(T array1);
+public interface AtanAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> atan(T array1);
 }

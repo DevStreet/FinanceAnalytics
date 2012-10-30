@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.asin overload
  * @param <T> An OGArray type
  */
-public abstract class AsinAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> asin(T array1);
+public interface AsinAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> asin(T array1);
 }

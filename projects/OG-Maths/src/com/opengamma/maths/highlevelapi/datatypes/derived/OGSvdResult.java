@@ -7,7 +7,6 @@ package com.opengamma.maths.highlevelapi.datatypes.derived;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotRequested;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd;
 
 /**
@@ -15,9 +14,9 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlge
  */
 public class OGSvdResult {
 
-  private OGArraySuper<Number> _U; //CSIGNORE
-  private OGArraySuper<Number> _S; //CSIGNORE
-  private OGArraySuper<Number> _V; //CSIGNORE
+  private OGArraySuper<? extends Number> _U; //CSIGNORE
+  private OGArraySuper<? extends Number> _S; //CSIGNORE
+  private OGArraySuper<? extends Number> _V; //CSIGNORE
 
   /**
    * Constructs an SVD result, data is not copied just repointed as results are assumed to come from somewhere sane like {@link Svd}
@@ -25,7 +24,7 @@ public class OGSvdResult {
    * @param S
    * @param V
    */
-  public OGSvdResult(OGArraySuper<Number> U, OGArraySuper<Number> S, OGArraySuper<Number> V) { //CSIGNORE
+  public OGSvdResult(OGArraySuper<? extends Number> U, OGArraySuper<? extends Number> S, OGArraySuper<? extends Number> V) { //CSIGNORE
     _U = U;
     _S = S;
     _V = V;
@@ -35,7 +34,7 @@ public class OGSvdResult {
    * Gets the matrix U.
    * @return the matrix U.
    */
-  public OGArraySuper<Number> getU() {
+  public OGArraySuper<? extends Number> getU() {
     if (_U == null) {
       throw new MathsExceptionNotRequested("The matrix U was not requested to be computed at execution time.");
     }
@@ -46,7 +45,7 @@ public class OGSvdResult {
    * Gets the matrix S.
    * @return the matrix S
    */
-  public OGArraySuper<Number> getS() {
+  public OGArraySuper<? extends Number> getS() {
     if (_S == null) {
       throw new MathsExceptionNotRequested("The matrix S was not requested to be computed at execution time.");
     }
@@ -57,7 +56,7 @@ public class OGSvdResult {
    * Gets the matrix V.
    * @return the matrix V
    */
-  public OGArraySuper<Number> getV() {
+  public OGArraySuper<? extends Number> getV() {
     if (_V == null) {
       throw new MathsExceptionNotRequested("The matrix V was not requested to be computed at execution time.");
     }    

@@ -13,7 +13,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.sinh on OGSparse
  */
-public final class SinhOGSparseArray extends SinhAbstract<OGSparseArray> {
+public final class SinhOGSparseArray implements SinhAbstract<OGSparseArray> {
   private static SinhOGSparseArray s_instance = new SinhOGSparseArray();
 
   public static SinhOGSparseArray getInstance() {
@@ -23,7 +23,6 @@ public final class SinhOGSparseArray extends SinhAbstract<OGSparseArray> {
   private SinhOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray sinh(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

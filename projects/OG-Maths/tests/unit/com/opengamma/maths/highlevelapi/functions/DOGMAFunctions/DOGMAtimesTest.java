@@ -71,26 +71,26 @@ public class DOGMAtimesTest {
 
   @Test
   public void testDouble3x5AtimesDouble1x1Test() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, OGD1x1);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, OGD1x1);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
 
   @Test
   public void testDouble1x1timesDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGD1x1, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD1x1, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
 
   @Test
   public void testDouble3x5AtimesDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5Atimes3x5A));
 
   }
 
   @Test
   public void testDouble3x5AtimesDouble3x5BTest() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, OGD3x5B);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, OGD3x5B);
     assertTrue(tmp.equals(OGD3x5Atimes3x5B));
   }
 
@@ -102,19 +102,19 @@ public class DOGMAtimesTest {
 
   @Test
   public void testDouble3x5AtimesSparse1x1Test() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, OGS1x1);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, OGS1x1);
     assertTrue(tmp.equals(OGD3x5timesOGS1x1));
   }
 
   @Test
   public void testDouble1x1timesSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGD1x1, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD1x1, OGS3x5A);
     assertTrue(tmp.equals(OGD1x1timesOGS3x5));
   }
 
   @Test
   public void testDouble3x5AtimesSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, OGS3x5A);
     assertTrue(tmp.equals(OGD3x5AtimesOGS3x5A));
   }
 
@@ -126,19 +126,19 @@ public class DOGMAtimesTest {
 
   @Test
   public void testSparse3x5AtimesDouble1x1Test() {
-    OGArraySuper<Number> tmp = DA.times(OGS3x5A, OGD1x1);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS3x5A, OGD1x1);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
 
   @Test
   public void testSparse1x1timesDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGS1x1, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS1x1, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1timesOGD3x5));
   }
 
   @Test
   public void testSparse3x5AtimesDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGS3x5A, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS3x5A, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5AtimesOGS3x5A));
   }
 
@@ -150,19 +150,19 @@ public class DOGMAtimesTest {
 
   @Test
   public void testSparse3x5AtimesSparse1x1Test() {
-    OGArraySuper<Number> tmp = DA.times(OGS3x5A, OGS1x1);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS3x5A, OGS1x1);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
 
   @Test
   public void testSparse1x1timesSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGS1x1, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS1x1, OGS3x5A);
     assertTrue(tmp.equals(OGD1x1timesOGS3x5));
   }
 
   @Test
   public void testSparse3x5AtimesSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(OGS3x5A, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS3x5A, OGS3x5A);
     assertTrue(tmp.equals(OGS3x5AtimesOGS3x5A));
   }  
   
@@ -171,49 +171,49 @@ public class DOGMAtimesTest {
   // OGDoubleArray operate on natives
   @Test
   public void testDouble3x5AtimesdoubleTest() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, 10.e0);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, 10.e0);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
 
   @Test
   public void testDouble3x5AtimesintTest() {
-    OGArraySuper<Number> tmp = DA.times(OGD3x5A, 10);
+    OGArraySuper<? extends Number> tmp = DA.times(OGD3x5A, 10);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
 
   @Test
   public void testdoubletimesDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(10.e0, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(10.e0, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
 
   @Test
   public void testinttimesDouble3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(10, OGD3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(10, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
   // OGSparseArray operate on natives
   @Test
   public void testSparse3x5AtimesdoubleTest() {
-    OGArraySuper<Number> tmp = DA.times(OGS3x5A, 10.e0);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS3x5A, 10.e0);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
 
   @Test
   public void testSparse3x5AtimesintTest() {
-    OGArraySuper<Number> tmp = DA.times(OGS3x5A, 10);
+    OGArraySuper<? extends Number> tmp = DA.times(OGS3x5A, 10);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
 
   @Test
   public void testdoubletimesSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(10.e0, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(10.e0, OGS3x5A);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
 
   @Test
   public void testinttimesSparse3x5ATest() {
-    OGArraySuper<Number> tmp = DA.times(10, OGS3x5A);
+    OGArraySuper<? extends Number> tmp = DA.times(10, OGS3x5A);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
   

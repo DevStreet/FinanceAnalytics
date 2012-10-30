@@ -19,128 +19,128 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMARearrangi
 public class DOGMARearrangingMatrices implements DOGMARearrangingMatricesAPI {
   private final Copy _copy = new Copy();
   @Override
-  public OGArraySuper<Number> cat(OGIndexArray dim, OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> cat(OGIndexArray dim, OGArraySuper<? extends Number>... array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> diag(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> diag(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> flipdim(OGArraySuper<Number> array, OGIndexArray dim) {
+  public OGArraySuper<? extends Number> flipdim(OGArraySuper<? extends Number> array, OGIndexArray dim) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> fliplr(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> fliplr(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> flipud(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> flipud(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> horzcat(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> horzcat(OGArraySuper<? extends Number>... array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> ipermute(OGArraySuper<Number> array, OGPermutationArray perm) {
+  public OGArraySuper<? extends Number> ipermute(OGArraySuper<? extends Number> array, OGPermutationArray perm) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> permute(OGArraySuper<Number> array, OGPermutationArray perm) {
+  public OGArraySuper<? extends Number> permute(OGArraySuper<? extends Number> array, OGPermutationArray perm) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> postpad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c) {
+  public OGArraySuper<? extends Number> postpad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> postpad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c, OGIndexArray dim) {
+  public OGArraySuper<? extends Number> postpad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c, OGIndexArray dim) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> prepad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c) {
+  public OGArraySuper<? extends Number> prepad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> prepad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c, OGIndexArray dim) {
+  public OGArraySuper<? extends Number> prepad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c, OGIndexArray dim) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> reshape(OGArraySuper<Number> array, OGIndexArray rows, OGIndexArray columns) {
+  public OGArraySuper<? extends Number> reshape(OGArraySuper<? extends Number> array, OGIndexArray rows, OGIndexArray columns) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> resize(OGArraySuper<Number> array, OGIndexArray rows, OGIndexArray columns) {
+  public OGArraySuper<? extends Number> resize(OGArraySuper<? extends Number> array, OGIndexArray rows, OGIndexArray columns) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> rot90(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> rot90(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> rot90(OGArraySuper<Number> array, OGIndexArray increments) {
+  public OGArraySuper<? extends Number> rot90(OGArraySuper<? extends Number> array, OGIndexArray increments) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sort(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> sort(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sort(OGArraySuper<Number> array, String order) {
+  public OGArraySuper<? extends Number> sort(OGArraySuper<? extends Number> array, String order) {
     return null;
   }
 
   @Override
-  public OGSortResult<OGArraySuper<Number>> sort(OGArraySuper<Number> array, OGIndexArray dim, String order) {
+  public OGSortResult<OGArraySuper<? extends Number>> sort(OGArraySuper<? extends Number> array, OGIndexArray dim, String order) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sortrows(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> sortrows(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sortrows(OGArraySuper<Number> array, OGIndexArray columnIndex) {
+  public OGArraySuper<? extends Number> sortrows(OGArraySuper<? extends Number> array, OGIndexArray columnIndex) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> triu(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> triu(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> tril(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> tril(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> vertcat(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> vertcat(OGArraySuper<? extends Number>... array) {
     return null;
   }
 
  
   @Override
-  public OGArraySuper<Number> copy(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> copy(OGArraySuper<? extends Number> array) {
     return _copy.copy(array);
   }
 

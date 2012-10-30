@@ -31,14 +31,14 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
 
   /* ADD */
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number>... array) {
     if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
       Catchers.catchNaN(array[0]);
     }
     if (DOGMAconfig.getHaltOnInfOnFunctionEntry()) {
       Catchers.catchInf(array[0]);
     }
-    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+    OGArraySuper<? extends Number> tmp = _copy.copy(array[0]);
     for (int i = 1; i < array.length; i++) {
       if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
         Catchers.catchNaN(array[i]);
@@ -58,8 +58,8 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
-    OGArraySuper<Number> ret = null;
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
+    OGArraySuper<? extends Number> ret = null;
     if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
       Catchers.catchNaN(array1);
       Catchers.catchNaN(array2);
@@ -79,8 +79,8 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double aNumber) {
-    OGArraySuper<Number> ret = null;
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number> array1, double aNumber) {
+    OGArraySuper<? extends Number> ret = null;
     if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
       Catchers.catchNaN(array1);
       Catchers.catchNaN(aNumber);
@@ -100,8 +100,8 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, int aNumber) {
-    OGArraySuper<Number> ret = null;
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number> array1, int aNumber) {
+    OGArraySuper<? extends Number> ret = null;
     if (DOGMAconfig.getHaltOnNaNOnFunctionEntry()) {
       Catchers.catchNaN(array1);
     }
@@ -120,8 +120,8 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
 
   /* SUBTRACT */
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number>... array) {
-    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number>... array) {
+    OGArraySuper<? extends Number> tmp = _copy.copy(array[0]);
     for (int i = 1; i < array.length; i++) {
       tmp = _plusMinus.minus(tmp, array[i]);
     }
@@ -129,77 +129,77 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return _plusMinus.minus(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, double aNumber) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number> array1, double aNumber) {
     return minus(array1, new OGDoubleArray(aNumber));
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, int aNumber) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number> array1, int aNumber) {
     return minus(array1, new OGDoubleArray(aNumber));
   }
 
   /* LDIVIDE */
 
   @Override
-  public OGArraySuper<Number> ldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> ldivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     throw new MathsExceptionNotImplemented("ldivide not implemented yet");
   }
 
   /* MLDIVIDE */
 
   @Override
-  public OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mldivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     throw new MathsExceptionNotImplemented("mldivide not implemented yet");
   }
 
   /* RDIVIDE */
 
   @Override
-  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> rdivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return _rdivide.rdivide(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, double number) {
+  public OGArraySuper<? extends Number> rdivide(OGArraySuper<? extends Number> array1, double number) {
     return _rdivide.rdivide(array1, new OGDoubleArray(number));
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number) {
+  public OGArraySuper<? extends Number> rdivide(OGArraySuper<? extends Number> array1, int number) {
     return _rdivide.rdivide(array1, new OGDoubleArray(number));
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(double number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> rdivide(double number, OGArraySuper<? extends Number> array1) {
     return _rdivide.rdivide(new OGDoubleArray(number), array1);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(int number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> rdivide(int number, OGArraySuper<? extends Number> array1) {
     return _rdivide.rdivide(new OGDoubleArray(number), array1);
   }
 
   /* MRDIVIDE */
 
   @Override
-  public OGArraySuper<Number> mrdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mrdivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     throw new MathsExceptionNotImplemented("mrdivide not implemented yet");
   }
 
   /* TIMES */
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return _times.times(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number>... array) {
-    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number>... array) {
+    OGArraySuper<? extends Number> tmp = _copy.copy(array[0]);
     for (int i = 1; i < array.length; i++) {
       tmp = _times.times(tmp, array[i]);
     }
@@ -207,29 +207,29 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number> array1, double number) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number> array1, double number) {
     return _times.times(array1, new OGDoubleArray(number));
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number> array1, int number) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number> array1, int number) {
     return _times.times(array1, new OGDoubleArray(number));
   }
 
   @Override
-  public OGArraySuper<Number> times(double number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> times(double number, OGArraySuper<? extends Number> array1) {
     return _times.times(array1, new OGDoubleArray(number));
   }
 
   @Override
-  public OGArraySuper<Number> times(int number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> times(int number, OGArraySuper<? extends Number> array1) {
     return _times.times(array1, new OGDoubleArray(number));
   }
 
   /* MTIMES */
   @Override
-  public OGArraySuper<Number> mtimes(OGArraySuper<Number>... array) {
-    OGArraySuper<Number> tmp = _copy.copy(array[0]);
+  public OGArraySuper<? extends Number> mtimes(OGArraySuper<? extends Number>... array) {
+    OGArraySuper<? extends Number> tmp = _copy.copy(array[0]);
     for (int i = 1; i < array.length; i++) {
       tmp = _mtimes.mtimes(tmp, array[i]);
     }
@@ -237,25 +237,25 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   }
 
   @Override
-  public OGArraySuper<Number> mtimes(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mtimes(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return _mtimes.mtimes(array1, array2);
   }
 
   /* POWER */
   @Override
-  public OGArraySuper<Number> power(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> power(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     throw new MathsExceptionNotImplemented("power not implemented yet");
   }
 
   /* MPOWER */
   @Override
-  public OGArraySuper<Number> mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mpower(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     throw new MathsExceptionNotImplemented("mpower not implemented yet");
   }
 
   /* TRANSPOSE */
   @Override
-  public OGArraySuper<Number> transpose(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> transpose(OGArraySuper<? extends Number> array) {
     return _transpose.transpose(array);
   }
 

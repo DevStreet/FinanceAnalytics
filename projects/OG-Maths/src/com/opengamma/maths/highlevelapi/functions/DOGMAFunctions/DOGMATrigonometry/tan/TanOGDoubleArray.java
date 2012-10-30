@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.tan on OGDouble
  */
-public final class TanOGDoubleArray extends TanAbstract<OGDoubleArray> {
+public final class TanOGDoubleArray implements TanAbstract<OGDoubleArray> {
   private static TanOGDoubleArray s_instance = new TanOGDoubleArray();
 
   public static TanOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class TanOGDoubleArray extends TanAbstract<OGDoubleArray> {
   private TanOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray tan(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

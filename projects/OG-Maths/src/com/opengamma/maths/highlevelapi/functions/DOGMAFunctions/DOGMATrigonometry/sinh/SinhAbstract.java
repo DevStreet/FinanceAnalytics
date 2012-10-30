@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.sinh overload
  * @param <T> An OGArray type
  */
-public abstract class SinhAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> sinh(T array1);
+public interface SinhAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> sinh(T array1);
 }

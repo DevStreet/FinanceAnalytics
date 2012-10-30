@@ -16,10 +16,10 @@ import com.opengamma.maths.lowlevelapi.io.smartImport.SnortDataProperties;
  */
 public class SmartImport {
 
-  public OGArraySuper<Number> fromNativeDoubleDouble(double[][] aMatrix) {
+  public OGArraySuper<Double> fromNativeDoubleDouble(double[][] aMatrix) {
     SnortDataProperties snorter = new SnortDataProperties(aMatrix);
 
-    OGArraySuper<Number> ret = null;
+    OGArraySuper<Double> ret = null;
 
     switch (snorter.getMatrixType()) {
       case upperTriangular:
@@ -42,8 +42,8 @@ public class SmartImport {
    * @param o the orientation the vector should be
    * @return an OGArraySuper type 
    */
-  public OGArraySuper<Number> fromNativeDouble(double[] aVector, orientation o) {
-    OGArraySuper<Number> ret = null;
+  public OGArraySuper<Double> fromNativeDouble(double[] aVector, orientation o) {
+    OGArraySuper<Double> ret = null;
     switch (o) {
       case row:
         ret = new OGDoubleArray(aVector, 1, aVector.length);

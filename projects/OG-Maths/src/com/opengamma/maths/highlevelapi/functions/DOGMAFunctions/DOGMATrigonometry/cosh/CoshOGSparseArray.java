@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.cosh on OGSparse
  */
-public final class CoshOGSparseArray extends CoshAbstract<OGSparseArray> {
+public final class CoshOGSparseArray implements CoshAbstract<OGSparseArray> {
   private static CoshOGSparseArray s_instance = new CoshOGSparseArray();
 
   public static CoshOGSparseArray getInstance() {
@@ -24,7 +24,6 @@ public final class CoshOGSparseArray extends CoshAbstract<OGSparseArray> {
   private CoshOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray cosh(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

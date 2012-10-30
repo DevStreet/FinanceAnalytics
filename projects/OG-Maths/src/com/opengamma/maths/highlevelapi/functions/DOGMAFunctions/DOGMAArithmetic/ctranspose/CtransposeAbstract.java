@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Class holder for the transpose operation
  * @param <T> An OGArray type
  */
-public abstract class CtransposeAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> ctranspose(T array1);
+public interface CtransposeAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  T ctranspose(T array1);
 }

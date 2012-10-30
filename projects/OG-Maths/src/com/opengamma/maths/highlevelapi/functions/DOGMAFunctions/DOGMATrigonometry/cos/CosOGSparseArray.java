@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.cos on OGSparse
  */
-public final class CosOGSparseArray extends CosAbstract<OGSparseArray> {
+public final class CosOGSparseArray implements CosAbstract<OGSparseArray> {
   private static CosOGSparseArray s_instance = new CosOGSparseArray();
 
   public static CosOGSparseArray getInstance() {
@@ -24,7 +24,6 @@ public final class CosOGSparseArray extends CosAbstract<OGSparseArray> {
   private CosOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray cos(OGSparseArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

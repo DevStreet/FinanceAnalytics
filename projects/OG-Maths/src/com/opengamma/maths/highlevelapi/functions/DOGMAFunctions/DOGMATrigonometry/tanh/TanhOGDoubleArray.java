@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.tanh on OGDouble
  */
-public final class TanhOGDoubleArray extends TanhAbstract<OGDoubleArray> {
+public final class TanhOGDoubleArray implements TanhAbstract<OGDoubleArray> {
   private static TanhOGDoubleArray s_instance = new TanhOGDoubleArray();
 
   public static TanhOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class TanhOGDoubleArray extends TanhAbstract<OGDoubleArray> {
   private TanhOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray tanh(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

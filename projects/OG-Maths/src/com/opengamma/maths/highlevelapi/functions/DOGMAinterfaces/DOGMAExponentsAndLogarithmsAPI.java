@@ -16,6 +16,6 @@ public interface DOGMAExponentsAndLogarithmsAPI {
    * @param array1 the array
    * @return the element wise square root of the array
    */
-  OGArraySuper<Number> sqrt(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> sqrt(OGArraySuper<? extends Number> array1);
   
 }

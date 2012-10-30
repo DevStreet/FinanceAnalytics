@@ -12,7 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 /**
  * Adds {@link OGDiagonalArray} to {@link OGDoubleArray} 
  */
-public final class PlusOGDiagonalArrayOGDoubleArray extends PlusMinusAbstract<OGDiagonalArray, OGDoubleArray> {
+public final class PlusOGDiagonalArrayOGDoubleArray implements PlusMinusAbstract<OGDiagonalArray, OGDoubleArray> {
   private static PlusOGDiagonalArrayOGDoubleArray s_instance = new PlusOGDiagonalArrayOGDoubleArray();
 
   public static PlusOGDiagonalArrayOGDoubleArray getInstance() {
@@ -24,9 +24,8 @@ public final class PlusOGDiagonalArrayOGDoubleArray extends PlusMinusAbstract<OG
 
   private static PlusOGDoubleArrayOGDiagonalArray s_reverse = PlusOGDoubleArrayOGDiagonalArray.getInstance();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plusminus(OGDiagonalArray array1, OGDoubleArray array2, int op) {
+  public OGArraySuper<? extends Number> plusminus(OGDiagonalArray array1, OGDoubleArray array2, int op) {
     return s_reverse.plusminus(array2, array1, op);
   }
 

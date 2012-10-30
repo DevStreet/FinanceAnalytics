@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Math.tan overload
  * @param <T> An OGArray type
  */
-public abstract class TanAbstract<T extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> tan(T array1);
+public interface TanAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> tan(T array1);
 }

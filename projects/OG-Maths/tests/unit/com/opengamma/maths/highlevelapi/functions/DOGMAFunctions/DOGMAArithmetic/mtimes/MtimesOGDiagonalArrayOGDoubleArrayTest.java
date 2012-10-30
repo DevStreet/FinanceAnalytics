@@ -56,7 +56,7 @@ public class MtimesOGDiagonalArrayOGDoubleArrayTest {
   MtimesOGDiagonalArrayOGDoubleArray mtimes = MtimesOGDiagonalArrayOGDoubleArray.getInstance();
 
   DOGMA dogma = new DOGMA();
-  OGArraySuper<Number> tmp;
+  OGArraySuper<? extends Number> tmp;
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void null1Test() {

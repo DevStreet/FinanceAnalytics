@@ -7,7 +7,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -15,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGDouble / OGSparse
  */
-public final class RdivideOGDoubleArrayOGSparseArray extends RdivideAbstract<OGDoubleArray, OGSparseArray> {
+public final class RdivideOGDoubleArrayOGSparseArray implements RdivideAbstract<OGDoubleArray, OGSparseArray> {
   private static RdivideOGDoubleArrayOGSparseArray s_instance = new RdivideOGDoubleArrayOGSparseArray();
 
   public static RdivideOGDoubleArrayOGSparseArray getInstance() {
@@ -25,9 +24,8 @@ public final class RdivideOGDoubleArrayOGSparseArray extends RdivideAbstract<OGD
   private RdivideOGDoubleArrayOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> rdivide(OGDoubleArray array1, OGSparseArray array2) {
+  public OGDoubleArray rdivide(OGDoubleArray array1, OGSparseArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -45,7 +43,7 @@ public final class RdivideOGDoubleArrayOGSparseArray extends RdivideAbstract<OGD
     double[] tmp = null;
     int n;
     int denseOffset = 0;
-    OGArraySuper<Number> ret = null;
+    OGDoubleArray ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued DenseMatrix rdivide Sparse
       n = rowsArray2 * columnsArray2;

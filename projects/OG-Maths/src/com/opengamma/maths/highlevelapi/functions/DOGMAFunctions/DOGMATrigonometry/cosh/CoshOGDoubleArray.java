@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class CoshOGDoubleArray extends CoshAbstract<OGDoubleArray> {
+public final class CoshOGDoubleArray implements CoshAbstract<OGDoubleArray> {
   private static CoshOGDoubleArray s_instance = new CoshOGDoubleArray();
 
   public static CoshOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class CoshOGDoubleArray extends CoshAbstract<OGDoubleArray> {
   private CoshOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray cosh(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

@@ -11,6 +11,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * Catches Infss
  * @param <T> An OGArray type
  */
-public abstract class CatchInfAbstract<T extends OGArraySuper<Number>> {
+public abstract class CatchInfAbstract<T extends OGArraySuper<? extends Number>> {
   public abstract void catchinf(T array1);
 }

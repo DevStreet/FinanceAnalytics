@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Holds a "diagonal" array
  */
-public class OGDiagonalArray extends OGArraySuper<Number> {
+public class OGDiagonalArray extends OGArraySuper<Double> {
 
   private double[] _data;
   private int _columns;

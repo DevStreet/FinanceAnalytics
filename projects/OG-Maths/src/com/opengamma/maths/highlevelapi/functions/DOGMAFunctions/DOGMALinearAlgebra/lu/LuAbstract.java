@@ -13,6 +13,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlge
  *  Abstract for LU calls
  *  @param <T> is an OGArraySuper type
  */
-public abstract class LuAbstract<T extends OGArraySuper<Number>> {
-  public abstract OGLuResult lu(T array1, compute these);
+public interface LuAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGLuResult lu(T array1, compute these);
 }

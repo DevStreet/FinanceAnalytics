@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erf;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
@@ -13,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 /**
  * Does erf on OGDoubleArray
  */
-public final class ErfOGDoubleArray extends ErfAbstract<OGDoubleArray> {
+public final class ErfOGDoubleArray implements ErfAbstract<OGDoubleArray> {
   private static ErfOGDoubleArray s_instance = new ErfOGDoubleArray();
 
   public static ErfOGDoubleArray getInstance() {
@@ -23,9 +22,8 @@ public final class ErfOGDoubleArray extends ErfAbstract<OGDoubleArray> {
   private ErfOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> erf(OGDoubleArray array1) {
+  public OGDoubleArray erf(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();

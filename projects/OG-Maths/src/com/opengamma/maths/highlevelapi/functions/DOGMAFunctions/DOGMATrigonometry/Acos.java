@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
@@ -25,14 +25,14 @@ public class Acos {
   /**
    * hashmapped function pointers
    */
-  private static Map<Class<?>, AcosAbstract<?>> s_functionPointers = new HashMap<Class<?>, AcosAbstract<?>>();
+  private static Map<Class<?>, AcosAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
     s_functionPointers.put(OGDoubleArray.class, AcosOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, AcosOGSparseArray.getInstance());
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> acos(T array1) {
+  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> acos(T array1) {
     Catchers.catchNullFromArgList(array1, 1);
     AcosAbstract<T> use = (AcosAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {

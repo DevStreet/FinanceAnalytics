@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -13,7 +12,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Conjugate Transposes an OGComplexArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class CtransposeOGComplexArray extends CtransposeAbstract<OGComplexArray> {
+public final class CtransposeOGComplexArray implements CtransposeAbstract<OGComplexArray> {
   private static CtransposeOGComplexArray s_instance = new CtransposeOGComplexArray();
 
   public static CtransposeOGComplexArray getInstance() {
@@ -23,9 +22,8 @@ public final class CtransposeOGComplexArray extends CtransposeAbstract<OGComplex
   private CtransposeOGComplexArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> ctranspose(OGComplexArray array1) {
+  public OGComplexArray ctranspose(OGComplexArray array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();

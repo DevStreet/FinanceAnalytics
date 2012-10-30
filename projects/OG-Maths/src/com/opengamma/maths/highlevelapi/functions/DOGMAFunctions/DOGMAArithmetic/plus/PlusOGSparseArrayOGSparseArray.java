@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGSparseArrayOGSparseArray extends PlusMinusAbstract<OGSparseArray, OGSparseArray> {
+public final class PlusOGSparseArrayOGSparseArray implements PlusMinusAbstract<OGSparseArray, OGSparseArray> {
   private static PlusOGSparseArrayOGSparseArray s_instance = new PlusOGSparseArrayOGSparseArray();
 
   public static PlusOGSparseArrayOGSparseArray getInstance() {
@@ -25,9 +25,8 @@ public final class PlusOGSparseArrayOGSparseArray extends PlusMinusAbstract<OGSp
   private PlusOGSparseArrayOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plusminus(OGSparseArray array1, OGSparseArray array2, final int op) {
+  public OGArraySuper<? extends Number> plusminus(OGSparseArray array1, OGSparseArray array2, final int op) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -39,7 +38,7 @@ public final class PlusOGSparseArrayOGSparseArray extends PlusMinusAbstract<OGSp
 
     double[] tmp = null;
 
-    OGArraySuper<Number> retArray = null;
+    OGArraySuper<? extends Number> retArray = null;
 
     // Actually adding arrays
 

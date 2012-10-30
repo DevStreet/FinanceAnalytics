@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class SinhOGDoubleArray extends SinhAbstract<OGDoubleArray> {
+public final class SinhOGDoubleArray implements SinhAbstract<OGDoubleArray> {
   private static SinhOGDoubleArray s_instance = new SinhOGDoubleArray();
 
   public static SinhOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class SinhOGDoubleArray extends SinhAbstract<OGDoubleArray> {
   private SinhOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray sinh(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);

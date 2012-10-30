@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGDouble * OGSparse
  */
-public final class TimesOGDoubleArrayOGSparseArray extends TimesAbstract<OGDoubleArray, OGSparseArray> {
+public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGDoubleArray, OGSparseArray> {
   private static TimesOGDoubleArrayOGSparseArray s_instance = new TimesOGDoubleArrayOGSparseArray();
 
   public static TimesOGDoubleArrayOGSparseArray getInstance() {
@@ -26,9 +26,8 @@ public final class TimesOGDoubleArrayOGSparseArray extends TimesAbstract<OGDoubl
 
   private BLAS _localblas = new BLAS();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> times(OGDoubleArray array1, OGSparseArray array2) {
+  public OGArraySuper<? extends Number> times(OGDoubleArray array1, OGSparseArray array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -41,7 +40,7 @@ public final class TimesOGDoubleArrayOGSparseArray extends TimesAbstract<OGDoubl
 
     double[] tmp = null;
     int n;
-    OGArraySuper<Number> ret = null;
+    OGArraySuper<? extends Number> ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued DenseMatrix times Sparse = scaled Sparse 
       n = array2.getData().length;

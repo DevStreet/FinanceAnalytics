@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalArray;
@@ -23,7 +23,7 @@ public class Full {
   /**
    * hashmapped function pointers
    */
-  private static Map<Class<?>, FullAbstract<?>> s_functionPointers = new HashMap<Class<?>, FullAbstract<?>>();
+  private static Map<Class<? extends OGArraySuper<? extends Number>>, FullAbstract<? extends OGArraySuper<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
     s_functionPointers.put(OGDoubleArray.class, FullOGDoubleArray.getInstance());
     s_functionPointers.put(OGSparseArray.class, FullOGSparseArray.getInstance());
@@ -33,7 +33,7 @@ public class Full {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> full(T array1) {
+  public <T extends OGArraySuper<U>, U extends Number> OGArraySuper<? extends Number> full(T array1) {
     FullAbstract<T> use = (FullAbstract<T>) s_functionPointers.get(array1.getClass());
     return use.full(array1);
   }

@@ -17,62 +17,62 @@ public interface DOGMATrigonometaryAPI {
    * @param array1 the first array
    * @return the sin() of each element of array1
    */
-  OGArraySuper<Number> sin(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> sin(OGArraySuper<? extends Number> array1);
   
   /**
    * Performs vectorised cos()
    * @param array1 the first array
    * @return the cos() of each element of array1
    */
-  OGArraySuper<Number> cos(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> cos(OGArraySuper<? extends Number> array1);
   
   /**
    * Performs vectorised tan()
    * @param array1 the first array
    * @return the tan() of each element of array1
    */
-  OGArraySuper<Number> tan(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> tan(OGArraySuper<? extends Number> array1);
   
   /**
    * Performs vectorised asin()
    * @param array1 the first array
    * @return the asin() of each element of array1
    */
-  OGArraySuper<Number> asin(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> asin(OGArraySuper<? extends Number> array1);
   
   /**
    * Performs vectorised acos()
    * @param array1 the first array
    * @return the acos() of each element of array1
    */
-  OGArraySuper<Number> acos(OGArraySuper<Number> array1);  
+  OGArraySuper<? extends Number> acos(OGArraySuper<? extends Number> array1);  
 
   /**
    * Performs vectorised atan()
    * @param array1 the first array
    * @return the atan() of each element of array1
    */
-  OGArraySuper<Number> atan(OGArraySuper<Number> array1);  
+  OGArraySuper<? extends Number> atan(OGArraySuper<? extends Number> array1);  
 
   /**
    * Performs vectorised sinh()
    * @param array1 the first array
    * @return the sinh() of each element of array1
    */
-  OGArraySuper<Number> sinh(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> sinh(OGArraySuper<? extends Number> array1);
   
   /**
    * Performs vectorised cosh()
    * @param array1 the first array
    * @return the cosh() of each element of array1
    */
-  OGArraySuper<Number> cosh(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> cosh(OGArraySuper<? extends Number> array1);
   
   /**
    * Performs vectorised tanh()
    * @param array1 the first array
    * @return the tanh() of each element of array1
    */
-  OGArraySuper<Number> tanh(OGArraySuper<Number> array1);
+  OGArraySuper<? extends Number> tanh(OGArraySuper<? extends Number> array1);
   
 }

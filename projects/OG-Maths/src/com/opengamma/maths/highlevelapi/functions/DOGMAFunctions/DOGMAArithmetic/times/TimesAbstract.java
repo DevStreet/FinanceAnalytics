@@ -12,6 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public abstract class TimesAbstract<T extends OGArraySuper<Number>, S extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> times(T array1, S array2);
+public interface TimesAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> times(T array1, S array2);
 }

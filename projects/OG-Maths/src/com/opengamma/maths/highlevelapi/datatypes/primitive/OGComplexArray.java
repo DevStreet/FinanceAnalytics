@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 /**
  * OGComplex Array type (essentially an interleaved OGDoubleArray, byte aligned contiguous malloc of backing data required and assumed
  */
-public class OGComplexArray extends OGArraySuper<Number> {
+public class OGComplexArray extends OGArraySuper<ComplexType> {
 
   private double[] _data;
   private int _columns;

@@ -13,6 +13,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlge
  *  Abstract for SVD calls
  *  @param <T> is an OGArraySuper type
  */
-public abstract class SvdAbstract<T extends OGArraySuper<Number>> {
-  public abstract OGSvdResult svd(T array1, compute these);
+public interface SvdAbstract<T extends OGArraySuper<? extends Number>> {
+  
+  OGSvdResult svd(T array1, compute these);
 }

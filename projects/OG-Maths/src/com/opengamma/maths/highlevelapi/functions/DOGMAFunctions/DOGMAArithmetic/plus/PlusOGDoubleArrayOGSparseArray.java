@@ -7,14 +7,13 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDoubleArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseArray;
 
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGDoubleArrayOGSparseArray extends PlusMinusAbstract<OGDoubleArray, OGSparseArray> {
+public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<OGDoubleArray, OGSparseArray> {
   private static PlusOGDoubleArrayOGSparseArray s_instance = new PlusOGDoubleArrayOGSparseArray();
 
   public static PlusOGDoubleArrayOGSparseArray getInstance() {
@@ -24,9 +23,8 @@ public final class PlusOGDoubleArrayOGSparseArray extends PlusMinusAbstract<OGDo
   private PlusOGDoubleArrayOGSparseArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public OGArraySuper<Number> plusminus(OGDoubleArray array1, OGSparseArray array2, final int op) {
+  public OGDoubleArray plusminus(OGDoubleArray array1, OGSparseArray array2, final int op) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -35,7 +33,7 @@ public final class PlusOGDoubleArrayOGSparseArray extends PlusMinusAbstract<OGDo
 
     double[] tmp = null;
 
-    OGArraySuper<Number> retArray = null;
+    OGDoubleArray retArray = null;
 
     // Actually adding arrays
 

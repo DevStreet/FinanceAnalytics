@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Contains information about permutation patterns in a 2D matrix
  * Underneath it's essentially a vector
  */
-public class OGPermutationArray extends OGArraySuper<Number> {
+public class OGPermutationArray extends OGArraySuper<Integer> {
   private int[] _data;
   private int _rows;
   private int _columns;

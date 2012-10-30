@@ -14,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public class OGSparseArray extends OGArraySuper<Number> {
+public class OGSparseArray extends OGArraySuper<Double> {
 
   private double[] _values;
   private int[] _colPtr;

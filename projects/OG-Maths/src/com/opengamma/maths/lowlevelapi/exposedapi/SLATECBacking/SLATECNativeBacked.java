@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking;
 
-import com.opengamma.maths.nativewrappers.OGSLATECRawWrapper;
+//import com.opengamma.maths.nativewrappers.OGSLATECRawWrapper;
 
 /**
  * Native library backed SLATEC
  */
-public class SLATECNativeBacked extends SLATECAbstractSuper implements SLATECAPIInterface {
+public class SLATECNativeBacked {/*extends SLATECAbstractSuper implements SLATECAPIInterface {
 
   @Override
   public double derf(double x) {
@@ -22,5 +22,5 @@ public class SLATECNativeBacked extends SLATECAbstractSuper implements SLATECAPI
     return OGSLATECRawWrapper.derfc(new double[] {x });
   }
 
-
+*/
 }

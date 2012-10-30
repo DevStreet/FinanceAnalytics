@@ -32,8 +32,15 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAUtilityFu
 /**
  * The DOGMA language. The entry point for using all DOGMA functions from one place!
  */
-public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI, DOGMARearrangingMatricesAPI, DOGMASparseUtilitiesAPI, DOGMASpecialFunctionsAPI, DOGMATrigonometaryAPI,
-    DOGMAUtilityFunctionsAPI, DOGMALinearAlgebraAPI {
+public class DOGMA implements 
+  DOGMAArithmeticAPI, 
+  DOGMAExponentsAndLogarithmsAPI, 
+  DOGMARearrangingMatricesAPI, 
+  DOGMASparseUtilitiesAPI, 
+  DOGMASpecialFunctionsAPI, 
+  DOGMATrigonometaryAPI,
+  DOGMAUtilityFunctionsAPI, 
+  DOGMALinearAlgebraAPI {
   /**
    * The square root of minus one, the complex number <i>i</i>
    */
@@ -56,350 +63,350 @@ public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI
 
   // From Arithmetic...
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number>... array) {
     return DA.plus(array);
   }
 
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.plus(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, double number) {
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number> array1, double number) {
     return DA.plus(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> plus(OGArraySuper<Number> array1, int number) {
+  public OGArraySuper<? extends Number> plus(OGArraySuper<? extends Number> array1, int number) {
     return DA.plus(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number>... array) {
     return DA.minus(array);
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.plus(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, double number) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number> array1, double number) {
     return DA.minus(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> minus(OGArraySuper<Number> array1, int number) {
+  public OGArraySuper<? extends Number> minus(OGArraySuper<? extends Number> array1, int number) {
     return DA.minus(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> ldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> ldivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.ldivide(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> mldivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mldivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.mldivide(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> rdivide(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.rdivide(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, double number) {
+  public OGArraySuper<? extends Number> rdivide(OGArraySuper<? extends Number> array1, double number) {
     return DA.rdivide(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(OGArraySuper<Number> array1, int number) {
+  public OGArraySuper<? extends Number> rdivide(OGArraySuper<? extends Number> array1, int number) {
     return DA.rdivide(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(double number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> rdivide(double number, OGArraySuper<? extends Number> array1) {
     return DA.rdivide(number, array1);
   }
 
   @Override
-  public OGArraySuper<Number> rdivide(int number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> rdivide(int number, OGArraySuper<? extends Number> array1) {
     return DA.rdivide(number, array1);
   }
 
   @Override
-  public OGArraySuper<Number> mrdivide(OGArraySuper<Number> matrixA, OGArraySuper<Number> vectorb) {
+  public OGArraySuper<? extends Number> mrdivide(OGArraySuper<? extends Number> matrixA, OGArraySuper<? extends Number> vectorb) {
     return DA.mrdivide(matrixA, vectorb);
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number>... array) {
     return DA.times(array);
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.times(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number> array1, double number) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number> array1, double number) {
     return DA.times(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> times(OGArraySuper<Number> array1, int number) {
+  public OGArraySuper<? extends Number> times(OGArraySuper<? extends Number> array1, int number) {
     return DA.times(array1, number);
   }
 
   @Override
-  public OGArraySuper<Number> times(double number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> times(double number, OGArraySuper<? extends Number> array1) {
     return DA.times(number, array1);
   }
 
   @Override
-  public OGArraySuper<Number> times(int number, OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> times(int number, OGArraySuper<? extends Number> array1) {
     return DA.times(number, array1);
   }
 
   @Override
-  public OGArraySuper<Number> mtimes(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mtimes(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.mtimes(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> mtimes(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> mtimes(OGArraySuper<? extends Number>... array) {
     return DA.mtimes(array);
   }
 
   @Override
-  public OGArraySuper<Number> power(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> power(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.power(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> mpower(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> mpower(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DA.mpower(array1, array2);
   }
 
   @Override
-  public OGArraySuper<Number> transpose(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> transpose(OGArraySuper<? extends Number> array) {
     return DA.transpose(array);
   }
 
   // The exponents and logs API
 
   @Override
-  public OGArraySuper<Number> sqrt(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> sqrt(OGArraySuper<? extends Number> array1) {
     return DEAL.sqrt(array1);
   }
 
   // The rearranging matrices API
 
   @Override
-  public OGArraySuper<Number> cat(OGIndexArray dim, OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> cat(OGIndexArray dim, OGArraySuper<? extends Number>... array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> diag(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> diag(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> flipdim(OGArraySuper<Number> array, OGIndexArray dim) {
+  public OGArraySuper<? extends Number> flipdim(OGArraySuper<? extends Number> array, OGIndexArray dim) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> fliplr(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> fliplr(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> flipud(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> flipud(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> horzcat(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> horzcat(OGArraySuper<? extends Number>... array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> ipermute(OGArraySuper<Number> array, OGPermutationArray perm) {
+  public OGArraySuper<? extends Number> ipermute(OGArraySuper<? extends Number> array, OGPermutationArray perm) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> permute(OGArraySuper<Number> array, OGPermutationArray perm) {
+  public OGArraySuper<? extends Number> permute(OGArraySuper<? extends Number> array, OGPermutationArray perm) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> postpad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c) {
+  public OGArraySuper<? extends Number> postpad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> postpad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c, OGIndexArray dim) {
+  public OGArraySuper<? extends Number> postpad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c, OGIndexArray dim) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> prepad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c) {
+  public OGArraySuper<? extends Number> prepad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> prepad(OGArraySuper<Number> array, OGIndexArray l, OGArraySuper<Number> c, OGIndexArray dim) {
+  public OGArraySuper<? extends Number> prepad(OGArraySuper<? extends Number> array, OGIndexArray l, OGArraySuper<? extends Number> c, OGIndexArray dim) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> reshape(OGArraySuper<Number> array, OGIndexArray rows, OGIndexArray columns) {
+  public OGArraySuper<? extends Number> reshape(OGArraySuper<? extends Number> array, OGIndexArray rows, OGIndexArray columns) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> resize(OGArraySuper<Number> array, OGIndexArray rows, OGIndexArray columns) {
+  public OGArraySuper<? extends Number> resize(OGArraySuper<? extends Number> array, OGIndexArray rows, OGIndexArray columns) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> rot90(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> rot90(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> rot90(OGArraySuper<Number> array, OGIndexArray increments) {
+  public OGArraySuper<? extends Number> rot90(OGArraySuper<? extends Number> array, OGIndexArray increments) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sort(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> sort(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sort(OGArraySuper<Number> array, String order) {
+  public OGArraySuper<? extends Number> sort(OGArraySuper<? extends Number> array, String order) {
     return null;
   }
 
   @Override
-  public OGSortResult<OGArraySuper<Number>> sort(OGArraySuper<Number> array, OGIndexArray dim, String order) {
+  public OGSortResult<OGArraySuper<? extends Number>> sort(OGArraySuper<? extends Number> array, OGIndexArray dim, String order) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sortrows(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> sortrows(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> sortrows(OGArraySuper<Number> array, OGIndexArray columnIndex) {
+  public OGArraySuper<? extends Number> sortrows(OGArraySuper<? extends Number> array, OGIndexArray columnIndex) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> triu(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> triu(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> tril(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> tril(OGArraySuper<? extends Number> array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> vertcat(OGArraySuper<Number>... array) {
+  public OGArraySuper<? extends Number> vertcat(OGArraySuper<? extends Number>... array) {
     return null;
   }
 
   @Override
-  public OGArraySuper<Number> copy(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> copy(OGArraySuper<? extends Number> array) {
     return DRM.copy(array);
   }
 
   // The sparse utils API
 
   @Override
-  public OGArraySuper<Number> full(OGArraySuper<Number> array) {
+  public OGArraySuper<? extends Number> full(OGArraySuper<? extends Number> array) {
     return DSU.full(array);
   }
 
   // The special functions API
 
   @Override
-  public OGArraySuper<Number> erf(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> erf(OGArraySuper<? extends Number> array1) {
     return DSF.erf(array1);
   }
 
   @Override
-  public OGArraySuper<Number> erfc(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> erfc(OGArraySuper<? extends Number> array1) {
     return DSF.erfc(array1);
   }
 
   // The trig API
 
   @Override
-  public OGArraySuper<Number> sin(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> sin(OGArraySuper<? extends Number> array1) {
     return DT.sin(array1);
   }
 
   @Override
-  public OGArraySuper<Number> cos(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> cos(OGArraySuper<? extends Number> array1) {
     return DT.cos(array1);
   }
 
   @Override
-  public OGArraySuper<Number> tan(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> tan(OGArraySuper<? extends Number> array1) {
     return DT.tan(array1);
   }
 
   @Override
-  public OGArraySuper<Number> asin(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> asin(OGArraySuper<? extends Number> array1) {
     return DT.asin(array1);
   }
 
   @Override
-  public OGArraySuper<Number> acos(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> acos(OGArraySuper<? extends Number> array1) {
     return DT.acos(array1);
   }
 
   @Override
-  public OGArraySuper<Number> atan(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> atan(OGArraySuper<? extends Number> array1) {
     return DT.atan(array1);
   }
 
   @Override
-  public OGArraySuper<Number> sinh(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> sinh(OGArraySuper<? extends Number> array1) {
     return DT.sinh(array1);
   }
 
   @Override
-  public OGArraySuper<Number> cosh(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> cosh(OGArraySuper<? extends Number> array1) {
     return DT.cosh(array1);
   }
 
   @Override
-  public OGArraySuper<Number> tanh(OGArraySuper<Number> array1) {
+  public OGArraySuper<? extends Number> tanh(OGArraySuper<? extends Number> array1) {
     return DT.tanh(array1);
   }
 
   // the utlity functions api
 
   @Override
-  public OGArraySuper<Number> dot(OGArraySuper<Number> array1, OGArraySuper<Number> array2) {
+  public OGArraySuper<? extends Number> dot(OGArraySuper<? extends Number> array1, OGArraySuper<? extends Number> array2) {
     return DUF.dot(array1, array2);
   }
 
   // the linear algebra functions api
   @Override
-  public OGSvdResult svd(OGArraySuper<Number> array1, compute required) {
+  public OGSvdResult svd(OGArraySuper<? extends Number> array1, compute required) {
     return DLA.svd(array1, required);
   }
 }

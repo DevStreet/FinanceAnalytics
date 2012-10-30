@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
-import com.opengamma.maths.nativewrappers.OGBLASRawWrapper;
+//import com.opengamma.maths.nativewrappers.OGBLASRawWrapper;
 
 /**
  * Native library backed BLAS
  */
-public class BLASNativeBacked extends BLASAbstractSuper implements BLASAPIInterface {
+public class BLASNativeBacked {/*extends BLASAbstractSuper implements BLASAPIInterface {
 
   @Override
   public void drotg(double[] a, double[] b, double[] c, double[] s) {
@@ -168,5 +168,5 @@ public class BLASNativeBacked extends BLASAbstractSuper implements BLASAPIInterf
     OGBLASRawWrapper.dgemm(new char[] {transa }, new char[] {transb }, new int[] {m }, new int[] {n }, new int[] {k }, new double[] {alpha }, aMatrix, new int[] {lda }, bMatrix, new int[] {ldb },
         new double[] {beta }, cMatrix, new int[] {ldc });
   }
-
+*/
 }

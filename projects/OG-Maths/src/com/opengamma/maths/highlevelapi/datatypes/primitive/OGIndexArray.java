@@ -15,7 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 /**
  * The OGIndex class provides access to the typically understood notion of a matrix, i.e. A Fully populated array.
  */
-public class OGIndexArray extends OGArraySuper<Number> {
+public class OGIndexArray extends OGArraySuper<Integer> {
   private int[] _data;
   private int _rows;
   private int _columns;

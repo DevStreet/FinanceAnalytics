@@ -13,6 +13,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public abstract class RdivideAbstract<T extends OGArraySuper<Number>, S extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> rdivide(T array1, S array2);
+public interface RdivideAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> rdivide(T array1, S array2);
 }

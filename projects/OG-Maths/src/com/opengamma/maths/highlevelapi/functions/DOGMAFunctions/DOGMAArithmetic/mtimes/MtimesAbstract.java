@@ -12,6 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArraySuper;
  * @param <T> An OGArray type
  * @param <S> An OGArray type
  */
-public abstract class MtimesAbstract<T extends OGArraySuper<Number>, S extends OGArraySuper<Number>> {
-  public abstract <U> OGArraySuper<U> mtimes(T array1, S array2);
+public interface MtimesAbstract<T extends OGArraySuper<? extends Number>, S extends OGArraySuper<? extends Number>> {
+  
+  OGArraySuper<? extends Number> mtimes(T array1, S array2);
 }

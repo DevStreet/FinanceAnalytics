@@ -44,7 +44,7 @@ public class Transpose {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> transpose(T array1) {
+  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> transpose(T array1) {
     Catchers.catchNullFromArgList(array1, 1);
     TransposeAbstract<T> use = (TransposeAbstract<T>) s_functionPointers.get(array1.getClass());
     if (use == null) {

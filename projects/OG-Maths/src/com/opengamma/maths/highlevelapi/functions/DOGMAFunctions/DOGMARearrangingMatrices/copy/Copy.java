@@ -27,7 +27,7 @@ public class Copy {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends OGArraySuper<Number>> OGArraySuper<Number> copy(T array1) {
+  public <T extends OGArraySuper<? extends Number>> OGArraySuper<? extends Number> copy(T array1) {
     CopyAbstract<T> use = (CopyAbstract<T>) s_functionPointers.get(array1.getClass());
     return use.copy(array1);
   }

@@ -11,7 +11,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.asin on OGDouble
  */
-public final class AsinOGDoubleArray extends AsinAbstract<OGDoubleArray> {
+public final class AsinOGDoubleArray implements AsinAbstract<OGDoubleArray> {
   private static AsinOGDoubleArray s_instance = new AsinOGDoubleArray();
 
   public static AsinOGDoubleArray getInstance() {
@@ -21,7 +21,6 @@ public final class AsinOGDoubleArray extends AsinAbstract<OGDoubleArray> {
   private AsinOGDoubleArray() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public OGDoubleArray asin(OGDoubleArray array1) {
     Catchers.catchNullFromArgList(array1, 1);
