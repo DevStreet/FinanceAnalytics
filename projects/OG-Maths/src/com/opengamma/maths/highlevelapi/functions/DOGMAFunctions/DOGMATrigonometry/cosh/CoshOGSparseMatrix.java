@@ -3,27 +3,29 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tanh;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cosh;
+
+import java.util.Arrays;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.tanh on OGSparse
+ * Math.cosh on OGSparse
  */
-public final class TanhOGSparseArray implements TanhAbstract<OGSparseMatrix> {
-  private static TanhOGSparseArray s_instance = new TanhOGSparseArray();
+public final class CoshOGSparseMatrix implements CoshAbstract<OGSparseMatrix> {
+  private static CoshOGSparseMatrix s_instance = new CoshOGSparseMatrix();
 
-  public static TanhOGSparseArray getInstance() {
+  public static CoshOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private TanhOGSparseArray() {
+  private CoshOGSparseMatrix() {
   }
 
   @Override
-  public OGMatrix tanh(OGSparseMatrix array1) {
+  public OGMatrix cosh(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,11 +34,12 @@ public final class TanhOGSparseArray implements TanhAbstract<OGSparseMatrix> {
     final int[] rowIdx = array1.getRowIndex();
     final double[] dataArray1 = array1.getData();
     final int n = rowsArray1 * columnsArray1;
-    double[] tmp = new double[n]; //Math.tanh(0)=0
+    double[] tmp = new double[n];
+    Arrays.fill(tmp, 1.e0); //Math.cosh(0)=1
 
     for (int ir = 0; ir < columnsArray1; ir++) {
-      for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) { // loops through elements of correct column
-        tmp[rowIdx[i] + ir * rowsArray1] = Math.tanh(dataArray1[i]);
+      for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
+        tmp[rowIdx[i] + ir * rowsArray1] = Math.cosh(dataArray1[i]);
       }
     }
 

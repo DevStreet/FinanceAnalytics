@@ -3,26 +3,26 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tanh;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.asin;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.tanh on OGDouble
+ * Math.asin on OGDouble
  */
-public final class TanhOGDoubleArray implements TanhAbstract<OGMatrix> {
-  private static TanhOGDoubleArray s_instance = new TanhOGDoubleArray();
+public final class AsinOGMatrix implements AsinAbstract<OGMatrix> {
+  private static AsinOGMatrix s_instance = new AsinOGMatrix();
 
-  public static TanhOGDoubleArray getInstance() {
+  public static AsinOGMatrix getInstance() {
     return s_instance;
   }
 
-  private TanhOGDoubleArray() {
+  private AsinOGMatrix() {
   }
 
   @Override
-  public OGMatrix tanh(OGMatrix array1) {
+  public OGMatrix asin(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,7 +32,7 @@ public final class TanhOGDoubleArray implements TanhAbstract<OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.tanh(dataArray1[i]);
+      tmp[i] = Math.asin(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

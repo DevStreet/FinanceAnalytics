@@ -11,14 +11,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.acos on OGDouble
  */
-public final class AcosOGDoubleArray implements AcosAbstract<OGMatrix> {
-  private static AcosOGDoubleArray s_instance = new AcosOGDoubleArray();
+public final class AcosOGMatrix implements AcosAbstract<OGMatrix> {
+  private static AcosOGMatrix s_instance = new AcosOGMatrix();
 
-  public static AcosOGDoubleArray getInstance() {
+  public static AcosOGMatrix getInstance() {
     return s_instance;
   }
 
-  private AcosOGDoubleArray() {
+  private AcosOGMatrix() {
   }
 
   @Override

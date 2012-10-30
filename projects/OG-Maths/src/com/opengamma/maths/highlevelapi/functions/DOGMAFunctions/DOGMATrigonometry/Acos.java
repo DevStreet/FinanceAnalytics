@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos.AcosAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos.AcosOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos.AcosOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos.AcosOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos.AcosOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -27,8 +27,8 @@ public class Acos {
    */
   private static Map<Class<?>, AcosAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, AcosOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, AcosOGSparseArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, AcosOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, AcosOGSparseMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

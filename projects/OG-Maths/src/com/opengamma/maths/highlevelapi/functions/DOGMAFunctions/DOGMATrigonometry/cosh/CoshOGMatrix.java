@@ -3,26 +3,26 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cosh;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.atan on OGDouble
+ * 
  */
-public final class AtanOGDoubleArray implements AtanAbstract<OGMatrix> {
-  private static AtanOGDoubleArray s_instance = new AtanOGDoubleArray();
+public final class CoshOGMatrix implements CoshAbstract<OGMatrix> {
+  private static CoshOGMatrix s_instance = new CoshOGMatrix();
 
-  public static AtanOGDoubleArray getInstance() {
+  public static CoshOGMatrix getInstance() {
     return s_instance;
   }
 
-  private AtanOGDoubleArray() {
+  private CoshOGMatrix() {
   }
 
   @Override
-  public OGMatrix atan(OGMatrix array1) {
+  public OGMatrix cosh(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,7 +32,7 @@ public final class AtanOGDoubleArray implements AtanAbstract<OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.atan(dataArray1[i]);
+      tmp[i] = Math.cosh(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

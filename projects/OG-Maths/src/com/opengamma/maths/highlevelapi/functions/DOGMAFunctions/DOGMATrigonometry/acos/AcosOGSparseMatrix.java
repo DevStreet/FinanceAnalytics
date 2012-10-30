@@ -14,14 +14,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.acos on OGSparse
  */
-public final class AcosOGSparseArray implements AcosAbstract<OGSparseMatrix> {
-  private static AcosOGSparseArray s_instance = new AcosOGSparseArray();
+public final class AcosOGSparseMatrix implements AcosAbstract<OGSparseMatrix> {
+  private static AcosOGSparseMatrix s_instance = new AcosOGSparseMatrix();
 
-  public static AcosOGSparseArray getInstance() {
+  public static AcosOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private AcosOGSparseArray() {
+  private AcosOGSparseMatrix() {
   }
 
   @Override

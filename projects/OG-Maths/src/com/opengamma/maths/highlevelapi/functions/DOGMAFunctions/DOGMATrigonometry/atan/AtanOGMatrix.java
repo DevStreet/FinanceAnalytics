@@ -3,26 +3,26 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.asin;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.asin on OGDouble
+ * Math.atan on OGDouble
  */
-public final class AsinOGDoubleArray implements AsinAbstract<OGMatrix> {
-  private static AsinOGDoubleArray s_instance = new AsinOGDoubleArray();
+public final class AtanOGMatrix implements AtanAbstract<OGMatrix> {
+  private static AtanOGMatrix s_instance = new AtanOGMatrix();
 
-  public static AsinOGDoubleArray getInstance() {
+  public static AtanOGMatrix getInstance() {
     return s_instance;
   }
 
-  private AsinOGDoubleArray() {
+  private AtanOGMatrix() {
   }
 
   @Override
-  public OGMatrix asin(OGMatrix array1) {
+  public OGMatrix atan(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,7 +32,7 @@ public final class AsinOGDoubleArray implements AsinAbstract<OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.asin(dataArray1[i]);
+      tmp[i] = Math.atan(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

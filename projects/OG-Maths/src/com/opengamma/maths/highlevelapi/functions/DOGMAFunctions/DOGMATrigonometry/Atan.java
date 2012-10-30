@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan.AtanAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan.AtanOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan.AtanOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan.AtanOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan.AtanOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -27,8 +27,8 @@ public class Atan {
    */
   private static Map<Class<?>, AtanAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, AtanOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, AtanOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, AtanOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, AtanOGSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

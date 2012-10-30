@@ -3,26 +3,26 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.sin on OGDouble
+ * Math.tan on OGDouble
  */
-public final class SinOGDoubleArray implements SinAbstract<OGMatrix> {
-  private static SinOGDoubleArray s_instance = new SinOGDoubleArray();
+public final class TanOGMatrix implements TanAbstract<OGMatrix> {
+  private static TanOGMatrix s_instance = new TanOGMatrix();
 
-  public static SinOGDoubleArray getInstance() {
+  public static TanOGMatrix getInstance() {
     return s_instance;
   }
 
-  private SinOGDoubleArray() {
+  private TanOGMatrix() {
   }
 
   @Override
-  public OGMatrix sin(OGMatrix array1) {
+  public OGMatrix tan(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,7 +32,7 @@ public final class SinOGDoubleArray implements SinAbstract<OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.sin(dataArray1[i]);
+      tmp[i] = Math.tan(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

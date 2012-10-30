@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan.TanAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan.TanOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan.TanOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan.TanOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tan.TanOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -27,8 +27,8 @@ public class Tan {
    */
   private static Map<Class<?>, TanAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, TanOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, TanOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, TanOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, TanOGSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

@@ -3,29 +3,27 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos;
-
-import java.util.Arrays;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.tanh;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.cos on OGSparse
+ * Math.tanh on OGSparse
  */
-public final class CosOGSparseArray implements CosAbstract<OGSparseMatrix> {
-  private static CosOGSparseArray s_instance = new CosOGSparseArray();
+public final class TanhOGSparseMatrix implements TanhAbstract<OGSparseMatrix> {
+  private static TanhOGSparseMatrix s_instance = new TanhOGSparseMatrix();
 
-  public static CosOGSparseArray getInstance() {
+  public static TanhOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private CosOGSparseArray() {
+  private TanhOGSparseMatrix() {
   }
 
   @Override
-  public OGMatrix cos(OGSparseMatrix array1) {
+  public OGMatrix tanh(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -34,12 +32,11 @@ public final class CosOGSparseArray implements CosAbstract<OGSparseMatrix> {
     final int[] rowIdx = array1.getRowIndex();
     final double[] dataArray1 = array1.getData();
     final int n = rowsArray1 * columnsArray1;
-    double[] tmp = new double[n];
-    Arrays.fill(tmp, 1.e0); //Math.cos(0)=1
+    double[] tmp = new double[n]; //Math.tanh(0)=0
 
     for (int ir = 0; ir < columnsArray1; ir++) {
       for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) { // loops through elements of correct column
-        tmp[rowIdx[i] + ir * rowsArray1] = Math.cos(dataArray1[i]);
+        tmp[rowIdx[i] + ir * rowsArray1] = Math.tanh(dataArray1[i]);
       }
     }
 

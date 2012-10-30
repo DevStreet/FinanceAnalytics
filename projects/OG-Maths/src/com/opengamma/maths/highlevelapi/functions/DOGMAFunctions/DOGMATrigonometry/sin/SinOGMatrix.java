@@ -3,26 +3,26 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * 
+ * Math.sin on OGDouble
  */
-public final class CosOGDoubleArray implements CosAbstract<OGMatrix> {
-  private static CosOGDoubleArray s_instance = new CosOGDoubleArray();
+public final class SinOGMatrix implements SinAbstract<OGMatrix> {
+  private static SinOGMatrix s_instance = new SinOGMatrix();
 
-  public static CosOGDoubleArray getInstance() {
+  public static SinOGMatrix getInstance() {
     return s_instance;
   }
 
-  private CosOGDoubleArray() {
+  private SinOGMatrix() {
   }
 
   @Override
-  public OGMatrix cos(OGMatrix array1) {
+  public OGMatrix sin(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,7 +32,7 @@ public final class CosOGDoubleArray implements CosAbstract<OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.cos(dataArray1[i]);
+      tmp[i] = Math.sin(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

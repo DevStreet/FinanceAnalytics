@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos.CosAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos.CosOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos.CosOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos.CosOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos.CosOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -27,8 +27,8 @@ public class Cos {
    */
   private static Map<Class<?>, CosAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, CosOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, CosOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, CosOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, CosOGSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

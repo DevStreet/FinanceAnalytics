@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh.SinhAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh.SinhOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh.SinhOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh.SinhOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh.SinhOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -27,8 +27,8 @@ public class Sinh {
    */
   private static Map<Class<?>, SinhAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, SinhOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, SinhOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, SinhOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, SinhOGSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

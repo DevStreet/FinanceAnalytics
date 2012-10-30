@@ -13,14 +13,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Math.sinh on OGSparse
  */
-public final class SinhOGSparseArray implements SinhAbstract<OGSparseMatrix> {
-  private static SinhOGSparseArray s_instance = new SinhOGSparseArray();
+public final class SinhOGSparseMatrix implements SinhAbstract<OGSparseMatrix> {
+  private static SinhOGSparseMatrix s_instance = new SinhOGSparseMatrix();
 
-  public static SinhOGSparseArray getInstance() {
+  public static SinhOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private SinhOGSparseArray() {
+  private SinhOGSparseMatrix() {
   }
 
   @Override

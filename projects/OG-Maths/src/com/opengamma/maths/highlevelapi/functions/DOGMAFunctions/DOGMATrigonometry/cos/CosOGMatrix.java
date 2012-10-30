@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh;
+package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -11,18 +11,18 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * 
  */
-public final class SinhOGDoubleArray implements SinhAbstract<OGMatrix> {
-  private static SinhOGDoubleArray s_instance = new SinhOGDoubleArray();
+public final class CosOGMatrix implements CosAbstract<OGMatrix> {
+  private static CosOGMatrix s_instance = new CosOGMatrix();
 
-  public static SinhOGDoubleArray getInstance() {
+  public static CosOGMatrix getInstance() {
     return s_instance;
   }
 
-  private SinhOGDoubleArray() {
+  private CosOGMatrix() {
   }
 
   @Override
-  public OGMatrix sinh(OGMatrix array1) {
+  public OGMatrix cos(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -32,7 +32,7 @@ public final class SinhOGDoubleArray implements SinhAbstract<OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.sinh(dataArray1[i]);
+      tmp[i] = Math.cos(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
