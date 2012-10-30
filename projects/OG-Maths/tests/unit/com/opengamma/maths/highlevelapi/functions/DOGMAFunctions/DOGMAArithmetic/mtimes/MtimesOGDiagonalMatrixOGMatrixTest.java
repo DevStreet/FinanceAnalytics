@@ -17,7 +17,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMA;
 /**
  * tests diag mtimes full
  */
-public class MtimesOGDiagonalArrayOGDoubleArrayTest {
+public class MtimesOGDiagonalMatrixOGMatrixTest {
   double NaN = Double.NaN;
   double single = 7.d;
   double[] _dataC = new double[] {1., 2., 3. };
