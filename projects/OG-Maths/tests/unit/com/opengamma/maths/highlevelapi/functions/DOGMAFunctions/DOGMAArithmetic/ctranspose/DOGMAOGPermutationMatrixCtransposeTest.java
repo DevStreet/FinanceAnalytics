@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 /**
  * Tests OGPermutation transpose
  */
-public class DOGMAOGPermutationArrayCtransposeTest {
+public class DOGMAOGPermutationMatrixCtransposeTest {
 
   CtransposeOGPermutationMatrix t = CtransposeOGPermutationMatrix.getInstance();
 
