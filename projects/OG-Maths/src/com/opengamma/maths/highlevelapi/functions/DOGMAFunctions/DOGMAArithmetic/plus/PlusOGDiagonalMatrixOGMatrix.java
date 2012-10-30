@@ -12,17 +12,17 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 /**
  * Adds {@link OGDiagonalMatrix} to {@link OGMatrix} 
  */
-public final class PlusOGDiagonalArrayOGDoubleArray implements PlusMinusAbstract<OGDiagonalMatrix, OGMatrix> {
-  private static PlusOGDiagonalArrayOGDoubleArray s_instance = new PlusOGDiagonalArrayOGDoubleArray();
+public final class PlusOGDiagonalMatrixOGMatrix implements PlusMinusAbstract<OGDiagonalMatrix, OGMatrix> {
+  private static PlusOGDiagonalMatrixOGMatrix s_instance = new PlusOGDiagonalMatrixOGMatrix();
 
-  public static PlusOGDiagonalArrayOGDoubleArray getInstance() {
+  public static PlusOGDiagonalMatrixOGMatrix getInstance() {
     return s_instance;
   }
 
-  private PlusOGDiagonalArrayOGDoubleArray() {
+  private PlusOGDiagonalMatrixOGMatrix() {
   }
 
-  private static PlusOGDoubleArrayOGDiagonalArray s_reverse = PlusOGDoubleArrayOGDiagonalArray.getInstance();
+  private static PlusOGMatrixOGDiagonalMatrix s_reverse = PlusOGMatrixOGDiagonalMatrix.getInstance();
 
   @Override
   public OGArray<? extends Number> plusminus(OGDiagonalMatrix array1, OGMatrix array2, int op) {

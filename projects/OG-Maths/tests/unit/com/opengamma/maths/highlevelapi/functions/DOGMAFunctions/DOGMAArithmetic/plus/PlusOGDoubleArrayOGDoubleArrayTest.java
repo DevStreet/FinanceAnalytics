@@ -25,7 +25,7 @@ public class PlusOGDoubleArrayOGDoubleArrayTest {
 
   // null ptr etc is caught by the function pointer code
 
-  private static PlusOGDoubleArrayOGDoubleArray pm = PlusOGDoubleArrayOGDoubleArray.getInstance();
+  private static PlusOGMatrixOGMatrix pm = PlusOGMatrixOGMatrix.getInstance();
 
   @Test
   public static void scalarFullPlusFull() {

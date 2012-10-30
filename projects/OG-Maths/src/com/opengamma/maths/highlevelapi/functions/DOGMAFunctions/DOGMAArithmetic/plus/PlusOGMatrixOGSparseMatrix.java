@@ -13,14 +13,14 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Adds OGSparseArrays to OGDoubleArrays   
  */
-public final class PlusOGDoubleArrayOGSparseArray implements PlusMinusAbstract<OGMatrix, OGSparseMatrix> {
-  private static PlusOGDoubleArrayOGSparseArray s_instance = new PlusOGDoubleArrayOGSparseArray();
+public final class PlusOGMatrixOGSparseMatrix implements PlusMinusAbstract<OGMatrix, OGSparseMatrix> {
+  private static PlusOGMatrixOGSparseMatrix s_instance = new PlusOGMatrixOGSparseMatrix();
 
-  public static PlusOGDoubleArrayOGSparseArray getInstance() {
+  public static PlusOGMatrixOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private PlusOGDoubleArrayOGSparseArray() {
+  private PlusOGMatrixOGSparseMatrix() {
   }
 
   @Override

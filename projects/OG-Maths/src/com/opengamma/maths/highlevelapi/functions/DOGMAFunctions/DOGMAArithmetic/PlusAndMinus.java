@@ -15,12 +15,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusMinusAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDiagonalArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDoubleArrayOGDiagonalArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDoubleArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDoubleArrayOGSparseArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGSparseArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGSparseArrayOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGDiagonalMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGMatrixOGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGMatrixOGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGSparseMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus.PlusOGSparseMatrixOGSparseMatrix;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 
@@ -40,12 +40,12 @@ public class PlusAndMinus {
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGSparseMatrix.class);
     Pair<Class<?>, Class<?>> pairOGDoubleArrayOGDiagonalArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGDiagonalMatrix.class);
     Pair<Class<?>, Class<?>> pairOGDiagonalArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGDiagonalMatrix.class, OGMatrix.class);
-    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, PlusOGDoubleArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, PlusOGDoubleArrayOGSparseArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, PlusOGSparseArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGSparseArray, PlusOGSparseArrayOGSparseArray.getInstance());
-    s_functionPointers.put(pairOGDoubleArrayOGDiagonalArray, PlusOGDoubleArrayOGDiagonalArray.getInstance());
-    s_functionPointers.put(pairOGDiagonalArrayOGDoubleArray, PlusOGDiagonalArrayOGDoubleArray.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, PlusOGMatrixOGMatrix.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, PlusOGMatrixOGSparseMatrix.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, PlusOGSparseMatrixOGMatrix.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGSparseArray, PlusOGSparseMatrixOGSparseMatrix.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGDiagonalArray, PlusOGMatrixOGDiagonalMatrix.getInstance());
+    s_functionPointers.put(pairOGDiagonalArrayOGDoubleArray, PlusOGDiagonalMatrixOGMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

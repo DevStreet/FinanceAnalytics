@@ -14,14 +14,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Adds {@link OGMatrix} to {@link OGDiagonalMatrix} 
  */
-public final class PlusOGDoubleArrayOGDiagonalArray implements PlusMinusAbstract<OGMatrix, OGDiagonalMatrix> {
-  private static PlusOGDoubleArrayOGDiagonalArray s_instance = new PlusOGDoubleArrayOGDiagonalArray();
+public final class PlusOGMatrixOGDiagonalMatrix implements PlusMinusAbstract<OGMatrix, OGDiagonalMatrix> {
+  private static PlusOGMatrixOGDiagonalMatrix s_instance = new PlusOGMatrixOGDiagonalMatrix();
 
-  public static PlusOGDoubleArrayOGDiagonalArray getInstance() {
+  public static PlusOGMatrixOGDiagonalMatrix getInstance() {
     return s_instance;
   }
 
-  private PlusOGDoubleArrayOGDiagonalArray() {
+  private PlusOGMatrixOGDiagonalMatrix() {
   }
 
   @Override
