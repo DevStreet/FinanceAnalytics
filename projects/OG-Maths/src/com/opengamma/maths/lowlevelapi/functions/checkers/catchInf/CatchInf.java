@@ -32,8 +32,8 @@ public final class CatchInf {
   */
   private static Map<Class<?>, CatchInfAbstract<?>> s_functionPointers = new HashMap<Class<?>, CatchInfAbstract<?>>();
   static {
-    s_functionPointers.put(OGMatrix.class, CatchInfOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, CatchInfOGSparseArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, CatchInfOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, CatchInfOGSparseMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

@@ -32,8 +32,8 @@ public final class CatchNaN {
   */
   private static Map<Class<?>, CatchNaNAbstract<?>> s_functionPointers = new HashMap<Class<?>, CatchNaNAbstract<?>>();
   static {
-    s_functionPointers.put(OGMatrix.class, CatchNaNOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, CatchNaNOGSparseArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, CatchNaNOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, CatchNaNOGSparseMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

@@ -6,46 +6,47 @@
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.iss.IsNaN;
 
 /**
- * 
+ * Catches NaN in OGDoubleArray
  */
-public final class CatchNaNOGSparseArray extends CatchNaNAbstract<OGSparseMatrix> {
-  private static CatchNaNOGSparseArray s_instance = new CatchNaNOGSparseArray();
+public final class CatchNaNOGMatrix extends CatchNaNAbstract<OGMatrix> {
+  private static CatchNaNOGMatrix s_instance = new CatchNaNOGMatrix();
 
-  public static CatchNaNOGSparseArray getInstance() {
+  public static CatchNaNOGMatrix getInstance() {
     return s_instance;
   }
 
-  private CatchNaNOGSparseArray() {
+  private CatchNaNOGMatrix() {
   }
 
   @Override
-  public void catchnan(OGSparseMatrix array1) {
+  public void catchnan(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     boolean ret;
     final double[] data = array1.getData();
     ret = IsNaN.any(data);
     //NaN found, deal with it...
     if (ret) {
-      final int[] colPtr = array1.getColumnPtr();
-      final int[] rowIdx = array1.getRowIndex();
       int badrow = 0, badcol = 0;
+      final int rows = array1.getNumberOfRows();
       final int columns = array1.getNumberOfColumns();
-      for (int ir = 0; ir < columns; ir++) {
-        for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
-          if (Double.isNaN(data[i])) {
-            badrow = rowIdx[i];
-            badcol = ir;
+      boolean[] nans = IsNaN.getBooleans(data);
+      int jmp = 0;
+      for (int i = 0; i < columns; i++) {
+        jmp = i * rows;
+        for (int j = 0; j < rows; j++) {
+          if (nans[jmp + j] == true) {
+            badrow = j;
+            badcol = i;
             break;
           }
         }
       }
-      throw new MathsExceptionEncounteredNaN(badrow, badcol);
+      throw new MathsExceptionEncounteredNaN(badrow, badcol);      
     }
   }
-
 }

@@ -6,47 +6,46 @@
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchInf;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredInf;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.iss.IsInf;
 
 /**
- * Catches Inf in OGDoubleArray
+ * 
  */
-public final class CatchInfOGDoubleArray extends CatchInfAbstract<OGMatrix> {
-  private static CatchInfOGDoubleArray s_instance = new CatchInfOGDoubleArray();
+public final class CatchInfOGSparseMatrix extends CatchInfAbstract<OGSparseMatrix> {
+  private static CatchInfOGSparseMatrix s_instance = new CatchInfOGSparseMatrix();
 
-  public static CatchInfOGDoubleArray getInstance() {
+  public static CatchInfOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private CatchInfOGDoubleArray() {
+  private CatchInfOGSparseMatrix() {
   }
 
   @Override
-  public void catchinf(OGMatrix array1) {
+  public void catchinf(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     boolean ret;
     final double[] data = array1.getData();
     ret = IsInf.any(data);
     //Inf found, deal with it...
     if (ret) {
+      final int[] colPtr = array1.getColumnPtr();
+      final int[] rowIdx = array1.getRowIndex();
       int badrow = 0, badcol = 0;
-      final int rows = array1.getNumberOfRows();
       final int columns = array1.getNumberOfColumns();
-      boolean[] infs = IsInf.getBooleans(data);
-      int jmp = 0;
-      for (int i = 0; i < columns; i++) {
-        jmp = i * rows;
-        for (int j = 0; j < rows; j++) {
-          if (infs[jmp + j] == true) {
-            badrow = j;
-            badcol = i;
+      for (int ir = 0; ir < columns; ir++) {
+        for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
+          if (Double.isInfinite(data[i])) {
+            badrow = rowIdx[i];
+            badcol = ir;
             break;
           }
         }
       }
-      throw new MathsExceptionEncounteredInf(badrow, badcol);      
+      throw new MathsExceptionEncounteredInf(badrow, badcol);
     }
   }
+
 }
