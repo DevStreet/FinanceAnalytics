@@ -23,8 +23,8 @@ public class Sqrt {
    */
   private static Map<Class<?>, SqrtAbstract<?>> s_functionPointers = new HashMap<Class<?>, SqrtAbstract<?>>();
   static {
-    s_functionPointers.put(OGMatrix.class, SqrtOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, SqrtOGSparseArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, SqrtOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, SqrtOGSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

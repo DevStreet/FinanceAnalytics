@@ -6,28 +6,30 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponentsAndLogarithms.sqrt;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * does sqrt
  */
-public final class SqrtOGDoubleArray implements SqrtAbstract<OGMatrix> {
-  private static SqrtOGDoubleArray s_instance = new SqrtOGDoubleArray();
+public final class SqrtOGSparseMatrix implements SqrtAbstract<OGSparseMatrix> {
+  private static SqrtOGSparseMatrix s_instance = new SqrtOGSparseMatrix();
 
-  public static SqrtOGDoubleArray getInstance() {
+  public static SqrtOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private SqrtOGDoubleArray() {
+  private SqrtOGSparseMatrix() {
   }
 
   @Override
-  public OGMatrix sqrt(OGMatrix array1) {
+  public OGSparseMatrix sqrt(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
     final int columnsArray1 = array1.getNumberOfColumns();
+    final int [] rowIdx = array1.getRowIndex();
+    final int [] colPtr = array1.getColumnPtr();    
     final double[] dataArray1 = array1.getData();
     final int n = dataArray1.length;
 
@@ -40,6 +42,6 @@ public final class SqrtOGDoubleArray implements SqrtAbstract<OGMatrix> {
       }
     }
     
-    return new OGMatrix(tmp, rowsArray1, columnsArray1);
+    return new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
   }
 }
