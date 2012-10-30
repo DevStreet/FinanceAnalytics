@@ -14,14 +14,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGSparseArrayOGSparseArray implements MtimesAbstract<OGSparseMatrix, OGSparseMatrix> {
-  private static MtimesOGSparseArrayOGSparseArray s_instance = new MtimesOGSparseArrayOGSparseArray();
+public final class MtimesOGSparseMatrixOGSparseMatrix implements MtimesAbstract<OGSparseMatrix, OGSparseMatrix> {
+  private static MtimesOGSparseMatrixOGSparseMatrix s_instance = new MtimesOGSparseMatrixOGSparseMatrix();
 
-  public static MtimesOGSparseArrayOGSparseArray getInstance() {
+  public static MtimesOGSparseMatrixOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private MtimesOGSparseArrayOGSparseArray() {
+  private MtimesOGSparseMatrixOGSparseMatrix() {
   }
 
   private BLAS _localblas = new BLAS();

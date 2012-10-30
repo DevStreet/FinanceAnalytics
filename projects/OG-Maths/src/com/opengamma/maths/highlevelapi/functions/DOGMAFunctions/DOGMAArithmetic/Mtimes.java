@@ -13,10 +13,10 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGDoubleArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGDoubleArrayOGSparseArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGSparseArrayOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGSparseArrayOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGMatrixOGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGSparseMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes.MtimesOGSparseMatrixOGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAHelpers.genericconverters.GenericUpcastMapHolder;
 import com.opengamma.util.tuple.Pair;
 
@@ -33,10 +33,10 @@ public class Mtimes {
     Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGSparseMatrix.class);
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGMatrix.class);
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGSparseMatrix.class);
-    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, MtimesOGDoubleArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, MtimesOGDoubleArrayOGSparseArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, MtimesOGSparseArrayOGDoubleArray.getInstance());
-    s_functionPointers.put(pairOGSparseArrayOGSparseArray, MtimesOGSparseArrayOGSparseArray.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, MtimesOGMatrixOGMatrix.getInstance());
+    s_functionPointers.put(pairOGDoubleArrayOGSparseArray, MtimesOGMatrixOGSparseMatrix.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGDoubleArray, MtimesOGSparseMatrixOGMatrix.getInstance());
+    s_functionPointers.put(pairOGSparseArrayOGSparseArray, MtimesOGSparseMatrixOGSparseMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")
