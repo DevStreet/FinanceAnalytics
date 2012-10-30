@@ -12,7 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 /**
  * quick eyeballed does it work test for mldivide(), will be updated to be thorough once happy with alg and dependencies
  */
-public class MldivideOGDoubleArrayOGDoubleArrayTest {
+public class MldivideOGMatrixOGMatrixTest {
    private double[][] A_square_singular = new double[][] { {1.00, 2.00, 3.00 }, {1.00, 2.00, 3.00 }, {1.00, 2.00, 3.00 } };
   private double[][] A_square_symmetric_positive_definite = new double[][] { {123.00, 23.00, 23.00 }, {23.00, 123.00, 23.00 }, {23.00, 23.00, 123.00 } };
   private double[][] A_square_non_symmetric_well_conditioned = new double[][] { {10.00, 2.00, 1.00 }, {2.00, 3.00, 10.00 }, {4.00, 10.00, 1.00 } };
