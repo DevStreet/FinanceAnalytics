@@ -17,14 +17,14 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * SVD for OGComplex 
  */
-public final class SvdOGComplexArray implements SvdAbstract<OGComplexMatrix> {
-  private static SvdOGComplexArray s_instance = new SvdOGComplexArray();
+public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
+  private static SvdOGComplexMatrix s_instance = new SvdOGComplexMatrix();
 
-  public static SvdOGComplexArray getInstance() {
+  public static SvdOGComplexMatrix getInstance() {
     return s_instance;
   }
 
-  private SvdOGComplexArray() {
+  private SvdOGComplexMatrix() {
   }
 
   private LAPACK _localLAPACK = new LAPACK();

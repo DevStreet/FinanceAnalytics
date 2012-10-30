@@ -58,8 +58,8 @@ public class Svd {
    */
   private static Map<Class<?>, SvdAbstract<? extends OGArray<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, SvdOGDoubleArray.getInstance());
-    s_functionPointers.put(OGComplexMatrix.class, SvdOGComplexArray.getInstance());    
+    s_functionPointers.put(OGMatrix.class, SvdOGMatrix.getInstance());
+    s_functionPointers.put(OGComplexMatrix.class, SvdOGComplexMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")

@@ -16,14 +16,14 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 /**
  * SVD for OGDoubleArrays 
  */
-public final class SvdOGDoubleArray implements SvdAbstract<OGMatrix> {
-  private static SvdOGDoubleArray s_instance = new SvdOGDoubleArray();
+public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
+  private static SvdOGMatrix s_instance = new SvdOGMatrix();
 
-  public static SvdOGDoubleArray getInstance() {
+  public static SvdOGMatrix getInstance() {
     return s_instance;
   }
 
-  private SvdOGDoubleArray() {
+  private SvdOGMatrix() {
   }
 
   private LAPACK _localLAPACK = new LAPACK();
