@@ -14,14 +14,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGDouble * OGSparse
  */
-public final class TimesOGDoubleArrayOGSparseArray implements TimesAbstract<OGMatrix, OGSparseMatrix> {
-  private static TimesOGDoubleArrayOGSparseArray s_instance = new TimesOGDoubleArrayOGSparseArray();
+public final class TimesOGMatrixOGSparseMatrix implements TimesAbstract<OGMatrix, OGSparseMatrix> {
+  private static TimesOGMatrixOGSparseMatrix s_instance = new TimesOGMatrixOGSparseMatrix();
 
-  public static TimesOGDoubleArrayOGSparseArray getInstance() {
+  public static TimesOGMatrixOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private TimesOGDoubleArrayOGSparseArray() {
+  private TimesOGMatrixOGSparseMatrix() {
   }
 
   private BLAS _localblas = new BLAS();

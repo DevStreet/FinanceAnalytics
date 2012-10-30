@@ -12,18 +12,18 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Does elementwise OGSparse * OGDouble
  */
-public final class TimesOGSparseArrayOGDoubleArray implements TimesAbstract<OGSparseMatrix, OGMatrix> {
-  private static TimesOGSparseArrayOGDoubleArray s_instance = new TimesOGSparseArrayOGDoubleArray();
+public final class TimesOGSparseMatrixOGMatrix implements TimesAbstract<OGSparseMatrix, OGMatrix> {
+  private static TimesOGSparseMatrixOGMatrix s_instance = new TimesOGSparseMatrixOGMatrix();
 
-  public static TimesOGSparseArrayOGDoubleArray getInstance() {
+  public static TimesOGSparseMatrixOGMatrix getInstance() {
     return s_instance;
   }
 
-  private TimesOGSparseArrayOGDoubleArray() {
+  private TimesOGSparseMatrixOGMatrix() {
   }
 
   
-  private static TimesOGDoubleArrayOGSparseArray s_reverse = TimesOGDoubleArrayOGSparseArray.getInstance();
+  private static TimesOGMatrixOGSparseMatrix s_reverse = TimesOGMatrixOGSparseMatrix.getInstance();
   
   
   @Override

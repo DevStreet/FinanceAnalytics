@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Element wise multiply 
  */
-public final class TimesOGDoubleArrayOGDoubleArray implements TimesAbstract<OGMatrix, OGMatrix> {
-  private static TimesOGDoubleArrayOGDoubleArray s_instance = new TimesOGDoubleArrayOGDoubleArray();
+public final class TimesOGMatrixOGMatrix implements TimesAbstract<OGMatrix, OGMatrix> {
+  private static TimesOGMatrixOGMatrix s_instance = new TimesOGMatrixOGMatrix();
 
-  public static TimesOGDoubleArrayOGDoubleArray getInstance() {
+  public static TimesOGMatrixOGMatrix getInstance() {
     return s_instance;
   }
 
-  private TimesOGDoubleArrayOGDoubleArray() {
+  private TimesOGMatrixOGMatrix() {
   }
 
   private BLAS _localblas = new BLAS();
