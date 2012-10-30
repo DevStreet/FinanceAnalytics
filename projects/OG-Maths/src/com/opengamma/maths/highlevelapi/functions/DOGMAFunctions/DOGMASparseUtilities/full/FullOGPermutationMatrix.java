@@ -5,31 +5,31 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 
 /**
- * Full's OGDiagonalArrays
+ * Full's OGPermutationArrays
  */
-public final class FullOGDiagonalArray implements FullAbstract<OGDiagonalMatrix> {
+public final class FullOGPermutationMatrix implements FullAbstract<OGPermutationMatrix> {
 
-  private static FullOGDiagonalArray s_instance = new FullOGDiagonalArray();
+  private static FullOGPermutationMatrix s_instance = new FullOGPermutationMatrix();
 
-  public static FullOGDiagonalArray getInstance() {
+  public static FullOGPermutationMatrix getInstance() {
     return s_instance;
   }
 
-  private FullOGDiagonalArray() {
+  private FullOGPermutationMatrix() {
   }
 
   @Override
-  public OGMatrix full(OGDiagonalMatrix array1) {
+  public OGMatrix full(OGPermutationMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
-    final double[] data = array1.getData();
+    final int[] data = array1.getData();
     double[] tmp = new double[rows * cols];
-    for (int i = 0; i < data.length; i++) {
-      tmp[i * rows + i] = data[i];
+    for (int i = 0; i < cols; i++) {
+      tmp[i + data[i] * rows] = 1;
     }
     return new OGMatrix(tmp, rows, cols);
   }

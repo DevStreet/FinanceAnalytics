@@ -25,11 +25,11 @@ public class Full {
    */
   private static Map<Class<? extends OGArray<? extends Number>>, FullAbstract<? extends OGArray<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, FullOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, FullOGSparseArray.getInstance());
-    s_functionPointers.put(OGDiagonalMatrix.class, FullOGDiagonalArray.getInstance());
-    s_functionPointers.put(OGPermutationMatrix.class, FullOGPermutationArray.getInstance());
-    s_functionPointers.put(OGComplexMatrix.class, FullOGComplexArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, FullOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, FullOGSparseMatrix.getInstance());
+    s_functionPointers.put(OGDiagonalMatrix.class, FullOGDiagonalMatrix.getInstance());
+    s_functionPointers.put(OGPermutationMatrix.class, FullOGPermutationMatrix.getInstance());
+    s_functionPointers.put(OGComplexMatrix.class, FullOGComplexMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")

@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  */
 public class DOGMAOGSparseArrayFullTest {
 
-  private static FullOGSparseArray f = FullOGSparseArray.getInstance();
+  private static FullOGSparseMatrix f = FullOGSparseMatrix.getInstance();
 
   @Test
   public static void fullTest() {

@@ -11,14 +11,14 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Full's OGSparseArrays
  */
-public final class FullOGSparseArray implements FullAbstract<OGSparseMatrix> {
-  private static FullOGSparseArray s_instance = new FullOGSparseArray();
+public final class FullOGSparseMatrix implements FullAbstract<OGSparseMatrix> {
+  private static FullOGSparseMatrix s_instance = new FullOGSparseMatrix();
 
-  public static FullOGSparseArray getInstance() {
+  public static FullOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private FullOGSparseArray() {
+  private FullOGSparseMatrix() {
   }
 
   @Override

@@ -12,14 +12,14 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangin
 /**
  * Full's OGComplexArrays
  */
-public final class FullOGComplexArray implements FullAbstract<OGComplexMatrix> {
-  private static FullOGComplexArray s_instance = new FullOGComplexArray();
+public final class FullOGComplexMatrix implements FullAbstract<OGComplexMatrix> {
+  private static FullOGComplexMatrix s_instance = new FullOGComplexMatrix();
 
-  public static FullOGComplexArray getInstance() {
+  public static FullOGComplexMatrix getInstance() {
     return s_instance;
   }
 
-  private FullOGComplexArray() {
+  private FullOGComplexMatrix() {
   }
 
   private static CopyOGComplexMatrix s_copier = CopyOGComplexMatrix.getInstance();

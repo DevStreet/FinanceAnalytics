@@ -15,7 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
  */
 public class DOGMAOGDiagonalArrayFullTest {
 
-  private static FullOGDiagonalArray f = FullOGDiagonalArray.getInstance();
+  private static FullOGDiagonalMatrix f = FullOGDiagonalMatrix.getInstance();
   
   @Test
   public static void fullTest() {
