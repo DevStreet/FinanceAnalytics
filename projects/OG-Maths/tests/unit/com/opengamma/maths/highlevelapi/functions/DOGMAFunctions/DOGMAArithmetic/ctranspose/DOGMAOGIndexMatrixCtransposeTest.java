@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
  */
 public class DOGMAOGIndexMatrixCtransposeTest {
 
-  CtransposeOGIndexArray ct = CtransposeOGIndexArray.getInstance();
+  CtransposeOGIndexMatrix ct = CtransposeOGIndexMatrix.getInstance();
 
   int normalRows = 4;
   int normalCols = 3;

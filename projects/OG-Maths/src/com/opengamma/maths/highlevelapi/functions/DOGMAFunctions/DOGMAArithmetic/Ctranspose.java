@@ -20,7 +20,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGIndexArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGIndexMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGPermutationMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -37,7 +37,7 @@ public class Ctranspose {
   private static Map<Class<? extends OGArray<? extends Number>>, CtransposeAbstract<? extends OGArray<? extends Number>>> s_functionPointers = Maps.newHashMap();
   static {
     s_functionPointers.put(OGMatrix.class, CtransposeOGMatrix.getInstance());
-    s_functionPointers.put(OGIndexMatrix.class, CtransposeOGIndexArray.getInstance());    
+    s_functionPointers.put(OGIndexMatrix.class, CtransposeOGIndexMatrix.getInstance());    
     s_functionPointers.put(OGSparseMatrix.class, CtransposeOGSparseMatrix.getInstance());
     s_functionPointers.put(OGComplexMatrix.class, CtransposeOGComplexMatrix.getInstance());
     s_functionPointers.put(OGPermutationMatrix.class, CtransposeOGPermutationMatrix.getInstance());
