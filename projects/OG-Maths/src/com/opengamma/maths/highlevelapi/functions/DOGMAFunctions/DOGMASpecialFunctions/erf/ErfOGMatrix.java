@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 /**
  * Does erf on OGDoubleArray
  */
-public final class ErfOGDoubleArray implements ErfAbstract<OGMatrix> {
-  private static ErfOGDoubleArray s_instance = new ErfOGDoubleArray();
+public final class ErfOGMatrix implements ErfAbstract<OGMatrix> {
+  private static ErfOGMatrix s_instance = new ErfOGMatrix();
 
-  public static ErfOGDoubleArray getInstance() {
+  public static ErfOGMatrix getInstance() {
     return s_instance;
   }
 
-  private ErfOGDoubleArray() {
+  private ErfOGMatrix() {
   }
 
   @Override

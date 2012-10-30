@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 /**
  * Erf on Sparse
  */
-public final class ErfOGSparseArray implements ErfAbstract<OGSparseMatrix> {
-  private static ErfOGSparseArray s_instance = new ErfOGSparseArray();
+public final class ErfOGSparseMatrix implements ErfAbstract<OGSparseMatrix> {
+  private static ErfOGSparseMatrix s_instance = new ErfOGSparseMatrix();
 
-  public static ErfOGSparseArray getInstance() {
+  public static ErfOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private ErfOGSparseArray() {
+  private ErfOGSparseMatrix() {
   }
 
   @Override
