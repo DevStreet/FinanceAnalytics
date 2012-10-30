@@ -76,10 +76,22 @@ public interface LAPACKAPIInterface {
   // LUP
   void dgetrf(int m, int n, double[] A, int lda, int[] IPIV, int[] INFO); // CSIGNORE
 
+  // LUP back solve
+  void dgetrs(char trans, int n, int nrhs, double[] a, int lda, int[] ipiv, double[] b, int ldb, int[] info);
+
   // linear least squares
   void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info); //CSIGNORE
 
   // triangular solve
   void dtrtrs(char uplo, char trans, char diag, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info);
+
+  // cholesky decomposition
+  void dpotrf(char uplo, int n, double[] a, int lda, int[] info);
+
+  // cholesky back solve
+  void dpotrs(char uplo, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info);
+
+  // queries for block sizes, cross overpoints and arithmetic what nots, normally overloaded
+  int ilaenv(int ispec, char[] name, char[] opts, int n1, int n2, int n3, int n4);
 
 }

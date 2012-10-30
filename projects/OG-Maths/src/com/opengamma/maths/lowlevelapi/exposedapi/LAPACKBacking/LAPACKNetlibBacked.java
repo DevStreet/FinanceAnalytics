@@ -8,7 +8,11 @@ package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 import org.netlib.lapack.Dgelsd;
 import org.netlib.lapack.Dgesvd;
 import org.netlib.lapack.Dgetrf;
+import org.netlib.lapack.Dgetrs;
+import org.netlib.lapack.Dpotrf;
+import org.netlib.lapack.Dpotrs;
 import org.netlib.lapack.Dtrtrs;
+import org.netlib.lapack.Ilaenv;
 import org.netlib.util.intW;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
@@ -36,6 +40,13 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     Dgetrf.dgetrf(m, n, A, 0, lda, ipiv, 0, infoderef);
     info[0] = infoderef.val;
   }
+  
+  @Override
+  public void dgetrs(char trans, int n, int nrhs, double[] a, int lda, int[] ipiv, double[] b, int ldb, int[] info) {
+    intW infoderef = new intW(info[0]);
+    Dgetrs.dgetrs(String.valueOf(trans), n, nrhs, a, 0, lda, ipiv, 0, b, 0, ldb, infoderef);
+    info[0] = infoderef.val;
+  }
 
   @Override
   public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { //CSIGNORE
@@ -51,6 +62,28 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     intW infoderef = new intW(info[0]);
     Dtrtrs.dtrtrs(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, nrhs, a, 0, lda, b, 0, ldb, infoderef);
     info[0] = infoderef.val;
+  }
+  
+  
+  @Override
+  public void dpotrf(char uplo, int n, double[] a, int lda, int[] info) {
+    intW infoderef = new intW(info[0]);
+    Dpotrf.dpotrf(String.valueOf(uplo), n, a, 0, lda, infoderef);
+    info[0] = infoderef.val;
+  }
+  
+  @Override
+  public void dpotrs(char uplo, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info) {
+    intW infoderef = new intW(info[0]);
+    Dpotrs.dpotrs(String.valueOf(uplo), n, nrhs, a, 0, lda, b, 0, ldb, infoderef);
+    info[0] = infoderef.val;
+  }
+
+  @Override
+  public int ilaenv(int ispec, char[] name, char[] opts, int n1, int n2, int n3, int n4) {
+    // the byte code translated ilaenv is broken, seems to return some strange values including a -1 for ispec=9
+    // a quick look at the byte code seems to show iconst_m1 is loaded and returned
+    return Ilaenv.ilaenv(ispec, String.valueOf(name), String.valueOf(opts), n1, n2, n3, n4);
   }
 
 }
