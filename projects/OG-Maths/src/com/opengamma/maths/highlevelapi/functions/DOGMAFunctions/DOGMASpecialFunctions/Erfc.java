@@ -13,8 +13,8 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcAbstract;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcOGDoubleArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcOGSparseArray;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc.ErfcOGSparseMatrix;
 
 /**
  * Overloaded Erfc
@@ -25,8 +25,8 @@ public class Erfc {
    */
   private static Map<Class<?>, ErfcAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, ErfcOGDoubleArray.getInstance());
-    s_functionPointers.put(OGSparseMatrix.class, ErfcOGSparseArray.getInstance());
+    s_functionPointers.put(OGMatrix.class, ErfcOGMatrix.getInstance());
+    s_functionPointers.put(OGSparseMatrix.class, ErfcOGSparseMatrix.getInstance());
   }
 
   @SuppressWarnings("unchecked")
