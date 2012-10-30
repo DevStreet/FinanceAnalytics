@@ -11,14 +11,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Horzcat impl for horzcatting OGDouble OGDouble
  */
-public final class HorzcatOGDoubleArrayOGDoubleArray implements HorzcatAbstract<OGMatrix, OGMatrix> {
-  private static HorzcatOGDoubleArrayOGDoubleArray s_instance = new HorzcatOGDoubleArrayOGDoubleArray();
+public final class HorzcatOGMatrixOGMatrix implements HorzcatAbstract<OGMatrix, OGMatrix> {
+  private static HorzcatOGMatrixOGMatrix s_instance = new HorzcatOGMatrixOGMatrix();
 
-  public static HorzcatOGDoubleArrayOGDoubleArray getInstance() {
+  public static HorzcatOGMatrixOGMatrix getInstance() {
     return s_instance;
   }
 
-  private HorzcatOGDoubleArrayOGDoubleArray() {
+  private HorzcatOGMatrixOGMatrix() {
   }
 
   @Override

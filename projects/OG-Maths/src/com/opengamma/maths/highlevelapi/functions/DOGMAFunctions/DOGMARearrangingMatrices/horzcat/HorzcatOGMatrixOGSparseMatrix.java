@@ -12,14 +12,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * HCats a sparse array to a dense 
  */
-public final class HorzcatOGDoubleArrayOGSparseArray implements HorzcatAbstract<OGMatrix, OGSparseMatrix> {
-  private static HorzcatOGDoubleArrayOGSparseArray s_instance = new HorzcatOGDoubleArrayOGSparseArray();
+public final class HorzcatOGMatrixOGSparseMatrix implements HorzcatAbstract<OGMatrix, OGSparseMatrix> {
+  private static HorzcatOGMatrixOGSparseMatrix s_instance = new HorzcatOGMatrixOGSparseMatrix();
 
-  public static HorzcatOGDoubleArrayOGSparseArray getInstance() {
+  public static HorzcatOGMatrixOGSparseMatrix getInstance() {
     return s_instance;
   }
 
-  private HorzcatOGDoubleArrayOGSparseArray() {
+  private HorzcatOGMatrixOGSparseMatrix() {
   }
 
   @Override
