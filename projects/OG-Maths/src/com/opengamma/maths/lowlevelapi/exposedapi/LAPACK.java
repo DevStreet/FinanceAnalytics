@@ -38,7 +38,7 @@ public class LAPACK implements LAPACKAPIInterface {
 
   // for now plumb in netlib
   public LAPACK() {
-    _localLAPACK = new LAPACKNetlibBacked();
+    _localLAPACK = new LAPACKNativeBacked();
   }
 
   public LAPACK(backing backedby) {

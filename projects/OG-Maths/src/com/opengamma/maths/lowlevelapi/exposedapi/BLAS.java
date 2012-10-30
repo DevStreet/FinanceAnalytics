@@ -42,7 +42,7 @@ public class BLAS implements BLASAPIInterface {
   }
 
   public BLAS() {
-    _localBLAS = new BLASReferenceJavaBacked();
+    _localBLAS = new BLASNativeBacked();
   }
 
   public BLAS(backing backedby) {
