@@ -21,22 +21,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class ConfigMasterReader implements Iterable<ConfigItem> {
+public class ConfigMasterReader<T> implements Iterable<ConfigItem<T>> {
 
   private static final Logger s_logger = LoggerFactory.getLogger(ConfigMasterReader.class);
 
   private ConfigMaster _configMaster;
-  private ConfigSearchRequest _configSearchRequestTemplate;
+  private ConfigSearchRequest<T> _configSearchRequestTemplate;
 
   public ConfigMasterReader(ConfigMaster configMaster) {
     this(configMaster, null);
   }
 
-  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest configSearchRequest) {
+  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest<T> configSearchRequest) {
     this(configMaster, configSearchRequest, PagingRequest.DEFAULT_PAGING_SIZE);
   }
 
-  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest configSearchRequest, int bufferSize) {
+  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest<T> configSearchRequest, int bufferSize) {
     ArgumentChecker.notNull(configMaster, "configMaster");
     ArgumentChecker.notNegativeOrZero(bufferSize, "bufferSize");
     if (configSearchRequest == null) {
@@ -48,11 +48,11 @@ public class ConfigMasterReader implements Iterable<ConfigItem> {
   }
 
   @Override
-  public Iterator<ConfigItem> iterator() {
-    return new Iterator<ConfigItem>() {
+  public Iterator<ConfigItem<T>> iterator() {
+    return new Iterator<ConfigItem<T>>() {
 
       private int _nextPageIndex;
-      private ConfigSearchResult _configSearchResult;
+      private ConfigSearchResult<T> _configSearchResult;
       private Iterator<ConfigDocument> _iterator;
 
       {
@@ -70,11 +70,11 @@ public class ConfigMasterReader implements Iterable<ConfigItem> {
       }
 
       @Override
-      public ConfigItem next() {
+      public ConfigItem<T> next() {
         while (true) {
           try {
             ConfigDocument doc = _iterator.next();
-            return doc.getValue();
+            return (ConfigItem<T>) doc.getValue();
 
           } catch (NoSuchElementException e) {
             if ((_configSearchResult != null) && (!_configSearchResult.getPaging().isLastPage())) {
@@ -92,7 +92,7 @@ public class ConfigMasterReader implements Iterable<ConfigItem> {
       }
 
       private void turnPage() {
-        ConfigSearchRequest configSearchRequest = _configSearchRequestTemplate;
+        ConfigSearchRequest<T> configSearchRequest = _configSearchRequestTemplate;
         configSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _configSearchRequestTemplate.getPagingRequest().getPagingSize()));
         _nextPageIndex += _configSearchRequestTemplate.getPagingRequest().getPagingSize();
         try {
