@@ -164,7 +164,8 @@ public class NodePositionSecurityMasterReader implements Iterable<NodePositionSe
 
         Security underlying;
         try {
-          underlying = _securitySource.getSecurity(id.toBundle());
+          // TODO this indiscriminately chooses the first security in the returned bundle, which is not ideal
+          underlying = _securitySource.get(id.toBundle()).iterator().next();
           if (underlying != null && (underlying instanceof ManageableSecurity)) {
             result.add((ManageableSecurity) underlying);
           } else {
