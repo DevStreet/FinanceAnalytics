@@ -1,5 +1,6 @@
 package com.opengamma.integration.copiernew.config;
 
+import com.opengamma.core.config.impl.ConfigItem;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.master.config.ConfigMaster;
@@ -14,7 +15,7 @@ import com.opengamma.util.tuple.ObjectsPair;
 import javax.time.calendar.ZonedDateTime;
 import java.io.IOException;
 
-public class ConfigMasterWriter<T> implements Writeable<ConfigEntry<T>> {
+public class ConfigMasterWriter implements Writeable<ConfigItem> {
 
   private static final String TEMPLATE_NAME = "<name>";
 
@@ -37,12 +38,11 @@ public class ConfigMasterWriter<T> implements Writeable<ConfigEntry<T>> {
   }
 
   @Override
-  public void addOrUpdate(ConfigEntry<T> configEntry) {
-    ArgumentChecker.notNull(configEntry, "configEntry");
+  public void addOrUpdate(ConfigItem configItem) {
+    ArgumentChecker.notNull(configItem, "configItem");
 
-    ConfigSearchRequest searchReq = new ConfigSearchRequest<T>();
-    String name = configEntry.getConfigName();
-    T config = configEntry.getConfigEntry();
+    ConfigSearchRequest searchReq = new ConfigSearchRequest();
+    String name = configItem.getName();
 
     // Rename portfolio as per supplied template
     if (_nameTemplate != null) {
@@ -50,32 +50,32 @@ public class ConfigMasterWriter<T> implements Writeable<ConfigEntry<T>> {
     }
 
     searchReq.setName(name);
-    searchReq.setType(config.getClass());
+    searchReq.setType(configItem.getClass());
 
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(ZonedDateTime.now())); // valid now
     searchReq.setSortOrder(ConfigSearchSortOrder.VERSION_FROM_INSTANT_DESC);
-    ConfigSearchResult<T> searchResult = _configMaster.search(searchReq);
+    ConfigSearchResult searchResult = _configMaster.search(searchReq);
     Object foundConfig = searchResult.getFirstValue();
     if (foundConfig != null) {
 //      if (!foundConfig.equals(config)) {
-        ConfigDocument<T> updateDoc = new ConfigDocument<T>(config.getClass());
+        ConfigDocument updateDoc = new ConfigDocument(configItem);
         updateDoc.setName(name);
-        updateDoc.setValue(config);
+        updateDoc.setConfig(configItem);
         updateDoc.setUniqueId(searchResult.getFirstDocument().getUniqueId());
         ConfigDocument result = _configMaster.update(updateDoc);
 //      }
     } else {
       // Not found, so add it
-      ConfigDocument<T> addDoc = new ConfigDocument<T>(config.getClass());
-      addDoc.setValue(config);
+      ConfigDocument addDoc = new ConfigDocument(configItem);
+      addDoc.setConfig(configItem);
       addDoc.setName(name);
       ConfigDocument result = _configMaster.add(addDoc);
     }
   }
 
   @Override
-  public void addOrUpdate(Iterable<ConfigEntry<T>> data) {
-    for (ConfigEntry<T> datum : data) {
+  public void addOrUpdate(Iterable<ConfigItem> data) {
+    for (ConfigItem datum : data) {
       addOrUpdate(datum);
     }
   }

@@ -6,6 +6,7 @@
 package com.opengamma.integration.copiernew.config;
 
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.core.config.impl.ConfigItem;
 import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigSearchRequest;
@@ -20,26 +21,26 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
+public class ConfigMasterReader implements Iterable<ConfigItem> {
 
   private static final Logger s_logger = LoggerFactory.getLogger(ConfigMasterReader.class);
 
   private ConfigMaster _configMaster;
-  private ConfigSearchRequest<T> _configSearchRequestTemplate;
+  private ConfigSearchRequest _configSearchRequestTemplate;
 
   public ConfigMasterReader(ConfigMaster configMaster) {
     this(configMaster, null);
   }
 
-  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest<T> configSearchRequest) {
+  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest configSearchRequest) {
     this(configMaster, configSearchRequest, PagingRequest.DEFAULT_PAGING_SIZE);
   }
 
-  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest<T> configSearchRequest, int bufferSize) {
+  public ConfigMasterReader(ConfigMaster configMaster, ConfigSearchRequest configSearchRequest, int bufferSize) {
     ArgumentChecker.notNull(configMaster, "configMaster");
     ArgumentChecker.notNegativeOrZero(bufferSize, "bufferSize");
     if (configSearchRequest == null) {
-      configSearchRequest = new ConfigSearchRequest<T>();
+      configSearchRequest = new ConfigSearchRequest();
       configSearchRequest.setPagingRequest(PagingRequest.ofIndex(0, bufferSize));
     }
     _configSearchRequestTemplate = configSearchRequest;
@@ -47,12 +48,12 @@ public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
   }
 
   @Override
-  public Iterator<ConfigEntry<T>> iterator() {
-    return new Iterator<ConfigEntry<T>>() {
+  public Iterator<ConfigItem> iterator() {
+    return new Iterator<ConfigItem>() {
 
       private int _nextPageIndex;
-      private ConfigSearchResult<T> _configSearchResult;
-      private Iterator<ConfigDocument<T>> _iterator;
+      private ConfigSearchResult _configSearchResult;
+      private Iterator<ConfigDocument> _iterator;
 
       {
         _nextPageIndex = 0;
@@ -69,11 +70,12 @@ public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
       }
 
       @Override
-      public ConfigEntry<T> next() {
+      public ConfigItem next() {
         while (true) {
           try {
-            ConfigDocument<T> doc = _iterator.next();
-            return new ConfigEntry<T>(doc.getName(), doc.getValue(), doc.getUniqueId());
+            ConfigDocument doc = _iterator.next();
+            return doc.getValue();
+
           } catch (NoSuchElementException e) {
             if ((_configSearchResult != null) && (!_configSearchResult.getPaging().isLastPage())) {
               turnPage();
@@ -90,14 +92,14 @@ public class ConfigMasterReader<T> implements Iterable<ConfigEntry<T>> {
       }
 
       private void turnPage() {
-        ConfigSearchRequest<T> configSearchRequest = _configSearchRequestTemplate;
+        ConfigSearchRequest configSearchRequest = _configSearchRequestTemplate;
         configSearchRequest.setPagingRequest(PagingRequest.ofIndex(_nextPageIndex, _configSearchRequestTemplate.getPagingRequest().getPagingSize()));
         _nextPageIndex += _configSearchRequestTemplate.getPagingRequest().getPagingSize();
         try {
           _configSearchResult = _configMaster.search(configSearchRequest);
           _iterator = _configSearchResult.getDocuments().iterator();
         } catch (Throwable t) {
-          _iterator = new ArrayList<ConfigDocument<T>>().iterator();
+          _iterator = new ArrayList<ConfigDocument>().iterator();
           s_logger.error("Error performing config master search: " + t.getMessage());
         }
       }
