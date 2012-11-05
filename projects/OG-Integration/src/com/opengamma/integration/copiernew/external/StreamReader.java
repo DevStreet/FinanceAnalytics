@@ -53,7 +53,7 @@ public class StreamReader<T extends Bean> implements Iterable<T> {
           _buffer = (T)_objectInputStream.readObject();
         } catch (Throwable t) {
           _buffer = null;
-          s_logger.error("Could not deserialise from XML: " + t.getMessage());
+          s_logger.info("Could not deserialise from XML: " + t.getMessage());
         }
       }
 
@@ -70,7 +70,7 @@ public class StreamReader<T extends Bean> implements Iterable<T> {
             _buffer = (T)_objectInputStream.readObject();
           } catch (Throwable t) {
             _buffer = null;
-            s_logger.error("Could not deserialise from XML: " + t.getMessage());
+            s_logger.info("Could not deserialise from XML: " + t.getMessage());
           }
           return result;
         }
