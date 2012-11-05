@@ -13,7 +13,12 @@ import com.opengamma.integration.copiernew.Writeable;
 import com.opengamma.util.ArgumentChecker;
 import com.thoughtworks.xstream.XStream;
 
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +58,23 @@ public class StreamWriter<T> implements Writeable<T> {
     ArgumentChecker.notNull(outputStream, "outputStream");
     ArgumentChecker.notNull(driver, "driver");
     _xStream = new XStream(driver);
+    //_xStream.omitField(Object.class, "_uniqueId");
+    _xStream.registerConverter(new Converter() {
+      @Override
+      public void marshal(Object o, HierarchicalStreamWriter hierarchicalStreamWriter, MarshallingContext marshallingContext) {
+        // TODO
+      }
+
+      @Override
+      public Object unmarshal(HierarchicalStreamReader hierarchicalStreamReader, UnmarshallingContext unmarshallingContext) {
+        return null;  // TODO
+      }
+
+      @Override
+      public boolean canConvert(Class aClass) {
+        return aClass.equals(UniqueId.class);  // TODO
+      }
+    });
 
     try {
       _objectOutputStream = _xStream.createObjectOutputStream(outputStream);
