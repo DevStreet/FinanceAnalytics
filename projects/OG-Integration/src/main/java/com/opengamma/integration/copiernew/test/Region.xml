@@ -1,0 +1,1617 @@
+<?xml version="1.0"?>
+<object-stream>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.EmptyImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements/>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>SUPER_NATIONAL</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Africa</__name>
+    <__fullName>Africa</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.EmptyImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements/>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>SUPER_NATIONAL</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Asia</__name>
+    <__fullName>Asia</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AF</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AF</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>AFN</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Afghanistan</__name>
+    <__fullName>Islamic State of Afghanistan</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AL</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AL</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>ALL</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Albania</__name>
+    <__fullName>Republic of Albania</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>DZ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>DZ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>DZD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Algeria</__name>
+    <__fullName>People's Democratic Republic of Algeria</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AD</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AD</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>EUR</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Andorra</__name>
+    <__fullName>Principality of Andorra</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AO</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AO</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>AOA</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Angola</__name>
+    <__fullName>Republic of Angola</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AG</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AG</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>XCD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Antigua and Barbuda</__name>
+    <__fullName>Antigua and Barbuda</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AR</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AR</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>ARS</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Argentina</__name>
+    <__fullName>Argentine Republic</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AM</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AM</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>AMD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Armenia</__name>
+    <__fullName>Republic of Armenia</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AU</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AU</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>AUD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Australia</__name>
+    <__fullName>Commonwealth of Australia</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AT</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AT</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>EUR</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Austria</__name>
+    <__fullName>Republic of Austria</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AZ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AZ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>AZN</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Azerbaijan</__name>
+    <__fullName>Republic of Azerbaijan</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>GE</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>GE</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>RUB</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>PROTO_INDEPENDENT_STATE</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Abkhazia</__name>
+    <__fullName>Republic of Abkhazia</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AS</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AS</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>USD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>DEPENDENCY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>American Samoa</__name>
+    <__fullName>Territory of American Samoa</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AI</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AI</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>XCD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>DEPENDENCY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Anguilla</__name>
+    <__fullName>Anguilla</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AU</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AU</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>DEPENDENCY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Ashmore and Cartier Islands</__name>
+    <__fullName>Territory of Ashmore and Cartier Islands</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AX</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AX</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>EUR</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>PROTO_DEPENDENCY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Aland</__name>
+    <__fullName>Aland</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AW</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AW</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>AWG</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>PROTO_DEPENDENCY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Aruba</__name>
+    <__fullName>Aruba</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AC</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AC</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_CURRENCY_ALPHA3</__name>
+            </__scheme>
+            <__value>SHP</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>PROTO_DEPENDENCY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Ascension</__name>
+    <__fullName>Ascension</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AQ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AQ</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>DISPUTED_TERRITORY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Antarctica</__name>
+    <__fullName>Antarctica</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>FINANCIAL_REGION</__name>
+            </__scheme>
+            <__value>AQ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISO_COUNTRY_ALPHA2</__name>
+            </__scheme>
+            <__value>AQ</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>ANTARCTIC_TERRITORY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Australian Antarctic Territory</__name>
+    <__fullName>Australian Antarctic Territory</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>CIABJ</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>CIABJ</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Abidjan</__name>
+    <__fullName>Abidjan</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>AEAUH</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>AEAUH</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Abu Dhabi</__name>
+    <__fullName>Abu Dhabi</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>GHACC</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>GHACC</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Accra</__name>
+    <__fullName>Accra</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>ETADD</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>ETADD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Addis Ababa</__name>
+    <__fullName>Addis Ababa</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>AUADL</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>AUADL</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Adelaide</__name>
+    <__fullName>Adelaide</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>INAMD</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>INAMD</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Ahmedabad</__name>
+    <__fullName>Ahmedabad</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>JPNGO</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>JPNGO</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Aichi</__name>
+    <__fullName>Nagoya</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>DZALG</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>DZALG</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Alger (Algiers)</__name>
+    <__fullName>Alger (Algiers)</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>KZALA</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>KZALA</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Almaty</__name>
+    <__fullName>Almaty</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>NUALO</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>NUALO</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Alofi</__name>
+    <__fullName>Alofi</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>JOAMM</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>JOAMM</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Amman</__name>
+    <__fullName>Amman</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>NLAMS</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>NLAMS</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Amsterdam</__name>
+    <__fullName>Amsterdam</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>ADALV</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>ADALV</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Andorra la Vella</__name>
+    <__fullName>Andorra la Vella</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>TRANK</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>TRANK</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Ankara</__name>
+    <__fullName>Ankara</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>MGTNR</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>MGTNR</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Antananarivo</__name>
+    <__fullName>Antananarivo</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>BEANR</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>BEANR</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Antwerpen</__name>
+    <__fullName>Antwerpen</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>WSAPW</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>WSAPW</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Apia</__name>
+    <__fullName>Apia</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>SEART</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>SEART</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Arlandastad</__name>
+    <__fullName>Arlandastad</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>TMASB</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>TMASB</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Ashkhabad</__name>
+    <__fullName>Ashkhabad</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>ERASM</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>ERASM</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Asmara</__name>
+    <__fullName>Asmara</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>KZAST</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>KZAST</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Astana (ex Tselinograd)</__name>
+    <__fullName>Astana (ex Tselinograd)</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>PYASU</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>PYASU</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Asuncion</__name>
+    <__fullName>Asunci&#xFFFD;n</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>GRATH</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>GRATH</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Athinai</__name>
+    <__fullName>Ath&#xFFFD;nai</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+  <com.opengamma.master.region.ManageableRegion>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>COPP_CLARK_LOCODE</__name>
+            </__scheme>
+            <__value>NZAKL</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>UN_LOCODE_2010_2</__name>
+            </__scheme>
+            <__value>NZAKL</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__classification>MUNICIPALITY</__classification>
+    <__parentRegionIds>
+      <com.opengamma.id.UniqueId/>
+    </__parentRegionIds>
+    <__name>Auckland</__name>
+    <__fullName>Auckland</__fullName>
+    <__data>
+      <metaBean>
+        <bean reference="../.."/>
+      </metaBean>
+      <data class="empty-map"/>
+    </__data>
+  </com.opengamma.master.region.ManageableRegion>
+</object-stream>

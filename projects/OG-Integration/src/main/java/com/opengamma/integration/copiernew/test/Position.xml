@@ -1,0 +1,1675 @@
+<?xml version="1.0"?>
+<object-stream>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>10</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0019436200001000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>ETFC US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades/>
+    <__attributes>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>10</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0010062400001000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>GCI US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades/>
+    <__attributes>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>4550</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0010079500001000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>IPG US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105525</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>2000</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme>
+            <__name>COUNTER_PARTY</__name>
+          </__scheme>
+          <__value>BACS</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2010</year>
+          <month>DECEMBER</month>
+          <day>1</day>
+        </__tradeDate>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105522</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>1001</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>BACS</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2010</year>
+          <month>DECEMBER</month>
+          <day>2</day>
+        </__tradeDate>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105523</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>2001</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>BACS</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2010</year>
+          <month>DECEMBER</month>
+          <day>2</day>
+        </__tradeDate>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105524</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>2002</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>BACS</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2010</year>
+          <month>DECEMBER</month>
+          <day>2</day>
+        </__tradeDate>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105526</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>65</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>11</hour>
+            <minute>57</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </__tradeTime>
+        <__premium>12.0</__premium>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>11</hour>
+            <minute>57</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105527</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>2</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>11</hour>
+            <minute>48</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>2.0</__premium>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>11</hour>
+            <minute>48</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105528</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>11111</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>11</hour>
+            <minute>28</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>11111.0</__premium>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>11</hour>
+            <minute>28</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105529</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>222</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>11</hour>
+            <minute>28</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>222.0</__premium>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>11</hour>
+            <minute>28</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105530</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1021</__value>
+          <__version>104500</__version>
+        </__parentPositionId>
+        <__quantity>1</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010079500001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>IPG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>11</hour>
+            <minute>48</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>1.0</__premium>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>11</hour>
+            <minute>48</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade[5]/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+    </__trades>
+    <__attributes>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>950</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0010158100001000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>MRO US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105584</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1049</__value>
+          <__version>104534</__version>
+        </__parentPositionId>
+        <__quantity>6</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010158100001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>MRO US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme>
+            <__name>COUNTER_PARTY</__name>
+          </__scheme>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>12</hour>
+            <minute>41</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </__tradeTime>
+        <__premium>6.0</__premium>
+        <__premiumCurrency>
+          <__code>ANG</__code>
+        </__premiumCurrency>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>12</hour>
+            <minute>41</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105585</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1049</__value>
+          <__version>104534</__version>
+        </__parentPositionId>
+        <__quantity>7</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010158100001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>MRO US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>12</hour>
+            <minute>41</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>7.0</__premium>
+        <__premiumCurrency reference="../../com.opengamma.master.position.ManageableTrade/__premiumCurrency"/>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>12</hour>
+            <minute>41</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+    </__trades>
+    <__attributes>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>10</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0010061400003000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>FCX US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105854</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1040</__value>
+          <__version>104813</__version>
+        </__parentPositionId>
+        <__quantity>12</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010061400003000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>FCX US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme>
+            <__name>COUNTER_PARTY</__name>
+          </__scheme>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105855</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1040</__value>
+          <__version>104813</__version>
+        </__parentPositionId>
+        <__quantity>140</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010061400003000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>FCX US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>BACS</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>3</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </__tradeTime>
+        <__premium>100.0</__premium>
+        <__premiumCurrency>
+          <__code>USD</__code>
+        </__premiumCurrency>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>4</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+    </__trades>
+    <__attributes>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>10</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0010002100001000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>ARG US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105859</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1017</__value>
+          <__version>104841</__version>
+        </__parentPositionId>
+        <__quantity>12</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010002100001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>ARG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme>
+            <__name>COUNTER_PARTY</__name>
+          </__scheme>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>15</hour>
+            <minute>58</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </__tradeTime>
+        <__premium>1.0</__premium>
+        <__premiumCurrency>
+          <__code>AFN</__code>
+        </__premiumCurrency>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>1</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>15</hour>
+            <minute>58</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>105860</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1017</__value>
+          <__version>104841</__version>
+        </__parentPositionId>
+        <__quantity>12</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010002100001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>ARG US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>2</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>1.0</__premium>
+        <__premiumCurrency reference="../../com.opengamma.master.position.ManageableTrade/__premiumCurrency"/>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>2</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+    </__trades>
+    <__attributes>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+  <com.opengamma.master.position.ManageablePosition>
+    <__quantity>1770</__quantity>
+    <__securityLink>
+      <__externalId>
+        <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+          <comparator class="com.google.common.collect.NaturalOrdering"/>
+          <elements>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_BUID</__name>
+              </__scheme>
+              <__value>EQ0010741200001000</__value>
+            </com.opengamma.id.ExternalId>
+            <com.opengamma.id.ExternalId>
+              <__scheme>
+                <__name>BLOOMBERG_TICKER</__name>
+              </__scheme>
+              <__value>TROW US Equity</__value>
+            </com.opengamma.id.ExternalId>
+          </elements>
+        </__externalIds>
+      </__externalId>
+    </__securityLink>
+    <__trades>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>106012</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1019</__value>
+          <__version>104992</__version>
+        </__parentPositionId>
+        <__quantity>44</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010741200001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>TROW US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme>
+            <__name>COUNTER_PARTY</__name>
+          </__scheme>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </__tradeTime>
+        <__premium>6.0</__premium>
+        <__premiumCurrency>
+          <__code>AOA</__code>
+        </__premiumCurrency>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>106013</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1019</__value>
+          <__version>104992</__version>
+        </__parentPositionId>
+        <__quantity>22</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010741200001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>TROW US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>6.0</__premium>
+        <__premiumCurrency reference="../../com.opengamma.master.position.ManageableTrade/__premiumCurrency"/>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>106014</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1019</__value>
+          <__version>104992</__version>
+        </__parentPositionId>
+        <__quantity>75</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010741200001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>TROW US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>6.0</__premium>
+        <__premiumCurrency reference="../../com.opengamma.master.position.ManageableTrade/__premiumCurrency"/>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>106015</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1019</__value>
+          <__version>104992</__version>
+        </__parentPositionId>
+        <__quantity>11</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010741200001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>TROW US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>6.0</__premium>
+        <__premiumCurrency reference="../../com.opengamma.master.position.ManageableTrade/__premiumCurrency"/>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+      <com.opengamma.master.position.ManageableTrade>
+        <__uniqueId>
+          <__scheme>DbPos</__scheme>
+          <__value>106016</__value>
+          <__version>0</__version>
+        </__uniqueId>
+        <__parentPositionId>
+          <__scheme>DbPos</__scheme>
+          <__value>1019</__value>
+          <__version>104992</__version>
+        </__parentPositionId>
+        <__quantity>33</__quantity>
+        <__securityLink>
+          <__externalId>
+            <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+              <comparator class="com.google.common.collect.NaturalOrdering" reference="../../../../../../__securityLink/__externalId/__externalIds/comparator"/>
+              <elements>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId/__scheme"/>
+                  <__value>EQ0010741200001000</__value>
+                </com.opengamma.id.ExternalId>
+                <com.opengamma.id.ExternalId>
+                  <__scheme reference="../../../../../../../../__securityLink/__externalId/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+                  <__value>TROW US Equity</__value>
+                </com.opengamma.id.ExternalId>
+              </elements>
+            </__externalIds>
+          </__externalId>
+        </__securityLink>
+        <__counterpartyExternalId>
+          <__scheme reference="../../../com.opengamma.master.position.ManageableTrade/__counterpartyExternalId/__scheme"/>
+          <__value>bacs</__value>
+        </__counterpartyExternalId>
+        <__tradeDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__tradeDate>
+        <__tradeTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__tradeTime>
+        <__premium>6.0</__premium>
+        <__premiumCurrency reference="../../com.opengamma.master.position.ManageableTrade/__premiumCurrency"/>
+        <__premiumDate>
+          <year>2012</year>
+          <month>JANUARY</month>
+          <day>16</day>
+        </__premiumDate>
+        <__premiumTime>
+          <time>
+            <hour>16</hour>
+            <minute>53</minute>
+            <second>0</second>
+            <nano>0</nano>
+          </time>
+          <offset reference="../../../com.opengamma.master.position.ManageableTrade/__tradeTime/offset"/>
+        </__premiumTime>
+        <__attributes/>
+      </com.opengamma.master.position.ManageableTrade>
+    </__trades>
+    <__attributes>
+      <entry>
+        <string>Beta</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Liquidity</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Market Cap</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>Region</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Underlying</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by SECTOR</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>GICS by SUB_INDUSTRY</string>
+        <string>Unknown</string>
+      </entry>
+      <entry>
+        <string>Long/Short</string>
+        <string>N/A</string>
+      </entry>
+      <entry>
+        <string>GICS by INDUSTRY_GROUP</string>
+        <string>Unknown</string>
+      </entry>
+    </__attributes>
+  </com.opengamma.master.position.ManageablePosition>
+</object-stream>

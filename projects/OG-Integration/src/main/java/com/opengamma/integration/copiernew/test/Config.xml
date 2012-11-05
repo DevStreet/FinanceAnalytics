@@ -1,0 +1,603 @@
+<?xml version="1.0"?>
+<object-stream>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>Alan</__configName>
+    <__configEntry class="com.opengamma.engine.view.ViewDefinition">
+      <__uniqueIdentifier/>
+      <__name>Alan</__name>
+      <__marketDataUser>
+        <__userName/>
+        <__ipAddress/>
+      </__marketDataUser>
+      <__resultModelDefinition>
+        <__aggregatePositionOutputMode>TERMINAL_OUTPUTS</__aggregatePositionOutputMode>
+        <__positionOutputMode>TERMINAL_OUTPUTS</__positionOutputMode>
+        <__tradeOutputMode>TERMINAL_OUTPUTS</__tradeOutputMode>
+        <__securityOutputMode>TERMINAL_OUTPUTS</__securityOutputMode>
+        <__primitiveOutputMode>TERMINAL_OUTPUTS</__primitiveOutputMode>
+      </__resultModelDefinition>
+      <__minDeltaCalculationPeriod>0</__minDeltaCalculationPeriod>
+      <__maxDeltaCalculationPeriod>0</__maxDeltaCalculationPeriod>
+      <__minFullCalculationPeriod>0</__minFullCalculationPeriod>
+      <__maxFullCalculationPeriod>0</__maxFullCalculationPeriod>
+      <__defaultCurrency>
+        <__code>GBP</__code>
+      </__defaultCurrency>
+      <__calculationConfigurationsByName class="tree-map">
+        <entry>
+          <string>Set 1</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Set 1</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map">
+              <entry>
+                <string/>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string"/>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+            </__portfolioRequirementsBySecurityType>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements/>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../__portfolioRequirementsBySecurityType/entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+      </__calculationConfigurationsByName>
+      <__dumpComputationCacheToDisk>false</__dumpComputationCacheToDisk>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>Alan2</__configName>
+    <__configEntry class="com.opengamma.engine.view.ViewDefinition">
+      <__uniqueIdentifier/>
+      <__name>Alan2</__name>
+      <__portfolioId/>
+      <__marketDataUser>
+        <__userName>bbgintegrationtestuser</__userName>
+        <__ipAddress>bbg-lx-2.hq.opengamma.com/10.0.1.232</__ipAddress>
+      </__marketDataUser>
+      <__resultModelDefinition>
+        <__aggregatePositionOutputMode>TERMINAL_OUTPUTS</__aggregatePositionOutputMode>
+        <__positionOutputMode>TERMINAL_OUTPUTS</__positionOutputMode>
+        <__tradeOutputMode>TERMINAL_OUTPUTS</__tradeOutputMode>
+        <__securityOutputMode>TERMINAL_OUTPUTS</__securityOutputMode>
+        <__primitiveOutputMode>TERMINAL_OUTPUTS</__primitiveOutputMode>
+      </__resultModelDefinition>
+      <__minDeltaCalculationPeriod>1500</__minDeltaCalculationPeriod>
+      <__maxDeltaCalculationPeriod>2500</__maxDeltaCalculationPeriod>
+      <__minFullCalculationPeriod>1500</__minFullCalculationPeriod>
+      <__maxFullCalculationPeriod>2500</__maxFullCalculationPeriod>
+      <__defaultCurrency>
+        <__code>USD</__code>
+      </__defaultCurrency>
+      <__calculationConfigurationsByName class="tree-map">
+        <entry>
+          <string>Default</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Default</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map">
+              <entry>
+                <string>EQUITY</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string"/>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Actual Repo</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">BlackVolatilitySurface</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">CAPM Beta</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+            </__portfolioRequirementsBySecurityType>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements>
+              <com.opengamma.engine.value.ValueRequirement>
+                <__valueName>Market_Value</__valueName>
+                <__targetSpecification>
+                  <__type>PRIMITIVE</__type>
+                  <__uniqueId/>
+                </__targetSpecification>
+                <__constraints class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../__portfolioRequirementsBySecurityType/entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+              </com.opengamma.engine.value.ValueRequirement>
+            </__specificRequirements>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../__portfolioRequirementsBySecurityType/entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+      </__calculationConfigurationsByName>
+      <__dumpComputationCacheToDisk>false</__dumpComputationCacheToDisk>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>Antonio test View</__configName>
+    <__configEntry class="com.opengamma.engine.view.ViewDefinition">
+      <__uniqueIdentifier/>
+      <__name>Antonio test View</__name>
+      <__portfolioId/>
+      <__marketDataUser>
+        <__userName>bbgintegrationtestuser</__userName>
+        <__ipAddress>bbg-lx-2.hq.opengamma.com/10.0.1.232</__ipAddress>
+      </__marketDataUser>
+      <__resultModelDefinition>
+        <__aggregatePositionOutputMode>TERMINAL_OUTPUTS</__aggregatePositionOutputMode>
+        <__positionOutputMode>TERMINAL_OUTPUTS</__positionOutputMode>
+        <__tradeOutputMode>TERMINAL_OUTPUTS</__tradeOutputMode>
+        <__securityOutputMode>TERMINAL_OUTPUTS</__securityOutputMode>
+        <__primitiveOutputMode>TERMINAL_OUTPUTS</__primitiveOutputMode>
+      </__resultModelDefinition>
+      <__minDeltaCalculationPeriod>1000</__minDeltaCalculationPeriod>
+      <__maxDeltaCalculationPeriod>2500</__maxDeltaCalculationPeriod>
+      <__minFullCalculationPeriod>1000</__minFullCalculationPeriod>
+      <__maxFullCalculationPeriod>2500</__maxFullCalculationPeriod>
+      <__defaultCurrency>
+        <__code>USD</__code>
+      </__defaultCurrency>
+      <__calculationConfigurationsByName class="tree-map">
+        <entry>
+          <string>Default</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Default</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map">
+              <entry>
+                <string>EQUITY</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Daily PnL</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">FairValue</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">HistoricalVaR</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+            </__portfolioRequirementsBySecurityType>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements/>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+              <__properties class="singleton-map">
+                <entry>
+                  <string>MARKET_DATA_SHIFT</string>
+                  <singleton-set>
+                    <string>if (security.type=="EQUITY") x * 1.1;</string>
+                  </singleton-set>
+                </entry>
+              </__properties>
+              <__optional class="empty-set"/>
+              <__hashCode>0</__hashCode>
+              <__hashCodeValid>false</__hashCodeValid>
+            </__defaultProperties>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+      </__calculationConfigurationsByName>
+      <__dumpComputationCacheToDisk>false</__dumpComputationCacheToDisk>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>Afshin Test Equity Option View</__configName>
+    <__configEntry class="com.opengamma.engine.view.ViewDefinition">
+      <__uniqueIdentifier/>
+      <__name>Afshin Test Equity Option View</__name>
+      <__portfolioId/>
+      <__marketDataUser>
+        <__userName>bbgintegrationtestuser</__userName>
+        <__ipAddress>bbg-lx-2.hq.opengamma.com/10.0.1.232</__ipAddress>
+      </__marketDataUser>
+      <__resultModelDefinition>
+        <__aggregatePositionOutputMode>TERMINAL_OUTPUTS</__aggregatePositionOutputMode>
+        <__positionOutputMode>TERMINAL_OUTPUTS</__positionOutputMode>
+        <__tradeOutputMode>TERMINAL_OUTPUTS</__tradeOutputMode>
+        <__securityOutputMode>TERMINAL_OUTPUTS</__securityOutputMode>
+        <__primitiveOutputMode>TERMINAL_OUTPUTS</__primitiveOutputMode>
+      </__resultModelDefinition>
+      <__minDeltaCalculationPeriod>500</__minDeltaCalculationPeriod>
+      <__maxDeltaCalculationPeriod>8000</__maxDeltaCalculationPeriod>
+      <__minFullCalculationPeriod>500</__minFullCalculationPeriod>
+      <__maxFullCalculationPeriod>8000</__maxFullCalculationPeriod>
+      <__defaultCurrency>
+        <__code>USD</__code>
+      </__defaultCurrency>
+      <__calculationConfigurationsByName class="tree-map">
+        <entry>
+          <string>Default</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Default</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map">
+              <entry>
+                <string>EQUITY</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">FairValue</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Security Market Price</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Value</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+              <entry>
+                <string>EQUITY_INDEX_OPTION</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Security Implied Volatility</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+                      <__properties class="singleton-map">
+                        <entry>
+                          <string>Curve</string>
+                          <singleton-set>
+                            <string>FORWARD_3M</string>
+                          </singleton-set>
+                        </entry>
+                      </__properties>
+                      <__optional class="empty-set"/>
+                      <__hashCode>1120378523</__hashCode>
+                      <__hashCodeValid>true</__hashCodeValid>
+                    </second>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Security Market Price</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Value</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">ValueDelta</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">ValueGamma</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+              <entry>
+                <string>EQUITY_OPTION</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Security Implied Volatility</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+                      <__properties class="singleton-map">
+                        <entry>
+                          <string>Curve</string>
+                          <singleton-set>
+                            <string>FORWARD_3M</string>
+                          </singleton-set>
+                        </entry>
+                      </__properties>
+                      <__optional class="empty-set"/>
+                      <__hashCode>1120378523</__hashCode>
+                      <__hashCodeValid>true</__hashCodeValid>
+                    </second>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Security Market Price</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Value</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">ValueDelta</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">ValueGamma</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+            </__portfolioRequirementsBySecurityType>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements>
+              <com.opengamma.engine.value.ValueRequirement>
+                <__valueName>YieldCurve</__valueName>
+                <__targetSpecification>
+                  <__type>PRIMITIVE</__type>
+                  <__uniqueId/>
+                </__targetSpecification>
+                <__constraints class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+                  <__properties class="singleton-map">
+                    <entry>
+                      <string>Curve</string>
+                      <singleton-set>
+                        <string>FORWARD_3M</string>
+                      </singleton-set>
+                    </entry>
+                  </__properties>
+                  <__optional class="empty-set"/>
+                  <__hashCode>1120378523</__hashCode>
+                  <__hashCodeValid>true</__hashCodeValid>
+                </__constraints>
+              </com.opengamma.engine.value.ValueRequirement>
+              <com.opengamma.engine.value.ValueRequirement>
+                <__valueName>YieldCurve</__valueName>
+                <__targetSpecification>
+                  <__type>PRIMITIVE</__type>
+                  <__uniqueId/>
+                </__targetSpecification>
+                <__constraints class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+                  <__properties class="singleton-map">
+                    <entry>
+                      <string>Curve</string>
+                      <singleton-set>
+                        <string>FUNDING</string>
+                      </singleton-set>
+                    </entry>
+                  </__properties>
+                  <__optional class="empty-set"/>
+                  <__hashCode>260857362</__hashCode>
+                  <__hashCodeValid>true</__hashCodeValid>
+                </__constraints>
+              </com.opengamma.engine.value.ValueRequirement>
+            </__specificRequirements>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+              <__properties class="singleton-map">
+                <entry>
+                  <string>Currency</string>
+                  <singleton-set>
+                    <string>USD</string>
+                  </singleton-set>
+                </entry>
+              </__properties>
+              <__optional class="empty-set"/>
+              <__hashCode>0</__hashCode>
+              <__hashCodeValid>false</__hashCodeValid>
+            </__defaultProperties>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+      </__calculationConfigurationsByName>
+      <__dumpComputationCacheToDisk>false</__dumpComputationCacheToDisk>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>Afshin</__configName>
+    <__configEntry class="com.opengamma.engine.view.ViewDefinition">
+      <__uniqueIdentifier/>
+      <__name>Afshin</__name>
+      <__portfolioId/>
+      <__marketDataUser>
+        <__userName>bbgintegrationtestuser</__userName>
+        <__ipAddress>bbg-lx-2.hq.opengamma.com/10.0.1.232</__ipAddress>
+      </__marketDataUser>
+      <__resultModelDefinition>
+        <__aggregatePositionOutputMode>TERMINAL_OUTPUTS</__aggregatePositionOutputMode>
+        <__positionOutputMode>TERMINAL_OUTPUTS</__positionOutputMode>
+        <__tradeOutputMode>TERMINAL_OUTPUTS</__tradeOutputMode>
+        <__securityOutputMode>TERMINAL_OUTPUTS</__securityOutputMode>
+        <__primitiveOutputMode>TERMINAL_OUTPUTS</__primitiveOutputMode>
+      </__resultModelDefinition>
+      <__maxDeltaCalculationPeriod>500</__maxDeltaCalculationPeriod>
+      <__minFullCalculationPeriod>500</__minFullCalculationPeriod>
+      <__maxFullCalculationPeriod>500</__maxFullCalculationPeriod>
+      <__defaultCurrency>
+        <__code>USD</__code>
+      </__defaultCurrency>
+      <__calculationConfigurationsByName class="tree-map">
+        <entry>
+          <string>Default</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Default</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map">
+              <entry>
+                <string>BOND</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Actual Repo</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">CAPM Beta</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Clean Price</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+              <entry>
+                <string>EQUITY</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Actual Repo</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">CAPM Beta</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Clean Price</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../../entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+            </__portfolioRequirementsBySecurityType>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements/>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+              <__properties class="singleton-map">
+                <entry>
+                  <string>foo</string>
+                  <empty-set/>
+                </entry>
+              </__properties>
+              <__optional class="empty-set"/>
+              <__hashCode>0</__hashCode>
+              <__hashCodeValid>false</__hashCodeValid>
+            </__defaultProperties>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+        <entry>
+          <string>Set 2</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Set 2</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map"/>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements/>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../../entry/com.opengamma.engine.view.ViewCalculationConfiguration/__portfolioRequirementsBySecurityType/entry/sorted-set/com.opengamma.util.tuple.ObjectsPair/second"/>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform" reference="../../../entry/com.opengamma.engine.view.ViewCalculationConfiguration/__resolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+      </__calculationConfigurationsByName>
+      <__dumpComputationCacheToDisk>false</__dumpComputationCacheToDisk>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>Andrew Test View</__configName>
+    <__configEntry class="com.opengamma.engine.view.ViewDefinition">
+      <__uniqueIdentifier/>
+      <__name>Andrew Test View</__name>
+      <__portfolioId/>
+      <__marketDataUser>
+        <__userName>bbgintegrationtestuser</__userName>
+        <__ipAddress>bbg-lx-2.hq.opengamma.com/10.0.1.232</__ipAddress>
+      </__marketDataUser>
+      <__resultModelDefinition>
+        <__aggregatePositionOutputMode>TERMINAL_OUTPUTS</__aggregatePositionOutputMode>
+        <__positionOutputMode>TERMINAL_OUTPUTS</__positionOutputMode>
+        <__tradeOutputMode>TERMINAL_OUTPUTS</__tradeOutputMode>
+        <__securityOutputMode>TERMINAL_OUTPUTS</__securityOutputMode>
+        <__primitiveOutputMode>TERMINAL_OUTPUTS</__primitiveOutputMode>
+      </__resultModelDefinition>
+      <__minDeltaCalculationPeriod>500</__minDeltaCalculationPeriod>
+      <__maxDeltaCalculationPeriod>500</__maxDeltaCalculationPeriod>
+      <__minFullCalculationPeriod>500</__minFullCalculationPeriod>
+      <__maxFullCalculationPeriod>500</__maxFullCalculationPeriod>
+      <__defaultCurrency>
+        <__code>USD</__code>
+      </__defaultCurrency>
+      <__calculationConfigurationsByName class="tree-map">
+        <entry>
+          <string>Default</string>
+          <com.opengamma.engine.view.ViewCalculationConfiguration>
+            <__viewDefinition reference="../../../.."/>
+            <__name>Default</__name>
+            <__portfolioRequirementsBySecurityType class="tree-map">
+              <entry>
+                <string>EQUITY</string>
+                <sorted-set>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">Daily PnL</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">FairValue</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                  <com.opengamma.util.tuple.ObjectsPair>
+                    <first class="string">HistoricalVaR</first>
+                    <second class="com.opengamma.engine.value.ValueProperties$EmptyPropertiesImpl" reference="../../com.opengamma.util.tuple.ObjectsPair/second"/>
+                  </com.opengamma.util.tuple.ObjectsPair>
+                </sorted-set>
+              </entry>
+            </__portfolioRequirementsBySecurityType>
+            <__tradeRequirementsBySecurityType class="tree-map"/>
+            <__specificRequirements/>
+            <__deltaDefinition/>
+            <__defaultProperties class="com.opengamma.engine.value.ValueProperties$ValuePropertiesImpl">
+              <__properties class="singleton-map">
+                <entry>
+                  <string>MARKET_DATA_SHIFT</string>
+                  <singleton-set>
+                    <string>if (security.type=="EQUITY") x * 1.1;</string>
+                  </singleton-set>
+                </entry>
+              </__properties>
+              <__optional class="empty-set"/>
+              <__hashCode>0</__hashCode>
+              <__hashCodeValid>false</__hashCodeValid>
+            </__defaultProperties>
+            <__resolutionRuleTransform class="com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform"/>
+          </com.opengamma.engine.view.ViewCalculationConfiguration>
+        </entry>
+      </__calculationConfigurationsByName>
+      <__dumpComputationCacheToDisk>false</__dumpComputationCacheToDisk>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+  <com.opengamma.integration.copiernew.config.ConfigEntry>
+    <__configName>AlternativeThreeCurveUSDConfig</__configName>
+    <__configEntry class="com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfig">
+      <__calculationConfigName>AlternativeThreeCurveUSDConfig</__calculationConfigName>
+      <__yieldCurveNames>
+        <string>Forward6M</string>
+      </__yieldCurveNames>
+      <__uniqueId class="com.opengamma.util.money.Currency">
+        <__code>USD</__code>
+      </__uniqueId>
+      <__calculationMethod>ParRate</__calculationMethod>
+      <__exogenousConfigAndCurveNames>
+        <entry>
+          <string>DefaultTwoCurveUSDConfig</string>
+          <string-array>
+            <string>Discounting</string>
+            <string>Forward3M</string>
+          </string-array>
+        </entry>
+      </__exogenousConfigAndCurveNames>
+      <__curveExposuresForInstruments>
+        <entry>
+          <string>Forward6M</string>
+          <com.opengamma.financial.analytics.ircurve.calcconfig.CurveInstrumentConfig>
+            <__exposures>
+              <entry>
+                <com.opengamma.financial.analytics.ircurve.StripInstrumentType>BASIS_SWAP</com.opengamma.financial.analytics.ircurve.StripInstrumentType>
+                <string-array>
+                  <string>Discounting</string>
+                  <string>Forward3M</string>
+                  <string>Forward6M</string>
+                </string-array>
+              </entry>
+            </__exposures>
+          </com.opengamma.financial.analytics.ircurve.calcconfig.CurveInstrumentConfig>
+        </entry>
+      </__curveExposuresForInstruments>
+    </__configEntry>
+    <__uniqueId/>
+  </com.opengamma.integration.copiernew.config.ConfigEntry>
+</object-stream>

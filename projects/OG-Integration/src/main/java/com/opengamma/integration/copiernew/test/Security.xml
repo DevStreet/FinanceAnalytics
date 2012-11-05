@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<object-stream>
+  <com.opengamma.financial.security.equity.EquitySecurity>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>CUSIP</__name>
+            </__scheme>
+            <__value>009363102</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISIN</__name>
+            </__scheme>
+            <__value>US0093631028</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>OG_SYNTHETIC_TICKER</__name>
+            </__scheme>
+            <__value>AR</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__name>AIRGAS INC</__name>
+    <__securityType>EQUITY</__securityType>
+    <__attributes/>
+    <__exchange>NEW YORK STOCK EXCHANGE INC.</__exchange>
+    <__exchangeCode>XNYS</__exchangeCode>
+    <__companyName>AIRGAS INC</__companyName>
+    <__currency>
+      <__code>USD</__code>
+    </__currency>
+  </com.opengamma.financial.security.equity.EquitySecurity>
+  <com.opengamma.financial.security.equity.EquitySecurity>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>CUSIP</__name>
+            </__scheme>
+            <__value>03748R101</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ISIN</__name>
+            </__scheme>
+            <__value>US03748R1014</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>OG_SYNTHETIC_TICKER</__name>
+            </__scheme>
+            <__value>AI</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__name>APARTMENT INVT &amp; MGMT CO -A</__name>
+    <__securityType>EQUITY</__securityType>
+    <__attributes/>
+    <__exchange>NEW YORK STOCK EXCHANGE INC.</__exchange>
+    <__exchangeCode>XNYS</__exchangeCode>
+    <__companyName>APARTMENT INVT &amp; MGMT CO -A</__companyName>
+    <__currency>
+      <__code>USD</__code>
+    </__currency>
+  </com.opengamma.financial.security.equity.EquitySecurity>
+  <com.opengamma.financial.security.option.EquityOptionSecurity>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>BLOOMBERG_BUID</__name>
+            </__scheme>
+            <__value>EO313707201012011E000006</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>BLOOMBERG_TICKER</__name>
+            </__scheme>
+            <__value>ARM LN 12/17/10 P240 Equity</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__name>ARM 2010-12-17 P 240.0</__name>
+    <__securityType>EQUITY_OPTION</__securityType>
+    <__attributes/>
+    <__optionType>PUT</__optionType>
+    <__strike>240.0</__strike>
+    <__currency>
+      <__code>GBP</__code>
+    </__currency>
+    <__underlyingId>
+      <__scheme reference="../../__externalIdBundle/__externalIds/elements/com.opengamma.id.ExternalId[2]/__scheme"/>
+      <__value>ARM LN Equity</__value>
+    </__underlyingId>
+    <__exerciseType class="com.opengamma.financial.security.option.AmericanExerciseType"/>
+    <__expiry>
+      <__expiry>
+        <dateTime>
+          <dateTime>
+            <date>
+              <year>2010</year>
+              <month>DECEMBER</month>
+              <day>17</day>
+            </date>
+            <time>
+              <hour>0</hour>
+              <minute>0</minute>
+              <second>0</second>
+              <nano>0</nano>
+            </time>
+          </dateTime>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </dateTime>
+        <zone class="javax.time.calendar.TimeZone$Fixed">
+          <id>UTC</id>
+        </zone>
+      </__expiry>
+      <__accuracy>DAY_MONTH_YEAR</__accuracy>
+    </__expiry>
+    <__pointValue>250.0</__pointValue>
+    <__exchange>LN</__exchange>
+  </com.opengamma.financial.security.option.EquityOptionSecurity>
+  <com.opengamma.financial.security.option.IRFutureOptionSecurity>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>IR_FUTURE_OPTION_LOADER</__name>
+            </__scheme>
+            <__value>e0779492-b3c4-11e0-8000-f60485b0aaa2</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__name>American margined call on EDU2 Comdty, strike = 98.0, expiring 2012-09-17</__name>
+    <__securityType>IRFUTURE_OPTION</__securityType>
+    <__attributes/>
+    <__exchange>CME</__exchange>
+    <__expiry>
+      <__expiry>
+        <dateTime>
+          <dateTime>
+            <date>
+              <year>2012</year>
+              <month>SEPTEMBER</month>
+              <day>17</day>
+            </date>
+            <time>
+              <hour>17</hour>
+              <minute>0</minute>
+              <second>0</second>
+              <nano>0</nano>
+            </time>
+          </dateTime>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </dateTime>
+        <zone class="javax.time.calendar.TimeZone$Fixed">
+          <id>UTC</id>
+        </zone>
+      </__expiry>
+      <__accuracy>MIN_HOUR_DAY_MONTH_YEAR</__accuracy>
+    </__expiry>
+    <__exerciseType class="com.opengamma.financial.security.option.AmericanExerciseType"/>
+    <__underlyingId>
+      <__scheme>
+        <__name>BLOOMBERG_TICKER</__name>
+      </__scheme>
+      <__value>EDU2 Comdty</__value>
+    </__underlyingId>
+    <__pointValue>25.0</__pointValue>
+    <__margined>true</__margined>
+    <__currency>
+      <__code>USD</__code>
+    </__currency>
+    <__strike>98.0</__strike>
+    <__optionType>CALL</__optionType>
+  </com.opengamma.financial.security.option.IRFutureOptionSecurity>
+  <com.opengamma.financial.security.option.EquityOptionSecurity>
+    <__externalIdBundle>
+      <__externalIds class="com.google.common.collect.RegularImmutableSortedSet" resolves-to="com.google.common.collect.ImmutableSortedSet$SerializedForm">
+        <comparator class="com.google.common.collect.NaturalOrdering"/>
+        <elements>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>ACTIVFEED_TICKER</__name>
+            </__scheme>
+            <__value>AAPL/120519/00570000P.O</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme reference="../../com.opengamma.id.ExternalId/__scheme"/>
+            <__value>AAPL/GUTLH.O</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>BLOOMBERG_BUID</__name>
+            </__scheme>
+            <__value>EO1016952012050147400001</__value>
+          </com.opengamma.id.ExternalId>
+          <com.opengamma.id.ExternalId>
+            <__scheme>
+              <__name>BLOOMBERG_TICKER</__name>
+            </__scheme>
+            <__value>AAPL US 05/19/12 P570 Equity</__value>
+          </com.opengamma.id.ExternalId>
+        </elements>
+      </__externalIds>
+    </__externalIdBundle>
+    <__name>AAPL 2012-05-19 P 570.0</__name>
+    <__securityType>EQUITY_OPTION</__securityType>
+    <__attributes/>
+    <__optionType>PUT</__optionType>
+    <__strike>570.0</__strike>
+    <__currency>
+      <__code>USD</__code>
+    </__currency>
+    <__underlyingId>
+      <__scheme reference="../../__externalIdBundle/__externalIds/elements/com.opengamma.id.ExternalId[4]/__scheme"/>
+      <__value>AAPL US Equity</__value>
+    </__underlyingId>
+    <__exerciseType class="com.opengamma.financial.security.option.AmericanExerciseType"/>
+    <__expiry>
+      <__expiry>
+        <dateTime>
+          <dateTime>
+            <date>
+              <year>2012</year>
+              <month>MAY</month>
+              <day>19</day>
+            </date>
+            <time>
+              <hour>0</hour>
+              <minute>0</minute>
+              <second>0</second>
+              <nano>0</nano>
+            </time>
+          </dateTime>
+          <offset>
+            <amountSeconds>0</amountSeconds>
+          </offset>
+        </dateTime>
+        <zone class="javax.time.calendar.TimeZone$Fixed">
+          <id>UTC</id>
+        </zone>
+      </__expiry>
+      <__accuracy>DAY_MONTH_YEAR</__accuracy>
+    </__expiry>
+    <__pointValue>5.0</__pointValue>
+    <__exchange>US</__exchange>
+  </com.opengamma.financial.security.option.EquityOptionSecurity>
+</object-stream>
