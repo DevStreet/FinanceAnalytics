@@ -22,6 +22,9 @@ import java.util.List;
 
 import org.custommonkey.xmlunit.*;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 /*
 Round trip for each data type and external format (cross-product)
 Empty and malformed data/wrong data type in each external format
@@ -34,7 +37,7 @@ public class RoundTripTest {
   @Test
   public void testRoundTrip() throws Exception {
 
-    for (String name : new String[] {"Security", "Position"}) { //, "Exchange", "Holiday", "Portfolio", "Region", "Config"}) {
+    for (String name : new String[] {"Config", "Security", "Holiday"}) { //, "Region", "Exchange", "Portfolio", "Position"}) {
 
       // Create mock master
       Object master = ReaderWriterUtils.getMasterClassInfo(name).getInMemoryMasterClass().newInstance();
@@ -63,23 +66,25 @@ public class RoundTripTest {
       XMLUnit.setIgnoreWhitespace(true);
       XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true);
 
-      System.out.println("Start " + name);
-      System.out.print(original);
-      System.out.println(outputStream);
+      System.out.print("Performing " + name + " round trip test... ");
 
       Diff diff = new Diff(original, outputStream.toString());
       diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-      System.out.println("Shallow diff for " + name + " returned " + diff.similar());
+      System.out.println("ready: " + diff.similar());
 
-      StringBuilder sb = new StringBuilder();
-     	DetailedDiff myDiff = new DetailedDiff(diff);
-     	myDiff.overrideElementQualifier(new
-        RecursiveElementNameAndTextQualifier());
-     	List<Difference> differences = myDiff.getAllDifferences();
-     	for (Difference d : differences)
-     	    sb.append(d.toString() + "\n");
-     	System.out.println(sb.toString());
-      System.out.println();
+      if (!diff.similar()) {
+        StringBuilder sb = new StringBuilder();
+        DetailedDiff myDiff = new DetailedDiff(diff);
+        myDiff.overrideElementQualifier(new
+          RecursiveElementNameAndTextQualifier());
+        List<Difference> differences = myDiff.getAllDifferences();
+        for (Difference d : differences)
+            sb.append(d.toString() + "\n");
+        System.out.println(sb.toString());
+        System.out.println();
+      }
+
+      assertTrue(diff.similar());
     }
   }
 
