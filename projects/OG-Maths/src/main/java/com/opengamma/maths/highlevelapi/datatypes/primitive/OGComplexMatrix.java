@@ -273,10 +273,10 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     for (int i = 0; i < 2 * _rows; i += 2) {
       for (int j = 0; j < _columns - 1; j++) {
         imag = _data[j * 2 * _rows + i + 1];
-        str += String.format("%24.18f " + (imag > 0 ? "+" : "-") + "%24.18fi, ", _data[j * 2 * _rows + i], Math.abs(imag));
+        str += String.format("%24.18f " + (imag >= 0 ? "+" : "-") + "%24.18fi, ", _data[j * 2 * _rows + i], Math.abs(imag));
       }
       imag = _data[(_columns - 1) * 2 * _rows + i + 1];
-      str += String.format("%24.18f " + (imag > 0 ? "+" : "-") + "%24.18fi, ", _data[(_columns - 1) * 2 * _rows + i], Math.abs(imag));
+      str += String.format("%24.18f " + (imag >= 0 ? "+" : "-") + "%24.18fi, ", _data[(_columns - 1) * 2 * _rows + i], Math.abs(imag));
       str += String.format("\n");
     }
     return str;
