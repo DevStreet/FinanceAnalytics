@@ -35,6 +35,22 @@ public class MatrixPrimitiveUtils {
    * @param aMatrix an array of arrays
    * @return true if array is ragged, false if array is not!
    */
+  public static boolean isRagged(Object[][] aMatrix) {
+    int rows = aMatrix.length;
+    int cols = aMatrix[0].length;
+    for (int i = 0; i < rows; i++) {
+      if (aMatrix[i].length != cols) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  /**
+   * Tests if an array is ragged
+   * @param aMatrix an array of arrays
+   * @return true if array is ragged, false if array is not!
+   */
   public static boolean isRagged(int[][] aMatrix) {
     int rows = aMatrix.length;
     int cols = aMatrix[0].length;
