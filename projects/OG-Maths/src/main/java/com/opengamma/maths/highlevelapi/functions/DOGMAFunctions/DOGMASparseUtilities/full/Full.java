@@ -8,8 +8,10 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
@@ -30,11 +32,15 @@ public class Full {
     s_functionPointers.put(OGDiagonalMatrix.class, FullOGDiagonalMatrix.getInstance());
     s_functionPointers.put(OGPermutationMatrix.class, FullOGPermutationMatrix.getInstance());
     s_functionPointers.put(OGComplexMatrix.class, FullOGComplexMatrix.getInstance());
+    s_functionPointers.put(OGComplexSparseMatrix.class, FullOGComplexSparseMatrix.getInstance());    
   }
 
   @SuppressWarnings("unchecked")
   public <T extends OGArray<U>, U extends Number> OGArray<? extends Number> full(T array1) {
     FullAbstract<T> use = (FullAbstract<T>) s_functionPointers.get(array1.getClass());
+    if (use == null) {
+      throw new MathsExceptionNotImplemented("Full() on array " + array1.getClass().toString() + " is not yet implemented");
+    }    
     return use.full(array1);
   }
 }
