@@ -41,6 +41,17 @@ public class DOGMA implements
   DOGMATrigonometaryAPI,
   DOGMAUtilityFunctionsAPI, 
   DOGMALinearAlgebraAPI {
+  
+  DOGMA(){};
+  private static DOGMA s_instance = new DOGMA();
+  /**
+   * Returns the DOGMA instance
+   * @return the DOGMA instance
+   */
+  public static DOGMA getInstance() {
+    return s_instance;
+  }
+  
   /**
    * The square root of minus one, the complex number <i>i</i>
    */
@@ -89,7 +100,7 @@ public class DOGMA implements
 
   @Override
   public OGArray<? extends Number> minus(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return DA.plus(array1, array2);
+    return DA.minus(array1, array2);
   }
 
   @Override

@@ -25,7 +25,7 @@ public class SvdSimpleTest {
   private static OGMatrix A = new OGMatrix(s_data, m, n);
 
   Svd mySVD = new Svd();
-  DOGMA DOGMA = new DOGMA();
+  DOGMA dogma = DOGMA.getInstance();
 
   @Test
   public void svdCallTest() {
@@ -33,7 +33,7 @@ public class SvdSimpleTest {
     System.out.println(result.getU().toString());
     System.out.println(result.getS().toString());
     System.out.println(result.getV().toString());
-    OGArray<? extends Number> tmp = DOGMA.mtimes(result.getU(),result.getS(),DOGMA.transpose(result.getV()));
+    OGArray<? extends Number> tmp = dogma.mtimes(result.getU(),result.getS(),dogma.transpose(result.getV()));
     System.out.println(tmp.toString());
   }
 

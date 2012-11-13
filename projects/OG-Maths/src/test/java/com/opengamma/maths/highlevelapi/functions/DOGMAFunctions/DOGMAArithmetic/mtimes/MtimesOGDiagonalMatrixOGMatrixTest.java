@@ -55,7 +55,7 @@ public class MtimesOGDiagonalMatrixOGMatrixTest {
 
   MtimesOGDiagonalMatrixOGMatrix mtimes = MtimesOGDiagonalMatrixOGMatrix.getInstance();
 
-  DOGMA dogma = new DOGMA();
+  DOGMA dogma = DOGMA.getInstance();
   OGArray<? extends Number> tmp;
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
