@@ -6,6 +6,7 @@
 package com.opengamma.maths.highlevelapi.datatypes.primitive;
 
 import java.util.Arrays;
+import java.util.Formatter;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
@@ -276,8 +277,8 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
     }
 
     if (rowIdx.length * 2 != values.length) {
-      throw new MathsExceptionIllegalArgument("Insufficient data or rowIdx values given, in complex data layout rowIdx.length*2 = data.length, however the data passed as rowIdx.length*2=" + 2 *
-          rowIdx.length + "values.length=" + values.length + " .");
+      throw new MathsExceptionIllegalArgument("Insufficient data or rowIdx values given, in complex data layout rowIdx.length*2 = data.length, however the data passed as rowIdx.length*2 = " + 2 *
+          rowIdx.length + "values.length = " + values.length + " .");
     }
 
     // check there is at least some data in the matrix.
@@ -512,7 +513,31 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
 
   @Override
   public String toString() {
-    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _rows + "\nrows=" + _cols + "\nels=" + _els;
+    StringBuffer sb = new StringBuffer();
+    Formatter formatter = new Formatter(sb);
+    double abstmp;
+    for (int ir = 0; ir < _cols; ir++) {
+      for (int i = _colPtr[ir]; i < _colPtr[ir + 1]; i++) {
+        sb.append("(");
+        sb.append(_rowIdx[i]);
+        sb.append(",");
+        sb.append(ir);
+        sb.append(") = ");
+        formatter.format("%24.18f", _values[2 * i]);
+        abstmp = (_values[2 * i + 1]);
+        if (abstmp < 0) {
+          sb.append("-");
+        } else {
+          sb.append("    +");
+        }
+        formatter.format("%24.18f", Math.abs(abstmp));
+        sb.append("i ");
+        sb.append("\n");
+      }
+    }
+
+    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _rows + "\nrows=" + _cols + "\nels=" + _els + "\n" +
+        sb.toString();
 
   }
 

@@ -29,12 +29,12 @@ public final class FullOGComplexSparseMatrix implements FullAbstract<OGComplexSp
     final int[] rowIdx = array1.getRowIndex();
     final double[] data = array1.getData();
     double[] tmp = new double[2 * rows * cols];
-    int dataPtr = 0;
+    int idx, ptr = 0;
     for (int ir = 0; ir < cols; ir++) {
       for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) {
-        tmp[(rowIdx[i] + ir * rows) * 2] = data[dataPtr];
-        tmp[(rowIdx[i] + ir * rows) * 2 + 1] = data[dataPtr + 1];
-        dataPtr += 2;
+        idx = 2 * (rowIdx[i] + ir * rows);
+        tmp[idx] = data[ptr++];
+        tmp[idx + 1] = data[ptr++];
       }
     }
     return new OGComplexMatrix(tmp, rows, cols);
