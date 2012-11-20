@@ -5,36 +5,24 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Sin;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Math.sin on OGDouble
+ * 
  */
-public final class SinOGMatrix implements SinAbstract<OGMatrix> {
-  private static SinOGMatrix s_instance = new SinOGMatrix();
-
-  public static SinOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SinOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Sin.class)
+public class SinOGMatrix implements Sin<OGMatrix, OGMatrix> {
 
   @Override
-  public OGMatrix sin(OGMatrix array1) {
-    Catchers.catchNullFromArgList(array1, 1);
-
-    final int rowsArray1 = array1.getNumberOfRows();
-    final int columnsArray1 = array1.getNumberOfColumns();
-    final double[] dataArray1 = array1.getData();
-    final int n = dataArray1.length;
-
+  public OGMatrix eval(OGMatrix array1) {
+    int n = array1.getData().length;
     double[] tmp = new double[n];
+    double[] data = array1.getData();
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.sin(dataArray1[i]);
+      tmp[i] = Math.sin(data[i]);
     }
-    return new OGMatrix(tmp, rowsArray1, columnsArray1);
+    return new OGMatrix(tmp, array1.getNumberOfRows(), array1.getNumberOfColumns());
   }
-
 }

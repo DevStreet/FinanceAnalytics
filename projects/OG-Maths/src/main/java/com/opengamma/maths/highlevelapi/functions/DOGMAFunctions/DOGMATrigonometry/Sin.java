@@ -27,7 +27,6 @@ public class Sin {
    */
   private static Map<Class<?>, SinAbstract<?>> s_functionPointers = Maps.newHashMap();
   static {
-    s_functionPointers.put(OGMatrix.class, SinOGMatrix.getInstance());
     s_functionPointers.put(OGSparseMatrix.class, SinOGSparseMatrix.getInstance());    
   }
 

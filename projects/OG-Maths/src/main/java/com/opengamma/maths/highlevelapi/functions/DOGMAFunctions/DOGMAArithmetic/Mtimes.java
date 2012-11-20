@@ -33,7 +33,6 @@ public class Mtimes {
     Pair<Class<?>, Class<?>> pairOGDoubleArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGMatrix.class, OGSparseMatrix.class);
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGDoubleArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGMatrix.class);
     Pair<Class<?>, Class<?>> pairOGSparseArrayOGSparseArray = Pair.<Class<?>, Class<?>>of(OGSparseMatrix.class, OGSparseMatrix.class);
-    s_functionPointers.put(pairOGDoubleArrayOGDoubleArray, MtimesOGMatrixOGMatrix.getInstance());
     s_functionPointers.put(pairOGDoubleArrayOGSparseArray, MtimesOGMatrixOGSparseMatrix.getInstance());
     s_functionPointers.put(pairOGSparseArrayOGDoubleArray, MtimesOGSparseMatrixOGMatrix.getInstance());
     s_functionPointers.put(pairOGSparseArrayOGSparseArray, MtimesOGSparseMatrixOGSparseMatrix.getInstance());
