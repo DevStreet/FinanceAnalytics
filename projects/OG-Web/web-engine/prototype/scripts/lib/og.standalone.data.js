@@ -6,10 +6,6 @@
     $.fn.ogdata = function (input) {
         var $selector = $(this), grid_width = $selector.width(), util = {}, gadget = {}, grid, cols,
             data, json_strify = JSON.stringify, json_parse = JSON.parse;
-        /**
-         * @param d {Object} object with data & labels arrays
-         * @param num
-         */
         gadget.getCntr = function () {
             return $selector;
         };
@@ -54,14 +50,14 @@
          */
         util.process_data = function (object) {
             if (!object.data) return;
-            var ismatrix, xlabels, ylabels, col_width, cols;
-            ismatrix = (object.data['matrix'] && !$.isEmptyObject(object.data['matrix']));
-            if (!ismatrix && !object.labels) object.labels = ['Label', 'Value'];
-            xlabels = ismatrix ? object.data['xLabels'] : object.labels;
-            ylabels = ismatrix ? object.data['yLabels'] : null;
-            col_width = util.column_width(xlabels, settings.max_col_width, ismatrix);
+            var is_matrix, xlabels, ylabels, col_width, cols;
+            is_matrix = (object.data.matrix && !$.isEmptyObject(object.data.matrix));
+            if (!is_matrix && !object.labels) object.labels = ['Label', 'Value'];
+            xlabels = is_matrix ? object.data['xLabels'] : object.labels;
+            ylabels = is_matrix ? object.data['yLabels'] : null;
+            col_width = util.column_width(xlabels, settings.max_col_width, is_matrix);
             cols = [];
-            if (ismatrix){
+            if (is_matrix) {
                 cols.push({id: 'ylabelscol', name: '', field: 'ylabelscol', width: col_width});
                 $selector.addClass('matrix');
             } else {
@@ -70,10 +66,10 @@
             xlabels.forEach(function (val) {
                 cols.push({id: val, name: val, field: val, width: col_width});
             });
-            return { 
-                data: (ismatrix ? object.data['matrix'] : object.data).reduce(function (acc, val, i) {
+            return {
+                data: (is_matrix ? object.data.matrix : object.data).reduce(function (acc, val, i) {
                     var obj = {};
-                    if (ismatrix) obj.ylabelscol = ylabels[i];
+                    if (is_matrix) obj.ylabelscol = ylabels[i];
                     val.forEach(function (val, i) {obj[xlabels[i]] = val;});
                     return acc.push(obj) && acc;
                 }, []),
@@ -90,8 +86,13 @@
         util.column_width = function (cols, max, matrix) {
             var cols = cols.length + (matrix ? 1 : 0),
                 potential_width = grid_width / cols,
-                scrollbar_width = 18; // TODO: get shared scroll width
-            return potential_width > max ? max : potential_width - (scrollbar_width / cols);
+                scrollbar_width = 21; // TODO: get shared scroll width
+            return potential_width > max ? max : potential_width - (util.scrollbar_width() / cols);
+        };
+        util.scrollbar_width = function () {
+            var html = '<div style="width: 100px; height: 100px; position: absolute; \
+                visibility: hidden; overflow: auto; left: -10000px; z-index: -10000; bottom: 100px" />';
+            return 100 - $(html).appendTo('body').append('<div />').find('div').css('height', '200px').width();
         };
         gadget.load(input);
         return gadget;

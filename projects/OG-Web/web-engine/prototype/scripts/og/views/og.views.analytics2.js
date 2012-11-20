@@ -4,30 +4,32 @@
  */
 $.register_module({
     name: 'og.views.analytics2',
-    dependencies: ['og.views.common.state', 'og.common.routes', 'og.common.gadgets.GadgetsContainer'],
+    dependencies: ['og.analytics.Form'],
     obj: function () {
-        var routes = og.common.routes, module = this, view;
+        var routes = og.common.routes, module = this, view,
+            main_selector = '.OG-layout-analytics-center', form;
         module.rules = {load: {route: '/', method: module.name + '.load'}};
         return view = {
             check_state: og.views.common.state.check.partial('/'),
-            default_details: function () {
-                og.analytics.containers.initialize();
-                og.api.text({module: 'og.analytics.grid.configure_tash'}).pipe(function (markup) {
-                    var template = Handlebars.compile(markup);
-                    $('.OG-layout-analytics-center').html(template({}));
-                });
-            },
             load: function (args) {
-                view.check_state({args: args, conditions: [{new_page: view.default_details}]});
+                $('.OG-masthead .og-analytics-beta').addClass('og-active');
+                var new_page = false;
+                if (!form) form = new og.analytics.Form({selector:'.OG-layout-analytics-masthead .og-form'});
+                form.replay_query(og.analytics.url.last.main);
+                view.check_state({args: args, conditions: [
+                    {new_page: function () {new_page = true; og.analytics.containers.initialize();}}
+                ]});
                 og.analytics.resize();
-                og.analytics.form('.OG-layout-analytics-masthead');
+                if (!new_page && !args.data && og.analytics.url.last.main) {
+                    og.analytics.url.clear_main(), $(main_selector).html('');
+                    if (!og.analytics.url.last.main) form.reset_query();
+                }
             },
             load_item: function (args) {
                 view.check_state({args: args, conditions: [{new_page: view.load}]});
                 og.analytics.url.process(args, function () {
-                    // og.analytics.url.last.main
-                });                
-                og.analytics.resize();
+                    form.replay_query(og.analytics.url.last.main);
+                });
             },
             init: function () {for (var rule in view.rules) routes.add(view.rules[rule]);},
             rules: {
