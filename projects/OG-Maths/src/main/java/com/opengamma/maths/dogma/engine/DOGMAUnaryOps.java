@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.dogma.engine;
 
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
 import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;
 import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
@@ -14,7 +15,9 @@ import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulat
 import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;
 import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;
 
 /**
  * Maps unary functions to op chains
@@ -62,5 +65,17 @@ public class DOGMAUnaryOps {
     OGArray<? extends Number> tmp = s_runner.dispatch(s_sinInstructions[type1], arg1);
     return tmp;
   }
-
+  
+  public static OGArray<? extends Number> sin(Number arg1) {
+    OGArray<? extends Number> arg1rewrite;
+    if (arg1.getClass() == ComplexType.class) {
+      arg1rewrite = new OGComplexScalar(arg1);
+    } else {
+      arg1rewrite = new OGRealScalar(arg1);
+    }
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+    OGArray<? extends Number> tmp = s_runner.dispatch(s_sinInstructions[type1], arg1rewrite);
+    return tmp;
+  }
+  
 }

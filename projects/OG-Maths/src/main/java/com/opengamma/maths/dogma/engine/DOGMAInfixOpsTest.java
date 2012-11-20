@@ -7,6 +7,7 @@ package com.opengamma.maths.dogma.engine;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.maths.dogma.DogmaLanguage;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
@@ -35,8 +36,10 @@ public class DOGMAInfixOpsTest {
     System.out.println(DOGMAInfixOps.plus(arr4, arr3));
     System.out.println(DOGMAInfixOps.plus(arr2, arr4));
     System.out.println(DOGMAInfixOps.plus(arr2, arr5));
+    System.out.println("\n\n\nFROM DOGMA..."+DogmaLanguage.plus(arr2, arr5)+"\n\n\n");
     System.out.println(DOGMAInfixOps.mtimes(arr3, arr2));   
     System.out.println("7x diag=" + DOGMAInfixOps.mtimes(7, arr4));
+    System.out.println("\n\n\n"+DogmaLanguage.sin(arr5));
   }
 
 }
