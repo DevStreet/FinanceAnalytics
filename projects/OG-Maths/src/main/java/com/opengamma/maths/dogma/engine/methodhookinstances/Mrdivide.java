@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.dogma.engine.mrdivide;
+package com.opengamma.maths.dogma.engine.methodhookinstances;
 
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;

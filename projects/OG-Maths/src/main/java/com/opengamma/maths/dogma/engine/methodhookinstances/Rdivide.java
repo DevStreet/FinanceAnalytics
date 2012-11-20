@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.dogma.engine.mtimes;
+package com.opengamma.maths.dogma.engine.methodhookinstances;
 
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
@@ -13,7 +13,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
  * @param <S> arg1
  * @param <T> arg2
  */
-public interface Mtimes<R extends OGArray<? extends Number>, S extends OGArray<? extends Number>, T extends OGArray<? extends Number>> extends InfixOperator<R, S, T> {
+public interface Rdivide<R extends OGArray<? extends Number>, S extends OGArray<? extends Number>, T extends OGArray<? extends Number>> extends InfixOperator<R, S, T> {
 
 
 }

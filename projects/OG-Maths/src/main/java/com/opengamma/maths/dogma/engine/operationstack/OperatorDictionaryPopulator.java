@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.dogma.engine;
+package com.opengamma.maths.dogma.engine.operationstack;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.fudgemsg.types.ClasspathUtilities;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 
 /**
  * Scans classpath for classes tagged with @DOGMAMethodHook

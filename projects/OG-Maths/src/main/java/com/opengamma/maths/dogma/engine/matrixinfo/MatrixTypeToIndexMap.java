@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.dogma.engine;
+package com.opengamma.maths.dogma.engine.matrixinfo;
 
 import java.util.HashMap;
 import java.util.Map;

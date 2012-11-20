@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
-import com.opengamma.maths.dogma.engine.MatrixTypeToIndexMap;
 import com.opengamma.maths.dogma.engine.converters.ConversionPointers;
 import com.opengamma.maths.dogma.engine.converters.Converter;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 

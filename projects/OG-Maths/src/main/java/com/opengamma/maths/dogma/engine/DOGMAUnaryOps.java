@@ -6,10 +6,13 @@
 package com.opengamma.maths.dogma.engine;
 
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;
+import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Sin;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunctions;
+import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;
 import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;
-import com.opengamma.maths.dogma.engine.sin.Sin;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 

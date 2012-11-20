@@ -8,9 +8,11 @@ package com.opengamma.maths.dogma.engine;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
+import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
 import com.opengamma.maths.dogma.engine.operationstack.InfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;
-import com.opengamma.maths.dogma.engine.plus.Plus;
+import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
