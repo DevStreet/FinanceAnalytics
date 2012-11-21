@@ -41,7 +41,7 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("if (arg1.getClass() == ComplexType.class) {\n");
     tmp.append("arg1rewrite = new OGComplexScalar(arg1);\n");
     tmp.append("} else {\n");
-    tmp.append("arg1rewrite = new OGRealScalar(arg1);\n");
+    tmp.append("arg1rewrite = new OGRealScalar(arg1.doubleValue());\n");
     tmp.append("}\n");
     tmp.append("int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());\n");
     tmp.append("OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_");

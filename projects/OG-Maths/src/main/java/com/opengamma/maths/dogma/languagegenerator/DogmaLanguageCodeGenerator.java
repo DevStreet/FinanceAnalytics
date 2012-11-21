@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;
 
 /**
  * 
@@ -66,6 +67,12 @@ public class DogmaLanguageCodeGenerator {
     // add singleton
     sbprocedural.append(singleton());
 
+    // add logger
+    sbprocedural.append(logger());
+
+    // add code for verbose start up
+    sbprocedural.append(verboseHandler());
+
     // add dispatch
     sbprocedural.append(chainRunners());
 
@@ -75,6 +82,9 @@ public class DogmaLanguageCodeGenerator {
     // start static block
     sbprocedural.append(beginStaticBlock());
 
+    // add start up note
+    sbprocedural.append(dogmastart());
+
     // add evaluation default matrix cost
     sbprocedural.append(evalCostMatrix());
 
@@ -83,6 +93,9 @@ public class DogmaLanguageCodeGenerator {
 
     // add jump table code
     sbprocedural.append(sbjumptables);
+
+    // add end note
+    sbprocedural.append(dogmafinished());
 
     // close static block
     sbprocedural.append(closeBrace());
@@ -117,6 +130,16 @@ public class DogmaLanguageCodeGenerator {
     return tmp.toString();
   }
 
+  private static String verboseHandler() {
+    StringBuffer tmp = new StringBuffer();
+    tmp.append("// switch for chatty start up\n");
+    tmp.append("private static boolean s_verbose;\n");
+    tmp.append("public DogmaLanguage(boolean verbose) {\n");
+    tmp.append("s_verbose = verbose;\n");
+    tmp.append("};\n");
+    return tmp.toString();
+  }
+
   private static String singleton() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("private static DogmaLanguage s_instance;\n");
@@ -148,6 +171,8 @@ public class DogmaLanguageCodeGenerator {
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;\n");
+    tmp.append("import org.slf4j.Logger;\n");
+    tmp.append("import org.slf4j.LoggerFactory;\n");
     return tmp.toString();
   }
 
@@ -168,6 +193,27 @@ public class DogmaLanguageCodeGenerator {
     return tmp.toString();
   }
 
+  private static String logger() {
+    return "private static Logger s_log = LoggerFactory.getLogger(DogmaLanguage.class);";
+  }
+
+  private static String dogmastart() {
+    StringBuffer tmp = new StringBuffer();
+    tmp.append("if(s_verbose){\n");
+    tmp.append("  s_log.info(\"Welcome to DOGMA\");");
+    tmp.append("  s_log.info(\"Building instructions...\");");
+    tmp.append("}\n");
+    return tmp.toString();
+  }
+
+  private static String dogmafinished() {
+    StringBuffer tmp = new StringBuffer();
+    tmp.append("if(s_verbose){\n");
+    tmp.append("  s_log.info(\"DOGMA built.\");");
+    tmp.append("}\n");
+    return tmp.toString();
+  }
+
   private static String beginStaticBlock() {
     return "static {\n";
   }
@@ -182,17 +228,30 @@ public class DogmaLanguageCodeGenerator {
 
   private static String evalCostMatrix() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("final double[][] DefaultInfixFunctionEvalCosts = new double[][] {//\n");
-    tmp.append("{1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },//\n");
-    tmp.append("{0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },//\n");
-    tmp.append("{0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },//\n");
-    tmp.append("{0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },//\n");
-    tmp.append("{0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },//\n");
-    tmp.append("{0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },//\n");
-    tmp.append("{0, 0, 0, 0, 0, 0, 25, 0, 50, 0 },//\n");
-    tmp.append("{0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },//\n");
-    tmp.append("{0, 0, 0, 0, 0, 0, 50, 0, 100, 200 },//\n");
-    tmp.append("{0, 0, 0, 0, 0, 0, 0, 0, 0, 200 } };\n");
+    //    tmp.append("final double[][] DefaultInfixFunctionEvalCosts = new double[][] {//\n");
+    //    tmp.append("{1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },//\n");
+    //    tmp.append("{0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },//\n");
+    //    tmp.append("{0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },//\n");
+    //    tmp.append("{0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },//\n");
+    //    tmp.append("{0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },//\n");
+    //    tmp.append("{0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },//\n");
+    //    tmp.append("{0, 0, 0, 0, 0, 0, 25, 0, 50, 0 },//\n");
+    //    tmp.append("{0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },//\n");
+    //    tmp.append("{0, 0, 0, 0, 0, 0, 50, 0, 100, 200 },//\n");
+    //    tmp.append("{0, 0, 0, 0, 0, 0, 0, 0, 0, 200 } };\n");
+
+    tmp.append("final double[][] DefaultInfixFunctionEvalCosts = new double[][] {\n");
+    tmp.append("{1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//\n");
+    tmp.append("{1.00, 1.00, 0.00, 1.00, 0.00, 0.00, 0.00, 1.00, 0.00, 1.00 },//\n");
+    tmp.append("{1.00, 0.00, 1.00, 1.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00 },//\n");
+    tmp.append("{1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 1.00, 0.00, 1.00 },//\n");
+    tmp.append("{0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//\n");
+    tmp.append("{1.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//\n");
+    tmp.append("{1.00, 0.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//\n");
+    tmp.append("{1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 1.00 },//\n");
+    tmp.append("{1.00, 0.00, 1.00, 0.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00 },//\n");
+    tmp.append("{1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00 } };\n");
+
     tmp.append("OGMatrix defaultInfixFunctionEvalCostsMatrix = new OGMatrix(DefaultInfixFunctionEvalCosts);\n");
 
     tmp.append("final double[][] DefaultUnaryFunctionEvalCosts = new double[][] {//\n");
@@ -209,5 +268,4 @@ public class DogmaLanguageCodeGenerator {
     tmp.append("OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunctionEvalCosts);\n");
     return tmp.toString();
   }
-
 }

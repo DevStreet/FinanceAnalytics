@@ -42,7 +42,7 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("if (arg1.getClass() == ComplexType.class) {\n");
     tmp.append("arg1rewrite = new OGComplexScalar(arg1);\n");
     tmp.append("} else {\n");
-    tmp.append("arg1rewrite = new OGRealScalar(arg1);\n");
+    tmp.append("arg1rewrite = new OGRealScalar(arg1.doubleValue());\n");
     tmp.append("}\n");
     tmp.append("int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());\n");
     tmp.append("int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());\n");
@@ -59,10 +59,10 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("if (arg2.getClass() == ComplexType.class) {\n");
     tmp.append("arg2rewrite = new OGComplexScalar(arg2);\n");
     tmp.append("} else {\n");
-    tmp.append(" arg2rewrite = new OGRealScalar(arg2);\n");
+    tmp.append(" arg2rewrite = new OGRealScalar(arg2.doubleValue());\n");
     tmp.append(" }\n");
-    tmp.append(" int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());\n");
-    tmp.append("int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());\n");
+    tmp.append(" int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());\n");
+    tmp.append(" int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());\n");
     tmp.append("  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_");
     tmp.append(lname);
     tmp.append("Instructions[type1][type2], arg1, arg2rewrite);\n");
@@ -79,7 +79,7 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("FunctionTable");
     tmp.append(" = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),");
     tmp.append(f.getSimpleName());
-    tmp.append(".class);\n");
+    tmp.append(".class, s_verbose);\n");
     tmp.append("s_");
     tmp.append(f.getSimpleName().toLowerCase());
     tmp.append("Instructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),");
