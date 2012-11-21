@@ -6,7 +6,9 @@
 package com.opengamma.maths.dogma.engine.matrixinfo;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
@@ -53,7 +55,20 @@ public class MatrixTypeToIndexMap {
     if (ret != null) {
       return ret;
     } else {
-      throw new MathsExceptionConfigProblem("Unknown maths type encountered");
+      throw new MathsExceptionConfigProblem("Unknown maths type encountered. Offending class is : " + array.getCanonicalName() + "\nThis is usually due to a concrete implementation of a method " +
+          "not having concrete maths types in it's argument list, which in turn means it can't be looked up and therefore can't be reached, hence the code stops!");
     }
+  }
+
+  public static Class<?> getClassFromIndex(int idx) {
+    Set<Class<?>> keys = s_classToIntMap.keySet();
+    Iterator<Class<?>> it = keys.iterator();
+    while (it.hasNext()) {
+      Class<?> next = it.next();
+      if (s_classToIntMap.get(next) == idx) {
+        return next;
+      }
+    }
+    throw new MathsExceptionConfigProblem("Unknown index requested!");
   }
 }

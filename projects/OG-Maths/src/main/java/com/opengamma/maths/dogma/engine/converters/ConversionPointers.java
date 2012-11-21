@@ -19,6 +19,7 @@ import com.opengamma.maths.dogma.engine.converters.convertOGDiagonalMatrix.Conve
 import com.opengamma.maths.dogma.engine.converters.convertOGMatrix.ConvertOGMatrixToOGComplexMatrix;
 import com.opengamma.maths.dogma.engine.converters.convertOGMatrix.ConvertOGMatrixToOGSparseMatrix;
 import com.opengamma.maths.dogma.engine.converters.convertOGRealScalar.ConvertOGRealScalarToOGComplexDiagonalMatrix;
+import com.opengamma.maths.dogma.engine.converters.convertOGRealScalar.ConvertOGRealScalarToOGComplexMatrix;
 import com.opengamma.maths.dogma.engine.converters.convertOGRealScalar.ConvertOGRealScalarToOGComplexScalar;
 import com.opengamma.maths.dogma.engine.converters.convertOGRealScalar.ConvertOGRealScalarToOGDiagonalMatrix;
 import com.opengamma.maths.dogma.engine.converters.convertOGRealScalar.ConvertOGRealScalarToOGMatrix;
@@ -86,7 +87,7 @@ public class ConversionPointers {
     s_conversionDict[0][6] = null; // Number-->Sparse
     s_conversionDict[0][7] = null; // Number-->CplxSparse
     s_conversionDict[0][8] = new ConvertOGRealScalarToOGMatrix(); // Number-->Mat
-    s_conversionDict[0][9] = null; // Number-->CplxMat
+    s_conversionDict[0][9] = new ConvertOGRealScalarToOGComplexMatrix(); // Number-->CplxMat
     s_conversionDict[1][0] = null; // Complex-->Number
     s_conversionDict[1][1] = matrixNOP; // Complex-->Complex
     s_conversionDict[1][2] = new ConvertOGComplexScalarToOGComplexDiagonalMatrix(); // Complex-->Diag

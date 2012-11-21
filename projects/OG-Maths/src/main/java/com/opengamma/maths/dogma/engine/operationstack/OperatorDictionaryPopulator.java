@@ -72,10 +72,10 @@ public class OperatorDictionaryPopulator<T> {
     // see what it is supposed to do
     Class<?> theClass = clazz.getAnnotation(DOGMAMethodHook.class).provides();
 
-    Method[] m = registerInstance.getClass().getDeclaredMethods();
-    for (int i = 0; i < m.length; i++) {
-      System.out.println(m[i].toString());
-    }
+//    Method[] m = registerInstance.getClass().getDeclaredMethods();
+//    for (int i = 0; i < m.length; i++) {
+//      System.out.println(m[i].toString());
+//    }
 
     // add the thing to the map
     if (_opMap.get(theClass) == null) {

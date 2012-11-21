@@ -106,20 +106,18 @@ public class MethodScraperForUnaryFunctions {
     for (int i = 0; i < n; i++) {
       functionArgHasMatch[i] = -1; // signal no pairing
       if (functionTable[i] != null) {
-        System.out.println("Fn tab[" + i + "]=" + functionTable[i].toString());
+        //        System.out.println("Fn tab[" + i + "]=" + functionTable[i].toString());
         availabilityAndCostMatrix[i] = functionTableEvalCost.getEntry(i, 0);
         functionArgHasMatch[i] = i;
       }
     }
 
-    OGMatrix implexists = new OGMatrix(availabilityAndCostMatrix, 1, n);
-    System.out.println("availabilityAndCostMatrix=" + implexists.toString());
     int typeArg1;
     double mincost, cost;
     int best;
     UnaryFunctionChain[] ret = new UnaryFunctionChain[10];
 
-    System.out.println("functionArgHasMatch=" + Arrays.toString(functionArgHasMatch));
+    //    System.out.println("functionArgHasMatch=" + Arrays.toString(functionArgHasMatch));
 
     // for each type pair that has a nonzero weight (i.e. conversion is possible)...
     // if there is a function that has a prototype that matches, bung it in with null as NOP on the conversion lists
@@ -133,10 +131,8 @@ public class MethodScraperForUnaryFunctions {
         mincost = Double.MAX_VALUE;
         for (int j = 0; j < n; j++) {
           if (functionArgHasMatch[j] != -1) {
-
             typeArg1 = functionArgHasMatch[j];
-
-            if (conversionTableEvalCost.getEntry(i, typeArg1) != 0) { // it's possible to convert
+            if (s_conversionFunctions[i][typeArg1] != null) { // it's possible to convert
               cost = availabilityAndCostMatrix[i] + conversionTableEvalCost.getEntry(i, typeArg1);
               if (cost < mincost) {
                 mincost = cost;
@@ -144,13 +140,13 @@ public class MethodScraperForUnaryFunctions {
               }
             }
           }
-          if (best != -1) {
-            // create InfixOpChain based on best found, they are lists opposed to class pointers because at some point we might want to be able to run chains of conversions
-            UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>> clazz = functionTable[best];
-            List<Converter<? super OGArray<? extends Number>>> chain1 = new ArrayList<Converter<? super OGArray<? extends Number>>>();
-            chain1.add((Converter<? super OGArray<? extends Number>>) s_conversionFunctions[i][best]);
-            ret[i] = new UnaryFunctionChain(chain1, clazz);
-          }
+        }
+        if (best != -1) {
+          // create InfixOpChain based on best found, they are lists opposed to class pointers because at some point we might want to be able to run chains of conversions
+          UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>> clazz = functionTable[best];
+          List<Converter<? super OGArray<? extends Number>>> chain1 = new ArrayList<Converter<? super OGArray<? extends Number>>>();
+          chain1.add((Converter<? super OGArray<? extends Number>>) s_conversionFunctions[i][best]);
+          ret[i] = new UnaryFunctionChain(chain1, clazz);
         }
       }
     }
