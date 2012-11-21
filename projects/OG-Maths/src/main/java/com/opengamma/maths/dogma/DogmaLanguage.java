@@ -26,11 +26,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Transpose;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Mtimes;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Minus;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Sin;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
 
 /**
  * Provides the DOGMA Language
@@ -54,11 +55,12 @@ public class DogmaLanguage {
 
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
+  private static InfixOpChain[][] s_plusInstructions; //CSOFF
+  private static UnaryFunctionChain[] s_transposeInstructions; //CSOFF
   private static InfixOpChain[][] s_mtimesInstructions; //CSOFF
   private static InfixOpChain[][] s_minusInstructions; //CSOFF
   private static InfixOpChain[][] s_timesInstructions; //CSOFF
   private static UnaryFunctionChain[] s_sinInstructions; //CSOFF
-  private static InfixOpChain[][] s_plusInstructions; //CSOFF
   static {
     if (s_verbose) {
       s_log.info("Welcome to DOGMA");
@@ -90,6 +92,15 @@ public class DogmaLanguage {
     // Build instructions sets
     OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();
     OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();
+    InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] PlusFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(
+        operatorDictInfix.getOperationsMap(), Plus.class, s_verbose);
+    s_plusInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(), PlusFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+
+    UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] TransposeFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(
+        operatorDictUnary.getOperationsMap(), Transpose.class);
+    s_transposeInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(), TransposeFunctionTable,
+        defaultUnaryFunctionEvalCostsMatrix);
+
     InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] MtimesFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(
         operatorDictInfix.getOperationsMap(), Mtimes.class, s_verbose);
     s_mtimesInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(), MtimesFunctionTable, defaultInfixFunctionEvalCostsMatrix);
@@ -106,14 +117,61 @@ public class DogmaLanguage {
         Sin.class);
     s_sinInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(), SinFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
 
-    InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] PlusFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(
-        operatorDictInfix.getOperationsMap(), Plus.class, s_verbose);
-    s_plusInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(), PlusFunctionTable, defaultInfixFunctionEvalCostsMatrix);
-
     if (s_verbose) {
       s_log.info("DOGMA built.");
     }
 
+  }
+
+  public static OGArray<? extends Number> plus(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1, arg2);
+    return tmp;
+  }
+
+  public static OGArray<? extends Number> plus(Number arg1, OGArray<? extends Number> arg2) {
+    OGArray<? extends Number> arg1rewrite;
+    if (arg1.getClass() == ComplexType.class) {
+      arg1rewrite = new OGComplexScalar(arg1);
+    } else {
+      arg1rewrite = new OGRealScalar(arg1.doubleValue());
+    }
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1rewrite, arg2);
+    return tmp;
+  }
+
+  public static OGArray<? extends Number> plus(OGArray<? extends Number> arg1, Number arg2) {
+    OGArray<? extends Number> arg2rewrite;
+    if (arg2.getClass() == ComplexType.class) {
+      arg2rewrite = new OGComplexScalar(arg2);
+    } else {
+      arg2rewrite = new OGRealScalar(arg2.doubleValue());
+    }
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
+    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1, arg2rewrite);
+    return tmp;
+  }
+
+  public static OGArray<? extends Number> transpose(OGArray<? extends Number> arg1) {
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+    OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_transposeInstructions[type1], arg1);
+    return tmp;
+  }
+
+  public static OGArray<? extends Number> transpose(Number arg1) {
+    OGArray<? extends Number> arg1rewrite;
+    if (arg1.getClass() == ComplexType.class) {
+      arg1rewrite = new OGComplexScalar(arg1);
+    } else {
+      arg1rewrite = new OGRealScalar(arg1.doubleValue());
+    }
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+    OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_transposeInstructions[type1], arg1rewrite);
+    return tmp;
   }
 
   public static OGArray<? extends Number> mtimes(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
@@ -230,39 +288,6 @@ public class DogmaLanguage {
     }
     int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
     OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_sinInstructions[type1], arg1rewrite);
-    return tmp;
-  }
-
-  public static OGArray<? extends Number> plus(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
-    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
-    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1, arg2);
-    return tmp;
-  }
-
-  public static OGArray<? extends Number> plus(Number arg1, OGArray<? extends Number> arg2) {
-    OGArray<? extends Number> arg1rewrite;
-    if (arg1.getClass() == ComplexType.class) {
-      arg1rewrite = new OGComplexScalar(arg1);
-    } else {
-      arg1rewrite = new OGRealScalar(arg1.doubleValue());
-    }
-    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
-    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1rewrite, arg2);
-    return tmp;
-  }
-
-  public static OGArray<? extends Number> plus(OGArray<? extends Number> arg1, Number arg2) {
-    OGArray<? extends Number> arg2rewrite;
-    if (arg2.getClass() == ComplexType.class) {
-      arg2rewrite = new OGComplexScalar(arg2);
-    } else {
-      arg2rewrite = new OGRealScalar(arg2.doubleValue());
-    }
-    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
-    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1, arg2rewrite);
     return tmp;
   }
 
