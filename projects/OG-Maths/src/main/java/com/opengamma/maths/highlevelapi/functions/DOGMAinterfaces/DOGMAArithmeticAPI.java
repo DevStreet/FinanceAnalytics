@@ -152,56 +152,6 @@ public interface DOGMAArithmeticAPI {
    */
   OGArray<? extends Number> mrdivide(OGArray<? extends Number> matrixA, OGArray<? extends Number> vectorb);
 
-  /* TIMES */
-  /**
-   * Element wise multiplication. For more than two inputs it returns the multiplications
-   * applied and accumulated from left to right, e.g.
-   * (((array[0]*array[1])*array[2])*array[3])... 
-   * @param array the arrays to multiply
-   * @return the cumulative product of array multiplication
-   */
-  OGArray<? extends Number> times(OGArray<? extends Number>... array);
-
-  /**
-   * Element wise multiplication. of two OGArray arrays
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return the element wise product of the arrays 
-   */
-  OGArray<? extends Number> times(OGArray<? extends Number> array1, OGArray<? extends Number> array2);
-
-  /**
-   * Element wise multiplication of OGArray with a number
-   * @param array1 the first array
-   * @param number a number
-   * @return the element wise product of the arrays with the number 
-   */
-  OGArray<? extends Number> times(OGArray<? extends Number> array1, double number);
-  
-  /**
-   * Element wise multiplication of OGArray with a number
-   * @param array1 the first array
-   * @param number a number
-   * @return the element wise product of the arrays with the number 
-   */
-  OGArray<? extends Number> times(OGArray<? extends Number> array1, int number);
-  
-  /**
-   * Element wise multiplication of OGArray with a number
-   * @param number a number
-   * @param array1 the first array
-   * @return the element wise product of the arrays with the number 
-   */
-  OGArray<? extends Number> times(double number, OGArray<? extends Number> array1);
-
-  /**
-   * Element wise multiplication of OGArray with a number
-   * @param number a number
-   * @param array1 the first array
-   * @return the element wise product of the arrays with the number 
-   */
-  OGArray<? extends Number> times(int number, OGArray<? extends Number> array1);  
-  
   /* POWER */
   /**
    * Element by element raise to a power

@@ -18,17 +18,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGMatrixOGSparseMatrix implements Mtimes<OGArray<? extends Number>, OGMatrix, OGSparseMatrix> {
-  private static MtimesOGMatrixOGSparseMatrix s_instance = new MtimesOGMatrixOGSparseMatrix();
-
-  public static MtimesOGMatrixOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private MtimesOGMatrixOGSparseMatrix() {
-  }
-
   private BLAS _localblas = new BLAS();
-
   @Override
   public OGArray<? extends Number> eval(OGMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);

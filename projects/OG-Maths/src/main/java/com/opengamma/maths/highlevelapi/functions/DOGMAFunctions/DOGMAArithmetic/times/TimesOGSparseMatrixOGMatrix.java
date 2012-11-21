@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
@@ -12,23 +14,13 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Does elementwise OGSparse * OGDouble
  */
-public final class TimesOGSparseMatrixOGMatrix implements TimesAbstract<OGSparseMatrix, OGMatrix> {
-  private static TimesOGSparseMatrixOGMatrix s_instance = new TimesOGSparseMatrixOGMatrix();
+@DOGMAMethodHook(provides = Times.class)
+public final class TimesOGSparseMatrixOGMatrix implements Times<OGArray<? extends Number>, OGSparseMatrix, OGMatrix> {
 
-  public static TimesOGSparseMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private TimesOGSparseMatrixOGMatrix() {
-  }
-
-  
-  private static TimesOGMatrixOGSparseMatrix s_reverse = TimesOGMatrixOGSparseMatrix.getInstance();
-  
-  
   @Override
-  public OGArray<? extends Number> times(OGSparseMatrix array1, OGMatrix array2) {
-    return s_reverse.times(array2, array1);
+  public OGArray<? extends Number> eval(OGSparseMatrix array1, OGMatrix array2) {
+    TimesOGMatrixOGSparseMatrix s_reverse = new TimesOGMatrixOGSparseMatrix();
+    return s_reverse.eval(array2, array1);
   }
 
 }

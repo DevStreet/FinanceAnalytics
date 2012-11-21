@@ -53,7 +53,7 @@ public class MtimesOGDiagonalMatrixOGMatrixTest {
   OGDiagonalMatrix OGDiag6x2 = new OGDiagonalMatrix(_dataC, 6, 2);
   OGDiagonalMatrix OGDiag4x6TimesSingle = new OGDiagonalMatrix(_dataC4x6TimesSingle, 4, 6);
 
-  MtimesOGDiagonalMatrixOGMatrix mtimes = MtimesOGDiagonalMatrixOGMatrix.getInstance();
+  MtimesOGDiagonalMatrixOGMatrix mtimes = new MtimesOGDiagonalMatrixOGMatrix();
 
   DOGMA dogma = DOGMA.getInstance();
   OGArray<? extends Number> tmp;

@@ -65,17 +65,17 @@ public class DogmaTest {
     System.out.println("Input = " + ogDoubleMatrixData3by5.toString());
     System.out.println("Input = " + baz.full(ogSparseMatrixData3by5).toString());
 
-    answer3 = foo.times(ogDoubleMatrixData3by5, new OGMatrix(7.e0));
-    System.out.println("Times = " + answer3.toString());
-
-    System.out.println("Sparse TIMES = ");
-    answer3 = foo.times(ogDoubleMatrixData3by5, ogSparseMatrixData3by5);
-    System.out.println("Dense Matrix = " + ogDoubleMatrixData3by5.toString());
-    System.out.println("Sparse Matrix = " + baz.full(ogSparseMatrixData3by5).toString());
-    System.out.println("Times Sparse = " + baz.full(answer3).toString());
-
-    answer3 = foo.times(ogSparseMatrixData3by5, ogMoreSparseMatrixData);
-    System.out.println("Sparse Times Sparse = " + baz.full(answer3).toString());
+//    answer3 = foo.times(ogDoubleMatrixData3by5, new OGMatrix(7.e0));
+//    System.out.println("Times = " + answer3.toString());
+//
+//    System.out.println("Sparse TIMES = ");
+//    answer3 = foo.times(ogDoubleMatrixData3by5, ogSparseMatrixData3by5);
+//    System.out.println("Dense Matrix = " + ogDoubleMatrixData3by5.toString());
+//    System.out.println("Sparse Matrix = " + baz.full(ogSparseMatrixData3by5).toString());
+//    System.out.println("Times Sparse = " + baz.full(answer3).toString());
+//
+//    answer3 = foo.times(ogSparseMatrixData3by5, ogMoreSparseMatrixData);
+//    System.out.println("Sparse Times Sparse = " + baz.full(answer3).toString());
 
     answer3 = foo.plus(ogSparseMatrixData3by5, ogMoreSparseMatrixData);
     System.out.println("Sparse Plus Sparse = " + baz.full(answer3).toString());
@@ -125,56 +125,56 @@ public class DogmaTest {
     System.out.println("MTIMES");
     System.out.println("Dense * Dense");
     System.out.println("Dense == " + ogDoubleMatrixData3by5.toString());
-    answer3 = foo.mtimes(new OGMatrix(new double[][] {{10 } }), ogDoubleMatrixData3by5);
-    System.out.println("mtimes single d full d = " + answer3.toString());
-
-    answer3 = foo.mtimes(new OGMatrix(new double[][] {{10, 20, 30 } }), ogDoubleMatrixData3by5);
-    System.out.println("mtimes row vector d full d = " + answer3.toString());
-
-    answer3 = foo.mtimes(ogDoubleMatrixData3by5, new OGMatrix(new double[][] { {10 }, {20 }, {30 }, {40 }, {50 } }));
-    System.out.println("mtimes full d col vector d = " + answer3.toString());
-
-    answer3 = foo.mtimes(ogDoubleMatrixData3by5, ogDoubleMatrixData5by2);
-    System.out.println("mtimes full d full d = " + answer3.toString());
-
-    System.out.println("Dense * Sparse");
-    answer3 = foo.mtimes(ogDoubleMatrixData3by5, new OGSparseMatrix(new double[][] {{10 } }));
-    System.out.println("mtimes full d single s= " + answer3.toString());
-
-    answer3 = foo.mtimes(new OGMatrix(new double[][] {{10 } }), ogSparseMatrixData3by5);
-    System.out.println("mtimes single d full s = " + baz.full(answer3).toString());    
-    
-    answer3 = foo.mtimes(ogDoubleMatrixData3by5, new OGSparseMatrix(new double[][] { {10 }, {0 }, {30 }, {0 }, {50 } }));
-    System.out.println("mtimes full d vector s = " + answer3.toString());
-
-    System.out.println("ogSparseMatrixData5by4" + ogSparseMatrixData5by4.toString());
-    answer3 = foo.mtimes(ogDoubleMatrixData3by5, ogSparseMatrixData5by4);
-    System.out.println("mtimes full d full s = " + answer3.toString());
-
-    System.out.println("Sparse * Dense");
-    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGMatrix(new double[][] {{10 } }));
-    System.out.println("mtimes full s single d = " + baz.full(answer3).toString());
-
-    answer3 = foo.mtimes(new OGSparseMatrix(new double[][] {{10 } }), ogDoubleMatrixData3by5);
-    System.out.println("mtimes single s full d = " + baz.full(answer3).toString());
-    
-    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGMatrix(new double[][] { {10 }, {20 }, {30 }, {40 } }));
-    System.out.println("mtimes full s vector d = " + baz.full(answer3).toString());
-
-    answer3 = foo.mtimes(ogSparseMatrixData5by4, ogDoubleMatrixData4by5);
-    System.out.println("mtimes full s full d = " + answer3.toString());
-    
-    
-    
-    System.out.println("Sparse * Sparse");
-    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGSparseMatrix(new double[][] {{10 } }));
-    System.out.println("mtimes full s single s = " + baz.full(answer3).toString());
-
-    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGSparseMatrix(new double[][] { {0 }, {20 }, {30 }, {0 } }));
-    System.out.println("mtimes full s vector s = " + baz.full(answer3).toString());   
-
-    answer3 = foo.mtimes(ogSparseMatrixData3by5, ogSparseMatrixData5by4);
-    System.out.println("mtimes full s full s = " + baz.full(answer3).toString());    
+//    answer3 = foo.mtimes(new OGMatrix(new double[][] {{10 } }), ogDoubleMatrixData3by5);
+//    System.out.println("mtimes single d full d = " + answer3.toString());
+//
+//    answer3 = foo.mtimes(new OGMatrix(new double[][] {{10, 20, 30 } }), ogDoubleMatrixData3by5);
+//    System.out.println("mtimes row vector d full d = " + answer3.toString());
+//
+//    answer3 = foo.mtimes(ogDoubleMatrixData3by5, new OGMatrix(new double[][] { {10 }, {20 }, {30 }, {40 }, {50 } }));
+//    System.out.println("mtimes full d col vector d = " + answer3.toString());
+//
+//    answer3 = foo.mtimes(ogDoubleMatrixData3by5, ogDoubleMatrixData5by2);
+//    System.out.println("mtimes full d full d = " + answer3.toString());
+//
+//    System.out.println("Dense * Sparse");
+//    answer3 = foo.mtimes(ogDoubleMatrixData3by5, new OGSparseMatrix(new double[][] {{10 } }));
+//    System.out.println("mtimes full d single s= " + answer3.toString());
+//
+//    answer3 = foo.mtimes(new OGMatrix(new double[][] {{10 } }), ogSparseMatrixData3by5);
+//    System.out.println("mtimes single d full s = " + baz.full(answer3).toString());    
+//    
+//    answer3 = foo.mtimes(ogDoubleMatrixData3by5, new OGSparseMatrix(new double[][] { {10 }, {0 }, {30 }, {0 }, {50 } }));
+//    System.out.println("mtimes full d vector s = " + answer3.toString());
+//
+//    System.out.println("ogSparseMatrixData5by4" + ogSparseMatrixData5by4.toString());
+//    answer3 = foo.mtimes(ogDoubleMatrixData3by5, ogSparseMatrixData5by4);
+//    System.out.println("mtimes full d full s = " + answer3.toString());
+//
+//    System.out.println("Sparse * Dense");
+//    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGMatrix(new double[][] {{10 } }));
+//    System.out.println("mtimes full s single d = " + baz.full(answer3).toString());
+//
+//    answer3 = foo.mtimes(new OGSparseMatrix(new double[][] {{10 } }), ogDoubleMatrixData3by5);
+//    System.out.println("mtimes single s full d = " + baz.full(answer3).toString());
+//    
+//    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGMatrix(new double[][] { {10 }, {20 }, {30 }, {40 } }));
+//    System.out.println("mtimes full s vector d = " + baz.full(answer3).toString());
+//
+//    answer3 = foo.mtimes(ogSparseMatrixData5by4, ogDoubleMatrixData4by5);
+//    System.out.println("mtimes full s full d = " + answer3.toString());
+//    
+//    
+//    
+//    System.out.println("Sparse * Sparse");
+//    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGSparseMatrix(new double[][] {{10 } }));
+//    System.out.println("mtimes full s single s = " + baz.full(answer3).toString());
+//
+//    answer3 = foo.mtimes(ogSparseMatrixData5by4, new OGSparseMatrix(new double[][] { {0 }, {20 }, {30 }, {0 } }));
+//    System.out.println("mtimes full s vector s = " + baz.full(answer3).toString());   
+//
+//    answer3 = foo.mtimes(ogSparseMatrixData3by5, ogSparseMatrixData5by4);
+//    System.out.println("mtimes full s full s = " + baz.full(answer3).toString());    
   }
 
 }

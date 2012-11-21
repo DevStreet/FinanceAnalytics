@@ -11,7 +11,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Rdivide;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Transpose;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
@@ -23,7 +22,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final PlusAndMinus _plusMinus = new PlusAndMinus();
   private final Copy _copy = new Copy();
-  private final Times _times = new Times();
   private Rdivide _rdivide = new Rdivide();
   private Transpose _transpose = new Transpose();
 
@@ -187,41 +185,6 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   @Override
   public OGArray<? extends Number> mrdivide(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
     throw new MathsExceptionNotImplemented("mrdivide not implemented yet");
-  }
-
-  /* TIMES */
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return _times.times(array1, array2);
-  }
-
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number>... array) {
-    OGArray<? extends Number> tmp = _copy.copy(array[0]);
-    for (int i = 1; i < array.length; i++) {
-      tmp = _times.times(tmp, array[i]);
-    }
-    return tmp;
-  }
-
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number> array1, double number) {
-    return _times.times(array1, new OGMatrix(number));
-  }
-
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number> array1, int number) {
-    return _times.times(array1, new OGMatrix(number));
-  }
-
-  @Override
-  public OGArray<? extends Number> times(double number, OGArray<? extends Number> array1) {
-    return _times.times(array1, new OGMatrix(number));
-  }
-
-  @Override
-  public OGArray<? extends Number> times(int number, OGArray<? extends Number> array1) {
-    return _times.times(array1, new OGMatrix(number));
   }
 
   /* POWER */

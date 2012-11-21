@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -12,20 +14,13 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Element wise multiply 
  */
-public final class TimesOGMatrixOGMatrix implements TimesAbstract<OGMatrix, OGMatrix> {
-  private static TimesOGMatrixOGMatrix s_instance = new TimesOGMatrixOGMatrix();
-
-  public static TimesOGMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private TimesOGMatrixOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Times.class)
+public final class TimesOGMatrixOGMatrix implements Times<OGMatrix, OGMatrix, OGMatrix> {
 
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGMatrix times(OGMatrix array1, OGMatrix array2) {
+  public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that

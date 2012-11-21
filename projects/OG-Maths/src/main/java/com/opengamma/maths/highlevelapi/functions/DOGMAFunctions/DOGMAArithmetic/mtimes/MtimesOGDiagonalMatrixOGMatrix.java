@@ -18,14 +18,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGDiagonalMatrixOGMatrix implements Mtimes<OGArray<? extends Number>, OGDiagonalMatrix, OGMatrix> {
-  private static MtimesOGDiagonalMatrixOGMatrix s_instance = new MtimesOGDiagonalMatrixOGMatrix();
-
-  public static MtimesOGDiagonalMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private MtimesOGDiagonalMatrixOGMatrix() {
-  }
 
   private BLAS _localblas = new BLAS();
 

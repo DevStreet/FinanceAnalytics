@@ -7,7 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -15,20 +16,13 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGSparse * OGSparse
  */
-public final class TimesOGSparseMatrixOGSparseMatrix implements TimesAbstract<OGSparseMatrix, OGSparseMatrix> {
-  private static TimesOGSparseMatrixOGSparseMatrix s_instance = new TimesOGSparseMatrixOGSparseMatrix();
-
-  public static TimesOGSparseMatrixOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private TimesOGSparseMatrixOGSparseMatrix() {
-  }
+@DOGMAMethodHook(provides = Times.class)
+public final class TimesOGSparseMatrixOGSparseMatrix implements Times<OGSparseMatrix, OGSparseMatrix, OGSparseMatrix> {
 
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGArray<? extends Number> times(OGSparseMatrix array1, OGSparseMatrix array2) {
+  public OGSparseMatrix eval(OGSparseMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that
@@ -41,7 +35,7 @@ public final class TimesOGSparseMatrixOGSparseMatrix implements TimesAbstract<OG
 
     double[] tmp = null;
     int n;
-    OGArray<? extends Number> ret = null;
+    OGSparseMatrix ret = null;
 
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued Sparse times Sparse = scaled Sparse 
       n = array2.getData().length;
@@ -68,7 +62,7 @@ public final class TimesOGSparseMatrixOGSparseMatrix implements TimesAbstract<OG
 
     } else { // ew mul. Sparse * Sparse -> Sparse scaled by Sparse entries. So intersection of
       Catchers.catchBadCommute(columnsArray1, "Columns in first array", columnsArray2, "Columns in second array");
-      Catchers.catchBadCommute(rowsArray1, "Rows in first array", rowsArray2, "Rows in second array");      
+      Catchers.catchBadCommute(rowsArray1, "Rows in first array", rowsArray2, "Rows in second array");
       retRows = rowsArray1;
       retCols = columnsArray1;
 
@@ -107,7 +101,7 @@ public final class TimesOGSparseMatrixOGSparseMatrix implements TimesAbstract<OG
           }
         }
       }
-      newColptr[retCols ] = ptr;
+      newColptr[retCols] = ptr;
       ret = new OGSparseMatrix(Arrays.copyOf(newColptr, retCols + 1), Arrays.copyOf(newRowIdx, ptr), Arrays.copyOf(tmp, ptr), retRows, retCols);
     }
     return ret;

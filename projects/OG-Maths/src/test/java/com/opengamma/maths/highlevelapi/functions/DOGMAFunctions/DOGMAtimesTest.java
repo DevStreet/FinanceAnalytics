@@ -5,22 +5,26 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions;
 
+import static org.testng.Assert.assertTrue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.dogma.DogmaLanguage;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAArithmetic;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Tests the times() function in DOGMA
  */
 public class DOGMAtimesTest {
+  Logger foo = LoggerFactory.getLogger(getClass());
 
-  DOGMAArithmetic DA = new DOGMAArithmetic();
+  DogmaLanguage DA = new DogmaLanguage(true);
 
   // OGDoubles
   OGMatrix OGD1x1 = new OGMatrix(new double[][] {{10 } });
@@ -46,24 +50,21 @@ public class DOGMAtimesTest {
 
   OGSparseMatrix OGS3x5AtimesOGS3x5A = new OGSparseMatrix(new double[][] { {1, 4, 0, 16, 0 }, {0, 49, 0, 81, 100 }, {0, 0, 169, 0, 0 } });
   OGSparseMatrix OGS3x5AtimesOGD1x1 = new OGSparseMatrix(new double[][] { {10, -20, 0, -40, 0 }, {0, 70, 0, 90, -100 }, {0, 0, 130, 0, 0 } });
-  
+
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput1okinput2() {
-    DA.times(null, new OGMatrix(1));
+    OGArray<? extends Number> tmp = null;
+    DA.times(tmp, new OGMatrix(1));
   }
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput2okinput1() {
-    DA.times(new OGMatrix(1), null);
+    OGArray<? extends Number> tmp = null;
+    DA.times(new OGMatrix(1), tmp);
   }
 
-  @Test(expectedExceptions = MathsExceptionNullPointer.class)
-  public void testNullinput3okinput1and2() {
-    DA.times(new OGMatrix(1), new OGMatrix(1), null);
-  }
-
-  // Operations on classes
-  // OGDoubleArray and OGDoubleArray
+  //  // Operations on classes
+  //  // OGDoubleArray and OGDoubleArray
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public void testOGDandOGDNonConformantArgsTest() {
     DA.times(OGD5x2, OGD3x5A);
@@ -164,9 +165,8 @@ public class DOGMAtimesTest {
   public void testSparse3x5AtimesSparse3x5ATest() {
     OGArray<? extends Number> tmp = DA.times(OGS3x5A, OGS3x5A);
     assertTrue(tmp.equals(OGS3x5AtimesOGS3x5A));
-  }  
-  
-  
+  }
+
   // Operations on Natives
   // OGDoubleArray operate on natives
   @Test
@@ -192,6 +192,7 @@ public class DOGMAtimesTest {
     OGArray<? extends Number> tmp = DA.times(10, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5timesOGD1x1));
   }
+
   // OGSparseArray operate on natives
   @Test
   public void testSparse3x5AtimesdoubleTest() {
@@ -213,8 +214,8 @@ public class DOGMAtimesTest {
 
   @Test
   public void testinttimesSparse3x5ATest() {
-    OGArray<? extends Number> tmp = DA.times(10, OGS3x5A);
+    OGArray<? extends Number> tmp = DogmaLanguage.times(10, OGS3x5A);
     assertTrue(tmp.equals(OGS3x5AtimesOGD1x1));
   }
-  
+
 }

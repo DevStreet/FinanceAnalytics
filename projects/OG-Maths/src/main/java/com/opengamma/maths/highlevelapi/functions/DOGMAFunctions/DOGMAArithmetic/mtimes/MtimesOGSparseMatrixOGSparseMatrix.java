@@ -18,22 +18,11 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGSparseMatrixOGSparseMatrix implements Mtimes<OGSparseMatrix, OGSparseMatrix, OGSparseMatrix> {
-  private static MtimesOGSparseMatrixOGSparseMatrix s_instance = new MtimesOGSparseMatrixOGSparseMatrix();
-
-  public static MtimesOGSparseMatrixOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private MtimesOGSparseMatrixOGSparseMatrix() {
-  }
-
   private BLAS _localblas = new BLAS();
-
   @Override
   public OGSparseMatrix eval(OGSparseMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
-
     final int colsArray1 = array1.getNumberOfColumns();
     final int colsArray2 = array2.getNumberOfColumns();
     final int rowsArray1 = array1.getNumberOfRows();

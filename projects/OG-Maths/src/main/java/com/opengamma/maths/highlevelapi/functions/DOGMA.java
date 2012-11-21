@@ -154,36 +154,6 @@ public class DOGMA implements
   }
 
   @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number>... array) {
-    return DA.times(array);
-  }
-
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return DA.times(array1, array2);
-  }
-
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number> array1, double number) {
-    return DA.times(array1, number);
-  }
-
-  @Override
-  public OGArray<? extends Number> times(OGArray<? extends Number> array1, int number) {
-    return DA.times(array1, number);
-  }
-
-  @Override
-  public OGArray<? extends Number> times(double number, OGArray<? extends Number> array1) {
-    return DA.times(number, array1);
-  }
-
-  @Override
-  public OGArray<? extends Number> times(int number, OGArray<? extends Number> array1) {
-    return DA.times(number, array1);
-  }
-
-  @Override
   public OGArray<? extends Number> power(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
     return DA.power(array1, array2);
   }
