@@ -60,12 +60,12 @@ public class MtimesOGDiagonalMatrixOGMatrixTest {
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void null1Test() {
-    mtimes.mtimes(null, OGDA6x3);
+    mtimes.eval(null, OGDA6x3);
   }
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void null2Test() {
-    mtimes.mtimes(OGDiag3x6, null);
+    mtimes.eval(OGDiag3x6, null);
   }
 
   // branches in turn
@@ -73,49 +73,49 @@ public class MtimesOGDiagonalMatrixOGMatrixTest {
   // colsArray1 = 1, rowsArray1 = 1, data = NaN
   @Test
   public void singleNaNTimesMatrixTest() {
-    tmp = mtimes.mtimes(OGDiag1x1NaN, OGDA6x3);
+    tmp = mtimes.eval(OGDiag1x1NaN, OGDA6x3);
     assertTrue(OGSingleNaNTimesD.equals(tmp));
   }
 
   // colsArray1 = 1, rowsArray1 = 1, data = double  
   @Test
   public void singleTimesMatrixTest() {
-    tmp = mtimes.mtimes(OGDiag1x1, OGDA6x3);
+    tmp = mtimes.eval(OGDiag1x1, OGDA6x3);
     assertTrue(OGSingleTimesD.equals(tmp));
   }
 
   // colsArray2 = 1, rowsArray1 = 2, data = NaN
   @Test
   public void diagTimesSingleNaNTest() {
-    tmp = mtimes.mtimes(OGDiag4x6, OGD1x1NaN);
+    tmp = mtimes.eval(OGDiag4x6, OGD1x1NaN);
     assertTrue(OGC4x6TimesSingleNaN.equals(tmp));
   }  
   
   // colsArray2 = 1, rowsArray1 = 2, data = double
   @Test
   public void diagTimesSingleTest() {
-    tmp = mtimes.mtimes(OGDiag4x6, OGD1x1);
+    tmp = mtimes.eval(OGDiag4x6, OGD1x1);
     assertTrue(OGDiag4x6TimesSingle.equals(tmp));
   }
 
   // colsArray1 = random, rowsArray1 = random, colsArray2 = 1, rowsArray2 = random. Diag * vector test
   @Test
   public void diagTimesVectorTest() {
-    tmp = mtimes.mtimes(OGDiag4x6, OGVector6x1);
+    tmp = mtimes.eval(OGDiag4x6, OGVector6x1);
     assertTrue(OGC4x6TimesVector6x1.equals(tmp));
   }
   
   // colsArray1 = random, rowsArray1 = random, colsArray2 = random, rowsArray2 = random
   @Test
   public void matrixTimesMatrixNoExtraZerosTest() {
-    tmp = mtimes.mtimes(OGDiag3x6, OGDA6x3);
+    tmp = mtimes.eval(OGDiag3x6, OGDA6x3);
     assertTrue(OGC3x6timesD.equals(tmp));
   }
 
   // colsArray1 = random, rowsArray1 = random, Array1 has a zero block as it is not square. colsArray2 = random, rowsArray2 = random  
   @Test
   public void matrixTimesMatrixExtraZerosBelowTest() {
-    tmp = mtimes.mtimes(OGDiag4x6, OGDA6x3);
+    tmp = mtimes.eval(OGDiag4x6, OGDA6x3);
     assertTrue(OGC4x6timesD.equals(tmp));
   }
 
