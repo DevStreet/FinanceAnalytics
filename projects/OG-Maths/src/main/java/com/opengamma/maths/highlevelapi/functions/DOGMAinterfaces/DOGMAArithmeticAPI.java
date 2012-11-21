@@ -64,47 +64,6 @@ public interface DOGMAArithmeticAPI {
    */
   OGArray<? extends Number> mldivide(OGArray<? extends Number> array1, OGArray<? extends Number> array2);
 
-  /* RDIVIDE */
-  /**
-   * Element by element right division
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return array1 rdivided element-wise by array2. i.e. array1./array2
-   */
-  OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, OGArray<? extends Number> array2);
-
-  /**
-   * Element by element right division
-   * @param array1 the first array
-   * @param number the number
-   * @return array1 rdivided element-wise by a number. i.e. array1./number
-   */
-  OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, double number);
-
-  /**
-   * Element by element right division
-   * @param array1 the first array
-   * @param number the number
-   * @return array1 rdivided element-wise by a number. i.e. array1./number
-   */
-  OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, int number);
-
-  /**
-   * Element by element right division
-   * @param number the number
-   * @param array1 the first array 
-   * @return number is broadcast and then rdivided element-wise by array1. i.e. number/array1
-   */
-  OGArray<? extends Number> rdivide(double number, OGArray<? extends Number> array1);
-
-  /**
-   * Element by element right division
-   * @param number the number
-   * @param array1 the first array
-   * @return array1 is broadcast and then rdivided element-wise by array1
-   */
-  OGArray<? extends Number> rdivide(int number, OGArray<? extends Number> array1);
-
   /* MRDIVIDE */
   /**
    * Right division, which effectively returns x = inverse(A)*b

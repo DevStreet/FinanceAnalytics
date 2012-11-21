@@ -7,6 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -14,18 +16,11 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGDouble / OGSparse
  */
-public final class RdivideOGMatrixOGSparseMatrix implements RdivideAbstract<OGMatrix, OGSparseMatrix> {
-  private static RdivideOGMatrixOGSparseMatrix s_instance = new RdivideOGMatrixOGSparseMatrix();
-
-  public static RdivideOGMatrixOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private RdivideOGMatrixOGSparseMatrix() {
-  }
+@DOGMAMethodHook(provides = Rdivide.class)
+public final class RdivideOGMatrixOGSparseMatrix implements Rdivide<OGMatrix, OGMatrix, OGSparseMatrix> {
 
   @Override
-  public OGMatrix rdivide(OGMatrix array1, OGSparseMatrix array2) {
+  public OGMatrix eval(OGMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just mul by that

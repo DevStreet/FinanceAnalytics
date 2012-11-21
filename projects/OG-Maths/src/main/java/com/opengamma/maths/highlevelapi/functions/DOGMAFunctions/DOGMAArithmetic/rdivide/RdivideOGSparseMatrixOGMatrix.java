@@ -7,6 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
@@ -15,18 +17,10 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does elementwise OGSparse / OGDouble
  */
-public final class RdivideOGSparseMatrixOGMatrix implements RdivideAbstract<OGSparseMatrix, OGMatrix> {
-  private static RdivideOGSparseMatrixOGMatrix s_instance = new RdivideOGSparseMatrixOGMatrix();
-
-  public static RdivideOGSparseMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private RdivideOGSparseMatrixOGMatrix() {
-  }
-
+@DOGMAMethodHook(provides = Rdivide.class)
+public final class RdivideOGSparseMatrixOGMatrix implements Rdivide<OGArray<? extends Number>, OGSparseMatrix, OGMatrix> {
   @Override
-  public OGArray<? extends Number> rdivide(OGSparseMatrix array1, OGMatrix array2) {
+  public OGArray<? extends Number> eval(OGSparseMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     // if either is a single number then we just div by that

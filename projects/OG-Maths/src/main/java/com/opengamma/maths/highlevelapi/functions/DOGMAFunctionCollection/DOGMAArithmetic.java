@@ -8,7 +8,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Rdivide;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeticAPI;
 
@@ -17,7 +16,6 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAArithmeti
  */
 public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final Copy _copy = new Copy();
-  private Rdivide _rdivide = new Rdivide();
 
   //  @Override
   //  public OGArray<? extends Number> plus(OGArray<? extends Number> array1, int aNumber) {
@@ -64,33 +62,7 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
     throw new MathsExceptionNotImplemented("mldivide not implemented yet");
   }
 
-  /* RDIVIDE */
-
-  @Override
-  public OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return _rdivide.rdivide(array1, array2);
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, double number) {
-    return _rdivide.rdivide(array1, new OGMatrix(number));
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, int number) {
-    return _rdivide.rdivide(array1, new OGMatrix(number));
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(double number, OGArray<? extends Number> array1) {
-    return _rdivide.rdivide(new OGMatrix(number), array1);
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(int number, OGArray<? extends Number> array1) {
-    return _rdivide.rdivide(new OGMatrix(number), array1);
-  }
-
+ 
   /* MRDIVIDE */
 
   @Override

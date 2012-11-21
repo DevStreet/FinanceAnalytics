@@ -7,24 +7,19 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * Does rdivide on OGDouble pairings
+ * Does rdivide on OGMatrix pairings
  */
-public final class RdivideOGMatrixOGMatrix implements RdivideAbstract<OGMatrix, OGMatrix> {
-  private static RdivideOGMatrixOGMatrix s_instance = new RdivideOGMatrixOGMatrix();
-
-  public static RdivideOGMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private RdivideOGMatrixOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Rdivide.class)
+public final class RdivideOGMatrixOGMatrix implements Rdivide<OGMatrix, OGMatrix, OGMatrix> {
 
   @Override
-  public OGMatrix rdivide(OGMatrix array1, OGMatrix array2) {
+  public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 

@@ -99,31 +99,6 @@ public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI
   }
 
   @Override
-  public OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return DA.rdivide(array1, array2);
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, double number) {
-    return DA.rdivide(array1, number);
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(OGArray<? extends Number> array1, int number) {
-    return DA.rdivide(array1, number);
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(double number, OGArray<? extends Number> array1) {
-    return DA.rdivide(number, array1);
-  }
-
-  @Override
-  public OGArray<? extends Number> rdivide(int number, OGArray<? extends Number> array1) {
-    return DA.rdivide(number, array1);
-  }
-
-  @Override
   public OGArray<? extends Number> mrdivide(OGArray<? extends Number> matrixA, OGArray<? extends Number> vectorb) {
     return DA.mrdivide(matrixA, vectorb);
   }

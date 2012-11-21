@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.dogma.DogmaLanguage;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
@@ -20,7 +21,7 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAA
  * Tests the rdivide() function in DOGMA 
  */
 public class DOMGArdivideTest {
-  DOGMAArithmetic DA = new DOGMAArithmetic();
+  DogmaLanguage DA = DogmaLanguage.getInstance();
   double NaN= Double.NaN;
   
   // OGDoubles
@@ -68,12 +69,14 @@ public class DOMGArdivideTest {
   
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput1okinput2() {
-    DA.rdivide(null, new OGMatrix(1));
+    OGMatrix tmp = null;
+    DA.rdivide(tmp, new OGMatrix(1));
   }
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput2okinput1() {
-    DA.rdivide(new OGMatrix(1), null);
+    OGMatrix tmp = null;
+    DA.rdivide(new OGMatrix(1), tmp);
   }
 
   // Operations on classes

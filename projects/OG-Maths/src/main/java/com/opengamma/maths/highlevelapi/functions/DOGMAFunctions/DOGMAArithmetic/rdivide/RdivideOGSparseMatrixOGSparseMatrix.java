@@ -7,6 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
@@ -14,18 +16,11 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * Does elementwise OGSparse * OGSparse
  */
-public final class RdivideOGSparseMatrixOGSparseMatrix implements RdivideAbstract<OGSparseMatrix, OGSparseMatrix> {
-  private static RdivideOGSparseMatrixOGSparseMatrix s_instance = new RdivideOGSparseMatrixOGSparseMatrix();
-
-  public static RdivideOGSparseMatrixOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private RdivideOGSparseMatrixOGSparseMatrix() {
-  }
+@DOGMAMethodHook(provides = Rdivide.class)
+public final class RdivideOGSparseMatrixOGSparseMatrix implements Rdivide<OGArray<? extends Number>, OGSparseMatrix, OGSparseMatrix> {
 
   @Override
-  public OGArray<? extends Number> rdivide(OGSparseMatrix array1, OGSparseMatrix array2) {
+  public OGArray<? extends Number> eval(OGSparseMatrix array1, OGSparseMatrix array2) {
 
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
