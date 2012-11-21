@@ -27,7 +27,7 @@ public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
   }
 
   private LAPACK _localLAPACK = new LAPACK();
-  private TransposeOGMatrix _transpose = TransposeOGMatrix.getInstance();
+  private TransposeOGMatrix _transpose = new TransposeOGMatrix();
 
   @Override
   public OGSvdResult svd(OGMatrix array1, compute these) {
@@ -67,7 +67,7 @@ public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
         U = pointLess;
         VT = new double[n * n];
         _localLAPACK.dgesvd('N', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
-        resultV = _transpose.transpose(new OGMatrix(VT, n, n));
+        resultV = _transpose.eval(new OGMatrix(VT, n, n));
         break;
 
       case US:
@@ -83,7 +83,7 @@ public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
         VT = new double[n * n];
         _localLAPACK.dgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
         resultU = new OGMatrix(U, m, m);
-        resultV = _transpose.transpose(new OGMatrix(VT, n, n));
+        resultV = _transpose.eval(new OGMatrix(VT, n, n));
         break;
 
       case SV:
@@ -91,7 +91,7 @@ public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
         VT = new double[n * n];
         _localLAPACK.dgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, info);
         resultS = new OGDiagonalMatrix(S, m, n);
-        resultV = _transpose.transpose(new OGMatrix(VT, n, n));
+        resultV = _transpose.eval(new OGMatrix(VT, n, n));
         break;
 
       case USV:
@@ -102,7 +102,7 @@ public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
         resultS = new OGDiagonalMatrix(S, m, n);
         // rather inefficient but necessary evil for the minute
         // TODO: in place transpose of column major array 
-        resultV = _transpose.transpose(new OGMatrix(VT, n, n));
+        resultV = _transpose.eval(new OGMatrix(VT, n, n));
         break;
     }
     return new OGSvdResult(resultU, resultS, resultV);

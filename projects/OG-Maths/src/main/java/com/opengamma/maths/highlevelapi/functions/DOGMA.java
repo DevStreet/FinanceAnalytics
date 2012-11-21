@@ -138,11 +138,6 @@ public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI
     return DA.mpower(array1, array2);
   }
 
-  @Override
-  public OGArray<? extends Number> transpose(OGArray<? extends Number> array) {
-    return DA.transpose(array);
-  }
-
   // The exponents and logs API
 
   @Override

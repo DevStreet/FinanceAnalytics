@@ -5,24 +5,19 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Transpose;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Transpose for {@link OGPermutationMatrix}
  */
-public final class TransposeOGPermutationMatrix implements TransposeAbstract<OGPermutationMatrix> {
-  private static TransposeOGPermutationMatrix s_instance = new TransposeOGPermutationMatrix();
-
-  public static TransposeOGPermutationMatrix getInstance() {
-    return s_instance;
-  }
-
-  private TransposeOGPermutationMatrix() {
-  }
+@DOGMAMethodHook(provides = Transpose.class)
+public final class TransposeOGPermutationMatrix implements Transpose<OGPermutationMatrix, OGPermutationMatrix> {
 
   @Override
-  public OGPermutationMatrix transpose(OGPermutationMatrix array1) {
+  public OGPermutationMatrix eval(OGPermutationMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     // transpose of a permutation matrix is just looking up its own indices in itself a(i,j)=a(j,i) but we walk just once with compressed canonical vectors
     // so if you have permutation vector P, range=1:length(P), the range(P) gives the transpose permutation

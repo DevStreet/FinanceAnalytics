@@ -5,24 +5,18 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Transpose;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Transposes an OGSparseArray
  */
-public final class TransposeOGSparseMatrix implements TransposeAbstract<OGSparseMatrix> {
-  private static TransposeOGSparseMatrix s_instance = new TransposeOGSparseMatrix();
-
-  public static TransposeOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private TransposeOGSparseMatrix() {
-  }
-
+@DOGMAMethodHook(provides = Transpose.class)
+public final class TransposeOGSparseMatrix implements Transpose<OGSparseMatrix, OGSparseMatrix> {
   @Override
-  public OGSparseMatrix transpose(OGSparseMatrix array1) {
+  public OGSparseMatrix eval(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -50,7 +44,6 @@ public final class TransposeOGSparseMatrix implements TransposeAbstract<OGSparse
     }
     // memcpy the new col ptr to the temporary array so that we can use the information for indexing into the new data structure 
     System.arraycopy(retColPtr, 0, tmpColPtr, 0, retColPtr.length);
-
 
     int thiselement; // reference to old element's position in new system's indexing
     // walk original data structure and assign to new one

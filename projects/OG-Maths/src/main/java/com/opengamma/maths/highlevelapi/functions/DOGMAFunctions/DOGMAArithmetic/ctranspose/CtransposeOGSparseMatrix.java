@@ -22,11 +22,11 @@ public final class CtransposeOGSparseMatrix implements CtransposeAbstract<OGSpar
   private CtransposeOGSparseMatrix() {
   }
 
-  private TransposeOGSparseMatrix _transpose = TransposeOGSparseMatrix.getInstance();
+  private TransposeOGSparseMatrix _transpose = new TransposeOGSparseMatrix();
 
   @Override
   public OGSparseMatrix ctranspose(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
-    return _transpose.transpose(array1);
+    return _transpose.eval(array1);
   }
 }

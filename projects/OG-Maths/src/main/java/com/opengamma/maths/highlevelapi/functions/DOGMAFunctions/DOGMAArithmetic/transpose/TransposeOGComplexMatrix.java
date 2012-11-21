@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Transpose;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -12,18 +14,11 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Transposes an OGComplexArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class TransposeOGComplexMatrix implements TransposeAbstract<OGComplexMatrix> {
-  private static TransposeOGComplexMatrix s_instance = new TransposeOGComplexMatrix();
-
-  public static TransposeOGComplexMatrix getInstance() {
-    return s_instance;
-  }
-
-  private TransposeOGComplexMatrix() {
-  }
+@DOGMAMethodHook(provides = Transpose.class)
+public final class TransposeOGComplexMatrix implements Transpose<OGComplexMatrix, OGComplexMatrix> {
 
   @Override
-  public OGComplexMatrix transpose(OGComplexMatrix array1) {
+  public OGComplexMatrix eval(OGComplexMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();

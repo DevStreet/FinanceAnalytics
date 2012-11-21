@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
  */
 public class DOGMAOGDiagonalMatrixTransposeTest {
 
-  TransposeOGDiagonalMatrix t = TransposeOGDiagonalMatrix.getInstance();
+  TransposeOGDiagonalMatrix t = new TransposeOGDiagonalMatrix();
 
   int normalRows = 4;
   int normalCols = 3;
@@ -31,12 +31,12 @@ public class DOGMAOGDiagonalMatrixTransposeTest {
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void nullInTest() {
     OGDiagonalMatrix tmp = null;
-    t.transpose(tmp);
+    t.eval(tmp);
   }
 
   @Test
   public void testTranspose() {
-    assertTrue(array1tranposed.equals(t.transpose(array1)));
+    assertTrue(array1tranposed.equals(t.eval(array1)));
   }
 
 }

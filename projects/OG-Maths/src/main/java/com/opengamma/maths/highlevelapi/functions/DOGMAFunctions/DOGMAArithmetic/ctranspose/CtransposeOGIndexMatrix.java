@@ -23,13 +23,13 @@ public final class CtransposeOGIndexMatrix implements CtransposeAbstract<OGIndex
   private CtransposeOGIndexMatrix() {
   }
   
-  private TransposeOGIndexMatrix _transpose = TransposeOGIndexMatrix.getInstance();
+  private TransposeOGIndexMatrix _transpose = new TransposeOGIndexMatrix();
 
 
   @Override
   public OGIndexMatrix ctranspose(OGIndexMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
-    return _transpose.transpose(array1);
+    return _transpose.eval(array1);
   }
 
 }

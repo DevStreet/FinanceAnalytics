@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  */
 public class DOGMAOGSparseMatrixTransposeTest {
 
-  TransposeOGSparseMatrix t = TransposeOGSparseMatrix.getInstance();
+  TransposeOGSparseMatrix t = new TransposeOGSparseMatrix();
 
   int normalRows = 4;
   int normalCols = 3;
@@ -31,13 +31,13 @@ public class DOGMAOGSparseMatrixTransposeTest {
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void nullInTest() {
     OGSparseMatrix tmp = null;
-    t.transpose(tmp);
+    t.eval(tmp);
   }
 
   @Test
   public void testTranspose() {
-    t.transpose(array1);
-    assertTrue(array1transposed.equals(t.transpose(array1)));
+    t.eval(array1);
+    assertTrue(array1transposed.equals(t.eval(array1)));
   }
 
 }
