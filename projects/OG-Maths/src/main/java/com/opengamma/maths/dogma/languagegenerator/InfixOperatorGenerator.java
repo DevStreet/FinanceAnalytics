@@ -27,6 +27,8 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("public static OGArray<? extends Number>");
     tmp.append(lname);
     tmp.append("(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {\n");
+    tmp.append("  Catchers.catchNullFromArgList(arg1, 1);\n");
+    tmp.append("  Catchers.catchNullFromArgList(arg2, 2);\n");    
     tmp.append("  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());\n");
     tmp.append("  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());\n");
     tmp.append("  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_");
@@ -38,6 +40,8 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("public static OGArray<? extends Number> ");
     tmp.append(lname);
     tmp.append("(Number arg1, OGArray<? extends Number> arg2) {\n");
+    tmp.append("  Catchers.catchNullFromArgList(arg1, 1);\n");
+    tmp.append("  Catchers.catchNullFromArgList(arg2, 2);\n");    
     tmp.append("OGArray<? extends Number> arg1rewrite;\n");
     tmp.append("if (arg1.getClass() == ComplexType.class) {\n");
     tmp.append("arg1rewrite = new OGComplexScalar(arg1);\n");
@@ -55,6 +59,8 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("public static OGArray<? extends Number>");
     tmp.append(lname);
     tmp.append("(OGArray<? extends Number> arg1, Number arg2) {\n");
+    tmp.append("  Catchers.catchNullFromArgList(arg1, 1);\n");
+    tmp.append("  Catchers.catchNullFromArgList(arg2, 2);\n");    
     tmp.append("OGArray<? extends Number> arg2rewrite;\n");
     tmp.append("if (arg2.getClass() == ComplexType.class) {\n");
     tmp.append("arg2rewrite = new OGComplexScalar(arg2);\n");

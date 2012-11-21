@@ -167,6 +167,7 @@ public class DogmaLanguageCodeGenerator {
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
+    tmp.append("import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");

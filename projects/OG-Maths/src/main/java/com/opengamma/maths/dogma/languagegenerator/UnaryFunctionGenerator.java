@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.dogma.languagegenerator;
 
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+
 
 /**
  * 
@@ -27,6 +29,7 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("public static OGArray<? extends Number>");
     tmp.append(lname);
     tmp.append("(OGArray<? extends Number> arg1) {\n");
+    tmp.append("Catchers.catchNullFromArgList(arg1, 1);\n");
     tmp.append("int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());\n");
     tmp.append("OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_");
     tmp.append(lname);
@@ -37,6 +40,7 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("public static OGArray<? extends Number>");
     tmp.append(lname);
     tmp.append("(Number arg1) {");
+    tmp.append("Catchers.catchNullFromArgList(arg1, 1);\n");    
     tmp.append("OGArray<? extends Number> arg1rewrite;\n");
     tmp.append("if (arg1.getClass() == ComplexType.class) {\n");
     tmp.append("arg1rewrite = new OGComplexScalar(arg1);\n");
