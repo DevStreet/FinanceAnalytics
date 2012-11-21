@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Ctranspose;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGIndexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -13,23 +15,13 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Conjugate Transposes an OGIndexArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class CtransposeOGIndexMatrix implements CtransposeAbstract<OGIndexMatrix> {
-  private static CtransposeOGIndexMatrix s_instance = new CtransposeOGIndexMatrix();
-
-  public static CtransposeOGIndexMatrix getInstance() {
-    return s_instance;
-  }
-
-  private CtransposeOGIndexMatrix() {
-  }
-  
-  private TransposeOGIndexMatrix _transpose = new TransposeOGIndexMatrix();
-
-
+@DOGMAMethodHook(provides = Ctranspose.class)
+public final class CtransposeOGIndexMatrix implements Ctranspose<OGIndexMatrix, OGIndexMatrix> {
   @Override
-  public OGIndexMatrix ctranspose(OGIndexMatrix array1) {
+  public OGIndexMatrix eval(OGIndexMatrix array1) {
+    TransposeOGIndexMatrix transpose = new TransposeOGIndexMatrix();
     Catchers.catchNullFromArgList(array1, 1);
-    return _transpose.eval(array1);
+    return transpose.eval(array1);
   }
 
 }

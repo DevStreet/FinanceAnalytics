@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Ctranspose;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -12,21 +14,13 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Conjugate transposes an OGSparseArray
  */
-public final class CtransposeOGSparseMatrix implements CtransposeAbstract<OGSparseMatrix> {
-  private static CtransposeOGSparseMatrix s_instance = new CtransposeOGSparseMatrix();
-
-  public static CtransposeOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private CtransposeOGSparseMatrix() {
-  }
-
-  private TransposeOGSparseMatrix _transpose = new TransposeOGSparseMatrix();
+@DOGMAMethodHook(provides = Ctranspose.class)
+public final class CtransposeOGSparseMatrix implements Ctranspose<OGSparseMatrix, OGSparseMatrix> {
 
   @Override
-  public OGSparseMatrix ctranspose(OGSparseMatrix array1) {
+  public OGSparseMatrix eval(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
-    return _transpose.eval(array1);
+    TransposeOGSparseMatrix transpose = new TransposeOGSparseMatrix();
+    return transpose.eval(array1);
   }
 }

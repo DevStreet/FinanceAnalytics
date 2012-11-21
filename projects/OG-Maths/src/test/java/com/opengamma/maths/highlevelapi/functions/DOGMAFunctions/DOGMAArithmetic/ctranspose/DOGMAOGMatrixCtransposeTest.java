@@ -16,7 +16,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
  */
 public class DOGMAOGMatrixCtransposeTest {
 
-  CtransposeOGMatrix ct = CtransposeOGMatrix.getInstance();
+  CtransposeOGMatrix ct = new CtransposeOGMatrix();
 
   int normalRows = 4;
   int normalCols = 3;
@@ -32,12 +32,12 @@ public class DOGMAOGMatrixCtransposeTest {
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void nullInTest() {
     OGMatrix tmp = null;
-    ct.ctranspose(tmp);
+    ct.eval(tmp);
   }
 
   @Test
   public void testTranspose() {
-    assertTrue(array1tranposed.equals(ct.ctranspose(array1)));
+    assertTrue(array1tranposed.equals(ct.eval(array1)));
   }
 
 }

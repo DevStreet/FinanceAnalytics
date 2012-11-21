@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Ctranspose;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -13,23 +15,14 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Conjugate Transposes an OGDoubleArray
  * TODO: At some point consider COW or at least state propagated permutations for things like this?!
  */
-public final class CtransposeOGMatrix implements CtransposeAbstract<OGMatrix> {
-  private static CtransposeOGMatrix s_instance = new CtransposeOGMatrix();
-
-  public static CtransposeOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private CtransposeOGMatrix() {
-  }
-  
-  private TransposeOGMatrix _transpose = new TransposeOGMatrix();
-
+@DOGMAMethodHook(provides = Ctranspose.class)
+public final class CtransposeOGMatrix implements Ctranspose<OGMatrix, OGMatrix> {
 
   @Override
-  public OGMatrix ctranspose(OGMatrix array1) {
+  public OGMatrix eval(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
-    return _transpose.eval(array1);
+    TransposeOGMatrix transpose = new TransposeOGMatrix();
+    return transpose.eval(array1);
   }
 
 }

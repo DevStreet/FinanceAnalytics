@@ -28,7 +28,7 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
   }
 
   private LAPACK _localLAPACK = new LAPACK();
-  private CtransposeOGComplexMatrix _cmplxtranspose = CtransposeOGComplexMatrix.getInstance();
+  private CtransposeOGComplexMatrix _cmplxtranspose = new CtransposeOGComplexMatrix();
 
   @Override
   public OGSvdResult svd(OGComplexMatrix array1, compute these) {
@@ -70,7 +70,7 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
         U = pointLess;
         VT = new double[n * n];
         _localLAPACK.zgesvd('N', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
-        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
+        resultV = _cmplxtranspose.eval(new OGComplexMatrix(VT, n, n));
         break;
 
       case US:
@@ -86,7 +86,7 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
         VT = new double[n * n];
         _localLAPACK.zgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
         resultU = new OGComplexMatrix(U, m, m);
-        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
+        resultV = _cmplxtranspose.eval(new OGComplexMatrix(VT, n, n));
         break;
 
       case SV:
@@ -94,7 +94,7 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
         VT = new double[n * n];
         _localLAPACK.zgesvd('N', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
         resultS = new OGDiagonalMatrix(S, m, n);
-        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
+        resultV = _cmplxtranspose.eval(new OGComplexMatrix(VT, n, n));
         break;
 
       case USV:
@@ -106,7 +106,7 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
         resultS = new OGDiagonalMatrix(S, m, n);
         // rather inefficient but necessary evil for the minute
         // TODO: in place transpose of column major array 
-        resultV = _cmplxtranspose.ctranspose(new OGComplexMatrix(VT, n, n));
+        resultV = _cmplxtranspose.eval(new OGComplexMatrix(VT, n, n));
         break;
     }
     return new OGSvdResult(resultU, resultS, resultV);
