@@ -24,6 +24,7 @@ $.register_module({
             clear_main: function () {
                 if (og.analytics.grid) og.analytics.grid.kill();
                 last_fingerprint.main = last_object.main = null;
+                return url;
             },
             last: last_object,
             launch: function (params) {
@@ -57,6 +58,7 @@ $.register_module({
                         if (!last_fingerprint[panel]) last_fingerprint[panel] = [];
                         if (!last_object[panel]) last_object[panel] = [];
                         last_fingerprint[panel] = gadgets.map(function (gadget, index) {
+                            delete gadget.fingerprint;
                             var fingerprint = JSON.stringify(gadget);
                             last_object[panel][index] = JSON.parse(fingerprint);
                             if (last_fingerprint[panel][index] === fingerprint) return fingerprint;

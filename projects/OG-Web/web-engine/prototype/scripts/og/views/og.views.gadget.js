@@ -13,8 +13,7 @@ $.register_module({
             root: function () {$content.html('No gadget was specified.');},
             grid: function (args) {
                 og.api.rest.compressor.get({content: args.data}).pipe(function (result) {
-                    // TODO this is a global ... remove it!
-                    grid = new og.analytics.Grid({selector: content, sparklines: false, source: result.data.data});
+                    new og.analytics.Grid({selector: content, sparklines: false, source: result.data.data});
                 });
             },
             gadgetscontainer: function (args) {
@@ -24,7 +23,7 @@ $.register_module({
             },
             positions: function (args) {
                 $content.html('\
-                    <section class="OG-details-positions og-js-positions"></section>\
+                    <section class="OG-gadgets-positions-container og-js-positions"></section>\
                     <section class="og-js-trades"></section>\
                 ');
                 gadgets.positions({

@@ -5,6 +5,9 @@
  */
 package com.opengamma.engine.view.calc;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
@@ -56,6 +59,8 @@ import com.opengamma.engine.test.MockConfigSource;
 import com.opengamma.engine.test.MockFunction;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueRequirement;
+import com.opengamma.engine.view.ExecutionLogMode;
+import com.opengamma.engine.view.ExecutionLogModeSource;
 import com.opengamma.engine.view.ViewCalculationConfiguration;
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewDefinition;
@@ -64,6 +69,7 @@ import com.opengamma.engine.view.cache.InMemoryViewComputationCacheSource;
 import com.opengamma.engine.view.cache.ViewComputationCacheSource;
 import com.opengamma.engine.view.calc.stats.DiscardingGraphStatisticsGathererProvider;
 import com.opengamma.engine.view.calc.stats.GraphExecutorStatisticsGathererProvider;
+import com.opengamma.engine.view.calcnode.CalculationNodeLogEventListener;
 import com.opengamma.engine.view.calcnode.JobDispatcher;
 import com.opengamma.engine.view.calcnode.LocalNodeJobInvoker;
 import com.opengamma.engine.view.calcnode.SimpleCalculationNode;
@@ -81,6 +87,7 @@ import com.opengamma.id.VersionCorrection;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.transport.InMemoryRequestConduit;
 import com.opengamma.util.ehcache.EHCacheUtils;
+import com.opengamma.util.log.ThreadLocalLogEventListener;
 import com.opengamma.util.test.Timeout;
 
 public class CancelExecutionTest {
@@ -126,6 +133,7 @@ public class CancelExecutionTest {
     }
   };
 
+  @SuppressWarnings("unchecked")
   private Future<?> executeTestJob(DependencyGraphExecutorFactory<?> factory) {
     final InMemoryLKVMarketDataProvider marketDataProvider = new InMemoryLKVMarketDataProvider();
     final MarketDataProviderResolver marketDataProviderResolver = new SingleMarketDataProviderResolver(new SingletonMarketDataProviderFactory(marketDataProvider));
@@ -157,7 +165,7 @@ public class CancelExecutionTest {
     final FunctionExecutionContext executionContext = new FunctionExecutionContext();
     final ComputationTargetResolver targetResolver = new DefaultComputationTargetResolver(securitySource, positionSource);
     final JobDispatcher jobDispatcher = new JobDispatcher(new LocalNodeJobInvoker(new SimpleCalculationNode(computationCacheSource, compilationService, executionContext, targetResolver,
-        viewProcessorQuerySender, "node", Executors.newCachedThreadPool(), functionInvocationStatistics)));
+        viewProcessorQuerySender, "node", Executors.newCachedThreadPool(), functionInvocationStatistics, new CalculationNodeLogEventListener(new ThreadLocalLogEventListener()))));
     final ViewPermissionProvider viewPermissionProvider = new DefaultViewPermissionProvider();
     final GraphExecutorStatisticsGathererProvider graphExecutorStatisticsProvider = new DiscardingGraphStatisticsGathererProvider();
     ViewDefinition viewDefinition = new ViewDefinition("TestView", UserPrincipal.getTestUser());
@@ -182,9 +190,11 @@ public class CancelExecutionTest {
     graphs.put(graph.getCalculationConfigurationName(), graph);
     CompiledViewDefinitionWithGraphsImpl viewEvaluationModel = new CompiledViewDefinitionWithGraphsImpl(viewDefinition, graphs, new SimplePortfolio("Test Portfolio"), 0);
     ViewCycleExecutionOptions cycleOptions = new ViewCycleExecutionOptions(Instant.ofEpochMillis(1), new MarketDataSpecification());
+    ExecutionLogModeSource logModeSource = mock(ExecutionLogModeSource.class);
+    when(logModeSource.getLogMode(any(Set.class))).thenReturn(ExecutionLogMode.INDICATORS);
     final SingleComputationCycle cycle = new SingleComputationCycle(UniqueId.of("Test", "Cycle1"), UniqueId.of("Test", "ViewProcess1"), computationCycleResultListener, vpc, viewEvaluationModel,
-        cycleOptions, VersionCorrection.of(Instant.ofEpochMillis(1), Instant.ofEpochMillis(1)));
-    return cycle.getDependencyGraphExecutor().execute(graph, new LinkedBlockingQueue<ExecutionResult>(), cycle.getStatisticsGatherer());
+        cycleOptions, logModeSource, VersionCorrection.of(Instant.ofEpochMillis(1), Instant.ofEpochMillis(1)));
+    return cycle.getDependencyGraphExecutor().execute(graph, new LinkedBlockingQueue<ExecutionResult>(), cycle.getStatisticsGatherer(), logModeSource);
   }
 
   private boolean jobFinished() {
