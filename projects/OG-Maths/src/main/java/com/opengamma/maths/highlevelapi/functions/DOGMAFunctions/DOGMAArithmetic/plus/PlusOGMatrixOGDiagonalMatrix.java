@@ -7,6 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -14,18 +16,11 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Adds {@link OGMatrix} to {@link OGDiagonalMatrix} 
  */
-public final class PlusOGMatrixOGDiagonalMatrix implements PlusMinusAbstract<OGMatrix, OGDiagonalMatrix> {
-  private static PlusOGMatrixOGDiagonalMatrix s_instance = new PlusOGMatrixOGDiagonalMatrix();
-
-  public static PlusOGMatrixOGDiagonalMatrix getInstance() {
-    return s_instance;
-  }
-
-  private PlusOGMatrixOGDiagonalMatrix() {
-  }
+@DOGMAMethodHook(provides = Plus.class)
+public final class PlusOGMatrixOGDiagonalMatrix implements Plus<OGMatrix, OGMatrix, OGDiagonalMatrix> {
 
   @Override
-  public OGMatrix plusminus(OGMatrix array1, OGDiagonalMatrix array2, int op) {
+  public OGMatrix eval(OGMatrix array1, OGDiagonalMatrix array2) {
 
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
@@ -36,7 +31,6 @@ public final class PlusOGMatrixOGDiagonalMatrix implements PlusMinusAbstract<OGM
     double[] tmp = null;
 
     OGMatrix retArray = null;
-    final double signval = Math.copySign(1, op);
 
     // Actually adding arrays
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the diag array a OGDoubleArray and ADD 
@@ -48,14 +42,14 @@ public final class PlusOGMatrixOGDiagonalMatrix implements PlusMinusAbstract<OGM
       retRows = rowsArray2;
       retCols = columnsArray2;
       for (int i = 0; i < data.length; i++) {
-        tmp[i * rowsArray2 + i] += signval * data[i];
+        tmp[i * rowsArray2 + i] += data[i];
       }
       retArray = new OGMatrix(tmp, retRows, retCols);
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // diagonal array is actually a single number, so we can just deref and add
       final int n = array1.getData().length;
       tmp = new double[n];
       System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      final double singleDouble = array2.getData()[0] * signval;
+      final double singleDouble = array2.getData()[0];
       for (int i = 0; i < n; i++) {
         tmp[i] += singleDouble;
       }
@@ -72,7 +66,7 @@ public final class PlusOGMatrixOGDiagonalMatrix implements PlusMinusAbstract<OGM
       System.arraycopy(array1.getData(), 0, tmp, 0, n);
       final double[] data = array2.getData();
       for (int i = 0; i < data.length; i++) {
-        tmp[i * rowsArray1 + i] += data[i] * signval;
+        tmp[i * rowsArray1 + i] += data[i];
       }
       retArray = new OGMatrix(tmp, retRows, retCols);
     }

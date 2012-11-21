@@ -5,28 +5,22 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
- * Adds OGDoubleArrays to OGSparseArrays   
+ * Adds {@link OGSparseMatrix} to {@link OGMatrix}    
  */
-public final class PlusOGSparseMatrixOGMatrix implements PlusMinusAbstract<OGSparseMatrix, OGMatrix> {
-  private static PlusOGSparseMatrixOGMatrix s_instance = new PlusOGSparseMatrixOGMatrix();
+@DOGMAMethodHook(provides = Plus.class)
+public final class PlusOGSparseMatrixOGMatrix implements Plus<OGArray<? extends Number>, OGSparseMatrix, OGMatrix> {
 
-  public static PlusOGSparseMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private PlusOGSparseMatrixOGMatrix() {
-  }
-
-  private static PlusOGMatrixOGSparseMatrix s_reverse = PlusOGMatrixOGSparseMatrix.getInstance();
-  
   @Override
-  public OGArray<? extends Number> plusminus(OGSparseMatrix array1, OGMatrix array2, final int op) {
-    return s_reverse.plusminus(array2, array1, op);
+  public OGArray<? extends Number> eval(OGSparseMatrix array1, OGMatrix array2) {
+    PlusOGMatrixOGSparseMatrix reverse = new PlusOGMatrixOGSparseMatrix();
+    return reverse.eval(array2, array1);
   }
 
 }

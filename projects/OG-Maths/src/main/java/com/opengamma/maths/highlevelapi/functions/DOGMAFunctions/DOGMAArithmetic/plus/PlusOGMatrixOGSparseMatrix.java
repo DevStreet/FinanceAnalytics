@@ -7,24 +7,19 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
- * Adds OGSparseArrays to OGDoubleArrays   
+ * Adds {@link OGMatrix} to {@link OGSparseMatrix}    
  */
-public final class PlusOGMatrixOGSparseMatrix implements PlusMinusAbstract<OGMatrix, OGSparseMatrix> {
-  private static PlusOGMatrixOGSparseMatrix s_instance = new PlusOGMatrixOGSparseMatrix();
-
-  public static PlusOGMatrixOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private PlusOGMatrixOGSparseMatrix() {
-  }
+@DOGMAMethodHook(provides = Plus.class)
+public final class PlusOGMatrixOGSparseMatrix implements Plus<OGMatrix, OGMatrix, OGSparseMatrix> {
 
   @Override
-  public OGMatrix plusminus(OGMatrix array1, OGSparseMatrix array2, final int op) {
+  public OGMatrix eval(OGMatrix array1, OGSparseMatrix array2) {
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int rowsArray2 = array2.getNumberOfRows();
@@ -49,7 +44,7 @@ public final class PlusOGMatrixOGSparseMatrix implements PlusMinusAbstract<OGMat
       retCols = columnsArray2;
       for (int ir = 0; ir < columnsArray2; ir++) {
         for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) { // loops through elements of correct column
-          tmp[rowIdx[i] + ir * rowsArray2] +=  op * data[i];
+          tmp[rowIdx[i] + ir * rowsArray2] += data[i];
         }
       }
       retArray = new OGMatrix(tmp, retRows, retCols);
@@ -61,7 +56,7 @@ public final class PlusOGMatrixOGSparseMatrix implements PlusMinusAbstract<OGMat
       final double[] singleDouble = array2.getData();
       final double deref = singleDouble[0];
       for (int i = 0; i < n; i++) {
-        tmp[i] = tmp[i] + op * deref;
+        tmp[i] = tmp[i] + deref;
       }
       retRows = rowsArray1;
       retCols = columnsArray1;
@@ -76,8 +71,8 @@ public final class PlusOGMatrixOGSparseMatrix implements PlusMinusAbstract<OGMat
       final int[] rowIdx = array2.getRowIndex();
       final double[] data = array2.getData();
       for (int ir = 0; ir < retCols; ir++) {
-        for (int i = colPtr[ir]; i <= colPtr[ir + 1] - 1; i++) {
-          tmp[rowIdx[i] + ir * retRows] += op * data[i];
+        for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) {
+          tmp[rowIdx[i] + ir * retRows] += data[i];
         }
       }
       retArray = new OGMatrix(tmp, retRows, retCols);

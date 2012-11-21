@@ -11,6 +11,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 
 /**
  * Adds an OGComplexMatrix to an OGComplexMatrix
+ * TODO: scalar adds
  */
 @DOGMAMethodHook(provides = Plus.class)
 public class PlusOGComplexMatrixOGComplexMatrix implements Plus<OGComplexMatrix, OGComplexMatrix, OGComplexMatrix> {

@@ -13,41 +13,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
  */
 public interface DOGMAArithmeticAPI {
 
-  /* ADD */
-  /**
-   * Adds OGArray arrays.
-   * If more than two arrays are given the additions are applied from left to right and accumulated.
-   * e.g. (((array[0]+array[1])+array[2])+array[3])... 
-   * @param array the arrays to add together
-   * @return the sum of the arrays  
-   */
-  OGArray<? extends Number> plus(OGArray<? extends Number>... array);
-
-  /**
-   * Adds two OGArraySuper<? extends Number> arrays
-   * @param array1 the first array
-   * @param array2 the second array
-   * @return the sum of the arrays 
-   */
-  OGArray<? extends Number> plus(OGArray<? extends Number> array1, OGArray<? extends Number> array2);
-  
-  /**
-   * Adds a number to an OGArraySuper<? extends Number> array
-   * @param array1 the first array
-   * @param number the number
-   * @return array1 plus a number
-   */
-  OGArray<? extends Number> plus(OGArray<? extends Number> array1, double number);
-  
-  /**
-   * Adds a number to an OGArraySuper<? extends Number> array
-   * @param array1 the first array
-   * @param number the number
-   * @return array1 plus a number 
-   */
-  OGArray<? extends Number> plus(OGArray<? extends Number> array1, int number);  
-  
-
+ 
   /* SUBTRACT */
   /**
    * Subtracts OGArray arrays.

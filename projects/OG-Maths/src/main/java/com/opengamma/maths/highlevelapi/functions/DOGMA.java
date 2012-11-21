@@ -32,18 +32,14 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMAUtilityFu
 /**
  * The DOGMA language. The entry point for using all DOGMA functions from one place!
  */
-public class DOGMA implements 
-  DOGMAArithmeticAPI, 
-  DOGMAExponentsAndLogarithmsAPI, 
-  DOGMARearrangingMatricesAPI, 
-  DOGMASparseUtilitiesAPI, 
-  DOGMASpecialFunctionsAPI, 
-  DOGMATrigonometaryAPI,
-  DOGMAUtilityFunctionsAPI, 
-  DOGMALinearAlgebraAPI {
-  
-  DOGMA(){};
+public class DOGMA implements DOGMAArithmeticAPI, DOGMAExponentsAndLogarithmsAPI, DOGMARearrangingMatricesAPI, DOGMASparseUtilitiesAPI, DOGMASpecialFunctionsAPI, DOGMATrigonometaryAPI,
+    DOGMAUtilityFunctionsAPI, DOGMALinearAlgebraAPI {
+
+  DOGMA() {
+  };
+
   private static DOGMA s_instance = new DOGMA();
+
   /**
    * Returns the DOGMA instance
    * @return the DOGMA instance
@@ -51,7 +47,7 @@ public class DOGMA implements
   public static DOGMA getInstance() {
     return s_instance;
   }
-  
+
   /**
    * The square root of minus one, the complex number <i>i</i>
    */
@@ -61,7 +57,7 @@ public class DOGMA implements
    * Negated square root of minus one, the complex number <i>-i</i>
    */
   public static final ComplexType negative_i = ComplexType.NEGATIVE_I;  //CSIGNORE  
-  
+
   // impl blobs
   private static final DOGMAArithmetic DA = new DOGMAArithmetic();
   private static final DOGMAExponentsAndLogarithmsAPI DEAL = new DOGMAExponentsAndLogarithms();
@@ -71,27 +67,6 @@ public class DOGMA implements
   private static final DOGMATrigonometry DT = new DOGMATrigonometry();
   private static final DOGMAUtilityFunctions DUF = new DOGMAUtilityFunctions();
   private static final DOGMALinearAlgebra DLA = new DOGMALinearAlgebra();
-
-  // From Arithmetic...
-  @Override
-  public OGArray<? extends Number> plus(OGArray<? extends Number>... array) {
-    return DA.plus(array);
-  }
-
-  @Override
-  public OGArray<? extends Number> plus(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return DA.plus(array1, array2);
-  }
-
-  @Override
-  public OGArray<? extends Number> plus(OGArray<? extends Number> array1, double number) {
-    return DA.plus(array1, number);
-  }
-
-  @Override
-  public OGArray<? extends Number> plus(OGArray<? extends Number> array1, int number) {
-    return DA.plus(array1, number);
-  }
 
   @Override
   public OGArray<? extends Number> minus(OGArray<? extends Number>... array) {
