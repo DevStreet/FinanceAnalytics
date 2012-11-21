@@ -9,7 +9,6 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.properties.DOGMAconfig;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Mtimes;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.PlusAndMinus;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Rdivide;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.Times;
@@ -26,7 +25,6 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   private final Copy _copy = new Copy();
   private final Times _times = new Times();
   private Rdivide _rdivide = new Rdivide();
-  private Mtimes _mtimes = new Mtimes();
   private Transpose _transpose = new Transpose();
 
   /* ADD */
@@ -224,21 +222,6 @@ public class DOGMAArithmetic implements DOGMAArithmeticAPI {
   @Override
   public OGArray<? extends Number> times(int number, OGArray<? extends Number> array1) {
     return _times.times(array1, new OGMatrix(number));
-  }
-
-  /* MTIMES */
-  @Override
-  public OGArray<? extends Number> mtimes(OGArray<? extends Number>... array) {
-    OGArray<? extends Number> tmp = _copy.copy(array[0]);
-    for (int i = 1; i < array.length; i++) {
-      tmp = _mtimes.mtimes(tmp, array[i]);
-    }
-    return tmp;
-  }
-
-  @Override
-  public OGArray<? extends Number> mtimes(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return _mtimes.mtimes(array1, array2);
   }
 
   /* POWER */

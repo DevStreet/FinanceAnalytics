@@ -202,26 +202,6 @@ public interface DOGMAArithmeticAPI {
    */
   OGArray<? extends Number> times(int number, OGArray<? extends Number> array1);  
   
-  /* MTIMES */
-  /**
-   * Matrix multiplication. For more two inputs it returns the multiplications
-   * applied and accumulated from left to right, e.g.
-   * array1*array2 
-   * @param array1 the first array
-   * @param array2 the second array 
-   * @return the cumulative product of array multiplication
-   */
-  OGArray<? extends Number> mtimes(OGArray<? extends Number> array1, OGArray<? extends Number> array2);
-  
-  /**
-   * Matrix multiplication. For more than two inputs it returns the multiplications
-   * applied and accumulated from left to right, e.g.
-   * (((array[0]*array[1])*array[2])*array[3])... 
-   * @param array the arrays to multiply
-   * @return the cumulative product of array multiplication
-   */
-  OGArray<? extends Number> mtimes(OGArray<? extends Number>... array);
-
   /* POWER */
   /**
    * Element by element raise to a power

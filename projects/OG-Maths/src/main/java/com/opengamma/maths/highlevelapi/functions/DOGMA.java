@@ -184,16 +184,6 @@ public class DOGMA implements
   }
 
   @Override
-  public OGArray<? extends Number> mtimes(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
-    return DA.mtimes(array1, array2);
-  }
-
-  @Override
-  public OGArray<? extends Number> mtimes(OGArray<? extends Number>... array) {
-    return DA.mtimes(array);
-  }
-
-  @Override
   public OGArray<? extends Number> power(OGArray<? extends Number> array1, OGArray<? extends Number> array2) {
     return DA.power(array1, array2);
   }

@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
-import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Mtimes;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
@@ -14,7 +13,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does matrix * matrix in a mathematical sense
  */
-@DOGMAMethodHook(provides = Mtimes.class)
+
 public final class MtimesOGMatrixOGMatrix implements Mtimes<OGMatrix, OGMatrix, OGMatrix> {
   private BLAS _localblas = new BLAS();
 

@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Mtimes;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
@@ -14,7 +16,8 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Does matrix * matrix in a mathematical sense
  */
-public final class MtimesOGSparseMatrixOGMatrix implements MtimesAbstract<OGSparseMatrix, OGMatrix> {
+@DOGMAMethodHook(provides = Mtimes.class)
+public final class MtimesOGSparseMatrixOGMatrix implements Mtimes<OGArray<? extends Number>, OGSparseMatrix, OGMatrix> {
   private static MtimesOGSparseMatrixOGMatrix s_instance = new MtimesOGSparseMatrixOGMatrix();
 
   public static MtimesOGSparseMatrixOGMatrix getInstance() {
@@ -27,7 +30,7 @@ public final class MtimesOGSparseMatrixOGMatrix implements MtimesAbstract<OGSpar
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGArray<? extends Number> mtimes(OGSparseMatrix array1, OGMatrix array2) {
+  public OGArray<? extends Number> eval(OGSparseMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
