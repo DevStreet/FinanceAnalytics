@@ -26,13 +26,14 @@ import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Mtimes;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Transpose;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Ctranspose;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Minus;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Sin;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Rdivide;
 import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Minus;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Mldivide;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Ctranspose;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Sin;
 /**
  * Provides the DOGMA Language
  */
@@ -51,13 +52,14 @@ s_verbose = verbose;
 private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
 private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
 private static InfixOpChain[][] s_mtimesInstructions; //CSOFF
-private static InfixOpChain[][] s_timesInstructions; //CSOFF
 private static UnaryFunctionChain[] s_transposeInstructions; //CSOFF
-private static UnaryFunctionChain[] s_ctransposeInstructions; //CSOFF
-private static InfixOpChain[][] s_minusInstructions; //CSOFF
-private static UnaryFunctionChain[] s_sinInstructions; //CSOFF
 private static InfixOpChain[][] s_rdivideInstructions; //CSOFF
 private static InfixOpChain[][] s_plusInstructions; //CSOFF
+private static InfixOpChain[][] s_minusInstructions; //CSOFF
+private static InfixOpChain[][] s_mldivideInstructions; //CSOFF
+private static UnaryFunctionChain[] s_ctransposeInstructions; //CSOFF
+private static InfixOpChain[][] s_timesInstructions; //CSOFF
+private static UnaryFunctionChain[] s_sinInstructions; //CSOFF
 static {
 if(s_verbose){
   s_log.info("Welcome to DOGMA");  s_log.info("Building instructions...");}
@@ -91,26 +93,29 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] MtimesFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Mtimes.class, s_verbose);
 s_mtimesInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),MtimesFunctionTable, defaultInfixFunctionEvalCostsMatrix);
 
-InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] TimesFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Times.class, s_verbose);
-s_timesInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),TimesFunctionTable, defaultInfixFunctionEvalCostsMatrix);
-
 UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] TransposeFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Transpose.class);
 s_transposeInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),TransposeFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
-
-UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] CtransposeFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Ctranspose.class);
-s_ctransposeInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),CtransposeFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
-
-InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] MinusFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Minus.class, s_verbose);
-s_minusInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),MinusFunctionTable, defaultInfixFunctionEvalCostsMatrix);
-
-UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] SinFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Sin.class);
-s_sinInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),SinFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
 
 InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] RdivideFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Rdivide.class, s_verbose);
 s_rdivideInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),RdivideFunctionTable, defaultInfixFunctionEvalCostsMatrix);
 
 InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] PlusFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Plus.class, s_verbose);
 s_plusInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),PlusFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+
+InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] MinusFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Minus.class, s_verbose);
+s_minusInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),MinusFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+
+InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] MldivideFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Mldivide.class, s_verbose);
+s_mldivideInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),MldivideFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+
+UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] CtransposeFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Ctranspose.class);
+s_ctransposeInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),CtransposeFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
+
+InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] TimesFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Times.class, s_verbose);
+s_timesInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),TimesFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+
+UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] SinFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Sin.class);
+s_sinInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),SinFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
 
 if(s_verbose){
   s_log.info("DOGMA built.");}
@@ -157,46 +162,6 @@ arg2rewrite = new OGComplexScalar(arg2);
 }
 
 
-public static OGArray<? extends Number>times(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
-  Catchers.catchNullFromArgList(arg1, 1);
-  Catchers.catchNullFromArgList(arg2, 2);
-  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_timesInstructions[type1][type2], arg1, arg2);
-  return tmp;
-}
-
-public static OGArray<? extends Number> times(Number arg1, OGArray<? extends Number> arg2) {
-  Catchers.catchNullFromArgList(arg1, 1);
-  Catchers.catchNullFromArgList(arg2, 2);
-OGArray<? extends Number> arg1rewrite;
-if (arg1.getClass() == ComplexType.class) {
-arg1rewrite = new OGComplexScalar(arg1);
-} else {
-arg1rewrite = new OGRealScalar(arg1.doubleValue());
-}
-int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_timesInstructions[type1][type2], arg1rewrite, arg2);
-  return tmp;
-}
-
-public static OGArray<? extends Number>times(OGArray<? extends Number> arg1, Number arg2) {
-  Catchers.catchNullFromArgList(arg1, 1);
-  Catchers.catchNullFromArgList(arg2, 2);
-OGArray<? extends Number> arg2rewrite;
-if (arg2.getClass() == ComplexType.class) {
-arg2rewrite = new OGComplexScalar(arg2);
-} else {
- arg2rewrite = new OGRealScalar(arg2.doubleValue());
- }
- int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
- int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_timesInstructions[type1][type2], arg1, arg2rewrite);
-  return tmp;
-}
-
-
 public static OGArray<? extends Number>transpose(OGArray<? extends Number> arg1) {
 Catchers.catchNullFromArgList(arg1, 1);
 int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
@@ -213,86 +178,6 @@ arg1rewrite = new OGRealScalar(arg1.doubleValue());
 }
 int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
 OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_transposeInstructions[type1], arg1rewrite);
-return tmp;
-}
-
-
-public static OGArray<? extends Number>ctranspose(OGArray<? extends Number> arg1) {
-Catchers.catchNullFromArgList(arg1, 1);
-int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_ctransposeInstructions[type1], arg1);
-return tmp;
-}
-
-public static OGArray<? extends Number>ctranspose(Number arg1) {Catchers.catchNullFromArgList(arg1, 1);
-OGArray<? extends Number> arg1rewrite;
-if (arg1.getClass() == ComplexType.class) {
-arg1rewrite = new OGComplexScalar(arg1);
-} else {
-arg1rewrite = new OGRealScalar(arg1.doubleValue());
-}
-int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_ctransposeInstructions[type1], arg1rewrite);
-return tmp;
-}
-
-
-public static OGArray<? extends Number>minus(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
-  Catchers.catchNullFromArgList(arg1, 1);
-  Catchers.catchNullFromArgList(arg2, 2);
-  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_minusInstructions[type1][type2], arg1, arg2);
-  return tmp;
-}
-
-public static OGArray<? extends Number> minus(Number arg1, OGArray<? extends Number> arg2) {
-  Catchers.catchNullFromArgList(arg1, 1);
-  Catchers.catchNullFromArgList(arg2, 2);
-OGArray<? extends Number> arg1rewrite;
-if (arg1.getClass() == ComplexType.class) {
-arg1rewrite = new OGComplexScalar(arg1);
-} else {
-arg1rewrite = new OGRealScalar(arg1.doubleValue());
-}
-int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_minusInstructions[type1][type2], arg1rewrite, arg2);
-  return tmp;
-}
-
-public static OGArray<? extends Number>minus(OGArray<? extends Number> arg1, Number arg2) {
-  Catchers.catchNullFromArgList(arg1, 1);
-  Catchers.catchNullFromArgList(arg2, 2);
-OGArray<? extends Number> arg2rewrite;
-if (arg2.getClass() == ComplexType.class) {
-arg2rewrite = new OGComplexScalar(arg2);
-} else {
- arg2rewrite = new OGRealScalar(arg2.doubleValue());
- }
- int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
- int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_minusInstructions[type1][type2], arg1, arg2rewrite);
-  return tmp;
-}
-
-
-public static OGArray<? extends Number>sin(OGArray<? extends Number> arg1) {
-Catchers.catchNullFromArgList(arg1, 1);
-int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_sinInstructions[type1], arg1);
-return tmp;
-}
-
-public static OGArray<? extends Number>sin(Number arg1) {Catchers.catchNullFromArgList(arg1, 1);
-OGArray<? extends Number> arg1rewrite;
-if (arg1.getClass() == ComplexType.class) {
-arg1rewrite = new OGComplexScalar(arg1);
-} else {
-arg1rewrite = new OGRealScalar(arg1.doubleValue());
-}
-int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_sinInstructions[type1], arg1rewrite);
 return tmp;
 }
 
@@ -374,6 +259,166 @@ arg2rewrite = new OGComplexScalar(arg2);
  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
   OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_plusInstructions[type1][type2], arg1, arg2rewrite);
   return tmp;
+}
+
+
+public static OGArray<? extends Number>minus(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_minusInstructions[type1][type2], arg1, arg2);
+  return tmp;
+}
+
+public static OGArray<? extends Number> minus(Number arg1, OGArray<? extends Number> arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+arg1rewrite = new OGRealScalar(arg1.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_minusInstructions[type1][type2], arg1rewrite, arg2);
+  return tmp;
+}
+
+public static OGArray<? extends Number>minus(OGArray<? extends Number> arg1, Number arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+OGArray<? extends Number> arg2rewrite;
+if (arg2.getClass() == ComplexType.class) {
+arg2rewrite = new OGComplexScalar(arg2);
+} else {
+ arg2rewrite = new OGRealScalar(arg2.doubleValue());
+ }
+ int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+ int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_minusInstructions[type1][type2], arg1, arg2rewrite);
+  return tmp;
+}
+
+
+public static OGArray<? extends Number>mldivide(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_mldivideInstructions[type1][type2], arg1, arg2);
+  return tmp;
+}
+
+public static OGArray<? extends Number> mldivide(Number arg1, OGArray<? extends Number> arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+arg1rewrite = new OGRealScalar(arg1.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_mldivideInstructions[type1][type2], arg1rewrite, arg2);
+  return tmp;
+}
+
+public static OGArray<? extends Number>mldivide(OGArray<? extends Number> arg1, Number arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+OGArray<? extends Number> arg2rewrite;
+if (arg2.getClass() == ComplexType.class) {
+arg2rewrite = new OGComplexScalar(arg2);
+} else {
+ arg2rewrite = new OGRealScalar(arg2.doubleValue());
+ }
+ int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+ int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_mldivideInstructions[type1][type2], arg1, arg2rewrite);
+  return tmp;
+}
+
+
+public static OGArray<? extends Number>ctranspose(OGArray<? extends Number> arg1) {
+Catchers.catchNullFromArgList(arg1, 1);
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_ctransposeInstructions[type1], arg1);
+return tmp;
+}
+
+public static OGArray<? extends Number>ctranspose(Number arg1) {Catchers.catchNullFromArgList(arg1, 1);
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+arg1rewrite = new OGRealScalar(arg1.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_ctransposeInstructions[type1], arg1rewrite);
+return tmp;
+}
+
+
+public static OGArray<? extends Number>times(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_timesInstructions[type1][type2], arg1, arg2);
+  return tmp;
+}
+
+public static OGArray<? extends Number> times(Number arg1, OGArray<? extends Number> arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+arg1rewrite = new OGRealScalar(arg1.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_timesInstructions[type1][type2], arg1rewrite, arg2);
+  return tmp;
+}
+
+public static OGArray<? extends Number>times(OGArray<? extends Number> arg1, Number arg2) {
+  Catchers.catchNullFromArgList(arg1, 1);
+  Catchers.catchNullFromArgList(arg2, 2);
+OGArray<? extends Number> arg2rewrite;
+if (arg2.getClass() == ComplexType.class) {
+arg2rewrite = new OGComplexScalar(arg2);
+} else {
+ arg2rewrite = new OGRealScalar(arg2.doubleValue());
+ }
+ int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+ int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2rewrite.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_timesInstructions[type1][type2], arg1, arg2rewrite);
+  return tmp;
+}
+
+
+public static OGArray<? extends Number>sin(OGArray<? extends Number> arg1) {
+Catchers.catchNullFromArgList(arg1, 1);
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_sinInstructions[type1], arg1);
+return tmp;
+}
+
+public static OGArray<? extends Number>sin(Number arg1) {Catchers.catchNullFromArgList(arg1, 1);
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+arg1rewrite = new OGRealScalar(arg1.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_sinInstructions[type1], arg1rewrite);
+return tmp;
 }
 
 
