@@ -5,30 +5,23 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy;
 
-
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Copy;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
- * Copies sparse arrays
+ * Copies OGSparseMatrix's
  */
-public final class CopyOGSparseMatrix implements CopyAbstract<OGSparseMatrix> {
-  private static CopyOGSparseMatrix s_instance = new CopyOGSparseMatrix();
-
-  public static CopyOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private CopyOGSparseMatrix() {
-  }
-
+@DOGMAMethodHook(provides = Copy.class)
+public final class CopyOGSparseMatrix implements Copy<OGSparseMatrix, OGSparseMatrix> {
   @Override
-  public OGSparseMatrix copy(OGSparseMatrix array1) {
+  public OGSparseMatrix eval(OGSparseMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
-    double [] values = DenseMemoryManipulation.memcpy(array1.getData());
-    int [] rowIdx = DenseMemoryManipulation.memcpy(array1.getRowIndex());
-    int [] colPtr = DenseMemoryManipulation.memcpy(array1.getColumnPtr());    
+    double[] values = DenseMemoryManipulation.memcpy(array1.getData());
+    int[] rowIdx = DenseMemoryManipulation.memcpy(array1.getRowIndex());
+    int[] colPtr = DenseMemoryManipulation.memcpy(array1.getColumnPtr());
     return new OGSparseMatrix(colPtr, rowIdx, values, rows, cols);
   }
 
