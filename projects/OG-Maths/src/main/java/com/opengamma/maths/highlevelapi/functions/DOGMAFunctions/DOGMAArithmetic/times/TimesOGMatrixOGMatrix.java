@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.times;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Times;
+import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;

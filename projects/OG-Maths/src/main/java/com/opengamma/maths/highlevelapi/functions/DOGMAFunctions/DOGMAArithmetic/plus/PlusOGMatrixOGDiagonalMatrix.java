@@ -8,7 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import java.util.Arrays;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
+import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Plus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;

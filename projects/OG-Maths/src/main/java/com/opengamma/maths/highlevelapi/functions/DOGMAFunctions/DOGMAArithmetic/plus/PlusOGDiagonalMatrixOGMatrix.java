@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Plus;
+import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Plus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;

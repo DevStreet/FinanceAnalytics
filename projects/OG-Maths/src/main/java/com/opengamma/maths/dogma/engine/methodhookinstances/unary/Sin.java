@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.dogma.engine.methodhookinstances;
+package com.opengamma.maths.dogma.engine.methodhookinstances.unary;
 
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
@@ -12,7 +12,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
  * @param <R> ret
  * @param <S> arg1
  */
-public interface Ctranspose<R extends OGArray<? extends Number>, S extends OGArray<? extends Number>> extends UnaryFunction<R, S> {
+public interface Sin<R extends OGArray<? extends Number>, S extends OGArray<? extends Number>> extends UnaryFunction<R, S> {
 
 
 }

@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sin;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
-import com.opengamma.maths.dogma.engine.methodhookinstances.Sin;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sin;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
