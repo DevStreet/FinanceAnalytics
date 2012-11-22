@@ -5,39 +5,33 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sparse;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Sparse's a sparse array
  */
-public final class SparseOGSparseMatrix implements SparseAbstract<OGSparseMatrix> {
-
-  private static SparseOGSparseMatrix s_instance = new SparseOGSparseMatrix();
-
-  public static SparseOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SparseOGSparseMatrix() {
-  }
+@DOGMAMethodHook(provides = Sparse.class)
+public final class SparseOGSparseMatrix implements Sparse<OGSparseMatrix, OGSparseMatrix> {
 
   @Override
-  public OGSparseMatrix sparse(OGSparseMatrix array1) {
+  public OGSparseMatrix eval(OGSparseMatrix array1) {
     final int rows = array1.getNumberOfRows();
-    final int cols = array1.getNumberOfColumns();    
+    final int cols = array1.getNumberOfColumns();
     final double[] data = array1.getData();
     final int[] colPtr = array1.getColumnPtr();
     final int[] rowIdx = array1.getRowIndex();
-    
-    final double[]tmpData = new double [data.length];
+
+    final double[] tmpData = new double[data.length];
     System.arraycopy(data, 0, tmpData, 0, data.length);
-    
-    final int[]tmpColPtr = new int[colPtr.length];
+
+    final int[] tmpColPtr = new int[colPtr.length];
     System.arraycopy(colPtr, 0, tmpColPtr, 0, colPtr.length);
 
-    final int[]tmpRowIdx = new int[rowIdx.length];
-    System.arraycopy(rowIdx, 0, tmpRowIdx, 0, rowIdx.length);    
-    
+    final int[] tmpRowIdx = new int[rowIdx.length];
+    System.arraycopy(rowIdx, 0, tmpRowIdx, 0, rowIdx.length);
+
     return new OGSparseMatrix(tmpColPtr, tmpRowIdx, tmpData, rows, cols);
   }
 

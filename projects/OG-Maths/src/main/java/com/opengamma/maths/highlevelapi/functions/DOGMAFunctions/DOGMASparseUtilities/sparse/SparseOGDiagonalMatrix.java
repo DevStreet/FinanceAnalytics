@@ -5,25 +5,19 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sparse;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Sparse's a sparse array
  */
-public final class SparseOGDiagonalMatrix implements SparseAbstract<OGDiagonalMatrix> {
-
-  private static SparseOGDiagonalMatrix s_instance = new SparseOGDiagonalMatrix();
-
-  public static SparseOGDiagonalMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SparseOGDiagonalMatrix() {
-  }
+@DOGMAMethodHook(provides = Sparse.class)
+public final class SparseOGDiagonalMatrix implements Sparse<OGSparseMatrix, OGDiagonalMatrix> {
 
   @Override
-  public OGSparseMatrix sparse(OGDiagonalMatrix array1) {
+  public OGSparseMatrix eval(OGDiagonalMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final double[] data = array1.getData();
