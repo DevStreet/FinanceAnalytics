@@ -16,10 +16,10 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtil
  */
 @DOGMAConverterHook(provides = Converter.class)
 public final class ConvertOGSparseMatrixToOGMatrix implements Converter<OGSparseMatrix> {
-  private static FullOGSparseMatrix s_full = FullOGSparseMatrix.getInstance();
+  private static FullOGSparseMatrix s_full = new FullOGSparseMatrix();
   
   @Override
   public OGArray<? extends Number> convert(OGSparseMatrix array1) {
-    return s_full.full(array1);
+    return s_full.eval(array1);
   }
 }

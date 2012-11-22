@@ -16,9 +16,9 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtil
  */
 @DOGMAConverterHook(provides = Converter.class)
 public final class ConvertOGDiagonalToOGMatrix implements Converter<OGDiagonalMatrix> {
-  private static FullOGDiagonalMatrix s_full = FullOGDiagonalMatrix.getInstance();
+  private static FullOGDiagonalMatrix s_full = new FullOGDiagonalMatrix();
   @Override
   public OGArray<? extends Number> convert(OGDiagonalMatrix array1) {
-    return s_full.full(array1);
+    return s_full.eval(array1);
   }
 }
