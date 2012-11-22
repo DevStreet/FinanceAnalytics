@@ -15,13 +15,13 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
  */
 public class DOGMAOGDiagonalMatrixFullTest {
 
-  private static FullOGDiagonalMatrix f = FullOGDiagonalMatrix.getInstance();
+  private static FullOGDiagonalMatrix f = new FullOGDiagonalMatrix();
   
   @Test
   public static void fullTest() {
     OGDiagonalMatrix p = new OGDiagonalMatrix(new double[] {1, 2, 3 }, 4, 5);
     OGMatrix answer = new OGMatrix(new double[] {1.00, 0.00, 0.00, 0.00, 0.00, 2.00, 0.00, 0.00, 0.00, 0.00, 3.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00 }, 4, 5);
-    assertTrue(answer.equals(f.full(p)));
+    assertTrue(answer.equals(f.eval(p)));
   }
 
 }

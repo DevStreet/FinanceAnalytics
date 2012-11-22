@@ -15,7 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
  */
 public class DOGMAOGComplexMatrixFullTest {
 
-  private static FullOGComplexMatrix f = FullOGComplexMatrix.getInstance();
+  private static FullOGComplexMatrix f = new FullOGComplexMatrix();
 
   @Test
   public static void fullTest() {
@@ -23,6 +23,6 @@ public class DOGMAOGComplexMatrixFullTest {
     double[][] imagdata = new double[][] { {10.00, 20.00, 30.00 }, {40.00, 50.00, 60.00 }, {70.00, 80.00, 90.00 }, {100.00, 110.00, 120.00 } };
     OGComplexMatrix answer = new OGComplexMatrix(realdata, imagdata);
     OGComplexMatrix p = new OGComplexMatrix(realdata, imagdata);
-    assertTrue(answer.equals(f.full(p)));
+    assertTrue(answer.equals(f.eval(p)));
   }
 }

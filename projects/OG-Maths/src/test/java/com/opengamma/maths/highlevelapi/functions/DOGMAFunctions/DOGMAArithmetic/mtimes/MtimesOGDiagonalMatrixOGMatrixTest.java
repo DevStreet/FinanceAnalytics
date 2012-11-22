@@ -5,14 +5,15 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mtimes;
 
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
+import org.testng.annotations.Test;
+
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.dogma.DogmaLanguage;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMA;
 
 /**
  * tests diag mtimes full
@@ -55,7 +56,7 @@ public class MtimesOGDiagonalMatrixOGMatrixTest {
 
   MtimesOGDiagonalMatrixOGMatrix mtimes = new MtimesOGDiagonalMatrixOGMatrix();
 
-  DOGMA dogma = DOGMA.getInstance();
+  DogmaLanguage dogma = DogmaLanguage.getInstance();
   OGArray<? extends Number> tmp;
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)

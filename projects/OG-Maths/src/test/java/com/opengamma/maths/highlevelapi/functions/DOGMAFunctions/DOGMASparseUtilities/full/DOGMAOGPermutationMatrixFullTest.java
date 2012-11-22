@@ -16,12 +16,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
  */
 public class DOGMAOGPermutationMatrixFullTest {
 
-  private static FullOGPermutationMatrix f = FullOGPermutationMatrix.getInstance();
+  private static FullOGPermutationMatrix f = new FullOGPermutationMatrix();
 
   @Test
   public static void fullTest() {
     OGMatrix answer = new OGMatrix(new double[][]{{      0.00,      0.00,      0.00,      0.00,      1.00},{      0.00,      0.00,      1.00,      0.00,      0.00},{      0.00,      0.00,      0.00,      1.00,      0.00},{      0.00,      1.00,      0.00,      0.00,      0.00},{      1.00,      0.00,      0.00,      0.00,      0.00}});
     OGPermutationMatrix p = new OGPermutationMatrix(new int[] {4, 2, 3, 1, 0 });
-    assertTrue(answer.equals(f.full(p)));
+    assertTrue(answer.equals(f.eval(p)));
   }
 }

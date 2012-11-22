@@ -16,14 +16,14 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  */
 public class DOGMAOGSparseMatrixFullTest {
 
-  private static FullOGSparseMatrix f = FullOGSparseMatrix.getInstance();
+  private static FullOGSparseMatrix f = new FullOGSparseMatrix();
 
   @Test
   public static void fullTest() {
     double[][] data = new double[][] { {1.00, 2.00, 0.00 }, {4.00, 0.00, 6.00 }, {0.00, 8.00, 0.00 }, {0.00, 11.00, 12.00 } };
     OGSparseMatrix p = new OGSparseMatrix(data);
     OGMatrix answer = new OGMatrix(data);
-    assertTrue(answer.equals(f.full(p)));
+    assertTrue(answer.equals(f.eval(p)));
   }
 
 }

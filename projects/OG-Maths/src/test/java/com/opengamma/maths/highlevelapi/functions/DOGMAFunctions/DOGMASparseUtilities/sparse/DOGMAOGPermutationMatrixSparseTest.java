@@ -5,12 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse;
 
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
+
+import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.Full;
 
 /**
  * tests sparse on diag type
@@ -27,7 +27,6 @@ public class DOGMAOGPermutationMatrixSparseTest {
 
   private static OGSparseMatrix sparseAnswer = new OGSparseMatrix(denseAnswer);
 
-  static Full f = new Full();
   
   @Test
   public static void permutationToSparseTest() {

@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * 
@@ -16,6 +15,6 @@ public interface DOGMASparseUtilitiesAPI {
    * @param array a matrix to turn into a full matrix
    * @return a full matrix
    */
-  OGArray<? extends Number> full(OGArray<? extends Number> array);
+//  OGArray<? extends Number> full(OGArray<? extends Number> array);
 
 }
