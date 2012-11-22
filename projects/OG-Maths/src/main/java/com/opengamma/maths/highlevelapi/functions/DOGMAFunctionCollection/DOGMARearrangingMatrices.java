@@ -9,7 +9,6 @@ import com.opengamma.maths.highlevelapi.datatypes.derived.OGSortResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.Copy;
 import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMARearrangingMatricesAPI;
 
 
@@ -17,7 +16,6 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAinterfaces.DOGMARearrangi
  * Functions for rearranging matrices
  */
 public class DOGMARearrangingMatrices implements DOGMARearrangingMatricesAPI {
-  private final Copy _copy = new Copy();
   @Override
   public OGArray<? extends Number> cat(OGIndexMatrix dim, OGArray<? extends Number>... array) {
     return null;
@@ -138,10 +136,5 @@ public class DOGMARearrangingMatrices implements DOGMARearrangingMatricesAPI {
     return null;
   }
 
- 
-  @Override
-  public OGArray<? extends Number> copy(OGArray<? extends Number> array) {
-    return _copy.copy(array);
-  }
 
 }

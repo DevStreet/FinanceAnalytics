@@ -214,5 +214,5 @@ public interface DOGMARearrangingMatricesAPI {
    * @param array the array to copy
    * @return a copy of an array
    */
-  OGArray<? extends Number> copy(OGArray<? extends Number> array);
+//  OGArray<? extends Number> copy(OGArray<? extends Number> array);
 }
