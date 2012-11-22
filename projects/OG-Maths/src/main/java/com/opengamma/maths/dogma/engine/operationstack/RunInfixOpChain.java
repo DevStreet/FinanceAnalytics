@@ -26,9 +26,12 @@ public class RunInfixOpChain {
    * @return the operation performed with arr1 and arr2 as args
    */
   public OGArray<? extends Number> dispatch(InfixOpChain ops, OGArray<? extends Number> arr1, OGArray<? extends Number> arr2) {
-    Catchers.catchNullFromArgList(ops, 1);
     Catchers.catchNullFromArgList(arr1, 2);
     Catchers.catchNullFromArgList(arr2, 3);
+    if (ops == null) {
+      throw new MathsExceptionGeneric("Operation is not defined or unreachable from the graph of implemented operations for class combination: " + arr1.getClass().getSimpleName() + " and " +
+          arr2.getClass().getSimpleName());
+    }
     OGArray<? extends Number> converted1;
     OGArray<? extends Number> converted2;
     List<Converter<? super OGArray<? extends Number>>> chain1 = ops.getConvertfirst();
@@ -45,8 +48,8 @@ public class RunInfixOpChain {
     }
     InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>> m = ops.getMethod();
     if (m == null) {
-      throw new MathsExceptionGeneric("Instruction is missing from operation chain, problematic classes were: First operand: " + arr2.getClass().toString() +
-          " Second operand: " + arr2.getClass().toString());
+      throw new MathsExceptionGeneric("Instruction is missing from operation chain, problematic classes were: First operand: " + arr2.getClass().toString() + " Second operand: " +
+          arr2.getClass().toString());
     }
     return m.eval(converted1, converted2);
   }

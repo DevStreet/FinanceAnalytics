@@ -25,10 +25,10 @@ public class RunUnaryFunctionChain {
    * @return ops(arr1)
    */
   public OGArray<? extends Number> dispatch(UnaryFunctionChain ops, OGArray<? extends Number> arr1) {
-    if (ops == null) {
-      throw new MathsExceptionGeneric("Invalid operation (or operation is not implemented) for " + arr1.getClass().toString());
-    }
     Catchers.catchNullFromArgList(arr1, 2);
+    if (ops == null) {
+      throw new MathsExceptionGeneric("Operation is not defined or unreachable from the graph of implemented operations for class: " + arr1.getClass().getSimpleName());
+    }    
     OGArray<? extends Number> converted1;
     UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>> m = ops.getMethod();
     if (m == null) {
