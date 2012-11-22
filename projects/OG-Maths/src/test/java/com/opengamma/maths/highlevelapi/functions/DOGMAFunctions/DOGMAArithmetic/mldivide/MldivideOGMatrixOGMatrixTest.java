@@ -31,7 +31,7 @@ public class MldivideOGMatrixOGMatrixTest {
 
   @Test
   public void aTest() {
-    OGMatrix answer = mldivide.mldivide(A3, A1);
+    OGMatrix answer = mldivide.eval(A3, A1);
     System.out.println(A1.toString());
     System.out.println(A3.toString());
     System.out.println(answer.toString());
@@ -39,7 +39,7 @@ public class MldivideOGMatrixOGMatrixTest {
 
   @Test
   public void a2Test() {
-    OGMatrix answer = mldivide.mldivide(A4, B1);
+    OGMatrix answer = mldivide.eval(A4, B1);
     System.out.println(answer.toString());
   }
 
