@@ -16,10 +16,10 @@ import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtil
  */
 @DOGMAConverterHook(provides = Converter.class)
 public final class ConvertOGDiagonalToOGSparseMatrix implements Converter<OGDiagonalMatrix> {
-  private static SparseOGDiagonalMatrix s_sparse = SparseOGDiagonalMatrix.getInstance();
+  private static SparseOGDiagonalMatrix s_sparse = new SparseOGDiagonalMatrix();
 
   @Override
   public OGArray<? extends Number> convert(OGDiagonalMatrix array1) {
-    return s_sparse.sparse(array1);
+    return s_sparse.eval(array1);
   }
 }
