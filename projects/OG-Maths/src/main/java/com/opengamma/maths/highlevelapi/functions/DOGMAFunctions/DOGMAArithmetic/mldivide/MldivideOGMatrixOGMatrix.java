@@ -8,6 +8,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.Mldivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -15,12 +17,13 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 /**
  * Generalised linear system solver. Does the classic "backslash" operation found in a number of languages.
  */
-public class MldivideOGMatrixOGMatrix implements MldivideInterface<OGMatrix, OGMatrix> {
+@DOGMAMethodHook(provides = Mldivide.class)
+public class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatrix, OGMatrix> {
 
   private LAPACK _lapack = new LAPACK();
 
   @Override
-  public OGMatrix mldivide(OGMatrix array1, OGMatrix array2) {
+  public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     int len;
@@ -42,6 +45,9 @@ public class MldivideOGMatrixOGMatrix implements MldivideInterface<OGMatrix, OGM
     // if success, back solve with dpotrs, else fall through
     // if cholesky failed or matrix is not suitable for cholesky try and solve with dgetrf() via LU and back substitution
     // if matrix is not square or LAPACK flagged failure from earlier solve with SVD via dgelsd
+
+    // FIXME: not happy with above alg. Better attempt might be if not square check condition, try QR, check condition of R, SVD is last resort.
+    // Can probably wire up the QR into SVD using LAPACK internals
 
     // First...
     // check if the system is sane
@@ -89,7 +95,7 @@ public class MldivideOGMatrixOGMatrix implements MldivideInterface<OGMatrix, OGM
 
     // if we got here we either have a rectangular system, or something broke in LAPACK (i.e. info!=0)
     //TODO: if(info!=0) find out why, is singular compute the rcond and shove it in a log
-    
+
     // so we attempt a general least squares solve
     double[] s = new double[Math.min(rows1, cols1)];
     double rcond = -1; // this is the definition of singular in the Moore-Penrose sense, if set to -1 machine prec is used
