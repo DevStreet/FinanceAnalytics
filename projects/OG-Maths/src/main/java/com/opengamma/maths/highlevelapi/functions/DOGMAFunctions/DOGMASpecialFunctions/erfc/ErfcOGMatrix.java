@@ -5,6 +5,8 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFunctions.erfc;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Erfc;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
@@ -12,18 +14,11 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
 /**
  * Does erfc on OGDoubleArray
  */
-public final class ErfcOGMatrix implements ErfcAbstract<OGMatrix> {
-  private static ErfcOGMatrix s_instance = new ErfcOGMatrix();
-
-  public static ErfcOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private ErfcOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Erfc.class)
+public final class ErfcOGMatrix implements Erfc<OGMatrix, OGMatrix> {
 
   @Override
-  public OGMatrix erfc(OGMatrix array1) {
+  public OGMatrix eval(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();

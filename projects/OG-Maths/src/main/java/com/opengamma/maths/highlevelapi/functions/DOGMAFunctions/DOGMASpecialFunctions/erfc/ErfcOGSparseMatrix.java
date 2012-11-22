@@ -7,6 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFu
 
 import java.util.Arrays;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Erfc;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
@@ -15,18 +17,11 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
 /**
  * Erfc on Sparse
  */
-public final class ErfcOGSparseMatrix implements ErfcAbstract<OGSparseMatrix> {
-  private static ErfcOGSparseMatrix s_instance = new ErfcOGSparseMatrix();
-
-  public static ErfcOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private ErfcOGSparseMatrix() {
-  }
+@DOGMAMethodHook(provides = Erfc.class)
+public final class ErfcOGSparseMatrix implements Erfc<OGMatrix, OGSparseMatrix> {
 
   @Override
-  public OGMatrix erfc(OGSparseMatrix array1) {
+  public OGMatrix eval(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
