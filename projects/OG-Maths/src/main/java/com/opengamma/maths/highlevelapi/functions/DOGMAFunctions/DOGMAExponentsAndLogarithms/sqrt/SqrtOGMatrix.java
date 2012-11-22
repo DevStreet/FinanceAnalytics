@@ -6,24 +6,19 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponentsAndLogarithms.sqrt;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sqrt;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * does sqrt
  */
-public final class SqrtOGMatrix implements SqrtAbstract<OGMatrix> {
-  private static SqrtOGMatrix s_instance = new SqrtOGMatrix();
-
-  public static SqrtOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SqrtOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Sqrt.class)
+public final class SqrtOGMatrix implements Sqrt<OGMatrix, OGMatrix> {
 
   @Override
-  public OGMatrix sqrt(OGMatrix array1) {
+  public OGMatrix eval(OGMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -39,7 +34,7 @@ public final class SqrtOGMatrix implements SqrtAbstract<OGMatrix> {
         throw new MathsExceptionNotImplemented("Sqrt of negative numbers not implemented, awaiting complex support");
       }
     }
-    
+
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }
 }
