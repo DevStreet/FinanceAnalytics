@@ -5,25 +5,19 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Full;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 
 /**
  * Full's OGPermutationArrays
  */
-public final class FullOGPermutationMatrix implements FullAbstract<OGPermutationMatrix> {
-
-  private static FullOGPermutationMatrix s_instance = new FullOGPermutationMatrix();
-
-  public static FullOGPermutationMatrix getInstance() {
-    return s_instance;
-  }
-
-  private FullOGPermutationMatrix() {
-  }
+@DOGMAMethodHook(provides = Full.class)
+public final class FullOGPermutationMatrix implements Full<OGMatrix, OGPermutationMatrix> {
 
   @Override
-  public OGMatrix full(OGPermutationMatrix array1) {
+  public OGMatrix eval(OGPermutationMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final int[] data = array1.getData();

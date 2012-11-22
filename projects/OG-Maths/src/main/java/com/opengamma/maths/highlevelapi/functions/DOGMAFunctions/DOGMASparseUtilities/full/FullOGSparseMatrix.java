@@ -5,24 +5,18 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Full;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 
 /**
  * Full's OGSparseArrays
  */
-public final class FullOGSparseMatrix implements FullAbstract<OGSparseMatrix> {
-  private static FullOGSparseMatrix s_instance = new FullOGSparseMatrix();
-
-  public static FullOGSparseMatrix getInstance() {
-    return s_instance;
-  }
-
-  private FullOGSparseMatrix() {
-  }
-
+@DOGMAMethodHook(provides = Full.class)
+public final class FullOGSparseMatrix implements Full<OGMatrix, OGSparseMatrix> {
   @Override
-  public OGMatrix full(OGSparseMatrix array1) {
+  public OGMatrix eval(OGSparseMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
     final int[] colPtr = array1.getColumnPtr();
