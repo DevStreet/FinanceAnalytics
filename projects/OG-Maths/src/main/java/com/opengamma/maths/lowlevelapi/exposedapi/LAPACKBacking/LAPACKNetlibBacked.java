@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 
+import org.netlib.lapack.Dgeev;
 import org.netlib.lapack.Dgelsd;
 import org.netlib.lapack.Dgesvd;
 import org.netlib.lapack.Dgetrf;
@@ -40,7 +41,7 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     Dgetrf.dgetrf(m, n, A, 0, lda, ipiv, 0, infoderef);
     info[0] = infoderef.val;
   }
-  
+
   @Override
   public void dgetrs(char trans, int n, int nrhs, double[] a, int lda, int[] ipiv, double[] b, int ldb, int[] info) {
     intW infoderef = new intW(info[0]);
@@ -63,20 +64,19 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     Dtrtrs.dtrtrs(String.valueOf(uplo), String.valueOf(trans), String.valueOf(diag), n, nrhs, a, 0, lda, b, 0, ldb, infoderef);
     info[0] = infoderef.val;
   }
-  
-  
+
   @Override
   public void dpotrf(char uplo, int n, double[] a, int lda, int[] info) {
     intW infoderef = new intW(info[0]);
     Dpotrf.dpotrf(String.valueOf(uplo), n, a, 0, lda, infoderef);
     info[0] = infoderef.val;
   }
-  
+
   @Override
   public void dpotrs(char uplo, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info) {
     intW infoderef = new intW(info[0]);
     Dpotrs.dpotrs(String.valueOf(uplo), n, nrhs, a, 0, lda, b, 0, ldb, infoderef);
-    info[0] = infoderef.val;
+
   }
 
   @Override
@@ -84,6 +84,13 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     // the byte code translated ilaenv is broken, seems to return some strange values including a -1 for ispec=9
     // a quick look at the byte code seems to show iconst_m1 is loaded and returned
     return Ilaenv.ilaenv(ispec, String.valueOf(name), String.valueOf(opts), n1, n2, n3, n4);
+  }
+
+  @Override
+  public void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info) {
+    intW infoderef = new intW(info[0]);
+    Dgeev.dgeev(String.valueOf(jobvl), String.valueOf(jobvr), n, a, lda, 0, wr, 0, wi, 0, vl, 0, ldvl, vr, 0, ldvr, work, 0, lwork, infoderef);
+    info[0] = infoderef.val;
   }
 
 }

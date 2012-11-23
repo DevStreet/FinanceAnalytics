@@ -97,4 +97,9 @@ public class LAPACK implements LAPACKAPIInterface {
     return _localLAPACK.ilaenv(ispec, name, opts, n1, n2, n3, n4);
   }
 
+  @Override
+  public void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info) {
+    _localLAPACK.dgeev(jobvl, jobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr, work, lwork, info);
+  }
+
 }

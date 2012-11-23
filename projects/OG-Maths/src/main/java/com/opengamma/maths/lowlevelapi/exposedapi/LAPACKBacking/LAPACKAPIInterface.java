@@ -94,4 +94,7 @@ public interface LAPACKAPIInterface {
   // queries for block sizes, cross overpoints and arithmetic what nots, normally overloaded
   int ilaenv(int ispec, char[] name, char[] opts, int n1, int n2, int n3, int n4);
 
+  // generalised eigenvalues+vectors
+  void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info);
+
 }

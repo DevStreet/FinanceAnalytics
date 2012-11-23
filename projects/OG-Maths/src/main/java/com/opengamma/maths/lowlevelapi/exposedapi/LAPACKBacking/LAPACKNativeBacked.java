@@ -57,6 +57,12 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
 
   @Override
   public int ilaenv(int ispec, char[] name, char[] opts, int n1, int n2, int n3, int n4) {
-    return OGLAPACKRawWrapper.ilaenv(new int[] {ispec}, name, opts, new int[] {n1},  new int[] {n2},  new int[] {n3},  new int[] {n4});
+    return OGLAPACKRawWrapper.ilaenv(new int[] {ispec }, name, opts, new int[] {n1 }, new int[] {n2 }, new int[] {n3 }, new int[] {n4 });
   }
+
+  @Override
+  public void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info) {
+    OGLAPACKRawWrapper.dgeev(new char[] {jobvl }, new char[] {jobvr }, new int[] {n }, a, new int[] {lda }, wr, wi, vl, new int[] {ldvl }, vr, new int[] {ldvr }, work, new int[] {lwork }, null);
+  }
+
 }

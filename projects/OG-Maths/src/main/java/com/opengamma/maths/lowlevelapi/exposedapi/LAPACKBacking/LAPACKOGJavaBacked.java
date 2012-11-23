@@ -47,4 +47,8 @@ public class LAPACKOGJavaBacked extends LAPACKAbstractSuper implements LAPACKAPI
     return 0;
   }
 
+  @Override
+  public void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info) {
+  }
+
 }
