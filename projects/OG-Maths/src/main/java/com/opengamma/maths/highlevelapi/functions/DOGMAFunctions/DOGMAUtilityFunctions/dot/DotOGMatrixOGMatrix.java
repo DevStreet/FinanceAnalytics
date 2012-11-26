@@ -5,27 +5,22 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAUtilityFunctions.dot;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.binary.Dot;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * 
+ * Dot product
  */
-public final class DotOGMatrixOGMatrix implements DotAbstract<OGMatrix, OGMatrix> {
-  private static DotOGMatrixOGMatrix s_instance = new DotOGMatrixOGMatrix();
-
-  public static DotOGMatrixOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private DotOGMatrixOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Dot.class)
+public final class DotOGMatrixOGMatrix implements Dot<OGMatrix, OGMatrix, OGMatrix> {
 
   private BLAS _localblas = new BLAS();
 
   @Override
-  public OGMatrix dot(OGMatrix array1, OGMatrix array2) {
+  public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     OGMatrix dot = null;
