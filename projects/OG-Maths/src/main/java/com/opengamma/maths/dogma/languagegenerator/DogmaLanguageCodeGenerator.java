@@ -12,9 +12,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opengamma.maths.dogma.engine.language.ArbitraryFunction;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
-import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;
 
 /**
  * 
@@ -29,6 +29,7 @@ public class DogmaLanguageCodeGenerator {
   static {
     s_generationMap.put(UnaryFunction.class, UnaryFunctionGenerator.getInstance());
     s_generationMap.put(InfixOperator.class, InfixOperatorGenerator.getInstance());
+    s_generationMap.put(ArbitraryFunction.class, ArbitraryFunctionGenerator.getInstance());
   }
 
   public String generateCode() {
@@ -42,13 +43,15 @@ public class DogmaLanguageCodeGenerator {
 
     // generate code from tokens
     for (FullToken tok : fullTokens) {
-      g = s_generationMap.get(tok.getClazz());
+      g = s_generationMap.get(tok.getInterfaceClassType());
+      System.out.println("name = " + tok.getSimpleName() + ". class id =" + tok.getInterfaceClass().getSimpleName());
       if (g == null) {
-        s_log.warn("class " + tok.getClazz() + " has no code generator class available");
+        s_log.warn("class " + tok.getInterfaceClassType() + " has no code generator class available");
+      } else {
+        sbtablevars.append(g.generateTableCodeVariables(tok));
+        sbjumptables.append(g.generateTableCode(tok));
+        sbmethods.append(g.generateMethodCode(tok));
       }
-      sbtablevars.append(g.generateTableCodeVariables(tok));
-      sbjumptables.append(g.generateTableCode(tok));
-      sbmethods.append(g.generateMethodCode(tok));
       sbimports.append("import " + tok.getCanonicalName() + ";\n");
     }
 
@@ -221,10 +224,6 @@ public class DogmaLanguageCodeGenerator {
 
   private static String closeBrace() {
     return "\n}\n";
-  }
-
-  private static String openBrace() {
-    return "\n{\n";
   }
 
   private static String evalCostMatrix() {

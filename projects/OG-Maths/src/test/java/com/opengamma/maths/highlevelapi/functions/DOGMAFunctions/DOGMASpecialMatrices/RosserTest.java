@@ -24,7 +24,7 @@ public class RosserTest {
   @Test
   public static void testRosser() {
     final int n = 8;
-    OGMatrix tmp = Rosser.rosser();
+    OGMatrix tmp = RosserFunction.rosser();
     assertArrayEquals(tmp.getData(), s_theRosserData, D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);

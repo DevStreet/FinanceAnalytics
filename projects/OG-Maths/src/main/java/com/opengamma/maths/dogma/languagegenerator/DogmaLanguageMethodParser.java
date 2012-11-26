@@ -14,8 +14,7 @@ import java.util.Set;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.dogma.engine.language.InfixOperator;
-import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.language.Function;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 
 /**
@@ -32,37 +31,33 @@ public class DogmaLanguageMethodParser {
     return s_instance;
   }
 
-  private static Map<Class<?>, TypeToken> s_interfaceMap = new HashMap<Class<?>, TypeToken>();
-  private static OperatorDictionaryPopulator<FullToken> s_infixops;
+  private static OperatorDictionaryPopulator<Function> s_infixops;
   private static Method[] s_m;
   private static List<FullToken> s_tokens = new ArrayList<FullToken>();
   private static FullToken s_atoken;
 
   static {
-    s_infixops = new OperatorDictionaryPopulator<FullToken>();
-    s_m = UnaryFunction.class.getDeclaredMethods();
-    s_interfaceMap.put(UnaryFunction.class, new TypeToken(s_m[0].getReturnType().toString(), s_m[0].getParameterTypes()));
-    s_m = InfixOperator.class.getDeclaredMethods();
-    //    System.out.println("writing out generics " + s_m[0].getReturnType().getGenericInterfaces()[0].toString());
-    s_interfaceMap.put(InfixOperator.class, new TypeToken(s_m[0].getReturnType().toString(), s_m[0].getParameterTypes()));
+    s_infixops = new OperatorDictionaryPopulator<Function>();
     parseFunctions();
   }
 
   // this is a bit of a kludge, and by bit I mean a lot
   private static void parseFunctions() {
-    Map<Class<?>, Set<FullToken>> opsmap = s_infixops.getOperationsMap();
+    Map<Class<?>, Set<Function>> opsmap = s_infixops.getOperationsMap();
+    System.out.println("Function map is \n" + opsmap.toString());
     Set<Class<?>> keyset = opsmap.keySet();
     for (Class<?> key : keyset) {
-      s_atoken = new FullToken(key.getCanonicalName(), key.getSimpleName(), s_interfaceMap.get(key.getInterfaces()[0]), key.getInterfaces()[0]);
+      System.out.println("key is " + key.toString() + " key name is " + key.getSimpleName());
+      s_atoken = new FullToken(key.getSimpleName(), key.getCanonicalName(), key, opsmap.get(key));
+      //      System.out.println(s_atoken.toString());
       s_tokens.add(s_atoken);
     }
+
   }
 
   List<FullToken> getTokens() {
     return s_tokens;
   }
-
-
 
   @Override
   public String toString() {

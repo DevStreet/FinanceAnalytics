@@ -6,13 +6,18 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Rosser;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Vander;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Generates Vandermonde matrices from a vector
  */
-public class Vander {
+@DOGMAMethodHook(provides = Vander.class)
+public class VanderFunction {
 
   /**
    * Generates the Vandermonde matrix of order "n"
@@ -20,6 +25,7 @@ public class Vander {
    * @param n the order
    * @return a Vandermonde matrix based on aMatrix of order "n"
    */
+  @DOGMAMethodLiteral
   public static OGMatrix vander(OGMatrix aMatrix, int n) {
     Catchers.catchNull(aMatrix);
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(n, 2);
@@ -67,7 +73,8 @@ public class Vander {
    * @param aMatrix a vector of values to act as the base for the polynomial form, orientation invariant
    * @return a Vandermonde matrix based on aMatrix of order "n"
    */
+  @DOGMAMethodLiteral
   public static OGMatrix vander(OGMatrix aMatrix) {
-    return Vander.vander(aMatrix, Math.max(aMatrix.getNumberOfRows(), aMatrix.getNumberOfColumns()));
+    return VanderFunction.vander(aMatrix, Math.max(aMatrix.getNumberOfRows(), aMatrix.getNumberOfColumns()));
   }
 }

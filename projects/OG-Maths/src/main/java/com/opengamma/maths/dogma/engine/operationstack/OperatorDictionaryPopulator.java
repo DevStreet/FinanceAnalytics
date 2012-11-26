@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.dogma.engine.operationstack;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
