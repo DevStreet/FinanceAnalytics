@@ -19,6 +19,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGSparseMatrixOGSparseMatrix implements Mtimes<OGSparseMatrix, OGSparseMatrix, OGSparseMatrix> {
   private BLAS _localblas = new BLAS();
+
   @Override
   public OGSparseMatrix eval(OGSparseMatrix array1, OGSparseMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
@@ -92,7 +93,16 @@ public final class MtimesOGSparseMatrixOGSparseMatrix implements Mtimes<OGSparse
         }
 
       }
-      newColPtr[colsArray2] = newPtr - 1;
+      
+      // branch so column vectors don't end up with a negative colptr index on the final element i.e. [0,-1] 
+      if (colsArray2 > 1) {
+        newColPtr[colsArray2] = newPtr - 1;
+      } else {
+        newColPtr[colsArray2] = newPtr; 
+      }
+
+      System.out.println("new col ptr=" + Arrays.toString(newColPtr));
+
       ret = new OGSparseMatrix(Arrays.copyOf(newColPtr, colsArray2 + 1), Arrays.copyOf(newRowIdx, newPtr), Arrays.copyOf(newData, newPtr), rowsArray1, colsArray2);
     }
     return ret;
