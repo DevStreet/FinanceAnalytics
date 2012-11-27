@@ -5,6 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Hilb;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -14,13 +17,15 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Hilb(i,j) = 1.0 / (i+j-1)
  * For [i,j]>=1 
  */
-public class Hilb {
+@DOGMAMethodHook(provides = Hilb.class)
+public class HilbFunction {
 
   /**
    * Returns the Hilbert matrix of order "n"
    * @param n the order
    * @return a Hilbert matrix of order "n"
    */
+  @DOGMAMethodLiteral
   public static OGMatrix hilb(int n) {
     Catchers.catchValueShouldNotBeNegativeFromArgList(n, 1);
     double[] data = new double[n * n];

@@ -29,18 +29,18 @@ public class WilkinsonTest {
 
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void badNTest() {
-    Wilkinson.wilkinson(-1);
+    WilkinsonFunction.wilkinson(-1);
   }
 
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void zeroNTest() {
-    Wilkinson.wilkinson(0);
+    WilkinsonFunction.wilkinson(0);
   }
 
   @Test
   public static void simple1x1Test() {
     final int n = 1;
-    OGMatrix tmp = Wilkinson.wilkinson(n);
+    OGMatrix tmp = WilkinsonFunction.wilkinson(n);
     assertArrayEquals(tmp.getData(), wilk1, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
@@ -49,7 +49,7 @@ public class WilkinsonTest {
   @Test
   public static void simple4x4Test() {
     final int n = 4;
-    OGMatrix tmp = Wilkinson.wilkinson(n);
+    OGMatrix tmp = WilkinsonFunction.wilkinson(n);
     assertArrayEquals(tmp.getData(), wilk4, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
@@ -58,7 +58,7 @@ public class WilkinsonTest {
   @Test
   public static void simple9x9Test() {
     final int n = 9;
-    OGMatrix tmp = Wilkinson.wilkinson(n);
+    OGMatrix tmp = WilkinsonFunction.wilkinson(n);
     assertArrayEquals(tmp.getData(), wilk9, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
@@ -67,7 +67,7 @@ public class WilkinsonTest {
   @Test
   public static void simple10x10Test() {
     final int n = 10;
-    OGMatrix tmp = Wilkinson.wilkinson(n);
+    OGMatrix tmp = WilkinsonFunction.wilkinson(n);
     assertArrayEquals(tmp.getData(), wilk10, 10 * D1MACH.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);

@@ -6,6 +6,9 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.InvHilb;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DBINOM;
@@ -21,8 +24,10 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.DBINOM;
  * The American Mathematical Monthly
  * Vol. 90, No. 5 (May, 1983), pp. 301-312
  */
-public class Invhilb {
+@DOGMAMethodHook(provides = InvHilb.class)
+public class InvhilbFunction {
 
+  @DOGMAMethodLiteral
   public static OGMatrix invhilb(int n) {
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(n, 1);
     double[] data = new double[n * n];

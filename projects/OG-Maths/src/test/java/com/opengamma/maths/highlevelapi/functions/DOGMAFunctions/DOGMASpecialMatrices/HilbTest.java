@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.Hilb;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.HilbFunction;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
@@ -32,7 +32,7 @@ public class HilbTest {
 
   @Test
   public void hilbSimpleTest() {
-    OGMatrix tmp = Hilb.hilb(10);
+    OGMatrix tmp = HilbFunction.hilb(10);
     assertArrayEquals(tmp.getData(),hilb10x10,10*D1MACH.four());
     assertTrue(tmp.getNumberOfColumns()==10);
     assertTrue(tmp.getNumberOfRows()==10);
@@ -40,18 +40,18 @@ public class HilbTest {
 
   @Test
   public void hilbSimple1x1Test() {
-    OGMatrix tmp = Hilb.hilb(1);
+    OGMatrix tmp = HilbFunction.hilb(1);
     assertArrayEquals(tmp.getData(),new double[] {1},10*D1MACH.four());
   }  
   
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void badNTest() {
-    Hilb.hilb(-1);
+    HilbFunction.hilb(-1);
   }
 
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void zeroNTest() {
-    Hilb.hilb(0);
+    HilbFunction.hilb(0);
   }  
   
 }

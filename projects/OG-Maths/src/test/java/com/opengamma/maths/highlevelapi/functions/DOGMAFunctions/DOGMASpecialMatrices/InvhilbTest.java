@@ -34,34 +34,34 @@ public class InvhilbTest {
   
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void badNTest() {
-    Invhilb.invhilb(-1);
+    InvhilbFunction.invhilb(-1);
   }
 
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void zeroNTest() {
-    Invhilb.invhilb(0);
+    InvhilbFunction.invhilb(0);
   }  
   
   @Test(expectedExceptions = MathsExceptionOverflow.class)
   public void overflowTest() {  
-    Invhilb.invhilb(204);
+    InvhilbFunction.invhilb(204);
   }
   
   @Test
   public void simple2x2Test() {
-    OGMatrix tmp = Invhilb.invhilb(2);
+    OGMatrix tmp = InvhilbFunction.invhilb(2);
     assertArrayEquals(tmp.getData(),invhilb2x2,10*D1MACH.four());
   }
 
   @Test
   public void simple10x10Test() {
-    OGMatrix tmp = Invhilb.invhilb(10);
+    OGMatrix tmp = InvhilbFunction.invhilb(10);
     assertArrayEquals(tmp.getData(),invhilb10x10,10*D1MACH.four());
   }  
   
   @Test
   public void hilbSimple1x1Test() {
-    OGMatrix tmp = Invhilb.invhilb(1);
+    OGMatrix tmp = InvhilbFunction.invhilb(1);
     assertArrayEquals(tmp.getData(),new double[] {1},10*D1MACH.four());
   }  
   

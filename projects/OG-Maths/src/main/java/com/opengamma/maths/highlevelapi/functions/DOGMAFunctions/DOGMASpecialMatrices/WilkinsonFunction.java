@@ -5,6 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Wilkinson;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -14,13 +17,15 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * identical eigenvalues (for larger "n"'s).
  * By using these matrices as a test, both performance and convergence of such routines can be tested.  
  */
-public class Wilkinson {
+@DOGMAMethodHook(provides = Wilkinson.class)
+public class WilkinsonFunction {
 
   /** 
    * Returns the order "n" Wilkinson matrix
    * @param n the order of the matrix required
    * @return the order "n" Wilkinson matrix
    */
+  @DOGMAMethodLiteral
   public static OGMatrix wilkinson(final int n) {
     Catchers.catchValueShouldNotBeNegativeOrZeroFromArgList(n, 1);
     final int nn = n * n;
