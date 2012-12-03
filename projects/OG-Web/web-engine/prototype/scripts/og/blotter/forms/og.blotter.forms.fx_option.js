@@ -7,10 +7,9 @@ $.register_module({
     dependencies: [],
     obj: function () {   
         return function () {
-            var contructor = this;
-            contructor.load = function () {
-                var config = {}, dialog; 
-                config.title = 'FX Option';
+            var constructor = this;
+            constructor.load = function () {
+                constructor.title = 'FX Option';
                 var form = new og.common.util.ui.Form({
                     module: 'og.blotter.forms.fx_derivative_tash',
                     data: {},
@@ -20,19 +19,18 @@ $.register_module({
                 });
                 form.children.push(
                     new form.Block({
-                        module: 'og.blotter.forms.blocks.derivative_value_tash',
+                        module: 'og.blotter.forms.blocks.fx_derivative_value_tash',
                         extras: {}
-                    }),
-                     new form.Block({
-                        module: 'og.blotter.forms.blocks.fx_option_date_tash',
+                    }),                    
+                    new form.Block({
+                        module: 'og.blotter.forms.blocks.fx_derivative_date_tash',
                         extras: {}
                     })
                 );
                 form.dom();
-                $('.OG-blotter-form-title').html(config.title);
             }; 
-            contructor.load();
-            contructor.kill = function () {
+            constructor.load();
+            constructor.kill = function () {
             };
         };
     }

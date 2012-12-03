@@ -7,10 +7,9 @@ $.register_module({
     dependencies: [],
     obj: function () {   
         return function () {
-            var contructor = this;
-            contructor.load = function () {
-                var config = {}, dialog; 
-                config.title = 'Bond Future';
+            var constructor = this;
+            constructor.load = function () {
+                constructor.title = 'Bond Future';
                 var form = new og.common.util.ui.Form({
                     module: 'og.blotter.forms.bond_future_tash',
                     data: {},
@@ -29,10 +28,10 @@ $.register_module({
                     })
                 );
                 form.dom();
-                $('.OG-blotter-form-title').html(config.title);
+                
             }; 
-            contructor.load();
-            contructor.kill = function () {
+            constructor.load();
+            constructor.kill = function () {
             };
         };
     }

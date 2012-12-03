@@ -38,6 +38,7 @@ $.register_module({
                 rest_options.cache_for = rest_options.cache_for || 30 * 1000;
                 if (!data_generator) return og.api.rest[resource].get(rest_options).pipe(rest_handler);
                 data_generator(function (data) {
+                    console.log(data);
                     data.forEach(function (datum) {
                         var option = typeof datum === 'string' ? {value: datum, text: datum} : datum,
                             $option = $('<option/>').attr('value', option.value).html(option.text);
@@ -60,7 +61,6 @@ $.register_module({
             var block = this, args = Array.prototype.slice.call(arguments, 1), type = arguments[0];
             return Block.prototype.on.apply(block, [type, '#' + block.id].concat(args));
         };
-        Dropdown.prototype.template = null; // reset back to null because it got set to false in Block
         return Dropdown;
     }
 });

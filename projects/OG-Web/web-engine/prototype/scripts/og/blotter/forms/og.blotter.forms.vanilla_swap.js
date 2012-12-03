@@ -7,11 +7,10 @@ $.register_module({
     dependencies: [],
     obj: function () {   
         return function () {
-            var contructor = this;
-            contructor.load = function () {
-                var config = {}, dialog; 
-                config.title = 'Vanilla Swap';
-                var form = new og.common.util.ui.Form({
+            var constructor = this;
+            constructor.load = function () {
+                constructor.title = 'Vanilla Swap';
+                form = new og.common.util.ui.Form({
                     module: 'og.blotter.forms.vanilla_swap_tash',
                     data: {},
                     type_map: {},
@@ -37,11 +36,10 @@ $.register_module({
                     })     
                 );
                 form.dom();
-                $('.OG-blotter-form-title').html(config.title);
             }; 
-            contructor.load();
-            contructor.kill = function () {
+            constructor.kill = function () {
             };
+            constructor.load();
         };
     }
 });
