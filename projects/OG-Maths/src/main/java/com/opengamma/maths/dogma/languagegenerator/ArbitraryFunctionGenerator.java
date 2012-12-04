@@ -28,6 +28,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     return s_instance;
   }
 
+  private static String s_indent = "  ";
   private static String s_autogenPath = "com.opengamma.maths.dogma.autogen.";
 
   @Override
@@ -74,7 +75,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         parameterTypes = next.getParameterTypes();
         returnType = next.getReturnType();
         mname = next.getName();
-        tmp.append("public static " + returnType.getSimpleName() + " " + fnamel + "(");
+        tmp.append(s_indent + "public static " + returnType.getSimpleName() + " " + fnamel + "(");
         int plen = parameterTypes.length;
         if (plen > 0) {
           for (int i = 0; i < plen - 1; i++) {
@@ -85,10 +86,12 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
           argnamesbuf.append(" arg" + (plen - 1));
         }
         tmp.append(argbuf);
-        tmp.append(" ){\n");
-        tmp.append("// " + mname + "\n");
-        tmp.append("return s_" + nextImplementingClass.getClass().getSimpleName().toLowerCase() + "." + mname + "(" + argnamesbuf.toString() + ");\n");
-        tmp.append("};\n");
+        tmp.append("){\n");
+        if (!returnType.getSimpleName().equalsIgnoreCase("void")) {
+          tmp.append(s_indent + s_indent + "return ");
+        }
+        tmp.append(s_indent + "s_" + nextImplementingClass.getClass().getSimpleName().toLowerCase() + "." + mname + "(" + argnamesbuf.toString() + ");\n");
+        tmp.append(s_indent + "};\n");
       }
     }
     return tmp.toString();
@@ -125,7 +128,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         throw new MathsExceptionGeneric("Class: " + nextImplementingClass.getClass() + " is annotated to have a DOGMAMethodHook and is declared to provide the " +
             "ArbitraryFunction interface, however, the instantiated class has no methods annotated with DOGMAMethodLiteral.");
       }
-      tmp.append("private static " + nextImplementingClass.getClass().getCanonicalName() + " s_" + nextImplementingClass.getClass().getSimpleName().toString().toLowerCase() + " = new " +
+      tmp.append(s_indent + "private static " + nextImplementingClass.getClass().getCanonicalName() + " s_" + nextImplementingClass.getClass().getSimpleName().toString().toLowerCase() + " = new " +
           nextImplementingClass.getClass().getCanonicalName() + "();\n");
     }
     return tmp.toString();
@@ -160,7 +163,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         throw new MathsExceptionGeneric("Class: " + nextImplementingClass.getClass() + " is annotated to have a DOGMAMethodHook and is declared to provide the " +
             "ArbitraryFunction interface, however, the instantiated class has no methods annotated with DOGMAMethodLiteral.");
       }
-//      System.out.println(methodList.toString());
+      //      System.out.println(methodList.toString());
 
       Iterator<Method> mit = methodList.iterator();
       Method next;
@@ -175,21 +178,23 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         parameterTypes = next.getParameterTypes();
         returnType = next.getReturnType();
         mname = next.getName();
-        tmp.append("public static " + returnType.getSimpleName() + " " + fnamel + "(");
+        tmp.append(s_indent + "public static " + returnType.getSimpleName() + " " + fnamel + "(");
         int plen = parameterTypes.length;
         if (plen > 0) {
           for (int i = 0; i < plen - 1; i++) {
             argbuf.append(parameterTypes[i].getSimpleName() + " arg" + i + ", ");
-            argnamesbuf.append(" arg" + i + ", ");
+            argnamesbuf.append("arg" + i + ", ");
           }
           argbuf.append(parameterTypes[plen - 1].getSimpleName() + " arg" + (plen - 1));
-          argnamesbuf.append(" arg" + (plen - 1));
+          argnamesbuf.append("arg" + (plen - 1));
         }
         tmp.append(argbuf);
-        tmp.append(" ){\n");
-        tmp.append("// " + mname + "\n");
-        tmp.append("return " + s_autogenPath + "DOGMA" + f.getSimpleName() + "." + mname + "(" + argnamesbuf.toString() + ");\n");
-        tmp.append("};\n");
+        tmp.append(") {\n");
+        if (!returnType.getSimpleName().equalsIgnoreCase("void")) {
+          tmp.append(s_indent + s_indent + "return ");
+        }
+        tmp.append(s_indent + s_indent + s_autogenPath + "DOGMA" + f.getSimpleName() + "." + mname + "(" + argnamesbuf.toString() + ");\n");
+        tmp.append(s_indent + "};\n\n");
       }
     }
     return tmp.toString();

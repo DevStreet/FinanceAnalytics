@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.dogma.languagegenerator;
 
-
 /**
  * 
  */
@@ -20,24 +19,25 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
   }
 
   private static String s_autogenPath = "com.opengamma.maths.dogma.autogen.";
+  private static String s_indent = "  ";
 
   @Override
   public String generateMethodCode(FullToken f) {
     StringBuffer tmp = new StringBuffer();
     String lname = f.getSimpleName().toLowerCase();
     tmp.append("\n");
-    tmp.append("public static OGArray<? extends Number>");
+    tmp.append(s_indent + "public static OGArray<? extends Number> ");
     tmp.append(lname);
     tmp.append("(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {\n");
-    tmp.append("  Catchers.catchNullFromArgList(arg1, 1);\n");
-    tmp.append("  Catchers.catchNullFromArgList(arg2, 2);\n");
-    tmp.append("  int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());\n");
-    tmp.append("  int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());\n");
-    tmp.append("  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_");
+    tmp.append(s_indent + s_indent + "Catchers.catchNullFromArgList(arg1, 1);\n");
+    tmp.append(s_indent + s_indent + "Catchers.catchNullFromArgList(arg2, 2);\n");
+    tmp.append(s_indent + s_indent + "int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());\n");
+    tmp.append(s_indent + s_indent + "int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg2.getClass());\n");
+    tmp.append(s_indent + s_indent + "OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_");
     tmp.append(lname);
     tmp.append("Instructions[type1][type2], arg1, arg2);\n");
-    tmp.append("  return tmp;\n");
-    tmp.append("}\n\n");
+    tmp.append(s_indent + s_indent + "return tmp;\n");
+    tmp.append(s_indent + "}\n\n");
 
     tmp.append("public static OGArray<? extends Number> ");
     tmp.append(lname);
@@ -111,37 +111,37 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
     String callStr = s_autogenPath + "DOGMA" + f.getSimpleName() + "." + lname + "(arg1, arg2);";
     tmp.append("\n");
 
-    tmp.append("public static OGArray<? extends Number>");
+    tmp.append(s_indent + "public static OGArray<? extends Number> ");
     tmp.append(lname);
     tmp.append("(OGArray<? extends Number> arg1, OGArray<? extends Number> arg2) {\n");
-    tmp.append("  return ");
+    tmp.append(s_indent + s_indent + "return ");
     tmp.append(callStr);
     tmp.append("\n");
-    tmp.append("}\n\n");
+    tmp.append(s_indent + "}\n\n");
 
-    tmp.append("public static OGArray<? extends Number>");
+    tmp.append(s_indent + "public static OGArray<? extends Number> ");
     tmp.append(lname);
     tmp.append("(Number arg1, OGArray<? extends Number> arg2) {\n");
-    tmp.append("  return ");
+    tmp.append(s_indent + s_indent + "return ");
     tmp.append(callStr);
     tmp.append("\n");
-    tmp.append("}\n\n");
+    tmp.append(s_indent + "}\n\n");
 
-    tmp.append("public static OGArray<? extends Number>");
+    tmp.append(s_indent + "public static OGArray<? extends Number> ");
     tmp.append(lname);
-    tmp.append("(OGArray<? extends Number> arg1,Number arg2) {\n");
-    tmp.append("  return ");
+    tmp.append("(OGArray<? extends Number> arg1, Number arg2) {\n");
+    tmp.append(s_indent + s_indent + "return ");
     tmp.append(callStr);
     tmp.append("\n");
-    tmp.append("}\n\n");
+    tmp.append(s_indent + "}\n\n");
 
-    tmp.append("public static Number ");
+    tmp.append(s_indent + "public static Number ");
     tmp.append(lname);
     tmp.append("(Number arg1, Number arg2) {\n");
-    tmp.append("  return ");
+    tmp.append(s_indent + s_indent + "return ");
     tmp.append(callStr);
     tmp.append("\n");
-    tmp.append("}\n\n");
+    tmp.append(s_indent + "}\n\n");
     return tmp.toString();
   }
 
@@ -165,9 +165,9 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
   @Override
   public String generateTableCodeVariables(FullToken f) {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("  private static InfixOpChain[][] s_");
+    tmp.append(s_indent + "private static InfixOpChain[][] s_");
     tmp.append(f.getSimpleName().toLowerCase());
-    tmp.append("Instructions; //CSOFF");
+    tmp.append("Instructions;");
     tmp.append("\n");
     return tmp.toString();
   }

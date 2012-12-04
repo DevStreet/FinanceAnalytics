@@ -25,7 +25,7 @@ public class DogmaLanguageCodeGeneratorMonolithic {
   private static DogmaLanguageMethodParser s_dogmaLanguageMethodParser = DogmaLanguageMethodParser.getInstance();
 
   private static Map<Class<?>, DogmaLangTokenToCodeGenerator> s_generationMap = new HashMap<Class<?>, DogmaLangTokenToCodeGenerator>();
-
+  private static String s_indent = "  ";
   static {
     s_generationMap.put(UnaryFunction.class, UnaryFunctionGenerator.getInstance());
     s_generationMap.put(InfixOperator.class, InfixOperatorGenerator.getInstance());
@@ -128,6 +128,10 @@ public class DogmaLanguageCodeGeneratorMonolithic {
   private static String classname() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("/**\n");
+    tmp.append(" * Suppression against unused code, typically imports, this is due to autogeneration and it being easier to include all at little extra cost.\n");
+    tmp.append(" */\n");
+    tmp.append("@SuppressWarnings(\"unused\")\n");
+    tmp.append("/**\n");
     tmp.append(" * Provides the DOGMA Language\n");
     tmp.append(" */\n");
     tmp.append("public class DogmaLanguage {\n");
@@ -137,27 +141,38 @@ public class DogmaLanguageCodeGeneratorMonolithic {
   private static String verboseHandler() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("// switch for chatty start up\n");
-    tmp.append("private static boolean s_verbose;\n");
-    tmp.append("public DogmaLanguage(boolean verbose) {\n");
-    tmp.append("s_verbose = verbose;\n");
-    tmp.append("};\n");
+    tmp.append(s_indent + "private static boolean s_verbose;\n");
+    tmp.append(s_indent + "public DogmaLanguage(boolean verbose) {\n");
+    tmp.append(s_indent + s_indent + "s_verbose = verbose;\n");
+    tmp.append(s_indent + "};\n");
     return tmp.toString();
   }
 
   private static String singleton() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("private static DogmaLanguage s_instance;\n");
-    tmp.append("DogmaLanguage() {\n");
-    tmp.append("}\n");
-    tmp.append("public static DogmaLanguage getInstance() {\n");
-    tmp.append("return s_instance;\n");
-    tmp.append("}\n");
+    tmp.append(s_indent + "private static DogmaLanguage s_instance;\n");
+    tmp.append(s_indent + "DogmaLanguage() {\n");
+    tmp.append(s_indent + "}\n");
+    tmp.append(s_indent + "public static DogmaLanguage getInstance() {\n");
+    tmp.append(s_indent + s_indent + "return s_instance;\n");
+    tmp.append(s_indent + "}\n");
     return tmp.toString();
   }
 
   public static String imports() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("import com.opengamma.maths.commonapi.numbers.ComplexType;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;\n");
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.InfixOperator;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.UnaryFunction;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.Function;\n");
@@ -168,13 +183,8 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunInfixOpChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
     tmp.append("import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;\n");
     tmp.append("import org.slf4j.Logger;\n");
     tmp.append("import org.slf4j.LoggerFactory;\n");
@@ -183,44 +193,45 @@ public class DogmaLanguageCodeGeneratorMonolithic {
 
   private static String chainRunners() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();\n");
-    tmp.append("private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();\n");
+    tmp.append(s_indent + "private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();\n");
+    tmp.append(s_indent + "private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();\n");
     return tmp.toString();
   }
 
   private static String operationDict() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("// Build instructions sets\n ");
-    tmp.append("OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator");
-    tmp.append("<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
-    tmp.append("OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary");
+    tmp.append(s_indent + "// Build instructions sets\n ");
+    tmp.append(s_indent +
+        "OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator");
+    tmp.append(s_indent + "<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
+    tmp.append(s_indent + "OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary");
     tmp.append(" = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
     return tmp.toString();
   }
 
   private static String logger() {
-    return "private static Logger s_log = LoggerFactory.getLogger(DogmaLanguage.class);";
+    return s_indent + "private static Logger s_log = LoggerFactory.getLogger(DogmaLanguage.class);\n";
   }
 
   private static String dogmastart() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("if(s_verbose){\n");
-    tmp.append("  s_log.info(\"Welcome to DOGMA\");");
-    tmp.append("  s_log.info(\"Building instructions...\");");
-    tmp.append("}\n");
+    tmp.append(s_indent + "if(s_verbose){\n");
+    tmp.append(s_indent + s_indent + "s_log.info(\"Welcome to DOGMA\");\n");
+    tmp.append(s_indent + s_indent + "s_log.info(\"Building instructions...\");\n");
+    tmp.append(s_indent + "}\n");
     return tmp.toString();
   }
 
   private static String dogmafinished() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("if(s_verbose){\n");
-    tmp.append("  s_log.info(\"DOGMA built.\");");
-    tmp.append("}\n");
+    tmp.append(s_indent + "if(s_verbose){\n");
+    tmp.append(s_indent + s_indent + "s_log.info(\"DOGMA built.\");\n");
+    tmp.append(s_indent + "}\n");
     return tmp.toString();
   }
 
   private static String beginStaticBlock() {
-    return "static {\n";
+    return s_indent + "static {\n";
   }
 
   private static String closeBrace() {
@@ -241,7 +252,7 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     //    tmp.append("{0, 0, 0, 0, 0, 0, 50, 0, 100, 200 },//\n");
     //    tmp.append("{0, 0, 0, 0, 0, 0, 0, 0, 0, 200 } };\n");
 
-    tmp.append("final double[][] DefaultInfixFunctionEvalCosts = new double[][] {\n");
+    tmp.append(s_indent + "final double[][] DefaultInfixFunctionEvalCosts = new double[][] {\n");
     tmp.append("{1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//\n");
     tmp.append("{1.00, 1.00, 0.00, 1.00, 0.00, 0.00, 0.00, 1.00, 0.00, 1.00 },//\n");
     tmp.append("{1.00, 0.00, 1.00, 1.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00 },//\n");
