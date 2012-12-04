@@ -5,9 +5,6 @@
  */
 package com.opengamma.maths.dogma.languagegenerator;
 
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-
-
 /**
  * 
  */
@@ -20,6 +17,8 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
   public static UnaryFunctionGenerator getInstance() {
     return s_instance;
   }
+
+  private static String s_autogenPath = "com.opengamma.maths.dogma.autogen.";
 
   @Override
   public String generateMethodCode(FullToken f) {
@@ -37,10 +36,10 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("return tmp;\n");
     tmp.append("}\n\n");
 
-    tmp.append("public static OGArray<? extends Number>");
+    tmp.append("public static Number ");
     tmp.append(lname);
     tmp.append("(Number arg1) {");
-    tmp.append("Catchers.catchNullFromArgList(arg1, 1);\n");    
+    tmp.append("Catchers.catchNullFromArgList(arg1, 1);\n");
     tmp.append("OGArray<? extends Number> arg1rewrite;\n");
     tmp.append("if (arg1.getClass() == ComplexType.class) {\n");
     tmp.append("arg1rewrite = new OGComplexScalar(arg1);\n");
@@ -51,9 +50,8 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_");
     tmp.append(lname);
     tmp.append("Instructions[type1], arg1rewrite);\n");
-    tmp.append("return tmp;\n");
+    tmp.append("return tmp.getEntry(0, 0);\n");
     tmp.append("}\n\n");
-
     return tmp.toString();
   }
 
@@ -81,6 +79,30 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append(f.getSimpleName().toLowerCase());
     tmp.append("Instructions; //CSOFF");
     tmp.append("\n");
+    return tmp.toString();
+  }
+
+  @Override
+  public String generateEntryPointsCode(FullToken f) {
+    StringBuffer tmp = new StringBuffer();
+    String lname = f.getSimpleName().toLowerCase();
+    String callStr = s_autogenPath + "DOGMA" + f.getSimpleName() + "." + lname + "(arg1);";
+    tmp.append("\n");
+    tmp.append("public static OGArray<? extends Number>");
+    tmp.append(lname);
+    tmp.append("(OGArray<? extends Number> arg1) {\n");
+    tmp.append("  return ");
+    tmp.append(callStr);
+    tmp.append("\n");
+    tmp.append("}\n\n");
+
+    tmp.append("public static Number ");
+    tmp.append(lname);
+    tmp.append("(Number arg1) {\n");
+    tmp.append("  return ");
+    tmp.append(callStr);
+    tmp.append("\n");
+    tmp.append("}\n\n");
     return tmp.toString();
   }
 

@@ -5,9 +5,7 @@
  */
 package com.opengamma.maths.dogma.languagegenerator;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +16,7 @@ import com.opengamma.maths.dogma.engine.language.Function;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 
 /**
- * 
+ * Creates "tokens" from the methods found by the operation dictionary populating class OperatorDictionaryPopulator.
  */
 public class DogmaLanguageMethodParser {
 
@@ -32,7 +30,6 @@ public class DogmaLanguageMethodParser {
   }
 
   private static OperatorDictionaryPopulator<Function> s_infixops;
-  private static Method[] s_m;
   private static List<FullToken> s_tokens = new ArrayList<FullToken>();
   private static FullToken s_atoken;
 
@@ -44,12 +41,9 @@ public class DogmaLanguageMethodParser {
   // this is a bit of a kludge, and by bit I mean a lot
   private static void parseFunctions() {
     Map<Class<?>, Set<Function>> opsmap = s_infixops.getOperationsMap();
-    System.out.println("Function map is \n" + opsmap.toString());
     Set<Class<?>> keyset = opsmap.keySet();
     for (Class<?> key : keyset) {
-      System.out.println("key is " + key.toString() + " key name is " + key.getSimpleName());
       s_atoken = new FullToken(key.getSimpleName(), key.getCanonicalName(), key, opsmap.get(key));
-      //      System.out.println(s_atoken.toString());
       s_tokens.add(s_atoken);
     }
 

@@ -15,4 +15,6 @@ public interface DogmaLangTokenToCodeGenerator {
   String generateTableCode(FullToken f);
 
   String generateTableCodeVariables(FullToken f);
+  
+  String generateEntryPointsCode(FullToken f);  
 }

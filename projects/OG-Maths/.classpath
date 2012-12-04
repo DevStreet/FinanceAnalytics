@@ -4,10 +4,17 @@
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="tests/performance"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-<!--	<classpathentry kind="src" output="tests/classes" path="src/test/java"/> -->
-<!--	<classpathentry kind="src" output="tests/classes" path="tests/performance"/> -->
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/OG-Util"/>
-	<classpathentry exported="true" kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=OG-Maths&amp;ivyXmlPath=ivy.xml&amp;confs=*"/>
+        <classpathentry exported="true" kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=OG-Maths&amp;ivyXmlPath=ivy.xml&amp;confs=*">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/usr/local/lib/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="/OG-Analytics"/>
+	<classpathentry kind="lib" path="/usr/local/lib">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/usr/local/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

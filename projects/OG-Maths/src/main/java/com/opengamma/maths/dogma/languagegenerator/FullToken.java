@@ -12,10 +12,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.dogma.engine.language.FunctionInterfaceRegister;
 
 /**
- * 
- */
-/**
- * A function token description for the dogma lang  
+ * A function token description for the dogma language
  */
 public class FullToken {
   private String _canonicalName, _simpleName;
@@ -37,7 +34,7 @@ public class FullToken {
     int implementsAnRecognisedInterface = 0;
     Class<?> interfaceFoundPtr = null;
     for (int i = 0; i < interfacesDeclared.length; i++) {
-      System.out.println("Checking for " + interfacesDeclared[i].toString());
+//      System.out.println("Checking for " + interfacesDeclared[i].toString());
       if (registeredInterface.contains(interfacesDeclared[i])) {
         implementsAnRecognisedInterface++;
         interfaceFoundPtr = interfacesDeclared[i];

@@ -6,7 +6,6 @@
 package com.opengamma.maths.dogma.languagegenerator;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -19,11 +18,8 @@ import com.opengamma.maths.dogma.engine.language.UnaryFunction;
 /**
  * 
  */
-public class DogmaLanguageCodeGenerator {
-  private static Logger s_log = LoggerFactory.getLogger(DogmaLanguageCodeGenerator.class);
-
-  private static DogmaLanguageMethodParser s_dogmaLanguageMethodParser = DogmaLanguageMethodParser.getInstance();
-
+public class FunctionGenerator {
+  private static Logger s_log = LoggerFactory.getLogger(FunctionGenerator.class);
   private static Map<Class<?>, DogmaLangTokenToCodeGenerator> s_generationMap = new HashMap<Class<?>, DogmaLangTokenToCodeGenerator>();
 
   static {
@@ -32,8 +28,30 @@ public class DogmaLanguageCodeGenerator {
     s_generationMap.put(ArbitraryFunction.class, ArbitraryFunctionGenerator.getInstance());
   }
 
-  public String generateCode() {
-    List<FullToken> fullTokens = s_dogmaLanguageMethodParser.getTokens();
+  private FullToken _tok;
+  private String _simpleClassName;
+  private String _dogmaClassName;
+
+  FunctionGenerator(FullToken tok) {
+    _tok = tok;
+    _simpleClassName = _tok.getSimpleName();
+    _dogmaClassName = "DOGMA" + _tok.getSimpleName();
+  }
+
+  public String entryPointGenerator() {
+    StringBuffer sbFunctionEntry = new StringBuffer();
+    DogmaLangTokenToCodeGenerator g;
+    g = s_generationMap.get(_tok.getInterfaceClassType());
+    if (g == null) {
+      s_log.warn("class " + _tok.getInterfaceClassType() + " has no code generator class available");
+    } else {
+      sbFunctionEntry.append(g.generateEntryPointsCode(_tok));
+    }
+    return sbFunctionEntry.toString();
+  }
+
+  public String classGenerator() {
+
     DogmaLangTokenToCodeGenerator g;
     StringBuffer sbprocedural = new StringBuffer();
     StringBuffer sbtablevars = new StringBuffer();
@@ -41,19 +59,16 @@ public class DogmaLanguageCodeGenerator {
     StringBuffer sbmethods = new StringBuffer();
     StringBuffer sbimports = new StringBuffer();
 
-    // generate code from tokens
-    for (FullToken tok : fullTokens) {
-      g = s_generationMap.get(tok.getInterfaceClassType());
-      System.out.println("name = " + tok.getSimpleName() + ". class id =" + tok.getInterfaceClass().getSimpleName());
-      if (g == null) {
-        s_log.warn("class " + tok.getInterfaceClassType() + " has no code generator class available");
-      } else {
-        sbtablevars.append(g.generateTableCodeVariables(tok));
-        sbjumptables.append(g.generateTableCode(tok));
-        sbmethods.append(g.generateMethodCode(tok));
-      }
-      sbimports.append("import " + tok.getCanonicalName() + ";\n");
+    g = s_generationMap.get(_tok.getInterfaceClassType());
+//    System.out.println("name = " + _tok.getSimpleName() + ". class id =" + _tok.getInterfaceClass().getSimpleName());
+    if (g == null) {
+      s_log.warn("class " + _tok.getInterfaceClassType() + " has no code generator class available");
+    } else {
+      sbtablevars.append(g.generateTableCodeVariables(_tok));
+      sbjumptables.append(g.generateTableCode(_tok));
+      sbmethods.append(g.generateMethodCode(_tok));
     }
+    sbimports.append("import " + _tok.getCanonicalName() + ";\n");
 
     // procedural code gathering
 
@@ -85,9 +100,6 @@ public class DogmaLanguageCodeGenerator {
     // start static block
     sbprocedural.append(beginStaticBlock());
 
-    // add start up note
-    sbprocedural.append(dogmastart());
-
     // add evaluation default matrix cost
     sbprocedural.append(evalCostMatrix());
 
@@ -96,9 +108,6 @@ public class DogmaLanguageCodeGenerator {
 
     // add jump table code
     sbprocedural.append(sbjumptables);
-
-    // add end note
-    sbprocedural.append(dogmafinished());
 
     // close static block
     sbprocedural.append(closeBrace());
@@ -120,37 +129,37 @@ public class DogmaLanguageCodeGenerator {
     tmp.append(" *\n");
     tmp.append(" * Please see distribution for license.\n");
     tmp.append(" */\n");
-    tmp.append("package com.opengamma.maths.dogma;\n");
+    tmp.append("package com.opengamma.maths.dogma.autogen;\n");
     return tmp.toString();
   }
 
-  private static String classname() {
+  private String classname() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("/**\n");
     tmp.append(" * Provides the DOGMA Language\n");
     tmp.append(" */\n");
-    tmp.append("public class DogmaLanguage {\n");
+    tmp.append("public class " + _dogmaClassName + " {\n");
     return tmp.toString();
   }
 
-  private static String verboseHandler() {
+  private String verboseHandler() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("// switch for chatty start up\n");
-    tmp.append("private static boolean s_verbose;\n");
-    tmp.append("public DogmaLanguage(boolean verbose) {\n");
-    tmp.append("s_verbose = verbose;\n");
-    tmp.append("};\n");
+    tmp.append("  // switch for chatty start up\n");
+    tmp.append("  private static boolean s_verbose;\n");
+    tmp.append("  public " + _dogmaClassName + "(boolean verbose) {\n");
+    tmp.append("    s_verbose = verbose;\n");
+    tmp.append("  };\n");
     return tmp.toString();
   }
 
-  private static String singleton() {
+  private String singleton() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("private static DogmaLanguage s_instance;\n");
-    tmp.append("DogmaLanguage() {\n");
-    tmp.append("}\n");
-    tmp.append("public static DogmaLanguage getInstance() {\n");
-    tmp.append("return s_instance;\n");
-    tmp.append("}\n");
+    tmp.append("  private static " + _dogmaClassName + " s_instance;\n");
+    tmp.append("  " + _dogmaClassName + "() {\n");
+    tmp.append("  }\n");
+    tmp.append("  public static " + _dogmaClassName + " getInstance() {\n");
+    tmp.append("    return s_instance;\n");
+    tmp.append("  }\n");
     return tmp.toString();
   }
 
@@ -182,8 +191,8 @@ public class DogmaLanguageCodeGenerator {
 
   private static String chainRunners() {
     StringBuffer tmp = new StringBuffer();
-    tmp.append("private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();\n");
-    tmp.append("private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();\n");
+    tmp.append("  private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();\n");
+    tmp.append("  private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();\n");
     return tmp.toString();
   }
 
@@ -197,25 +206,8 @@ public class DogmaLanguageCodeGenerator {
     return tmp.toString();
   }
 
-  private static String logger() {
-    return "private static Logger s_log = LoggerFactory.getLogger(DogmaLanguage.class);";
-  }
-
-  private static String dogmastart() {
-    StringBuffer tmp = new StringBuffer();
-    tmp.append("if(s_verbose){\n");
-    tmp.append("  s_log.info(\"Welcome to DOGMA\");");
-    tmp.append("  s_log.info(\"Building instructions...\");");
-    tmp.append("}\n");
-    return tmp.toString();
-  }
-
-  private static String dogmafinished() {
-    StringBuffer tmp = new StringBuffer();
-    tmp.append("if(s_verbose){\n");
-    tmp.append("  s_log.info(\"DOGMA built.\");");
-    tmp.append("}\n");
-    return tmp.toString();
+  private String logger() {
+    return "  private static Logger s_log = LoggerFactory.getLogger(" + _simpleClassName + ".class);\n";
   }
 
   private static String beginStaticBlock() {
@@ -268,4 +260,5 @@ public class DogmaLanguageCodeGenerator {
     tmp.append("OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunctionEvalCosts);\n");
     return tmp.toString();
   }
+
 }

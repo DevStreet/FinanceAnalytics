@@ -28,16 +28,17 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     return s_instance;
   }
 
+  private static String s_autogenPath = "com.opengamma.maths.dogma.autogen.";
+
   @Override
   public String generateMethodCode(FullToken f) {
-    Set<?> ClassesWithFunctions = f.getImplementingFunctions();
+    Set<?> classesWithFunctions = f.getImplementingFunctions();
 
     // for each class, reflect, look for labelled functions, add in;
 
     StringBuffer tmp = new StringBuffer();
-    String lname = f.getSimpleName().toLowerCase();
 
-    Iterator<?> it = ClassesWithFunctions.iterator();
+    Iterator<?> it = classesWithFunctions.iterator();
     Object nextImplementingClass;
     Class<?> localClass;
     Method[] localMethods;
@@ -58,7 +59,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         throw new MathsExceptionGeneric("Class: " + nextImplementingClass.getClass() + " is annotated to have a DOGMAMethodHook and is declared to provide the " +
             "ArbitraryFunction interface, however, the instantiated class has no methods annotated with DOGMAMethodLiteral.");
       }
-      System.out.println(methodList.toString());
+      //      System.out.println(methodList.toString());
 
       Iterator<Method> mit = methodList.iterator();
       Method next;
@@ -103,9 +104,9 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
   @Override
   public String generateTableCodeVariables(FullToken f) {
     StringBuffer tmp = new StringBuffer();
-    Set<?> ClassesWithFunctions = f.getImplementingFunctions();
+    Set<?> classesWithFunctions = f.getImplementingFunctions();
     // for each class, reflect, look for labelled functions, add in;
-    Iterator<?> it = ClassesWithFunctions.iterator();
+    Iterator<?> it = classesWithFunctions.iterator();
     Object nextImplementingClass;
     Class<?> localClass;
     Method[] localMethods;
@@ -126,6 +127,70 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
       }
       tmp.append("private static " + nextImplementingClass.getClass().getCanonicalName() + " s_" + nextImplementingClass.getClass().getSimpleName().toString().toLowerCase() + " = new " +
           nextImplementingClass.getClass().getCanonicalName() + "();\n");
+    }
+    return tmp.toString();
+  }
+
+  @Override
+  public String generateEntryPointsCode(FullToken f) {
+    Set<?> classesWithFunctions = f.getImplementingFunctions();
+
+    // for each class, reflect, look for labelled functions, add in;
+
+    StringBuffer tmp = new StringBuffer();
+
+    Iterator<?> it = classesWithFunctions.iterator();
+    Object nextImplementingClass;
+    Class<?> localClass;
+    Method[] localMethods;
+    boolean methodFound;
+    List<Method> methodList = new ArrayList<Method>();
+    while (it.hasNext()) {
+      methodFound = false;
+      nextImplementingClass = it.next();
+      localClass = nextImplementingClass.getClass();
+      localMethods = localClass.getDeclaredMethods();
+      for (int i = 0; i < localMethods.length; i++) {
+        if (localMethods[i].getAnnotation(DOGMAMethodLiteral.class) != null) {
+          methodFound = true;
+          methodList.add(localMethods[i]);
+        }
+      }
+      if (!methodFound) {
+        throw new MathsExceptionGeneric("Class: " + nextImplementingClass.getClass() + " is annotated to have a DOGMAMethodHook and is declared to provide the " +
+            "ArbitraryFunction interface, however, the instantiated class has no methods annotated with DOGMAMethodLiteral.");
+      }
+//      System.out.println(methodList.toString());
+
+      Iterator<Method> mit = methodList.iterator();
+      Method next;
+      Class<?> returnType;
+      String mname;
+      String fname = f.getSimpleName();
+      String fnamel = fname.toLowerCase();
+      Class<?>[] parameterTypes;
+      while (mit.hasNext()) {
+        StringBuffer argbuf = new StringBuffer(), argnamesbuf = new StringBuffer();
+        next = mit.next();
+        parameterTypes = next.getParameterTypes();
+        returnType = next.getReturnType();
+        mname = next.getName();
+        tmp.append("public static " + returnType.getSimpleName() + " " + fnamel + "(");
+        int plen = parameterTypes.length;
+        if (plen > 0) {
+          for (int i = 0; i < plen - 1; i++) {
+            argbuf.append(parameterTypes[i].getSimpleName() + " arg" + i + ", ");
+            argnamesbuf.append(" arg" + i + ", ");
+          }
+          argbuf.append(parameterTypes[plen - 1].getSimpleName() + " arg" + (plen - 1));
+          argnamesbuf.append(" arg" + (plen - 1));
+        }
+        tmp.append(argbuf);
+        tmp.append(" ){\n");
+        tmp.append("// " + mname + "\n");
+        tmp.append("return " + s_autogenPath + "DOGMA" + f.getSimpleName() + "." + mname + "(" + argnamesbuf.toString() + ");\n");
+        tmp.append("};\n");
+      }
     }
     return tmp.toString();
   }

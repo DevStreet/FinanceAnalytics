@@ -90,8 +90,8 @@ public class ConversionPointers {
     s_conversionDict[0][9] = new ConvertOGRealScalarToOGComplexMatrix(); // Number-->CplxMat
     s_conversionDict[1][0] = null; // Complex-->Number
     s_conversionDict[1][1] = matrixNOP; // Complex-->Complex
-    s_conversionDict[1][2] = new ConvertOGComplexScalarToOGComplexDiagonalMatrix(); // Complex-->Diag
-    s_conversionDict[1][3] = null; // Complex-->CplxDiag
+    s_conversionDict[1][2] = null; // Complex-->Diag
+    s_conversionDict[1][3] = new ConvertOGComplexScalarToOGComplexDiagonalMatrix(); // Complex-->CplxDiag
     s_conversionDict[1][4] = null; // Complex-->Perm
     s_conversionDict[1][5] = null; // Complex-->Idx
     s_conversionDict[1][6] = null; // Complex-->Sparse
