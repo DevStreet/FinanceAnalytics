@@ -40,7 +40,8 @@ $.register_module({
                 }) : (promise = viewports.put({
                         view_id: view_id, grid_type: grid_type, graph_id: graph_id,
                         loading: function () {loading_viewport_id = true;},
-                        rows: viewport.rows, cols: viewport.cols, format: viewport.format, log: viewport.log
+                        rows: viewport.rows, cols: viewport.cols, cells: viewport.cells,
+                        format: viewport.format, log: viewport.log
                     })).pipe(function (result) {
                         loading_viewport_id = false;
                         if (result.error) return (data.prefix = module.name + ' (' + label + view_id + '-dead):\n'),
@@ -74,7 +75,19 @@ $.register_module({
                 try {api.put(put_options).pipe(view_handler);} // initial request params come from outside so try/catch
                 catch (error) {fire('fatal', data.prefix + error.message);}
             };
+            var nonsensical_viewport = function (viewport) {
+                return !(viewport.cells && viewport.cells.length) &&
+                    (!viewport.rows || !viewport.rows.length || !viewport.cols || !viewport.cols.length);
+            };
             var reconnect_handler = function () {initialize();};
+            var same_viewport = function (one, two) {
+                if ((!one || !two) && one !== two) return false; // if either viewport is null
+                if ((one.cells && two.rows) || (one.rows && two.cells)) return false;
+                if (one.cells && two.cells)
+                    return one.cells.join('|') === two.cells.join('|') && one.format === two.format;
+                return one.rows.join('|') === two.rows.join('|') && one.cols.join('|') === two.cols.join('|') &&
+                    one.format === two.format;
+            };
             var structure_handler = function (result) {
                 if (!grid_type || (depgraph && !graph_id)) return;
                 if (result.error) return fire('fatal', data.prefix + result.message);
@@ -85,11 +98,6 @@ $.register_module({
                 meta.columns.scroll = result.data[SETS].slice(1);
                 fire('meta', meta, {grid_type: grid_type, view_id: view_id, graph_id: graph_id, meta: result});
                 if (!subscribed) return data_setup();
-            };
-            var same_viewport = function (one, two) {
-                if ((!one || !two) && one !== two) return false; // if either viewport is null
-                return one.rows.join('|') === two.rows.join('|') && one.cols.join('|') === two.cols.join('|') &&
-                    one.format === two.format;
             };
             var structure_setup = function (update) {
                 var initial = !update;
@@ -159,7 +167,7 @@ $.register_module({
                     if (meta.viewport) (meta.viewport.cols = []), (meta.viewport.rows = []);
                     return data;
                 }
-                if (!new_viewport.rows.length || !new_viewport.cols.length)
+                if (nonsensical_viewport(new_viewport))
                     return og.dev.warn(data.prefix + 'nonsensical viewport, ', new_viewport), data;
                 if (same_viewport(viewport_cache, new_viewport)) return data; // duplicate viewport, do nothing
                 viewport_cache = JSON.parse(JSON.stringify(data.meta.viewport = viewport = new_viewport));
@@ -167,7 +175,8 @@ $.register_module({
                 try { // viewport definitions come from outside, so try/catch
                     (promise = viewports.put({
                         view_id: view_id, grid_type: grid_type, graph_id: graph_id, viewport_id: viewport_id,
-                        rows: viewport.rows, cols: viewport.cols, format: viewport.format, log: viewport.log
+                        rows: viewport.rows, cols: viewport.cols, cells: viewport.cells,
+                        format: viewport.format, log: viewport.log
                     })).pipe(function (result) {if (result.error) return;});
                     viewport_version = promise.id;
                 } catch (error) {fire('fatal', data.prefix + error.message);}
