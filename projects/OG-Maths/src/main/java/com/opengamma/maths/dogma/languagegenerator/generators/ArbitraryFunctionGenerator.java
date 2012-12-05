@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.dogma.languagegenerator;
+package com.opengamma.maths.dogma.languagegenerator.generators;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import java.util.Set;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.languagegenerator.DogmaLangTokenToCodeGenerator;
+import com.opengamma.maths.dogma.languagegenerator.FullToken;
 
 /**
  * 

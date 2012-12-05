@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.maths.dogma.engine.language.ArbitraryFunction;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.languagegenerator.generators.ArbitraryFunctionGenerator;
+import com.opengamma.maths.dogma.languagegenerator.generators.InfixOperatorGenerator;
+import com.opengamma.maths.dogma.languagegenerator.generators.UnaryFunctionGenerator;
 
 /**
  * Generates the monolithic class representation of the DOGMA language code  

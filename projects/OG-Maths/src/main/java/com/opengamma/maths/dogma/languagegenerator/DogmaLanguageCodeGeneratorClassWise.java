@@ -14,6 +14,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opengamma.maths.dogma.languagegenerator.docs.Doc;
+import com.opengamma.maths.dogma.languagegenerator.docs.DocsDictionaryPopulator;
+
 /**
  * Generates the multi-class lazy initialisation representation of the DOGMA language code  
  */
@@ -25,6 +28,7 @@ public class DogmaLanguageCodeGeneratorClassWise {
   private static String s_outpathAutogen;
   private static String s_outpath;
 
+ 
   DogmaLanguageCodeGeneratorClassWise(String outpath, String autogenPostfix) {
     s_outpathAutogen = new String(outpath + File.separatorChar + autogenPostfix);
     s_outpath = new String(outpath);
