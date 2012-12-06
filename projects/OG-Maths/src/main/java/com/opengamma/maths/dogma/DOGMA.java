@@ -1222,6 +1222,14 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAMtimes.mtimes(arg0, arg1);
   }
 
+  public static OGMatrix ones(int arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAOnes.ones(arg0);
+  };
+
+  public static OGMatrix ones(int arg0, int arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAOnes.ones(arg0, arg1);
+  };
+
 
 /**
  * DOGMA Function: Plus
