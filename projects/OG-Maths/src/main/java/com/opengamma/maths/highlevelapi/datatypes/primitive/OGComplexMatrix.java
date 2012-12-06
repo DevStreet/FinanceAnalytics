@@ -54,7 +54,10 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
   }
 
   /**
-   * Takes a column major double[] and turns it into an OGComplexArray (imaginary part assumed to be zero)
+   * Takes a column major double[] and turns it into an OGComplexArray
+   * The length of dataIn must be either:
+   * <li>rows*columns in which case it is assumed the double[] provided is the real part of the data (imaginary part assumed zero)
+   * <li>2*rows*columns in which case it is assumed the double[] provided is formed of interleaved real and imaginary values
    * @param dataIn the real part data backing data
    * @param rows number of rows
    * @param columns number of columns
