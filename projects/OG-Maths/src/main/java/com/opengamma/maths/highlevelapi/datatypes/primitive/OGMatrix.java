@@ -166,7 +166,7 @@ public class OGMatrix extends OGArray<Double> {
 
   @Override
   public String toString() {
-    String str = "OGDoubleArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
+    String str = "OGMatrix:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";
     for (int i = 0; i < _rows; i++) {
       for (int j = 0; j < _columns; j++) {
