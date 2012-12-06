@@ -106,29 +106,33 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns a the conjugate transpose of the argument.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns a the conjugate transpose of the argument. This is the equivalent
+ * to arg0' in m-code. If the literal transpose of a matrix is needed then
+ * use the function transpose()
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{-10,20,-30,4}});
+ * OGArray<? extends Number> bar = ctranspose(foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [0.84270..., 0.99532..., 0.99998..., 1.00000...]
  * }
  * </pre>
  *
- * @param arg0 Docs Missing - No description given
+ * @param arg0 the array on which the conjugate transpose operation shall be applied.
  * <p>
- * @return Docs Missing - No description given
+ * @return Returns the conjugate transpose of the argument
  */
 
   public static OGArray<? extends Number> ctranspose(OGArray<? extends Number> arg0) {
@@ -138,6 +142,46 @@ public class DOGMA {
 
 /**
  * DOGMA Function: Ctranspose
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns a the conjugate transpose of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns a the conjugate transpose of the argument. This is the equivalent
+ * to arg0' in m-code. If the literal transpose of a matrix is needed then
+ * use the function transpose()
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{-10,20,-30,4}});
+ * OGArray<? extends Number> bar = ctranspose(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [0.84270..., 0.99532..., 0.99998..., 1.00000...]
+ * }
+ * </pre>
+ *
+ * @param arg0 the array on which the conjugate transpose operation shall be applied.
+ * <p>
+ * @return Returns the conjugate transpose of the argument
+ */
+
+  public static Number ctranspose(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMACtranspose.ctranspose(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Disp
  * <p>
  * Short Description:
  * <p>
@@ -163,16 +207,45 @@ public class DOGMA {
  *
  * @param arg0 Docs Missing - No description given
  * <p>
- * @return Docs Missing - No description given
  */
 
-  public static Number ctranspose(Number arg0) {
-    return com.opengamma.maths.dogma.autogen.DOGMACtranspose.ctranspose(arg0);
+  public static void disp(OGArray<? extends Number> arg0) {
+    com.opengamma.maths.dogma.autogen.DOGMADisp.disp(arg0);
   }
 
-  public static void disp(OGComplexMatrix arg0) {
+
+/**
+ * DOGMA Function: Disp
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ */
+
+  public static void disp(Number arg0) {
     com.opengamma.maths.dogma.autogen.DOGMADisp.disp(arg0);
-  };
+  }
 
 
 /**
@@ -400,29 +473,32 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the complimentary error function of the argument.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the complimentary error function of the argument. Mathematically: 1
+ * - erf(arg0)
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{0.1,0.2,0.3,0.4}});
+ * OGArray<? extends Number> bar = erfc(foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [0.88754..., 0.77730..., 0.67137..., 0.57161...]
  * }
  * </pre>
  *
- * @param arg0 Docs Missing - No description given
+ * @param arg0 The argument for which the complimentary error function values are to be computed.
  * <p>
- * @return Docs Missing - No description given
+ * @return the value of the complimentary error function evaluated at the argument
  */
 
   public static OGArray<? extends Number> erfc(OGArray<? extends Number> arg0) {
@@ -435,29 +511,32 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the complimentary error function of the argument.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the complimentary error function of the argument. Mathematically: 1
+ * - erf(arg0)
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{0.1,0.2,0.3,0.4}});
+ * OGArray<? extends Number> bar = erfc(foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [0.88754..., 0.77730..., 0.67137..., 0.57161...]
  * }
  * </pre>
  *
- * @param arg0 Docs Missing - No description given
+ * @param arg0 The argument for which the complimentary error function values are to be computed.
  * <p>
- * @return Docs Missing - No description given
+ * @return the value of the complimentary error function evaluated at the argument
  */
 
   public static Number erfc(Number arg0) {

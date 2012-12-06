@@ -8,13 +8,17 @@ package com.opengamma.maths.dogma.autogen;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
 import com.opengamma.maths.dogma.engine.language.Function;
 import com.opengamma.maths.dogma.engine.operationstack.InfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunctions;
+import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForVoidUnaryFunctions;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 import com.opengamma.maths.dogma.engine.operationstack.RunInfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;
+import com.opengamma.maths.dogma.engine.operationstack.RunVoidUnaryFunctionChain;
+import com.opengamma.maths.dogma.engine.operationstack.VoidUnaryFunctionChain;
 import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;
@@ -51,6 +55,7 @@ public class DOGMAVander {
   };
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
+  private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
   private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.VanderFunction s_vanderfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.VanderFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
@@ -80,6 +85,7 @@ OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunction
 // Build instructions sets
  OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();
 OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();
+OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
   public static OGMatrix vander(OGMatrix arg0, int arg1){

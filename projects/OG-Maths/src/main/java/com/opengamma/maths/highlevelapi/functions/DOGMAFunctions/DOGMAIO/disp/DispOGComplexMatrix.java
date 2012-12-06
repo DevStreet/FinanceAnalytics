@@ -6,19 +6,18 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIO.disp;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
-import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
-import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Disp;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unaryvoid.Disp;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * 
+ * Displays comlpex matrices
  */
 @DOGMAMethodHook(provides = Disp.class)
-public class DispOGComplexMatrix implements Disp {
+public class DispOGComplexMatrix implements Disp<OGComplexMatrix> {
 
-  @DOGMAMethodLiteral
-  public void disp(OGComplexMatrix array1) {
+  @Override
+  public void eval(OGComplexMatrix array1) {
     Catchers.catchNull(array1);
     double[] data = array1.getData();
     int rows = array1.getNumberOfRows();
@@ -36,4 +35,5 @@ public class DispOGComplexMatrix implements Disp {
     }
     System.out.println(str);
   }
+
 }

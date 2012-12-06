@@ -8,13 +8,17 @@ package com.opengamma.maths.dogma.autogen;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
 import com.opengamma.maths.dogma.engine.language.Function;
 import com.opengamma.maths.dogma.engine.operationstack.InfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunctions;
+import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForVoidUnaryFunctions;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 import com.opengamma.maths.dogma.engine.operationstack.RunInfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;
+import com.opengamma.maths.dogma.engine.operationstack.RunVoidUnaryFunctionChain;
+import com.opengamma.maths.dogma.engine.operationstack.VoidUnaryFunctionChain;
 import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;
@@ -32,7 +36,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Disp;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unaryvoid.Disp;
 /**
  * Provides the DOGMA Language
  */
@@ -51,7 +55,8 @@ public class DOGMADisp {
   };
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIO.disp.DispOGComplexMatrix s_dispogcomplexmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIO.disp.DispOGComplexMatrix();
+  private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
+  private static VoidUnaryFunctionChain[] s_dispInstructions;
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//
@@ -80,10 +85,29 @@ OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunction
 // Build instructions sets
  OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();
 OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();
+OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
+VoidUnaryFunction<OGArray<? extends Number>>[] DispFunctionTable = MethodScraperForVoidUnaryFunctions.availableMethodsForVoidUnaryFunctions(operatorDictVoidUnary.getOperationsMap(),Disp.class);
+s_dispInstructions = MethodScraperForVoidUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),DispFunctionTable, defaultUnaryFunctionEvalCostsMatrix); // same eval cost matrix is fine as default
+
 
 }
-  public static void disp(OGComplexMatrix arg0){
-  s_dispogcomplexmatrix.disp( arg0);
-  };
+
+public static void disp(OGArray<? extends Number> arg0) {
+Catchers.catchNullFromArgList(arg0, 1);
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0.getClass());
+ s_voidUnaryFunctionChainRunner.dispatch(s_dispInstructions[type1], arg0);
+}
+
+public static void disp(Number arg0) {Catchers.catchNullFromArgList(arg0, 1);
+OGArray<? extends Number> arg0rewrite;
+if (arg0.getClass() == ComplexType.class) {
+arg0rewrite = new OGComplexScalar(arg0);
+} else {
+arg0rewrite = new OGRealScalar(arg0.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0rewrite.getClass());
+s_voidUnaryFunctionChainRunner.dispatch(s_dispInstructions[type1], arg0rewrite);
+}
+
 
 }
