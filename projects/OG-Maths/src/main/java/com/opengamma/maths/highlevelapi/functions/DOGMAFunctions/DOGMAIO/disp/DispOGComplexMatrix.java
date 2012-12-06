@@ -27,10 +27,10 @@ public class DispOGComplexMatrix implements Disp<OGComplexMatrix> {
     for (int i = 0; i < 2 * rows; i += 2) {
       for (int j = 0; j < columns - 1; j++) {
         imag = data[j * 2 * rows + i + 1];
-        str += String.format("%24.18f " + (imag >= 0 ? "+" : "-") + "%24.18fi, ", data[j * 2 * rows + i], Math.abs(imag));
+        str += String.format("%24.18f " + (imag >= 0 ? "    +" : "    -") + "%24.18fi, ", data[j * 2 * rows + i], Math.abs(imag));
       }
       imag = data[(columns - 1) * 2 * rows + i + 1];
-      str += String.format("%24.18f " + (imag >= 0 ? "+" : "-") + "%24.18fi, ", data[(columns - 1) * 2 * rows + i], Math.abs(imag));
+      str += String.format("%24.18f " + (imag >= 0 ? "    +" : "    -") + "%24.18fi, ", data[(columns - 1) * 2 * rows + i], Math.abs(imag));
       str += String.format("\n");
     }
     System.out.println(str);
