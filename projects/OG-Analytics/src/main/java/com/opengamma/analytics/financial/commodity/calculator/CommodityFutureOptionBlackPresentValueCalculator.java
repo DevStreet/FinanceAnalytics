@@ -13,57 +13,43 @@ import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisito
 import com.opengamma.util.ArgumentChecker;
 
 /**
- *
+ * Calculates the present value of commodity future options using the Black method.
  */
-public class CommodityFutureOptionForwardThetaCalculator extends InstrumentDerivativeVisitorAdapter<StaticReplicationDataBundle, Double> {
-
-  private static final CommodityFutureOptionForwardThetaCalculator s_instance = new CommodityFutureOptionForwardThetaCalculator();
+public final class CommodityFutureOptionBlackPresentValueCalculator extends InstrumentDerivativeVisitorAdapter<StaticReplicationDataBundle, Double> {
+  /** A static instance of this calculator */
+  private static final CommodityFutureOptionBlackPresentValueCalculator s_instance = new CommodityFutureOptionBlackPresentValueCalculator();
+  /** The Black pricer */
   private static final CommodityFutureOptionBlackMethod PRICER = CommodityFutureOptionBlackMethod.getInstance();
 
-  public static CommodityFutureOptionForwardThetaCalculator getInstance() {
+  /**
+   * @return The static instance of this calculator
+   */
+  public static CommodityFutureOptionBlackPresentValueCalculator getInstance() {
     return s_instance;
   }
 
-  /**
-   *
-   */
-  public CommodityFutureOptionForwardThetaCalculator() {
+  private CommodityFutureOptionBlackPresentValueCalculator() {
   }
 
   @Override
   public Double visitAgricultureFutureOption(final AgricultureFutureOption derivative, final StaticReplicationDataBundle data) {
     ArgumentChecker.notNull(derivative, "derivative");
     ArgumentChecker.notNull(data, "data");
-    return PRICER.forwardTheta(derivative, data);
+    return PRICER.presentValue(derivative, data);
   }
 
   @Override
   public Double visitEnergyFutureOption(final EnergyFutureOption derivative, final StaticReplicationDataBundle data) {
     ArgumentChecker.notNull(derivative, "derivative");
     ArgumentChecker.notNull(data, "data");
-    return PRICER.forwardTheta(derivative, data);
+    return PRICER.presentValue(derivative, data);
   }
 
   @Override
   public Double visitMetalFutureOption(final MetalFutureOption derivative, final StaticReplicationDataBundle data) {
     ArgumentChecker.notNull(derivative, "derivative");
     ArgumentChecker.notNull(data, "data");
-    return PRICER.forwardTheta(derivative, data);
-  }
-
-  @Override
-  public Double visitAgricultureFutureOption(final AgricultureFutureOption derivative) {
-    throw new UnsupportedOperationException("This visitor (" + this.getClass() + ") does not support an visitAgricultureFutureOption without a StaticReplicationDataBundle");
-  }
-
-  @Override
-  public Double visitEnergyFutureOption(final EnergyFutureOption derivative) {
-    throw new UnsupportedOperationException("This visitor (" + this.getClass() + ") does not support an visitEnergyFutureOption without a StaticReplicationDataBundle");
-  }
-
-  @Override
-  public Double visitMetalFutureOption(final MetalFutureOption derivative) {
-    throw new UnsupportedOperationException("This visitor (" + this.getClass() + ") does not support an visitMetalFutureOption without a StaticReplicationDataBundle");
+    return PRICER.presentValue(derivative, data);
   }
 
 }
