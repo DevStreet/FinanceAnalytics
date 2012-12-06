@@ -16,6 +16,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
 import com.opengamma.maths.dogma.languagegenerator.DogmaLangTokenToCodeGenerator;
 import com.opengamma.maths.dogma.languagegenerator.FullToken;
 import com.opengamma.maths.dogma.languagegenerator.docs.Doc;
+import com.opengamma.maths.dogma.languagegenerator.docs.DocFormatter;
 import com.opengamma.maths.dogma.languagegenerator.docs.DocsDictionaryPopulator;
 
 /**
@@ -105,70 +106,15 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
   public String generateEntryPointsCode(FullToken f) {
     StringBuffer tmp = new StringBuffer();
     String lname = f.getSimpleName().toLowerCase();
+    StringBuffer docStr = new StringBuffer();
+    DocFormatter d = new DocFormatter(f);
+    docStr.append(d.getDocs());
 
-    String functionTitle = "DOGMA Function: " + f.getSimpleName() + "( arg0 )";
-    String shortDesc = "Docs Missing - No description given";
-    String longDesc = "Docs Missing - No description given";
-    String example = "Docs Missing - No description given";
-    String argumentValues = "Docs Missing - No description given\n";
-    String returnValueDescription = "Docs Missing - No description given";
-    Set<Doc> docClazz = s_classToDocsMap.get(f.getInterfaceClass());
-    if (s_classToDocsMap.get(f.getInterfaceClass()) != null) {
-      if (docClazz.size() > 1) {
-        s_log.warn("Multiple documentation classes found for function " + f.getSimpleName() + " results may be strange!");
-      }
-      shortDesc = "";
-      longDesc = "";
-      example = "";
-      argumentValues = "";
-      returnValueDescription = "";
-      Iterator<Doc> it = docClazz.iterator();
-      Doc next = null;
-      while (it.hasNext()) {
-        next = it.next();
-        shortDesc += next.shortDescription();
-        longDesc += next.longDescription();
-        example += next.exampleInput();
-        if (next.argDescriptions().length > 1) {
-          throw new MathsExceptionConfigProblem("Docs suppied for class " + f.getSimpleName() + " declare more argument descriptions than there are actual arguments.");
-        }
-        for (int i = 0; i < next.argDescriptions().length; i++) {
-          argumentValues += next.argDescriptions()[i] + "\n";
-        }
-        returnValueDescription += next.returnDescription();
-      }
-    }
-
-    tmp.append("/**\n");
-    tmp.append(" * ");
-    
-    tmp.append(functionTitle + "\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * Short Description:\n");
-    tmp.append(" * ");
-    
-    tmp.append(shortDesc + "\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * Full Description:\n");
-    tmp.append(" * ");
-    tmp.append(longDesc + "\n");
-    
-    tmp.append(" * <p>\n");
-    tmp.append(" * Example(s):\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * ");
-    
-    tmp.append(example + "\n");
-    tmp.append(" * <p>\n");
-    
-    tmp.append(" * @param arg0 " + argumentValues);
-    tmp.append(" * <p>\n");
-    tmp.append(" * @return " + returnValueDescription + "\n");
-    tmp.append(" */");
-    
     // the code
     String callStr = s_autogenPath + "DOGMA" + f.getSimpleName() + "." + lname + "(arg0);";
+
     tmp.append("\n");
+    tmp.append(docStr);
     tmp.append(s_indent + "public static OGArray<? extends Number> ");
     tmp.append(lname);
     tmp.append("(OGArray<? extends Number> arg0) {\n");
@@ -177,30 +123,8 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
     tmp.append("\n");
     tmp.append(s_indent + "}\n\n");
 
-    tmp.append("/**\n");
-    tmp.append(" * ");
-    tmp.append(functionTitle + "\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * Short Description:\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * ");
-    tmp.append(shortDesc + "\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * Full Description:\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * ");
-    tmp.append(longDesc + "\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * Example(s):\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * ");
-    tmp.append(example + "\n");
-    tmp.append(" * <p>\n");
-    tmp.append(" * @param arg0 " + argumentValues);
-    tmp.append(" * <p>\n");
-    tmp.append(" * @return " + returnValueDescription + "\n");
-    tmp.append(" */");
-    tmp.append("\n" + s_indent + "public static Number ");
+    tmp.append(docStr);
+    tmp.append(s_indent + "public static Number ");
     tmp.append(lname);
     tmp.append("(Number arg0) {\n");
     tmp.append(s_indent + s_indent + "return ");

@@ -146,7 +146,7 @@ public class DocFormatter {
         if (s_docClazz.size() > 1) {
           s_log.warn("Multiple documentation classes found for function " + tok.getSimpleName() + " results may be strange!");
         }
-        argumentValues = new String[] {"", "" };
+        argumentValues = new String[] {"" };
         returnValueDescription = "";
         Iterator<Doc> it = s_docClazz.iterator();
         Doc next = null;
@@ -155,19 +155,17 @@ public class DocFormatter {
           if (next.argDescriptions().length > 1) {
             throw new MathsExceptionConfigProblem("Docs supplied for class " + tok.getSimpleName() + " declare more argument descriptions than there are actual arguments.");
           }
-          for (int i = 0; i < next.argDescriptions().length; i++) {
-            argumentValues[i] = next.argDescriptions()[i];
-          }
+          argumentValues[0] = next.argDescriptions()[0];
           returnValueDescription += next.returnDescription();
         }
       }
 
-      tmp.append(" * @param arg0 " + argumentValues);
+      tmp.append(" * @param arg0 " + argumentValues[0] + "\n");
       tmp.append(" * <p>\n");
       tmp.append(" * @return " + returnValueDescription + "\n");
       tmp.append(" */\n\n");
 
-      return "";
+      return tmp.toString();
     }
   }
 

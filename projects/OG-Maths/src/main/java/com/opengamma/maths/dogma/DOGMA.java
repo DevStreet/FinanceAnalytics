@@ -28,29 +28,45 @@ import org.slf4j.LoggerFactory;
  * Provides the DOGMA Language
  */
 public class DOGMA {
+
+
 /**
- * DOGMA Function: Copy( arg0 )
+ * DOGMA Function: Copy
  * <p>
  * Short Description:
+ * <p>
  * Returns a clean copy of the argument.
  * <p>
  * Full Description:
+ * <p>
  * Returns a clean deep copy of the argument.
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * No examples given.
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * No examples output given.
+ * }
+ * </pre>
+ *
  * @param arg0 The array to be copied.
  * <p>
  * @return Returns a clean deep copy of the argument
  */
+
   public static OGArray<? extends Number> copy(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMACopy.copy(arg0);
   }
 
+
 /**
- * DOGMA Function: Copy( arg0 )
+ * DOGMA Function: Copy
  * <p>
  * Short Description:
  * <p>
@@ -60,41 +76,68 @@ public class DOGMA {
  * <p>
  * Returns a clean deep copy of the argument.
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * No examples given.
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * No examples output given.
+ * }
+ * </pre>
+ *
  * @param arg0 The array to be copied.
  * <p>
  * @return Returns a clean deep copy of the argument
  */
+
   public static Number copy(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMACopy.copy(arg0);
   }
 
+
+
 /**
- * DOGMA Function: Ctranspose( arg0 )
+ * DOGMA Function: Ctranspose
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> ctranspose(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMACtranspose.ctranspose(arg0);
   }
 
+
 /**
- * DOGMA Function: Ctranspose( arg0 )
+ * DOGMA Function: Ctranspose
  * <p>
  * Short Description:
  * <p>
@@ -104,14 +147,25 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number ctranspose(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMACtranspose.ctranspose(arg0);
   }
@@ -264,73 +318,120 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMADot.dot(arg0, arg1);
   }
 
+
+
 /**
- * DOGMA Function: Erf( arg0 )
+ * DOGMA Function: Erf
  * <p>
  * Short Description:
- * Docs Missing - No description given
+ * <p>
+ * Returns the error function of the argument.
  * <p>
  * Full Description:
- * Docs Missing - No description given
  * <p>
- * Example(s):
+ * Returns the error function of the argument.
  * <p>
- * Docs Missing - No description given
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = erf(foo);
+ * disp(bar);
+ * }
+ * </pre>
  * <p>
- * @param arg0 Docs Missing - No description given
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [0.84270..., 0.99532..., 0.99998..., 1.00000...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the error function values are to be computed.
  * <p>
- * @return Docs Missing - No description given
+ * @return the value of the error function evaluated at the argument
  */
+
   public static OGArray<? extends Number> erf(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAErf.erf(arg0);
   }
 
+
 /**
- * DOGMA Function: Erf( arg0 )
+ * DOGMA Function: Erf
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the error function of the argument.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the error function of the argument.
  * <p>
- * Example(s):
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = erf(foo);
+ * disp(bar);
+ * }
+ * </pre>
  * <p>
- * Docs Missing - No description given
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [0.84270..., 0.99532..., 0.99998..., 1.00000...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the error function values are to be computed.
  * <p>
- * @param arg0 Docs Missing - No description given
- * <p>
- * @return Docs Missing - No description given
+ * @return the value of the error function evaluated at the argument
  */
+
   public static Number erf(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAErf.erf(arg0);
   }
 
+
+
 /**
- * DOGMA Function: Erfc( arg0 )
+ * DOGMA Function: Erfc
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> erfc(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAErfc.erfc(arg0);
   }
 
+
 /**
- * DOGMA Function: Erfc( arg0 )
+ * DOGMA Function: Erfc
  * <p>
  * Short Description:
  * <p>
@@ -340,41 +441,68 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number erfc(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAErfc.erfc(arg0);
   }
 
+
+
 /**
- * DOGMA Function: Full( arg0 )
+ * DOGMA Function: Full
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> full(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAFull.full(arg0);
   }
 
+
 /**
- * DOGMA Function: Full( arg0 )
+ * DOGMA Function: Full
  * <p>
  * Short Description:
  * <p>
@@ -384,14 +512,25 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number full(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAFull.full(arg0);
   }
@@ -554,30 +693,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the first.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the
+ * first. This is the equivalent of the m-code operation arg0-arg1. The
+ * operation is vectorised such that if either argument is a single number it
+ * is applied to each element of the argument, whereas if both arguments
+ * are the same dimension element wise subtraction takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = minus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [6, 5, 4, 3]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument from which to subtract.
+ * @param arg1  The second argument to be subtracted.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise subtraction of the second input argument from the first
  */
 
   public static OGArray<? extends Number> minus(OGArray<? extends Number> arg0, OGArray<? extends Number> arg1) {
@@ -590,30 +735,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the first.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the
+ * first. This is the equivalent of the m-code operation arg0-arg1. The
+ * operation is vectorised such that if either argument is a single number it
+ * is applied to each element of the argument, whereas if both arguments
+ * are the same dimension element wise subtraction takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = minus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [6, 5, 4, 3]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument from which to subtract.
+ * @param arg1  The second argument to be subtracted.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise subtraction of the second input argument from the first
  */
 
   public static OGArray<? extends Number> minus(Number arg0, OGArray<? extends Number> arg1) {
@@ -626,30 +777,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the first.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the
+ * first. This is the equivalent of the m-code operation arg0-arg1. The
+ * operation is vectorised such that if either argument is a single number it
+ * is applied to each element of the argument, whereas if both arguments
+ * are the same dimension element wise subtraction takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = minus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [6, 5, 4, 3]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument from which to subtract.
+ * @param arg1  The second argument to be subtracted.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise subtraction of the second input argument from the first
  */
 
   public static OGArray<? extends Number> minus(OGArray<? extends Number> arg0, Number arg1) {
@@ -662,30 +819,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the first.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise subtraction of the second input argument from the
+ * first. This is the equivalent of the m-code operation arg0-arg1. The
+ * operation is vectorised such that if either argument is a single number it
+ * is applied to each element of the argument, whereas if both arguments
+ * are the same dimension element wise subtraction takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = minus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [6, 5, 4, 3]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument from which to subtract.
+ * @param arg1  The second argument to be subtracted.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise subtraction of the second input argument from the first
  */
 
   public static Number minus(Number arg0, Number arg1) {
@@ -986,30 +1149,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise sum of the input arguments.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise addition of the input arguments. This is the
+ * equivalent of the m-code operation arg0+arg1. The operation is vectorised
+ * such that if either argument is a single number it is applied to each
+ * element of the argument, whereas if both arguments are the same dimension
+ * element wise addition takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = plus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [8, 9, 10, 11]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument to add.
+ * @param arg1  The second argument to add.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise sum of the input arguments
  */
 
   public static OGArray<? extends Number> plus(OGArray<? extends Number> arg0, OGArray<? extends Number> arg1) {
@@ -1022,30 +1191,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise sum of the input arguments.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise addition of the input arguments. This is the
+ * equivalent of the m-code operation arg0+arg1. The operation is vectorised
+ * such that if either argument is a single number it is applied to each
+ * element of the argument, whereas if both arguments are the same dimension
+ * element wise addition takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = plus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [8, 9, 10, 11]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument to add.
+ * @param arg1  The second argument to add.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise sum of the input arguments
  */
 
   public static OGArray<? extends Number> plus(Number arg0, OGArray<? extends Number> arg1) {
@@ -1058,30 +1233,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise sum of the input arguments.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise addition of the input arguments. This is the
+ * equivalent of the m-code operation arg0+arg1. The operation is vectorised
+ * such that if either argument is a single number it is applied to each
+ * element of the argument, whereas if both arguments are the same dimension
+ * element wise addition takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = plus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [8, 9, 10, 11]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument to add.
+ * @param arg1  The second argument to add.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise sum of the input arguments
  */
 
   public static OGArray<? extends Number> plus(OGArray<? extends Number> arg0, Number arg1) {
@@ -1094,30 +1275,36 @@ public class DOGMA {
  * <p>
  * Short Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise sum of the input arguments.
  * <p>
  * Full Description:
  * <p>
- * Docs Missing - No description given
+ * Returns the element wise addition of the input arguments. This is the
+ * equivalent of the m-code operation arg0+arg1. The operation is vectorised
+ * such that if either argument is a single number it is applied to each
+ * element of the argument, whereas if both arguments are the same dimension
+ * element wise addition takes place.
  * <p>
  * Example Code:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * OGMatrix foo = new OGMatrix(new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = plus(7, foo);
+ * disp(bar);
  * }
  * </pre>
  * <p>
  * Example Output:
  * <pre>
  * {@code 
- * Docs Missing - No description given
+ * Output [8, 9, 10, 11]
  * }
  * </pre>
  *
- * @param arg0  Docs Missing - No description given
- * @param arg1  Docs Missing - No description given
+ * @param arg0  The first argument to add.
+ * @param arg1  The second argument to add.
  * 
- * @return Docs Missing - No description given
+ * @return The element wise sum of the input arguments
  */
 
   public static Number plus(Number arg0, Number arg1) {
@@ -1272,29 +1459,45 @@ public class DOGMA {
     return     com.opengamma.maths.dogma.autogen.DOGMARosser.rosser();
   };
 
+
+
 /**
- * DOGMA Function: Sin( arg0 )
+ * DOGMA Function: Sin
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> sin(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASin.sin(arg0);
   }
 
+
 /**
- * DOGMA Function: Sin( arg0 )
+ * DOGMA Function: Sin
  * <p>
  * Short Description:
  * <p>
@@ -1304,41 +1507,68 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number sin(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASin.sin(arg0);
   }
 
+
+
 /**
- * DOGMA Function: Sparse( arg0 )
+ * DOGMA Function: Sparse
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> sparse(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASparse.sparse(arg0);
   }
 
+
 /**
- * DOGMA Function: Sparse( arg0 )
+ * DOGMA Function: Sparse
  * <p>
  * Short Description:
  * <p>
@@ -1348,41 +1578,68 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number sparse(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASparse.sparse(arg0);
   }
 
+
+
 /**
- * DOGMA Function: Sqrt( arg0 )
+ * DOGMA Function: Sqrt
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> sqrt(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASqrt.sqrt(arg0);
   }
 
+
 /**
- * DOGMA Function: Sqrt( arg0 )
+ * DOGMA Function: Sqrt
  * <p>
  * Short Description:
  * <p>
@@ -1392,14 +1649,25 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number sqrt(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASqrt.sqrt(arg0);
   }
@@ -1572,29 +1840,45 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMATimes.times(arg0, arg1);
   }
 
+
+
 /**
- * DOGMA Function: Transpose( arg0 )
+ * DOGMA Function: Transpose
  * <p>
  * Short Description:
+ * <p>
  * Docs Missing - No description given
  * <p>
  * Full Description:
- * Docs Missing - No description given
- * <p>
- * Example(s):
  * <p>
  * Docs Missing - No description given
  * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static OGArray<? extends Number> transpose(OGArray<? extends Number> arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMATranspose.transpose(arg0);
   }
 
+
 /**
- * DOGMA Function: Transpose( arg0 )
+ * DOGMA Function: Transpose
  * <p>
  * Short Description:
  * <p>
@@ -1604,14 +1888,25 @@ public class DOGMA {
  * <p>
  * Docs Missing - No description given
  * <p>
- * Example(s):
- * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
  * Docs Missing - No description given
+ * }
+ * </pre>
  * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
  * @param arg0 Docs Missing - No description given
  * <p>
  * @return Docs Missing - No description given
  */
+
   public static Number transpose(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMATranspose.transpose(arg0);
   }
