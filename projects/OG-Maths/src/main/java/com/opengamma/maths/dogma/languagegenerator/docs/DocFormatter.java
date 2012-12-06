@@ -19,6 +19,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
 import com.opengamma.maths.dogma.engine.language.ArbitraryFunction;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
 import com.opengamma.maths.dogma.languagegenerator.FullToken;
 
 /**
@@ -35,6 +36,7 @@ public class DocFormatter {
     s_classToSpecificFnMap.put(UnaryFunction.class, new UnarySpecificFormatting());
     s_classToSpecificFnMap.put(InfixOperator.class, new InfixSpecificFormatting());
     s_classToSpecificFnMap.put(ArbitraryFunction.class, new ArbitrarySpecificFormatting());
+    s_classToSpecificFnMap.put(VoidUnaryFunction.class, new VoidUnarySpecificFormatting());
   }
 
   // This is the text wrapping width for the docs for which 80 seems a good default, 
@@ -163,6 +165,40 @@ public class DocFormatter {
       tmp.append(" * @param arg0 " + argumentValues[0] + "\n");
       tmp.append(" * <p>\n");
       tmp.append(" * @return " + returnValueDescription + "\n");
+      tmp.append(" */\n\n");
+
+      return tmp.toString();
+    }
+  }
+
+  /**
+   * Specific formatting for the Unary function classes
+   */
+  private static class VoidUnarySpecificFormatting implements SpecificFormatter {
+    public String evalFormat(FullToken tok) {
+      String[] argumentValues = {"Docs Missing - No description given" };
+      StringBuffer tmp = new StringBuffer();
+      if (s_docClazz != null) {
+        if (s_docClazz.size() > 1) {
+          s_log.warn("Multiple documentation classes found for function " + tok.getSimpleName() + " results may be strange!");
+        }
+        argumentValues = new String[] {"" };
+        Iterator<Doc> it = s_docClazz.iterator();
+        Doc next = null;
+        while (it.hasNext()) {
+          next = it.next();
+          if (next.argDescriptions().length > 1) {
+            throw new MathsExceptionConfigProblem("Docs supplied for class " + tok.getSimpleName() + " declare more argument descriptions than there are actual arguments.");
+          }
+          argumentValues[0] = next.argDescriptions()[0];
+          if (!next.returnDescription().equalsIgnoreCase("")) {
+            throw new MathsExceptionConfigProblem("Docs supplied for class " + tok.getSimpleName() + " declare return for a function that is void by definition.");
+          }
+        }
+      }
+
+      tmp.append(" * @param arg0 " + argumentValues[0] + "\n");
+      tmp.append(" * <p>\n");
       tmp.append(" */\n\n");
 
       return tmp.toString();

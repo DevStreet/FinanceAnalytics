@@ -28,6 +28,7 @@ public class FunctionInterfaceRegister {
     s_registeredFunctionInterfaces.add(InfixOperator.class);
     s_registeredFunctionInterfaces.add(UnaryFunction.class);
     s_registeredFunctionInterfaces.add(ArbitraryFunction.class);
+    s_registeredFunctionInterfaces.add(VoidUnaryFunction.class);    
   }
 
   public static Set<Class<?>> getRegisteredFunctionInterfaces() {

@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.dogma.engine.operationstack;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

@@ -41,6 +41,7 @@ public class DogmaLanguageMethodParser {
   // this is a bit of a kludge, and by bit I mean a lot
   private static void parseFunctions() {
     Map<Class<?>, Set<Function>> opsmap = s_infixops.getOperationsMap();
+    System.out.println(opsmap.toString());
     Set<Class<?>> keyset = opsmap.keySet();
     for (Class<?> key : keyset) {
       s_atoken = new FullToken(key.getSimpleName(), key.getCanonicalName(), key, opsmap.get(key));

@@ -15,9 +15,11 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.maths.dogma.engine.language.ArbitraryFunction;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
+import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
 import com.opengamma.maths.dogma.languagegenerator.generators.ArbitraryFunctionGenerator;
 import com.opengamma.maths.dogma.languagegenerator.generators.InfixOperatorGenerator;
 import com.opengamma.maths.dogma.languagegenerator.generators.UnaryFunctionGenerator;
+import com.opengamma.maths.dogma.languagegenerator.generators.VoidUnaryFunctionGenerator;
 
 /**
  * Generates the monolithic class representation of the DOGMA language code  
@@ -31,6 +33,7 @@ public class DogmaLanguageCodeGeneratorMonolithic {
   private static String s_indent = "  ";
   static {
     s_generationMap.put(UnaryFunction.class, UnaryFunctionGenerator.getInstance());
+    s_generationMap.put(VoidUnaryFunction.class, VoidUnaryFunctionGenerator.getInstance());
     s_generationMap.put(InfixOperator.class, InfixOperatorGenerator.getInstance());
     s_generationMap.put(ArbitraryFunction.class, ArbitraryFunctionGenerator.getInstance());
   }
@@ -178,14 +181,18 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.InfixOperator;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.UnaryFunction;\n");
+    tmp.append("import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.Function;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.InfixOpChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunctions;\n");
+    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForVoidUnaryFunctions;\n");    
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunInfixOpChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;\n");
+    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunVoidUnaryFunctionChain;\n");    
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;\n");
+    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.VoidUnaryFunctionChain;\n");    
     tmp.append("import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;\n");
@@ -198,6 +205,7 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     StringBuffer tmp = new StringBuffer();
     tmp.append(s_indent + "private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();\n");
     tmp.append(s_indent + "private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();\n");
+    tmp.append(s_indent + "private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();\n");    
     return tmp.toString();
   }
 
@@ -209,6 +217,8 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     tmp.append(s_indent + "<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
     tmp.append(s_indent + "OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary");
     tmp.append(" = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
+    tmp.append("OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary");
+    tmp.append(" = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();\n");  
     return tmp.toString();
   }
 

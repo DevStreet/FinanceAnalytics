@@ -34,7 +34,6 @@ public class FullToken {
     int implementsAnRecognisedInterface = 0;
     Class<?> interfaceFoundPtr = null;
     for (int i = 0; i < interfacesDeclared.length; i++) {
-//      System.out.println("Checking for " + interfacesDeclared[i].toString());
       if (registeredInterface.contains(interfacesDeclared[i])) {
         implementsAnRecognisedInterface++;
         interfaceFoundPtr = interfacesDeclared[i];

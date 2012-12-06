@@ -14,9 +14,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.maths.dogma.languagegenerator.docs.Doc;
-import com.opengamma.maths.dogma.languagegenerator.docs.DocsDictionaryPopulator;
-
 /**
  * Generates the multi-class lazy initialisation representation of the DOGMA language code  
  */
