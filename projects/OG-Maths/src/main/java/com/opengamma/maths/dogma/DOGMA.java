@@ -546,6 +546,77 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Exp
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> exp(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAExp.exp(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Exp
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number exp(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAExp.exp(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Full
  * <p>
  * Short Description:
@@ -765,6 +836,77 @@ public class DOGMA {
   public static OGMatrix invhilb(int arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAInvHilb.invhilb(arg0);
   };
+
+
+
+/**
+ * DOGMA Function: Log
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> log(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMALog.log(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Log
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number log(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMALog.log(arg0);
+  }
 
 
 /**
