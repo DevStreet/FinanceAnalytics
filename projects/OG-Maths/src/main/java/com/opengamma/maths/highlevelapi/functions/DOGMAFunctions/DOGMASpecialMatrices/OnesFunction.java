@@ -14,7 +14,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
- * 
+ * provides ones()
  */
 @DOGMAMethodHook(provides = Ones.class)
 public class OnesFunction {

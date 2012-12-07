@@ -5,20 +5,22 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponentsAndLogarithms.sqrt;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sqrt;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
- * does sqrt
+ * does sqrt on sparse matrices
  */
 @DOGMAMethodHook(provides = Sqrt.class)
-public final class SqrtOGSparseMatrix implements Sqrt<OGSparseMatrix, OGSparseMatrix> {
+public final class SqrtOGSparseMatrix implements Sqrt<OGArray<? extends Number>, OGSparseMatrix> {
 
   @Override
-  public OGSparseMatrix eval(OGSparseMatrix array1) {
+  public OGArray<? extends Number> eval(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
     final int rowsArray1 = array1.getNumberOfRows();
@@ -29,14 +31,29 @@ public final class SqrtOGSparseMatrix implements Sqrt<OGSparseMatrix, OGSparseMa
     final int n = dataArray1.length;
 
     double[] tmp = new double[n];
-    for (int i = 0; i < n; i++) {
-      if (dataArray1[i] > 0) {
+    double[] cmplxTmp;
+    boolean isCmplx = false;
+    int i;
+    for (i = 0; i < n; i++) {
+      if (dataArray1[i] >= 0) {
         tmp[i] = Math.sqrt(dataArray1[i]);
       } else {
-        throw new MathsExceptionNotImplemented("Sqrt of negative numbers not implemented, awaiting complex support");
+        isCmplx = true;
+        break;
       }
     }
-
-    return new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+    if (isCmplx) {
+      cmplxTmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(tmp);
+      for (int j = i; j < n; j++) {
+        if (dataArray1[j] >= 0) {
+          cmplxTmp[2 * j] = Math.sqrt(dataArray1[j]);
+        } else {
+          cmplxTmp[2 * j + 1] = Math.sqrt(-dataArray1[j]);
+        }
+      }
+      return new OGComplexSparseMatrix(colPtr, rowIdx, cmplxTmp, rowsArray1, columnsArray1);
+    } else {
+      return new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+    }
   }
 }
