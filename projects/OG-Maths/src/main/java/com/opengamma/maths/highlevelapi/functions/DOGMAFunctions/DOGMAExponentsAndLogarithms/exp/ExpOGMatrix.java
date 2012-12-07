@@ -7,7 +7,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponents
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Exp;
-import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sqrt;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -15,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * does exp
  */
 @DOGMAMethodHook(provides = Exp.class)
-public final class ExpOGMatrix implements Sqrt<OGMatrix, OGMatrix> {
+public final class ExpOGMatrix implements Exp<OGMatrix, OGMatrix> {
 
   @Override
   public OGMatrix eval(OGMatrix array1) {

@@ -7,7 +7,6 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponents
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Exp;
-import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sqrt;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -17,7 +16,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Need exp(a+bi) = exp(a)*(cos(b) + i*sin(b))
  */
 @DOGMAMethodHook(provides = Exp.class)
-public final class ExpOGComplexMatrix implements Sqrt<OGComplexMatrix, OGComplexMatrix> {
+public final class ExpOGComplexMatrix implements Exp<OGComplexMatrix, OGComplexMatrix> {
 
   @Override
   public OGComplexMatrix eval(OGComplexMatrix array1) {
