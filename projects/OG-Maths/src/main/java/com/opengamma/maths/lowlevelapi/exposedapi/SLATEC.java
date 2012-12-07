@@ -53,4 +53,14 @@ public class SLATEC implements SLATECAPIInterface {
   public double derfc(double x) {
     return _localSLATEC.derfc(x);
   }
+
+  @Override
+  public double zabs(double zr, double zi) {
+    return _localSLATEC.zabs(zr, zi);
+  }
+
+  @Override
+  public void zlog(double ar, double ai, double[] br, double[] bi, int[] ierr) {
+    _localSLATEC.zlog(ar, ai, br, bi, ierr);
+  }
 }

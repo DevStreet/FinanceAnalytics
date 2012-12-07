@@ -16,12 +16,22 @@ public class SLATECNativeBacked extends SLATECAbstractSuper implements SLATECAPI
 
   @Override
   public double derf(double x) {
-    return OGSLATECRawWrapper.derf(new double[] {x});
-  }  
-  
+    return OGSLATECRawWrapper.derf(new double[] {x });
+  }
+
   @Override
   public double derfc(double x) {
     return OGSLATECRawWrapper.derfc(new double[] {x });
+  }
+
+  @Override
+  public double zabs(double zr, double zi) {
+    return OGSLATECRawWrapper.zabs(new double[] {zr }, new double[] {zi });
+  }
+
+  @Override
+  public void zlog(double ar, double ai, double[] br, double[] bi, int[] ierr) {
+    OGSLATECRawWrapper.zlog(new double[] {ar }, new double[] {ai }, br, bi, ierr);
   }
 
 }
