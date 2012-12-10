@@ -31,6 +31,87 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Abs
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the absolute value of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the absolute value of the argument for both real and complex
+ * numbers. In the case of real numbers this is simply the magnitude of the
+ * number. In the case of complex number a+ib it is by definition the square
+ * root of (a^2 + b^2)
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = abs(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.4142..., 2.8284..., 4.2426..., 5.6569...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the absolute values are to be computed.
+ * <p>
+ * @return the magnitude of the argument
+ */
+
+  public static OGArray<? extends Number> abs(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAbs.abs(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Abs
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the absolute value of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the absolute value of the argument for both real and complex
+ * numbers. In the case of real numbers this is simply the magnitude of the
+ * number. In the case of complex number a+ib it is by definition the square
+ * root of (a^2 + b^2)
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{1,2,3,4}});
+ * OGArray<? extends Number> bar = abs(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.4142..., 2.8284..., 4.2426..., 5.6569...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the absolute values are to be computed.
+ * <p>
+ * @return the magnitude of the argument
+ */
+
+  public static Number abs(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAbs.abs(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Copy
  * <p>
  * Short Description:
