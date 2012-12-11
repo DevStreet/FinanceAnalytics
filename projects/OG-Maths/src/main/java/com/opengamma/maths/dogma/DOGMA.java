@@ -112,6 +112,85 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Conj
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the conjugated value of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the conjugated value of the argument for both real and complex
+ * numbers. In the case of real numbers this is simply the number. In the case
+ * of complex number a+ib it is by definition the square root of (a - bi)
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{1,-2,3,-4}});
+ * OGArray<? extends Number> bar = conj(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.00... - 1.00...i, 2.00... + 2.00...i, 3.00... - 3.00...i, 4.00... + 4.00...i ]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the conjugated values are to be computed.
+ * <p>
+ * @return the conjugated value of the argument
+ */
+
+  public static OGArray<? extends Number> conj(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAConj.conj(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Conj
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the conjugated value of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the conjugated value of the argument for both real and complex
+ * numbers. In the case of real numbers this is simply the number. In the case
+ * of complex number a+ib it is by definition the square root of (a - bi)
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{1,-2,3,-4}});
+ * OGArray<? extends Number> bar = conj(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.00... - 1.00...i, 2.00... + 2.00...i, 3.00... - 3.00...i, 4.00... + 4.00...i ]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the conjugated values are to be computed.
+ * <p>
+ * @return the conjugated value of the argument
+ */
+
+  public static Number conj(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAConj.conj(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Copy
  * <p>
  * Short Description:
@@ -912,6 +991,87 @@ public class DOGMA {
 
   public static Number horzcat(Number arg0, Number arg1) {
     return com.opengamma.maths.dogma.autogen.DOGMAHorzcat.horzcat(arg0, arg1);
+  }
+
+
+
+/**
+ * DOGMA Function: Imag
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the imaginary part of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the imaginary part of the argument for both real and complex
+ * numbers. In the case of real numbers this returns the zero matrix of dimension
+ * the same as the input. In the case of complex numbers a+ib returns the
+ * values of "b"
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{1,-2,3,-4}});
+ * OGArray<? extends Number> bar = imag(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.00..., -2.00..., 3.00..., -4.00...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the imaginary values are to be extracted.
+ * <p>
+ * @return the imaginary part of the argument
+ */
+
+  public static OGArray<? extends Number> imag(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAImag.imag(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Imag
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the imaginary part of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the imaginary part of the argument for both real and complex
+ * numbers. In the case of real numbers this returns the zero matrix of dimension
+ * the same as the input. In the case of complex numbers a+ib returns the
+ * values of "b"
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,2,3,4}},new double[][]{{1,-2,3,-4}});
+ * OGArray<? extends Number> bar = imag(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.00..., -2.00..., 3.00..., -4.00...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the imaginary values are to be extracted.
+ * <p>
+ * @return the imaginary part of the argument
+ */
+
+  public static Number imag(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAImag.imag(arg0);
   }
 
   public static OGMatrix invhilb(int arg0) {
@@ -1763,6 +1923,85 @@ public class DOGMA {
 
   public static Number rdivide(Number arg0, Number arg1) {
     return com.opengamma.maths.dogma.autogen.DOGMARdivide.rdivide(arg0, arg1);
+  }
+
+
+
+/**
+ * DOGMA Function: Real
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the real part of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the real part of the argument for both real and complex numbers. In
+ * the case of real numbers this returns the input. In the case of complex
+ * numbers a+ib returns the values of "a"
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,20,3,40}},new double[][]{{1,-2,3,-4}});
+ * OGArray<? extends Number> bar = real(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.00..., 20.00..., 3.00..., 40.00...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the real values are to be extracted.
+ * <p>
+ * @return the real part of the argument
+ */
+
+  public static OGArray<? extends Number> real(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAReal.real(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Real
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the real part of the argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the real part of the argument for both real and complex numbers. In
+ * the case of real numbers this returns the input. In the case of complex
+ * numbers a+ib returns the values of "a"
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{1,20,3,40}},new double[][]{{1,-2,3,-4}});
+ * OGArray<? extends Number> bar = real(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.00..., 20.00..., 3.00..., 40.00...]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the real values are to be extracted.
+ * <p>
+ * @return the real part of the argument
+ */
+
+  public static Number real(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAReal.real(arg0);
   }
 
   public static OGMatrix rosser() {
