@@ -7,12 +7,12 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlg
 
 import org.testng.annotations.Test;
 
+import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
-import com.opengamma.maths.highlevelapi.functions.DOGMA;
 
 /**
  * Simple svd test
@@ -25,7 +25,6 @@ public class SvdSimpleTest {
   private static OGMatrix A = new OGMatrix(s_data, m, n);
 
   Svd mySVD = new Svd();
-  DOGMA dogma = DOGMA.getInstance();
 
   @Test
   public void svdCallTest() {
@@ -33,7 +32,7 @@ public class SvdSimpleTest {
     System.out.println(result.getU().toString());
     System.out.println(result.getS().toString());
     System.out.println(result.getV().toString());
-    OGArray<? extends Number> tmp = dogma.mtimes(result.getU(),result.getS(),dogma.transpose(result.getV()));
+    OGArray<? extends Number> tmp = DOGMA.mtimes(DOGMA.mtimes(result.getU(), result.getS()), DOGMA.transpose(result.getV()));
     System.out.println(tmp.toString());
   }
 
