@@ -47,4 +47,10 @@ public interface SLATECAPIInterface {
    */
   void zlog(double ar, double ai, double[] br, double[] bi, int[] ierr);
 
+  /**
+   * Computes the complex trigonometric arc tangent of the argument.
+   * @param z a complex number where the real part is stored in z[0] and the imaginary in z[1]
+   * @return the arc tangent of z.
+   */
+  double[] zatan(final double[] z);
 }

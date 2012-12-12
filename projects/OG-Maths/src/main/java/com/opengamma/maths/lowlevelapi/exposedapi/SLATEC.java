@@ -63,4 +63,9 @@ public class SLATEC implements SLATECAPIInterface {
   public void zlog(double ar, double ai, double[] br, double[] bi, int[] ierr) {
     _localSLATEC.zlog(ar, ai, br, bi, ierr);
   }
+
+  @Override
+  public double[] zatan(double[] z) {
+    return _localSLATEC.zatan(z);
+  }
 }

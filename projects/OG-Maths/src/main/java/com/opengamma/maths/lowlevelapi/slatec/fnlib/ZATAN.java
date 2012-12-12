@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.MathsConstants;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.complexbuiltins.ComplexArithmetic;
 
 /**
  * ZATAN(Z) computes the complex trigonometric arc tangent of the argument.
@@ -43,16 +44,16 @@ public class ZATAN {
       }
       zatan[0] = 0.0d;
       zatan[1] = 0.0d;
-      z2 = cplxmulOOP(z, z);
+      z2 = ComplexArithmetic.multiply(z, z);
       int twoi;
       double[] z2timeszatan;
       for (int i = 1; i <= NTERMS; i++) {
         twoi = 2 * (NTERMS - i) + 1;
-        z2timeszatan = cplxmulOOP(z2, zatan);
+        z2timeszatan = ComplexArithmetic.multiply(z2, zatan);
         zatan[0] = 1.0d / twoi - z2timeszatan[0];
         zatan[1] = -z2timeszatan[1]; // negate, no real part
       }
-      zatan = cplxmulOOP(z, zatan);
+      zatan = ComplexArithmetic.multiply(z, zatan);
     } else if (r > RMAX) {
       zatan[0] = s_halfPi;
       if (z[0] < 0.0) {
@@ -77,19 +78,6 @@ public class ZATAN {
 
     }
     return zatan;
-
-  }
-
-  private static double[] cplxmulOOP(double[] v1, double[] v2) {
-    double[] ret = new double[2];
-    double a, b, c, d;
-    a = v1[0];
-    b = v1[1];
-    c = v2[0];
-    d = v2[1];
-    ret[0] = a * c - b * d;
-    ret[1] = b * c + a * d;
-    return ret;
   }
 
 }

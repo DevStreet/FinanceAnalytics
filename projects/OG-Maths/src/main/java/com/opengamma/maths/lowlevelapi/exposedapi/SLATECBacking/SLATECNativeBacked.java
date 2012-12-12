@@ -5,9 +5,8 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.nativewrappers.OGSLATECRawWrapper;
-
-//import com.opengamma.maths.nativewrappers.OGSLATECRawWrapper;
 
 /**
  * Native library backed SLATEC
@@ -32,6 +31,12 @@ public class SLATECNativeBacked extends SLATECAbstractSuper implements SLATECAPI
   @Override
   public void zlog(double ar, double ai, double[] br, double[] bi, int[] ierr) {
     OGSLATECRawWrapper.zlog(new double[] {ar }, new double[] {ai }, br, bi, ierr);
+  }
+
+  // TODO: Add in ZATAN in a SLATEC_extn lib, or perhaps just use the native vector variant
+  @Override
+  public double[] zatan(double[] z) {
+    throw new MathsExceptionNotImplemented("ZATAN is not implemented in SLATEC as Fortran has complex double precision support built in.");
   }
 
 }
