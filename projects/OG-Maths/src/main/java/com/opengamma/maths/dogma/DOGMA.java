@@ -2083,6 +2083,10 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAReal.real(arg0);
   }
 
+  public static OGMatrix reshape(OGMatrix arg0, int arg1, int arg2) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAReshape.reshape(arg0, arg1, arg2);
+  };
+
   public static OGMatrix rosser() {
     return     com.opengamma.maths.dogma.autogen.DOGMARosser.rosser();
   };
