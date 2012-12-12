@@ -160,6 +160,7 @@
     <fragment>/styles/analytics/og.analytics.gadget.OG-gadgets-container.css</fragment>
     <fragment>/styles/analytics/og.analytics.gadget.OG-gadget-tabs-options.css</fragment>
     <fragment>/styles/analytics/og.analytics.gadget.OG-gadget-expanded-positions.css</fragment>
+    <fragment>/styles/analytics/og.analytics.gadget.OG-logger.css</fragment>
     <fragment>/styles/analytics/og.analytics.OG-layout-blotter.css</fragment>
     <fragment>/styles/analytics/og.analytics.OG-layout-analytics.css</fragment>
     <fragment>/styles/analytics/og.analytics.OG-layout-gadget.css</fragment>
@@ -297,6 +298,7 @@
     <fragment>/scripts/og/common/util/ui/og.common.util.ui.toolbar.js</fragment>
     <fragment>/scripts/og/common/util/ui/og.common.util.ui.tooltip.js</fragment>
     <fragment>/scripts/og/common/util/ui/og.common.util.ui.attributes.js</fragment>
+    <fragment>/scripts/og/common/util/ui/og.common.util.ui.portfolio.js</fragment>
   </bundle>
   <bundle id="common.js">
     <fragment>/scripts/og/common/slickgrid/formatters/og.common.slickgrid.formatters.timeseries.js</fragment>
@@ -321,6 +323,7 @@
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.timeseries.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.curve.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.data.js</fragment>
+    <fragment>/scripts/og/common/gadgets/og.common.gadgets.log.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.surface.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.depgraph.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.securitiesidentifiers.js</fragment>
@@ -346,6 +349,7 @@
   </bundle>
   <bundle id="blotter.js">
     <fragment>/scripts/og/blotter/og.blotter.dialog.js</fragment>
+    <fragment>/scripts/og/blotter/og.blotter.util.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.vanilla_swap.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.variance_swap.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.swaption.js</fragment>
@@ -366,6 +370,7 @@
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_fx_option.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_ir_swap.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_swaption.js</fragment>
+    <fragment>/scripts/og/blotter/forms/blocks/og.blotter.forms.blocks.portfolio.js</fragment>
   </bundle>
   <bundle id="views_common.js">
     <fragment>/scripts/og/views/common/og.views.common.state.js</fragment>

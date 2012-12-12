@@ -28,7 +28,7 @@ import com.opengamma.util.ArgumentChecker;
  *
  */
 public abstract class EquityBlackVolatilitySurfaceDefaults extends DefaultPropertyFunction {
-  private static final Logger s_logger = LoggerFactory.getLogger(FXBlackVolatilitySurfaceDefaults.class);
+  private static final Logger s_logger = LoggerFactory.getLogger(EquityBlackVolatilitySurfaceDefaults.class);
   private static final String[] VALUE_REQUIREMENTS = new String[] {
     ValueRequirementNames.BLACK_VOLATILITY_SURFACE,
     ValueRequirementNames.LOCAL_VOLATILITY_SURFACE,
@@ -76,6 +76,8 @@ public abstract class EquityBlackVolatilitySurfaceDefaults extends DefaultProper
       _tickerToCurveCalculationConfig.put(ticker, defaultsPerTicker[i + 4]);
       _tickerToSurfaceName.put(ticker, defaultsPerTicker[i + 5]);
     }
+    int temp = 0;
+    temp = temp + 1;
   }
 
   @Override
