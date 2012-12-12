@@ -112,6 +112,85 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Angle
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the argument (or phase) of the input argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the argument (or phase) of the input argument. By definition for a
+ * complex number a+bi it is atan(b/a).The quadrant in which the answer
+ * lies is accounted for through the use of atan2()
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{0,1,-1}},new double[][]{{1,1,0}});
+ * OGArray<? extends Number> bar = angle(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.57080..., 0.78540..., 3.14159]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the value of the mathematical argument is to be computed.
+ * <p>
+ * @return the mathematical argument of the input
+ */
+
+  public static OGArray<? extends Number> angle(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAngle.angle(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Angle
+ * <p>
+ * Short Description:
+ * <p>
+ * Returns the argument (or phase) of the input argument.
+ * <p>
+ * Full Description:
+ * <p>
+ * Returns the argument (or phase) of the input argument. By definition for a
+ * complex number a+bi it is atan(b/a).The quadrant in which the answer
+ * lies is accounted for through the use of atan2()
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * OGComplexMatrix foo = new OGComplexMatrix(new double[][]{{0,1,-1}},new double[][]{{1,1,0}});
+ * OGArray<? extends Number> bar = angle(foo);
+ * disp(bar);
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Output [1.57080..., 0.78540..., 3.14159]
+ * }
+ * </pre>
+ *
+ * @param arg0 The argument for which the value of the mathematical argument is to be computed.
+ * <p>
+ * @return the mathematical argument of the input
+ */
+
+  public static Number angle(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAngle.angle(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Conj
  * <p>
  * Short Description:
