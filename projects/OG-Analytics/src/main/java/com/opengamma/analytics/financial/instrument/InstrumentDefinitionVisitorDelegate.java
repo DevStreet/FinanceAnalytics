@@ -14,6 +14,8 @@ import com.opengamma.analytics.financial.commodity.definition.EnergyFutureOption
 import com.opengamma.analytics.financial.commodity.definition.MetalForwardDefinition;
 import com.opengamma.analytics.financial.commodity.definition.MetalFutureDefinition;
 import com.opengamma.analytics.financial.commodity.definition.MetalFutureOptionDefinition;
+import com.opengamma.analytics.financial.equity.future.definition.EquityFutureDefinition;
+import com.opengamma.analytics.financial.equity.future.definition.EquityIndexDividendFutureDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexNonDeliverableForwardDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexNonDeliverableOptionDefinition;
@@ -306,7 +308,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitBondFutureOptionPremiumTransactionDefinition(final BondFutureOptionPremiumTransactionDefinition bond) {
-    return _delegate.visitBondFutureOptionPremiumTransactionDefinition(bond, null);
+    return _delegate.visitBondFutureOptionPremiumTransactionDefinition(bond);
   }
 
   @Override
@@ -681,7 +683,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitMetalForwardDefinition(final MetalForwardDefinition future, final DATA_TYPE data) {
-    return _delegate.visitMetalForwardDefinition(future);
+    return _delegate.visitMetalForwardDefinition(future, data);
   }
 
   @Override
@@ -691,7 +693,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitMetalFutureDefinition(final MetalFutureDefinition future, final DATA_TYPE data) {
-    return _delegate.visitMetalFutureDefinition(future);
+    return _delegate.visitMetalFutureDefinition(future, data);
   }
 
   @Override
@@ -701,7 +703,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitMetalFutureOptionDefinition(final MetalFutureOptionDefinition future, final DATA_TYPE data) {
-    return _delegate.visitMetalFutureOptionDefinition(future);
+    return _delegate.visitMetalFutureOptionDefinition(future, data);
   }
 
   @Override
@@ -711,7 +713,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitAgricultureForwardDefinition(final AgricultureForwardDefinition future, final DATA_TYPE data) {
-    return _delegate.visitAgricultureForwardDefinition(future);
+    return _delegate.visitAgricultureForwardDefinition(future, data);
   }
 
   @Override
@@ -721,7 +723,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitAgricultureFutureDefinition(final AgricultureFutureDefinition future, final DATA_TYPE data) {
-    return _delegate.visitAgricultureFutureDefinition(future);
+    return _delegate.visitAgricultureFutureDefinition(future, data);
   }
 
   @Override
@@ -731,7 +733,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitAgricultureFutureOptionDefinition(final AgricultureFutureOptionDefinition future, final DATA_TYPE data) {
-    return _delegate.visitAgricultureFutureOptionDefinition(future);
+    return _delegate.visitAgricultureFutureOptionDefinition(future, data);
   }
 
   @Override
@@ -741,7 +743,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitEnergyForwardDefinition(final EnergyForwardDefinition future, final DATA_TYPE data) {
-    return _delegate.visitEnergyForwardDefinition(future);
+    return _delegate.visitEnergyForwardDefinition(future, data);
   }
 
   @Override
@@ -751,7 +753,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitEnergyFutureDefinition(final EnergyFutureDefinition future, final DATA_TYPE data) {
-    return _delegate.visitEnergyFutureDefinition(future);
+    return _delegate.visitEnergyFutureDefinition(future, data);
   }
 
   @Override
@@ -761,7 +763,7 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
 
   @Override
   public RESULT_TYPE visitEnergyFutureOptionDefinition(final EnergyFutureOptionDefinition future, final DATA_TYPE data) {
-    return _delegate.visitEnergyFutureOptionDefinition(future);
+    return _delegate.visitEnergyFutureOptionDefinition(future, data);
   }
 
   @Override
@@ -769,4 +771,23 @@ public class InstrumentDefinitionVisitorDelegate<DATA_TYPE, RESULT_TYPE> impleme
     return _delegate.visitEnergyFutureOptionDefinition(future);
   }
 
+  @Override
+  public RESULT_TYPE visitEquityFutureDefinition(final EquityFutureDefinition future, final DATA_TYPE data) {
+    return _delegate.visitEquityFutureDefinition(future, data);
+  }
+
+  @Override
+  public RESULT_TYPE visitEquityFutureDefinition(final EquityFutureDefinition future) {
+    return _delegate.visitEquityFutureDefinition(future);
+  }
+
+  @Override
+  public RESULT_TYPE visitEquityIndexDividendFutureDefinition(final EquityIndexDividendFutureDefinition future, final DATA_TYPE data) {
+    return _delegate.visitEquityIndexDividendFutureDefinition(future, data);
+  }
+
+  @Override
+  public RESULT_TYPE visitEquityIndexDividendFutureDefinition(final EquityIndexDividendFutureDefinition future) {
+    return _delegate.visitEquityIndexDividendFutureDefinition(future);
+  }
 }

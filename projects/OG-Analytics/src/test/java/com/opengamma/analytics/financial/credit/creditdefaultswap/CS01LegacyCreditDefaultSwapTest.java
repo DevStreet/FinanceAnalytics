@@ -17,8 +17,8 @@ import com.opengamma.analytics.financial.credit.RestructuringClause;
 import com.opengamma.analytics.financial.credit.SpreadBumpType;
 import com.opengamma.analytics.financial.credit.StubType;
 import com.opengamma.analytics.financial.credit.cds.ISDACurve;
-import com.opengamma.analytics.financial.credit.creditdefaultswap.definition.LegacyCreditDefaultSwapDefinition;
-import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.CS01LegacyCreditDefaultSwap;
+import com.opengamma.analytics.financial.credit.creditdefaultswap.definition.legacy.LegacyCreditDefaultSwapDefinition;
+import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.legacy.CS01LegacyCreditDefaultSwap;
 import com.opengamma.analytics.financial.credit.hazardratemodel.HazardRateCurve;
 import com.opengamma.analytics.financial.credit.obligormodel.CreditRating;
 import com.opengamma.analytics.financial.credit.obligormodel.CreditRatingFitch;
@@ -47,7 +47,6 @@ public class CS01LegacyCreditDefaultSwapTest {
   //----------------------------------------------------------------------------------
 
   // TODO : Add all the tests
-  // TODO : Fix the time decay test
 
   // ----------------------------------------------------------------------------------
 
@@ -299,17 +298,17 @@ public class CS01LegacyCreditDefaultSwapTest {
   // Hazard rate term structure (assume this has been calibrated previously)
 
   static double[] hazardRateTimes = {
-    0.0,
-    s_act365.getDayCountFraction(valuationDate, ZonedDateTime.of(2013, 06, 20, 0, 0, 0, 0, TimeZone.UTC)),
-    s_act365.getDayCountFraction(valuationDate, ZonedDateTime.of(2015, 06, 20, 0, 0, 0, 0, TimeZone.UTC)),
-    s_act365.getDayCountFraction(valuationDate, ZonedDateTime.of(2018, 06, 20, 0, 0, 0, 0, TimeZone.UTC))
+      0.0,
+      s_act365.getDayCountFraction(valuationDate, ZonedDateTime.of(2013, 06, 20, 0, 0, 0, 0, TimeZone.UTC)),
+      s_act365.getDayCountFraction(valuationDate, ZonedDateTime.of(2015, 06, 20, 0, 0, 0, 0, TimeZone.UTC)),
+      s_act365.getDayCountFraction(valuationDate, ZonedDateTime.of(2018, 06, 20, 0, 0, 0, 0, TimeZone.UTC))
   };
 
   static double[] hazardRates = {
-    (new PeriodicInterestRate(0.09709857471184660000, 1)).toContinuous().getRate(),
-    (new PeriodicInterestRate(0.09709857471184660000, 1)).toContinuous().getRate(),
-    (new PeriodicInterestRate(0.09705141266558010000, 1)).toContinuous().getRate(),
-    (new PeriodicInterestRate(0.09701141671498870000, 1)).toContinuous().getRate()
+      (new PeriodicInterestRate(0.09709857471184660000, 1)).toContinuous().getRate(),
+      (new PeriodicInterestRate(0.09709857471184660000, 1)).toContinuous().getRate(),
+      (new PeriodicInterestRate(0.09705141266558010000, 1)).toContinuous().getRate(),
+      (new PeriodicInterestRate(0.09701141671498870000, 1)).toContinuous().getRate()
   };
 
   // Build the hazard rate curve object (No offset - survival probability = 1 on valuationDate)
@@ -439,6 +438,64 @@ public class CS01LegacyCreditDefaultSwapTest {
     marketSpreads[5] = flatSpread;
     marketSpreads[6] = flatSpread;
     marketSpreads[7] = flatSpread;
+
+    // -------------------------------------------------------------------------------------
+
+    // Create a CS01 calculator object
+    final CS01LegacyCreditDefaultSwap cs01 = new CS01LegacyCreditDefaultSwap();
+
+    // Compute the CS01 for a parallel shift
+    final double parallelCS01 = cs01.getCS01ParallelShiftCreditDefaultSwap(valuationDate, cds, yieldCurve, tenors, marketSpreads, spreadBump, spreadBumpType, priceType);
+
+    // -------------------------------------------------------------------------------------
+
+    if (outputResults) {
+      System.out.println("CDS CS01 = " + parallelCS01);
+    }
+
+    // -------------------------------------------------------------------------------------
+  }
+
+  // -----------------------------------------------------------------------------------------------
+
+  @Test
+  public void testCS01CalculationParallelShiftThreeTenors() {
+
+    // -------------------------------------------------------------------------------------
+
+    if (outputResults) {
+      System.out.println("Running parallel CS01 calculation test (3 tenors) ...");
+    }
+
+    // -------------------------------------------------------------------------------------
+
+    // Define the market data to calibrate to
+
+    // The type of spread bump to apply
+    final SpreadBumpType spreadBumpType = SpreadBumpType.ADDITIVE_PARALLEL;
+
+    // The number of CDS instruments used to calibrate against
+    final int numberOfCalibrationCDS = 3;
+
+    // The flat (unbumped) spread
+    final double flatSpread = 550.0;
+
+    // The magnitude (but not direction) of bump to apply (in bps)
+    final double spreadBump = 1.0;
+
+    // The CDS tenors to calibrate to
+    final ZonedDateTime[] tenors = new ZonedDateTime[numberOfCalibrationCDS];
+
+    tenors[0] = DateUtils.getUTCDate(2013, 6, 20);
+    tenors[1] = DateUtils.getUTCDate(2015, 6, 20);
+    tenors[2] = DateUtils.getUTCDate(2018, 6, 20);
+
+    // The market observed par CDS spreads at these tenors
+    final double[] marketSpreads = new double[numberOfCalibrationCDS];
+
+    marketSpreads[0] = flatSpread;
+    marketSpreads[1] = flatSpread;
+    marketSpreads[2] = flatSpread;
 
     // -------------------------------------------------------------------------------------
 

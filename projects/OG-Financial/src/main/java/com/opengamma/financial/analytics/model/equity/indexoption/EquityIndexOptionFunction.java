@@ -116,7 +116,8 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
     final ValueRequirement desiredValue = desiredValues.iterator().next();
 
     // a. The Spot Index
-    final Object spotObject = inputs.getValue(getSpotRequirement(underlyingId));
+    final HistoricalTimeSeriesSource tsSource = OpenGammaExecutionContext.getHistoricalTimeSeriesSource(executionContext);
+    final Object spotObject = inputs.getValue(getSpotRequirement(underlyingId, tsSource));
     if (spotObject == null) {
       throw new OpenGammaRuntimeException("Could not get Underlying's Spot value");
     }
@@ -125,19 +126,19 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
     // b. The Funding Curve
     final String fundingCurveName = desiredValue.getConstraint(ValuePropertyNames.CURVE);
     final String curveConfigName = desiredValue.getConstraint(ValuePropertyNames.CURVE_CALCULATION_CONFIG);
-    final Object fundingObject = inputs.getValue(getDiscountCurveRequirement(fundingCurveName, curveConfigName, security));
-    if (fundingObject == null) {
-      throw new OpenGammaRuntimeException("Could not get Funding Curve");
+    final Object discountingObject = inputs.getValue(getDiscountCurveRequirement(fundingCurveName, curveConfigName, security));
+    if (discountingObject == null) {
+      throw new OpenGammaRuntimeException("Could not get discounting Curve");
     }
-    if (!(fundingObject instanceof YieldCurve)) { //TODO: make it more generic
+    if (!(discountingObject instanceof YieldCurve)) { //TODO: make it more generic
       throw new IllegalArgumentException("Can only handle YieldCurve");
     }
-    final YieldCurve fundingCurve = (YieldCurve) fundingObject;
+    final YieldCurve discountingCurve = (YieldCurve) discountingObject;
 
     // c. The Vol Surface
     final String volSurfaceName = desiredValue.getConstraint(ValuePropertyNames.SURFACE);
     final String smileInterpolator = desiredValue.getConstraint(BlackVolatilitySurfacePropertyNamesAndValues.PROPERTY_SMILE_INTERPOLATOR);
-    final Object volSurfaceObject = inputs.getValue(getVolatilitySurfaceRequirement(OpenGammaExecutionContext.getHistoricalTimeSeriesSource(executionContext), security, volSurfaceName,
+    final Object volSurfaceObject = inputs.getValue(getVolatilitySurfaceRequirement(tsSource, security, volSurfaceName,
         smileInterpolator, curveConfigName, fundingCurveName, underlyingId));
     if (volSurfaceObject == null || !(volSurfaceObject instanceof BlackVolatilitySurface)) {
       throw new OpenGammaRuntimeException("Could not get Volatility Surface");
@@ -149,10 +150,10 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
     if (blackVolSurf instanceof BlackVolatilitySurfaceMoneyness) { // Use forwards tied to vols if available
       forwardCurve = ((BlackVolatilitySurfaceMoneyness) blackVolSurf).getForwardCurve();
     } else {
-      forwardCurve = new ForwardCurve(spot, fundingCurve.getCurve()); // else build from spot and funding curve
+      forwardCurve = new ForwardCurve(spot, discountingCurve.getCurve()); // else build from spot and funding curve
     }
 
-    final StaticReplicationDataBundle market = new StaticReplicationDataBundle(blackVolSurf, fundingCurve, forwardCurve);
+    final StaticReplicationDataBundle market = new StaticReplicationDataBundle(blackVolSurf, discountingCurve, forwardCurve);
     return market;
   }
 
@@ -187,12 +188,12 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
         .with(ValuePropertyNames.CURRENCY, FinancialSecurityUtils.getCurrency(target.getSecurity()).getCode());
   }
 
-  protected ValueProperties.Builder createValueProperties(final ComputationTarget target, ValueRequirement desiredValue, FunctionExecutionContext executionContext) {
+  protected ValueProperties.Builder createValueProperties(final ComputationTarget target, final ValueRequirement desiredValue, final FunctionExecutionContext executionContext) {
     final String fundingCurveName = getFundingCurveName(desiredValue);
     final String curveConfigName = getCurveConfigName(desiredValue);
     final String volSurfaceName = desiredValue.getConstraint(ValuePropertyNames.SURFACE);
     final String smileInterpolatorName = desiredValue.getConstraint(BlackVolatilitySurfacePropertyNamesAndValues.PROPERTY_SMILE_INTERPOLATOR);
-    ValueProperties.Builder builder = createValueProperties()
+    final ValueProperties.Builder builder = createValueProperties()
         .with(ValuePropertyNames.CALCULATION_METHOD, FXOptionBlackFunction.BLACK_METHOD)
         .with(ValuePropertyNames.CURVE, fundingCurveName)
         .with(ValuePropertyNames.CURVE_CALCULATION_CONFIG, curveConfigName)
@@ -202,7 +203,7 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
     return builder;
   }
 
-  protected String getFundingCurveName(ValueRequirement desiredValue) {
+  protected String getFundingCurveName(final ValueRequirement desiredValue) {
     final Set<String> fundingCurves = desiredValue.getConstraints().getValues(ValuePropertyNames.CURVE);
     if (fundingCurves == null || fundingCurves.size() != 1) {
       s_logger.info("Could not find {} requirement. Looking for a default..", ValuePropertyNames.CURVE);
@@ -212,7 +213,7 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
     return fundingCurveName;
   }
 
-  protected String getCurveConfigName(ValueRequirement desiredValue) {
+  protected String getCurveConfigName(final ValueRequirement desiredValue) {
     final Set<String> curveConfigNames = desiredValue.getConstraints().getValues(ValuePropertyNames.CURVE_CALCULATION_CONFIG);
     if (curveConfigNames == null || curveConfigNames.size() != 1) {
       s_logger.info("Could not find {} requirement. Looking for a default..", ValuePropertyNames.CURVE_CALCULATION_CONFIG);
@@ -222,8 +223,8 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
     return curveConfigName;
   }
 
-  protected ValueRequirement getDiscountCurveRequirement(String fundingCurveName, String curveCalculationConfigName, Security security) {
-    ValueProperties properties = ValueProperties.builder()
+  protected ValueRequirement getDiscountCurveRequirement(final String fundingCurveName, final String curveCalculationConfigName, final Security security) {
+    final ValueProperties properties = ValueProperties.builder()
       .with(ValuePropertyNames.CURVE, fundingCurveName)
       .with(ValuePropertyNames.CURVE_CALCULATION_CONFIG, curveCalculationConfigName)
       .get();
@@ -231,10 +232,6 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
   }
 
   @Override
-  /**
-   * Get the set of ValueRequirements
-   * If null, engine will attempt to find a default, and call function again
-   */
   public Set<ValueRequirement> getRequirements(final FunctionCompilationContext context, final ComputationTarget target, final ValueRequirement desiredValue) {
 
     final ValueProperties constraints = desiredValue.getConstraints();
@@ -249,8 +246,12 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
       throw new OpenGammaRuntimeException("EquityIndexOptionFunction does not handle this security type: " + security.getSecurityType());
     }
 
+    // TODO: REVIEW THIS - TimeSeriesSource, used to get Ticker, the Vol ComputationTarget, from ExternalIdBundle
+    // We are now also using the ticker for the Spot / Market_Value Requirement
+    final HistoricalTimeSeriesSource tsSource = OpenGammaCompilationContext.getHistoricalTimeSeriesSource(context);
+    
     // 1. Spot Index Requirement
-    final ValueRequirement spotReq = getSpotRequirement(underlyingId);
+    final ValueRequirement spotReq = getSpotRequirement(underlyingId, tsSource);
 
     // 2. Funding Curve Requirement
     // Funding curve
@@ -279,20 +280,18 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
       return null;
     }
     final String smileInterpolator = interpolators.iterator().next();
-    // TODO: REVIEW THIS - TimeSeriesSource, used to get Ticker, the Vol ComputationTarget, from ExternalIdBundle
-    final ValueRequirement volReq = getVolatilitySurfaceRequirement(OpenGammaCompilationContext.getHistoricalTimeSeriesSource(context), security,
-        volSurfaceName, smileInterpolator, curveConfigName, fundingCurveName, underlyingId);
 
+    final ValueRequirement volReq = getVolatilitySurfaceRequirement(tsSource, security, volSurfaceName, smileInterpolator, curveConfigName, fundingCurveName, underlyingId);
     // Return the set
-    return Sets.newHashSet(spotReq, fundingReq, volReq);
+    return Sets.newHashSet(fundingReq, spotReq, volReq);
   }
 
   // TODO: One should not be required to pass the FundingCurve and CurveConfig names, so that the VolatilitySurface can build an EquityForwardCurve
   protected ValueRequirement getVolatilitySurfaceRequirement(final HistoricalTimeSeriesSource tsSource, final Security security,
       final String surfaceName, final String smileInterpolator, final String curveConfig, final String fundingCurveName, final ExternalId underlyingBuid) {
     // Targets for equity vol surfaces are the underlying tickers
-    String bbgTicker = getBloombergTicker(tsSource, underlyingBuid);
-    final UniqueId newId = UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName(), bbgTicker);
+    final String bbgTicker = getBloombergTicker(tsSource, underlyingBuid);
+    final UniqueId newId = UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName(), bbgTicker); // FIXME: WEAK Tickers mean stale data. Also, this should NOT be hardcoded
 
     // Set Forward Curve Currency Property
     final String curveCurrency = FinancialSecurityUtils.getCurrency(security).toString();
@@ -315,20 +314,23 @@ public abstract class EquityIndexOptionFunction extends AbstractFunction.NonComp
   protected String getBloombergTicker(final HistoricalTimeSeriesSource tsSource, final ExternalId underlyingBuid) {
     if (tsSource == null || underlyingBuid == null) {
       throw new OpenGammaRuntimeException("Unable to find option underlyer's ticker from the ExternalIdBundle");
-    } else {
-      final HistoricalTimeSeries historicalTimeSeries = tsSource.getHistoricalTimeSeries("PX_LAST", ExternalIdBundle.of(underlyingBuid), null, null, true, null, true, 1);
-      if (historicalTimeSeries == null) {
-        throw new OpenGammaRuntimeException("We require a time series for " + underlyingBuid);
-      }
-      final ExternalIdBundle idBundle = tsSource.getExternalIdBundle(historicalTimeSeries.getUniqueId());
-      String bbgTicker = (idBundle.getExternalId(ExternalSchemes.BLOOMBERG_TICKER)).getValue();
-      return bbgTicker;
     }
+    final HistoricalTimeSeries historicalTimeSeries = tsSource.getHistoricalTimeSeries("PX_LAST", ExternalIdBundle.of(underlyingBuid), null, null, true, null, true, 1);
+    if (historicalTimeSeries == null) {
+      throw new OpenGammaRuntimeException("We require a time series for " + underlyingBuid);
+    }
+    final ExternalIdBundle idBundle = tsSource.getExternalIdBundle(historicalTimeSeries.getUniqueId());
+    final String bbgTicker = (idBundle.getExternalId(ExternalSchemes.BLOOMBERG_TICKER)).getValue();
+    return bbgTicker;
   }
 
-  protected ValueRequirement getSpotRequirement(final ExternalId underlyingId) {
-    return new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, ComputationTargetType.PRIMITIVE, UniqueId.of(underlyingId.getScheme().getName(), underlyingId.getValue()));
-    // Alternatively, as in EquityFuturesFunction: ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, security.getUnderlyingId());
+  protected ValueRequirement getSpotRequirement(final ExternalId underlyingId, final HistoricalTimeSeriesSource tsSource) {
+    final String bbgTicker = getBloombergTicker(tsSource, underlyingId);
+//    final UniqueId newId = UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK.getName(), bbgTicker);  // FIXME: Using WEAK Ticker gives stale data,
+    final UniqueId newId = UniqueId.of(ExternalSchemes.BLOOMBERG_TICKER.getName(), bbgTicker); //FIXME: NOT using WEAK Ticker means the spot may be out of line with VolSurface
+    return new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, newId);
+    // return new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, ComputationTargetType.PRIMITIVE, UniqueId.of(underlyingId.getScheme().getName(), underlyingId.getValue()));
+    
   }
 
   protected final String getValueRequirementName() {

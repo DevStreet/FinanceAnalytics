@@ -7,7 +7,7 @@ package com.opengamma.analytics.financial.credit.marketdatachecker;
 
 import javax.time.calendar.ZonedDateTime;
 
-import com.opengamma.analytics.financial.credit.creditdefaultswap.definition.LegacyCreditDefaultSwapDefinition;
+import com.opengamma.analytics.financial.credit.creditdefaultswap.definition.legacy.LegacyCreditDefaultSwapDefinition;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -15,15 +15,15 @@ import com.opengamma.util.ArgumentChecker;
  */
 public class SpreadTermStructureDataChecker {
 
-  // -------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------------------------------------------------
 
   private final double _tolerance = 1e-15;
 
-  // -------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------------------------------------------------
 
   // TODO : Check that no two tenors are identical
 
-  // -------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------------------------------------------------
 
   public void checkSpreadData(final ZonedDateTime valuationDate, final LegacyCreditDefaultSwapDefinition cds, final ZonedDateTime[] marketTenors, final double[] marketSpreads) {
 
@@ -45,6 +45,5 @@ public class SpreadTermStructureDataChecker {
 
   }
 
-  // -------------------------------------------------------------------------------------------------
-
+  // ----------------------------------------------------------------------------------------------------------------------------------------
 }

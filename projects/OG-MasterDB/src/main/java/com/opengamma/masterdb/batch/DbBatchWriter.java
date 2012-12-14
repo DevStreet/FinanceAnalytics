@@ -29,6 +29,7 @@ import javax.time.Instant;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -71,6 +72,7 @@ import com.opengamma.engine.value.ComputedValueResult;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
+import com.opengamma.engine.view.ExecutionLogWithContext;
 import com.opengamma.engine.view.ViewCalculationResultModel;
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewResultEntry;
@@ -877,7 +879,7 @@ public class DbBatchWriter extends AbstractDbMaster {
            */
           public Boolean execute(ComputedValueResult result) {
             if (result.getInvocationResult() != InvocationResult.SUCCESS) {
-              s_logger.error("The calculation of {} has failed, {}:{} ", newArray(result.getSpecification(), result.getInvocationResult(), result.getExecutionLog().getExceptionMessage()));
+              s_logger.error("The calculation of {} has failed, {}:{} ", newArray(result.getSpecification(), result.getInvocationResult(), result.getAggregatedExecutionLog()));
               return true;
             } else {
               Object value = result.getValue();
@@ -1260,11 +1262,11 @@ public class DbBatchWriter extends AbstractDbMaster {
       throw new IllegalArgumentException("Please give a failed item");
     }
 
-    ComputeFailureKey computeFailureKey = new ComputeFailureKey(
-      item.getComputedValue().getSpecification().getFunctionUniqueId(),
-      item.getComputedValue().getExecutionLog().getExceptionClass(),
-      item.getComputedValue().getExecutionLog().getExceptionMessage(),
-      item.getComputedValue().getExecutionLog().getExceptionStackTrace());
+    ExecutionLogWithContext rootLog = item.getComputedValue().getAggregatedExecutionLog().getRootLog();
+    String exceptionClass = rootLog != null ? rootLog.getExecutionLog().getExceptionClass() : null;
+    String exceptionMessage = rootLog != null ? rootLog.getExecutionLog().getExceptionMessage() : null;
+    String exceptionStackTrace = rootLog != null ? rootLog.getExecutionLog().getExceptionStackTrace() : null;
+    ComputeFailureKey computeFailureKey = new ComputeFailureKey(item.getComputedValue().getSpecification().getFunctionUniqueId(), exceptionClass, exceptionMessage, exceptionStackTrace);
     return getComputeFailureFromDb(computeFailureCache, computeFailureKey);
   }
 

@@ -662,14 +662,20 @@ $.register_module({
                             },
                             put: function (config) {
                                 config = config || {};
-                                var promise = new Promise, root = this.root, method = root.split('/'), data = {}, meta;
+                                var promise = new Promise, root = this.root, method = root.split('/'), data = {}, meta,
+                                    fields = ['cells', 'rows', 'cols', 'format', 'log'],
+                                    api_fields = ['cells', 'rows', 'columns', 'format', 'enableLogging'];
                                 meta = check({
                                     bundle: {method: root + '#put', config: config},
-                                    required: [{all_of: ['view_id', 'graph_id', 'rows', 'columns', 'format']}]
+                                    required: [
+                                        {all_of: ['view_id', 'graph_id', 'format']},
+                                        {either: ['rows', 'cols'], or: ['cells']}
+                                    ]
                                 });
                                 meta.type = 'POST';
-                                ['rows', 'columns', 'format'].forEach(function (key) {data[key] = config[key];});
+                                fields.forEach(function (key, idx) {data[api_fields[idx]] = config[key];});
                                 data['clientId'] = api.id;
+                                data['enableLogging'] = !!data['enableLogging'];
                                 data.version = promise.id;
                                 method[1] = config.view_id;
                                 method[2] = config.grid_type;
@@ -728,14 +734,20 @@ $.register_module({
                         },
                         put: function (config) {
                             config = config || {};
-                            var promise = new Promise, root = this.root, method = root.split('/'), data = {}, meta;
+                            var promise = new Promise, root = this.root, method = root.split('/'), data = {}, meta,
+                                fields = ['cells', 'rows', 'cols', 'format', 'log'],
+                                api_fields = ['cells', 'rows', 'columns', 'format', 'enableLogging'];
                             meta = check({
                                 bundle: {method: root + '#put', config: config},
-                                required: [{all_of: ['view_id', 'rows', 'columns', 'format']}]
+                                required: [
+                                    {all_of: ['view_id', 'format']},
+                                    {either: ['rows', 'cols'], or: ['cells']}
+                                ]
                             });
                             meta.type = 'POST';
-                            ['rows', 'columns', 'format'].forEach(function (key) {data[key] = config[key];});
+                            fields.forEach(function (key, idx) {data[api_fields[idx]] = config[key];});
                             data['clientId'] = api.id;
+                            data['enableLogging'] = !!data['enableLogging'];
                             data.version = promise.id;
                             method[1] = config.view_id;
                             method[2] = config.grid_type;
