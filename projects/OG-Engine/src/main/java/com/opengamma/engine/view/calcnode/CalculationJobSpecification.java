@@ -25,7 +25,8 @@ public final class CalculationJobSpecification {
    */
   private final UniqueId _viewCycleId;
   /**
-   * The calculation configuration name, unique within a given cycle identifier. This combined with the cycle identifier uniquely identifies the cache being used for the job.
+   * The calculation configuration name, unique within a given cycle identifier. This combined with the cycle
+   * identifier uniquely identifies the cache being used for the job.
    */
   private final String _calcConfigName;
   /**
@@ -37,7 +38,8 @@ public final class CalculationJobSpecification {
    */
   private final long _jobId;
   
-  public CalculationJobSpecification(final UniqueId viewCycleId, final String calcConfigName, final Instant valuationTime, final long jobId) {
+  public CalculationJobSpecification(final UniqueId viewCycleId, final String calcConfigName,
+                                     final Instant valuationTime, final long jobId) {
     // TODO kirk 2009-09-25 -- Check Inputs
     _viewCycleId = viewCycleId;
     _calcConfigName = calcConfigName;

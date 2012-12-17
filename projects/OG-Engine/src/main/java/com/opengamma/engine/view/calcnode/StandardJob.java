@@ -80,21 +80,23 @@ import com.opengamma.util.tuple.Triple;
   }
 
   /**
-   * Change the cache hints on a job. Tail jobs run on the same node as their parent but if we split them into discreet jobs any values previously produced by their parents into the private cache must
-   * now go into the shared cache.
+   * Change the cache hints on a job. Tail jobs run on the same node as their parent but if we split them into discreet
+   * jobs any values previously produced by their parents into the private cache must now go into the shared cache.
    * 
    * @param job the job to process, not null
    * @param the adjusted job, not null
    */
   /* package */static CalculationJob adjustCacheHints(final CalculationJob job,
-      final Map<ValueSpecification, Triple<CalculationJob, ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>>> outputs) {
+      final Map<ValueSpecification, Triple<CalculationJob, ? extends Set<ValueSpecification>,
+          ? extends Set<ValueSpecification>>> outputs) {
     // (job, private, public)
-    final Triple<CalculationJob, ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>> jobValues = Triple
-        .of(job, new HashSet<ValueSpecification>(), new HashSet<ValueSpecification>());
+    final Triple<CalculationJob, ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>> jobValues =
+        Triple.of(job, new HashSet<ValueSpecification>(), new HashSet<ValueSpecification>());
     final CacheSelectHint hint = job.getCacheSelectHint();
     for (CalculationJobItem item : job.getJobItems()) {
       for (ValueSpecification input : item.getInputs()) {
-        final Triple<CalculationJob, ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>> producer = outputs.get(input);
+        final Triple<CalculationJob, ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>> producer =
+            outputs.get(input);
         if (producer == null) {
           // Input produced by a previous job, so must be in the shared cache
           assert !hint.isPrivateValue(input);
@@ -139,7 +141,8 @@ import com.opengamma.util.tuple.Triple;
     }
     s_logger.debug("Rewriting {} to {}", hint, newHint);
     // Construct the rewritten job
-    final CalculationJob newJob = new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(), job.getRequiredJobIds(), job.getJobItems(), newHint);
+    final CalculationJob newJob = new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(),
+        job.getRequiredJobIds(), job.getJobItems(), newHint);
     if (newTail != null) {
       for (CalculationJob tail : newTail) {
         newJob.addTail(tail);
@@ -149,7 +152,8 @@ import com.opengamma.util.tuple.Triple;
   }
 
   /**
-   * A watched job instance that corresponds to one of the original jobs. The job may have a tail. When it completes, new watched job instances will be submitted for each tail job.
+   * A watched job instance that corresponds to one of the original jobs. The job may have a tail. When it completes,
+   * new watched job instances will be submitted for each tail job.
    */
   /* package */static final class WholeWatchedJob extends WatchedJob implements JobResultReceiver {
 
@@ -233,7 +237,8 @@ import com.opengamma.util.tuple.Triple;
     private final Collection<CalculationJob> _tail;
 
     private WholeWatchedJob(final DispatchableJob creator, final CalculationJob job, final Context context) {
-      super(creator, new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(), null, job.getJobItems(), job.getCacheSelectHint()));
+      super(creator, new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(), null,
+          job.getJobItems(), job.getCacheSelectHint()));
       _context = context;
       _tail = job.getTail();
       context.declareJobPending(job.getSpecification().getJobId());
@@ -308,9 +313,10 @@ import com.opengamma.util.tuple.Triple;
           }
       }
     } else {
-      // Rewrite the private/shared caching information and submit a watched job for the root. Any tail jobs will be submitted after their
-      // parent jobs complete
-      final CalculationJob job = adjustCacheHints(getJob(), new HashMap<ValueSpecification, Triple<CalculationJob, ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>>>());
+      // Rewrite the private/shared caching information and submit a watched job for the root. Any tail jobs will be
+      // submitted after their parent jobs complete
+      final CalculationJob job = adjustCacheHints(getJob(), new HashMap<ValueSpecification, Triple<CalculationJob,
+          ? extends Set<ValueSpecification>, ? extends Set<ValueSpecification>>>());
       s_logger.debug("Submitting adjusted watched job for {}", this);
       return createWholeWatchedJob(job);
     }

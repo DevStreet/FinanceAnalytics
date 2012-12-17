@@ -63,7 +63,8 @@ import com.opengamma.engine.view.calc.JobIdSource;
   }
 
   /**
-   * A job result receiver that will dispatch a second job on the first notification and report the merged results to an underlying receiver on the second notification.
+   * A job result receiver that will dispatch a second job on the first notification and report the merged results to
+   * an underlying receiver on the second notification.
    */
   private static final class HalfJobResultReceiver implements JobResultReceiver {
 
@@ -78,7 +79,8 @@ import com.opengamma.engine.view.calc.JobIdSource;
       _next = new Whole(creator, next, this);
     }
 
-    private void resultReceived(final CalculationJobSpecification spec, final long duration, final Set<String> nodeIds, final List<CalculationJobResultItem> items) {
+    private void resultReceived(final CalculationJobSpecification spec, final long duration, final Set<String> nodeIds,
+                                final List<CalculationJobResultItem> items) {
       final DispatchableJob next = _next;
       if (next != null) {
         // First half received -- store results and submit the second half
@@ -114,22 +116,26 @@ import com.opengamma.engine.view.calc.JobIdSource;
 
     @Override
     public void resultReceived(final CalculationJobResult result) {
-      resultReceived(result.getSpecification(), result.getDuration(), Collections.singleton(result.getComputeNodeId()), result.getResultItems());
+      resultReceived(result.getSpecification(), result.getDuration(), Collections.singleton(result.getComputeNodeId()),
+          result.getResultItems());
     }
 
   }
 
   /**
-   * A watched job that is composed of two sequential calculation jobs created by splitting the original. This object manages the first of the jobs. If that fails it will be split. When that job (or
-   * it's split form) completes the second job will be submitted using. This behavior is implemented using a new instance of {@link Whole} and the {@HalfJobResultReceiver} to
-   * manage the merging of results and submission of the second to allow the original job object to be garbage collected at the first opportunity.
+   * A watched job that is composed of two sequential calculation jobs created by splitting the original. This object
+   * manages the first of the jobs. If that fails it will be split. When that job (or it's split form) completes the
+   * second job will be submitted using. This behavior is implemented using a new instance of {@link Whole} and the
+   * {@HalfJobResultReceiver} to manage the merging of results and submission of the second to allow the original job
+   * object to be garbage collected at the first opportunity.
    */
   private static final class Split extends WatchedJob {
 
     private final CalculationJob _next;
     private final JobResultReceiver _receiver;
 
-    private Split(final DispatchableJob creator, final CalculationJob first, final CalculationJob second, final JobResultReceiver receiver) {
+    private Split(final DispatchableJob creator, final CalculationJob first, final CalculationJob second,
+                  final JobResultReceiver receiver) {
       super(creator, first);
       _next = second;
       _receiver = receiver;
@@ -143,9 +149,10 @@ import com.opengamma.engine.view.calc.JobIdSource;
   }
 
   /**
-   * Split a job into two that can be executed sequentially. Any values that are produced in the first but needed in the second and previously considered "private" will be "shared" in the new jobs.
-   * The job identifier of the second will be the same as the original job so that any of its tails will recognize its completion as before. The first will receive a new job identifier from
-   * JobIdSource.
+   * Split a job into two that can be executed sequentially. Any values that are produced in the first but needed in
+   * the second and previously considered "private" will be "shared" in the new jobs. The job identifier of the second
+   * will be the same as the original job so that any of its tails will recognize its completion as before. The first
+   * will receive a new job identifier from JobIdSource.
    * 
    * @param creator the source job, not null
    * @param job the job to split, not null and with at least 2 items
@@ -212,7 +219,8 @@ import com.opengamma.engine.view.calc.JobIdSource;
     } else {
       headHint = CacheSelectHint.privateValues(headPrivate);
     }
-    final CalculationJob head = new CalculationJob(job.getSpecification().withJobId(JobIdSource.getId()), job.getFunctionInitializationIdentifier(), null, headItems, headHint);
+    final CalculationJob head = new CalculationJob(job.getSpecification().withJobId(JobIdSource.getId()),
+        job.getFunctionInitializationIdentifier(), null, headItems, headHint);
     // Construct the tail cache hint, job specification (using original ID) and job
     final CacheSelectHint tailHint;
     if (tailPrivate.size() > tailShared.size()) {
@@ -220,7 +228,8 @@ import com.opengamma.engine.view.calc.JobIdSource;
     } else {
       tailHint = CacheSelectHint.privateValues(tailPrivate);
     }
-    final CalculationJob tail = new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(), null, tailItems, tailHint);
+    final CalculationJob tail = new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(),
+        null, tailItems, tailHint);
     // Create the watched job
     return new Split(creator, head, tail, creator.getResultReceiver(null));
   }

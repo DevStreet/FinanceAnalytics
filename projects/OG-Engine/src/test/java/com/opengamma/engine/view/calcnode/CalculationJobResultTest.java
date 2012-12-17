@@ -37,12 +37,14 @@ public class CalculationJobResultTest {
   
   public void fudge() {
     IdentifierMap identifierMap = new InMemoryIdentifierMap ();
-    CalculationJobSpecification spec = new CalculationJobSpecification(UniqueId.of("Test", "ViewCycle"), "config", Instant.now(), 1L);
+    CalculationJobSpecification spec =
+        new CalculationJobSpecification(UniqueId.of("Test", "ViewCycle"), "config", Instant.now(), 1L);
     
     CalculationJobResultItem item1 = CalculationJobResultItem.success();
     
     MutableExecutionLog executionLog = new MutableExecutionLog(ExecutionLogMode.INDICATORS);
-    CalculationJobResultItem item2 = CalculationJobResultItemBuilder.of(executionLog).withException(new RuntimeException("failure!")).toResultItem();
+    CalculationJobResultItem item2 =
+        CalculationJobResultItemBuilder.of(executionLog).withException(new RuntimeException("failure!")).toResultItem();
     
     CalculationJobResult result = new CalculationJobResult(spec, 
         500, 

@@ -38,10 +38,11 @@ import com.opengamma.transport.FudgeMessageReceiver;
 import com.opengamma.transport.FudgeMessageSender;
 
 /**
- * Client end to RemoteNodeServer for registering one or more AbstractCalculationNodes with a remote job dispatcher. The connection must
- * deliver messages in network order (i.e. not use an executor service).
+ * Client end to RemoteNodeServer for registering one or more AbstractCalculationNodes with a remote job dispatcher.
+ * The connection must deliver messages in network order (i.e. not use an executor service).
  */
-public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer implements FudgeMessageReceiver, Lifecycle, FudgeConnectionStateListener {
+public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer
+    implements FudgeMessageReceiver, Lifecycle, FudgeConnectionStateListener {
 
   private static final Logger s_logger = LoggerFactory.getLogger(RemoteNodeClient.class);
 
@@ -110,8 +111,8 @@ public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer i
 
   };
 
-  public RemoteNodeClient(final FudgeConnection connection, final CompiledFunctionService functionCompilationService, final IdentifierMap identifierMap,
-      final FunctionInvocationStatisticsSender statistics) {
+  public RemoteNodeClient(final FudgeConnection connection, final CompiledFunctionService functionCompilationService,
+                          final IdentifierMap identifierMap, final FunctionInvocationStatisticsSender statistics) {
     _connection = connection;
     _functionCompilationService = functionCompilationService;
     _identifierMap = identifierMap;
@@ -126,14 +127,16 @@ public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer i
     }
   }
 
-  public RemoteNodeClient(final FudgeConnection connection, final CompiledFunctionService functionCompilationService, final IdentifierMap identifierMap,
-      final FunctionInvocationStatisticsSender statistics, final SimpleCalculationNode node) {
+  public RemoteNodeClient(final FudgeConnection connection, final CompiledFunctionService functionCompilationService,
+                          final IdentifierMap identifierMap, final FunctionInvocationStatisticsSender statistics,
+                          final SimpleCalculationNode node) {
     this(connection, functionCompilationService, identifierMap, statistics);
     setNode(node);
   }
 
-  public RemoteNodeClient(final FudgeConnection connection, final CompiledFunctionService functionCompilationService, final IdentifierMap identifierMap,
-      final FunctionInvocationStatisticsSender statistics, final Collection<SimpleCalculationNode> nodes) {
+  public RemoteNodeClient(final FudgeConnection connection, final CompiledFunctionService functionCompilationService,
+                          final IdentifierMap identifierMap, final FunctionInvocationStatisticsSender statistics,
+                          final Collection<SimpleCalculationNode> nodes) {
     this(connection, functionCompilationService, identifierMap, statistics);
     setNodes(nodes);
   }
@@ -172,7 +175,8 @@ public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer i
   private void sendMessage(final RemoteCalcNodeMessage message) {
     final FudgeMessageSender sender = getConnection().getFudgeMessageSender();
     final FudgeSerializer serializer = new FudgeSerializer(sender.getFudgeContext());
-    final FudgeMsg msg = FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(message), message.getClass(), RemoteCalcNodeMessage.class);
+    final FudgeMsg msg = FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(message), message.getClass(),
+        RemoteCalcNodeMessage.class);
     s_logger.debug("Sending message ({} fields) to {}", msg.getNumFields(), _connection);
     sender.send(msg);
   }

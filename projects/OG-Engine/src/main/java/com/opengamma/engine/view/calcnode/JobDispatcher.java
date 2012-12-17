@@ -41,7 +41,8 @@ public class JobDispatcher implements JobInvokerRegister {
   private final Map<JobInvoker, Collection<Capability>> _capabilityCache = new ConcurrentHashMap<JobInvoker, Collection<Capability>>();
 
   /**
-   * Maximum number of times a job will be submitted in its entirety to remote nodes before it gets partitioned to isolate an individual failure.
+   * Maximum number of times a job will be submitted in its entirety to remote nodes before it gets partitioned to
+   * isolate an individual failure.
    */
   private int _maxJobAttempts = DEFAULT_MAX_JOB_ATTEMPTS;
   private String _jobFailureNodeId = DEFAULT_JOB_FAILURE_NODE_ID;

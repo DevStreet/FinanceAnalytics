@@ -18,15 +18,20 @@ import com.opengamma.engine.view.ExecutionLogMode;
 import com.opengamma.util.async.Cancelable;
 
 /**
- * A job and all of its tails that can be dispatched to calculation nodes via an invoker. If the job fails (the local JobInvoker instance will make sure a failure is reported when loss of a remote
- * node is detected) it may be rescheduled. If the maximum number of reschedules is exceeded, or the job is failed on the same node twice, it becomes a "watched" job.
+ * A job and all of its tails that can be dispatched to calculation nodes via an invoker. If the job fails (the local
+ * JobInvoker instance will make sure a failure is reported when loss of a remote node is detected) it may be
+ * rescheduled. If the maximum number of reschedules is exceeded, or the job is failed on the same node twice, it
+ * becomes a "watched" job.
  * <p>
- * A watched job may not have a tail. If a job has a tail, the tails are extracted and rewritten, along with the root job, to use shared cache for values. The original job may then be resubmitted to
- * the dispatcher with a job result receiver that will submit the tail job(s) on original job completion. When those tails have complete the original result receiver will be notified.
+ * A watched job may not have a tail. If a job has a tail, the tails are extracted and rewritten, along with the root
+ * job, to use shared cache for values. The original job may then be resubmitted to the dispatcher with a job result
+ * receiver that will submit the tail job(s) on original job completion. When those tails have complete the original
+ * result receiver will be notified.
  * <p>
- * When a watched job fails, if it contains a single job item that item can be reported to a blacklist maintainer. If the job contains multiple items it is split into two parts, rewritten to use the
- * shared cache for values. The first will then be resubmitted with a job result receiver that will submit the second part of the job on first part completion. When the second part of the job
- * completed the original callback will be notified.
+ * When a watched job fails, if it contains a single job item that item can be reported to a blacklist maintainer.
+ * If the job contains multiple items it is split into two parts, rewritten to use the shared cache for values. The
+ * first will then be resubmitted with a job result receiver that will submit the second part of the job on first part
+ * completion. When the second part of the job completed the original callback will be notified.
  */
 /* package */abstract class DispatchableJob implements JobInvocationReceiver {
 
@@ -158,7 +163,8 @@ import com.opengamma.util.async.Cancelable;
     s_logger.info("Job {} completed on node {}", this, result.getComputeNodeId());
     resultReceiver.resultReceived(result);
     final long durationNanos = getDurationNanos();
-    s_logger.debug("Reported time = {}ms, non-executing job time = {}ms", (double) result.getDuration() / 1000000d, ((double) durationNanos - (double) result.getDuration()) / 1000000d);
+    s_logger.debug("Reported time = {}ms, non-executing job time = {}ms",
+        (double) result.getDuration() / 1000000d, ((double) durationNanos - (double) result.getDuration()) / 1000000d);
     if (getDispatcher().getStatisticsGatherer() != null) {
       final int size = result.getResultItems().size();
       getDispatcher().getStatisticsGatherer().jobCompleted(result.getComputeNodeId(), size, result.getDuration(), getDurationNanos());
@@ -197,13 +203,15 @@ import com.opengamma.util.async.Cancelable;
     }
   }
 
-  protected void notifyFailure(final CalculationJob job, final CalculationJobResultItem failure, final JobResultReceiver resultReceiver) {
+  protected void notifyFailure(final CalculationJob job, final CalculationJobResultItem failure,
+                               final JobResultReceiver resultReceiver) {
     final int size = job.getJobItems().size();
     final List<CalculationJobResultItem> failureItems = new ArrayList<CalculationJobResultItem>(size);
     for (int i = 0; i < size; i++) {
       failureItems.add(failure);
     }
-    final CalculationJobResult jobResult = new CalculationJobResult(job.getSpecification(), getDurationNanos(), failureItems, getDispatcher().getJobFailureNodeId());
+    final CalculationJobResult jobResult = new CalculationJobResult(job.getSpecification(), getDurationNanos(),
+        failureItems, getDispatcher().getJobFailureNodeId());
     resultReceiver.resultReceived(jobResult);
   }
 
@@ -240,10 +248,12 @@ import com.opengamma.util.async.Cancelable;
         return;
       } else {
         s_logger.warn("Invoker {} reports job {} failure", jobInvoker.getInvokerId(), this);
-        jobFailed(jobInvoker, "node on " + jobInvoker.getInvokerId(), new OpenGammaRuntimeException("Node reported failure at " + timeAccrued + "ms keepalive"));
+        jobFailed(jobInvoker, "node on " + jobInvoker.getInvokerId(),
+            new OpenGammaRuntimeException("Node reported failure at " + timeAccrued + "ms keepalive"));
       }
     } else {
-      jobFailed(jobInvoker, "node on " + jobInvoker.getInvokerId(), new OpenGammaRuntimeException("Invocation limit of " + getDispatcher().getMaxJobExecutionTime() + "ms exceeded"));
+      jobFailed(jobInvoker, "node on " + jobInvoker.getInvokerId(),
+          new OpenGammaRuntimeException("Invocation limit of " + getDispatcher().getMaxJobExecutionTime() + "ms exceeded"));
     }
   }
 

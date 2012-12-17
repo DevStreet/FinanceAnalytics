@@ -112,15 +112,16 @@ import com.opengamma.transport.FudgeMessageSender;
       if (message.getReady() != null) {
         message.getReady().accept(this);
       }
-      // We decrement the count (and re-register) before processing the data as the remote node is already available if it's sent us its data.
+      // We decrement the count (and re-register) before processing the data as the remote node is already available
+      // if it's sent us its data.
       final JobInfo job = getPendingJobs().remove(message.getJob());
       if (job == null) {
         s_logger.warn("Duplicate or failure for cancelled callback {} received", message.getJob());
         return;
       }
       if (_launched.addAndGet(job.getLaunchDelta()) < _capacity) {
-        // We check for below capacity. We can get "equal" here, but that means there is an invoke taking place which will be dealt with
-        // by the notifyWhenAvailable that gets called to reschedule the invoker
+        // We check for below capacity. We can get "equal" here, but that means there is an invoke taking place which
+        // will be dealt with by the notifyWhenAvailable that gets called to reschedule the invoker
         if (registerIfRequired(true)) {
           s_logger.debug("Notified dispatcher of capacity available");
         }
@@ -167,15 +168,16 @@ import com.opengamma.transport.FudgeMessageSender;
       if (message.getReady() != null) {
         message.getReady().accept(this);
       }
-      // We decrement the count (and re-register) before processing the data as the remote node is already available if it's sent us its data.
+      // We decrement the count (and re-register) before processing the data as the remote node is already available
+      // if it's sent us its data.
       final JobInfo job = getPendingJobs().remove(message.getResult().getSpecification());
       if (job == null) {
         s_logger.warn("Duplicate or result for cancelled callback {} received", message.getResult().getSpecification());
         return;
       }
       if (_launched.addAndGet(job.getLaunchDelta()) < _capacity) {
-        // We check for below capacity. We can get "equal" here, but that means there is an invoke taking place which will be dealt with
-        // by the notifyWhenAvailable that gets called to reschedule the invoker
+        // We check for below capacity. We can get "equal" here, but that means there is an invoke taking place
+        // which will be dealt with by the notifyWhenAvailable that gets called to reschedule the invoker
         if (registerIfRequired(true)) {
           s_logger.debug("Notified dispatcher of capacity available");
         }
@@ -247,10 +249,12 @@ import com.opengamma.transport.FudgeMessageSender;
 
   protected void sendMessage(final RemoteCalcNodeMessage message) {
     final FudgeSerializer serializer = new FudgeSerializer(getFudgeMessageSender().getFudgeContext());
-    getFudgeMessageSender().send(FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(message), message.getClass(), RemoteCalcNodeMessage.class));
+    getFudgeMessageSender().send(FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(message),
+        message.getClass(), RemoteCalcNodeMessage.class));
   }
 
-  private void jobFailed(final JobInvocationReceiver receiver, final CalculationJob job, final String nodeId, final Exception e) {
+  private void jobFailed(final JobInvocationReceiver receiver, final CalculationJob job,
+                         final String nodeId, final Exception e) {
     receiver.jobFailed(this, nodeId, e);
     if (job.getTail() == null) {
       if (job.getRequiredJobIds() == null) {
@@ -267,7 +271,8 @@ import com.opengamma.transport.FudgeMessageSender;
   }
 
   /**
-   * Replaces any blacklisted job items with no-op functions. This keeps the shape of the job the same and may allow continuation of dependent jobs that can operate on missing inputs.
+   * Replaces any blacklisted job items with no-op functions. This keeps the shape of the job the same and may allow
+   * continuation of dependent jobs that can operate on missing inputs.
    */
   /* package */static CalculationJob blacklist(final FunctionBlacklistQuery query, final CalculationJob job) {
     if (query.isEmpty()) {
@@ -295,7 +300,8 @@ import com.opengamma.transport.FudgeMessageSender;
             newItems.add(item);
           }
         }
-        return new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(), job.getRequiredJobIds(), newItems, job.getCacheSelectHint());
+        return new CalculationJob(job.getSpecification(), job.getFunctionInitializationIdentifier(),
+            job.getRequiredJobIds(), newItems, job.getCacheSelectHint());
       }
     }
     return job;
@@ -338,9 +344,9 @@ import com.opengamma.transport.FudgeMessageSender;
         } catch (Exception e) {
           s_logger.warn("Error sending job {}", rootJob.getSpecification().getJobId());
           jobFailed(receiver, rootJob, "node on " + getInvokerId(), e);
-          // Not knowing where the failure occurred, we may get an additional decrement if any of the jobs started completing. This may have
-          // broken the whole connection which will not be a problem. Otherwise We'll check, and adjust, for this when "Ready" messages
-          // arrive.
+          // Not knowing where the failure occurred, we may get an additional decrement if any of the jobs started
+          // completing. This may have broken the whole connection which will not be a problem. Otherwise We'll check,
+          // and adjust, for this when "Ready" messages arrive.
           if (_launched.decrementAndGet() < _capacity) {
             if (registerIfRequired(true)) {
               s_logger.debug("Notified dispatcher of capacity available");

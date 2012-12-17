@@ -83,8 +83,9 @@ public class RemoteNodeServer implements FudgeConnectionReceiver {
   }
 
   /**
-   * Implementation of {@link FunctionBlacklistMaintainerProvider} that updates a blacklist which is the host identifier prefixed with a fixed string. For example host "calc42" might use a blacklist
-   * called "REMOTE_NODE_calc42" if the bean is set with the default prefix of "REMOTE_NODE_".
+   * Implementation of {@link FunctionBlacklistMaintainerProvider} that updates a blacklist which is the host
+   * identifier prefixed with a fixed string. For example host "calc42" might use a blacklist called
+   * "REMOTE_NODE_calc42" if the bean is set with the default prefix of "REMOTE_NODE_".
    */
   public static class FunctionBlacklistMaintainerProviderBean implements FunctionBlacklistMaintainerProvider {
 
@@ -133,7 +134,8 @@ public class RemoteNodeServer implements FudgeConnectionReceiver {
   }
 
   /**
-   * Implementation of {@link FunctionBlacklistMaintainerProvider} that wraps multiple maintainers up to create a {@link MultipleFunctionBlacklistMaintainer} for the host.
+   * Implementation of {@link FunctionBlacklistMaintainerProvider} that wraps multiple maintainers up to create a
+   * {@link MultipleFunctionBlacklistMaintainer} for the host.
    */
   public static class MultipleFunctionBlacklistMaintainerProvider implements FunctionBlacklistMaintainerProvider {
 
@@ -195,8 +197,9 @@ public class RemoteNodeServer implements FudgeConnectionReceiver {
   }
 
   /**
-   * Implementation of {@link FunctionBlacklistQueryProvider} that queries a blacklist which is the host identifier prefixed with a fixed string. For example host "calc42" might use a blacklist called
-   * "REMOTE_NODE_calc42" if the bean is set with the default prefix of "REMOTE_NODE_".
+   * Implementation of {@link FunctionBlacklistQueryProvider} that queries a blacklist which is the host identifier
+   * prefixed with a fixed string. For example host "calc42" might use a blacklist called "REMOTE_NODE_calc42" if the
+   * bean is set with the default prefix of "REMOTE_NODE_".
    */
   public static class FunctionBlacklistQueryProviderBean implements FunctionBlacklistQueryProvider {
 
@@ -228,7 +231,8 @@ public class RemoteNodeServer implements FudgeConnectionReceiver {
   }
 
   /**
-   * Implementation of {@link FunctionBlacklistQueryProvider} that wraps multiple queries up to create a {@link MultipleFunctionBlacklistQuery} for the host.
+   * Implementation of {@link FunctionBlacklistQueryProvider} that wraps multiple queries up to create a
+   * {@link MultipleFunctionBlacklistQuery} for the host.
    */
   public static class MultipleFunctionBlacklistQueryProvider implements FunctionBlacklistQueryProvider {
 
@@ -366,9 +370,11 @@ public class RemoteNodeServer implements FudgeConnectionReceiver {
   }
 
   @Override
-  public void connectionReceived(final FudgeContext fudgeContext, final FudgeMsgEnvelope message, final FudgeConnection connection) {
+  public void connectionReceived(final FudgeContext fudgeContext, final FudgeMsgEnvelope message,
+                                 final FudgeConnection connection) {
     final FudgeDeserializer deserializer = new FudgeDeserializer(fudgeContext);
-    final RemoteCalcNodeMessage remoteCalcNodeMessage = deserializer.fudgeMsgToObject(RemoteCalcNodeMessage.class, message.getMessage());
+    final RemoteCalcNodeMessage remoteCalcNodeMessage = deserializer.fudgeMsgToObject(RemoteCalcNodeMessage.class,
+        message.getMessage());
     remoteCalcNodeMessage.accept(new RemoteCalcNodeMessageVisitor() {
 
       @Override
@@ -379,7 +385,8 @@ public class RemoteNodeServer implements FudgeConnectionReceiver {
       @Override
       protected void visitReadyMessage(final Ready message) {
         s_logger.info("Remote node {} connected - {}", message.getHostId(), connection);
-        final RemoteNodeJobInvoker invoker = new RemoteNodeJobInvoker(getExecutorService(), message, connection, getIdentifierMap(), getFunctionCosts(), getBlacklistQuery(message.getHostId()),
+        final RemoteNodeJobInvoker invoker = new RemoteNodeJobInvoker(getExecutorService(), message, connection,
+            getIdentifierMap(), getFunctionCosts(), getBlacklistQuery(message.getHostId()),
             getBlacklistUpdate(message.getHostId()));
         if (_capabilitiesToAdd != null) {
           invoker.addCapabilities(_capabilitiesToAdd);

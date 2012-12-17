@@ -42,7 +42,8 @@ public final class Capability implements Comparable<Capability> {
     return new Capability(identifier, null, upperBoundParameter);
   }
 
-  public static Capability boundedInstanceOf(final String identifier, final double lowerBoundParameter, final double upperBoundParameter) {
+  public static Capability boundedInstanceOf(final String identifier, final double lowerBoundParameter,
+                                             final double upperBoundParameter) {
     ArgumentChecker.isTrue(lowerBoundParameter <= upperBoundParameter, "lower bound must be less than upper bound");
     return new Capability(identifier, lowerBoundParameter, upperBoundParameter);
   }
@@ -84,12 +85,14 @@ public final class Capability implements Comparable<Capability> {
       return false;
     }
     final Capability other = (Capability) o;
-    return ObjectUtils.equals(getIdentifier(), other.getIdentifier()) && ObjectUtils.equals(getLowerBoundParameter(), other.getLowerBoundParameter())
+    return ObjectUtils.equals(getIdentifier(), other.getIdentifier())
+        && ObjectUtils.equals(getLowerBoundParameter(), other.getLowerBoundParameter())
         && ObjectUtils.equals(getUpperBoundParameter(), other.getUpperBoundParameter());
   }
 
   /**
-   * Capabilities are ordered by identifier, then by lower bound (with unbounded before bounded), then by upper bound (with bounded before unbounded).
+   * Capabilities are ordered by identifier, then by lower bound (with unbounded before bounded), then by upper bound
+   * (with bounded before unbounded).
    * 
    * @param o capability to compare to
    * @return result of the comparison

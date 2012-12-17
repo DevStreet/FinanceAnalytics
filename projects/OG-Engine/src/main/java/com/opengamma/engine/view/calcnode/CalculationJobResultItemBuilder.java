@@ -34,7 +34,8 @@ public final class CalculationJobResultItemBuilder {
   public CalculationJobResultItemBuilder withMissingInputs(Set<ValueSpecification> missingInputs) {
     ArgumentChecker.notNull(missingInputs, "missingInputs");
     _missingInputs = missingInputs;
-    withException(CalculationJobResultItem.MISSING_INPUTS_FAILURE_CLASS, "Unable to execute because of " + missingInputs.size() + " missing input(s)");
+    withException(CalculationJobResultItem.MISSING_INPUTS_FAILURE_CLASS, "Unable to execute because of " +
+        missingInputs.size() + " missing input(s)");
     return this;
   }
   
