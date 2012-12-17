@@ -58,11 +58,13 @@ import com.opengamma.util.time.DateUtils;
 import com.opengamma.util.tuple.Pair;
 
 /**
- * A calculation node implementation. The node can only be used by one thread - i.e. executeJob cannot be called concurrently to do multiple jobs. To execute multiple jobs concurrently separate
- * calculation nodes must be used.
+ * A calculation node implementation. The node can only be used by one thread - i.e. executeJob cannot be called
+ * concurrently to do multiple jobs. To execute multiple jobs concurrently separate calculation nodes must be used.
  * <p>
- * The function repository (and anything else) must be properly initialized and ready for use by the node when it receives its first job. Responsibility for initialization should therefore lie with
- * whatever will logically be dispatching jobs. This is typically a {@link ViewProcessor} for local nodes or a {@link RemoteNodeClient} for remote nodes.
+ * The function repository (and anything else) must be properly initialized and ready for use by the node when it
+ * receives its first job. Responsibility for initialization should therefore lie with whatever will logically be
+ * dispatching jobs. This is typically a {@link ViewProcessor} for local nodes or a {@link RemoteNodeClient} for
+ * remote nodes.
  */
 public class SimpleCalculationNode extends SimpleCalculationNodeState implements CalculationNode {
 
@@ -74,10 +76,12 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   private static int s_nodeUniqueID;
 
   /**
-   * The deferred caches for performing write-behind and late write completion (asynchronous flush) to the value cache. The map contains weak values so that entries can be cleared when the deferred
-   * cache is dead (i.e. no calculation node is currently using it and its writer is not running).
+   * The deferred caches for performing write-behind and late write completion (asynchronous flush) to the value
+   * cache. The map contains weak values so that entries can be cleared when the deferred cache is dead (i.e. no
+   * calculation node is currently using it and its writer is not running).
    */
-  private static final ConcurrentMap<ViewComputationCache, DeferredViewComputationCache> s_deferredCaches = new MapMaker().weakValues().makeMap();
+  private static final ConcurrentMap<ViewComputationCache, DeferredViewComputationCache> s_deferredCaches =
+      new MapMaker().weakValues().makeMap();
 
   private final ViewComputationCacheSource _cacheSource;
   private final CompiledFunctionService _functionCompilationService;
@@ -95,8 +99,9 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   private MaximumJobItemExecutionWatchdog _maxJobItemExecution = new MaximumJobItemExecutionWatchdog();
 
   public SimpleCalculationNode(ViewComputationCacheSource cacheSource, CompiledFunctionService functionCompilationService,
-      FunctionExecutionContext functionExecutionContext, ComputationTargetResolver targetResolver, ViewProcessorQuerySender calcNodeQuerySender, String nodeId,
-      ExecutorService executorService, FunctionInvocationStatisticsGatherer functionInvocationStatistics, CalculationNodeLogEventListener logListener) {
+      FunctionExecutionContext functionExecutionContext, ComputationTargetResolver targetResolver,
+      ViewProcessorQuerySender calcNodeQuerySender, String nodeId, ExecutorService executorService,
+      FunctionInvocationStatisticsGatherer functionInvocationStatistics, CalculationNodeLogEventListener logListener) {
     super(functionExecutionContext);
     ArgumentChecker.notNull(cacheSource, "cacheSource");
     ArgumentChecker.notNull(functionCompilationService, "functionCompilationService");
@@ -142,8 +147,10 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   /**
-   * Sets whether to use a write-behind strategy when writing to the shared value cache. Write-behind can work well if the cost of writing is high (e.g. network overhead). If the write is cheap (e.g.
-   * to an in-process, in-memory store) then the overheads of the write-behind become a burden. An executor service must be available if this is selected.
+   * Sets whether to use a write-behind strategy when writing to the shared value cache. Write-behind can work well
+   * if the cost of writing is high (e.g. network overhead). If the write is cheap (e.g. to an in-process, in-memory
+   * store) then the overheads of the write-behind become a burden. An executor service must be available if this is
+   * selected.
    * 
    * @param writeBehind true to use write-behind on the shared value cache, false not to
    */
@@ -157,8 +164,9 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   /**
-   * Sets whether to use a write-behind strategy when writing to the private value cache. Write-behind can work well if the cost of writing is high (e.g. disk overhead). If the write is cheap (e.g. to
-   * an in-process, in-memory store) then the overheads of the write-behind become a burden. An executor service must be available if this is selected.
+   * Sets whether to use a write-behind strategy when writing to the private value cache. Write-behind can work well
+   * if the cost of writing is high (e.g. disk overhead). If the write is cheap (e.g. to an in-process, in-memory store)
+   * then the overheads of the write-behind become a burden. An executor service must be available if this is selected.
    * 
    * @param writeBehind true to use write-behind on the private value cache, false not to
    */
@@ -193,7 +201,8 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   /**
-   * Sets a function blacklist to use for checking each job invocation. The blacklist(s) used may suppress particular functions on this node, the logical group of nodes or at all nodes.
+   * Sets a function blacklist to use for checking each job invocation. The blacklist(s) used may suppress particular
+   * functions on this node, the logical group of nodes or at all nodes.
    * 
    * @param query the blacklist to query against, not null
    */
@@ -212,8 +221,9 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   /**
-   * Sets a maintenance policy for updating one or more blacklist(s) when a job item throws an exception. The application of a policy at this point will depend on the nature of the function library.
-   * Issuing updates from the function's {@link FunctionInvoker} can allow more specific control over how a function failure should be reported.
+   * Sets a maintenance policy for updating one or more blacklist(s) when a job item throws an exception. The
+   * application of a policy at this point will depend on the nature of the function library. Issuing updates from the
+   * function's {@link FunctionInvoker} can allow more specific control over how a function failure should be reported.
    * 
    * @param update the maintainer to notify of a job item that threw an exception
    */
@@ -255,12 +265,14 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   //-------------------------------------------------------------------------
-  private CalculationJobResult executeJobResult(final List<CalculationJobResultItem> resultItems) throws AsynchronousExecution {
+  private CalculationJobResult executeJobResult(final List<CalculationJobResultItem> resultItems)
+    throws AsynchronousExecution {
     if (resultItems == null) {
       return null;
     }
     final long executionTime = System.nanoTime() - getExecutionStartTime();
-    final CalculationJobResult jobResult = new CalculationJobResult(getJob().getSpecification(), executionTime, resultItems, getNodeId());
+    final CalculationJobResult jobResult = new CalculationJobResult(getJob().getSpecification(), executionTime,
+                                                                    resultItems, getNodeId());
     s_logger.info("Executed {} in {}ns", getJob(), executionTime);
     try {
       getCache().flush();
@@ -283,15 +295,18 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   /**
-   * Invokes all of the items from a calculation job on this node. If asynchronous execution occurs, the {@link AsynchronousHandleExecution} will report a handle so that it can be resumed when the job
-   * next becomes runnable. If the write behind cache is being used then the {@link AsynchronousExecution} will contain the deferred completion job. This is to allow tail job executions on the local
-   * nodes to start immediately but block the central dispatcher until the cache has been flushed.
+   * Invokes all of the items from a calculation job on this node. If asynchronous execution occurs, the
+   * {@link AsynchronousHandleExecution} will report a handle so that it can be resumed when the job next becomes
+   * runnable. If the write behind cache is being used then the {@link AsynchronousExecution} will contain the deferred
+   * completion job. This is to allow tail job executions on the local nodes to start immediately but block the central
+   * dispatcher until the cache has been flushed.
    * 
    * @param job the job to execute
    * @return the job result
    * @throws AsynchronousHandleExecution if the job is completing asynchronously
    */
-  public CalculationJobResult executeJob(final CalculationJob job) throws AsynchronousHandleExecution, AsynchronousExecution {
+  public CalculationJobResult executeJob(final CalculationJob job)
+    throws AsynchronousHandleExecution, AsynchronousExecution {
     s_logger.info("Executing {} on {}", job, _nodeId);
     setJob(job);
     final CalculationJobSpecification spec = job.getSpecification();
@@ -311,7 +326,8 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
     return executeJobResult(jobItems);
   }
   
-  private CalculationJobResult executeJobAsyncResult(final AsynchronousHandleExecution ex) throws AsynchronousHandleExecution {
+  private CalculationJobResult executeJobAsyncResult(final AsynchronousHandleExecution ex)
+    throws AsynchronousHandleExecution {
     final AsynchronousHandleOperation<CalculationJobResult> async = new AsynchronousHandleOperation<CalculationJobResult>();
     ex.setResultHandleListener(new ResultListener<AsynchronousHandle<List<CalculationJobResultItem>>>() {
       @Override
@@ -347,13 +363,15 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
     getCache().putValues(results, getJob().getCacheSelectHint());
   }
 
-  private void invocationBlacklisted(final CalculationJobItem jobItem, final CalculationJobResultItemBuilder resultItemBuilder) {
+  private void invocationBlacklisted(final CalculationJobItem jobItem,
+                                     final CalculationJobResultItemBuilder resultItemBuilder) {
     final Set<ValueSpecification> outputs = jobItem.getOutputs();
     postEvaluationErrors(outputs, NotCalculatedSentinel.SUPPRESSED);
     resultItemBuilder.withSuppression();
   }
 
-  private void invocationFailure(final Throwable t, final CalculationJobItem jobItem, final CalculationJobResultItemBuilder resultItemBuilder) {
+  private void invocationFailure(final Throwable t, final CalculationJobItem jobItem,
+                                 final CalculationJobResultItemBuilder resultItemBuilder) {
     s_logger.error("Caught exception", t);
     getFunctionBlacklistUpdate().failedJobItem(jobItem);
     final Set<ValueSpecification> outputs = jobItem.getOutputs();
@@ -371,7 +389,9 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   //-------------------------------------------------------------------------
-  private List<CalculationJobResultItem> executeJobItems(final Iterator<CalculationJobItem> jobItemItr, final List<CalculationJobResultItem> resultItems) throws AsynchronousHandleExecution {
+  private List<CalculationJobResultItem> executeJobItems(final Iterator<CalculationJobItem> jobItemItr,
+                                                         final List<CalculationJobResultItem> resultItems)
+    throws AsynchronousHandleExecution {
     while (jobItemItr.hasNext()) {
       if (getJob().isCancelled()) {
         return null;
@@ -388,12 +408,14 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
           // Can only use this thread's logs during the synchronous attempt
           attachLog(executionLog);
           try {
-            invoke(jobItem, new DeferredInvocationStatistics(getFunctionInvocationStatistics(), getConfiguration()), resultItemBuilder);
+            invoke(jobItem, new DeferredInvocationStatistics(getFunctionInvocationStatistics(), getConfiguration()),
+                                                             resultItemBuilder);
           } finally {
             detachLog();
           }
         } catch (AsynchronousExecution e) {
-          final AsynchronousHandleOperation<List<CalculationJobResultItem>> async = new AsynchronousHandleOperation<List<CalculationJobResultItem>>();
+          final AsynchronousHandleOperation<List<CalculationJobResultItem>> async =
+              new AsynchronousHandleOperation<List<CalculationJobResultItem>>();
           e.setResultListener(new ResultListener<Void>() {
             @Override
             public void operationComplete(final AsynchronousResult<Void> result) {
@@ -434,7 +456,8 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
     DeferredViewComputationCache deferred = s_deferredCaches.get(cache);
     if (deferred == null) {
       if (isUseWriteBehindSharedCache() || isUseWriteBehindPrivateCache()) {
-        deferred = new WriteBehindViewComputationCache(cache, getExecutorService(), isUseWriteBehindSharedCache(), isUseWriteBehindPrivateCache());
+        deferred = new WriteBehindViewComputationCache(cache, getExecutorService(), isUseWriteBehindSharedCache(),
+                                                       isUseWriteBehindPrivateCache());
       } else {
         deferred = new DirectWriteViewComputationCache(cache);
       }
@@ -461,7 +484,8 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
   }
 
   private void invokeResult(FunctionInvoker invoker, DeferredInvocationStatistics statistics,
-      Set<ValueSpecification> missing, Set<ValueSpecification> outputs, Collection<ComputedValue> results, CalculationJobResultItemBuilder resultItemBuilder) {
+                            Set<ValueSpecification> missing, Set<ValueSpecification> outputs,
+                            Collection<ComputedValue> results, CalculationJobResultItemBuilder resultItemBuilder) {
     if (results == null) {
       postEvaluationErrors(outputs, NotCalculatedSentinel.EVALUATION_ERROR);
       resultItemBuilder.withException(ERROR_INVOKING, "No results returned by invoker " + invoker);
@@ -505,13 +529,15 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
     } else {
       target = LazyComputationTargetResolver.resolve(getTargetResolver(), jobItem.getComputationTargetSpecification());
       if (target == null) {
-        resultItemBuilder.withException(ERROR_CANT_RESOLVE, "Unable to resolve target " + jobItem.getComputationTargetSpecification());
+        resultItemBuilder.withException(ERROR_CANT_RESOLVE,
+            "Unable to resolve target " + jobItem.getComputationTargetSpecification());
         return;
       }
     }
     final FunctionInvoker invoker = getFunctions().getInvoker(functionUniqueId);
     if (invoker == null) {
-      resultItemBuilder.withException(ERROR_BAD_FUNCTION, "Unable to locate " + functionUniqueId + " in function repository");
+      resultItemBuilder.withException(ERROR_BAD_FUNCTION,
+          "Unable to locate " + functionUniqueId + " in function repository");
       return;
     }
     // set parameters
@@ -567,7 +593,8 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
         return;
       }
       if (target == null) {
-        resultItemBuilder.withException(ERROR_CANT_RESOLVE, "Unable to resolve target " + jobItem.getComputationTargetSpecification());
+        resultItemBuilder.withException(ERROR_CANT_RESOLVE,
+            "Unable to resolve target " + jobItem.getComputationTargetSpecification());
         return;
       }
     }
@@ -575,7 +602,8 @@ public class SimpleCalculationNode extends SimpleCalculationNodeState implements
     statistics.beginInvocation(functionUniqueId);
     final Set<ValueSpecification> outputs = jobItem.getOutputs();
     try {
-      invokeResult(invoker, statistics, missing, outputs, invoker.execute(getFunctionExecutionContext(), functionInputs, target, plat2290(outputs)), resultItemBuilder);
+      invokeResult(invoker, statistics, missing, outputs, invoker.execute(getFunctionExecutionContext(), functionInputs,
+          target, plat2290(outputs)), resultItemBuilder);
     } catch (AsynchronousExecution e) {
       e.setResultListener(new ResultListener<Set<ComputedValue>>() {
         @Override
