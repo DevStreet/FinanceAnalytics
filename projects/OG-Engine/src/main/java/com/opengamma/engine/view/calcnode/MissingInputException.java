@@ -15,7 +15,7 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.engine.value.ValueSpecification;
 
 /**
- * 
+ * Run-time exception thrown when an engine function's execution fails due to missing input data
  */
 public class MissingInputException extends OpenGammaRuntimeException {
 
