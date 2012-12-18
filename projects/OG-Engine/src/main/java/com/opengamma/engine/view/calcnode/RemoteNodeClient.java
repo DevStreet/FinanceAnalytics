@@ -38,7 +38,7 @@ import com.opengamma.transport.FudgeMessageReceiver;
 import com.opengamma.transport.FudgeMessageSender;
 
 /**
- * Client end to RemoteNodeServer for registering one or more AbstractCalculationNodes with a remote job dispatcher.
+ * Client end to RemoteNodeServer for registering one or more SimpleCalculationNodes with a remote job dispatcher.
  * The connection must deliver messages in network order (i.e. not use an executor service).
  */
 public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer
@@ -204,7 +204,8 @@ public class RemoteNodeClient extends SimpleCalculationNodeInvocationContainer
     final FudgeMsg msg = msgEnvelope.getMessage();
     s_logger.debug("Received ({} fields) from {}", msg.getNumFields(), _connection);
     final FudgeDeserializer deserializer = new FudgeDeserializer(fudgeContext);
-    final RemoteCalcNodeMessage message = deserializer.fudgeMsgToObject(RemoteCalcNodeMessage.class, msgEnvelope.getMessage());
+    final RemoteCalcNodeMessage message =
+        deserializer.fudgeMsgToObject(RemoteCalcNodeMessage.class, msgEnvelope.getMessage());
     message.accept(_messageVisitor);
   }
 
