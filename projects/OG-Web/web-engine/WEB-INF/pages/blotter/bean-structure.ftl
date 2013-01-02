@@ -1,32 +1,41 @@
 <#escape x as x?html>
+    <#macro typeNames infoList>
+        <#list infoList as info>
+            <#if info.beanType>
+                <a href="${info.expectedType}">${info.expectedType}</a>
+            <#else>
+                ${info.expectedType} <#if info.actualType?has_content>(${info.actualType})</#if>
+            </#if>
+        </#list>
+    </#macro>
     <@page title="${type} Structure">
         <@section title="${type}">
             <@table items=properties empty="" headers=["Property", "Type", "Optional", "Read-only", "Endpoint"]; prop>
             <td>${prop.name}</td>
             <td>
                 <#if prop.type == "map">
-                    {${prop.keyTypeName}: ${prop.valueTypeName}}
+                    {<@typeNames prop.types/>:<@typeNames prop.valueTypes/>}
                 <#else>
                     <#if prop.type == "array">[</#if>
-                    <#if prop.isBean>
-                        <#list prop.typeNames as typeName>
-                            <a href="${typeName}">${typeName}</a><#if typeName_has_next>, </#if>
-                        </#list>
-                    <#else>
-                    ${prop.typeNames[0]}
-                    </#if>
+                    <@typeNames prop.types/>
                     <#if prop.type == "array">]</#if>
                 </#if>
             </td>
-            <td><#if prop.isOptional>true</#if></td>
-            <td><#if prop.isReadOnly>true</#if></td>
-            <td></td>
+            <td><#if prop.optional>true</#if></td>
+            <td><#if prop.readOnly>true</#if></td>
+            <td>
+                <#if prop.types?has_content>
+                    <#list prop.types as info>
+                        <#if info.endpoint?has_content><a href="/jax/blotter/lookup/${info.endpoint}">/jax/blotter/lookup/${info.endpoint}</a></#if>
+                    </#list>
+                </#if>
+            </td>
             </@table>
         </@section>
-        <#if hasUnderlying>
+        <#if underlyingType?has_content>
             <@subsection title="Underlying Security">
-                <#list underlyingTypeNames as typeName>
-                    <a href="${typeName}">${typeName}</a><#if typeName_has_next>, </#if>
+                <#list underlyingTypes as info>
+                    <a href="${info.expectedType}">${info.expectedType}</a><#if info_has_next>, </#if>
                 </#list>
             </@subsection>
         </#if>

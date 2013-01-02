@@ -137,5 +137,4 @@ public class DefaultAggregatedExecutionLog implements AggregatedExecutionLog {
     sb.append(']');
     return sb.toString();
   }
-
 }
