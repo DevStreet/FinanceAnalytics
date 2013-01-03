@@ -54,9 +54,21 @@ public class OGPermutationMatrix extends OGArray<Integer> {
    * Gets the data.
    * @return the data
    */
-  public int[] getData() {
-    return _data;
+  public double[] getData() {
+    double[] tmp = new double[_data.length];
+    for (int i = 0; i < _data.length; i++) {
+      tmp[i] = _data[i];
+    }
+    return tmp;
   }
+  
+  /**
+   * Get as int data
+   * @return the data as int[]
+   */
+  public int[] getIntData() {
+    return _data;
+  }  
 
   @Override
   public int getNumberOfRows() {

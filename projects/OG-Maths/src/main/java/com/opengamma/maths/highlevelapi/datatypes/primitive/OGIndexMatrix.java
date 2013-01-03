@@ -142,12 +142,24 @@ public class OGIndexMatrix extends OGArray<Integer> {
 
   /**
    * Gets the data
-   * @return _data the OGIndex data in it's native storage format
+   * @return _data the OGIndex data as double[]
    */
-  public int[] getData() {
-    return Arrays.copyOf(_data, _data.length);
+  public double[] getData() {
+    double[] tmp = new double[_data.length];
+    for (int i = 0; i < _data.length; i++) {
+      tmp[i] = _data[i];
+    }
+    return tmp;
   }
-
+  
+  /**
+   * Get as int data
+   * @return the data as int[]
+   */
+  public int[] getIntData() {
+    return _data;
+  }  
+  
   /**
    * ToString for pretty printing
    * @return A string representation of the matrix
@@ -198,5 +210,7 @@ public class OGIndexMatrix extends OGArray<Integer> {
     }
     return true;
   }
+
+
 
 }

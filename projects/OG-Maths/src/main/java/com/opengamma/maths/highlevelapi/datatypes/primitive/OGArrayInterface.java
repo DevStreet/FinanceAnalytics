@@ -16,5 +16,7 @@ public interface OGArrayInterface<T extends Number> {
   int getNumberOfColumns();
 
   T getEntry(int... indices);
-  
+
+  double[] getData();
+
 }

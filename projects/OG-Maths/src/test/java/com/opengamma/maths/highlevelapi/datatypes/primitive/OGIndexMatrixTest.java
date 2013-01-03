@@ -61,7 +61,7 @@ public class OGIndexMatrixTest {
   public void testintPtrPtrConstructorInternalDataTest() {
     OGIndexMatrix D = new OGIndexMatrix(data4x3);
     assertTrue(D.getClass() == OGIndexMatrix.class);
-    assertTrue(Arrays.equals(D.getData(), data4x3unwound));
+    assertTrue(Arrays.equals(D.getIntData(), data4x3unwound));
     assertTrue(D.getNumberOfRows() == 4);
     assertTrue(D.getNumberOfColumns() == 3);
   }
@@ -89,7 +89,7 @@ public class OGIndexMatrixTest {
   public void testintPtrConstructorInternalDataTest() {
     OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
     assertTrue(D.getClass() == OGIndexMatrix.class);
-    assertTrue(Arrays.equals(D.getData(), data4x3unwound));
+    assertTrue(Arrays.equals(D.getIntData(), data4x3unwound));
     assertTrue(D.getNumberOfRows() == 4);
     assertTrue(D.getNumberOfColumns() == 3);
   }
@@ -98,7 +98,7 @@ public class OGIndexMatrixTest {
   public void testintConstructorInternalDataTest() {
     OGIndexMatrix D = new OGIndexMatrix(7);
     assertTrue(D.getClass() == OGIndexMatrix.class);
-    assertTrue(Arrays.equals(D.getData(), new int[] {7}));
+    assertTrue(Arrays.equals(D.getIntData(), new int[] {7}));
     assertTrue(D.getNumberOfRows() == 1);
     assertTrue(D.getNumberOfColumns() == 1);
   }
@@ -205,7 +205,7 @@ public class OGIndexMatrixTest {
   @Test
   public void testGetDataTest() {
     OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
-    assertTrue(Arrays.equals(D.getData(), data4x3unwound));
+    assertTrue(Arrays.equals(D.getIntData(), data4x3unwound));
   }
 
   // test equals obj points to obj

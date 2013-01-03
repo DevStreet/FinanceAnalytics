@@ -60,7 +60,7 @@ public class OGPermutationMatrixTest {
   public void testintPtrConstructorDataOKTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     assertTrue(D.getClass() == OGPermutationMatrix.class);
-    assertTrue(Arrays.equals(D.getData(), data));
+    assertTrue(Arrays.equals(D.getIntData(), data));
     assertTrue(D.getNumberOfRows() == 5);
     assertTrue(D.getNumberOfColumns() == 5);
   }
@@ -83,7 +83,7 @@ public class OGPermutationMatrixTest {
   @Test
   public void testGetDataTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
-    assertTrue(Arrays.equals(D.getData(), data));
+    assertTrue(Arrays.equals(D.getIntData(), data));
   }
   
   // test get entry bad index count
