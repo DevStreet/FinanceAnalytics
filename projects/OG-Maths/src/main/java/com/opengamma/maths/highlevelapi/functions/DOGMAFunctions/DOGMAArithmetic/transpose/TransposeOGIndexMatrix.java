@@ -23,7 +23,7 @@ public final class TransposeOGIndexMatrix implements Transpose<OGIndexMatrix, OG
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
     int retRows = columnsArray1, retCols = rowsArray1;
-    int[] data = array1.getData();
+    int[] data = array1.getIntData();
     int[] tmp = new int[rowsArray1 * columnsArray1];
 
     int ir;

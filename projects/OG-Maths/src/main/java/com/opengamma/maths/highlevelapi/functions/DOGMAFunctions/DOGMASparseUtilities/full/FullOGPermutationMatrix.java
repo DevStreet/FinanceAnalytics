@@ -20,7 +20,7 @@ public final class FullOGPermutationMatrix implements Full<OGMatrix, OGPermutati
   public OGMatrix eval(OGPermutationMatrix array1) {
     final int rows = array1.getNumberOfRows();
     final int cols = array1.getNumberOfColumns();
-    final int[] data = array1.getData();
+    final int[] data = array1.getIntData();
     double[] tmp = new double[rows * cols];
     for (int i = 0; i < cols; i++) {
       tmp[i + data[i] * rows] = 1;

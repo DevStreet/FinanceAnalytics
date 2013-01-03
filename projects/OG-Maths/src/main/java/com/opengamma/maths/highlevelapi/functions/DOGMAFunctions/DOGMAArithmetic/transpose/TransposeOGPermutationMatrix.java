@@ -21,7 +21,7 @@ public final class TransposeOGPermutationMatrix implements Transpose<OGPermutati
     Catchers.catchNullFromArgList(array1, 1);
     // transpose of a permutation matrix is just looking up its own indices in itself a(i,j)=a(j,i) but we walk just once with compressed canonical vectors
     // so if you have permutation vector P, range=1:length(P), the range(P) gives the transpose permutation
-    int[] data = array1.getData();
+    int[] data = array1.getIntData();
     int dim = array1.getNumberOfRows();
 
     int[] tmp = new int[dim];
