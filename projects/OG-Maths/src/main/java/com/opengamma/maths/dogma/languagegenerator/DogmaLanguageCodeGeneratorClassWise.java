@@ -25,7 +25,6 @@ public class DogmaLanguageCodeGeneratorClassWise {
   private static String s_outpathAutogen;
   private static String s_outpath;
 
- 
   DogmaLanguageCodeGeneratorClassWise(String outpath, String autogenPostfix) {
     s_outpathAutogen = new String(outpath + File.separatorChar + autogenPostfix);
     s_outpath = new String(outpath);
@@ -58,11 +57,12 @@ public class DogmaLanguageCodeGeneratorClassWise {
         e.printStackTrace();
       }
     }
+    s_log.debug("Function Count Total: " + fullTokens.size());
 
     StringBuffer entryPointFull = new StringBuffer();
     entryPointFull.append(entryPointHeader());
     entryPointFull.append(entryPointImports());
-    entryPointFull.append(entryPointClassDecl());    
+    entryPointFull.append(entryPointClassDecl());
     entryPointFull.append(entryPointCode);
     entryPointFull.append(entryPointFooter());
     // write out the language file with the entry points
@@ -94,11 +94,11 @@ public class DogmaLanguageCodeGeneratorClassWise {
     tmp.append("import com.opengamma.maths.commonapi.numbers.ComplexType;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;\n");    
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;\n");    
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;\n");
@@ -146,4 +146,3 @@ public class DogmaLanguageCodeGeneratorClassWise {
   }
 
 }
-

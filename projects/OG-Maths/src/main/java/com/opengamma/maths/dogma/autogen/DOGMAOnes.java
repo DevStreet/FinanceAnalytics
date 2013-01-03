@@ -88,10 +88,10 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static OGMatrix ones(int arg0){
+  public static OGMatrix ones(Integer arg0){
     return   s_onesfunction.ones( arg0);
   };
-  public static OGMatrix ones(int arg0, int arg1){
+  public static OGMatrix ones(Integer arg0, Integer arg1){
     return   s_onesfunction.ones( arg0,  arg1);
   };
 

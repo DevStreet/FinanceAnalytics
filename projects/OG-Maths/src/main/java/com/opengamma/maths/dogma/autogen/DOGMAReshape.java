@@ -88,7 +88,7 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static OGMatrix reshape(OGMatrix arg0, int arg1, int arg2){
+  public static OGMatrix reshape(OGMatrix arg0, Integer arg1, Integer arg2){
     return   s_reshapeogmatrix.reshape( arg0,  arg1,  arg2);
   };
 

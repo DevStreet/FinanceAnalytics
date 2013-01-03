@@ -88,7 +88,7 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static OGMatrix vander(OGMatrix arg0, int arg1){
+  public static OGMatrix vander(OGMatrix arg0, Integer arg1){
     return   s_vanderfunction.vander( arg0,  arg1);
   };
   public static OGMatrix vander(OGMatrix arg0){

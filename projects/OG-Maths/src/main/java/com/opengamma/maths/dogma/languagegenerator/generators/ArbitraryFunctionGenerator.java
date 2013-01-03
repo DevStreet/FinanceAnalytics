@@ -7,14 +7,17 @@ package com.opengamma.maths.dogma.languagegenerator.generators;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
 import com.opengamma.maths.dogma.languagegenerator.DogmaLangTokenToCodeGenerator;
 import com.opengamma.maths.dogma.languagegenerator.FullToken;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArrayInterface;
 
 /**
  * 
@@ -81,10 +84,12 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         int plen = parameterTypes.length;
         if (plen > 0) {
           for (int i = 0; i < plen - 1; i++) {
-            argbuf.append(parameterTypes[i].getSimpleName() + " arg" + i + ", ");
+            //            argbuf.append(parameterTypes[i].getSimpleName() + " arg" + i + ", ");
+            argbuf.append(superizeIfaceType(parameterTypes[i]) + " arg" + i + ", ");
             argnamesbuf.append(" arg" + i + ", ");
           }
-          argbuf.append(parameterTypes[plen - 1].getSimpleName() + " arg" + (plen - 1));
+          //          argbuf.append(parameterTypes[plen - 1].getSimpleName() + " arg" + (plen - 1));
+          argbuf.append(superizeIfaceType(parameterTypes[plen - 1]) + " arg" + (plen - 1));
           argnamesbuf.append(" arg" + (plen - 1));
         }
         tmp.append(argbuf);
@@ -97,6 +102,37 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
       }
     }
     return tmp.toString();
+  }
+
+  private static Map<String, String> numberClassNames = new HashMap<String, String>();
+  static {
+    numberClassNames.put("short", "Short");
+    numberClassNames.put("int", "Integer");
+    numberClassNames.put("long", "Long");
+    numberClassNames.put("ComplexType", "ComplexType");
+    numberClassNames.put("double", "Double");
+    numberClassNames.put("float", "Float");
+  }
+
+  private String superizeIfaceType(Class<?> clazz) {
+
+    // looks through the class interfaces to see if its an OGArray type
+    Class<?> superClass = clazz.getSuperclass();
+    if (superClass != null) {
+      Class<?>[] implementedIfaces = superClass.getInterfaces();
+      for (int iWalkIfacePtr = 0; iWalkIfacePtr < implementedIfaces.length; iWalkIfacePtr++) {
+        if (implementedIfaces[iWalkIfacePtr] == OGArrayInterface.class) {
+          return clazz.getSimpleName();
+        }
+      }
+    }
+
+    // sees if the class is one of the primitive "Number" types, shame number is so broken, should really be called "numeric" 
+    if (numberClassNames.containsKey(clazz.getSimpleName())) {
+      return numberClassNames.get(clazz.getSimpleName());
+    }
+
+    return clazz.getSimpleName();
   }
 
   @Override
