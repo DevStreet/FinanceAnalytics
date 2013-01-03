@@ -179,11 +179,29 @@
 
 
 -- ==========================================================================
+@NAME(InsertType)
+  INSERT INTO cfg_type
+    (config_type)
+  VALUES
+    (:config_type)
+
+
+-- ==========================================================================
 @NAME(SelectTypes)
   SELECT
-    DISTINCT main.config_type AS config_type
+    config_type
   FROM
-    cfg_config main
+    cfg_type
+
+
+-- ==========================================================================
+@NAME(SelectTypeWhere)
+  SELECT
+    config_type
+  FROM
+    cfg_type
+  WHERE
+    config_type = :config_type
 
 
 -- ==========================================================================

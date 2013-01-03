@@ -23,6 +23,7 @@ import org.fudgemsg.mapping.FudgeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.support.SqlLobValue;
@@ -116,6 +117,18 @@ import com.opengamma.util.paging.PagingRequest;
     ArgumentChecker.notNull(document.getName(), "document.name");
     ArgumentChecker.notNull(document.getConfig(), "document.value");
     ArgumentChecker.notNull(document.getType(), "document.type");
+
+    // If the config type is not in the config_type table then add it
+    // NOTE We might want to constrain config types to a set predetermined at initial deployment by disabling this code
+    final DbMapSqlParameterSource typeArg = new DbMapSqlParameterSource()
+      .addValue("config_type", document.getType().getName(), Types.VARCHAR);
+    try {
+      String sql = getElSqlBundle().getSql("SelectTypeWhere", typeArg);
+      getJdbcTemplate().queryForObject(sql, Object.class, typeArg);
+    } catch (EmptyResultDataAccessException e) {
+      String sql = getElSqlBundle().getSql("InsertType", typeArg);
+      getJdbcTemplate().update(sql, typeArg);
+    }
 
     final Object value = document.getConfig().getValue();
     final long docId = nextId("cfg_config_seq");
