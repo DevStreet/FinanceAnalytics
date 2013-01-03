@@ -15,10 +15,11 @@ $.register_module({
 
         // Private
         var query = null, template = null, emitter = new EventEmitter(), initialized = false,
-            ag_menu = null, ds_menu = null, ac_menu = null, status = null, selector, $dom = {}, vd_s = '.og-view',
-            fcntrls_s = 'input, select, a, button', ac_s = 'input autocompletechange autocompleteselect',
-            ds_template = null, ag_template = null, viewdefs = null, viewdefs_store = [], aggregators = null,
-            ac_data = null, ag_data = null, ds_data = null,
+            pf_menu = null, ag_menu = null, ds_menu = null, vd_menu = null, status = null, selector, $dom = {},
+            vd_s = '.og-view .og-option-title', fcntrls_s = 'input, select, a, button',
+            ac_s = 'input autocompletechange autocompleteselect', ds_template = null, ag_template = null,
+            portfolios = null, pf_store = [], viewdefs = null, viewdefs_store = [], aggregators = null, ac_data = null,
+            pf_data = null, ag_data = null, ds_data = null,
             events = {
                 focus: 'dropmenu:focus',
                 focused:'dropmenu:focused',
@@ -63,12 +64,14 @@ $.register_module({
         var fetch_template = function (callback) {
             $.when(
                 og.api.text({module: 'og.analytics.form_tash'}),
+                og.api.rest.portfolios.get(),
                 og.api.text({module: 'og.analytics.form_aggregation_tash'}),
                 og.api.text({module: 'og.analytics.form_datasources_tash'}),
                 og.api.rest.viewdefinitions.get({page: '*'}),
                 og.api.rest.aggregators.get()
-            ).pipe(function (tmpl, ag_tmpl, ds_tmpl, vds, ag_data) {
+            ).pipe(function (tmpl, pfs, ag_tmpl, ds_tmpl, vds, ag_data) {
                 if (!tmpl.error) template = tmpl;
+                if (!pfs.error && 'data' in pfs && pfs.data.data.length) portfolios = (pf_store = pfs.data.data);
                 if (!ag_tmpl.error) ag_template = ag_tmpl;
                 if (!ds_tmpl.error) ds_template = ds_tmpl;
                 if (!vds.error && 'data' in vds && vds.data.length) viewdefs = (viewdefs_store = vds.data).pluck('name');
@@ -94,10 +97,15 @@ $.register_module({
                 $dom.ds = $('.og-datasources', $dom.form);
                 $dom.load_btn = $('.og-load', $dom.form);
             }
+            if (portfolios) {
+                if (pf_data) pf_data = get_view_index(pf_data, 'id');
+                pf_menu = new og.common.util.ui.AutoCombo(selector+' .og-portfolios', 'Search Portfolios...', viewdefs);
+                pf_menu.$input.on(ac_s, auto_combo_handler).select();
+            }
             if (viewdefs) {
                 if (ac_data) ac_data = get_view_index(ac_data, 'id');
-                ac_menu = new og.common.util.ui.AutoCombo(selector+' '+vd_s, 'search...', viewdefs, ac_data);
-                ac_menu.$input.on(ac_s, auto_combo_handler).select();
+                vd_menu = new og.common.util.ui.AutoCombo(selector+' '+vd_s, 'search...', viewdefs, ac_data);
+                vd_menu.$input.on(ac_s, auto_combo_handler).select();
             }
             if ($dom.ag && ag_template) {
                 ag_menu = new og.analytics.AggregatorsMenu({
@@ -123,8 +131,8 @@ $.register_module({
             //status = new og.analytics.Status(selector + ' .og-status');
         };
         var load_query = function () {
-            if (!ac_menu || !ds_menu) return;
-            var id = get_view_index(ac_menu.$input.val(), 'name'), providers = ds_menu.get_query();
+            if (!vd_menu || !ds_menu) return;
+            var id = get_view_index(vd_menu.$input.val(), 'name'), providers = ds_menu.get_query();
             if (!id) return;
             if (!providers) return;
             og.analytics.url.main(query = {
@@ -136,11 +144,11 @@ $.register_module({
         var keydown_handler = function (event) {
             if (event.keyCode !== 9) return;
             var $elem = $(this), shift_key = event.shiftKey;
-            if (!$elem || !ac_menu || !ag_menu || !ds_menu || !$dom.ag || !$dom.ds) return;
+            if (!$elem || !vd_menu || !ag_menu || !ds_menu || !$dom.ag || !$dom.ds) return;
             $dom.ag_fcntrls = $dom.ag.find(fcntrls_s);
             $dom.ds_fcntrls = $dom.ds.find(fcntrls_s);
             if (!shift_key) {
-                if (ac_menu.state === 'focused') ag_menu.emitEvent(events.open);
+                if (vd_menu.state === 'focused') ag_menu.emitEvent(events.open);
                 if ($elem.is($dom.ag_fcntrls.eq(-1))) ds_menu.emitEvent(events.open);
                 if ($elem.is($dom.ds_fcntrls.eq(-1))) ds_menu.emitEvent(events.close);
             } else if (shift_key) {
@@ -151,10 +159,10 @@ $.register_module({
         };
         var query_cancelled = function (menu) {
             emitter.emitEvent(events.closeall);
-            if (ac_menu) ac_menu.$input.select();
+            if (vd_menu) vd_menu.$input.select();
         };
         var query_selected = function (menu) {
-            if (!ac_menu || !ds_menu) return;
+            if (!vd_menu || !ds_menu) return;
             if (menu === ag_menu) ds_menu.emitEvent(events.open).emitEvent(events.focus);
             else if (menu === ds_menu) $dom.load_btn.focus();
         };
@@ -201,7 +209,7 @@ $.register_module({
             if ('viewdefinition' in url_config && url_config.viewdefinition &&
                 typeof url_config.viewdefinition === 'string') {
                 if (!query || (url_config.viewdefinition !== query.viewdefinition)) {
-                    if (ac_menu) ac_menu.$input.val(get_view_index(url_config.viewdefinition, 'id'));
+                    if (vd_menu) vd_menu.$input.val(get_view_index(url_config.viewdefinition, 'id'));
                     else ac_data = url_config.viewdefinition;
                 }
             }
@@ -211,7 +219,7 @@ $.register_module({
         constructor.prototype.reset_query = function () {
             if (query) query = null;
             [ag_menu, ds_menu].forEach(function (menu) { if (menu) menu.emitEvent(events.resetquery); });
-            if (ac_menu) ac_menu.$input.val('search...');
+            if (vd_menu) vd_menu.$input.val('search...');
         };
         return constructor;
     }

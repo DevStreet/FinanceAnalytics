@@ -106,7 +106,7 @@ $.register_module({
                     return combo.$input.autocomplete('widget').is(':visible') ?
                         combo.$input.autocomplete('close').select() : combo.open();
                 });
-                $([combo.$wrapper, combo.$button]).prependTo(selector);
+                $([combo.$wrapper, combo.$button]).appendTo(selector);
                 if (input_val) combo.$input.val(input_val);
             }
             return combo;

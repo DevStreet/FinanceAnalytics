@@ -8,11 +8,12 @@
     position: relative;
 }
 
+.OG-analytics-form .og-portfolios,
 .OG-analytics-form .og-view,
 .OG-analytics-form .og-aggregation,
 .OG-analytics-form .og-datasources,
 .OG-analytics-form .og-load {
-    position: absolute;
+    position: relative;
     display: inline-block;
     float: left;
 }
@@ -47,40 +48,58 @@
     left: 4px;
 }
 
+
 /**
- * View
+ * Portfolio
  */
-.OG-analytics-form .og-view {
-    width: 20%;
-    left: 0;
+.OG-analytics-form .og-portfolios{
+    width:30%;
 }
 
-.OG-analytics-form .og-view:hover input {
-    background: #fffee5;
-}
-
-.OG-analytics-form .og-view div:first-child {
+.OG-analytics-form .og-portfolios div:first-child {
     position: absolute;
     top: 4px;
     left: 2px;
     right: 21px;
 }
 
-.OG-analytics-form .og-view input {
-    width: 100%;
-    height: 32px;
+.OG-analytics-form .og-portfolios input {
     font-size: 26px;
-    color: #475562;
-    font-family: 'Open Sans', arial, serif;
+    height: 32px;
+    width: 100%;
 }
 
-.OG-analytics-form .og-view .og-icon-down {
+.OG-analytics-form .og-portfolios .og-icon-down {
     height: 32px;
 }
 
 /**
- * Title (for aggregation and datasource)
+ * View
  */
+.OG-analytics-form .og-view {
+    width: 20%;
+}
+
+.OG-analytics-form .og-view:hover input {
+    background: #fffee5;
+}
+
+.OG-analytics-form .og-view input {
+    color: #475562;
+    font-family: 'Open Sans', arial, serif;
+    font-size: 18px;
+    height: 22px;
+    left: 0;
+    position: absolute;
+    right: 21px;
+    top: 15px;
+    border:none;
+}
+
+.OG-analytics-form .og-view .og-icon-down{
+    right:7px;
+}
+
 
 .OG-analytics-form .og-option-title {
     cursor: default;
@@ -150,26 +169,23 @@
 }
 
 /**
- * Aggregation
- */
-.OG-analytics-form .og-aggregation {
-    width: 20%;
-    left: 21%;
-}
-
-/**
  * Datasources
  */
 .OG-analytics-form .og-datasources {
     width: 30%;
-    left: 42%;
+}
+
+/**
+ * Aggregation
+ */
+.OG-analytics-form .og-aggregation {
+    width: 20%;
 }
 
 /**
  * Load
  */
 .OG-analytics-form .og-load {
-    left: 73%;
     top: 7px;
 }
 
@@ -228,4 +244,13 @@
 
 .OG-analytics-form .og-status .live {
     background-color: #0c9605;
+}
+
+.OG-analytics-form .og-portfolios,
+.OG-analytics-form .og-view,
+.OG-analytics-form .og-datasources,
+.OG-analytics-form .og-aggregation,
+.OG-analytics-form .og-load,
+.OG-analytics-form .og-status{
+    margin-right: 10px;
 }
