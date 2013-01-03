@@ -162,8 +162,6 @@ public class Catchers {
       }
     }
   }
-  
-  
 
   /**
    * Catches null pointer
@@ -315,8 +313,8 @@ public class Catchers {
         throw new MathsExceptionNullPointer("Argument passed in position " + pos + " has row " + i + " pointing to NULL. STOPPING");
       }
     }
-  }  
-  
+  }
+
   // Numeric catchers  
   // my kingdom for a template/macro  
 
@@ -860,6 +858,32 @@ public class Catchers {
   public static void catchInf(double aNumber) {
     if (Double.isInfinite(aNumber)) {
       throw new MathsExceptionEncounteredInf("On double value");
+    }
+  }
+
+  //// catch Inf or NaN
+
+  /**
+   * Catches Inf or NaNs in OGArraySuper types
+   * @param array1 an OGArraySuper type
+   */
+  public static void catchInfOrNaN(OGArray<? extends Number> array1) {
+    CatchInf catchinf = CatchInf.getInstance();
+    catchinf.catchinf(array1);
+    CatchNaN catchnan = CatchNaN.getInstance();
+    catchnan.catchnan(array1);
+  }
+
+  /**
+   * Catches double == +/-Inf or NaN
+   * @param aNumber a double
+   */
+  public static void catchInfOrNaN(double aNumber) {
+    if (Double.isInfinite(aNumber)) {
+      throw new MathsExceptionEncounteredInf("On double value");
+    }
+    if (Double.isNaN(aNumber)) {
+      throw new MathsExceptionEncounteredNaN("On double value");
     }
   }
 
