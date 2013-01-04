@@ -88,7 +88,7 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static OGMatrix invhilb(Integer arg0){
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix invhilb(Integer arg0){
     return   s_invhilbfunction.invhilb( arg0);
   };
 

@@ -91,5 +91,8 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
   public static int length(OGArray arg0){
     return   s_lengthfunction.length( arg0);
   };
+  public static int length(Number arg0){
+    return   s_lengthfunction.length( arg0);
+  };
 
 }

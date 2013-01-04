@@ -88,7 +88,7 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static OGMatrix rosser(){
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix rosser(){
     return   s_rosserfunction.rosser();
   };
 
