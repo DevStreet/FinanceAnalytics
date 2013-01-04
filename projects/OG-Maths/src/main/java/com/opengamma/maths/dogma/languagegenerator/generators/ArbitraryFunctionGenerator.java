@@ -6,6 +6,7 @@
 package com.opengamma.maths.dogma.languagegenerator.generators;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,9 +21,9 @@ import com.opengamma.maths.dogma.languagegenerator.FullToken;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArrayInterface;
 
 /**
- * 
- * TODO: This needs a refactor, too much repetition and unnecessary repeated reflection
+ *
  */
+// TODO: This needs a refactor, too much repetition and unnecessary repeated reflection
 public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
   ArbitraryFunctionGenerator() {
   }
@@ -70,17 +71,25 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
       Iterator<Method> mit = methodList.iterator();
       Method next;
       Class<?> returnType;
+      Type genericReturnType;
       String mname;
       String fname = f.getSimpleName();
       String fnamel = fname.toLowerCase();
       Class<?>[] parameterTypes;
+      String returnTypeString;
       while (mit.hasNext()) {
         StringBuffer argbuf = new StringBuffer(), argnamesbuf = new StringBuffer();
         next = mit.next();
         parameterTypes = next.getParameterTypes();
         returnType = next.getReturnType();
+        genericReturnType = next.getGenericReturnType();
+        if (!returnType.toString().equalsIgnoreCase(genericReturnType.toString())) {
+          returnTypeString = genericReturnType.toString();
+        } else {
+          returnTypeString = returnType.getCanonicalName();
+        }
         mname = next.getName();
-        tmp.append(s_indent + "public static " + returnType.getSimpleName() + " " + fnamel + "(");
+        tmp.append(s_indent + "public static " + returnTypeString + " " + fnamel + "(");
         int plen = parameterTypes.length;
         if (plen > 0) {
           for (int i = 0; i < plen - 1; i++) {
@@ -104,14 +113,14 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     return tmp.toString();
   }
 
-  private static Map<String, String> numberClassNames = new HashMap<String, String>();
+  private static Map<String, String> s_numberClassNames = new HashMap<String, String>();
   static {
-    numberClassNames.put("short", "Short");
-    numberClassNames.put("int", "Integer");
-    numberClassNames.put("long", "Long");
-    numberClassNames.put("ComplexType", "ComplexType");
-    numberClassNames.put("double", "Double");
-    numberClassNames.put("float", "Float");
+    s_numberClassNames.put("short", "Short");
+    s_numberClassNames.put("int", "Integer");
+    s_numberClassNames.put("long", "Long");
+    s_numberClassNames.put("ComplexType", "ComplexType");
+    s_numberClassNames.put("double", "Double");
+    s_numberClassNames.put("float", "Float");
   }
 
   private String superizeIfaceType(Class<?> clazz) {
@@ -128,8 +137,8 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     }
 
     // sees if the class is one of the primitive "Number" types, shame number is so broken, should really be called "numeric" 
-    if (numberClassNames.containsKey(clazz.getSimpleName())) {
-      return numberClassNames.get(clazz.getSimpleName());
+    if (s_numberClassNames.containsKey(clazz.getSimpleName())) {
+      return s_numberClassNames.get(clazz.getSimpleName());
     }
 
     return clazz.getSimpleName();
@@ -206,17 +215,26 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
       Iterator<Method> mit = methodList.iterator();
       Method next;
       Class<?> returnType;
+      Type genericReturnType;
       String mname;
       String fname = f.getSimpleName();
       String fnamel = fname.toLowerCase();
       Class<?>[] parameterTypes;
+      String returnTypeString;
       while (mit.hasNext()) {
         StringBuffer argbuf = new StringBuffer(), argnamesbuf = new StringBuffer();
         next = mit.next();
         parameterTypes = next.getParameterTypes();
         returnType = next.getReturnType();
+
+        genericReturnType = next.getGenericReturnType();
+        if (!returnType.toString().equalsIgnoreCase(genericReturnType.toString())) {
+          returnTypeString = genericReturnType.toString();
+        } else {
+          returnTypeString = returnType.getCanonicalName();
+        }
         mname = next.getName();
-        tmp.append(s_indent + "public static " + returnType.getSimpleName() + " " + fnamel + "(");
+        tmp.append(s_indent + "public static " + returnTypeString + " " + fnamel + "(");
         int plen = parameterTypes.length;
         if (plen > 0) {
           for (int i = 0; i < plen - 1; i++) {
