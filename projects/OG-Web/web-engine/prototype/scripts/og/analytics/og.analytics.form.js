@@ -44,7 +44,18 @@ $.register_module({
                             ), '<strong>$1</strong>'
                         );
                     };
-                src.get({page: '*'}).pipe(callback);
+                src.get({page: '*'}).pipe(function (resp){
+                    data = callback(resp);
+                    data.sort((function(){
+                        return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
+                    })());
+                    if (data && data.length) {
+                        res(data.reduce(function (acc, val) {
+                            if (!req.term || val && matcher.test(val)) acc.push({label: htmlize(val)});
+                            return acc;
+                        }, []));
+                    }
+                });
             };
         };
 
@@ -85,16 +96,11 @@ $.register_module({
         var fetch_template = function (callback) {
             $.when(
                 og.api.text({module: 'og.analytics.form_tash'}),
-                //og.api.rest.portfolios.get({page:'*'}),
                 og.api.text({module: 'og.analytics.form_aggregation_tash'}),
                 og.api.text({module: 'og.analytics.form_datasources_tash'}),
                 og.api.rest.aggregators.get()
-            ).pipe(function (tmpl, /*pfs,*/ ag_tmpl, ds_tmpl, ag_data) {
+            ).pipe(function (tmpl, ag_tmpl, ds_tmpl, ag_data) {
                 if (!tmpl.error) template = tmpl;
-                /*if (!pfs.error && 'data' in pfs && 'data' in pfs.data && pfs.data.data.length)
-                    portfolios = (pf_store = pfs.data.data).map(function (entry) {
-                        return entry.split('|')[2];
-                    });*/
                 if (!ag_tmpl.error) ag_template = ag_tmpl;
                 if (!ds_tmpl.error) ds_template = ds_tmpl;
                 if (!ag_data.error && 'data' in ag_data) aggregators = ag_data.data;
@@ -106,7 +112,7 @@ $.register_module({
             for (var needle, i = pf_store.length - 1; i >= 0; i--) {
                 needle = pf_store[i].split('|');
                 if (needle[2] === val) return needle[0];
-            };
+            }
         };
 
         var get_view_index = function (val, key) {
@@ -128,28 +134,27 @@ $.register_module({
                 $dom.ds = $('.og-datasources', $dom.form);
                 $dom.load_btn = $('.og-load', $dom.form);
             }
-            if (portfolios) {
-                //if (pf_data) pf_data = get_portfolio_index(pf_data, 'id');
-                //pf_menu = new og.common.util.ui.AutoCombo(selector+' .og-portfolios', 'Search Portfolios...', portfolios, pf_data);
-                //pf_menu.$input.on(ac_s, auto_combo_handler).select();
-            }
+
+            if (pf_data) pf_data = get_portfolio(pf_data, 'id');
+            pf_menu = new og.common.util.ui.AutoCombo({
+                selector: selector+' .og-portfolios',
+                placeholder: 'Search Portfolios...',
+                input_val: pf_data,
+                source: ac_source(og.api.rest.portfolios, function (portfolio_resp) {
+                    return portfolios = (pf_store = portfolio_resp.data.data).map(function (entry) {
+                        return entry.split('|')[2];
+                    });
+                })
+            });
+            pf_menu.$input.on(ac_s, auto_combo_handler).select();
 
             if (ac_data) ac_data = get_view_index(ac_data, 'id');
             vd_menu = new og.common.util.ui.AutoCombo({
                 selector: selector+' '+vd_s,
                 placeholder: 'search...',
                 input_val: ac_data,
-                source: ac_source(og.api.rest.viewdefinitions, function (resp) {
-                    data = viewdefs = (viewdefs_store = resp.data).pluck('name');
-                    data.sort((function(){
-                        return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
-                    })());
-                    if (data && data.length) {
-                        res(data.reduce(function (acc, val) {
-                            if (!req.term || val && matcher.test(val)) acc.push({label: htmlize(val)});
-                            return acc;
-                        }, []));
-                    }
+                source: ac_source(og.api.rest.viewdefinitions, function (viewdefs_resp) {
+                    return viewdefs = (viewdefs_store = viewdefs_resp.data).pluck('name');
                 })
             });
 
