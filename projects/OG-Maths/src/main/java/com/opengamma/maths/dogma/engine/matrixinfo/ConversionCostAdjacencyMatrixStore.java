@@ -31,18 +31,31 @@ public class ConversionCostAdjacencyMatrixStore {
     {0, 0, 0, 0, 0, 0, 0, 0, 1, 1 }, //
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } };
 
+  
+  // _FROM_      Number  Complex  Diag  CplxDiag  Perm  Idx   Sparse  CplxSparse   Mat  CplxMat
+  //Number     |  Yes   |   Yes  | Yes |   Yes   | No  | No  |  Yes  |    Yes    | Yes |  Yes  |
+  //Complex    |   No   |   Yes  | No  |   Yes   | No  | No  |  No   |    Yes    | No  |  Yes  |
+  //Diag       |   No   |   No   | Yes |   Yes   | No  | No  |  Yes  |    Yes    | Yes |  Yes  |
+  //CplxDiag   |   No   |   No   | No  |   Yes   | No  | No  |  No   |    Yes    | No  |  Yes  |
+  //Perm       |   No   |   No   | No  |   No    | Yes | No  |  Yes  |    Yes    | Yes |  Yes  |
+  //Idx        |   No   |   No   | No  |   No    | No  | Yes |  Yes  |    Yes    | Yes |  Yes  |
+  //Sparse     |   No   |   No   | No  |   No    | No  | No  |  Yes  |    Yes    | Yes |  Yes  |
+  //CplxSparse |   No   |   No   | No  |   No    | No  | No  |  No   |    Yes    | No  |  Yes  |
+  //Mat        |   No   |   No   | No  |   No    | No  | No  |  No   |    No     | Yes |  Yes  |
+  //CplxMat    |   No   |   No   | No  |   No    | No  | No  |  No   |    No     | No  |  Yes  |
+
   // hacky approx costs of conversion
   private static final double[][] SDataWeighted = new double[][] {//
-      {1, 1, 1, 1, 0, 1, 1, 1, 1, 1 }, //
-      {0, 1, 0, 1, 0, 0, 0, 1, 0, 1 }, //
-      {0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, //
-      {0, 0, 0, 1, 0, 0, 0, 1, 0, 1 }, //
-      {0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }, //
-      {0, 0, 0, 0, 0, 1, 0, 0, 0, 0 }, //
-      {0, 0, 0, 0, 0, 0, 1, 1, 1, 1 }, //
-      {0, 0, 0, 0, 0, 0, 0, 1, 0, 1 }, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 1, 1 }, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } };
+      {1, 1, 1, 1, 0, 1, 1, 1, 1,  1 }, //
+      {0, 1, 0, 1, 0, 0, 0, 1, 0,  1 }, //
+      {0, 0, 1, 5, 0, 0, 5, 5, 7,  10 }, //
+      {0, 0, 0, 1, 0, 0, 0, 5, 0,  10 }, //
+      {0, 0, 0, 0, 1, 0, 0, 0, 0,  0 }, //
+      {0, 0, 0, 0, 0, 1, 0, 0, 0,  0 }, //
+      {0, 0, 0, 0, 0, 0, 1, 5, 20, 25 }, //
+      {0, 0, 0, 0, 0, 0, 0, 1, 0,  25 }, //
+      {0, 0, 0, 0, 0, 0, 0, 0, 1,  10 }, //
+      {0, 0, 0, 0, 0, 0, 0, 0, 0,  1 } };
   //CSON
 
   // we store this a an OGMatrix cos we can 
