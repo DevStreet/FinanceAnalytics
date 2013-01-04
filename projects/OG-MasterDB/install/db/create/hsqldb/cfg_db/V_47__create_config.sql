@@ -11,7 +11,7 @@ CREATE TABLE cfg_schema_version (
 );
 INSERT INTO cfg_schema_version (version_key, version_value) VALUES ('schema_patch', '47');
 
-CREATE SEQUENCE cfg_config_seq
+CREATE SEQUENCE cfg_config_seq AS bigint
     START WITH 1000 INCREMENT BY 1 NO CYCLE;
 -- "as bigint" required by Derby/HSQL, not accepted by Postgresql
 
@@ -24,7 +24,7 @@ CREATE TABLE cfg_config (
     corr_to_instant timestamp without time zone NOT NULL,
     name varchar(255) NOT NULL,
     config_type varchar(255) NOT NULL,
-    config bytea NOT NULL,
+    config blob NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT cfg_chk_config_ver_order CHECK (ver_from_instant <= ver_to_instant),
     CONSTRAINT cfg_chk_config_corr_order CHECK (corr_from_instant <= corr_to_instant),
@@ -37,11 +37,11 @@ CREATE INDEX ix_cfg_config_ver_to_instant ON cfg_config(ver_to_instant);
 CREATE INDEX ix_cfg_config_corr_from_instant ON cfg_config(corr_from_instant);
 CREATE INDEX ix_cfg_config_corr_to_instant ON cfg_config(corr_to_instant);
 CREATE INDEX ix_cfg_config_name ON cfg_config(name);
-CREATE INDEX ix_cfg_config_nameu ON cfg_config(UPPER(name));
+-- CREATE INDEX ix_cfg_config_nameu ON cfg_config(UPPER(name));
 CREATE INDEX ix_cfg_config_config_type ON cfg_config(config_type);
 
 CREATE TABLE cfg_type (
   config_type VARCHAR(255) PRIMARY KEY NOT NULL,
   CONSTRAINT cfg_fk_type2type FOREIGN KEY (config_type) REFERENCES cfg_type (config_type)
-) WITHOUT oids;
+);
 
