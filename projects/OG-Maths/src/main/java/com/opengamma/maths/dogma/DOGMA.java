@@ -188,6 +188,14 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAAngle.angle(arg0);
   }
 
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1, Number arg2) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAColon.colon(arg0, arg1, arg2);
+  };
+
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAColon.colon(arg0, arg1);
+  };
+
 
 
 /**
@@ -924,7 +932,7 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAFull.full(arg0);
   }
 
-  public static OGMatrix hilb(int arg0) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix hilb(int arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAHilb.hilb(arg0);
   };
 
@@ -1153,8 +1161,16 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAImag.imag(arg0);
   }
 
-  public static OGMatrix invhilb(int arg0) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix invhilb(int arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAInvHilb.invhilb(arg0);
+  };
+
+  public static int length(OGArray arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMALength.length(arg0);
+  };
+
+  public static int length(Number arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMALength.length(arg0);
   };
 
 
@@ -1227,6 +1243,14 @@ public class DOGMA {
   public static Number log(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMALog.log(arg0);
   }
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(OGArray arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAMeshgrid.meshgrid(arg0);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(OGArray arg0, OGArray arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAMeshgrid.meshgrid(arg0, arg1);
+  };
 
 
 /**
@@ -1684,11 +1708,11 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAMtimes.mtimes(arg0, arg1);
   }
 
-  public static OGMatrix ones(int arg0) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix ones(int arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAOnes.ones(arg0);
   };
 
-  public static OGMatrix ones(int arg0, int arg1) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix ones(int arg0, int arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMAOnes.ones(arg0, arg1);
   };
 
@@ -2083,13 +2107,84 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAReal.real(arg0);
   }
 
-  public static OGMatrix reshape(OGMatrix arg0, int arg1, int arg2) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix reshape(OGMatrix arg0, int arg1, int arg2) {
     return     com.opengamma.maths.dogma.autogen.DOGMAReshape.reshape(arg0, arg1, arg2);
   };
 
-  public static OGMatrix rosser() {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix rosser() {
     return     com.opengamma.maths.dogma.autogen.DOGMARosser.rosser();
   };
+
+
+
+/**
+ * DOGMA Function: Round
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> round(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMARound.round(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Round
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number round(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMARound.round(arg0);
+  }
 
 
 
@@ -2543,16 +2638,166 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMATranspose.transpose(arg0);
   }
 
-  public static OGMatrix vander(OGMatrix arg0, int arg1) {
+
+
+/**
+ * DOGMA Function: Uminus
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> uminus(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAUminus.uminus(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Uminus
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number uminus(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAUminus.uminus(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Unique
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> unique(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAUnique.unique(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Unique
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number unique(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAUnique.unique(arg0);
+  }
+
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(OGMatrix arg0, int arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMAVander.vander(arg0, arg1);
   };
 
-  public static OGMatrix vander(OGMatrix arg0) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(OGMatrix arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAVander.vander(arg0);
   };
 
-  public static OGMatrix wilkinson(int arg0) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix wilkinson(int arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAWilkinson.wilkinson(arg0);
+  };
+
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix zeros(int arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAZeros.zeros(arg0);
+  };
+
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix zeros(int arg0, int arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMAZeros.zeros(arg0, arg1);
   };
 
 }
