@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.minus;
 
+import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Minus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
@@ -20,7 +21,7 @@ public final class MinusOGDiagonalMatrixOGMatrix implements Minus<OGArray<? exte
   @Override
   public OGArray<? extends Number> eval(OGDiagonalMatrix array1, OGMatrix array2) {
     MinusOGMatrixOGDiagonalMatrix reverse = new MinusOGMatrixOGDiagonalMatrix();
-    return reverse.eval(array2, array1);
+    return DOGMA.uminus(reverse.eval(array2, array1));
   }
 
 }

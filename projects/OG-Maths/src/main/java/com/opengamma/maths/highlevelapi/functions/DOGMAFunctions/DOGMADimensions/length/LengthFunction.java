@@ -26,4 +26,15 @@ public final class LengthFunction implements Length {
 
     return Math.max(rowsArray1, columnsArray1);
   }
+
+  /**
+   * Returns the "length" of a matrix, this is the length of the largest dimension
+   * @param array1 the array from which the length shall be computed
+   * @return the length of array1
+   */
+  @DOGMAMethodLiteral
+  public int length(Number array1) {
+    Catchers.catchNullFromArgList(array1, 1);
+    return 1;
+  }
 }

@@ -43,7 +43,7 @@ public final class RdivideOGSparseMatrixOGMatrix implements Rdivide<OGArray<? ex
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued SparseMatrix rdivide dense
       n = rowsArray2 * columnsArray2;
       tmp = new double[n];
-      final double deref = sparseData[0];
+      final double deref = array1.getEntry(0, 0);
       Arrays.fill(tmp, deref);
       for (int i = 0; i < n; i++) {
         tmp[i] /= denseData[i];

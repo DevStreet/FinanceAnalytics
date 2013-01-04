@@ -11,6 +11,7 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Minus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Subtracts an {@link OGMatrix} from an {@link OGSparseMatrix}    
@@ -35,7 +36,7 @@ public final class MinusOGMatrixOGSparseMatrix implements Minus<OGMatrix, OGMatr
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the sparse array a OGDoubleArray and ADD
       final int n = columnsArray2 * rowsArray2;
       tmp = new double[n];
-      final double singleDouble = array2.getData()[0];
+      final double singleDouble = array1.getData()[0];
       Arrays.fill(tmp, singleDouble);
       final int[] colPtr = array2.getColumnPtr();
       final int[] rowIdx = array2.getRowIndex();
@@ -61,7 +62,10 @@ public final class MinusOGMatrixOGSparseMatrix implements Minus<OGMatrix, OGMatr
       retRows = rowsArray1;
       retCols = columnsArray1;
       retArray = new OGMatrix(tmp, retRows, retCols);
-    } else { // Both arrays are full dimension, do sparse add    
+    } else { // Both arrays are full dimension, do sparse subtract    
+      // check commute
+      Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
+      Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
       retRows = rowsArray1;
       retCols = columnsArray1;
       final int n = retRows * retCols;

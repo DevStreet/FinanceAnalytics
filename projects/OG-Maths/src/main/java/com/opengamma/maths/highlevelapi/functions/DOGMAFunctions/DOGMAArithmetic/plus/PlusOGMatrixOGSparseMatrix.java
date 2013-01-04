@@ -35,7 +35,7 @@ public final class PlusOGMatrixOGSparseMatrix implements Plus<OGMatrix, OGMatrix
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the sparse array a OGDoubleArray and ADD
       final int n = columnsArray2 * rowsArray2;
       tmp = new double[n];
-      final double singleDouble = array2.getData()[0];
+      final double singleDouble = array2.getEntry(0, 0);
       Arrays.fill(tmp, singleDouble);
       final int[] colPtr = array2.getColumnPtr();
       final int[] rowIdx = array2.getRowIndex();
