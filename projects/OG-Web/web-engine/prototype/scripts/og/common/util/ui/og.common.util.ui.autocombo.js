@@ -67,7 +67,7 @@ $.register_module({
                 focus: replace_placeholder
             };
             // wrap input in div, enable input width 100% of parent, FF, IE
-            combo.$wrapper = $('<div>').html('<input type="text">');
+            combo.$wrapper = $('<div class="autocomplete-cntr">').html('<input type="text">');
             combo.$input = combo.$wrapper.find('input');
             combo.$button = $('<div class="OG-icon og-icon-down"></div>');
             if (combo.$input && combo.$button) {

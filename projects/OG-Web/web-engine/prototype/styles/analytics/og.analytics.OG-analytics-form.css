@@ -52,15 +52,18 @@
 /**
  * Portfolio
  */
-.OG-analytics-form .og-portfolios{
-    width:30%;
+.OG-analytics-form div.og-portfolios{
+    margin-right: 31px;
+    width: 20%;
+    top: 5px;
+    left: 2px;
 }
 
 .OG-analytics-form .og-portfolios div:first-child {
-    position: absolute;
+    /*position: relative;
     top: 4px;
     left: 2px;
-    right: 21px;
+    right: 21px;*/
 }
 
 .OG-analytics-form .og-portfolios input {
@@ -71,6 +74,8 @@
 
 .OG-analytics-form .og-portfolios .og-icon-down {
     height: 32px;
+    top: 1px;
+    right: -21px;
 }
 
 /**
@@ -84,20 +89,25 @@
     background: #fffee5;
 }
 
+.OG-analytics-form .og-view .autocomplete-cntr{
+    left: 0;
+    position: absolute;
+    right: 28px;
+    top: 15px;
+}
+
 .OG-analytics-form .og-view input {
-    color: #475562;
+    border: none;
     font-family: 'Open Sans', arial, serif;
     font-size: 18px;
     height: 22px;
-    left: 0;
-    position: absolute;
-    right: 21px;
-    top: 15px;
-    border:none;
+    width: 100%;
 }
 
 .OG-analytics-form .og-view .og-icon-down{
+    height: 22px;
     right:7px;
+    top:16px;
 }
 
 

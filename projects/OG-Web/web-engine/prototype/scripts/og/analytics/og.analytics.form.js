@@ -16,7 +16,7 @@ $.register_module({
         // Private
         var query = null, template = null, emitter = new EventEmitter(), initialized = false,
             pf_menu = null, ag_menu = null, ds_menu = null, vd_menu = null, status = null, selector, $dom = {},
-            vd_s = '.og-view .og-option-title', fcntrls_s = 'input, select, a, button',
+            vd_s = '.og-view', fcntrls_s = 'input, select, a, button',
             ac_s = 'input autocompletechange autocompleteselect', ds_template = null, ag_template = null,
             portfolios = null, pf_store = [], viewdefs = null, viewdefs_store = [], aggregators = null, ac_data = null,
             pf_data = null, ag_data = null, ds_data = null,
@@ -32,6 +32,7 @@ $.register_module({
                 querycancelled: 'dropmenu:querycancelled',
                 resetquery:'dropmenu:resetquery'
             };
+
         var auto_combo_handler = function (event, ui) {
             if (!$dom || !('load_btn' in $dom) || !$dom.load_btn) return;
             /*
@@ -40,14 +41,17 @@ $.register_module({
                 else $dom.load_btn.addClass('og-disabled');
             */
         };
+
         var close_dropmenu = function (menu) {
             if (!menu || !ds_menu || !ag_menu) return;
             if (menu === ds_menu) ag_menu.emitEvent(events.close);
             else ds_menu.emitEvent(events.close);
         };
+
         var start_status = function (event) {
             if (status) status.play();
         };
+
         var constructor = function (conf) {
             if (!conf) return og.dev.warn('og.analytics.Form: Missing param [conf] to constructor');
             if (!('selector' in conf) || !conf.selector)
@@ -61,6 +65,7 @@ $.register_module({
             if (template) init(); else fetch_template(init);
             return form;
         };
+
         var fetch_template = function (callback) {
             $.when(
                 og.api.text({module: 'og.analytics.form_tash'}),
@@ -79,6 +84,7 @@ $.register_module({
                 if (callback) callback();
             });
         };
+
         var get_view_index = function (val, key) {
             var pick;
             if (viewdefs_store && viewdefs_store.length){
@@ -88,6 +94,7 @@ $.register_module({
             }
             return pick;
         };
+
         var init = function () {
             if (!selector || !template) return;
             $dom.form = $(selector);
@@ -130,6 +137,7 @@ $.register_module({
             if ($dom.load_btn) $dom.load_btn.on('click', load_query).on('click', start_status);
             //status = new og.analytics.Status(selector + ' .og-status');
         };
+
         var load_query = function () {
             if (!vd_menu || !ds_menu) return;
             var id = get_view_index(vd_menu.$input.val(), 'name'), providers = ds_menu.get_query();
@@ -141,6 +149,7 @@ $.register_module({
                 viewdefinition: id
             });
         };
+
         var keydown_handler = function (event) {
             if (event.keyCode !== 9) return;
             var $elem = $(this), shift_key = event.shiftKey;
@@ -157,10 +166,12 @@ $.register_module({
                 if ($elem.is($dom.ag_fcntrls.eq(0))) ag_menu.emitEvent(events.close);
             }
         };
+
         var query_cancelled = function (menu) {
             emitter.emitEvent(events.closeall);
             if (vd_menu) vd_menu.$input.select();
         };
+
         var query_selected = function (menu) {
             if (!vd_menu || !ds_menu) return;
             if (menu === ag_menu) ds_menu.emitEvent(events.open).emitEvent(events.focus);
