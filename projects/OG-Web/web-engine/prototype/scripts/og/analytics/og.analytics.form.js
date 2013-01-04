@@ -33,6 +33,21 @@ $.register_module({
                 resetquery:'dropmenu:resetquery'
             };
 
+        var ac_source = function (src, callback) {
+            return function (req, res) {
+                var escaped = $.ui.autocomplete.escapeRegex(req.term),
+                    matcher = new RegExp(escaped, 'i'),
+                    htmlize = function (str) {
+                        return !req.term ? str : str.replace(
+                            new RegExp(
+                                '(?![^&;]+;)(?!<[^<>]*)(' + escaped + ')(?![^<>]*>)(?![^&;]+;)', 'gi'
+                            ), '<strong>$1</strong>'
+                        );
+                    };
+                src.get({page: '*'}).pipe(callback);
+            };
+        };
+
         var auto_combo_handler = function (event, ui) {
             if (!$dom || !('load_btn' in $dom) || !$dom.load_btn) return;
             /*
@@ -66,33 +81,42 @@ $.register_module({
             return form;
         };
 
+        // TODO AG: Move individual api calls into the corresponding classes
         var fetch_template = function (callback) {
             $.when(
                 og.api.text({module: 'og.analytics.form_tash'}),
-                og.api.rest.portfolios.get(),
+                //og.api.rest.portfolios.get({page:'*'}),
                 og.api.text({module: 'og.analytics.form_aggregation_tash'}),
                 og.api.text({module: 'og.analytics.form_datasources_tash'}),
-                og.api.rest.viewdefinitions.get({page: '*'}),
                 og.api.rest.aggregators.get()
-            ).pipe(function (tmpl, pfs, ag_tmpl, ds_tmpl, vds, ag_data) {
+            ).pipe(function (tmpl, /*pfs,*/ ag_tmpl, ds_tmpl, ag_data) {
                 if (!tmpl.error) template = tmpl;
-                if (!pfs.error && 'data' in pfs && pfs.data.data.length) portfolios = (pf_store = pfs.data.data);
+                /*if (!pfs.error && 'data' in pfs && 'data' in pfs.data && pfs.data.data.length)
+                    portfolios = (pf_store = pfs.data.data).map(function (entry) {
+                        return entry.split('|')[2];
+                    });*/
                 if (!ag_tmpl.error) ag_template = ag_tmpl;
                 if (!ds_tmpl.error) ds_template = ds_tmpl;
-                if (!vds.error && 'data' in vds && vds.data.length) viewdefs = (viewdefs_store = vds.data).pluck('name');
                 if (!ag_data.error && 'data' in ag_data) aggregators = ag_data.data;
                 if (callback) callback();
             });
         };
 
+        var get_portfolio = function (val) {
+            for (var needle, i = pf_store.length - 1; i >= 0; i--) {
+                needle = pf_store[i].split('|');
+                if (needle[2] === val) return needle[0];
+            };
+        };
+
         var get_view_index = function (val, key) {
-            var pick;
+            var needle;
             if (viewdefs_store && viewdefs_store.length){
                 viewdefs_store.forEach(function (entry) {
-                    if (entry[key] === val) pick = key === 'id' ? entry.name: entry.id;
+                    if (entry[key] === val) needle = key === 'id' ? entry.name: entry.id;
                 });
             }
-            return pick;
+            return needle;
         };
 
         var init = function () {
@@ -105,15 +129,30 @@ $.register_module({
                 $dom.load_btn = $('.og-load', $dom.form);
             }
             if (portfolios) {
-                if (pf_data) pf_data = get_view_index(pf_data, 'id');
-                pf_menu = new og.common.util.ui.AutoCombo(selector+' .og-portfolios', 'Search Portfolios...', viewdefs);
-                pf_menu.$input.on(ac_s, auto_combo_handler).select();
+                //if (pf_data) pf_data = get_portfolio_index(pf_data, 'id');
+                //pf_menu = new og.common.util.ui.AutoCombo(selector+' .og-portfolios', 'Search Portfolios...', portfolios, pf_data);
+                //pf_menu.$input.on(ac_s, auto_combo_handler).select();
             }
-            if (viewdefs) {
-                if (ac_data) ac_data = get_view_index(ac_data, 'id');
-                vd_menu = new og.common.util.ui.AutoCombo(selector+' '+vd_s, 'search...', viewdefs, ac_data);
-                vd_menu.$input.on(ac_s, auto_combo_handler).select();
-            }
+
+            if (ac_data) ac_data = get_view_index(ac_data, 'id');
+            vd_menu = new og.common.util.ui.AutoCombo({
+                selector: selector+' '+vd_s,
+                placeholder: 'search...',
+                input_val: ac_data,
+                source: ac_source(og.api.rest.viewdefinitions, function (resp) {
+                    data = viewdefs = (viewdefs_store = resp.data).pluck('name');
+                    data.sort((function(){
+                        return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
+                    })());
+                    if (data && data.length) {
+                        res(data.reduce(function (acc, val) {
+                            if (!req.term || val && matcher.test(val)) acc.push({label: htmlize(val)});
+                            return acc;
+                        }, []));
+                    }
+                })
+            });
+
             if ($dom.ag && ag_template) {
                 ag_menu = new og.analytics.AggregatorsMenu({
                     cntr:$dom.ag, tmpl:ag_template, data: aggregators, opts:ag_data
@@ -157,19 +196,19 @@ $.register_module({
             $dom.ag_fcntrls = $dom.ag.find(fcntrls_s);
             $dom.ds_fcntrls = $dom.ds.find(fcntrls_s);
             if (!shift_key) {
-                if (vd_menu.state === 'focused') ag_menu.emitEvent(events.open);
-                if ($elem.is($dom.ag_fcntrls.eq(-1))) ds_menu.emitEvent(events.open);
-                if ($elem.is($dom.ds_fcntrls.eq(-1))) ds_menu.emitEvent(events.close);
+                if (vd_menu.state === 'focused') ds_menu.emitEvent(events.open);
+                if ($elem.is($dom.ds_fcntrls.eq(-1))) ag_menu.emitEvent(events.open);
+                if ($elem.is($dom.ag_fcntrls.eq(-1))) ag_menu.emitEvent(events.close);
             } else if (shift_key) {
-                if ($elem.is($dom.load_btn)) ds_menu.emitEvent(events.open);
-                if ($elem.is($dom.ds_fcntrls.eq(0))) ag_menu.emitEvent(events.open);
-                if ($elem.is($dom.ag_fcntrls.eq(0))) ag_menu.emitEvent(events.close);
+                if ($elem.is($dom.load_btn)) ag_menu.emitEvent(events.open);
+                if ($elem.is($dom.ag_fcntrls.eq(0))) ds_menu.emitEvent(events.open);
+                if ($elem.is($dom.ds_fcntrls.eq(0))) ds_menu.emitEvent(events.close);
             }
         };
 
         var query_cancelled = function (menu) {
             emitter.emitEvent(events.closeall);
-            if (vd_menu) vd_menu.$input.select();
+            if (pf_menu) pf_menu.$input.select();
         };
 
         var query_selected = function (menu) {
