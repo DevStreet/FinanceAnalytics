@@ -14,6 +14,7 @@ import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.MetaBean;
 import org.joda.beans.MetaProperty;
+import org.joda.beans.Property;
 
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.id.ExternalId;
@@ -50,7 +51,9 @@ import com.opengamma.util.ArgumentChecker;
     _metaBeanFactory = new MapMetaBeanFactory(metaBeans);
   }
 
-  /* package */ UniqueId buildTrade(BeanDataSource tradeData, BeanDataSource securityData, BeanDataSource underlyingData) {
+  /* package */ UniqueId buildAndSaveTrade(BeanDataSource tradeData,
+                                           BeanDataSource securityData,
+                                           BeanDataSource underlyingData) {
     ObjectId securityId = buildSecurity(securityData, underlyingData).getObjectId();
     ManageableTrade.Meta meta = ManageableTrade.meta();
     BeanBuilder<? extends ManageableTrade> tradeBuilder =
@@ -80,6 +83,29 @@ import com.opengamma.util.ArgumentChecker;
     List<ManageableTrade> trades = savedPosition.getTrades();
     ManageableTrade savedTrade = trades.get(0);
     return savedTrade.getUniqueId();
+  }
+
+  // TODO move these to a separate class that only extracts data, also handles securities and underlyings
+  /**
+   * Extracts trade data and populates a data sink.
+   * @param trade The trade
+   * @param sink The sink that should be populated with the trade data
+   */
+  /* package */ static void extractTradeData(ManageableTrade trade, BeanDataSink<?> sink) {
+    sink.setBeanData(trade.metaBean(), trade);
+    extractPropertyData(trade.uniqueId(), sink);
+    extractPropertyData(trade.tradeDate(), sink);
+    extractPropertyData(trade.tradeTime(), sink);
+    extractPropertyData(trade.premium(), sink);
+    extractPropertyData(trade.premiumCurrency(), sink);
+    extractPropertyData(trade.premiumDate(), sink);
+    extractPropertyData(trade.premiumTime(), sink);
+    sink.setMapValues(trade.attributes().name(), trade.getAttributes());
+    sink.setValue(COUNTERPARTY, trade.getCounterpartyExternalId().getValue());
+  }
+
+  private static void extractPropertyData(Property<?> property, BeanDataSink<?> sink) {
+    sink.setValue(property.name(), property.metaProperty().getString(property.bean()));
   }
 
   /**
@@ -148,6 +174,9 @@ import com.opengamma.util.ArgumentChecker;
     // TODO decorator to filter out trade properties
     BeanVisitor<Bean> visitor = new BeanBuildingVisitor<Bean>(data, _metaBeanFactory);
     MetaBean metaBean = _metaBeanFactory.beanFor(data);
+    // TODO externalIdBundle needs to be specified or building fails because it's null
+    // we never want to set it. BeanBuildingVisitor should return the bean builder so we can set an empty ID bundle
+    // and then call build(). we don't need to support externalIdBundle so can always set it to be EMPTY
     Object bean = new BeanTraverser().traverse(metaBean, visitor);
     if (!expectedType.isAssignableFrom(bean.getClass())) {
       throw new IllegalArgumentException("object type " + bean.getClass().getName() + " doesn't conform to " +
