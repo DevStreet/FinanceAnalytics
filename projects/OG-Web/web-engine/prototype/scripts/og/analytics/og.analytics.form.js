@@ -45,11 +45,11 @@ $.register_module({
                         );
                     };
                 src.get({page: '*'}).pipe(function (resp){
-                    data = callback(resp);
-                    data.sort((function(){
-                        return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
-                    })());
+                    var data = callback(resp);
                     if (data && data.length) {
+                        data.sort((function(){
+                            return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
+                        })());
                         res(data.reduce(function (acc, val) {
                             if (!req.term || val && matcher.test(val)) acc.push({label: htmlize(val)});
                             return acc;
