@@ -20,7 +20,7 @@ $.register_module({
                 menu.$dom.toggle_infix = $(dummy_s).append('<span>then</span>');
                 if (menu.$dom.toggle) menu.$dom.toggle.on('mousedown', menu.toggle_menu.bind(menu));
                 if (menu.$dom.menu) {
-                    if ((menu.$dom.menu_actions = $('.og-menu-actions', menu.$dom.menu)).length) {
+                    if ((menu.$dom.menu_actions = $('.og-menu-actions', menu.$dom.menu))) {
                         menu.$dom.opt = $('.OG-dropmenu-options', menu.$dom.menu);
                         menu.$dom.opt.data('pos', ((menu.opts = []).push(menu.$dom.opt), menu.opts.length-1));
                         menu.$dom.add = $('.OG-link-add', menu.$dom.menu);
