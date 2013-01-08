@@ -4,18 +4,13 @@
  */
 $.register_module({
     name: 'og.analytics.Form',
-    dependencies: [
-        'og.common.util.ui.AutoCombo',
-        'og.analytics.AggregatorsMenu',
-        'og.analytics.DatasourcesMenu',
-        'og.analytics.Status',
-        'og.views.common.layout'
-    ],
+    dependencies: [],
     obj: function () {
 
         // Private
         var query = null, template = null, emitter = new EventEmitter(), initialized = false,
-            pf_menu = null, ag_menu = null, ds_menu = null, vd_menu = null, status = null, selector, $dom = {},
+            portfolios_menu = null, view_definitions_menu = null, datasources_menu = null, temporal_menu = null,
+            aggregators_menu = null, status = null, selector, $dom = {},
             vd_s = '.og-view', fcntrls_s = 'input, select, a, button',
             ac_s = 'input autocompletechange autocompleteselect', ds_template = null, ag_template = null,
             portfolios = null, pf_store = [], viewdefs = null, viewdefs_store = [], aggregators = null, ac_data = null,
@@ -69,9 +64,9 @@ $.register_module({
         };
 
         var close_dropmenu = function (menu) {
-            if (!menu || !ds_menu || !ag_menu) return;
-            if (menu === ds_menu) ag_menu.emitEvent(events.close);
-            else ds_menu.emitEvent(events.close);
+            if (!menu || !datasources_menu || !aggregators_menu) return;
+            if (menu === datasources_menu) aggregators_menu.emitEvent(events.close);
+            else datasources_menu.emitEvent(events.close);
         };
 
         var start_status = function (event) {
@@ -130,13 +125,14 @@ $.register_module({
             $dom.form = $(selector);
             if ($dom.form) {
                 $dom.form.html(template).on('keydown', fcntrls_s, keydown_handler);
-                $dom.ag = $('.og-aggregation', $dom.form);
-                $dom.ds = $('.og-datasources', $dom.form);
+                $dom.datasources = $('.og-datasources', $dom.form);
+                $dom.temporal = $('.og-temporal', $dom.form);
+                $dom.aggregators = $('.og-aggregation', $dom.form);
                 $dom.load_btn = $('.og-load', $dom.form);
             }
 
             if (pf_data) pf_data = get_portfolio(pf_data, 'id');
-            pf_menu = new og.common.util.ui.AutoCombo({
+            portfolios_menu = new og.common.util.ui.AutoCombo({
                 selector: selector+' .og-portfolios',
                 placeholder: 'Search Portfolios...',
                 input_val: pf_data,
@@ -146,10 +142,10 @@ $.register_module({
                     });
                 })
             });
-            pf_menu.$input.on(ac_s, auto_combo_handler).select();
+            portfolios_menu.$input.on(ac_s, auto_combo_handler).select();
 
             if (ac_data) ac_data = get_view_index(ac_data, 'id');
-            vd_menu = new og.common.util.ui.AutoCombo({
+            view_definitions_menu = new og.common.util.ui.AutoCombo({
                 selector: selector+' '+vd_s,
                 placeholder: 'search...',
                 input_val: ac_data,
@@ -158,24 +154,30 @@ $.register_module({
                 })
             });
 
-            if ($dom.ag && ag_template) {
-                ag_menu = new og.analytics.AggregatorsMenu({
-                    cntr:$dom.ag, tmpl:ag_template, data: aggregators, opts:ag_data
+            if ($dom.aggregators && ag_template) {
+                aggregators_menu = new og.analytics.AggregatorsMenu({
+                    cntr:$dom.aggregators, tmpl:ag_template, data: aggregators, opts:ag_data
                 });
             }
-            if ($dom.ds && ds_template) {
-                ds_menu = new og.analytics.DatasourcesMenu({cntr:$dom.ds, tmpl:ds_template, opts:ds_data});
+
+            if ($dom.datasources && ds_template) {
+                datasources_menu = new og.analytics.DatasourcesMenu({
+                    cntr:$dom.datasources, tmpl:ds_template, opts:ds_data
+                });
             }
-            if (ag_menu && ds_menu) {
-                [ag_menu, ds_menu].forEach(function (menu) {
+
+            if ($dom.temporal) temporal_menu = new og.analytics.TemporalMenu({ cntr:$dom.temporal });
+
+            if (aggregators_menu && datasources_menu) {
+                [aggregators_menu, datasources_menu].forEach(function (menu) {
                     menu.addListener(events.opened, close_dropmenu)
                         .addListener(events.queryselected, query_selected)
                         .addListener(events.querycancelled, query_cancelled)
                         .addListener(events.resetquery, menu.reset_query);
                 });
                 emitter.addListener(events.closeall, function () {
-                    close_dropmenu(ag_menu);
-                    close_dropmenu(ds_menu);
+                    close_dropmenu(aggregators_menu);
+                    close_dropmenu(datasources_menu);
                 });
             }
             if ($dom.load_btn) $dom.load_btn.on('click', load_query).on('click', start_status);
@@ -183,12 +185,12 @@ $.register_module({
         };
 
         var load_query = function () {
-            if (!vd_menu || !ds_menu) return;
-            var id = get_view_index(vd_menu.$input.val(), 'name'), providers = ds_menu.get_query();
+            if (!view_definitions_menu || !datasources_menu) return;
+            var id = get_view_index(view_definitions_menu.$input.val(), 'name'), providers = datasources_menu.get_query();
             if (!id) return;
             if (!providers) return;
             og.analytics.url.main(query = {
-                aggregators: ag_menu ? ag_menu.get_query() : [],
+                aggregators: aggregators_menu ? aggregators_menu.get_query() : [],
                 providers: providers,
                 viewdefinition: id
             });
@@ -197,29 +199,29 @@ $.register_module({
         var keydown_handler = function (event) {
             if (event.keyCode !== 9) return;
             var $elem = $(this), shift_key = event.shiftKey;
-            if (!$elem || !vd_menu || !ag_menu || !ds_menu || !$dom.ag || !$dom.ds) return;
-            $dom.ag_fcntrls = $dom.ag.find(fcntrls_s);
-            $dom.ds_fcntrls = $dom.ds.find(fcntrls_s);
+            if (!$elem || !view_definitions_menu || !aggregators_menu || !datasources_menu || !$dom.aggregators || !$dom.datasources) return;
+            $dom.ag_fcntrls = $dom.aggregators.find(fcntrls_s);
+            $dom.ds_fcntrls = $dom.datasources.find(fcntrls_s);
             if (!shift_key) {
-                if (vd_menu.state === 'focused') ds_menu.emitEvent(events.open);
-                if ($elem.is($dom.ds_fcntrls.eq(-1))) ag_menu.emitEvent(events.open);
-                if ($elem.is($dom.ag_fcntrls.eq(-1))) ag_menu.emitEvent(events.close);
+                if (view_definitions_menu.state === 'focused') datasources_menu.emitEvent(events.open);
+                if ($elem.is($dom.ds_fcntrls.eq(-1))) aggregators_menu.emitEvent(events.open);
+                if ($elem.is($dom.ag_fcntrls.eq(-1))) aggregators_menu.emitEvent(events.close);
             } else if (shift_key) {
-                if ($elem.is($dom.load_btn)) ag_menu.emitEvent(events.open);
-                if ($elem.is($dom.ag_fcntrls.eq(0))) ds_menu.emitEvent(events.open);
-                if ($elem.is($dom.ds_fcntrls.eq(0))) ds_menu.emitEvent(events.close);
+                if ($elem.is($dom.load_btn)) aggregators_menu.emitEvent(events.open);
+                if ($elem.is($dom.ag_fcntrls.eq(0))) datasources_menu.emitEvent(events.open);
+                if ($elem.is($dom.ds_fcntrls.eq(0))) datasources_menu.emitEvent(events.close);
             }
         };
 
         var query_cancelled = function (menu) {
             emitter.emitEvent(events.closeall);
-            if (pf_menu) pf_menu.$input.select();
+            if (portfolios_menu) portfolios_menu.$input.select();
         };
 
         var query_selected = function (menu) {
-            if (!vd_menu || !ds_menu) return;
-            if (menu === ag_menu) ds_menu.emitEvent(events.open).emitEvent(events.focus);
-            else if (menu === ds_menu) $dom.load_btn.focus();
+            if (!view_definitions_menu || !datasources_menu) return;
+            if (menu === aggregators_menu) datasources_menu.emitEvent(events.open).emitEvent(events.focus);
+            else if (menu === datasources_menu) $dom.load_btn.focus();
         };
 
         // Public
@@ -238,7 +240,7 @@ $.register_module({
                             return {val:entry, required_field:false};
                         })
                     };
-                    if (ag_menu) ag_menu.replay_query(ag_val); else ag_data = ag_val;
+                    if (aggregators_menu) aggregators_menu.replay_query(ag_val); else ag_data = ag_val;
                 }
             }
 
@@ -257,14 +259,14 @@ $.register_module({
                             return obj;
                         })
                     };
-                    if (ds_menu) ds_menu.replay_query(ds_val); else ds_data = ds_val;
+                    if (datasources_menu) datasources_menu.replay_query(ds_val); else ds_data = ds_val;
                 }
             }
 
             if ('viewdefinition' in url_config && url_config.viewdefinition &&
                 typeof url_config.viewdefinition === 'string') {
                 if (!query || (url_config.viewdefinition !== query.viewdefinition)) {
-                    if (vd_menu) vd_menu.$input.val(get_view_index(url_config.viewdefinition, 'id'));
+                    if (view_definitions_menu) view_definitions_menu.$input.val(get_view_index(url_config.viewdefinition, 'id'));
                     else ac_data = url_config.viewdefinition;
                 }
             }
@@ -273,8 +275,8 @@ $.register_module({
         };
         constructor.prototype.reset_query = function () {
             if (query) query = null;
-            [ag_menu, ds_menu].forEach(function (menu) { if (menu) menu.emitEvent(events.resetquery); });
-            if (vd_menu) vd_menu.$input.val('search...');
+            [aggregators_menu, datasources_menu].forEach(function (menu) { if (menu) menu.emitEvent(events.resetquery); });
+            if (view_definitions_menu) view_definitions_menu.$input.val('search...');
         };
         return constructor;
     }

@@ -218,11 +218,6 @@
     font-size: 11px;
 }
 
-
-.OG-analytics-form .og-optional .og-icon-Depgraph:after{
-    background: none;
-}
-
 .OG-analytics-form .og-optional .og-icon-down{
     height: 11px;
 }
@@ -234,7 +229,7 @@
 }
 
 .OG-analytics-form .og-optional .og-icon-Temporal,
-.OG-analytics-form .og-optional .og-icon-Depgraph,
+.OG-analytics-form .og-optional .og-icon-Aggregation,
 .OG-analytics-form .og-optional .og-icon-Filter{
     top:2px;
     margin:0 3px 0 0
@@ -252,15 +247,6 @@
  */
 .OG-analytics-form .og-aggregation {
     margin: 0 10%;
-}
-
-.OG-analytics-form .og-aggregation .og-icon-Depgraph:before {
-    background-position: -67px -77px;
-    background-color: transparent;
-    display: inline-block;
-    height: 14px;
-    width: 13px;
-    z-index: 2;
 }
 
 /**
