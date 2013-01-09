@@ -155,7 +155,7 @@
     text-transform: capitalize;
 }
 
-.OG-analytics-form .og-option-title > span {
+.OG-analytics-form .og-option-title li span {
     color: #999;
     text-transform: uppercase;
     font-size: 12px;
