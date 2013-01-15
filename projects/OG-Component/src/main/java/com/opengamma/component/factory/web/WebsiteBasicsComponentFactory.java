@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
+import com.opengamma.master.security.impl.EHCachingSecurityMaster;
+import net.sf.ehcache.CacheManager;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -154,7 +156,8 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
     repo.getRestComponents().publishResource(resource);
     resource = new JerseyRestResourceFactory(WebRegionsResource.class, getRegionMaster());
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, getSecurityMaster(), getSecurityLoader(), getHistoricalTimeSeriesMaster());
+//    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, getSecurityMaster(), getSecurityLoader(), getHistoricalTimeSeriesMaster());
+    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, new EHCachingSecurityMaster(getSecurityMaster(), CacheManager.getInstance()), getSecurityLoader(), getHistoricalTimeSeriesMaster());
     repo.getRestComponents().publishResource(resource);
     resource = new JerseyRestResourceFactory(WebPositionsResource.class, getPositionMaster(), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
     repo.getRestComponents().publishResource(resource);
