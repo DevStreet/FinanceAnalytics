@@ -154,6 +154,10 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       _fromVersionCorrectionInstantMap = new TreeMap<>();
     }
 
+    public InstantMap(NavigableMap<Instant, NavigableMap<Instant, D>> map) {
+      _fromVersionCorrectionInstantMap = map;
+    }
+
     public D get(VersionCorrection versionCorrection) {
       versionCorrection = versionCorrection.withLatestFixed(Instant.now());
       Instant fromVersionInstant = _fromVersionCorrectionInstantMap.floorKey(versionCorrection.getVersionAsOf());
@@ -162,17 +166,15 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
         Instant fromCorrectionInstant = fromCorrectionInstantMap.floorKey(versionCorrection.getCorrectedTo());
         if (fromCorrectionInstant != null) {
           D document = fromCorrectionInstantMap.get(fromCorrectionInstant);
-          if (
-              (
+          if ((
                document.getVersionFromInstant() == null ||
                document.getVersionFromInstant().equals(versionCorrection.getVersionAsOf()) ||
                document.getVersionFromInstant().isBefore(versionCorrection.getVersionAsOf())
-              ) && (
+             ) && (
                document.getCorrectionFromInstant() == null ||
                document.getCorrectionFromInstant().equals(versionCorrection.getCorrectedTo()) ||
                document.getCorrectionFromInstant().isBefore(versionCorrection.getCorrectedTo())
-              )
-             ) {
+             )) {
             return document;
           } // else one or both of the found version and correction expire too early
         } // else did not find a correction that's old enough
@@ -180,7 +182,22 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       return null;
     }
 
-    public void put(D document) { // assumes documents has the same objectid as the others in this InstantMap
+    public InstantMap getRange(Instant fromVersion, Instant toVersion) {
+
+      // get tail of map
+      NavigableMap<Instant, NavigableMap<Instant, D>> tailMap = fromVersion != null && _fromVersionCorrectionInstantMap.floorKey(fromVersion) != null
+          ? _fromVersionCorrectionInstantMap.tailMap(_fromVersionCorrectionInstantMap.floorKey(fromVersion), true)
+          : _fromVersionCorrectionInstantMap;
+
+      // get head of tail
+      NavigableMap<Instant, NavigableMap<Instant, D>> headOfTailMap = toVersion != null && _fromVersionCorrectionInstantMap.floorKey(toVersion) != null
+          ? tailMap.headMap(_fromVersionCorrectionInstantMap.floorKey(toVersion), false)
+          : tailMap;
+
+      return new InstantMap(headOfTailMap);
+    }
+
+    public void put(D document) { // assumes document has the same objectid as the others in this InstantMap
       Instant versionFromInstant = document.getVersionFromInstant() != null ? document.getVersionFromInstant() : Instant.EPOCH;
       Instant correctionFromInstant = document.getCorrectionFromInstant() != null ? document.getCorrectionFromInstant() : Instant.EPOCH;
       NavigableMap<Instant, D> fromCorrectionInstantMap = _fromVersionCorrectionInstantMap.get(versionFromInstant);
@@ -190,6 +207,10 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       }
       // TODO may need to invalidate previous latest by changing version/correction or reloading from underlying
       fromCorrectionInstantMap.put(correctionFromInstant, document);
+    }
+
+    public NavigableMap<Instant, NavigableMap<Instant, D>> getMap() {
+      return _fromVersionCorrectionInstantMap;
     }
   } // InstantMap
 
@@ -223,10 +244,12 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       result = getUnderlying().get(objectId, versionCorrection);
 
       // Update uniqueid map
-      getDocumentByUidCache().put(new Element(result.getUniqueId(), result));
+      if (result != null) { // TODO NOT CACHING MISSES :(
+        getDocumentByUidCache().put(new Element(result.getUniqueId(), result));
 
-      // Update objectid/version/correction map
-      instantMap.put(result); // result may be null
+        // Update objectid/version/correction map
+        instantMap.put(result);
+      }
     }
     return result;
   }
@@ -249,12 +272,14 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
         // Get document from underlying master
         result = getUnderlying().get(uniqueId);
 
-        // Update uniqueid map
-        getDocumentByUidCache().put(new Element(result.getUniqueId(), result));
+        if (result != null) { // TODO NOT CACHING MISSES :(
+          // Update uniqueid map
+          getDocumentByUidCache().put(new Element(uniqueId, result));
 
-        // Update objectid/version/correction map
-        InstantMap instantMap = getOrCreateInstantMap(uniqueId.getObjectId(), getDocumentByOidCache());
-        instantMap.put(result);
+          // Update objectid/version/correction map
+          InstantMap instantMap = getOrCreateInstantMap(uniqueId.getObjectId(), getDocumentByOidCache());
+          instantMap.put(result);
+        }
       }
     }
     return result;
@@ -314,13 +339,8 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     // Remove document from underlying master
     getUnderlying().remove(oid);
 
-//    // Adjust version/correction validity of latest version in Oid cache
-//    InstantMap instantMap = getOrCreateInstantMap(oid, getDocumentByOidCache());
-//    D oldDocument = instantMap.get(VersionCorrection.LATEST);
-//    if (oldDocument != null) {
-//      oldDocument.setVersionToInstant(Instant.now());   // hope this is accurate enough, might need to fetch times from underlying master
-//      oldDocument.setCorrectionToInstant(Instant.now());
-//    }
+    // Adjust version/correction validity of latest version in Oid cache
+    cleanCaches(oid.getObjectId(), Instant.now(), null);
   }
 
   @Override
@@ -371,9 +391,30 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
   //-------------------------------------------------------------------------
 
-  private void cleanCaches(ObjectId oid, Instant versionFrom, Instant versionTo) {
-    // TODO finer granularity cleaning/clean UniqueId cache too
-    getDocumentByOidCache().remove(oid);
+  private void cleanCaches(ObjectId oid, Instant fromVersion, Instant toVersion) {
+
+// Coarse grain removal from caches - very inefficient
+//    getDocumentByOidCache().remove(oid);
+//    for (UniqueId uniqueId : (Collection<UniqueId>) getDocumentByUidCache().getKeys()) {
+//      if (uniqueId.getObjectId().equals(oid)) {
+//        getDocumentByUidCache().remove(uniqueId);
+//      }
+//    }
+
+    // Get the documents that match the version range
+    InstantMap instantMap = getOrCreateInstantMap(oid, getDocumentByOidCache()).getRange(fromVersion, toVersion);
+
+    // Remove all matching versions
+    for (NavigableMap<Instant, D> correctionMap : instantMap.getMap().values()) {
+
+      // Remove each correction from Uid map
+      for (D document : correctionMap.values()) {
+        getDocumentByUidCache().remove(document.getUniqueId());
+      }
+
+      // Remove all corrections from Oid map
+      correctionMap.clear();
+    }
   }
 
   /**
