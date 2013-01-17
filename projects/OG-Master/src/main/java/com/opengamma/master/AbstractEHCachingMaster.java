@@ -167,13 +167,13 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
         if (fromCorrectionInstant != null) {
           D document = fromCorrectionInstantMap.get(fromCorrectionInstant);
           if ((
-               document.getVersionFromInstant() == null ||
-               document.getVersionFromInstant().equals(versionCorrection.getVersionAsOf()) ||
-               document.getVersionFromInstant().isBefore(versionCorrection.getVersionAsOf())
+               document.getVersionToInstant() == null ||
+               document.getVersionToInstant().equals(versionCorrection.getVersionAsOf()) ||
+               document.getVersionToInstant().isAfter(versionCorrection.getVersionAsOf())
              ) && (
-               document.getCorrectionFromInstant() == null ||
-               document.getCorrectionFromInstant().equals(versionCorrection.getCorrectedTo()) ||
-               document.getCorrectionFromInstant().isBefore(versionCorrection.getCorrectedTo())
+               document.getCorrectionToInstant() == null ||
+               document.getCorrectionToInstant().equals(versionCorrection.getCorrectedTo()) ||
+               document.getCorrectionToInstant().isAfter(versionCorrection.getCorrectedTo())
              )) {
             return document;
           } // else one or both of the found version and correction expire too early
@@ -185,12 +185,14 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     public InstantMap getRange(Instant fromVersion, Instant toVersion) {
 
       // get tail of map
-      NavigableMap<Instant, NavigableMap<Instant, D>> tailMap = fromVersion != null && _fromVersionCorrectionInstantMap.floorKey(fromVersion) != null
+      NavigableMap<Instant, NavigableMap<Instant, D>> tailMap =
+          fromVersion != null && _fromVersionCorrectionInstantMap.floorKey(fromVersion) != null
           ? _fromVersionCorrectionInstantMap.tailMap(_fromVersionCorrectionInstantMap.floorKey(fromVersion), true)
           : _fromVersionCorrectionInstantMap;
 
       // get head of tail
-      NavigableMap<Instant, NavigableMap<Instant, D>> headOfTailMap = toVersion != null && _fromVersionCorrectionInstantMap.floorKey(toVersion) != null
+      NavigableMap<Instant, NavigableMap<Instant, D>> headOfTailMap =
+          toVersion != null && _fromVersionCorrectionInstantMap.floorKey(toVersion) != null
           ? tailMap.headMap(_fromVersionCorrectionInstantMap.floorKey(toVersion), false)
           : tailMap;
 
@@ -423,6 +425,8 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    */
   public void shutdown() {
     getUnderlying().changeManager().removeChangeListener(_changeListener);
+    getCacheManager().clearAllStartingWith(_documentByOidCacheName);
+    getCacheManager().clearAllStartingWith(_documentByUidCacheName);
     getCacheManager().removeCache(_documentByOidCacheName);
     getCacheManager().removeCache(_documentByUidCacheName);
   }
