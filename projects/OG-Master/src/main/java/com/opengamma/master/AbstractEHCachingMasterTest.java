@@ -30,11 +30,15 @@ import javax.time.calendar.TimeZone;
 import javax.time.calendar.ZonedDateTime;
 import java.util.List;
 
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.*;
 
 /**
- * Test {@link com.opengamma.master.security.impl.EHCachingSecurityMaster} using an underlying {@link com.opengamma.master.security.impl.InMemorySecurityMaster}.
+ * Common properties and methods for testing EHCaching masters. This abstract class declares document variables of
+ * generic type without initial values, and provides a populate method which can be called by a test subclass to
+ * populate a mock master with the documents, but only after the the subclass initialises the documents with objects
+ * of the correct type.
  */
 public abstract class AbstractEHCachingMasterTest<M extends AbstractChangeProvidingMaster<D>, D extends AbstractDocument> {
 
@@ -67,14 +71,20 @@ public abstract class AbstractEHCachingMasterTest<M extends AbstractChangeProvid
   protected D docC100_Vto2011;
   protected D docC300_V2011to;
 
-  protected abstract M getCleanMockMaster();
-  protected abstract AbstractEHCachingMaster<D> getCleanEHCachingMaster(M underlyingMaster, CacheManager cacheManager);
+  // Document to add
+  protected static final ObjectId ADDED_OID = ObjectId.of(ID_SCHEME, "ADDED");
+  protected static final UniqueId ADDED_UID = UniqueId.of(ADDED_OID, "1");
+  protected D DOC_TO_ADD;
+  protected D DOC_ADDED;
 
   /**
    * Creates a fresh mock master and configures it to respond as though it contains the above documents
    * @return the mock master
    */
   protected AbstractChangeProvidingMaster populateMockMaster(M mockUnderlyingMaster) {
+
+    ChangeManager changeManager = new BasicChangeManager();
+    when(mockUnderlyingMaster.changeManager()).thenReturn(changeManager);
 
     // Set up VersionFrom, VersionTo, CorrectionFrom, CorrectionTo
 
@@ -108,10 +118,7 @@ public abstract class AbstractEHCachingMasterTest<M extends AbstractChangeProvid
     // Document C 300: v 2011 to
     docC300_V2011to.setVersionFromInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
 
-    ChangeManager changeManager = new BasicChangeManager();
-    when(mockUnderlyingMaster.changeManager()).thenReturn(changeManager);
-
-    // Configure mock master to respond to versioned unique ID gets
+     // Configure mock master to respond to versioned unique ID gets
     when(mockUnderlyingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId())).thenReturn(docA100_V1999to2010_Cto2011);
     when(mockUnderlyingMaster.get(docA200_V2010to.getUniqueId())).thenReturn(docA200_V2010to);
     when(mockUnderlyingMaster.get(docA300_V1999to2010_C2011to.getUniqueId())).thenReturn(docA300_V1999to2010_C2011to);
@@ -144,173 +151,15 @@ public abstract class AbstractEHCachingMasterTest<M extends AbstractChangeProvid
     when(mockUnderlyingMaster.get(
         eq(C_OID), argThat(new IsValidFor(docC300_V2011to)))).thenReturn(docC300_V2011to);
 
+    // Configure mock master to respond to add
+    when(mockUnderlyingMaster.add(DOC_TO_ADD)).thenReturn(DOC_ADDED);
+    when(mockUnderlyingMaster.get(ADDED_UID)).thenReturn(DOC_ADDED);
+    when(mockUnderlyingMaster.get(eq(ADDED_OID), argThat(new IsValidFor(DOC_ADDED)))).thenReturn(DOC_ADDED);
+
     return mockUnderlyingMaster;
   }
 
-  /********************************************************************************************************************/
-
-  @Test
-  public void testGetUidVersioned() {
-    M mockUnderlyingMaster = getCleanMockMaster();
-    AbstractEHCachingMaster<D> cachingMaster = getCleanEHCachingMaster(mockUnderlyingMaster, getCleanCacheManager());
-
-    // Assert returned documents
-    assertEquals(docB200_V2000to2009, cachingMaster.get(docB200_V2000to2009.getUniqueId()));
-    assertEquals(docA100_V1999to2010_Cto2011, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId()));
-    assertEquals(docA100_V1999to2010_Cto2011, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId()));
-    assertEquals(docA100_V1999to2010_Cto2011, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId()));
-    assertEquals(docB200_V2000to2009, cachingMaster.get(docB200_V2000to2009.getUniqueId()));
-    assertEquals(docB200_V2000to2009, cachingMaster.get(docB200_V2000to2009.getUniqueId()));
-    assertEquals(docA100_V1999to2010_Cto2011, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId()));
-    assertEquals(docB200_V2000to2009, cachingMaster.get(docB200_V2000to2009.getUniqueId()));
-
-    // Assert invocation counts
-    verify(mockUnderlyingMaster, times(1)).get(docA100_V1999to2010_Cto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docA200_V2010to.getUniqueId());
-    verify(mockUnderlyingMaster, times(1)).get(docB200_V2000to2009.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB400_V2009to2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB500_V2011to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC100_Vto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC300_V2011to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docA200_V2010to.getObjectId(), VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(docB500_V2011to.getObjectId(), VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(docC300_V2011to.getObjectId(), VersionCorrection.LATEST);
-
-    cachingMaster.shutdown();
-  }
-
-  @Test
-  public void testGetUidUnversioned() {
-    M mockUnderlyingMaster = getCleanMockMaster();
-    AbstractEHCachingMaster<D> cachingMaster = getCleanEHCachingMaster(mockUnderlyingMaster, getCleanCacheManager());
-
-    // Assert returned documents
-    assertEquals(docB500_V2011to, cachingMaster.get(docB200_V2000to2009.getUniqueId().toLatest()));
-    assertEquals(docA200_V2010to, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId().toLatest()));
-    assertEquals(docA200_V2010to, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId().toLatest()));
-    assertEquals(docA200_V2010to, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId().toLatest()));
-    assertEquals(docB500_V2011to, cachingMaster.get(docB200_V2000to2009.getUniqueId().toLatest()));
-    assertEquals(docB500_V2011to, cachingMaster.get(docB200_V2000to2009.getUniqueId().toLatest()));
-    assertEquals(docA200_V2010to, cachingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId().toLatest()));
-    assertEquals(docB500_V2011to, cachingMaster.get(docB200_V2000to2009.getUniqueId().toLatest()));
-
-    // Assert invocation counts
-    verify(mockUnderlyingMaster, times(1)).get(A_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(1)).get(B_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(C_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(docA100_V1999to2010_Cto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docA200_V2010to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB200_V2000to2009.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB400_V2009to2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB500_V2011to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC100_Vto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC300_V2011to.getUniqueId());
-
-    cachingMaster.shutdown();
-  }
-
-  @Test
-  public void testGetOidLatestVersionCorrection() {
-    M mockUnderlyingMaster = getCleanMockMaster();
-    AbstractEHCachingMaster<D> cachingMaster = getCleanEHCachingMaster(mockUnderlyingMaster, getCleanCacheManager());
-
-    // Assert returned documents
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
-    assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
-    assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
-    assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
-    assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
-
-    // Assert invocation counts
-    verify(mockUnderlyingMaster, times(1)).get(A_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(1)).get(B_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(C_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(docA100_V1999to2010_Cto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docA200_V2010to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB200_V2000to2009.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB400_V2009to2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB500_V2011to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC100_Vto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC300_V2011to.getUniqueId());
-
-    cachingMaster.shutdown();
-  }
-
-  @Test
-  public void testGetOidMixedVersionCorrection() {
-    M mockUnderlyingMaster = getCleanMockMaster();
-    AbstractEHCachingMaster<D> cachingMaster = getCleanEHCachingMaster(mockUnderlyingMaster, getCleanCacheManager());
-
-    // Assert returned documents
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
-    assertEquals(docA100_V1999to2010_Cto2011, cachingMaster.get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant(),
-                             ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant())));
-    assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
-    assertEquals(docA300_V1999to2010_C2011to, cachingMaster.get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now)));
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.of(now, now)));
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
-    assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
-    assertEquals(docB500_V2011to, cachingMaster.get(B_OID,
-        VersionCorrection.of(ZonedDateTime.of(2011, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now)));
-
-    // Assert invocation counts
-    verify(mockUnderlyingMaster, times(1)).get(B_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(1)).get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant(),
-                             ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant()));
-    verify(mockUnderlyingMaster, times(1)).get(A_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(1)).get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now));
-    verify(mockUnderlyingMaster, times(0)).get(B_OID, VersionCorrection.of(now, now));
-    verify(mockUnderlyingMaster, times(0)).get(B_OID,
-        VersionCorrection.of(ZonedDateTime.of(2011, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now));
-    verify(mockUnderlyingMaster, times(0)).get(C_OID, VersionCorrection.LATEST);
-    verify(mockUnderlyingMaster, times(0)).get(docA100_V1999to2010_Cto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docA200_V2010to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docA300_V1999to2010_C2011to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB200_V2000to2009.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB400_V2009to2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docB500_V2011to.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC100_Vto2011.getUniqueId());
-    verify(mockUnderlyingMaster, times(0)).get(docC300_V2011to.getUniqueId());
-
-    cachingMaster.shutdown();
-  }
-
-  @Test
-  public void testCachedMiss() {
-
-  }
-
-  /********************************************************************************************************************/
-
-  @Test
-  public void testUpdate() {
-
-  }
-
-  @Test
-  public void testAdd() {
-
-  }
-
-  @Test
-  public void testCorrect() {
-
-  }
-
-  @Test
-  public void testChangeProvider() {
-
-  }
-
-  /********************************************************************************************************************/
-
+  //-------------------------------------------------------------------------
 
   /**
    * Mockito argument matcher that checks whether a VersionCorrection is within a document's v/c range
@@ -339,7 +188,7 @@ public abstract class AbstractEHCachingMasterTest<M extends AbstractChangeProvid
    * Returns an empty cache manager
    * @return the cache manager
    */
-  private CacheManager getCleanCacheManager() {
+  protected CacheManager getCleanCacheManager() {
     CacheManager cacheManager = CacheManager.getInstance();
     cacheManager.clearAll();
     cacheManager.removalAll();
