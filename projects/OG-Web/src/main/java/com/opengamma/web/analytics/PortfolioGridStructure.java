@@ -20,8 +20,8 @@ import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.view.ViewCalculationConfiguration;
+import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
-import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -29,15 +29,12 @@ import com.opengamma.util.tuple.Pair;
  */
 public class PortfolioGridStructure extends MainGridStructure {
 
-  /* Label column can be NodeId or PositionId, setting the type as null means it will be set for every cell. */
-  private static final AnalyticsColumnGroup s_fixedColumnGroup =
-      new AnalyticsColumnGroup("fixed", ImmutableList.of(new AnalyticsColumn("Label", "", null),
-                                                         new AnalyticsColumn("Quantity", "", BigDecimal.class)));
   private final AnalyticsNode _root;
 
-  /* package */ PortfolioGridStructure(final CompiledViewDefinition compiledViewDef, final ValueMappings valueMappings) {
-    super(s_fixedColumnGroup, compiledViewDef, rows(compiledViewDef), valueMappings);
-    ArgumentChecker.notNull(compiledViewDef, "compiledViewDef");
+  private PortfolioGridStructure(GridColumnGroups columnGroups,
+                                 CompiledViewDefinition compiledViewDef,
+                                 TargetLookup targetLookup) {
+    super(columnGroups, targetLookup);
     _root = AnalyticsNode.portoflioRoot(compiledViewDef);
   }
 
@@ -45,29 +42,53 @@ public class PortfolioGridStructure extends MainGridStructure {
     _root = AnalyticsNode.emptyRoot();
   }
 
-  /* package */static PortfolioGridStructure empty() {
+  /* package */ static PortfolioGridStructure forAnalytics(CompiledViewDefinition compiledViewDef,
+                                                           ValueMappings valueMappings) {
+    List<MainGridStructure.Row> rows = rows(compiledViewDef);
+    GridColumn labelColumn = new GridColumn("Label", "", null, new PortfolioLabelRenderer(rows));
+    GridColumn quantityColumn = new GridColumn("Quantity", "", BigDecimal.class, new QuantityRenderer(rows), null);
+    GridColumnGroup fixedColumns = new GridColumnGroup("fixed", ImmutableList.of(labelColumn, quantityColumn));
+    TargetLookup targetLookup = new TargetLookup(valueMappings, rows);
+    List<GridColumnGroup> analyticsColumns = buildAnalyticsColumns(compiledViewDef.getViewDefinition(), targetLookup);
+    List<GridColumnGroup> groups = Lists.newArrayList(fixedColumns);
+    groups.addAll(analyticsColumns);
+    GridColumnGroups columnGroups = new GridColumnGroups(groups);
+    return new PortfolioGridStructure(columnGroups, compiledViewDef, targetLookup);
+  }
+
+  /* package */
+  @SuppressWarnings("UnusedDeclaration")
+  static PortfolioGridStructure forBlotter() {
     return new PortfolioGridStructure();
   }
 
-  @Override
-  protected List<ColumnKey> buildColumns(final ViewCalculationConfiguration calcConfig) {
-    final List<ColumnKey> columnKeys = Lists.newArrayList();
-    for (final Pair<String, ValueProperties> portfolioOutput : calcConfig.getAllPortfolioRequirements()) {
-      final String valueName = portfolioOutput.getFirst();
-      final ValueProperties constraints = portfolioOutput.getSecond();
-      final ColumnKey columnKey = new ColumnKey(calcConfig.getName(), valueName, constraints);
-      columnKeys.add(columnKey);
-    }
-    return columnKeys;
+  /* package */ static PortfolioGridStructure empty() {
+    return new PortfolioGridStructure();
   }
 
   public AnalyticsNode getRoot() {
     return _root;
   }
 
-  @Override
-  public String toString() {
-    return "PortfolioGridStructure [_root=" + _root + "]";
+  /**
+   * @param viewDef The view definition
+   * @return Columns for displaying calculated analytics data, one group per calculation configuration
+   */
+  private static List<GridColumnGroup> buildAnalyticsColumns(ViewDefinition viewDef, TargetLookup targetLookup) {
+    List<GridColumnGroup> columnGroups = Lists.newArrayList();
+    for (ViewCalculationConfiguration calcConfig : viewDef.getAllCalculationConfigurations()) {
+      List<GridColumn> columns = Lists.newArrayList();
+      for (Pair<String, ValueProperties> portfolioOutput : calcConfig.getAllPortfolioRequirements()) {
+        String valueName = portfolioOutput.getFirst();
+        Class<?> columnType = ValueTypes.getTypeForValueName(valueName);
+        ValueProperties constraints = portfolioOutput.getSecond();
+        ColumnSpecification columnSpec = new ColumnSpecification(calcConfig.getName(), valueName, constraints);
+        // TODO ensure columnSpec isn't a duplicate
+        columns.add(GridColumn.forKey(columnSpec, columnType, targetLookup));
+      }
+      columnGroups.add(new GridColumnGroup(calcConfig.getName(), columns));
+    }
+    return columnGroups;
   }
 
   private static List<Row> rows(final CompiledViewDefinition viewDef) {
@@ -75,11 +96,12 @@ public class PortfolioGridStructure extends MainGridStructure {
     if (portfolio == null) {
       return Collections.emptyList();
     }
-    final PortfolioMapperFunction<Row> targetFn = new PortfolioMapperFunction<Row>() {
+    PortfolioMapperFunction<Row> targetFn = new PortfolioMapperFunction<Row>() {
 
       @Override
-      public Row apply(final PortfolioNode node) {
-        final ComputationTargetSpecification target = ComputationTargetSpecification.of(node);
+      public Row apply(PortfolioNode node) {
+        ComputationTargetSpecification target =
+            new ComputationTargetSpecification(ComputationTargetType.PORTFOLIO_NODE, node.getUniqueId());
         String nodeName;
         // if the parent ID is null it's the root node
         if (node.getParentNodeId() == null) {
@@ -92,11 +114,12 @@ public class PortfolioGridStructure extends MainGridStructure {
       }
 
       @Override
-      public Row apply(final PortfolioNode parentNode, final Position position) {
-        final ComputationTargetSpecification target = ComputationTargetSpecification.of(parentNode).containing(ComputationTargetType.POSITION, position.getUniqueId().toLatest());
+      public Row apply(PortfolioNode parentNode, Position position) {
+        // TODO I don't think toLatest() will do long term. resolution time available on the result model
+        ComputationTargetSpecification target = ComputationTargetSpecification.of(parentNode).containing(
+            ComputationTargetType.POSITION, position.getUniqueId().toLatest());
         return new Row(target, position.getSecurity().getName(), position.getQuantity());
       }
-
     };
     return PortfolioMapper.map(portfolio.getRootNode(), targetFn);
   }

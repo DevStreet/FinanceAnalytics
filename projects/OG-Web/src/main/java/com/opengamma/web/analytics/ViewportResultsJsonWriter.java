@@ -64,14 +64,14 @@ public class ViewportResultsJsonWriter {
 
   // TODO use a Freemarker template - will that perform well enough?
   public String getJson(ViewportResults viewportResults) {
-    List<ViewportResults.Cell> viewportCells = viewportResults.getResults();
+    List<ResultsCell> viewportCells = viewportResults.getResults();
     List<Object> results = Lists.newArrayListWithCapacity(viewportCells.size());
-    for (ViewportResults.Cell cell : viewportCells) {
+    for (ResultsCell cell : viewportCells) {
       Object cellValue = cell.getValue();
       ValueSpecification cellValueSpec = cell.getValueSpecification();
       Object formattedValue = _formatter.format(cellValue, cellValueSpec, viewportResults.getFormat());
       Collection<Object> history = cell.getHistory();
-      Class<?> columnType = viewportResults.getColumnType(cell.getColumn());
+      Class<?> columnType = cell.getType();
       DataType columnFormat = _formatter.getDataType(columnType);
       Map<String, Object> valueMap = Maps.newHashMap();
       AggregatedExecutionLog executionLog = cell.getExecutionLog();
