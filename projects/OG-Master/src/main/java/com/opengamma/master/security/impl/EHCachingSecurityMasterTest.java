@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.*;
 
 /**
- * Test {@link com.opengamma.master.security.impl.EHCachingSecurityMaster} using an underlying {@link com.opengamma.master.security.impl.InMemorySecurityMaster}.
+ * Test {@link com.opengamma.master.security.impl.EHCachingSecurityMaster}
  */
 @Test
 public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<SecurityMaster, SecurityDocument> {
@@ -66,17 +66,41 @@ public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<Sec
     docC300_V2011to = new SecurityDocument(
         new ManageableSecurity(C300_UID, "C", "test", ExternalIdBundle.EMPTY));
 
+    // Document to add
+    DOC_TO_ADD = new SecurityDocument(
+      new ManageableSecurity(null, "ADD", "test", ExternalIdBundle.EMPTY));
+    DOC_ADDED = new SecurityDocument(
+        new ManageableSecurity(ADDED_UID, "ADD", "test", ExternalIdBundle.EMPTY));
    }
 
-
-  @Override
-  protected SecurityMaster getCleanMockMaster() {
-    SecurityMaster securityMaster = mock(SecurityMaster.class);
-    return (SecurityMaster) populateMockMaster(securityMaster);
+  @Test
+  void testSearch() {
+    SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
+    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+    
+    //TODO
+    
+    cachingMaster.shutdown();
   }
 
-  @Override
-  protected AbstractEHCachingMaster<SecurityDocument> getCleanEHCachingMaster(SecurityMaster underlyingMaster, CacheManager cacheManager) {
-    return new EHCachingSecurityMaster(underlyingMaster, cacheManager);
+  @Test
+  void testHistorySearch() {
+    SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
+    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
   }
+
+  @Test
+  void testMetaDataSearch() {
+    SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
+    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
+  }
+
 }
