@@ -109,11 +109,6 @@ public class BlotterResource {
       FXForwardSecurity.meta(),
       SwapSecurity.meta(),
       SwaptionSecurity.meta(),
-      FixedInterestRateLeg.meta(),
-      FloatingInterestRateLeg.meta(),
-      FloatingSpreadIRLeg.meta(),
-      FloatingGearingIRLeg.meta(),
-      InterestRateNotional.meta(),
       CapFloorCMSSpreadSecurity.meta(),
       NonDeliverableFXOptionSecurity.meta(),
       FXOptionSecurity.meta(),
@@ -121,7 +116,11 @@ public class BlotterResource {
       CapFloorSecurity.meta(),
       EquityVarianceSwapSecurity.meta(),
       FXBarrierOptionSecurity.meta(),
-      NonDeliverableFXOptionSecurity.meta());
+      FixedInterestRateLeg.meta(),
+      FloatingInterestRateLeg.meta(),
+      FloatingSpreadIRLeg.meta(),
+      FloatingGearingIRLeg.meta(),
+      InterestRateNotional.meta());
   private final NewOtcTradeBuilder _newTradeBuilder;
 
   private static final Map<Class<?>, Class<?>> s_underlyingSecurityTypes = ImmutableMap.<Class<?>, Class<?>>of(
@@ -218,7 +217,7 @@ public class BlotterResource {
     _newTradeBuilder = new NewOtcTradeBuilder(_securityMaster, _positionMaster, s_metaBeans, s_stringConvert);
   }
 
-  /* package */ static StringConvert getStringConvert() {
+  public static StringConvert getStringConvert() {
     return s_stringConvert;
   }
 

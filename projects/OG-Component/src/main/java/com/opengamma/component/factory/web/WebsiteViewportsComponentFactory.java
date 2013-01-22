@@ -36,6 +36,9 @@ import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.marketdata.NamedMarketDataSpecificationRepository;
 import com.opengamma.engine.view.ViewProcessor;
 import com.opengamma.financial.aggregation.PortfolioAggregationFunctions;
+import com.opengamma.financial.currency.ConfigDBCurrencyPairsSource;
+import com.opengamma.financial.currency.CurrencyPairs;
+import com.opengamma.financial.currency.CurrencyPairsSource;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.impl.MasterConfigSource;
@@ -48,7 +51,9 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 import com.opengamma.web.analytics.AnalyticsViewManager;
 import com.opengamma.web.analytics.GridColumnsJsonWriter;
 import com.opengamma.web.analytics.ViewportResultsJsonWriter;
+import com.opengamma.web.analytics.blotter.BlotterColumnMapper;
 import com.opengamma.web.analytics.blotter.BlotterResource;
+import com.opengamma.web.analytics.blotter.DefaultBlotterColumnMappings;
 import com.opengamma.web.analytics.formatting.ResultsFormatter;
 import com.opengamma.web.analytics.json.Compressor;
 import com.opengamma.web.analytics.json.DependencyGraphGridStructureMessageBodyWriter;
@@ -181,11 +186,16 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
         getUserPortfolioMaster(),
         getUserPositionMaster(),
         getPortfolioAggregationFunctions().getMappedFunctions());
+    CurrencyPairsSource currencyPairsSource = new ConfigDBCurrencyPairsSource(configSource);
+    // TODO should be able to configure the currency pairs
+    CurrencyPairs currencyPairs = currencyPairsSource.getCurrencyPairs(CurrencyPairs.DEFAULT_CURRENCY_PAIRS);
+    BlotterColumnMapper blotterColumnMapper = DefaultBlotterColumnMappings.create(currencyPairs);
     AnalyticsViewManager analyticsViewManager = new AnalyticsViewManager(getViewProcessor(),
                                                                          aggregatedViewDefManager,
                                                                          getMarketDataSnapshotMaster(),
                                                                          getComputationTargetResolver(),
-                                                                         getMarketDataSpecificationRepository());
+                                                                         getMarketDataSpecificationRepository(),
+                                                                         blotterColumnMapper);
     ResultsFormatter resultsFormatter = new ResultsFormatter();
     GridColumnsJsonWriter columnWriter = new GridColumnsJsonWriter(resultsFormatter);
     ViewportResultsJsonWriter viewportResultsWriter = new ViewportResultsJsonWriter(resultsFormatter);
