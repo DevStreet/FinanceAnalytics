@@ -10,9 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.time.Instant;
-import javax.time.TimeSource;
-import javax.time.calendar.Clock;
-import javax.time.calendar.LocalDate;
 import javax.time.calendar.ZonedDateTime;
 
 import org.slf4j.Logger;
@@ -241,17 +238,16 @@ public abstract class EquityOptionFunction extends AbstractFunction.NonCompiledI
     if (forwardCurveCalculationMethods == null || forwardCurveCalculationMethods.size() != 1) {
       return null;
     }
-
+    final String forwardCurveName = Iterables.getOnlyElement(forwardCurveNames);
+    final String forwardCurveCalculationMethod = Iterables.getOnlyElement(forwardCurveCalculationMethods);
     final ExternalId underlyingId = FinancialSecurityUtils.getUnderlyingId(security);
     final HistoricalTimeSeriesSource tsSource = OpenGammaCompilationContext.getHistoricalTimeSeriesSource(context);
     final SecuritySource securitySource = OpenGammaCompilationContext.getSecuritySource(context);
-    final ValueRequirement volReq = getVolatilitySurfaceRequirement(tsSource, securitySource, desiredValue, security, volSurfaceName, surfaceCalculationMethod, underlyingId);
+    final ValueRequirement volReq = getVolatilitySurfaceRequirement(tsSource, securitySource, desiredValue, security, volSurfaceName, forwardCurveName,
+        surfaceCalculationMethod, underlyingId);
     if (volReq == null) {
       return null;
     }
-
-    final String forwardCurveName = Iterables.getOnlyElement(forwardCurveNames);
-    final String forwardCurveCalculationMethod = Iterables.getOnlyElement(forwardCurveCalculationMethods);
     final ValueRequirement forwardCurveReq = getForwardCurveRequirement(tsSource, securitySource, forwardCurveName, forwardCurveCalculationMethod, security, underlyingId);
     // Return the set
     return Sets.newHashSet(discountingReq, volReq, forwardCurveReq);
@@ -309,10 +305,7 @@ public abstract class EquityOptionFunction extends AbstractFunction.NonCompiledI
     assert discountCurvePropertiesSet;
     assert forwardCurvePropertiesSet;
     assert surfacePropertiesSet;
-    properties
-      .with(PROPERTY_DISCOUNTING_CURVE_NAME, discountingCurveName)
-      .with(PROPERTY_DISCOUNTING_CURVE_CONFIG, discountingCurveConfig)
-      .with(PROPERTY_FORWARD_CURVE_NAME, forwardCurveName);
+    properties.with(PROPERTY_DISCOUNTING_CURVE_NAME, discountingCurveName).with(PROPERTY_DISCOUNTING_CURVE_CONFIG, discountingCurveConfig).with(PROPERTY_FORWARD_CURVE_NAME, forwardCurveName);
     final Set<ValueSpecification> results = new HashSet<>();
     for (final String valueRequirement : _valueRequirementNames) {
       results.add(new ValueSpecification(valueRequirement, target.toSpecification(), properties.get()));
@@ -334,19 +327,22 @@ public abstract class EquityOptionFunction extends AbstractFunction.NonCompiledI
         .with(ValuePropertyNames.CURVE, forwardCurveName)
         .with(ForwardCurveValuePropertyNames.PROPERTY_FORWARD_CURVE_CALCULATION_METHOD, forwardCurveCalculationMethod)
         .get();
+    // REVIEW Andrew 2012-01-17 -- Why can't we just use the underlyingBuid external identifier directly here, with a target type of SECURITY, and shift the logic into the reference resolver?
     return new ValueRequirement(ValueRequirementNames.FORWARD_CURVE, ComputationTargetType.PRIMITIVE, getWeakUnderlyingId(underlyingBuid, tsSource, securitySource), properties);
   }
 
   private ValueRequirement getVolatilitySurfaceRequirement(final HistoricalTimeSeriesSource tsSource, final SecuritySource securitySource,
-      final ValueRequirement desiredValue, final Security security, final String surfaceName, final String surfaceCalculationMethod, final ExternalId underlyingBuid) {
-    return BlackVolatilitySurfacePropertyUtils.getSurfaceRequirement(desiredValue, surfaceName, InstrumentTypeProperties.EQUITY_OPTION,
-        getWeakUnderlyingId(underlyingBuid, tsSource, securitySource));
+      final ValueRequirement desiredValue, final Security security, final String surfaceName, final String forwardCurveName,
+      final String surfaceCalculationMethod, final ExternalId underlyingBuid) {
+    // REVIEW Andrew 2012-01-17 -- Could we pass a CTRef to the getSurfaceRequirement and use the underlyingBuid external identifier directly with a target type of SECURITY
+    return BlackVolatilitySurfacePropertyUtils.getSurfaceRequirement(desiredValue, surfaceName, forwardCurveName, InstrumentTypeProperties.EQUITY_OPTION,
+        ComputationTargetType.PRIMITIVE, getWeakUnderlyingId(underlyingBuid, tsSource, securitySource));
   }
 
   private ExternalId getWeakUnderlyingId(final ExternalId underlyingId, final HistoricalTimeSeriesSource tsSource, final SecuritySource securitySource) {
     if (ExternalSchemes.BLOOMBERG_BUID.equals(underlyingId.getScheme())) {
       // this is a hack so it doesn't hammer the db.
-      Instant futureHour = Instant.ofEpochMillis(((System.currentTimeMillis() / 3600_000) * 3600_000) + 3600_000);
+      final Instant futureHour = Instant.ofEpochMillis(((System.currentTimeMillis() / 3600_000) * 3600_000) + 3600_000);
       final Security underlyingSecurity = securitySource.getSingle(ExternalIdBundle.of(underlyingId), VersionCorrection.of(futureHour, futureHour));
       if (underlyingSecurity == null) {
         final HistoricalTimeSeries historicalTimeSeries = tsSource.getHistoricalTimeSeries(MarketDataRequirementNames.MARKET_VALUE, ExternalIdBundle.of(underlyingId), null, null, true, null, true, 1);

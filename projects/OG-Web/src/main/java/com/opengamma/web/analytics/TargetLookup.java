@@ -19,9 +19,9 @@ import com.opengamma.util.tuple.Pair;
 
   /** Mappings of requirements to specifications. */
   private final ValueMappings _valueMappings;
-  private final List<MainGridStructure.Row> _rows;
+  private final List<? extends MainGridStructure.Row> _rows;
 
-  /* package */ TargetLookup(ValueMappings valueMappings, List<MainGridStructure.Row> rows) {
+  /* package */ TargetLookup(ValueMappings valueMappings, List<? extends MainGridStructure.Row> rows) {
     ArgumentChecker.notNull(valueMappings, "valueMappings");
     ArgumentChecker.notNull(rows, "rows");
     _valueMappings = valueMappings;
@@ -34,7 +34,7 @@ import com.opengamma.util.tuple.Pair;
       throw new IllegalArgumentException("Row is outside grid bounds: row=" + rowIndex + ", rowCount=" + _rows.size());
     }
     if (colKey == null) {
-      throw new IllegalArgumentException("Unknown column key " + colKey);
+      return null;
     }
     MainGridStructure.Row row = _rows.get(rowIndex);
     ValueRequirement valueReq = new ValueRequirement(colKey.getValueName(), row.getTarget(), colKey.getValueProperties());

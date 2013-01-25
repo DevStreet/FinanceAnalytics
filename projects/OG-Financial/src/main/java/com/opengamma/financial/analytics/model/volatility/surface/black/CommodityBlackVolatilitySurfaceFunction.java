@@ -9,25 +9,18 @@ import static com.opengamma.engine.value.ValuePropertyNames.SURFACE;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.analytics.financial.model.volatility.smile.fitting.sabr.SmileSurfaceDataBundle;
-import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceData;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.function.FunctionCompilationContext;
-import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionInputs;
 import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
-import com.opengamma.financial.OpenGammaCompilationContext;
-import com.opengamma.financial.OpenGammaExecutionContext;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
 import com.opengamma.financial.analytics.model.curve.forward.ForwardCurveValuePropertyNames;
 import com.opengamma.financial.analytics.volatility.surface.SurfaceAndCubePropertyNames;
@@ -37,7 +30,6 @@ import com.opengamma.financial.analytics.volatility.surface.SurfaceAndCubeQuoteT
  *
  */
 public abstract class CommodityBlackVolatilitySurfaceFunction extends BlackVolatilitySurfaceFunction {
-  private static final Logger s_logger = LoggerFactory.getLogger(CommodityBlackVolatilitySurfaceFunction.class);
 
   /**
    * Spline interpolator function for Black volatility surfaces
@@ -177,12 +169,4 @@ public abstract class CommodityBlackVolatilitySurfaceFunction extends BlackVolat
     return volDataRequirement;
   }
 
-  protected HistoricalTimeSeriesSource getTimeSeriesSource(final FunctionExecutionContext context) {
-    return OpenGammaExecutionContext.getHistoricalTimeSeriesSource(context);
-  }
-
-  protected HistoricalTimeSeriesSource getTimeSeriesSource(final FunctionCompilationContext context) {
-    final HistoricalTimeSeriesSource tss = OpenGammaCompilationContext.getHistoricalTimeSeriesSource(context);
-    return tss;
-  }
 }
