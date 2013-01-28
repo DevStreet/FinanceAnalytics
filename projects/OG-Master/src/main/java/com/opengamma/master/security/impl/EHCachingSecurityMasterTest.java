@@ -70,15 +70,19 @@ public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<Sec
     DOC_TO_ADD = new SecurityDocument(
       new ManageableSecurity(null, "ADD", "test", ExternalIdBundle.EMPTY));
     DOC_ADDED = new SecurityDocument(
-        new ManageableSecurity(ADDED_UID, "ADD", "test", ExternalIdBundle.EMPTY));
+      new ManageableSecurity(ADDED_UID, "ADD", "test", ExternalIdBundle.EMPTY));
    }
 
   @Test
   void testSearch() {
     SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
-    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+    EHCachingSecurityMaster cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
     
     //TODO
+    SecuritySearchRequest request = new SecuritySearchRequest();
+    SecuritySearchResult result = cachingMaster.search(request);
+
+    assert result.getDocuments().size() == 3;
     
     cachingMaster.shutdown();
   }
@@ -88,7 +92,6 @@ public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<Sec
     SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
     AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
 
-    //TODO
 
     cachingMaster.shutdown();
   }

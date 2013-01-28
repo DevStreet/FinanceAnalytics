@@ -347,7 +347,57 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   }
 
   @Test
-  public void testCorrect() {
+  public void testCorrect() { // same as replaceVersion()
+    TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
+  }
+
+  @Test
+  public void testReplaceVersion() {
+    TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
+  }
+
+  @Test
+  public void testReplaceAllVersions() {
+    TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
+  }
+
+  @Test
+  public void testReplaceVersions() {
+    TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
+  }
+
+  @Test
+  public void testRemoveVersion() {
+    TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+
+    //TODO
+
+    cachingMaster.shutdown();
+  }
+
+  @Test
+  public void testAddVersion() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
     AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
 

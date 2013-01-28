@@ -35,8 +35,8 @@ import java.util.TreeMap;
 import static com.google.common.collect.Maps.newHashMap;
 
 /**
- * A cache decorating a master, mainly intended to reduce the frequency and repetition of queries from the management
- * UI to a database-backed master. In particular, prefetching is employed in paged queries, which tend to scale poorly.
+ * A cache decorating a master, mainly intended to reduce the frequency and repetition of queries to the underlying
+ * master.
  * <p>
  * The cache is implemented using {@code EHCache}.
  *
@@ -93,53 +93,6 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     underlying.changeManager().addChangeListener(_changeListener);
   }
 
-  //-------------------------------------------------------------------------
-
-  /**
-   * Gets the underlying source of items.
-   *
-   * @return the underlying source of items, not null
-   */
-  protected AbstractChangeProvidingMaster<D> getUnderlying() {
-    return _underlying;
-  }
-
-  /**
-   * Gets the cache manager.
-   *
-   * @return the cache manager, not null
-   */
-  protected CacheManager getCacheManager() {
-    return _manager;
-  }
-
-  /**
-   * Gets the document by ObjectId cache.
-   *
-   * @return the cache, not null
-   */
-  protected Cache getDocumentByOidCache() {
-    return _documentByOidCache;
-  }
-
-  /**
-   * Gets the document by UniqueId cache.
-   *
-   * @return the cache, not null
-   */
-  protected Cache getDocumentByUidCache() {
-    return _documentByUidCache;
-  }
-
-  /**
-   * Gets the change manager.
-   *
-   * @return the change manager, not null
-   */
-  @Override
-  public ChangeManager changeManager() {
-    return _changeManager;
-  }
   //-------------------------------------------------------------------------
 
   /**
@@ -348,7 +301,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   @Override
   public D correct(D document) {
     // Correct document in underlying master
-    D result = getUnderlying().correct(document);
+    D result = getUnderlying().correct(document); //TODO
 
     // Adjust version/correction validity of latest version in Oid cache
 //    InstantMap instantMap = getOrCreateInstantMap(document.getObjectId(), getDocumentByOidCache());
@@ -363,45 +316,37 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
   @Override
   public List<UniqueId> replaceVersion(UniqueId uniqueId, List<D> replacementDocuments) {
-    return getUnderlying().replaceVersion(uniqueId, replacementDocuments);
+    return getUnderlying().replaceVersion(uniqueId, replacementDocuments); //TODO
   }
 
   @Override
   public List<UniqueId> replaceAllVersions(ObjectIdentifiable objectId, List<D> replacementDocuments) {
-    return getUnderlying().replaceAllVersions(objectId, replacementDocuments);
+    return getUnderlying().replaceAllVersions(objectId, replacementDocuments); //TODO
   }
 
   @Override
   public List<UniqueId> replaceVersions(ObjectIdentifiable objectId, List<D> replacementDocuments) {
-    return getUnderlying().replaceVersions(objectId, replacementDocuments);
+    return getUnderlying().replaceVersions(objectId, replacementDocuments); //TODO
   }
 
   @Override
   public UniqueId replaceVersion(D replacementDocument) {
-    return getUnderlying().replaceVersion(replacementDocument);
+    return getUnderlying().replaceVersion(replacementDocument); //TODO
   }
 
   @Override
   public void removeVersion(UniqueId uniqueId) {
-    getUnderlying().removeVersion(uniqueId);
+    getUnderlying().removeVersion(uniqueId); //TODO
   }
 
   @Override
   public UniqueId addVersion(ObjectIdentifiable objectId, D documentToAdd) {
-    return getUnderlying().addVersion(objectId, documentToAdd);
+    return getUnderlying().addVersion(objectId, documentToAdd); //TODO
   }
 
   //-------------------------------------------------------------------------
 
   private void cleanCaches(ObjectId oid, Instant fromVersion, Instant toVersion) {
-
-// Coarse grain removal from caches - very inefficient
-//    getDocumentByOidCache().remove(oid);
-//    for (UniqueId uniqueId : (Collection<UniqueId>) getDocumentByUidCache().getKeys()) {
-//      if (uniqueId.getObjectId().equals(oid)) {
-//        getDocumentByUidCache().remove(uniqueId);
-//      }
-//    }
 
     // Get the documents that match the version range
     InstantMap instantMap = getOrCreateInstantMap(oid, getDocumentByOidCache()).getRange(fromVersion, toVersion);
@@ -432,6 +377,55 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   }
 
   //-------------------------------------------------------------------------
+
+  /**
+   * Gets the underlying source of items.
+   *
+   * @return the underlying source of items, not null
+   */
+  protected AbstractChangeProvidingMaster<D> getUnderlying() {
+    return _underlying;
+  }
+
+  /**
+   * Gets the cache manager.
+   *
+   * @return the cache manager, not null
+   */
+  protected CacheManager getCacheManager() {
+    return _manager;
+  }
+
+  /**
+   * Gets the document by ObjectId cache.
+   *
+   * @return the cache, not null
+   */
+  protected Cache getDocumentByOidCache() {
+    return _documentByOidCache;
+  }
+
+  /**
+   * Gets the document by UniqueId cache.
+   *
+   * @return the cache, not null
+   */
+  protected Cache getDocumentByUidCache() {
+    return _documentByUidCache;
+  }
+
+  /**
+   * Gets the change manager.
+   *
+   * @return the change manager, not null
+   */
+  @Override
+  public ChangeManager changeManager() {
+    return _changeManager;
+  }
+
+  //-------------------------------------------------------------------------
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[" + getUnderlying() + "]";
