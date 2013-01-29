@@ -5,34 +5,23 @@
  */
 package com.opengamma.master;
 
-import com.opengamma.DataNotFoundException;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.when;
+
+import org.mockito.ArgumentMatcher;
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
+
 import com.opengamma.core.change.BasicChangeManager;
 import com.opengamma.core.change.ChangeManager;
-import com.opengamma.id.ExternalId;
-import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.ObjectId;
-import com.opengamma.id.ObjectIdSupplier;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
-import com.opengamma.master.security.ManageableSecurity;
-import com.opengamma.master.security.SecurityDocument;
-import com.opengamma.master.security.SecurityMaster;
-import com.opengamma.master.security.SecuritySearchRequest;
-import com.opengamma.master.security.SecuritySearchResult;
-import com.opengamma.master.security.impl.EHCachingSecurityMaster;
-import com.opengamma.master.security.impl.InMemorySecurityMaster;
+
 import net.sf.ehcache.CacheManager;
-import org.mockito.ArgumentMatcher;
-import org.testng.annotations.Test;
-
-import javax.time.Instant;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
-import java.util.List;
-
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.*;
 
 /**
  * Common properties and methods for testing EHCaching masters. This abstract class declares document variables of
@@ -89,34 +78,42 @@ public abstract class AbstractEHCachingMasterTest<M extends AbstractChangeProvid
     // Set up VersionFrom, VersionTo, CorrectionFrom, CorrectionTo
 
     // Document A 100: v 1999 to 2010, c to 2011
-    docA100_V1999to2010_Cto2011.setVersionFromInstant(ZonedDateTime.of(1999, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
-    docA100_V1999to2010_Cto2011.setVersionToInstant(ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
-    docA100_V1999to2010_Cto2011.setCorrectionToInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+
+    docA100_V1999to2010_Cto2011.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(1999,
+                                                                                        1,
+                                                                                        1,
+                                                                                        12,
+                                                                                        0,
+                                                                                        0,
+                                                                                        0),
+                                                                                        ZoneOffset.UTC).toInstant());
+    docA100_V1999to2010_Cto2011.setVersionToInstant(ZonedDateTime.of(LocalDateTime.of(2010, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
+    docA100_V1999to2010_Cto2011.setCorrectionToInstant(ZonedDateTime.of(LocalDateTime.of(2011, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document A 200: v 2010 to
-    docA200_V2010to.setVersionFromInstant(ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docA200_V2010to.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(2010, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document A 300 (corrects A100): v 1999 to 2010, c 2011 to
-    docA300_V1999to2010_C2011to.setVersionFromInstant(ZonedDateTime.of(1999, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
-    docA300_V1999to2010_C2011to.setVersionToInstant(ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
-    docA300_V1999to2010_C2011to.setCorrectionFromInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docA300_V1999to2010_C2011to.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(1999, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
+    docA300_V1999to2010_C2011to.setVersionToInstant(ZonedDateTime.of(LocalDateTime.of(2010, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
+    docA300_V1999to2010_C2011to.setCorrectionFromInstant(ZonedDateTime.of(LocalDateTime.of(2011, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document B 200: v 2000 to 2009
-    docB200_V2000to2009.setVersionFromInstant(ZonedDateTime.of(2000, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
-    docB200_V2000to2009.setVersionToInstant(ZonedDateTime.of(2009, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docB200_V2000to2009.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(2000, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
+    docB200_V2000to2009.setVersionToInstant(ZonedDateTime.of(LocalDateTime.of(2009, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document B 400: v 2009 to 2011
-    docB400_V2009to2011.setVersionFromInstant(ZonedDateTime.of(2009, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
-    docB400_V2009to2011.setVersionToInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docB400_V2009to2011.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(2009, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
+    docB400_V2009to2011.setVersionToInstant(ZonedDateTime.of(LocalDateTime.of(2011, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document B 500: v 2011 to
-    docB500_V2011to.setVersionFromInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docB500_V2011to.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(2011, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document C 100: v to 2011
-    docC100_Vto2011.setVersionToInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docC100_Vto2011.setVersionToInstant(ZonedDateTime.of(LocalDateTime.of(2011, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
     // Document C 300: v 2011 to
-    docC300_V2011to.setVersionFromInstant(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant());
+    docC300_V2011to.setVersionFromInstant(ZonedDateTime.of(LocalDateTime.of(2011, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant());
 
      // Configure mock master to respond to versioned unique ID gets
     when(mockUnderlyingMaster.get(docA100_V1999to2010_Cto2011.getUniqueId())).thenReturn(docA100_V1999to2010_Cto2011);

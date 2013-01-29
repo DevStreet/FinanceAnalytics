@@ -5,25 +5,27 @@
  */
 package com.opengamma.master;
 
-import com.opengamma.core.change.ChangeManager;
-import com.opengamma.id.ObjectIdentifiable;
-import com.opengamma.id.UniqueId;
-import com.opengamma.id.UniqueIdentifiable;
-import com.opengamma.id.VersionCorrection;
-import net.sf.ehcache.CacheManager;
-import org.mockito.ArgumentMatcher;
-import org.testng.annotations.Test;
-
-import javax.time.Instant;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.testng.AssertJUnit.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.assertEquals;
+import org.testng.annotations.Test;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
+
+import com.opengamma.core.change.ChangeManager;
+import com.opengamma.id.ObjectIdentifiable;
+import com.opengamma.id.UniqueId;
+import com.opengamma.id.UniqueIdentifiable;
+import com.opengamma.id.VersionCorrection;
+
+import net.sf.ehcache.CacheManager;
 
 /**
  * Test EHCaching master behaviour that is common across all masters, using dummy TestDocument and TestMaster classes
@@ -257,28 +259,28 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
     // Assert returned documents
     assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
     assertEquals(docA100_V1999to2010_Cto2011, cachingMaster.get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant(),
-                             ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant())));
+        VersionCorrection.of(ZonedDateTime.of(LocalDateTime.of(2009, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant(),
+                             ZonedDateTime.of(LocalDateTime.of(2010, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant())));
     assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
     assertEquals(docA300_V1999to2010_C2011to, cachingMaster.get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now)));
+        VersionCorrection.of(ZonedDateTime.of(LocalDateTime.of(2009, 6, 6, 12, 0, 0, 0), ZoneOffset.UTC).toInstant(), now)));
     assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.of(now, now)));
     assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
     assertEquals(docA200_V2010to, cachingMaster.get(A_OID, VersionCorrection.LATEST));
     assertEquals(docB500_V2011to, cachingMaster.get(B_OID,
-        VersionCorrection.of(ZonedDateTime.of(2011, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now)));
+        VersionCorrection.of(ZonedDateTime.of(LocalDateTime.of(2011, 6, 6, 12, 0, 0, 0), ZoneOffset.UTC).toInstant(), now)));
 
     // Assert invocation counts
     verify(mockUnderlyingMaster, times(1)).get(B_OID, VersionCorrection.LATEST);
     verify(mockUnderlyingMaster, times(1)).get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant(),
-                             ZonedDateTime.of(2010, 1, 1, 12, 0, 0, 0, TimeZone.UTC).toInstant()));
+        VersionCorrection.of(ZonedDateTime.of(LocalDateTime.of(2009, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant(),
+                             ZonedDateTime.of(LocalDateTime.of(2010, 1, 1, 12, 0, 0, 0), ZoneOffset.UTC).toInstant()));
     verify(mockUnderlyingMaster, times(1)).get(A_OID, VersionCorrection.LATEST);
     verify(mockUnderlyingMaster, times(1)).get(A_OID,
-        VersionCorrection.of(ZonedDateTime.of(2009, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now));
+        VersionCorrection.of(ZonedDateTime.of(LocalDateTime.of(2009, 6, 6, 12, 0, 0, 0), ZoneOffset.UTC).toInstant(), now));
     verify(mockUnderlyingMaster, times(0)).get(B_OID, VersionCorrection.of(now, now));
     verify(mockUnderlyingMaster, times(0)).get(B_OID,
-        VersionCorrection.of(ZonedDateTime.of(2011, 6, 6, 12, 0, 0, 0, TimeZone.UTC).toInstant(), now));
+        VersionCorrection.of(ZonedDateTime.of(LocalDateTime.of(2011, 6, 6, 12, 0, 0, 0), ZoneOffset.UTC).toInstant(), now));
     verify(mockUnderlyingMaster, times(0)).get(C_OID, VersionCorrection.LATEST);
     verify(mockUnderlyingMaster, times(0)).get(docA100_V1999to2010_Cto2011.getUniqueId());
     verify(mockUnderlyingMaster, times(0)).get(docA200_V2010to.getUniqueId());

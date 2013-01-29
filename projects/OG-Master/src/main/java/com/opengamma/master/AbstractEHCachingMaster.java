@@ -22,10 +22,8 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.Instant;
 
-import javax.time.Instant;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

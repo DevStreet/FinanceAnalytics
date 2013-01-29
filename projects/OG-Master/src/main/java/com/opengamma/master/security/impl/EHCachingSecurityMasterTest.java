@@ -5,17 +5,11 @@
  */
 package com.opengamma.master.security.impl;
 
-import com.opengamma.DataNotFoundException;
-import com.opengamma.core.change.BasicChangeManager;
-import com.opengamma.core.change.ChangeManager;
-import com.opengamma.id.ExternalId;
+import static org.mockito.Mockito.mock;
+
+import org.testng.annotations.Test;
+
 import com.opengamma.id.ExternalIdBundle;
-import com.opengamma.id.ObjectId;
-import com.opengamma.id.ObjectIdSupplier;
-import com.opengamma.id.UniqueId;
-import com.opengamma.id.VersionCorrection;
-import com.opengamma.master.AbstractChangeProvidingMaster;
-import com.opengamma.master.AbstractDocument;
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractEHCachingMasterTest;
 import com.opengamma.master.security.ManageableSecurity;
@@ -23,17 +17,6 @@ import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.SecuritySearchResult;
-import net.sf.ehcache.CacheManager;
-import org.mockito.ArgumentMatcher;
-import org.testng.annotations.Test;
-
-import javax.time.Instant;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.*;
 
 /**
  * Test {@link com.opengamma.master.security.impl.EHCachingSecurityMaster}
