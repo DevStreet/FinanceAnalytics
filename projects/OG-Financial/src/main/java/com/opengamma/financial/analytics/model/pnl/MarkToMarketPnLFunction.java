@@ -9,14 +9,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import javax.time.calendar.Period;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.security.Security;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
@@ -27,11 +24,11 @@ import com.opengamma.engine.function.FunctionInputs;
 import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueProperties;
+import com.opengamma.engine.value.ValueProperties.Builder;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.engine.value.ValueProperties.Builder;
 import com.opengamma.financial.OpenGammaCompilationContext;
 import com.opengamma.financial.analytics.timeseries.DateConstraint;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesFunctionUtils;
@@ -48,6 +45,8 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.async.AsynchronousExecution;
 import com.opengamma.util.money.Currency;
+import com.opengamma.util.money.CurrencyAmount;
+import com.opengamma.util.time.DateUtils;
 
 /**
  * FIXME PROTOTYPE
@@ -124,7 +123,7 @@ public class MarkToMarketPnLFunction extends AbstractFunction.NonCompiledInvoker
         } else if (_closingPriceField.equals(field)) {
           // Get most recent closing price before today 
           // By intention, this will not be today's close even if it's available  
-          // TODO Review - Note that this may be stale, as we take latest value. Illiquid securities do not trade each day..
+          // TODO Review - Note that this may be stale, if time series aren't updated nightly, as we take latest value. Illiquid securities do not trade each day..
           Object value = input.getValue();
           if (value == null) {
             throw new NullPointerException("Did not satisfy time series latest requirement," + _closingPriceField + ", for security, " + security.getExternalIdBundle());
@@ -157,6 +156,7 @@ public class MarkToMarketPnLFunction extends AbstractFunction.NonCompiledInvoker
     }
     // Finally, multiply by the Trade's Quantity
     final Double dailyPnL = target.getTrade().getQuantity().doubleValue() * dailyValueMove;
+    CurrencyAmount pnlCcy = CurrencyAmount.of(FinancialSecurityUtils.getCurrency(security), dailyPnL); 
 
     // 3. Get Spec and Return
     final ValueRequirement desiredValue = desiredValues.iterator().next();
@@ -267,7 +267,7 @@ public class MarkToMarketPnLFunction extends AbstractFunction.NonCompiledInvoker
   }
   
   protected DateConstraint getTimeSeriesStartDate() {
-    return DateConstraint.VALUATION_TIME.minus(Period.ofDays(s_historyLookbackDays + 1)); // yesterday - HISTORY_LOOKBACK_DAYS
+    return DateConstraint.VALUATION_TIME.minus(DateUtils.periodOfDays(s_historyLookbackDays + 1)); // yesterday - HISTORY_LOOKBACK_DAYS
   }
   
   protected DateConstraint getTimeSeriesEndDate() {

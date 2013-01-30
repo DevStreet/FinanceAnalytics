@@ -8,7 +8,7 @@ package com.opengamma.financial.analytics.model.futureoption;
 import java.util.Collections;
 import java.util.Set;
 
-import com.opengamma.analytics.financial.commodity.calculator.CommodityFutureOptionBAWPresentValueCalculator;
+import com.opengamma.analytics.financial.commodity.calculator.ComFutOptBAWPresentValueCalculator;
 import com.opengamma.analytics.financial.equity.StaticReplicationDataBundle;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.engine.ComputationTargetSpecification;
@@ -31,7 +31,7 @@ public class CommodityFutureOptionBAWPVFunction extends CommodityFutureOptionBAW
   @Override
   protected Set<ComputedValue> computeValues(final InstrumentDerivative derivative, final StaticReplicationDataBundle market, final FunctionInputs inputs,
       final Set<ValueRequirement> desiredValues, final ComputationTargetSpecification targetSpec, final ValueProperties resultProperties) {
-    final double pv = derivative.accept(CommodityFutureOptionBAWPresentValueCalculator.getInstance(), market);
+    final double pv = derivative.accept(ComFutOptBAWPresentValueCalculator.getInstance(), market);
     final ValueSpecification spec = new ValueSpecification(getValueRequirementNames()[0], targetSpec, resultProperties);
     return Collections.singleton(new ComputedValue(spec, pv));
   }

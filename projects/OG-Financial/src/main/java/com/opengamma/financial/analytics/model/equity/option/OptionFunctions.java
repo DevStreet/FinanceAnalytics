@@ -10,6 +10,7 @@ import java.util.List;
 import com.opengamma.engine.function.config.AbstractRepositoryConfigurationBean;
 import com.opengamma.engine.function.config.FunctionConfiguration;
 import com.opengamma.engine.function.config.RepositoryConfigurationSource;
+import com.opengamma.engine.value.ValueRequirementNames;
 
 /**
  * Function repository configuration source for the functions contained in this package.
@@ -25,12 +26,21 @@ public class OptionFunctions extends AbstractRepositoryConfigurationBean {
     return new OptionFunctions().getObjectCreating();
   }
 
+  /**
+   * Gets the default values for calculations
+   * @return The repository with equity option defaults set
+   */
   public static RepositoryConfigurationSource defaults() {
     final Defaults factory = new Defaults();
     factory.afterPropertiesSet();
     return factory.getObject();
   }
 
+  /**
+   * @param overhedge The overhedge to use for equity barrier options
+   * @param callSpreadFullWidth The width of the call spread to use for barrier options
+   * @return The repository with equity barrier option defaults set
+   */
   public static RepositoryConfigurationSource defaults(final double overhedge, final double callSpreadFullWidth) {
     final Defaults factory = new Defaults();
     factory.setOverhedge(overhedge);
@@ -107,7 +117,12 @@ public class OptionFunctions extends AbstractRepositoryConfigurationBean {
     functions.add(functionConfiguration(EquityVanillaBarrierOptionVegaMatrixFunction.class));
     functions.add(functionConfiguration(EquityVanillaBarrierOptionVegaFunction.class));
     functions.add(functionConfiguration(EquityVanillaBarrierOptionVommaFunction.class));
-    functions.add(functionConfiguration(WeightedVegaFunction.class));
+    functions.add(functionConfiguration(PositionGreeksFunction.class, ValueRequirementNames.POSITION_DELTA, ValueRequirementNames.DELTA));
+    functions.add(functionConfiguration(PositionGreeksFunction.class, ValueRequirementNames.POSITION_GAMMA, ValueRequirementNames.GAMMA));
+    functions.add(functionConfiguration(PositionGreeksFunction.class, ValueRequirementNames.POSITION_RHO, ValueRequirementNames.RHO));
+    functions.add(functionConfiguration(PositionGreeksFunction.class, ValueRequirementNames.POSITION_THETA, ValueRequirementNames.THETA));
+    functions.add(functionConfiguration(PositionGreeksFunction.class, ValueRequirementNames.POSITION_VEGA, ValueRequirementNames.VEGA));
+    functions.add(functionConfiguration(WeightedVegaFunction.class)); 
   }
 
 }

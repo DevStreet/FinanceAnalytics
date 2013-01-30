@@ -32,10 +32,12 @@ import com.opengamma.web.analytics.blotter.BlotterColumn;
 import com.opengamma.web.analytics.blotter.BlotterColumnMapper;
 
 /**
- *
+ * The structure of the grid that displays portfolio data and analytics. Contains the column definitions and
+ * the portfolio tree structure.
  */
-public class PortfolioGridStructure extends MainGridStructure {
+public final class PortfolioGridStructure extends MainGridStructure {
 
+  /** The root node of the portfolio structure. */
   private final AnalyticsNode _root;
 
   private PortfolioGridStructure(GridColumnGroups columnGroups,
@@ -85,6 +87,9 @@ public class PortfolioGridStructure extends MainGridStructure {
     return new PortfolioGridStructure();
   }
 
+  /**
+   * @return The root node of the portfolio structure.
+   */
   public AnalyticsNode getRoot() {
     return _root;
   }
@@ -164,11 +169,13 @@ public class PortfolioGridStructure extends MainGridStructure {
         return new PortfolioGridRow(target, nodeName);
       }
 
+      // TODO need to return list of rows including trades - but only for fungible security types
       @Override
       public PortfolioGridRow apply(PortfolioNode parentNode, Position position) {
+        ComputationTargetSpecification nodeSpec = ComputationTargetSpecification.of(parentNode);
         // TODO I don't think toLatest() will do long term. resolution time available on the result model
-        ComputationTargetSpecification target = ComputationTargetSpecification.of(parentNode).containing(
-            ComputationTargetType.POSITION, position.getUniqueId().toLatest());
+        ComputationTargetSpecification target = nodeSpec.containing(ComputationTargetType.POSITION,
+                                                                    position.getUniqueId().toLatest());
         Security security = position.getSecurity();
         // TODO check the cast
         ManageableSecurity manageableSecurity = (ManageableSecurity) security;
@@ -178,26 +185,30 @@ public class PortfolioGridStructure extends MainGridStructure {
     return PortfolioMapper.map(portfolio.getRootNode(), targetFn);
   }
 
-  /* package */ static class PortfolioGridRow extends Row {
+  /**
+   * A row in the grid.
+   */
+  /* package */ static final class PortfolioGridRow extends Row {
 
-    private final ManageableSecurity _security;
+    /** The row's security, null if the row represents a node in the portfolio structure. */
+    private final Security _security;
 
     private PortfolioGridRow(ComputationTargetSpecification target, String name) {
       super(target, name, null);
       _security = null;
     }
 
-    private PortfolioGridRow(ComputationTargetSpecification target, ManageableSecurity security, BigDecimal quantity) {
+    private PortfolioGridRow(ComputationTargetSpecification target, Security security, BigDecimal quantity) {
       super(target, securityName(security), quantity);
       _security = security;
     }
 
-    private static String securityName(ManageableSecurity security) {
+    private static String securityName(Security security) {
       ArgumentChecker.notNull(security, "security");
       return security.getName();
     }
 
-    /* package */ ManageableSecurity getSecurity() {
+    /* package */ Security getSecurity() {
       return _security;
     }
   }
