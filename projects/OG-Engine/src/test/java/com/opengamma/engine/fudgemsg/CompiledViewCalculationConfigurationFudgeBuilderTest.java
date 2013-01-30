@@ -15,14 +15,13 @@ import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.opengamma.engine.ComputationTargetSpecification;
-import com.opengamma.engine.target.ComputationTargetRequirement;
+import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.engine.view.compilation.CompiledViewCalculationConfiguration;
 import com.opengamma.engine.view.compilation.CompiledViewCalculationConfigurationImpl;
-import com.opengamma.id.ExternalId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.util.test.AbstractFudgeBuilderTestCase;
 
@@ -43,11 +42,10 @@ public class CompiledViewCalculationConfigurationFudgeBuilderTest extends Abstra
   }
 
   public void testBasic() {
-    final ComputationTargetRequirement targetReq = ComputationTargetRequirement.of(ExternalId.of("Foo", "Bar"));
-    final ComputationTargetSpecification targetSpec = ComputationTargetSpecification.of(UniqueId.of("Sec", "123"));
-    final CompiledViewCalculationConfiguration in = new CompiledViewCalculationConfigurationImpl("2", ImmutableSet.of(ComputationTargetSpecification.NULL, targetSpec),
+    final ComputationTargetSpecification targetSpec = new ComputationTargetSpecification(ComputationTargetType.PRIMITIVE, UniqueId.of("Sec", "123"));
+    final CompiledViewCalculationConfiguration in = new CompiledViewCalculationConfigurationImpl("2", ImmutableSet.of(targetSpec),
         ImmutableMap.<ValueSpecification, Set<ValueRequirement>>of(new ValueSpecification("Value", targetSpec, ValueProperties.with(ValuePropertyNames.FUNCTION, "Foo").get()),
-            ImmutableSet.of(new ValueRequirement("Value", targetReq))), ImmutableMap.of(new ValueRequirement("Data", targetReq),
+            ImmutableSet.of(new ValueRequirement("Value", targetSpec))), ImmutableMap.of(new ValueRequirement("Data", targetSpec),
                 new ValueSpecification("Data", targetSpec, ValueProperties.with(ValuePropertyNames.FUNCTION, "Bar").get())));
     final CompiledViewCalculationConfiguration out = cycleObject(CompiledViewCalculationConfiguration.class, in);
     assertEquals(out.getName(), in.getName());

@@ -22,7 +22,6 @@ import org.fudgemsg.mapping.GenericFudgeBuilderFor;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.opengamma.engine.ComputationTargetSpecification;
-import com.opengamma.engine.target.ComputationTargetReference;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.engine.view.compilation.CompiledViewCalculationConfiguration;
@@ -57,7 +56,7 @@ public class CompiledViewCalculationConfigurationFudgeBuilder implements FudgeBu
     }
     final Set<ComputationTargetSpecification> result = Sets.newHashSetWithExpectedSize(submsg.getNumFields());
     for (final FudgeField field : submsg) {
-      result.add(deserializer.fieldValueToObject(ComputationTargetReference.class, field).getSpecification());
+      result.add(deserializer.fieldValueToObject(ComputationTargetSpecification.class, field));
     }
     return result;
   }
