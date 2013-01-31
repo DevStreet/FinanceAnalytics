@@ -38,6 +38,10 @@ import net.sf.ehcache.Element;
  * <p>
  * The cache is implemented using {@code EHCache}.
  *
+ * TODO Fix change management
+ * TODO Cache misses too
+ * TODO implement correct, replace etc.
+ *
  * @param <D> the document type returned by the master
  */
 public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implements AbstractChangeProvidingMaster<D> {
