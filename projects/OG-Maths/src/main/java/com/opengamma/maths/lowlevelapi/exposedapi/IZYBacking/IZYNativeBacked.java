@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.nativewrappers.OGIZYRawWrapper;
 
 /**
@@ -243,12 +244,14 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
 
   @Override
   public void vd_cdfnorm(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
-    OGIZYRawWrapper.vd_cdfnorm(count, arg0, offsetarg0, out0, offsetout0);
+    throw new MathsExceptionNotImplemented("cdfnorm is not implemented");
+    //    OGIZYRawWrapper.vd_cdfnorm(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
   public void vd_cdfnorminv(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
-    OGIZYRawWrapper.vd_cdfnorminv(count, arg0, offsetarg0, out0, offsetout0);
+    throw new MathsExceptionNotImplemented("cdfnorminv is not implemented");
+//    OGIZYRawWrapper.vd_cdfnorminv(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
@@ -263,12 +266,14 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
 
   @Override
   public void vd_erfinv(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
-    OGIZYRawWrapper.vd_erfinv(count, arg0, offsetarg0, out0, offsetout0);
+    throw new MathsExceptionNotImplemented("erfinv is not implemented");
+//    OGIZYRawWrapper.vd_erfinv(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
   public void vd_erfcinv(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
-    OGIZYRawWrapper.vd_erfcinv(count, arg0, offsetarg0, out0, offsetout0);
+    throw new MathsExceptionNotImplemented("erfcinv is not implemented");
+//    OGIZYRawWrapper.vd_erfcinv(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
