@@ -9,8 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
-import com.opengamma.master.security.impl.EHCachingSecurityMaster;
-import net.sf.ehcache.CacheManager;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -37,9 +35,11 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.holiday.HolidayMaster;
 import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
+import com.opengamma.master.position.impl.EHCachingPositionMaster;
 import com.opengamma.master.region.RegionMaster;
 import com.opengamma.master.security.SecurityLoader;
 import com.opengamma.master.security.SecurityMaster;
+import com.opengamma.master.security.impl.EHCachingSecurityMaster;
 import com.opengamma.web.WebHomeResource;
 import com.opengamma.web.config.WebConfigsResource;
 import com.opengamma.web.exchange.WebExchangesResource;
@@ -51,6 +51,8 @@ import com.opengamma.web.region.WebRegionsResource;
 import com.opengamma.web.security.WebSecuritiesResource;
 import com.opengamma.web.target.WebComputationTargetTypeResource;
 import com.opengamma.web.valuerequirementname.WebValueRequirementNamesResource;
+
+import net.sf.ehcache.CacheManager;
 
 /**
  * Component factory for the main website.
@@ -159,7 +161,8 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
 //    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, getSecurityMaster(), getSecurityLoader(), getHistoricalTimeSeriesMaster());
     resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, new EHCachingSecurityMaster(getSecurityMaster(), CacheManager.getInstance()), getSecurityLoader(), getHistoricalTimeSeriesMaster());
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebPositionsResource.class, getPositionMaster(), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
+//    resource = new JerseyRestResourceFactory(WebPositionsResource.class, getPositionMaster(), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
+    resource = new JerseyRestResourceFactory(WebPositionsResource.class, new EHCachingPositionMaster(getPositionMaster(), CacheManager.getInstance()), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
     repo.getRestComponents().publishResource(resource);
     resource = new JerseyRestResourceFactory(WebPortfoliosResource.class, getPortfolioMaster(), getPositionMaster(), getSecuritySource(), getScheduler());
     repo.getRestComponents().publishResource(resource);
