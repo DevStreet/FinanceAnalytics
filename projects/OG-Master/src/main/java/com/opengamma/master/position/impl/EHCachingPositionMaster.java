@@ -52,7 +52,7 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
   public EHCachingPositionMaster(final PositionMaster underlying, final CacheManager cacheManager) {
     super(underlying, cacheManager);
 
-    _documentSearchCache = new DocumentSearchCache<>(cacheManager, new DocumentSearchCache.CacheSearcher<PositionDocument>() {
+    _documentSearchCache = new DocumentSearchCache<>(cacheManager, "position", new DocumentSearchCache.CacheSearcher<PositionDocument>() {
       @Override
       public AbstractSearchResult<PositionDocument> search(AbstractSearchRequest request) {
         return ((PositionMaster) getUnderlying()).search((PositionSearchRequest) request);
@@ -61,7 +61,7 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
 
     // Prime search cache
     PositionSearchRequest defaultSearch = new PositionSearchRequest();
-    defaultSearch.setPagingRequest(PagingRequest.ofIndex(0, DocumentSearchCache.PREFETCH_GRANULARITY));
+    defaultSearch.setPagingRequest(PagingRequest.ofIndex(0, PagingRequest.DEFAULT_PAGING_SIZE));
     _documentSearchCache.backgroundPrefetch(defaultSearch);
 
   }

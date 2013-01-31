@@ -38,11 +38,11 @@ import net.sf.ehcache.Element;
 public class DocumentSearchCache<D extends AbstractDocument> {
 
   /** The number of units to prefetch on either side of the current paging request */
-  public static final int PREFETCH_RADIUS = 2;
+  private static final int PREFETCH_RADIUS = 2;
   /** The size of a prefetch unit */
-  public static final int PREFETCH_GRANULARITY = 100;
+  private static final int PREFETCH_GRANULARITY = 100;
   /** The maximum number of concurrent prefetch operations */
-  private final int MAX_PREFETCH_CONCURRENCY = 4;
+  private static final int MAX_PREFETCH_CONCURRENCY = 4;
 
   /**
    * The document cache indexed by search requests.
@@ -50,7 +50,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    */
   private final Cache _documentBySearchRequestCache;
   /** The document by search request cache's name. */
-  private final String _documentBySearchRequestCacheName = getClass().getName() + "-documentBySearchRequestCache";
+  private final String _documentBySearchRequestCacheName;
 
   /** The prefetch thread executor service */
   private final ExecutorService _executorService;
@@ -62,9 +62,18 @@ public class DocumentSearchCache<D extends AbstractDocument> {
     AbstractSearchResult<D> search(AbstractSearchRequest request);
   }
 
-  public DocumentSearchCache(CacheManager cacheManager, CacheSearcher<D> searcher) {
+  /**
+   * Create a new document search cache.
+   *
+   * @param cacheManager  The cache manager to use
+   * @param name          A unique name for this cache
+   * @param searcher      The CacheSearcher to use for passing search requests to an underlying master
+   */
+  public DocumentSearchCache(CacheManager cacheManager, String name, CacheSearcher<D> searcher) {
 
     _searcher = searcher;
+
+    _documentBySearchRequestCacheName = name + "-documentBySearchRequestCache";
 
     EHCacheUtils.addCache(cacheManager, _documentBySearchRequestCacheName);
     _documentBySearchRequestCache = EHCacheUtils.getCacheFromManager(cacheManager, _documentBySearchRequestCacheName);
@@ -279,6 +288,18 @@ public class DocumentSearchCache<D extends AbstractDocument> {
     }
 
     return new ObjectsPair<>(superIndex, superRange);
+  }
+
+  /**
+   * Call this at the end of a unit test run to clear the state of EHCache.
+   * It should not be part of a generic lifecycle method.
+   */
+  public void shutdown() {
+    //getUnderlying().changeManager().removeChangeListener(_changeListener);
+    //getCacheManager().clearAllStartingWith(_documentByOidCacheName);
+    //getCacheManager().clearAllStartingWith(_documentByUidCacheName);
+    //getCacheManager().removeCache(_documentByOidCacheName);
+    //getCacheManager().removeCache(_documentByUidCacheName);
   }
 
   /**

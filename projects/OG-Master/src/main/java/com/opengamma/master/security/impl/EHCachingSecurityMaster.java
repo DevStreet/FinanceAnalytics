@@ -52,7 +52,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   public EHCachingSecurityMaster(final SecurityMaster underlying, final CacheManager cacheManager) {
     super(underlying, cacheManager);
 
-    _documentSearchCache = new DocumentSearchCache<>(cacheManager, new DocumentSearchCache.CacheSearcher<SecurityDocument>() {
+    _documentSearchCache = new DocumentSearchCache<>(cacheManager, "security", new DocumentSearchCache.CacheSearcher<SecurityDocument>() {
       @Override
       public AbstractSearchResult<SecurityDocument> search(AbstractSearchRequest request) {
         return ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest) request);
@@ -62,7 +62,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     // Prime search cache
     SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
     defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
-    defaultSearch.setPagingRequest(PagingRequest.ofIndex(0, DocumentSearchCache.PREFETCH_GRANULARITY));
+    defaultSearch.setPagingRequest(PagingRequest.ofIndex(0, PagingRequest.DEFAULT_PAGING_SIZE));
     _documentSearchCache.backgroundPrefetch(defaultSearch);
   }
 
