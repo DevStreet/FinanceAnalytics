@@ -5,6 +5,17 @@
  */
 package com.opengamma.master;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.threeten.bp.Instant;
+
 import com.opengamma.DataNotFoundException;
 import com.opengamma.core.change.BasicChangeManager;
 import com.opengamma.core.change.ChangeEvent;
@@ -16,21 +27,10 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ehcache.EHCacheUtils;
-import com.opengamma.util.time.Expiry;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.threeten.bp.Instant;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 /**
  * A cache decorating a master, mainly intended to reduce the frequency and repetition of queries to the underlying
@@ -240,7 +240,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
   @Override
   public Map<UniqueId, D> get(Collection<UniqueId> uniqueIds) {
-    Map<UniqueId, D> result = newHashMap();
+    Map<UniqueId, D> result = new HashMap<>();
     for (UniqueId uniqueId : uniqueIds) {
       try {
         D object = get(uniqueId);
