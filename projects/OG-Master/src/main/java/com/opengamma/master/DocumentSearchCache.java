@@ -29,7 +29,6 @@ import net.sf.ehcache.Element;
  * <p>
  * The cache is implemented using {@code EHCache}.
  *
- * TODO fix indexing/caching towards end of master
  * TODO investigate better ways to use EHCache
  * TODO ensure that docs are not duplicated in-cache
  * TODO OPTIMIZE finer grain range locking
@@ -123,8 +122,11 @@ public class DocumentSearchCache<D extends AbstractDocument> {
               - (PREFETCH_RADIUS * PREFETCH_GRANULARITY)
         : 0;
     final int end =
-          ((originalRequest.getPagingRequest().getLastItem() / PREFETCH_GRANULARITY) * PREFETCH_GRANULARITY)
-              + (PREFETCH_RADIUS * PREFETCH_GRANULARITY); //TODO what if last item beyond end?
+        (originalRequest.getPagingRequest().getLastItem() < Integer.MAX_VALUE - (PREFETCH_RADIUS * PREFETCH_GRANULARITY))
+        ? ((originalRequest.getPagingRequest().getLastItem() / PREFETCH_GRANULARITY) * PREFETCH_GRANULARITY)
+              + (PREFETCH_RADIUS * PREFETCH_GRANULARITY)
+        : Integer.MAX_VALUE;
+
     PagingRequest superPagingRequest = PagingRequest.ofIndex(start, end - start);
 
     // Build new search request with larger range
@@ -154,6 +156,11 @@ public class DocumentSearchCache<D extends AbstractDocument> {
     final int totalDocuments = info.getFirst();
     final ConcurrentNavigableMap<Integer, List<D>> rangeMap = info.getSecond();
 
+    // Fix unpaged requests and end indexes larger than the total doc count
+    if (request.getPagingRequest().getPagingSize() > totalDocuments) {
+      request.setPagingRequest(PagingRequest.ofIndex(request.getPagingRequest().getFirstItem(), totalDocuments));
+    }
+
     // Ensure that the required range is cached in its entirety
     ObjectsPair<Integer, List<D>> pair = cacheSuperRange(request, rangeMap, blockUntilCached);
     final int superIndex = pair.getFirst();
@@ -162,7 +169,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
     // Create and return the search result
     final List<D> resultDocuments = superRange.subList(
         request.getPagingRequest().getFirstItem() - superIndex,
-        request.getPagingRequest().getLastItem()  - superIndex);
+        Math.min(request.getPagingRequest().getLastItem()  - superIndex, superRange.size()));
 
     return new ObjectsPair<>(totalDocuments, resultDocuments);
   }
