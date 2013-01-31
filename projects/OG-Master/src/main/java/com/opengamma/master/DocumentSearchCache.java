@@ -28,7 +28,6 @@ import net.sf.ehcache.Element;
  * A generic cache for search results
  * <p>
  * TODO investigate better ways to use EHCache
- * TODO separate cache logic from master-specific code
  * TODO ensure that docs are not duplicated in-cache
  * TODO OPTIMIZE cache replacement policy
  * TODO OPTIMIZE underlying search request coalescing
