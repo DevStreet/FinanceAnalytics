@@ -25,10 +25,14 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 /**
- * A generic cache for search results
+ * A document cache for search results, providing common caching logic to caching masters with a document search facility.
  * <p>
+ * The cache is implemented using {@code EHCache}.
+ *
+ * TODO fix indexing/caching towards end of master
  * TODO investigate better ways to use EHCache
  * TODO ensure that docs are not duplicated in-cache
+ * TODO OPTIMIZE finer grain range locking
  * TODO OPTIMIZE cache replacement policy
  * TODO OPTIMIZE underlying search request coalescing
  * TODO OPTIMIZE add front cache maps to keep EHCache happy
@@ -57,8 +61,18 @@ public class DocumentSearchCache<D extends AbstractDocument> {
   /** The searcher, provides access to master-specific search operations */
   private CacheSearcher<D> _searcher;
 
+  /**
+   * A cache searcher, used by the document search cache to pass search requests to an underlying master without
+   * knowing its type.
+   *
+   * @param <D> the document type
+   */
   public interface CacheSearcher<D extends AbstractDocument> {
-    AbstractSearchResult<D> search(AbstractSearchRequest request);
+    /** Searches an underlying master, casting search requests/results as required for a specific master
+     * @param request   The search request (will be cast to a search request for a specific master)
+     * @return          The search result
+     */
+    public AbstractSearchResult<D> search(AbstractSearchRequest request);
   }
 
   /**
@@ -193,8 +207,6 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    */
   protected ObjectsPair<Integer, List<D>> cacheSuperRange(final AbstractSearchRequest originalRequest,
                             final ConcurrentNavigableMap<Integer, List<D>> rangeMap, boolean blockUntilCached) {
-
-    // TODO finer grain locking; maybe give up caching and just return result if locking fails
 
     final int startIndex = originalRequest.getPagingRequest().getFirstItem();
     final int endIndex = originalRequest.getPagingRequest().getLastItem();
