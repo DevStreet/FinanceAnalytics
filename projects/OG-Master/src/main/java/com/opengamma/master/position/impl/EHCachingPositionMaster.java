@@ -61,9 +61,8 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
 
     // Prime search cache
     PositionSearchRequest defaultSearch = new PositionSearchRequest();
-    defaultSearch.setPagingRequest(PagingRequest.ofIndex(0, PagingRequest.DEFAULT_PAGING_SIZE));
+    defaultSearch.setPagingRequest(PagingRequest.FIRST_PAGE);
     _documentSearchCache.backgroundPrefetch(defaultSearch);
-
   }
 
   @Override

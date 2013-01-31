@@ -62,7 +62,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     // Prime search cache
     SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
     defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
-    defaultSearch.setPagingRequest(PagingRequest.ofIndex(0, PagingRequest.DEFAULT_PAGING_SIZE));
+    defaultSearch.setPagingRequest(PagingRequest.FIRST_PAGE);
     _documentSearchCache.backgroundPrefetch(defaultSearch);
   }
 
