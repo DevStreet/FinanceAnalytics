@@ -7,11 +7,12 @@
  * Code is a translation of the test code at http://www.netlib.org/blas/dblat1
  * It forms part of the Netlib BLAS/LAPACK reference library which is provided under a modified BSD licensed.
  */
-package com.opengamma.maths.lowlevelapi.exposedapi;
+package com.opengamma.maths.lowlevelapi.exposedapi.BLASTests;
 
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
+import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
 
 /**
  * Does the Netlib BLAS1 test (approximately)
