@@ -30,8 +30,7 @@ import net.sf.ehcache.CacheManager;
 
 /**
  * A cache decorating a {@code PositionMaster}, mainly intended to reduce the frequency and repetition of queries
- * from the management UI to a {@code DbPositionMaster}. In particular, prefetching is employed in paged queries,
- * which tend to scale poorly.
+ * from the management UI to a {@code DbPositionMaster}.
  * <p>
  * The cache is implemented using {@code EHCache}.
  */

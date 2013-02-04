@@ -32,10 +32,11 @@ import net.sf.ehcache.Element;
  * TODO investigate better ways to use EHCache
  * TODO ensure that docs are not duplicated in-cache
  * TODO OPTIMIZE finer grain range locking
- * TODO OPTIMIZE cache replacement policy
+ * TODO OPTIMIZE cache replacement policy/handling huge requests that would flush out entire content
  * TODO OPTIMIZE underlying search request coalescing
  * TODO OPTIMIZE add front cache maps to keep EHCache happy
- * @param <D>
+ *
+ * @param <D> The document type to cache
  */
 public class DocumentSearchCache<D extends AbstractDocument> {
 
@@ -57,7 +58,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
   /** The prefetch thread executor service */
   private final ExecutorService _executorService;
 
-  /** The searcher, provides access to master-specific search operations */
+  /** The searcher provides access to master-specific operations */
   private CacheSearcher<D> _searcher;
 
   /**
@@ -99,6 +100,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
 
   /**
    * Return a clone of the supplied search request, but with its paging request nulled out
+   *
    * @param request the search request
    * @return        a clone of the supplied search request, with its paging request nulled out
    */
@@ -111,6 +113,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
   /**
    * Calculate the range that should be prefetched for the supplied request and initiate the fetching of any uncached
    * ranges from the underlying master in the background, without blocking.
+   *
    * @param request the search request
    */
   public void backgroundPrefetch(final AbstractSearchRequest originalRequest) {
@@ -145,6 +148,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
   /**
    * If result is entirely cached return it immediately; otherwise, fetch any missing ranges from the underlying
    * master in the foreground, cache and return it.
+   *
    * @param request the search request
    * @return        the search result
    */
@@ -178,6 +182,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * Retrieve from cache the total #documents and the cached document ranges for the supplied search request (without
    * taking into account its paging request). If an cached entry is not found for the unpaged search request, then
    * create one, populate it with the results of the supplied paged search request, and return it.
+   *
    * @param cache   the search request ehcache
    * @param request the search request
    * @return        the total document count and a range map of cached documents for the supplied search request without
@@ -208,6 +213,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * Fill in any uncached gaps for the requested range from the underlying, creating a single cached 'super range' from
    * which the entire current search request can be satisfied. This method may be called concurrently in multiple
    * threads.
+   *
    * @param originalRequest the search request
    * @param rangeMap        the range map of cached documents for the supplied search request without paging
    * @return                a super-range of cached documents that contains at least the requested documents
