@@ -27,6 +27,31 @@ public class SLATECOGJavaBacked extends SLATECAbstractSuper implements SLATECAPI
   }
 
   @Override
+  public double dgamma(double x) {
+    return Double.NaN;
+  }
+  
+  @Override
+  public double dlngam(double x) {
+    return Double.NaN;
+  }
+  
+  @Override
+  public double dacosh(double x) {
+    return Double.NaN;
+  }
+
+  @Override
+  public double dasinh(double x) {
+    return Double.NaN;
+  }
+
+  @Override
+  public double datanh(double x) {
+    return Double.NaN;
+  }
+
+  @Override
   public double zabs(double zr, double zi) {
     return ZABS.zabs(zr, zi);
   }
@@ -40,5 +65,7 @@ public class SLATECOGJavaBacked extends SLATECAbstractSuper implements SLATECAPI
   public double[] zatan(double[] z) {
     return ZATAN.zatan(z);
   }
+
+
 
 }
