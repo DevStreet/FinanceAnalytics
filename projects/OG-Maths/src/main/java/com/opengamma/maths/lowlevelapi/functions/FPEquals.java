@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.blase;
+package com.opengamma.maths.lowlevelapi.functions;
 
 import java.util.Arrays;
 
@@ -47,10 +47,18 @@ public class FPEquals {
     return fuzzyEquals(a, b, s_defaulttol);
   }
 
+  public static boolean fuzzyEquals(double a, double b, double tol) {
+    return fuzzyEquals(new double[] {a }, new double[] {b }, tol);
+  }  
+  
+  public static boolean fuzzyEquals(double a, double b) {
+    return fuzzyEquals(new double[] {a }, new double[] {b }, s_defaulttol);
+  }
+
   public static boolean fuzzyEqualsDynamicTol(int count, double[] a, int offseta, double[] b, int offsetb) {
     double tolerance;
     for (int i = 0; i < count; i++) {
-      tolerance = 100 * Math.max(Math.ulp(a[i + offseta]), Math.ulp(b[i + offsetb]));
+      tolerance = 10 * Math.ulp(b[i + offsetb]);
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
         s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
         return false;
@@ -63,6 +71,10 @@ public class FPEquals {
     return fuzzyEqualsDynamicTol(a.length, a, 0, b, 0);
   }
 
+  public static boolean fuzzyEqualsDynamicTol(double a, double b) {
+    return fuzzyEqualsDynamicTol(1, new double[] {a}, 0, new double[] {b}, 0);
+  }
+  
   public static FPEquals getInstance() {
     return s_instance;
   }
