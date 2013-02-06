@@ -28,9 +28,10 @@ import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ehcache.EHCacheUtils;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 
 /**
  * A cache decorating a master, mainly intended to reduce the frequency and repetition of queries to the underlying
@@ -51,19 +52,28 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   /** The underlying cache. */
   private final AbstractChangeProvidingMaster<D> _underlying;
   /** The cache manager. */
-  private final CacheManager _manager;
+  private final CacheManager _cacheManager;
   /** Listens for changes in the underlying security source. */
   private final ChangeListener _changeListener;
   /** The local change manager. */
   private final ChangeManager _changeManager;
   /** The document cache indexed by ObjectId/version/correction. */
-  private final Cache _documentByOidCache;
+  private final Ehcache _oidToUidCache;
   /** The document cache indexed by UniqueId. */
-  private final Cache _documentByUidCache;
+  private final Ehcache _uidToDocumentCache;
   /** The document by oid cache's name. */
-  private final String _documentByOidCacheName = getClass().getName() + "-documentByOidCache";
+  private final String _oidtoUidCacheName = getClass().getName() + "-oidToUidCache";
   /** The document by uid cache's name. */
-  private final String _documentByUidCacheName = getClass().getName() + "-documentByUidCache";
+  private final String _uidToDocumentCacheName = getClass().getName() + "-uidToDocumentCache";
+
+  private class UidToDocumentCacheEntryFactory implements CacheEntryFactory {
+
+    @Override
+    public Object createEntry(Object key) throws Exception {
+      return null;  // TODO
+    }
+
+  }
 
   /**
    * Creates an instance over an underlying source specifying the cache manager.
@@ -74,12 +84,20 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   public AbstractEHCachingMaster(final AbstractChangeProvidingMaster<D> underlying, final CacheManager cacheManager) {
     ArgumentChecker.notNull(underlying, "underlying");
     ArgumentChecker.notNull(cacheManager, "cacheManager");
+
     _underlying = underlying;
-    EHCacheUtils.addCache(cacheManager, _documentByOidCacheName);
-    _documentByOidCache = EHCacheUtils.getCacheFromManager(cacheManager, _documentByOidCacheName);
-    EHCacheUtils.addCache(cacheManager, _documentByUidCacheName);
-    _documentByUidCache = EHCacheUtils.getCacheFromManager(cacheManager, _documentByUidCacheName);
-    _manager = cacheManager;
+    _cacheManager = cacheManager;
+
+    EHCacheUtils.addCache(cacheManager, _oidtoUidCacheName);
+    _oidToUidCache = EHCacheUtils.getCacheFromManager(cacheManager, _oidtoUidCacheName);
+    EHCacheUtils.addCache(cacheManager, _uidToDocumentCacheName);
+    _uidToDocumentCache = EHCacheUtils.getCacheFromManager(cacheManager, _uidToDocumentCacheName);
+
+    //_uidToDocumentCache = new SelfPopulatingCache(new Cache(), new UidToDocumentCacheEntryFactory());
+    //_cacheManager.addCache(_uidToDocumentCache);
+    //_oidToUidCache = new SelfPopulatingCache();
+    //_cacheManager.addCache(_oidToUidCache);
+
     _changeManager = new BasicChangeManager();
     _changeListener = new ChangeListener() {
       @Override
@@ -171,7 +189,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     }
   } // InstantMap
 
-  private InstantMap getOrCreateInstantMap(ObjectIdentifiable objectId, Cache cache) {
+  private InstantMap getOrCreateInstantMap(ObjectIdentifiable objectId, Ehcache cache) {
     Element e = cache.get(objectId);
     InstantMap instantMap;
     if (e != null) {
@@ -190,7 +208,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     ArgumentChecker.notNull(versionCorrection, "versionCorrection");
 
     // Get/create instant map
-    InstantMap instantMap = getOrCreateInstantMap(objectId, getDocumentByOidCache());
+    InstantMap instantMap = getOrCreateInstantMap(objectId, getOidToUidCache());
 
     // Get/create document in instant map
     D result = instantMap.get(versionCorrection);
@@ -202,7 +220,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
       // Update uniqueid map
       if (result != null) { // TODO NOT CACHING MISSES :(
-        getDocumentByUidCache().put(new Element(result.getUniqueId(), result));
+        getUidToDocumentCache().put(new Element(result.getUniqueId(), result));
 
         // Update objectid/version/correction map
         instantMap.put(result);
@@ -221,7 +239,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       result = get(uniqueId.getObjectId(), VersionCorrection.LATEST);
     } else {
       // Locate UniqueId in cache
-      Element e = getDocumentByUidCache().get(uniqueId);
+      Element e = getUidToDocumentCache().get(uniqueId);
       if (e != null) {
         result = (D) (e.getObjectValue());
         s_logger.debug("retrieved object: {} from doc-cache", result);
@@ -231,10 +249,10 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
         if (result != null) { // TODO NOT CACHING MISSES :(
           // Update uniqueid map
-          getDocumentByUidCache().put(new Element(uniqueId, result));
+          getUidToDocumentCache().put(new Element(uniqueId, result));
 
           // Update objectid/version/correction map
-          InstantMap instantMap = getOrCreateInstantMap(uniqueId.getObjectId(), getDocumentByOidCache());
+          InstantMap instantMap = getOrCreateInstantMap(uniqueId.getObjectId(), getOidToUidCache());
           instantMap.put(result);
         }
       }
@@ -265,11 +283,11 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     D result = getUnderlying().add(document);
 
     // Store document in ObjectId/version/correction map
-    InstantMap instantMap = getOrCreateInstantMap(result.getObjectId(), getDocumentByOidCache());
+    InstantMap instantMap = getOrCreateInstantMap(result.getObjectId(), getOidToUidCache());
     instantMap.put(result);
 
     // Store document in UniqueId map
-    getDocumentByUidCache().put(new Element(result.getUniqueId(), result));
+    getUidToDocumentCache().put(new Element(result.getUniqueId(), result));
 
     return result;
   }
@@ -280,11 +298,11 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     D result = getUnderlying().update(document);
 
     // Store document in ObjectId/version/correction map
-    InstantMap instantMap = getOrCreateInstantMap(result.getObjectId(), getDocumentByOidCache());
+    InstantMap instantMap = getOrCreateInstantMap(result.getObjectId(), getOidToUidCache());
     instantMap.put(result);
 
     // Store document in UniqueId map
-    getDocumentByUidCache().put(new Element(result.getUniqueId(), result));
+    getUidToDocumentCache().put(new Element(result.getUniqueId(), result));
 
     // TODO adjust version/correction validity of previous version in Oid map
     // TODO do we need to fire entity changed events here?
@@ -306,7 +324,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     D result = getUnderlying().correct(document); //TODO
 
     // Adjust version/correction validity of latest version in Oid cache
-//    InstantMap instantMap = getOrCreateInstantMap(document.getObjectId(), getDocumentByOidCache());
+//    InstantMap instantMap = getOrCreateInstantMap(document.getObjectId(), getOidToUidCache());
 //    D oldDocument = instantMap.get(VersionCorrection.of(document.getVersionToInstant(), document.getCorrectionToInstant()));
 //    if (oldDocument != null) {
 //      oldDocument.setVersionToInstant();   // hope this is accurate enough, might need to fetch times from underlyig master
@@ -351,14 +369,14 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   private void cleanCaches(ObjectId oid, Instant fromVersion, Instant toVersion) {
 
     // Get the documents that match the version range
-    InstantMap instantMap = getOrCreateInstantMap(oid, getDocumentByOidCache()).getRange(fromVersion, toVersion);
+    InstantMap instantMap = getOrCreateInstantMap(oid, getOidToUidCache()).getRange(fromVersion, toVersion);
 
     // Remove all matching versions
     for (NavigableMap<Instant, D> correctionMap : instantMap.getMap().values()) {
 
       // Remove each correction from Uid map
       for (D document : correctionMap.values()) {
-        getDocumentByUidCache().remove(document.getUniqueId());
+        getUidToDocumentCache().remove(document.getUniqueId());
       }
 
       // Remove all corrections from Oid map
@@ -372,10 +390,10 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    */
   public void shutdown() {
     getUnderlying().changeManager().removeChangeListener(_changeListener);
-    getCacheManager().clearAllStartingWith(_documentByOidCacheName);
-    getCacheManager().clearAllStartingWith(_documentByUidCacheName);
-    getCacheManager().removeCache(_documentByOidCacheName);
-    getCacheManager().removeCache(_documentByUidCacheName);
+    getCacheManager().clearAllStartingWith(_oidtoUidCacheName);
+    getCacheManager().clearAllStartingWith(_uidToDocumentCacheName);
+    getCacheManager().removeCache(_oidtoUidCacheName);
+    getCacheManager().removeCache(_uidToDocumentCacheName);
   }
 
   //-------------------------------------------------------------------------
@@ -395,7 +413,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    * @return the cache manager, not null
    */
   protected CacheManager getCacheManager() {
-    return _manager;
+    return _cacheManager;
   }
 
   /**
@@ -403,8 +421,8 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    *
    * @return the cache, not null
    */
-  protected Cache getDocumentByOidCache() {
-    return _documentByOidCache;
+  protected Ehcache getOidToUidCache() {
+    return _oidToUidCache;
   }
 
   /**
@@ -412,8 +430,8 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    *
    * @return the cache, not null
    */
-  protected Cache getDocumentByUidCache() {
-    return _documentByUidCache;
+  protected Ehcache getUidToDocumentCache() {
+    return _uidToDocumentCache;
   }
 
   /**
