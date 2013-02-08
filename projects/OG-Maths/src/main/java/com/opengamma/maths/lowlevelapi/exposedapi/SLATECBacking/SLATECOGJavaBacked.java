@@ -5,8 +5,13 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking;
 
+import com.opengamma.maths.lowlevelapi.slatec.fnlib.DACOSH;
+import com.opengamma.maths.lowlevelapi.slatec.fnlib.DASINH;
+import com.opengamma.maths.lowlevelapi.slatec.fnlib.DATANH;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
+import com.opengamma.maths.lowlevelapi.slatec.fnlib.DGAMMA;
+import com.opengamma.maths.lowlevelapi.slatec.fnlib.DLNGAM;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZABS;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZATAN;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZLOG;
@@ -28,27 +33,27 @@ public class SLATECOGJavaBacked extends SLATECAbstractSuper implements SLATECAPI
 
   @Override
   public double dgamma(double x) {
-    return Double.NaN;
+    return DGAMMA.dgamma(x);
   }
   
   @Override
   public double dlngam(double x) {
-    return Double.NaN;
+    return DLNGAM.dlngam(x);
   }
   
   @Override
   public double dacosh(double x) {
-    return Double.NaN;
+    return DACOSH.dacosh(x);
   }
 
   @Override
   public double dasinh(double x) {
-    return Double.NaN;
+    return DASINH.dasinh(x);
   }
 
   @Override
   public double datanh(double x) {
-    return Double.NaN;
+    return DATANH.datanh(x);
   }
 
   @Override
