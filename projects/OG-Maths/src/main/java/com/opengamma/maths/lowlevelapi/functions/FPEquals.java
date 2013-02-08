@@ -20,10 +20,6 @@ public class FPEquals {
   private static Logger s_log = LoggerFactory.getLogger(FPEquals.class);
 
   private static double s_defaulttol = 100 * D1MACH.four();
-  private static FPEquals s_instance;
-  static {
-    s_instance = new FPEquals();
-  }
 
   public static boolean equals(double[] a, double[] b) {
     return Arrays.equals(a, b);
@@ -31,6 +27,9 @@ public class FPEquals {
 
   public static boolean fuzzyEquals(int count, double[] a, int offseta, double[] b, int offsetb, double tolerance) {
     for (int i = 0; i < count; i++) {
+      if (Double.isNaN(a[i + offseta]) && !Double.isNaN(b[i + offsetb])) {
+        return false;
+      }
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
         s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
         return false;
@@ -49,8 +48,8 @@ public class FPEquals {
 
   public static boolean fuzzyEquals(double a, double b, double tol) {
     return fuzzyEquals(new double[] {a }, new double[] {b }, tol);
-  }  
-  
+  }
+
   public static boolean fuzzyEquals(double a, double b) {
     return fuzzyEquals(new double[] {a }, new double[] {b }, s_defaulttol);
   }
@@ -58,7 +57,7 @@ public class FPEquals {
   public static boolean fuzzyEqualsDynamicTol(int count, double[] a, int offseta, double[] b, int offsetb) {
     double tolerance;
     for (int i = 0; i < count; i++) {
-      tolerance = 10 * Math.ulp(b[i + offsetb]);
+      tolerance = 100 * Math.ulp(b[i + offsetb]);
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
         s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
         return false;
@@ -72,11 +71,7 @@ public class FPEquals {
   }
 
   public static boolean fuzzyEqualsDynamicTol(double a, double b) {
-    return fuzzyEqualsDynamicTol(1, new double[] {a}, 0, new double[] {b}, 0);
-  }
-  
-  public static FPEquals getInstance() {
-    return s_instance;
+    return fuzzyEqualsDynamicTol(1, new double[] {a }, 0, new double[] {b }, 0);
   }
 
 }
