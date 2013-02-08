@@ -5,10 +5,6 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking;
 
-import java.text.Format;
-
-import org.testng.annotations.Test;
-
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.MathE;
@@ -18,7 +14,7 @@ import com.opengamma.maths.lowlevelapi.functions.MathE;
  */
 public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIInterface {
 
-  private static SLATEC s_slatec = new SLATEC();
+  private static SLATEC s_slatec = new SLATEC(SLATEC.backing.OGjava);
 
   @Override
   public void vd_acos(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
@@ -170,7 +166,7 @@ public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIIn
     int jmparg0 = offsetarg0[0];
     int jmpout0 = offsetout0[0];
     for (int i = 0; i < n; i++) {
-      out0[i + jmpout0] = Math.pow(arg0[i + jmparg0], 1. / 3.);
+      out0[i + jmpout0] = Math.cbrt(arg0[i + jmparg0]);
     }
   }
 
@@ -570,6 +566,14 @@ public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIIn
 
   @Override
   public void vz_abs(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    int n = count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmpout0 = offsetout0[0];
+    int offset = jmparg0;
+    for (int i = 0; i < n; i++) {
+      out0[i + jmpout0] = s_slatec.zabs(arg0[offset], arg0[offset + 1]);
+      offset += 2;
+    }
   }
 
   @Override
