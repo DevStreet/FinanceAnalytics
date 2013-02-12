@@ -30,7 +30,43 @@ public interface SLATECAPIInterface {
   double derfc(double x);
 
   /**
-   * ZABS(X) Computes the absolute value or magnitude of a double precision complex number (stored as a two element double [])
+   * DGAMMA(X) provides the ability to calculate the complete Gamma function at position 'x'.
+   * @param x the position at which to evaluate the complete Gamma function.
+   * @return the value of the complete Gamma function at position 'x'
+   */
+  double dgamma(double x);
+
+  /**
+   * DLNGAM(X) provides the ability to calculate the absolute value of the base 'e' (natural) log of the complete Gamma function at position 'x'.
+   * @param x the position at which to evaluate the absolute value of the base 'e' (natural) log of the complete Gamma function.
+   * @return the value of the absolute value of the base 'e' (natural) log of the complete Gamma function function at position 'x'
+   */
+  double dlngam(double x);
+ 
+  
+  /**
+   * DACOSH(X) provides the ability to calculate the inverse hyperbolic cosine at position 'x'.
+   * @param x the position at which to evaluate the inverse hyperbolic cosine.
+   * @return the value of the inverse hyperbolic cosine at position 'x'
+   */
+  double dacosh(double x);
+
+  /**
+   * DASINH(X) provides the ability to calculate the inverse hyperbolic sine at position 'x'.
+   * @param x the position at which to evaluate the inverse hyperbolic sine.
+   * @return the value of the inverse hyperbolic sine at position 'x'
+   */
+  double dasinh(double x);
+  
+  /**
+   * DATANH(X) provides the ability to calculate the inverse hyperbolic tangent at position 'x'.
+   * @param x the position at which to evaluate the inverse hyperbolic tangent.
+   * @return the value of the inverse hyperbolic tangent at position 'x'
+   */  
+  double datanh(double x);
+  
+  /**
+   * ZABS(X) Computes the absolute value or magnitude of a double precision complex number (stored as a two element double []).
    * @param zr the real part of the complex number of which the absolute value shall be computed
    * @param zi the imaginary part of the complex number of which the absolute value shall be computed
    * @return the absolute value of the complex number
@@ -53,4 +89,9 @@ public interface SLATECAPIInterface {
    * @return the arc tangent of z.
    */
   double[] zatan(final double[] z);
+  
+  
+  
+  
+  
 }

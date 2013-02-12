@@ -32,7 +32,7 @@ public class SLATEC implements SLATECAPIInterface {
   }
 
   public SLATEC() {
-    _localSLATEC = new SLATECOGJavaBacked();
+    _localSLATEC = new SLATECNativeBacked();
   }
 
   public SLATEC(backing backedby) {
@@ -55,6 +55,31 @@ public class SLATEC implements SLATECAPIInterface {
   }
 
   @Override
+  public double dgamma(double x) {
+    return _localSLATEC.dgamma(x);
+  }
+  
+  @Override
+  public double dlngam(double x) {
+    return _localSLATEC.dlngam(x);
+  }
+  
+  @Override
+  public double dacosh(double x) {
+    return _localSLATEC.dacosh(x);
+  }
+
+  @Override
+  public double dasinh(double x) {
+    return _localSLATEC.dasinh(x);
+  }
+
+  @Override
+  public double datanh(double x) {
+    return _localSLATEC.datanh(x);
+  }
+  
+  @Override
   public double zabs(double zr, double zi) {
     return _localSLATEC.zabs(zr, zi);
   }
@@ -68,4 +93,6 @@ public class SLATEC implements SLATECAPIInterface {
   public double[] zatan(double[] z) {
     return _localSLATEC.zatan(z);
   }
+
+
 }
