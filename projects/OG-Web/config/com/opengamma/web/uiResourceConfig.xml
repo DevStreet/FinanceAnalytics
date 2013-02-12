@@ -207,6 +207,7 @@
     <fragment>/scripts/lib/js.ext.array.prototype.pluck.js</fragment>
     <fragment>/scripts/lib/js.ext.string.prototype.lang.js</fragment>
     <fragment>/scripts/lib/js.ext.string.prototype.trim.js</fragment>
+    <fragment>/scripts/lib/js.ext.object.create.js</fragment>
     <fragment>/scripts/lib/js.ext.object.keys.js</fragment>
     <fragment>/scripts/lib/js.ext.function.prototype.bind.js</fragment>
     <fragment>/scripts/lib/js.ext.function.prototype.partial.js</fragment>
@@ -223,6 +224,7 @@
     <fragment>/scripts/lib/jquery/jquery-tablesorter.parsers.js</fragment>
     <fragment>/scripts/lib/jquery/jquery-blurkill.js</fragment>
     <fragment>/scripts/lib/jquery/jquery.sparkline.2.0.js</fragment>
+    <fragment>/scripts/lib/jquery/jquery.searchabledropdown.js</fragment>
     <fragment>/scripts/lib/jquery/ui/jquery.ui.core.js</fragment>
     <fragment>/scripts/lib/jquery/ui/jquery.ui.widget.js</fragment>
     <fragment>/scripts/lib/jquery/ui/jquery.ui.mouse.js</fragment>

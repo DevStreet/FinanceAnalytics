@@ -9,6 +9,9 @@ $.register_module({
         var bools = {"false": false, "true": true}; 
         return {
             /* Util methods */
+            create_name : function (data){
+                return data.security.type + " " + data.trade.tradeDate; 
+            },
             update_block : function (section, extras){
                 section.block.html(function (html) {
                     $(section.selector).html(html);
@@ -24,7 +27,7 @@ $.register_module({
                 $('input:checkbox[name="'+ name +'"]').prop('checked', bools[value]);
             },
             add_datetimepicker : function (name){$('input[name="'+ name +'"]').datepicker({
-                dateFormat: 'yy-mm-dd'});
+                dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true});
             },
             get_checkbox : function (name) {
                 return $('input:checkbox[name="'+ name +'"]').is(':checked').toString();
@@ -49,9 +52,8 @@ $.register_module({
             },
             /* Util data */
             otc_trade : {                
-                tradeDate: "2013-01-01",
                 premiumCurrency: null,
-                tradeTime: "00:00Z",
+                tradeTime: null,
                 premium: null,
                 premiumTime: null,
                 attributes: {},
@@ -59,9 +61,8 @@ $.register_module({
                 type: "OtcTrade"
             },
             fungible_trade : {                
-                tradeDate: "2013-01-01",
                 premiumCurrency: null,
-                tradeTime: "00:00Z",
+                tradeTime: null,
                 premium: null,
                 premiumTime: null,
                 attributes: {},

@@ -12,7 +12,8 @@ $.register_module({
         var go = function () {
             og.api.rest.compressor.put({content: last_object, dependencies: ['data']}).pipe(function (result) {
                 var current = routes.current(),
-                    hash = routes.hash(og.views.analytics2.rules.load_item, {data: result.data.data});
+                    hash = routes.hash(og.views[og.analytics.blotter ? 'blotter' : 'analytics2']
+                        .rules.load_item, {data: result.data.data});
                 if (current.hash === hash) return url.process(current.args);
                 routes.go(hash);
             });
@@ -55,10 +56,15 @@ $.register_module({
                         if (og.analytics.blotter) og.analytics.grid.on('contextmenu', function (event, cell, col) {
                            if (cell) return og.common.util.ui.contextmenu({
                                defaults: true, zindex: 4, items: [
-                                   {name: 'Insert', handler: function () {new og.blotter.Dialog;}},
+                                   {name: 'Insert', handler: function () {
+                                    new og.blotter.Dialog({portfolio:{name: cell.row_value.nodeId, 
+                                        id: cell.row_value.nodeId}});
+                                }},
                                    {name: 'Edit', handler: function () {
-                                        og.api.rest.blotter.trades.get({id: cell.row_value.id})
-                                            .pipe(function(data){new og.blotter.Dialog(data);});
+                                        og.api.rest.blotter.trades.get({id: cell.row_value.tradeId})
+                                            .pipe(function(data){new og.blotter.Dialog({details: data, 
+                                                portfolio:{name: cell.row_value.nodeId, id: cell.row_value.nodeId}});
+                                            });
                                    }}
                                ]
                            }, event, cell);
@@ -66,7 +72,7 @@ $.register_module({
                     } else {
                         new og.analytics.Form2({callback: og.analytics.url.main, data: config.main});
                     }
-                    if (!config.main) new og.analytics.Form2({ callback: og.analytics.url.main });
+                    if (!config.main) {new og.analytics.Form2({ callback: og.analytics.url.main });}
                     panels.forEach(function (panel) {
                         var gadgets = config[panel], new_gadgets = [];
                         if (!gadgets || !gadgets.length)
