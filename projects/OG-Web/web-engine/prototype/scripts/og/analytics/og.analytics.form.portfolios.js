@@ -4,61 +4,74 @@
  */
 $.register_module({
     name: 'og.analytics.form.Portfolios',
-    dependencies: ['og.common.util.ui.Dropdown'],
+    dependencies: ['og.common.util.ui.AutoCombo'],
     obj: function () {
-        var Block = og.common.util.ui.Block;
-        var Portfolios = function (config) {
-            var block = this, form = config.form, index = 'portfolio', selectedIndex;
-            form.Block.call(block, {
-                template: '{{{children}}}<div class="OG-icon og-icon-down"></div>',
-                children: [new og.common.util.ui.Dropdown({
-                    form: form, resource: 'portfolios', index: index, value: config.val,
-                    rest_options: {page: '*'}, placeholder: 'Select portfolio', fields: [0, 2]
-                })],
-                processor: function (data) {
-                    if (!data[index]) // hack to get the value of a searchable dropdown
-                        data[index] = $('#' + form.id + ' select[name=' + index + ']').siblings('select').val();
-                }
-            });
-            block.on('form:load', function () {
-                var selectedIndex, selector = '#' + form.id + ' select[name=' + index + ']';
-                    select = $(selector).searchable().hide(),
-                    list = select.siblings('select').addClass('dropdown-list'),
-                    input = select.siblings('input').attr('placeholder', 'Select portfolio').select(),
-                    toggle = select.parent().siblings('.og-icon-down');
+        var module = this, Block = og.common.util.ui.Block, portfolios, portfolio_store;
 
-                if (select.val() !== '') input.val($('option:selected', select).text());
-
-                input.removeAttr('style').blur(function () {
-                    list.hide();
-                }).keydown(function (event) {
-                    if (event.keyCode === $.ui.keyCode.ESCAPE) list.hide();
-                    if (event.keyCode === $.ui.keyCode.UP || event.keyCode === $.ui.keyCode.DOWN) {
-                        if (input.val() === '') input.focus(0).click();
-                        list.show();
+        var ac_source = function (src, callback) {
+            return function (req, res) {
+                var escaped = $.ui.autocomplete.escapeRegex(req.term),
+                    matcher = new RegExp(escaped, 'i'),
+                    htmlize = function (str) {
+                        return !req.term ? str : str.replace(
+                            new RegExp(
+                                '(?![^&;]+;)(?!<[^<>]*)(' + escaped + ')(?![^<>]*>)(?![^&;]+;)', 'gi'
+                            ), '<strong>$1</strong>'
+                        );
+                    };
+                src.get({page: '*'}).pipe(function (resp){
+                    var data = callback(resp);
+                    if (data && data.length) {
+                        data.sort((function(){
+                            return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
+                        })());
+                        res(data.reduce(function (acc, val) {
+                            if (!req.term || val && matcher.test(val)) acc.push({label: htmlize(val)});
+                            return acc;
+                        }, []));
                     }
-                }).click(function (event) {
-                    list.show().prop('selectedIndex', selectedIndex);
-                    select.prop('selectedIndex', selectedIndex);
                 });
+            };
+        };
 
-                toggle.click(function (event) {
-                    selectedIndex = list.prop('selectedIndex');
-                    if (!selectedIndex) {
-                        select.prop('selectedIndex', selectedIndex);
-                        list.show().prop('selectedIndex', selectedIndex);
-                    }
-                    input.focus(0).click();
-                });
-
-                list.on('mousedown', function (event) {
-                    selectedIndex = list.get(0).selectedIndex;
-                    select.get(0).selectedIndex = selectedIndex+1;
-                    input.val(list.find("option:selected").text()).focus(0);
-                });
+        var store_porfolios = function (resp) {
+            return portfolios = (portfolio_store = resp.data.data).map(function (entry) {
+                return entry.split('|')[2];
             });
         };
+
+        var Portfolios = function (config) {
+            var block = this, menu, form = config.form;
+
+            form.Block.call(block, {
+                processor: function (data) {
+                    var port = portfolio_store.filter(function (entry) {
+                        return entry.split('|')[2] === menu.$input.val();
+                    });
+                    data.portfolio = port[0].split('|')[0];
+                }
+            });
+
+            form.on("form:load", function () {
+                menu = new og.common.util.ui.AutoCombo({
+                    selector:'.og-portfolios.og-autocombo',
+                    placeholder: 'Search Portfolios...',
+                    source: ac_source(og.api.rest.portfolios, store_porfolios)
+                });
+                if (config.val) {
+                    og.api.rest.portfolios.get().pipe(function (resp) {
+                        store_porfolios(resp);
+                        var val = portfolio_store.filter(function (entry) {
+                            return entry.split('|')[0] === config.val;
+                        });
+                        if (val.length && val[0] !== '') menu.$input.val(val[0].split('|')[2]);
+                    });
+                }
+            });
+        };
+
         Portfolios.prototype = new Block;
+
         return Portfolios;
     }
 });
