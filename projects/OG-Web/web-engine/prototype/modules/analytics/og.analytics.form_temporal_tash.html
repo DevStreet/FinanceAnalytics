@@ -7,21 +7,42 @@
   <fieldset class="valuation-time OG-background-03">
     <p>Valuation Time</p>
     <em>The time used by functions</em>
-    <label class="latest"><input type="radio" name="valuation-time" value="Latest" checked /> Latest</label>
-    <label class="custom"><input type="radio" name="valuation-time" value="Custom" /> Custom</label>
-    <input class="custom-date-time" type="text" name="valuation-time" value="" />
+    <label class="latest">
+      <input type="radio" name="valuation-time" value="Latest"
+        {{#unless valuation.datetime}} checked {{/unless}} /> Latest
+    </label>
+    <label class="custom">
+      <input type="radio" name="valuation-time" value="Custom"
+        {{#if valuation.datetime}} checked {{/if}} /> Custom
+    </label>
+    <input class="custom-date-time" type="text" name="valuation-time"
+      {{#if valuation.datetime}}value="{{valuation.datetime}}"{{else}}value=""{{/if}} />
   </fieldset>
   <fieldset class="portfolio-version">
     <p>Portfolio Version Time</p>
-    <label class="latest"><input type="radio" name="portfolio-version" value="Latest" checked /> Latest</label>
-    <label class="custom"><input type="radio" name="portfolio-version" value="Custom" /> Custom</label>
-    <input class="custom-date-time" type="text" name="portfolio-version" value="" />
+    <label class="latest">
+      <input type="radio" name="portfolio-version" value="Latest"
+        {{#unless portfolio_version.datetime}} checked {{/unless}} /> Latest
+    </label>
+    <label class="custom">
+      <input type="radio" name="portfolio-version" value="Custom"
+        {{#if portfolio_version.datetime}} checked {{/if}} /> Custom
+    </label>
+    <input class="custom-date-time" type="text" name="portfolio-version"
+        {{#if portfolio_version.datetime}}value="{{portfolio_version.datetime}}"{{else}}value=""{{/if}} />
   </fieldset>
   <fieldset class="portfolio-correction">
     <p>Portfolio Correction Time</p>
-    <label class="latest"><input type="radio" name="portfolio-correction" value="Latest" checked /> Latest</label>
-    <label class="custom"><input type="radio" name="portfolio-correction" value="Custom" /> Custom</label>
-    <input class="custom-date-time" type="text" name="portfolio-correction" value="" />
+    <label class="latest">
+      <input type="radio" name="portfolio-correction" value="Latest"
+        {{#unless portfolio_correction.datetime}} checked {{/unless}} /> Latest
+      </label>
+    <label class="custom">
+      <input type="radio" name="portfolio-correction" value="Custom"
+        {{#if portfolio_correction.datetime}} checked {{/if}} /> Custom
+    </label>
+    <input class="custom-date-time" type="text" name="portfolio-correction"
+        {{#if portfolio_correction.datetime}}value="{{portfolio_correction.datetime}}"{{else}}value=""{{/if}} />
   </fieldset>
   <fieldset class="temporal-datasources" style="display:none">
     <p>Data sources</p>
