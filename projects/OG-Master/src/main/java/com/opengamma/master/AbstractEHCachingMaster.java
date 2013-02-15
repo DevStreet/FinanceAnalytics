@@ -26,12 +26,10 @@ import com.opengamma.id.ObjectIdentifiable;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.ehcache.EHCacheUtils;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
-import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 
 /**
  * A cache decorating a master, mainly intended to reduce the frequency and repetition of queries to the underlying
@@ -66,15 +64,6 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   /** The document by uid cache's name. */
   private final String _uidToDocumentCacheName = getClass().getName() + "-uidToDocumentCache";
 
-  private class UidToDocumentCacheEntryFactory implements CacheEntryFactory {
-
-    @Override
-    public Object createEntry(Object key) throws Exception {
-      return null;  // TODO
-    }
-
-  }
-
   /**
    * Creates an instance over an underlying source specifying the cache manager.
    *
@@ -88,15 +77,25 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     _underlying = underlying;
     _cacheManager = cacheManager;
 
-    EHCacheUtils.addCache(cacheManager, _oidtoUidCacheName);
-    _oidToUidCache = EHCacheUtils.getCacheFromManager(cacheManager, _oidtoUidCacheName);
-    EHCacheUtils.addCache(cacheManager, _uidToDocumentCacheName);
-    _uidToDocumentCache = EHCacheUtils.getCacheFromManager(cacheManager, _uidToDocumentCacheName);
+    _cacheManager.addCache(_oidtoUidCacheName);
+    _oidToUidCache = _cacheManager.getCache(_oidtoUidCacheName);
+    _oidToUidCache.registerCacheWriter(new OidToUidCacheWriterFactory().createCacheWriter(_oidToUidCache, null));
+    _oidToUidCache.registerCacheLoader(new OidToUidCacheLoaderFactory().createCacheLoader(_oidToUidCache, null));
+    //_cacheManager.addCache(_oidtoUidCacheName);
+    //_oidToUidCache = new SelfPopulatingCache(_cacheManager.getCache(_oidtoUidCacheName), new OidToUidCacheEntryFactory());
+    //_cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(_oidtoUidCacheName), _oidToUidCache);
+    //_oidToUidCache.registerCacheWriter(new OidToUidCacheWriterFactory().createCacheWriter(_oidToUidCache, null));
 
-    //_uidToDocumentCache = new SelfPopulatingCache(new Cache(), new UidToDocumentCacheEntryFactory());
-    //_cacheManager.addCache(_uidToDocumentCache);
-    //_oidToUidCache = new SelfPopulatingCache();
-    //_cacheManager.addCache(_oidToUidCache);
+    _cacheManager.addCache(_uidToDocumentCacheName);
+    _uidToDocumentCache = _cacheManager.getCache(_uidToDocumentCacheName);
+    _uidToDocumentCache.registerCacheWriter(new UidToDocumentCacheWriterFactory().createCacheWriter(_uidToDocumentCache,
+                                                                                                    null));
+    _uidToDocumentCache.registerCacheLoader(new UidToDocumentCacheLoaderFactory().createCacheLoader(_uidToDocumentCache,
+                                                                                                    null));
+    //_cacheManager.addCache(_uidToDocumentCacheName);
+    //_uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(_uidToDocumentCacheName), new UidToDocumentCacheEntryFactory());
+    //_cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(_uidToDocumentCacheName), _uidToDocumentCache);
+    //_uidToDocumentCache.registerCacheWriter(new UidToDocumentCacheWriterFactory().createCacheWriter(_uidToDocumentCache, null));
 
     _changeManager = new BasicChangeManager();
     _changeListener = new ChangeListener() {
@@ -450,5 +449,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   public String toString() {
     return getClass().getSimpleName() + "[" + getUnderlying() + "]";
   }
+
+  //-------------------------------------------------------------------------
 
 }
