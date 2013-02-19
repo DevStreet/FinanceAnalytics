@@ -6,6 +6,7 @@
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
 import com.opengamma.maths.commonapi.MathsConstants;
+import com.opengamma.maths.lowlevelapi.functions.MathBits;
 
 /**
  * Computes the logarithm of a complex number, wrapping the argument appropriately.
@@ -30,6 +31,7 @@ public class ZLOG {
 
     if (ar == 0) {
       if (ai == 0) {
+        br[0] = MathBits.getNegativeInfinity(); // variation from SLATEC
         ierr[0] = 1;
         return;
       } else {
