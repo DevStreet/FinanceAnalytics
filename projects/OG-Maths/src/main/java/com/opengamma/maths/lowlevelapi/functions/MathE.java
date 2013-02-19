@@ -10,6 +10,15 @@ package com.opengamma.maths.lowlevelapi.functions;
  */
 public final class MathE {
 
+  /**
+   * Compute the signed integer and fractional parts of a floating point number.
+   * Special cases:
+   * Input val = NaN, returns NaN and intv[0] is set to NaN. NaN bit patterns are preserved.
+   * Input +/- infinity, returns +/- 0 and intv[0] is set to +/- infinity. 
+   * @param val the value to be decomposed
+   * @param intv returns with intv[0] containing the integral part of the number, see {@code trunc()}
+   * @return the fractional part of the floating point input
+   */
   public static double modf(double val, double[] intv) {
     if (Double.isNaN(val)) {
       intv[0] = val;
@@ -24,6 +33,16 @@ public final class MathE {
 
   }
 
+  /**
+   * Truncates a floating point number to the integer value which satisfies:
+   * That the magnitude of the absolute value of the returned number is not greater than the absolute value of number input
+   * Special cases:
+   * Input NaN returns NaN with the same bit pattern.
+   * Input +/- infinity respectively returns +/- infinity
+   * Signed zero is preserved
+   * @param val the number to truncated
+   * @return the truncated number
+   */
   public static double trunc(double val) {
     long valL = Double.doubleToRawLongBits(val);
     // IEEE double has from MSB: 1 bit for sign, 11 bits for exponent, 52 for significand
@@ -71,5 +90,5 @@ public final class MathE {
       return val;
     }
   }
-
+  
 }
