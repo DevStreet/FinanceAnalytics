@@ -57,31 +57,43 @@ $.register_module({
             });
         };
         var col_reorder = (function () {
-            var namespace = '.og_analytics_reorder', index, last, first,
+            var namespace = '.og_analytics_reorder', index, last, first, grid_width, timeout = null, nearest,
                 line = 'OG-g-h-line', reorderer = 'OG-g-h-reorderer', offset_left;
+            var auto_scroll = function (direction, scroll_left) {
+                var increment = 10, interval = 75, scroll_body = grid.elements.scroll_body;
+                clearTimeout(timeout);
+                if (direction === 'right') scroll_body.scrollLeft(scroll_left + increment);
+                else if (direction === 'left') scroll_body.scrollLeft(scroll_left - increment);
+                timeout = setTimeout(function () {auto_scroll(direction, scroll_body.scrollLeft());}, interval);
+            };
             var clean_up = function (grid) {
                 $('.' + reorderer).remove();
                 $('.' + line).remove();
                 $(document).off(namespace);
+                timeout = clearTimeout(timeout), null;
                 grid.elements.scroll_body.off(namespace);
                 grid.selector.clear();
             };
             var mousemove = function (grid, event) {
                 var scroll_left = grid.elements.scroll_body.scrollLeft(),
-                    x = event.pageX - grid.offset.left + scroll_left,
-                    scan = grid.meta.columns.scan.all, nearest = Math.max(
-                        grid.meta.fixed_length - 1,
-                        grid.meta.columns.scan.all.reduce(function (acc, val, idx) {return val < x ? idx : acc;}, 0)
-                    );
+                    x = event.pageX - grid.offset.left + scroll_left, fixed_width = grid.meta.columns.width.fixed,
+                    scan = grid.meta.columns.scan.all, line_left;
+                nearest = Math.max(
+                    grid.meta.fixed_length - 1,
+                    grid.meta.columns.scan.all.reduce(function (acc, val, idx) {return val < x ? idx : acc;}, 0)
+                );
+                line_left = grid.offset.left - scroll_left + scan[nearest];
                 $('.' + reorderer).css({left: event.pageX - offset_left});
-                $('.' + line).show().css({left: grid.offset.left - scroll_left + scan[nearest]});
+                if (line_left <= fixed_width + grid.offset.left) return auto_scroll('left', scroll_left);
+                if (line_left >= grid_width) return auto_scroll('right', scroll_left);
+                timeout = clearTimeout(timeout), null;
+                $('.' + line).show().css({left: line_left});
             };
             var mouseup = function (grid, event) {
                 clean_up(grid);
+                console.log('nearest', nearest);
             };
-            var scroll = function (event) {
-                $('.' + line).hide();
-            };
+            var scroll = function () {$('.' + line).hide();};
             return function (event, $target) {
                 var grid = this, $clone;
                 clean_up(grid);
@@ -89,6 +101,7 @@ $.register_module({
                 index = +$target.attr('data-index');
                 first = grid.meta.fixed_length;
                 last = grid.meta.columns.widths.length - 1;
+                grid_width = grid.elements.parent.width();
                 $clone = $target.clone();
                 $clone.find('.resize').remove();
                 offset_left = event.pageX - grid.offset.left + grid.elements.scroll_body.scrollLeft() -
@@ -241,8 +254,7 @@ $.register_module({
                     if ($target.is('.resize')) return col_resize.call(grid, event, $target), void 0;
                     // if ($target.is('.reorder')) return col_reorder.call(grid, event, $target), void 0;
                     if (!$target.is('.node')) return grid.fire('mousedown', event), void 0;
-                    if ($target.is('.loading')) return;
-                    $target.removeClass('expand collapse').addClass('loading');
+                    if ($target.is('.loading')) return; else $target.removeClass('expand collapse').addClass('loading');
                     grid.state.nodes[row = +$target.attr('data-row')] = !grid.state.nodes[row];
                     grid.resize().selector.clear();
                     return false; // kill bubbling
@@ -374,10 +386,7 @@ $.register_module({
                     grid_row = state.available.indexOf(rows[0]), types = meta.columns.types, type,
                     total_cols = cols.length, formatter = grid.formatter, col_end, row_len = rows.length,
                     col_len = fixed ? fixed_len : total_cols - fixed_len, column, cells, value,
-                    widths = meta.columns.widths, row_class = meta.row_class, result = {
-                        rows: [], loading: loading, holder_height: Math
-                            .max(inner.height + (fixed ? scrollbar : 0), inner.scroll_height - (fixed ? 0 : scrollbar)),
-                    };
+                    widths = meta.columns.widths, row_class = meta.row_class, result = {rows: [], loading: loading};
                 if (loading) return result;
                 for (i = 0; i < row_len; i += 1) {
                     result.rows.push({
@@ -638,12 +647,15 @@ $.register_module({
                 id: id, viewport_width: meta.inner.width, rest_top: meta.inner.height,
                 fixed_bg: background(columns.fixed, columns.width.fixed, 'ecf5fa'),
                 scroll_bg: background(columns.scroll, columns.width.scroll, 'ffffff'),
+                scroll_height: Math.max(meta.inner.height, meta.inner.scroll_height - scrollbar),
+                fixed_height: Math.max(meta.inner.height + scrollbar, meta.inner.scroll_height),
                 scroll_width: columns.width.scroll, fixed_width: columns.width.fixed + scrollbar,
                 scroll_left: columns.width.fixed, set_height: meta.set_height,
                 height: meta.inner.scroll_height, header_height: header_height, row_height: row_height,
                 columns: col_css(id, columns.fixed).concat(col_css(id, columns.scroll, meta.fixed_length)),
                 sets: set_css(id, columns.fixed).concat(set_css(id, columns.scroll, columns.fixed.length))
             });
+            grid.elements.style.empty();
             if ((sheet = grid.elements.style[0]).styleSheet) sheet.styleSheet.cssText = css; // IE
             else sheet.appendChild(document.createTextNode(css));
             grid.offset = grid.elements.parent.offset();
