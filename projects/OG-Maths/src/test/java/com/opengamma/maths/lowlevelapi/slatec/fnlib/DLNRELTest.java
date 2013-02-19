@@ -15,6 +15,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
 /**
  * Tests DLNREL
  */
+@Test
 public class DLNRELTest {
 
   double[] x = new double[] {-0.4e0, -0.35e0, -0.3e0, -0.25e0, -0.2e0, -0.15e0, -0.1e0, -0.05e0, 0e0, 0.05e0, 0.1e0, 0.15e0, 0.2e0, 0.25e0, 0.3e0, 0.35e0, 0.4e0 };

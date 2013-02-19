@@ -15,6 +15,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
 /**
  * Tests DERF
  */
+@Test
 public class DERFTest {
 
   static double[] input = {

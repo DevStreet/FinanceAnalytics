@@ -15,6 +15,7 @@ import com.opengamma.maths.lowlevelapi.functions.FPEquals;
 /**
  * Tests double acosh()
  */
+@Test
 public class DACOSHTest {
 
   static double[] input = new double[] {

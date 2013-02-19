@@ -18,6 +18,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
  */
 //TODO:: Sharpen this function, rewrite as the base function and let zasin call it opposed to the other way around
 // Tests out at ~ 1e-13
+@Test
 public class ZASINHTest {
   private static double[][] realP = { {-10.00, -9.00, -8.00, -7.00, -6.00, -5.00, -4.00, -3.00, -2.00, -1.00, 0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00 },
       {-10.00, -9.00, -8.00, -7.00, -6.00, -5.00, -4.00, -3.00, -2.00, -1.00, 0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00 },
