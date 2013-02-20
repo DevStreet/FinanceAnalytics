@@ -32,7 +32,7 @@ import net.sf.ehcache.Element;
  * <p>
  * The cache is implemented using {@code EHCache}.
  *
- * TODO ensure that docs are not duplicated in-cache
+ * TODO investigate possibility of using SelfPopulatingCache for the search cache too
  * TODO OPTIMIZE finer grain range locking
  * TODO OPTIMIZE cache replacement policy/handling huge requests that would flush out entire content
  * TODO OPTIMIZE underlying search request coalescing
