@@ -8,6 +8,10 @@ package com.opengamma.master;
 import java.util.Collection;
 import java.util.Properties;
 
+import com.opengamma.DataNotFoundException;
+import com.opengamma.id.UniqueId;
+import com.opengamma.util.ArgumentChecker;
+
 import net.sf.ehcache.CacheEntry;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
@@ -16,7 +20,14 @@ import net.sf.ehcache.writer.CacheWriter;
 import net.sf.ehcache.writer.CacheWriterFactory;
 import net.sf.ehcache.writer.writebehind.operations.SingleOperationType;
 
-public class UidToDocumentCacheWriterFactory  extends CacheWriterFactory {
+public class UidToDocumentCacheWriterFactory<D extends AbstractDocument> extends CacheWriterFactory {
+
+  private AbstractChangeProvidingMaster<D> _underlying;
+
+  public UidToDocumentCacheWriterFactory(AbstractChangeProvidingMaster<D> underlying) {
+    ArgumentChecker.notNull(underlying, "underlying");
+    _underlying = underlying;
+  }
 
   @Override
   public CacheWriter createCacheWriter(Ehcache ehcache, Properties properties) {
@@ -26,23 +37,31 @@ public class UidToDocumentCacheWriterFactory  extends CacheWriterFactory {
   public class UidToDocumentCacheWriter implements CacheWriter {
 
     @Override
-    public CacheWriter clone(Ehcache ehcache) throws CloneNotSupportedException {
-      return null;  // TODO
+    public CacheWriter clone(Ehcache ehcache) throws CloneNotSupportedException { //TODO ????
+      throw new CloneNotSupportedException();
     }
 
     @Override
     public void init() {
-      // TODO
+      // Empty
     }
 
     @Override
     public void dispose() throws CacheException {
-      // TODO
+      // Empty
     }
 
     @Override
     public void write(Element element) throws CacheException {
-      // TODO
+      try {
+        _underlying.get((UniqueId) element.getObjectKey());
+
+        // Update if no exception
+        _underlying.update((D) element.getObjectValue());
+      } catch (DataNotFoundException e) {
+        // Add if not found
+        _underlying.add((D) element.getObjectValue());
+      }
     }
 
     @Override
@@ -65,5 +84,4 @@ public class UidToDocumentCacheWriterFactory  extends CacheWriterFactory {
       // TODO
     }
   }
-
 }
