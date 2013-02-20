@@ -5,11 +5,13 @@
  */
 package com.opengamma.master.security.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opengamma.id.UniqueId;
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractSearchRequest;
 import com.opengamma.master.AbstractSearchResult;
@@ -57,7 +59,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
       public AbstractSearchResult<SecurityDocument> search(AbstractSearchRequest request) {
         return ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest) request);
       }
-    });
+    }, getUidToDocumentCache());
 
     // Prime search cache
     SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
@@ -72,9 +74,14 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     _documentSearchCache.backgroundPrefetch(request);
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
-    ObjectsPair<Integer, List<SecurityDocument>> pair = _documentSearchCache.doSearch(request, false); // don't block until cached
+    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.doSearch(request, false); // don't block until cached
 
-    SecuritySearchResult result = new SecuritySearchResult(pair.getSecond());
+    List<SecurityDocument> documents = new ArrayList<>();
+    for (UniqueId uniqueId : pair.getSecond()) {
+      documents.add(get(uniqueId));
+    }
+
+    SecuritySearchResult result = new SecuritySearchResult(documents);
     result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
     return result;
   }

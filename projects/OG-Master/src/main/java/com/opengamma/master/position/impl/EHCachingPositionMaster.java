@@ -5,6 +5,7 @@
  */
 package com.opengamma.master.position.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
       public AbstractSearchResult<PositionDocument> search(AbstractSearchRequest request) {
         return ((PositionMaster) getUnderlying()).search((PositionSearchRequest) request);
       }
-    });
+    }, getUidToDocumentCache());
 
     // Prime search cache
     PositionSearchRequest defaultSearch = new PositionSearchRequest();
@@ -75,9 +76,14 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
     _documentSearchCache.backgroundPrefetch(request);
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
-    ObjectsPair<Integer, List<PositionDocument>> pair = _documentSearchCache.doSearch(request, false); // don't block until cached
+    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.doSearch(request, false); // don't block until cached
 
-    PositionSearchResult result = new PositionSearchResult(pair.getSecond());
+    List<PositionDocument> documents = new ArrayList<>();
+    for (UniqueId uniqueId : pair.getSecond()) {
+      documents.add(get(uniqueId));
+    }
+
+    PositionSearchResult result = new PositionSearchResult(documents);
     result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
     return result;
   }

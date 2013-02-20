@@ -15,6 +15,8 @@ import java.util.concurrent.ExecutorService;
 
 import org.joda.beans.JodaBeanUtils;
 
+import com.opengamma.id.UniqueId;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ExecutorServiceFactoryBean;
 import com.opengamma.util.ehcache.EHCacheUtils;
 import com.opengamma.util.paging.PagingRequest;
@@ -22,6 +24,7 @@ import com.opengamma.util.tuple.ObjectsPair;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 /**
@@ -29,12 +32,11 @@ import net.sf.ehcache.Element;
  * <p>
  * The cache is implemented using {@code EHCache}.
  *
- * TODO investigate better ways to use EHCache
  * TODO ensure that docs are not duplicated in-cache
  * TODO OPTIMIZE finer grain range locking
  * TODO OPTIMIZE cache replacement policy/handling huge requests that would flush out entire content
  * TODO OPTIMIZE underlying search request coalescing
- * TODO OPTIMIZE add front cache maps to keep EHCache happy
+ * TODO OPTIMIZE add front cache maps to keep EHCache happy (is this still necessary?)
  *
  * @param <D> The document type to cache
  */
@@ -51,9 +53,9 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * The document cache indexed by search requests.
    * A cache entry contains unpaged (total) result size and a map from start indices to ranges of cached result documents
    */
-  private final Cache _documentBySearchRequestCache;
+  private final Cache _searchRequestCache;
   /** The document by search request cache's name. */
-  private final String _documentBySearchRequestCacheName;
+  private final String _searchRequestCacheName;
 
   /** The prefetch thread executor service */
   private final ExecutorService _executorService;
@@ -61,18 +63,21 @@ public class DocumentSearchCache<D extends AbstractDocument> {
   /** The searcher provides access to master-specific operations */
   private CacheSearcher<D> _searcher;
 
+  /** The document cache */
+  private Ehcache _documentCache;
+
   /**
    * A cache searcher, used by the document search cache to pass search requests to an underlying master without
    * knowing its type.
    *
    * @param <D> the document type
    */
-  public interface CacheSearcher<D extends AbstractDocument> {
+  public interface CacheSearcher<E extends AbstractDocument> {
     /** Searches an underlying master, casting search requests/results as required for a specific master
      * @param request   The search request (will be cast to a search request for a specific master)
      * @return          The search result
      */
-    public AbstractSearchResult<D> search(AbstractSearchRequest request);
+    public AbstractSearchResult<E> search(AbstractSearchRequest request);
   }
 
   /**
@@ -81,15 +86,20 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * @param cacheManager  The cache manager to use
    * @param name          A unique name for this cache
    * @param searcher      The CacheSearcher to use for passing search requests to an underlying master
+   * @param documentCache The UniqueId to Document cache where to put any loaded documents
    */
-  public DocumentSearchCache(CacheManager cacheManager, String name, CacheSearcher<D> searcher) {
+  public DocumentSearchCache(CacheManager cacheManager, String name, CacheSearcher<D> searcher, Ehcache documentCache) {
+    ArgumentChecker.notNull(cacheManager, "cacheManager");
+    ArgumentChecker.notNull(name, "name");
+    ArgumentChecker.notNull(searcher, "searcher");
+    ArgumentChecker.notNull(documentCache, "documentCache");
 
     _searcher = searcher;
+    _searchRequestCacheName = name + "-searchRequestCache";
+    _documentCache = documentCache;
 
-    _documentBySearchRequestCacheName = name + "-documentBySearchRequestCache";
-
-    EHCacheUtils.addCache(cacheManager, _documentBySearchRequestCacheName);
-    _documentBySearchRequestCache = EHCacheUtils.getCacheFromManager(cacheManager, _documentBySearchRequestCacheName);
+    EHCacheUtils.addCache(cacheManager, _searchRequestCacheName);
+    _searchRequestCache = EHCacheUtils.getCacheFromManager(cacheManager, _searchRequestCacheName);
 
     // Async prefetch executor service
     ExecutorServiceFactoryBean execBean = new ExecutorServiceFactoryBean();
@@ -152,13 +162,13 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * @param request the search request
    * @return        the search result
    */
-  public ObjectsPair<Integer, List<D>> doSearch(final AbstractSearchRequest request, boolean blockUntilCached) {
+  public ObjectsPair<Integer, List<UniqueId>> doSearch(final AbstractSearchRequest request, boolean blockUntilCached) {
 
     // Fetch the total #documents and cached document ranges for the search request (without paging)
-    final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<D>>> info =
-        getCachedRequestInfo(getDocumentBySearchRequestCache(), request);
+    final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>> info =
+        getCachedRequestInfo(getSearchRequestCache(), request);
     final int totalDocuments = info.getFirst();
-    final ConcurrentNavigableMap<Integer, List<D>> rangeMap = info.getSecond();
+    final ConcurrentNavigableMap<Integer, List<UniqueId>> rangeMap = info.getSecond();
 
     // Fix unpaged requests and end indexes larger than the total doc count
     if (request.getPagingRequest().getPagingSize() > totalDocuments) {
@@ -166,12 +176,12 @@ public class DocumentSearchCache<D extends AbstractDocument> {
     }
 
     // Ensure that the required range is cached in its entirety
-    ObjectsPair<Integer, List<D>> pair = cacheSuperRange(request, rangeMap, blockUntilCached);
+    ObjectsPair<Integer, List<UniqueId>> pair = cacheSuperRange(request, rangeMap, blockUntilCached);
     final int superIndex = pair.getFirst();
-    final List<D> superRange = pair.getSecond();
+    final List<UniqueId> superRange = pair.getSecond();
 
     // Create and return the search result
-    final List<D> resultDocuments = superRange.subList(
+    final List<UniqueId> resultDocuments = superRange.subList(
         request.getPagingRequest().getFirstItem() - superIndex,
         Math.min(request.getPagingRequest().getLastItem()  - superIndex, superRange.size()));
 
@@ -188,23 +198,27 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * @return        the total document count and a range map of cached documents for the supplied search request without
    *                paging
    */
-  protected ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<D>>>
+  protected ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>
                       getCachedRequestInfo(final Cache cache, final AbstractSearchRequest originalRequest) {
 
     AbstractSearchRequest request = withoutPagingRequest(originalRequest);
 
     // Get cache entry for current request (or create and get a primed cache entry if not found)
-    final Element element = getDocumentBySearchRequestCache().get(request);
+    final Element element = getSearchRequestCache().get(request);
     if (element != null) {
-      return (ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<D>>>) element.getObjectValue();
+      return (ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>) element.getObjectValue();
     } else {
       // Build a new cached map entry and pre-fill it with the results of the supplied search request
       final AbstractSearchResult<D> resultToCache = getSearcher().search(originalRequest);
-      final ConcurrentNavigableMap<Integer, List<D>> rangeMapToCache = new ConcurrentSkipListMap<>();
-      rangeMapToCache.put(resultToCache.getPaging().getFirstItem(), resultToCache.getDocuments());
-      final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<D>>> newResult =
+      final ConcurrentNavigableMap<Integer, List<UniqueId>> rangeMapToCache = new ConcurrentSkipListMap<>();
+
+      // Cache UniqueIds in search cache and add documents to uidToDocumentCache
+      rangeMapToCache.put(resultToCache.getPaging().getFirstItem(), extractUniqueIds(resultToCache.getDocuments()));
+      cacheDocuments(resultToCache.getDocuments());
+
+      final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>> newResult =
           new ObjectsPair<>(resultToCache.getPaging().getTotalItems(), rangeMapToCache);
-      getDocumentBySearchRequestCache().put(new Element(request, newResult));
+      getSearchRequestCache().put(new Element(request, newResult));
       return newResult;
     }
   }
@@ -218,14 +232,14 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    * @param rangeMap        the range map of cached documents for the supplied search request without paging
    * @return                a super-range of cached documents that contains at least the requested documents
    */
-  protected ObjectsPair<Integer, List<D>> cacheSuperRange(final AbstractSearchRequest originalRequest,
-                            final ConcurrentNavigableMap<Integer, List<D>> rangeMap, boolean blockUntilCached) {
+  protected ObjectsPair<Integer, List<UniqueId>> cacheSuperRange(final AbstractSearchRequest originalRequest,
+                            final ConcurrentNavigableMap<Integer, List<UniqueId>> rangeMap, boolean blockUntilCached) {
 
     final int startIndex = originalRequest.getPagingRequest().getFirstItem();
     final int endIndex = originalRequest.getPagingRequest().getLastItem();
     AbstractSearchRequest request = withoutPagingRequest(originalRequest);
 
-    final List<D> superRange;
+    final List<UniqueId> superRange;
     final int superIndex;
 
     if (blockUntilCached) {
@@ -238,7 +252,7 @@ public class DocumentSearchCache<D extends AbstractDocument> {
           superRange = rangeMap.floorEntry(startIndex).getValue();
           superIndex = rangeMap.floorKey(startIndex);
         } else {
-          superRange = Collections.synchronizedList(new LinkedList<D>());
+          superRange = Collections.synchronizedList(new LinkedList<UniqueId>());
           superIndex = startIndex;
           rangeMap.put(superIndex, superRange);
         }
@@ -247,8 +261,8 @@ public class DocumentSearchCache<D extends AbstractDocument> {
         // end index
         final Integer start = rangeMap.ceilingKey(startIndex + 1);
         final Integer end = rangeMap.floorKey(endIndex);
-        final ConcurrentNavigableMap<Integer, List<D>> subMap =
-            (ConcurrentNavigableMap<Integer, List<D>>) (
+        final ConcurrentNavigableMap<Integer, List<UniqueId>> subMap =
+            (ConcurrentNavigableMap<Integer, List<UniqueId>>) (
               ((start != null) && (end != null) && (start <= end))
                   ? rangeMap.subMap(start, true, end, true)
                   : new ConcurrentSkipListMap<>()
@@ -258,12 +272,16 @@ public class DocumentSearchCache<D extends AbstractDocument> {
         // filling in any gaps from the underlying master
         int currentIndex = superIndex + superRange.size();
         final List<Integer> toRemove = new LinkedList<>();
-        for (Map.Entry<Integer, List<D>> entry : subMap.entrySet()) {
+        for (Map.Entry<Integer, List<UniqueId>> entry : subMap.entrySet()) {
           // If required, fill gap from underlying
           if (entry.getKey() > currentIndex) {
             request.setPagingRequest(PagingRequest.ofIndex(currentIndex, entry.getKey() - currentIndex));
             AbstractSearchResult<D> missingResult = getSearcher().search(request);
-            superRange.addAll(missingResult.getDocuments());
+
+            // Cache UniqueIds in search cache and add documents to uidToDocumentCache
+            superRange.addAll(extractUniqueIds(missingResult.getDocuments()));
+            cacheDocuments(missingResult.getDocuments());
+
             currentIndex += missingResult.getDocuments().size();
           }
 
@@ -287,7 +305,11 @@ public class DocumentSearchCache<D extends AbstractDocument> {
               endIndex - currentIndex
           ));
           final AbstractSearchResult<D> missingResult = getSearcher().search(request);
-          superRange.addAll(missingResult.getDocuments());
+
+          // Cache UniqueIds in search cache and add documents to uidToDocumentCache
+          superRange.addAll(extractUniqueIds(missingResult.getDocuments()));
+          cacheDocuments(missingResult.getDocuments());
+
           currentIndex += missingResult.getDocuments().size();
         }
 
@@ -305,13 +327,31 @@ public class DocumentSearchCache<D extends AbstractDocument> {
       // If not entirely cached then just fetch from underlying without caching
       } else {
         final AbstractSearchResult<D> missingResult = getSearcher().search(originalRequest);
-        superRange = Collections.synchronizedList(new LinkedList<D>());
-        superRange.addAll(missingResult.getDocuments());
+        superRange = Collections.synchronizedList(new LinkedList<UniqueId>());
+
+        // Cache UniqueIds in search cache and add documents to uidToDocumentCache
+        superRange.addAll(extractUniqueIds(missingResult.getDocuments()));
+        cacheDocuments(missingResult.getDocuments());
+
         superIndex = startIndex;
       }
     }
 
     return new ObjectsPair<>(superIndex, superRange);
+  }
+
+  private List<UniqueId> extractUniqueIds(List<D> documents) {
+    List <UniqueId> result = new LinkedList<>();
+    for (D document : documents) {
+      result.add(document.getUniqueId());
+    }
+    return result;
+  }
+
+  private void cacheDocuments(List<D> documents) {
+    for (D document : documents) {
+      _documentCache.put(new Element(document.getUniqueId(), document));
+    }
   }
 
   /**
@@ -331,8 +371,8 @@ public class DocumentSearchCache<D extends AbstractDocument> {
    *
    * @return the cache, not null
    */
-  protected Cache getDocumentBySearchRequestCache() {
-    return _documentBySearchRequestCache;
+  protected Cache getSearchRequestCache() {
+    return _searchRequestCache;
   }
 
   public CacheSearcher<D> getSearcher() {
