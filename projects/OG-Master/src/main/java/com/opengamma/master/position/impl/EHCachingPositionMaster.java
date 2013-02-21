@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.AbstractSearchResult;
 import com.opengamma.master.DocumentSearchCache;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.position.PositionDocument;
@@ -41,7 +40,7 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
   private static final Logger s_logger = LoggerFactory.getLogger(EHCachingPositionMaster.class);
 
   /** The search cache */
-  private DocumentSearchCache<PositionDocument> _documentSearchCache;
+  private DocumentSearchCache _documentSearchCache;
 
   /**
    * Creates an instance over an underlying source specifying the cache manager.
@@ -52,12 +51,21 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
   public EHCachingPositionMaster(final PositionMaster underlying, final CacheManager cacheManager) {
     super(underlying, cacheManager);
 
-    _documentSearchCache = new DocumentSearchCache<>(cacheManager, "position", new DocumentSearchCache.CacheSearcher<PositionDocument>() {
+    // Create the doc search cache and register a position master searcher
+    _documentSearchCache = new DocumentSearchCache(cacheManager, "position", new DocumentSearchCache.CacheSearcher() {
       @Override
-      public AbstractSearchResult<PositionDocument> search(AbstractSearchRequest request) {
-        return ((PositionMaster) getUnderlying()).search((PositionSearchRequest) request);
+      public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
+        // Fetch search results from underlying master
+        PositionSearchResult result = ((PositionMaster) getUnderlying()).search((PositionSearchRequest) request);
+
+        // Cache the result documents
+        DocumentSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+
+        // Return the list of result UniqueIds
+        return new ObjectsPair<>(result.getPaging().getTotalItems(),
+                                 DocumentSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, getUidToDocumentCache());
+    });
 
     // Prime search cache
     PositionSearchRequest defaultSearch = new PositionSearchRequest();

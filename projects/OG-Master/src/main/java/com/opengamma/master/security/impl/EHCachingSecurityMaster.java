@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.AbstractSearchResult;
 import com.opengamma.master.DocumentSearchCache;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityHistoryRequest;
@@ -43,7 +42,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   private static final Logger s_logger = LoggerFactory.getLogger(EHCachingSecurityMaster.class);
 
   /** The search cache */
-  private DocumentSearchCache<SecurityDocument> _documentSearchCache;
+  private DocumentSearchCache _documentSearchCache;
 
   /**
    * Creates an instance over an underlying source specifying the cache manager.
@@ -54,12 +53,21 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   public EHCachingSecurityMaster(final SecurityMaster underlying, final CacheManager cacheManager) {
     super(underlying, cacheManager);
 
-    _documentSearchCache = new DocumentSearchCache<>(cacheManager, "security", new DocumentSearchCache.CacheSearcher<SecurityDocument>() {
+    // Create the doc search cache and register a security master searcher
+    _documentSearchCache = new DocumentSearchCache(cacheManager, "security", new DocumentSearchCache.CacheSearcher() {
       @Override
-      public AbstractSearchResult<SecurityDocument> search(AbstractSearchRequest request) {
-        return ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest) request);
+      public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
+        // Fetch search results from underlying master
+        SecuritySearchResult result = ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest) request);
+
+        // Cache the result documents
+        DocumentSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+
+        // Return the list of result UniqueIds
+        return new ObjectsPair<>(result.getPaging().getTotalItems(),
+                                 DocumentSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, getUidToDocumentCache());
+    });
 
     // Prime search cache
     SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
