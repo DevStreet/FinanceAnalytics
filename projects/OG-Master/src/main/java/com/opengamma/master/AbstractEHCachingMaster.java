@@ -66,23 +66,23 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   private final ChangeManager _changeManager;
   /** The document cache indexed by UniqueId. */
   private final Ehcache _uidToDocumentCache;
-  /** The document by uid cache's name. */
-  private final String _uidToDocumentCacheName = getClass().getName() + "-uidToDocumentCache";
 
   /**
    * Creates an instance over an underlying source specifying the cache manager.
    *
-   * @param underlying  the underlying source, not null
+   * @param name          the cache name, not empty
+   * @param underlying    the underlying source, not null
    * @param cacheManager  the cache manager, not null
    */
-  public AbstractEHCachingMaster(final AbstractChangeProvidingMaster<D> underlying, final CacheManager cacheManager) {
+  public AbstractEHCachingMaster(final String name, final AbstractChangeProvidingMaster<D> underlying, final CacheManager cacheManager) {
+    ArgumentChecker.notEmpty(name, "name");
     ArgumentChecker.notNull(underlying, "underlying");
     ArgumentChecker.notNull(cacheManager, "cacheManager");
 
     _underlying = underlying;
     _cacheManager = cacheManager;
 
-    CacheConfiguration uidtoDocumentCacheConfig = new CacheConfiguration(_uidToDocumentCacheName, 0).eternal(true);
+    CacheConfiguration cacheConfiguration = new CacheConfiguration(name + "-uidToDocumentCache", 1000).eternal(true);
     Searchable uidToDocumentCacheSearchable = new Searchable();
     uidToDocumentCacheSearchable.addSearchAttribute(new SearchAttribute().name("ObjectId")
         .expression("value.getObjectId().toString()"));
@@ -94,14 +94,12 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
         .className("com.opengamma.master.InstantExtractor"));
     uidToDocumentCacheSearchable.addSearchAttribute(new SearchAttribute().name("CorrectionToInstant")
         .className("com.opengamma.master.InstantExtractor"));
+    cacheConfiguration.addSearchable(uidToDocumentCacheSearchable);
 
-    uidtoDocumentCacheConfig.addSearchable(uidToDocumentCacheSearchable);
-    uidtoDocumentCacheConfig.setName(_uidToDocumentCacheName);
-
-    _cacheManager.addCache(new Cache(uidtoDocumentCacheConfig));
-    _uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(_uidToDocumentCacheName),
+    _cacheManager.addCache(new Cache(cacheConfiguration));
+    _uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(name + "-uidToDocumentCache"),
                                                   new UidToDocumentCacheEntryFactory<>(_underlying));
-    _cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(_uidToDocumentCacheName), _uidToDocumentCache);
+    _cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(name + "-uidToDocumentCache"), _uidToDocumentCache);
     //_uidToDocumentCache.registerCacheWriter(new UidToDocumentCacheWriterFactory().createCacheWriter(_uidToDocumentCache, null));
 
     // Listen to change events from underlying, clean this cache accordingly and relay events to our change listeners
@@ -367,8 +365,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    */
   public void shutdown() {
     getUnderlying().changeManager().removeChangeListener(_changeListener);
-    getCacheManager().clearAllStartingWith(_uidToDocumentCacheName);
-    getCacheManager().removeCache(_uidToDocumentCacheName);
+    getCacheManager().removeCache(_uidToDocumentCache.getName());
   }
 
   //-------------------------------------------------------------------------
