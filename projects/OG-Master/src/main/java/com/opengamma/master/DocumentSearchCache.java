@@ -18,7 +18,6 @@ import org.joda.beans.JodaBeanUtils;
 import com.opengamma.id.UniqueId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ExecutorServiceFactoryBean;
-import com.opengamma.util.ehcache.EHCacheUtils;
 import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.tuple.ObjectsPair;
 
@@ -98,8 +97,8 @@ public class DocumentSearchCache<D extends AbstractDocument> {
     _searchRequestCacheName = name + "-searchRequestCache";
     _documentCache = documentCache;
 
-    EHCacheUtils.addCache(cacheManager, _searchRequestCacheName);
-    _searchRequestCache = EHCacheUtils.getCacheFromManager(cacheManager, _searchRequestCacheName);
+    cacheManager.addCache(_searchRequestCacheName);
+    _searchRequestCache = cacheManager.getCache(_searchRequestCacheName);
 
     // Async prefetch executor service
     ExecutorServiceFactoryBean execBean = new ExecutorServiceFactoryBean();
