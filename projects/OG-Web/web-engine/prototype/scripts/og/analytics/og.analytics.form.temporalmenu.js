@@ -13,8 +13,7 @@ $.register_module({
             if (!('form' in config) || !config.form)
                 return og.dev.warn('og.analytics.TemporalMenu: Missing param key [config.form] to constructor.');
 
-            var block = this, menu, initialized = false, form = config.form, datetimepicker,
-                temporal = config.temporal || {};
+            var block = this, menu, form = config.form, temporal = config.temporal || {};
 
             var menu_handler = function (event) {
                 var $elem = $(event.srcElement || event.target), $custom;
@@ -41,15 +40,6 @@ $.register_module({
                     portfolio_version: port_version ? port_version : 'latest',
                     port_correction : port_correction ? port_correction : 'latest'
                 };
-            };
-
-            var dtp_mousedown = function (event){
-                // wip
-            };
-
-            var dtp_handler = function (elem) { // wip
-                // elem.off('mousedown', elem.selector, dtp_mousedown);
-                // elem.on('mousedown', elem.selector, dtp_mousedown);
             };
 
             form.Block.call(block, {
