@@ -78,7 +78,10 @@ public class DocumentSearchCache {
     _cacheManager = cacheManager;
     _searcher = searcher;
 
+    // Configure cache - this should probably be in an xml config
     CacheConfiguration cacheConfiguration = new CacheConfiguration(name + "-searchRequestCache", 1000);
+    cacheConfiguration.setStatistics(true);
+
     _searchRequestCache = new Cache(cacheConfiguration);
     cacheManager.addCache(_searchRequestCache);
 

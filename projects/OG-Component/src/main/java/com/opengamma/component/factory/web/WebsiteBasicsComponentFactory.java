@@ -5,9 +5,12 @@
  */
 package com.opengamma.component.factory.web;
 
+import java.lang.management.ManagementFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+
+import javax.management.MBeanServer;
 
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
@@ -58,6 +61,7 @@ import com.opengamma.web.target.WebComputationTargetTypeResource;
 import com.opengamma.web.valuerequirementname.WebValueRequirementNamesResource;
 
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.management.ManagementService;
 
 /**
  * Component factory for the main website.
@@ -154,6 +158,9 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
   }
 
   protected void initMasters(ComponentRepository repo) {
+
+    MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+    ManagementService.registerMBeans(CacheManager.getInstance(), mBeanServer, false, false, false, true);
 
     SecurityMaster  securityMaster  = new EHCachingSecurityMaster("security", getSecurityMaster(), CacheManager.getInstance());
     PositionMaster  positionMaster  = new EHCachingPositionMaster("position", getPositionMaster(), CacheManager.getInstance());

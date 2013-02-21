@@ -82,6 +82,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     _underlying = underlying;
     _cacheManager = cacheManager;
 
+    // Configure cache - this should probably be in an xml config
     CacheConfiguration cacheConfiguration = new CacheConfiguration(name + "-uidToDocumentCache", 1000).eternal(true);
     Searchable uidToDocumentCacheSearchable = new Searchable();
     uidToDocumentCacheSearchable.addSearchAttribute(new SearchAttribute().name("ObjectId")
@@ -95,6 +96,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     uidToDocumentCacheSearchable.addSearchAttribute(new SearchAttribute().name("CorrectionToInstant")
         .className("com.opengamma.master.InstantExtractor"));
     cacheConfiguration.addSearchable(uidToDocumentCacheSearchable);
+    cacheConfiguration.setStatistics(true);
 
     _cacheManager.addCache(new Cache(cacheConfiguration));
     _uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(name + "-uidToDocumentCache"),
