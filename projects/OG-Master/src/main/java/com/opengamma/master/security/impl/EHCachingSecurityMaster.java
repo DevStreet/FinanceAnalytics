@@ -47,14 +47,15 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   /**
    * Creates an instance over an underlying source specifying the cache manager.
    *
-   * @param underlying  the underlying security source, not null
+   * @param name          the cache name, not null
+   * @param underlying    the underlying security source, not null
    * @param cacheManager  the cache manager, not null
    */
-  public EHCachingSecurityMaster(final SecurityMaster underlying, final CacheManager cacheManager) {
-    super(underlying, cacheManager);
+  public EHCachingSecurityMaster(final String name, final SecurityMaster underlying, final CacheManager cacheManager) {
+    super(name, underlying, cacheManager);
 
     // Create the doc search cache and register a security master searcher
-    _documentSearchCache = new DocumentSearchCache(cacheManager, "security", new DocumentSearchCache.CacheSearcher() {
+    _documentSearchCache = new DocumentSearchCache(name, new DocumentSearchCache.CacheSearcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
         // Fetch search results from underlying master
@@ -67,7 +68,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  DocumentSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    });
+    }, cacheManager);
 
     // Prime search cache
     SecuritySearchRequest defaultSearch = new SecuritySearchRequest();

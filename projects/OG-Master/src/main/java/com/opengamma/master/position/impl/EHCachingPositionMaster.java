@@ -45,14 +45,15 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
   /**
    * Creates an instance over an underlying source specifying the cache manager.
    *
-   * @param underlying  the underlying Position source, not null
+   * @param name          the cache name, not null
+   * @param underlying    the underlying Position source, not null
    * @param cacheManager  the cache manager, not null
    */
-  public EHCachingPositionMaster(final PositionMaster underlying, final CacheManager cacheManager) {
-    super(underlying, cacheManager);
+  public EHCachingPositionMaster(final String name, final PositionMaster underlying, final CacheManager cacheManager) {
+    super(name, underlying, cacheManager);
 
     // Create the doc search cache and register a position master searcher
-    _documentSearchCache = new DocumentSearchCache(cacheManager, "position", new DocumentSearchCache.CacheSearcher() {
+    _documentSearchCache = new DocumentSearchCache(name, new DocumentSearchCache.CacheSearcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
         // Fetch search results from underlying master
@@ -65,7 +66,7 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  DocumentSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    });
+    }, cacheManager);
 
     // Prime search cache
     PositionSearchRequest defaultSearch = new PositionSearchRequest();
