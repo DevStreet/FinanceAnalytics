@@ -60,7 +60,7 @@ public class EHCachingExchangeMasterTest extends AbstractEHCachingMasterTest<Exc
   @Test
   void testSearch() {
     ExchangeMaster mockUnderlyingMaster = (ExchangeMaster) populateMockMaster(mock(ExchangeMaster.class));
-    AbstractEHCachingMaster<ExchangeDocument> cachingMaster = new EHCachingExchangeMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<ExchangeDocument> cachingMaster = new EHCachingExchangeMaster("exchange", mockUnderlyingMaster, getCleanCacheManager());
     
     //TODO
     
@@ -70,7 +70,7 @@ public class EHCachingExchangeMasterTest extends AbstractEHCachingMasterTest<Exc
   @Test
   void testHistorySearch() {
     ExchangeMaster mockUnderlyingMaster = (ExchangeMaster) populateMockMaster(mock(ExchangeMaster.class));
-    AbstractEHCachingMaster<ExchangeDocument> cachingMaster = new EHCachingExchangeMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<ExchangeDocument> cachingMaster = new EHCachingExchangeMaster("exchange", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

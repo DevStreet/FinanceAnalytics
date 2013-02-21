@@ -5,15 +5,15 @@
  */
 package com.opengamma.master.portfolio.impl;
 
-import com.opengamma.id.ExternalIdBundle;
+import static org.mockito.Mockito.mock;
+
+import org.testng.annotations.Test;
+
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractEHCachingMasterTest;
 import com.opengamma.master.portfolio.ManageablePortfolio;
 import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.master.portfolio.PortfolioMaster;
-import org.testng.annotations.Test;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * Test {@link EHCachingPortfolioMaster}
@@ -52,7 +52,7 @@ public class EHCachingPortfolioMasterTest extends AbstractEHCachingMasterTest<Po
   @Test
   void testSearch() {
     PortfolioMaster mockUnderlyingMaster = (PortfolioMaster) populateMockMaster(mock(PortfolioMaster.class));
-    AbstractEHCachingMaster<PortfolioDocument> cachingMaster = new EHCachingPortfolioMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<PortfolioDocument> cachingMaster = new EHCachingPortfolioMaster("portfolio", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -62,7 +62,7 @@ public class EHCachingPortfolioMasterTest extends AbstractEHCachingMasterTest<Po
   @Test
   void testHistorySearch() {
     PortfolioMaster mockUnderlyingMaster = (PortfolioMaster) populateMockMaster(mock(PortfolioMaster.class));
-    AbstractEHCachingMaster<PortfolioDocument> cachingMaster = new EHCachingPortfolioMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<PortfolioDocument> cachingMaster = new EHCachingPortfolioMaster("portfolio", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -72,7 +72,7 @@ public class EHCachingPortfolioMasterTest extends AbstractEHCachingMasterTest<Po
   @Test
   void testGetNode() {
     PortfolioMaster mockUnderlyingMaster = (PortfolioMaster) populateMockMaster(mock(PortfolioMaster.class));
-    AbstractEHCachingMaster<PortfolioDocument> cachingMaster = new EHCachingPortfolioMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<PortfolioDocument> cachingMaster = new EHCachingPortfolioMaster("portfolio", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

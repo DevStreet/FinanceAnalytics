@@ -152,8 +152,8 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   }
 
   class EHCachingTestMaster extends AbstractEHCachingMaster<TestDocument> {
-    public EHCachingTestMaster(AbstractChangeProvidingMaster<TestDocument> underlying, CacheManager cacheManager) {
-      super(underlying, cacheManager);
+    public EHCachingTestMaster(String name, AbstractChangeProvidingMaster<TestDocument> underlying, CacheManager cacheManager) {
+      super(name, underlying, cacheManager);
     }
   }
 
@@ -162,7 +162,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testGetUidVersioned() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     // Assert returned documents
     assertEquals(docB200_V2000to2009, cachingMaster.get(docB200_V2000to2009.getUniqueId()));
@@ -192,7 +192,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testGetUidUnversioned() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     // Assert returned documents
     assertEquals(docB500_V2011to, cachingMaster.get(docB200_V2000to2009.getUniqueId().toLatest()));
@@ -222,7 +222,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testGetOidLatestVersionCorrection() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     // Assert returned documents
     assertEquals(docB500_V2011to, cachingMaster.get(B_OID, VersionCorrection.LATEST));
@@ -252,7 +252,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testGetOidMixedVersionCorrection() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO enhance testing of v/c range border cases
 
@@ -297,7 +297,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testCachedMiss() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -309,7 +309,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testUpdate() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -319,7 +319,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testAdd() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     // Assert returned documents
     assertEquals(DOC_ADDED, cachingMaster.add(DOC_TO_ADD));
@@ -341,7 +341,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testRemove() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -351,7 +351,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testCorrect() { // same as replaceVersion()
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -361,7 +361,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testReplaceVersion() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -371,7 +371,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testReplaceAllVersions() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -381,7 +381,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testReplaceVersions() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -391,7 +391,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testRemoveVersion() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -401,7 +401,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testAddVersion() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -411,7 +411,7 @@ public class EHCachingMasterTest extends AbstractEHCachingMasterTest<EHCachingMa
   @Test
   public void testChangeProvider() {
     TestMaster mockUnderlyingMaster = (TestMaster) populateMockMaster(mock(TestMaster.class));
-    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<TestDocument> cachingMaster = new EHCachingTestMaster("test", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

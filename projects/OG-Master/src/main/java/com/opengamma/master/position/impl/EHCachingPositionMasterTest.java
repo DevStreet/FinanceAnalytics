@@ -5,21 +5,18 @@
  */
 package com.opengamma.master.position.impl;
 
+import static org.mockito.Mockito.mock;
+
+import java.math.BigDecimal;
+
+import org.testng.annotations.Test;
+
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractEHCachingMasterTest;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.PositionDocument;
 import com.opengamma.master.position.PositionMaster;
-import com.opengamma.master.security.SecurityDocument;
-import com.opengamma.master.security.SecurityMaster;
-import com.opengamma.master.security.impl.EHCachingSecurityMaster;
-import net.sf.ehcache.CacheManager;
-import org.testng.annotations.Test;
-
-import java.math.BigDecimal;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * Test {@link com.opengamma.master.position.impl.EHCachingPositionMaster}
@@ -57,7 +54,7 @@ public class EHCachingPositionMasterTest extends AbstractEHCachingMasterTest<Pos
   @Test
   void testSearch() {
     PositionMaster mockUnderlyingMaster = (PositionMaster) populateMockMaster(mock(PositionMaster.class));
-    AbstractEHCachingMaster<PositionDocument> cachingMaster = new EHCachingPositionMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<PositionDocument> cachingMaster = new EHCachingPositionMaster("position", mockUnderlyingMaster, getCleanCacheManager());
     
     //TODO
     
@@ -67,7 +64,7 @@ public class EHCachingPositionMasterTest extends AbstractEHCachingMasterTest<Pos
   @Test
   void testHistorySearch() {
     PositionMaster mockUnderlyingMaster = (PositionMaster) populateMockMaster(mock(PositionMaster.class));
-    AbstractEHCachingMaster<PositionDocument> cachingMaster = new EHCachingPositionMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<PositionDocument> cachingMaster = new EHCachingPositionMaster("position", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

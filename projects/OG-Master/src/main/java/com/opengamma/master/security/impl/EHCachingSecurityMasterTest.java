@@ -59,7 +59,7 @@ public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<Sec
   @Test
   void testSearch() {
     SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
-    EHCachingSecurityMaster cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+    EHCachingSecurityMaster cachingMaster = new EHCachingSecurityMaster("security", mockUnderlyingMaster, getCleanCacheManager());
     
     //TODO
     SecuritySearchRequest request = new SecuritySearchRequest();
@@ -73,7 +73,7 @@ public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<Sec
   @Test
   void testHistorySearch() {
     SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
-    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster("security", mockUnderlyingMaster, getCleanCacheManager());
 
 
     cachingMaster.shutdown();
@@ -82,7 +82,7 @@ public class EHCachingSecurityMasterTest extends AbstractEHCachingMasterTest<Sec
   @Test
   void testMetaDataSearch() {
     SecurityMaster mockUnderlyingMaster = (SecurityMaster) populateMockMaster(mock(SecurityMaster.class));
-    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<SecurityDocument> cachingMaster = new EHCachingSecurityMaster("security", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

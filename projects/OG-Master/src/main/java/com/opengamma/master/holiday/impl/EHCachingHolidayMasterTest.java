@@ -5,14 +5,14 @@
  */
 package com.opengamma.master.holiday.impl;
 
-import com.opengamma.master.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractEHCachingMasterTest;
-import com.opengamma.master.holiday.ManageableHoliday;
-import com.opengamma.master.holiday.HolidayDocument;
-import com.opengamma.master.holiday.HolidayMaster;
+import static org.mockito.Mockito.mock;
+
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.mock;
+import com.opengamma.master.AbstractEHCachingMaster;
+import com.opengamma.master.AbstractEHCachingMasterTest;
+import com.opengamma.master.holiday.HolidayDocument;
+import com.opengamma.master.holiday.HolidayMaster;
 
 /**
  * Test {@link EHCachingHolidayMaster}
@@ -27,7 +27,7 @@ public class EHCachingHolidayMasterTest extends AbstractEHCachingMasterTest<Holi
   @Test
   void testSearch() {
     HolidayMaster mockUnderlyingMaster = (HolidayMaster) populateMockMaster(mock(HolidayMaster.class));
-    AbstractEHCachingMaster<HolidayDocument> cachingMaster = new EHCachingHolidayMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<HolidayDocument> cachingMaster = new EHCachingHolidayMaster("holiday", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -37,7 +37,7 @@ public class EHCachingHolidayMasterTest extends AbstractEHCachingMasterTest<Holi
   @Test
   void testHistorySearch() {
     HolidayMaster mockUnderlyingMaster = (HolidayMaster) populateMockMaster(mock(HolidayMaster.class));
-    AbstractEHCachingMaster<HolidayDocument> cachingMaster = new EHCachingHolidayMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<HolidayDocument> cachingMaster = new EHCachingHolidayMaster("holiday", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -47,7 +47,7 @@ public class EHCachingHolidayMasterTest extends AbstractEHCachingMasterTest<Holi
   @Test
   void testMetaDataSearch() {
     HolidayMaster mockUnderlyingMaster = (HolidayMaster) populateMockMaster(mock(HolidayMaster.class));
-    AbstractEHCachingMaster<HolidayDocument> cachingMaster = new EHCachingHolidayMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<HolidayDocument> cachingMaster = new EHCachingHolidayMaster("holiday", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

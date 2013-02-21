@@ -5,15 +5,14 @@
  */
 package com.opengamma.master.config.impl;
 
-import com.opengamma.core.config.impl.ConfigItem;
-import com.opengamma.id.ExternalIdBundle;
+import static org.mockito.Mockito.mock;
+
+import org.testng.annotations.Test;
+
 import com.opengamma.master.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractEHCachingMasterTest;
 import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
-import org.testng.annotations.Test;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * Test {@link EHCachingConfigMaster}
@@ -50,7 +49,7 @@ public class EHCachingConfigMasterTest extends AbstractEHCachingMasterTest<Confi
   @Test
   void testSearch() {
     ConfigMaster mockUnderlyingMaster = (ConfigMaster) populateMockMaster(mock(ConfigMaster.class));
-    AbstractEHCachingMaster<ConfigDocument> cachingMaster = new EHCachingConfigMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<ConfigDocument> cachingMaster = new EHCachingConfigMaster("config", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -60,7 +59,7 @@ public class EHCachingConfigMasterTest extends AbstractEHCachingMasterTest<Confi
   @Test
   void testHistorySearch() {
     ConfigMaster mockUnderlyingMaster = (ConfigMaster) populateMockMaster(mock(ConfigMaster.class));
-    AbstractEHCachingMaster<ConfigDocument> cachingMaster = new EHCachingConfigMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<ConfigDocument> cachingMaster = new EHCachingConfigMaster("config", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -70,7 +69,7 @@ public class EHCachingConfigMasterTest extends AbstractEHCachingMasterTest<Confi
   @Test
   void testMetaDataSearch() {
     ConfigMaster mockUnderlyingMaster = (ConfigMaster) populateMockMaster(mock(ConfigMaster.class));
-    AbstractEHCachingMaster<ConfigDocument> cachingMaster = new EHCachingConfigMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<ConfigDocument> cachingMaster = new EHCachingConfigMaster("config", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 

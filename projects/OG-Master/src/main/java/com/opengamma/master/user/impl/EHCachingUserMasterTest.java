@@ -5,15 +5,14 @@
  */
 package com.opengamma.master.user.impl;
 
-import com.opengamma.id.ExternalIdBundle;
-import com.opengamma.master.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractEHCachingMasterTest;
-import com.opengamma.master.user.ManageableOGUser;
-import com.opengamma.master.user.UserDocument;
-import com.opengamma.master.user.UserMaster;
+import static org.mockito.Mockito.mock;
+
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.mock;
+import com.opengamma.master.AbstractEHCachingMaster;
+import com.opengamma.master.AbstractEHCachingMasterTest;
+import com.opengamma.master.user.UserDocument;
+import com.opengamma.master.user.UserMaster;
 
 /**
  * Test {@link EHCachingUserMaster}
@@ -28,7 +27,7 @@ public class EHCachingUserMasterTest extends AbstractEHCachingMasterTest<UserMas
   @Test
   void testSearch() {
     UserMaster mockUnderlyingMaster = (UserMaster) populateMockMaster(mock(UserMaster.class));
-    AbstractEHCachingMaster<UserDocument> cachingMaster = new EHCachingUserMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<UserDocument> cachingMaster = new EHCachingUserMaster("user", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -38,7 +37,7 @@ public class EHCachingUserMasterTest extends AbstractEHCachingMasterTest<UserMas
   @Test
   void testHistorySearch() {
     UserMaster mockUnderlyingMaster = (UserMaster) populateMockMaster(mock(UserMaster.class));
-    AbstractEHCachingMaster<UserDocument> cachingMaster = new EHCachingUserMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<UserDocument> cachingMaster = new EHCachingUserMaster("user", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
@@ -48,7 +47,7 @@ public class EHCachingUserMasterTest extends AbstractEHCachingMasterTest<UserMas
   @Test
   void testMetaDataSearch() {
     UserMaster mockUnderlyingMaster = (UserMaster) populateMockMaster(mock(UserMaster.class));
-    AbstractEHCachingMaster<UserDocument> cachingMaster = new EHCachingUserMaster(mockUnderlyingMaster, getCleanCacheManager());
+    AbstractEHCachingMaster<UserDocument> cachingMaster = new EHCachingUserMaster("user", mockUnderlyingMaster, getCleanCacheManager());
 
     //TODO
 
