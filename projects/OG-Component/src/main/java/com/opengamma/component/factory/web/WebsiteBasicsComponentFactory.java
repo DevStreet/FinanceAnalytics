@@ -28,15 +28,20 @@ import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.target.ComputationTargetTypeProvider;
 import com.opengamma.engine.target.DefaultComputationTargetTypeProvider;
 import com.opengamma.master.config.ConfigMaster;
+import com.opengamma.master.config.impl.EHCachingConfigMaster;
 import com.opengamma.master.config.impl.MasterConfigSource;
 import com.opengamma.master.exchange.ExchangeMaster;
+import com.opengamma.master.exchange.impl.EHCachingExchangeMaster;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesLoader;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.holiday.HolidayMaster;
+import com.opengamma.master.holiday.impl.EHCachingHolidayMaster;
 import com.opengamma.master.portfolio.PortfolioMaster;
+import com.opengamma.master.portfolio.impl.EHCachingPortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.position.impl.EHCachingPositionMaster;
 import com.opengamma.master.region.RegionMaster;
+import com.opengamma.master.region.impl.EHCachingRegionMaster;
 import com.opengamma.master.security.SecurityLoader;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.impl.EHCachingSecurityMaster;
@@ -149,24 +154,44 @@ public class WebsiteBasicsComponentFactory extends AbstractComponentFactory {
   }
 
   protected void initMasters(ComponentRepository repo) {
+
+    SecurityMaster  securityMaster  = new EHCachingSecurityMaster("security", getSecurityMaster(), CacheManager.getInstance());
+    PositionMaster  positionMaster  = new EHCachingPositionMaster("position", getPositionMaster(), CacheManager.getInstance());
+    PortfolioMaster portfolioMaster = new EHCachingPortfolioMaster("portfolio", getPortfolioMaster(), CacheManager.getInstance());
+    ConfigMaster    configMaster    = new EHCachingConfigMaster("config", getConfigMaster(), CacheManager.getInstance());
+    ExchangeMaster  exchangeMaster  = new EHCachingExchangeMaster("exchange", getExchangeMaster(), CacheManager.getInstance());
+    HolidayMaster   holidayMaster   = new EHCachingHolidayMaster("holiday", getHolidayMaster(), CacheManager.getInstance());
+    RegionMaster    regionMaster    = new EHCachingRegionMaster("region", getRegionMaster(), CacheManager.getInstance());
+
     JerseyRestResourceFactory resource;
-    resource = new JerseyRestResourceFactory(WebConfigsResource.class, getConfigMaster());
+    resource = new JerseyRestResourceFactory(WebConfigsResource.class,
+                                             configMaster);
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebExchangesResource.class, getExchangeMaster());
+    resource = new JerseyRestResourceFactory(WebExchangesResource.class,
+                                             exchangeMaster);
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebHolidaysResource.class, getHolidayMaster());
+    resource = new JerseyRestResourceFactory(WebHolidaysResource.class,
+                                             holidayMaster);
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebRegionsResource.class, getRegionMaster());
+    resource = new JerseyRestResourceFactory(WebRegionsResource.class,
+                                             regionMaster);
     repo.getRestComponents().publishResource(resource);
-//    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, getSecurityMaster(), getSecurityLoader(), getHistoricalTimeSeriesMaster());
-    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class, new EHCachingSecurityMaster(getSecurityMaster(), CacheManager.getInstance()), getSecurityLoader(), getHistoricalTimeSeriesMaster());
+    resource = new JerseyRestResourceFactory(WebSecuritiesResource.class,
+                                             securityMaster,
+                                             getSecurityLoader(), getHistoricalTimeSeriesMaster());
     repo.getRestComponents().publishResource(resource);
-//    resource = new JerseyRestResourceFactory(WebPositionsResource.class, getPositionMaster(), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
-    resource = new JerseyRestResourceFactory(WebPositionsResource.class, new EHCachingPositionMaster(getPositionMaster(), CacheManager.getInstance()), getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
+    resource = new JerseyRestResourceFactory(WebPositionsResource.class,
+                                             positionMaster,
+                                             getSecurityLoader(), getSecuritySource(), getHistoricalTimeSeriesSource());
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebPortfoliosResource.class, getPortfolioMaster(), getPositionMaster(), getSecuritySource(), getScheduler());
+    resource = new JerseyRestResourceFactory(WebPortfoliosResource.class,
+                                             portfolioMaster,
+                                             positionMaster,
+                                             getSecuritySource(), getScheduler());
     repo.getRestComponents().publishResource(resource);
-    resource = new JerseyRestResourceFactory(WebAllHistoricalTimeSeriesResource.class, getHistoricalTimeSeriesMaster(), getHistoricalTimeSeriesLoader(), new MasterConfigSource(getConfigMaster()));
+    resource = new JerseyRestResourceFactory(WebAllHistoricalTimeSeriesResource.class,
+                                             getHistoricalTimeSeriesMaster(),
+                                             getHistoricalTimeSeriesLoader(), new MasterConfigSource(getConfigMaster()));
     repo.getRestComponents().publishResource(resource);
     resource = new JerseyRestResourceFactory(WebComputationTargetTypeResource.class, getTargetTypes());
     repo.getRestComponents().publishResource(resource);
