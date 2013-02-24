@@ -13,6 +13,7 @@ import com.opengamma.maths.lowlevelapi.functions.FPEquals;
 /**
  * tests dgamma
  */
+@Test
 public class DGAMMATest {
 
   private double[] input = new double[] {-20.5, -19.5, -18.5, -17.5, -16.5, -15.5, -14.5, -13.5, -12.5, -11.5, -10.5, -9.5, -8.5, -7.5, -6.5, -5.5, -4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5,

@@ -14,6 +14,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 /**
  * Tests the INITDS function 
  */
+@Test
 public class INITDSTest {
 
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)

@@ -28,7 +28,7 @@ public class ZATAN2 {
     double[] zatan2;
     if (s_slatec.zabs(ccs[0], ccs[1]) != 0.d) {
       double[] tmp = new double[2];
-      tmp = ComplexArithmetic.divide(csn, ccs);
+      tmp = ComplexArithmetic.cdivide(csn, ccs);
       zatan2 = s_slatec.zatan(tmp);
 
       if (ccs[0] < 0) {

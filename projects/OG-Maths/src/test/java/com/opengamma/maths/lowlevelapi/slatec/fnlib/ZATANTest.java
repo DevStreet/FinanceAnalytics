@@ -18,6 +18,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 /**
  * Tests ZATAN
  */
+@Test
 public class ZATANTest {
 
   public static double[][] realP = {

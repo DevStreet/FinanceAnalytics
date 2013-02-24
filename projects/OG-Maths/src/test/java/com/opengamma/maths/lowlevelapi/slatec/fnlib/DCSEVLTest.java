@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 

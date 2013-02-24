@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 /**
  * Tests DERFC
  */
+@Test
 public class DERFCTest {
 
   static double[] input = {

@@ -14,6 +14,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MAC
 /**
  * Tests D9LGMC from SLATEC
  */
+@Test
 public class D9LGMCTest {
   private static double[] x = new double[] {10.000000000000000, 100.00000000000000, 1000.0000000000000, 10000.000000000000, 100000.00000000000, 1000000.0000000000, 10000000.000000000,
       100000000.00000000,

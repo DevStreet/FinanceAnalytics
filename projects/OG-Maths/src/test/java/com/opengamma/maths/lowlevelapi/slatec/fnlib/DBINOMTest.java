@@ -10,11 +10,11 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
  * Tests DBINOM
  */
+@Test
 public class DBINOMTest {
 
   double[] rangeTestAnswer = {0.1000000000000000E+01, 0.1100000000000000E+02, 0.5500000000000000E+02, 0.1650000000000000E+03, 0.3300000000000000E+03, 0.4620000000000000E+03, 0.4620000000000000E+03,
