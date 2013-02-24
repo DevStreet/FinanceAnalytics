@@ -19,40 +19,58 @@ $.register_module({
             });
         };
         var context_items = function (cell) {
+            //console.log(cell);
             var items = [];
             var position_edit = function () {
+                //console.log("position edit");
                 var arr = cell.row_value.positionId.split('~'), id = arr[0] + '~' + arr[1];
-                og.api.rest.blotter.positions.get({id: id}).pipe(function(data){
-                    data.data.trade.uniqueId = id;
+                og.api.rest.blotter.positions.get({id: id}).pipe(function (data) {
+                    // console.log(data);
                     new og.blotter.Dialog({
                         details: data, portfolio:{name: id, id: id}, 
-                        handler: function (data) {og.api.rest.blotter.positions.put(data);}
+                        handler: function (data) {return og.api.rest.blotter.positions.put(data);}
                     });
                 });
             };
             var trade_edit = function () {
-                og.api.rest.blotter.trades.get({id: cell.row_value.tradeId}).pipe(function(data){
+                //console.log("trade edit");
+                og.api.rest.blotter.trades.get({id: cell.row_value.tradeId}).pipe(function (data) {
                     new og.blotter.Dialog({
                         details: data, portfolio:{name: cell.row_value.nodeId, id: cell.row_value.nodeId},
-                        handler: function (data) {og.api.rest.blotter.trades.put(data);}
+                        handler: function (data) {return og.api.rest.blotter.trades.put(data);}
                     });
                 });
             };
             var trade_insert = function () {
                 new og.blotter.Dialog({portfolio:{name: cell.row_value.nodeId, id: cell.row_value.nodeId}, 
-                    handler: function (data) {og.api.rest.blotter.trades.put(data);}
+                    handler: function (data) {return og.api.rest.blotter.trades.put(data);}
                 });
             };
-            items.push({name: 'Insert', handler: trade_insert});
-            if ((cell.type === "POSITION" && cell.row in og.analytics.grid.meta.nodes) || cell.type === "NODE") {
+            var trade_delete = function () {
+                og.common.util.ui.dialog({
+                    type: 'confirm',
+                    title: 'Delete Trade / Position?',
+                    width: 400, height: 190,
+                    message: 'Are you sure you want to permanently delete this trade / position?',
+                    buttons: {
+                        'Delete': function () {
+                            //do something
+                        },
+                        'Cancel': function () {$(this).dialog('close');}
+                    }
+                });
+            };
+            items.push({name: 'Add Trade', handler: trade_insert});
+            if ((cell.type === "POSITION" && cell.row in og.analytics.grid.state.nodes) || cell.type === "NODE") {
                 return items;
             }
             if((cell.type === "OTC_TRADE" || cell.type === "FUNGIBLE_TRADE") && cell.row_value.tradeId){
-                items.push({name: 'Edit', handler: trade_edit}); 
+                items.push({name: 'Edit Trade', handler: trade_edit}); 
             } 
             else {
-                items.push({name: 'Edit', handler: position_edit}); 
+                items.push({name: 'Edit Trade', handler: position_edit}); 
             }
+            items.push({name: 'Delete', handler: trade_delete});
             return items;
         };
         return url = {
