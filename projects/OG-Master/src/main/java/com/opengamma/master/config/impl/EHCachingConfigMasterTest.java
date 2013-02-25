@@ -9,8 +9,8 @@ import static org.mockito.Mockito.mock;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.master.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractEHCachingMasterTest;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMasterTest;
 import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 

@@ -10,8 +10,8 @@ import static org.mockito.Mockito.mock;
 import org.testng.annotations.Test;
 
 import com.opengamma.id.ExternalIdBundle;
-import com.opengamma.master.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractEHCachingMasterTest;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMasterTest;
 import com.opengamma.master.security.ManageableSecurity;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityMaster;

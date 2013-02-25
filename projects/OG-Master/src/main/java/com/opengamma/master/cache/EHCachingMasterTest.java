@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.master;
+package com.opengamma.master.cache;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -24,6 +24,8 @@ import com.opengamma.id.ObjectIdentifiable;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.id.VersionCorrection;
+import com.opengamma.master.AbstractChangeProvidingMaster;
+import com.opengamma.master.AbstractDocument;
 
 import net.sf.ehcache.CacheManager;
 

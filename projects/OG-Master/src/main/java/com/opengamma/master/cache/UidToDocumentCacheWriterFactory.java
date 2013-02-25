@@ -3,13 +3,15 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.master;
+package com.opengamma.master.cache;
 
 import java.util.Collection;
 import java.util.Properties;
 
 import com.opengamma.DataNotFoundException;
 import com.opengamma.id.UniqueId;
+import com.opengamma.master.AbstractChangeProvidingMaster;
+import com.opengamma.master.AbstractDocument;
 import com.opengamma.util.ArgumentChecker;
 
 import net.sf.ehcache.CacheEntry;

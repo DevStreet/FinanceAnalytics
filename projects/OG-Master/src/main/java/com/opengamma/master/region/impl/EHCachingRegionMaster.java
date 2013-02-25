@@ -12,16 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.id.UniqueId;
-import com.opengamma.master.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.DocumentSearchCache;
+import com.opengamma.master.cache.DocumentSearchCache;
 import com.opengamma.master.region.RegionDocument;
 import com.opengamma.master.region.RegionHistoryRequest;
 import com.opengamma.master.region.RegionHistoryResult;
-import com.opengamma.master.region.RegionMaster;
-import com.opengamma.master.region.RegionSearchRequest;
-import com.opengamma.master.region.RegionSearchResult;
-import com.opengamma.master.region.RegionDocument;
 import com.opengamma.master.region.RegionMaster;
 import com.opengamma.master.region.RegionSearchRequest;
 import com.opengamma.master.region.RegionSearchResult;

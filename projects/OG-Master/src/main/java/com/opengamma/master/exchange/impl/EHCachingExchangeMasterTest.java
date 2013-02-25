@@ -11,8 +11,8 @@ import org.testng.annotations.Test;
 import org.threeten.bp.ZoneOffset;
 
 import com.opengamma.id.ExternalIdBundle;
-import com.opengamma.master.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractEHCachingMasterTest;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMasterTest;
 import com.opengamma.master.exchange.ExchangeDocument;
 import com.opengamma.master.exchange.ExchangeMaster;
 import com.opengamma.master.exchange.ManageableExchange;

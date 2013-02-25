@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 import org.testng.annotations.Test;
 
 import com.opengamma.id.ExternalIdBundle;
-import com.opengamma.master.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractEHCachingMasterTest;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMasterTest;
 import com.opengamma.master.position.ManageablePosition;
 import com.opengamma.master.position.PositionDocument;
 import com.opengamma.master.position.PositionMaster;

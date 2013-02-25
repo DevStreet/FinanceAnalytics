@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.id.UniqueId;
-import com.opengamma.master.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.DocumentSearchCache;
+import com.opengamma.master.cache.DocumentSearchCache;
 import com.opengamma.master.holiday.HolidayDocument;
 import com.opengamma.master.holiday.HolidayHistoryRequest;
 import com.opengamma.master.holiday.HolidayHistoryResult;

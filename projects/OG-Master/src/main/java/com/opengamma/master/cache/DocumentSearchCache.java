@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.master;
+package com.opengamma.master.cache;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,6 +17,8 @@ import org.joda.beans.JodaBeanUtils;
 
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.UniqueIdentifiable;
+import com.opengamma.master.AbstractDocument;
+import com.opengamma.master.AbstractSearchRequest;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ExecutorServiceFactoryBean;
 import com.opengamma.util.paging.PagingRequest;

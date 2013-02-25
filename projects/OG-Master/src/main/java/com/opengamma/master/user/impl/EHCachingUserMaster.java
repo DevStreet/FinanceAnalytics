@@ -8,7 +8,7 @@ package com.opengamma.master.user.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.master.AbstractEHCachingMaster;
+import com.opengamma.master.cache.AbstractEHCachingMaster;
 import com.opengamma.master.user.UserDocument;
 import com.opengamma.master.user.UserHistoryRequest;
 import com.opengamma.master.user.UserHistoryResult;

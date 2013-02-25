@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.master;
+package com.opengamma.master.cache;
 
 import static com.opengamma.master.InstantExtractor.MAX_INSTANT;
 
@@ -26,6 +26,9 @@ import com.opengamma.id.ObjectId;
 import com.opengamma.id.ObjectIdentifiable;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
+import com.opengamma.master.AbstractChangeProvidingMaster;
+import com.opengamma.master.AbstractDocument;
+import com.opengamma.master.InstantExtractor;
 import com.opengamma.util.ArgumentChecker;
 
 import net.sf.ehcache.Cache;

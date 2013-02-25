@@ -3,9 +3,11 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.master;
+package com.opengamma.master.cache;
 
 import com.opengamma.id.UniqueId;
+import com.opengamma.master.AbstractChangeProvidingMaster;
+import com.opengamma.master.AbstractDocument;
 import com.opengamma.util.ArgumentChecker;
 
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;

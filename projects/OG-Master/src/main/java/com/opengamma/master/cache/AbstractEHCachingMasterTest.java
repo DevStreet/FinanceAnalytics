@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.master;
+package com.opengamma.master.cache;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.argThat;
@@ -20,6 +20,8 @@ import com.opengamma.core.change.ChangeManager;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
+import com.opengamma.master.AbstractChangeProvidingMaster;
+import com.opengamma.master.AbstractDocument;
 
 import net.sf.ehcache.CacheManager;
 
