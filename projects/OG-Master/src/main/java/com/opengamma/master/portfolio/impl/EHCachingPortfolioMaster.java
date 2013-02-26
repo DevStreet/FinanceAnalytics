@@ -27,6 +27,7 @@ import com.opengamma.util.paging.Paging;
 import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.tuple.ObjectsPair;
 
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
@@ -92,7 +93,9 @@ public class EHCachingPortfolioMaster extends AbstractEHCachingMaster<PortfolioD
   }
 
   private void cacheAllNodes(ManageablePortfolioNode node) {
-    getUidToDocumentCache().put(new Element(node.getUniqueId().toString(), node));
+    // TODO don't cache entire node tree for each cached node!!!
+//    ManageablePortfolioNode prunedNode = JodaBeanUtils.clone(node);
+    getUidToDocumentCache().put(new Element(node.getUniqueId(), node));
     for (ManageablePortfolioNode childNode : node.getChildNodes()) {
       cacheAllNodes(childNode);
     }
@@ -124,15 +127,20 @@ public class EHCachingPortfolioMaster extends AbstractEHCachingMaster<PortfolioD
   @Override
   public ManageablePortfolioNode getNode(UniqueId nodeId) {
 
-    Element element = getUidToDocumentCache().get(nodeId);
-    if (element != null) {
-      ManageablePortfolioNode node = ((PortfolioDocument) element.getObjectValue()).getPortfolio().getRootNode();
-      return node;
-    } else {
+    Element element;
+    try {
+      element = getUidToDocumentCache().get(nodeId);
+    } catch (CacheException e) {
       ManageablePortfolioNode node = ((PortfolioMaster) getUnderlying()).getNode(nodeId);
       cacheAllNodes(node);
       return node;
     }
-  }
 
+    if (element != null) {
+      ManageablePortfolioNode node = ((ManageablePortfolioNode) element.getObjectValue());
+      return node;
+    } else {
+      return null;
+    }
+  }
 }
