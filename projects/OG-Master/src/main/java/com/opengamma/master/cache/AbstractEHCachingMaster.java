@@ -186,7 +186,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       D result = _underlying.get(objectId, versionCorrection);
 
       // Explicitly insert in cache
-      getUidToDocumentCache().put(new Element(result.getUniqueId().toString(), result));
+      getUidToDocumentCache().put(new Element(result.getUniqueId(), result));
 
       return result;
 
