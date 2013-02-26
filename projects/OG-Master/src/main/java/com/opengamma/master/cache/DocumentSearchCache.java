@@ -40,6 +40,7 @@ import net.sf.ehcache.config.CacheConfiguration;
  * TODO OPTIMIZE cache replacement policy/handling huge requests that would flush out entire content
  * TODO OPTIMIZE underlying search request coalescing
  * TODO OPTIMIZE add front cache maps to keep EHCache happy (is this still necessary?)
+ * TODO externalise configuration in xml file
  */
 public class DocumentSearchCache {
 
@@ -82,6 +83,12 @@ public class DocumentSearchCache {
 
     // Configure cache - this should probably be in an xml config
     CacheConfiguration cacheConfiguration = new CacheConfiguration(name + "-searchRequestCache", 1000);
+
+    // Make copies of cached objects (use default Serializable copy)
+    cacheConfiguration.setCopyOnRead(true);
+    cacheConfiguration.setCopyOnWrite(true);
+
+    // Generate statistics
     cacheConfiguration.setStatistics(true);
 
     _searchRequestCache = new Cache(cacheConfiguration);

@@ -38,6 +38,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.CopyStrategyConfiguration;
 import net.sf.ehcache.config.SearchAttribute;
 import net.sf.ehcache.config.Searchable;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
@@ -101,6 +102,13 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     uidToDocumentCacheSearchable.addSearchAttribute(new SearchAttribute().name("CorrectionToInstant")
                                                         .className("com.opengamma.master.InstantExtractor"));
     cacheConfiguration.addSearchable(uidToDocumentCacheSearchable);
+
+    // Make copies of cached objects
+    CopyStrategyConfiguration copyStrategyConfiguration = new CopyStrategyConfiguration();
+    copyStrategyConfiguration.setClass("com.opengamma.master.cache.JodaBeanCopyStrategy");
+    cacheConfiguration.addCopyStrategy(copyStrategyConfiguration);
+    cacheConfiguration.setCopyOnRead(true);
+    cacheConfiguration.setCopyOnWrite(true);
 
     // Generate statistics
     cacheConfiguration.setStatistics(true);
