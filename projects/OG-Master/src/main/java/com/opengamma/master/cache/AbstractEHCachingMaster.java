@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.threeten.bp.Instant;
 
 import com.opengamma.DataNotFoundException;
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.change.BasicChangeManager;
 import com.opengamma.core.change.ChangeEvent;
 import com.opengamma.core.change.ChangeListener;
@@ -110,6 +109,11 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     cacheConfiguration.setCopyOnRead(true);
     cacheConfiguration.setCopyOnWrite(true);
 
+    // Set max depth to traverse
+    //SizeOfPolicyConfiguration sizeOfPolicyConfiguration = new SizeOfPolicyConfiguration();
+    //sizeOfPolicyConfiguration.setMaxDepthExceededBehavior(SizeOfPolicyConfiguration.MaxDepthExceededBehavior.CONTINUE.name());
+    //cacheConfiguration.addSizeOfPolicy(sizeOfPolicyConfiguration);
+
     // Generate statistics
     cacheConfiguration.setStatistics(true);
 
@@ -167,11 +171,9 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       D result = (D) results.all().get(0).getValue();
 
       // Debug: check result against underlying
-      if (s_logger.isDebugEnabled()) {
-        D check = getUnderlying().get(objectId, versionCorrection);
-        if (!result.equals(check)) {
-          throw new OpenGammaRuntimeException(getUidToDocumentCache().getName() + " returned:\n" + result + "\nbut the underlying master returned:\n"  + check);
-        }
+      D check = getUnderlying().get(objectId, versionCorrection);
+      if (!result.equals(check)) {
+        s_logger.error(getUidToDocumentCache().getName() + " returned:\n" + result + "\nbut the underlying master returned:\n"  + check);
       }
 
       // Return cached value
@@ -209,11 +211,9 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     if (element != null && element.getObjectValue() != null) {
 
       // Debug: check result against underlying
-      if (s_logger.isDebugEnabled()) {
-        D check = getUnderlying().get(uniqueId);
-        if (!((D) element.getObjectValue()).equals(check)) {
-          throw new OpenGammaRuntimeException(getUidToDocumentCache().getName() + " returned:\n" + ((D) element.getObjectValue()) + "\nbut the underlying master returned:\n"  + check);
-        }
+      D check = getUnderlying().get(uniqueId);
+      if (!((D) element.getObjectValue()).equals(check)) {
+        s_logger.error(getUidToDocumentCache().getName() + " returned:\n" + ((D) element.getObjectValue()) + "\nbut the underlying master returned:\n"  + check);
       }
 
       return (D) element.getObjectValue();
