@@ -187,19 +187,20 @@ public class EHCachingPagedSearchCache {
     });
   }
 
+  //-------------------------------------------------------------------------
+
   /**
    * Retrieve from cache the total #results and the cached  ranges for the supplied search request (without
    * taking into account its paging request). If an cached entry is not found for the unpaged search request, then
    * create one, populate it with the results of the supplied paged search request, and return it.
    *
-   * @param cache   the search request ehcache
-   * @param request the search request, without paging
+   * @param requestBean the search request, without paging
    * @param pagingRequest the paging request
    * @return        the total result count and a range map of cached UniqueIds for the supplied search request without
    *                paging
    */
   private ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>
-                      getCachedRequestInfo(final Bean requestBean, PagingRequest pagingRequest) {
+      getCachedRequestInfo(final Bean requestBean, PagingRequest pagingRequest) {
 
     // Get cache entry for current request (or create and get a primed cache entry if not found)
     final Element element = getCache().get(requestBean);
@@ -333,6 +334,8 @@ public class EHCachingPagedSearchCache {
     return new ObjectsPair<>(superIndex, superRange);
   }
 
+  //-------------------------------------------------------------------------
+
   /**
    * Extract a list of unique Ids from a list of uniqueIdentifiable objects
    *
@@ -362,7 +365,7 @@ public class EHCachingPagedSearchCache {
   /**
    * Return a clone of the supplied search request, but with its paging request replaced
    *
-   * @param request the search request whose paging request to replace
+   * @param request the document search request whose paging request to replace
    * @param pagingRequest the paging request, null allowed
    * @return        a clone of the supplied search request, with its paging request replaced
    */
@@ -373,6 +376,13 @@ public class EHCachingPagedSearchCache {
     return newRequest;
   }
 
+  /**
+   * Return a clone of the supplied search request, but with its paging request replaced
+   *
+   * @param request the history search request whose paging request to replace
+   * @param pagingRequest the paging request, null allowed
+   * @return        a clone of the supplied search request, with its paging request replaced
+   */
   public static AbstractHistoryRequest withPagingRequest(final AbstractHistoryRequest request,
                                                          final PagingRequest pagingRequest) {
     final AbstractHistoryRequest newRequest = JodaBeanUtils.clone(request);
@@ -385,11 +395,10 @@ public class EHCachingPagedSearchCache {
    * It should not be part of a generic lifecycle method.
    */
   public void shutdown() {
+    // No change management for searches... yet
     //getUnderlying().changeManager().removeChangeListener(_changeListener);
-    //getCacheManager().clearAllStartingWith(_documentByOidCacheName);
-    //getCacheManager().clearAllStartingWith(_documentByUidCacheName);
-    //getCacheManager().removeCache(_documentByOidCacheName);
-    //getCacheManager().removeCache(_documentByUidCacheName);
+
+    getCacheManager().removeCache(getCache().getName());
   }
 
   /**
@@ -401,14 +410,29 @@ public class EHCachingPagedSearchCache {
     return _searcher;
   }
 
+  /**
+   * Gets the cache
+   *
+   * @return the cache instance
+   */
   public Ehcache getCache() {
     return _searchRequestCache;
   }
 
+  /**
+   * Gets the cache manager
+   *
+   * @return the cache manager instance
+   */
   public CacheManager getCacheManager() {
     return _cacheManager;
   }
 
+  /**
+   * Gets the executor service used for prefetching
+   *
+   * @return the executor service instance
+   */
   public ExecutorService getExecutorService() {
     return _executorService;
   }

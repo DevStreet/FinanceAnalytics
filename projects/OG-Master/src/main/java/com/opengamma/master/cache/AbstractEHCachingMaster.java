@@ -120,8 +120,8 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     _cacheManager.addCache(new Cache(cacheConfiguration));
     _uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(name + CACHE_NAME_SUFFIX),
                                                   new UidToDocumentCacheEntryFactory<>(_underlying));
-    _cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(name + CACHE_NAME_SUFFIX), _uidToDocumentCache);
-    //_uidToDocumentCache.registerCacheWriter(new UidToDocumentCacheWriterFactory().createCacheWriter(_uidToDocumentCache, null));
+    _cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(name + CACHE_NAME_SUFFIX), getUidToDocumentCache());
+    //getUidToDocumentCache().registerCacheWriter(new UidToDocumentCacheWriterFactory().createCacheWriter(getUidToDocumentCache(), null));
 
     // Listen to change events from underlying, clean this cache accordingly and relay events to our change listeners
     _changeManager = new BasicChangeManager();
@@ -147,21 +147,21 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     ArgumentChecker.notNull(versionCorrection, "versionCorrection");
 
     // Search through attributes for specified oid, versions/corrections
-    Results results = _uidToDocumentCache.createQuery()
+    Results results = getUidToDocumentCache().createQuery()
         .includeKeys().includeValues()
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("ObjectId"))
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("VersionFromInstant"))
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("VersionToInstant"))
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("CorrectionFromInstant"))
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("CorrectionToInstant"))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("ObjectId").eq(objectId.toString()))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("VersionFromInstant")
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("ObjectId"))
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("VersionFromInstant"))
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("VersionToInstant"))
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("CorrectionFromInstant"))
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("CorrectionToInstant"))
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("ObjectId").eq(objectId.toString()))
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("VersionFromInstant")
                        .le(versionCorrection.withLatestFixed(InstantExtractor.MAX_INSTANT).getVersionAsOf().toString()))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("VersionToInstant")
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("VersionToInstant")
                        .ge(versionCorrection.withLatestFixed(InstantExtractor.MAX_INSTANT).getVersionAsOf().toString()))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("CorrectionFromInstant")
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("CorrectionFromInstant")
                        .le(versionCorrection.withLatestFixed(InstantExtractor.MAX_INSTANT).getCorrectedTo().toString()))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("CorrectionToInstant")
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("CorrectionToInstant")
                        .ge(versionCorrection.withLatestFixed(InstantExtractor.MAX_INSTANT).getCorrectedTo().toString()))
         .execute();
 
@@ -205,7 +205,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     // Get from cache, which in turn self-populates from the underlying master
     Element element;
     try {
-      element = _uidToDocumentCache.get(uniqueId);
+      element = getUidToDocumentCache().get(uniqueId);
     } catch (CacheException e) {
       throw new DataNotFoundException(e.getMessage());
     }
@@ -384,15 +384,15 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
   private void cleanCaches(ObjectId objectId, Instant fromVersion, Instant toVersion) {
 
-    Results results = _uidToDocumentCache.createQuery().includeKeys()
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("ObjectId"))
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("VersionFromInstant"))
-        .includeAttribute(_uidToDocumentCache.getSearchAttribute("VersionToInstant"))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("ObjectId")
+    Results results = getUidToDocumentCache().createQuery().includeKeys()
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("ObjectId"))
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("VersionFromInstant"))
+        .includeAttribute(getUidToDocumentCache().getSearchAttribute("VersionToInstant"))
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("ObjectId")
                          .eq(objectId.toString()))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("VersionFromInstant")
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("VersionFromInstant")
                          .le((fromVersion != null ? fromVersion : InstantExtractor.MIN_INSTANT).toString()))
-        .addCriteria(_uidToDocumentCache.getSearchAttribute("VersionToInstant")
+        .addCriteria(getUidToDocumentCache().getSearchAttribute("VersionToInstant")
                          .ge((toVersion != null ? toVersion : InstantExtractor.MAX_INSTANT).toString()))
         .execute();
 
@@ -407,7 +407,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
    */
   public void shutdown() {
     getUnderlying().changeManager().removeChangeListener(_changeListener);
-    getCacheManager().removeCache(_uidToDocumentCache.getName());
+    getCacheManager().removeCache(getUidToDocumentCache().getName());
   }
 
   //-------------------------------------------------------------------------
@@ -439,11 +439,6 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     return _uidToDocumentCache;
   }
 
-  /**
-   * Gets the change manager.
-   *
-   * @return the change manager, not null
-   */
   @Override
   public ChangeManager changeManager() {
     return _changeManager;
