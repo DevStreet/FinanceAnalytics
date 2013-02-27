@@ -53,6 +53,8 @@ public class EHCachingPagedSearchCache {
   protected static final int MAX_PREFETCH_CONCURRENCY = 4;
   /** Cache name. */
   private static final String CACHE_NAME_SUFFIX = "PagedSearchCache";
+  /** Check cached results against results from underlying */
+  private static final boolean TEST_AGAINST_UNDERLYING = false; // s_logger.isDebugEnabled()
 
   /** The cache manager */
   private final CacheManager _cacheManager;

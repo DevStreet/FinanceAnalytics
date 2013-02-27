@@ -63,6 +63,9 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractEHCachingMaster.class);
   /** Cache name. */
   private static final String CACHE_NAME_SUFFIX = "UidToDocumentCache";
+  /** Check cached results against results from underlying */
+  private static final boolean TEST_AGAINST_UNDERLYING = false; // s_logger.isDebugEnabled()
+
   /** The underlying master. */
   private final AbstractChangeProvidingMaster<D> _underlying;
   /** The cache manager. */
@@ -168,9 +171,11 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
       D result = (D) results.all().get(0).getValue();
 
       // Debug: check result against underlying
-      D check = getUnderlying().get(objectId, versionCorrection);
-      if (!result.equals(check)) {
-        s_logger.error(getUidToDocumentCache().getName() + " returned:\n" + result + "\nbut the underlying master returned:\n"  + check);
+      if (TEST_AGAINST_UNDERLYING) {
+        D check = getUnderlying().get(objectId, versionCorrection);
+        if (!result.equals(check)) {
+          s_logger.error(getUidToDocumentCache().getName() + " returned:\n" + result + "\nbut the underlying master returned:\n" + check);
+        }
       }
 
       // Return cached value
@@ -208,9 +213,11 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     if (element != null && element.getObjectValue() != null) {
 
       // Debug: check result against underlying
-      D check = getUnderlying().get(uniqueId);
-      if (!((D) element.getObjectValue()).equals(check)) {
-        s_logger.error(getUidToDocumentCache().getName() + " returned:\n" + ((D) element.getObjectValue()) + "\nbut the underlying master returned:\n"  + check);
+      if (TEST_AGAINST_UNDERLYING) {
+        D check = getUnderlying().get(uniqueId);
+        if (!((D) element.getObjectValue()).equals(check)) {
+          s_logger.error(getUidToDocumentCache().getName() + " returned:\n" + ((D) element.getObjectValue()) + "\nbut the underlying master returned:\n"  + check);
+        }
       }
 
       return (D) element.getObjectValue();
