@@ -356,7 +356,7 @@ public class EHCachingPagedSearchCache {
   }
 
   /**
-   * Return a clone of the supplied search request, but with its paging request nulled out
+   * Return a clone of the supplied search request, but with its paging request replaced
    *
    * @param request the search request whose paging request to replace
    * @param pagingRequest the paging request, null allowed
