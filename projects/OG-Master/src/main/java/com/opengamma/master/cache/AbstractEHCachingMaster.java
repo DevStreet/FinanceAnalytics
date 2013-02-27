@@ -61,6 +61,8 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
 
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractEHCachingMaster.class);
+  /** Cache name. */
+  private static final String CACHE_NAME_SUFFIX = "UidToDocumentCache";
   /** The underlying master. */
   private final AbstractChangeProvidingMaster<D> _underlying;
   /** The cache manager. */
@@ -88,7 +90,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     _cacheManager = cacheManager;
 
     // Configure cache for searching - this should probably be in an xml config
-    CacheConfiguration cacheConfiguration = new CacheConfiguration(name + "-uidToDocumentCache", 1000);
+    CacheConfiguration cacheConfiguration = new CacheConfiguration(name + CACHE_NAME_SUFFIX, 1000);
     Searchable uidToDocumentCacheSearchable = new Searchable();
     uidToDocumentCacheSearchable.addSearchAttribute(new SearchAttribute().name("ObjectId")
         .expression("value.getObjectId().toString()"));
@@ -109,18 +111,13 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
     cacheConfiguration.setCopyOnRead(true);
     cacheConfiguration.setCopyOnWrite(true);
 
-    // Set max depth to traverse
-    //SizeOfPolicyConfiguration sizeOfPolicyConfiguration = new SizeOfPolicyConfiguration();
-    //sizeOfPolicyConfiguration.setMaxDepthExceededBehavior(SizeOfPolicyConfiguration.MaxDepthExceededBehavior.CONTINUE.name());
-    //cacheConfiguration.addSizeOfPolicy(sizeOfPolicyConfiguration);
-
     // Generate statistics
     cacheConfiguration.setStatistics(true);
 
     _cacheManager.addCache(new Cache(cacheConfiguration));
-    _uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(name + "-uidToDocumentCache"),
+    _uidToDocumentCache = new SelfPopulatingCache(_cacheManager.getCache(name + CACHE_NAME_SUFFIX),
                                                   new UidToDocumentCacheEntryFactory<>(_underlying));
-    _cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(name + "-uidToDocumentCache"), _uidToDocumentCache);
+    _cacheManager.replaceCacheWithDecoratedCache(_cacheManager.getCache(name + CACHE_NAME_SUFFIX), _uidToDocumentCache);
     //_uidToDocumentCache.registerCacheWriter(new UidToDocumentCacheWriterFactory().createCacheWriter(_uidToDocumentCache, null));
 
     // Listen to change events from underlying, clean this cache accordingly and relay events to our change listeners

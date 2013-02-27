@@ -51,6 +51,8 @@ public class EHCachingPagedSearchCache {
   protected static final int PREFETCH_GRANULARITY = 100;
   /** The maximum number of concurrent prefetch operations */
   protected static final int MAX_PREFETCH_CONCURRENCY = 4;
+  /** Cache name. */
+  private static final String CACHE_NAME_SUFFIX = "PagedSearchCache";
 
   /** The cache manager */
   private final CacheManager _cacheManager;
@@ -96,7 +98,7 @@ public class EHCachingPagedSearchCache {
     _searcher = searcher;
 
     // Configure cache - this should probably be in an xml config
-    CacheConfiguration cacheConfiguration = new CacheConfiguration(name + "-SearchRequestCache", 1000);
+    CacheConfiguration cacheConfiguration = new CacheConfiguration(name + CACHE_NAME_SUFFIX, 1000);
 
     // Make copies of cached objects (use default Serializable copy)
     cacheConfiguration.setCopyOnRead(true);
