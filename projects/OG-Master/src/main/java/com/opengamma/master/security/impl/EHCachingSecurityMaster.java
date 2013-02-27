@@ -8,14 +8,13 @@ package com.opengamma.master.security.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.cache.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.cache.EHCachingDocumentSearchCache;
-import com.opengamma.master.cache.SearchCache;
+import com.opengamma.master.cache.EHCachingPagedSearchCache;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityHistoryRequest;
 import com.opengamma.master.security.SecurityHistoryResult;
@@ -42,8 +41,11 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(EHCachingSecurityMaster.class);
 
-  /** The search cache */
-  private EHCachingDocumentSearchCache _documentSearchCache;
+  /** The document search cache */
+  private EHCachingPagedSearchCache _documentSearchCache;
+
+  /** The history search cache */
+  private EHCachingPagedSearchCache _historySearchCache;
 
   /**
    * Creates an instance over an underlying source specifying the cache manager.
@@ -55,36 +57,55 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   public EHCachingSecurityMaster(final String name, final SecurityMaster underlying, final CacheManager cacheManager) {
     super(name, underlying, cacheManager);
 
-    // Create the doc search cache and register a security master searcher
-    _documentSearchCache = new EHCachingDocumentSearchCache(name, new SearchCache.Searcher() {
+    // Create the document search cache and register a security master searcher
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
       @Override
-      public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
+      public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
-        SecuritySearchResult result = ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest) request);
+        SecuritySearchResult result = ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest)
+            EHCachingPagedSearchCache.withPagingRequest((SecuritySearchRequest) request, pagingRequest));
 
         // Cache the result documents
-        EHCachingDocumentSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+        EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
 
         // Return the list of result UniqueIds
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
-                                 EHCachingDocumentSearchCache.extractUniqueIds(result.getDocuments()));
+                                 EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
     }, cacheManager);
 
-    // Prime search cache
+    // Create the history search cache and register a security master searcher
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+      @Override
+      public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
+        // Fetch search results from underlying master
+        SecurityHistoryResult result = ((SecurityMaster) getUnderlying()).history((SecurityHistoryRequest)
+            EHCachingPagedSearchCache.withPagingRequest((SecurityHistoryRequest) request, pagingRequest));
+
+        // Cache the result documents
+        EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+
+        // Return the list of result UniqueIds
+        return new ObjectsPair<>(result.getPaging().getTotalItems(),
+                                 EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
+      }
+    }, cacheManager);
+
+    // Prime document search cache
     SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
     defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
-    defaultSearch.setPagingRequest(PagingRequest.FIRST_PAGE);
-    _documentSearchCache.backgroundPrefetch(defaultSearch);
+    _documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
   }
 
   @Override
   public SecuritySearchResult search(SecuritySearchRequest request) {
     // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
-    _documentSearchCache.backgroundPrefetch(request);
+    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
-    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(request, false); // don't block until cached
+    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(
+        EHCachingPagedSearchCache.withPagingRequest(request, null),
+        request.getPagingRequest(), false); // don't block until cached
 
     List<SecurityDocument> documents = new ArrayList<>();
     for (UniqueId uniqueId : pair.getSecond()) {
@@ -97,13 +118,29 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   }
 
   @Override
-  public SecurityMetaDataResult metaData(SecurityMetaDataRequest request) {
-    return ((SecurityMaster) getUnderlying()).metaData(request); //TODO
+  public SecurityHistoryResult history(SecurityHistoryRequest request) {
+
+    // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
+    _historySearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
+
+    // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
+    ObjectsPair<Integer, List<UniqueId>> pair = _historySearchCache.search(
+        EHCachingPagedSearchCache.withPagingRequest(request, null),
+        request.getPagingRequest(), false); // don't block until cached
+
+    List<SecurityDocument> documents = new ArrayList<>();
+    for (UniqueId uniqueId : pair.getSecond()) {
+      documents.add(get(uniqueId));
+    }
+
+    SecurityHistoryResult result = new SecurityHistoryResult(documents);
+    result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
+    return result;
   }
 
   @Override
-  public SecurityHistoryResult history(SecurityHistoryRequest request) {
-    return ((SecurityMaster) getUnderlying()).history(request); //TODO
+  public SecurityMetaDataResult metaData(SecurityMetaDataRequest request) {
+    return ((SecurityMaster) getUnderlying()).metaData(request);
   }
 
 }

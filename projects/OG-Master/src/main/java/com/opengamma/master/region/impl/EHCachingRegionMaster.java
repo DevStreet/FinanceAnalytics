@@ -8,14 +8,13 @@ package com.opengamma.master.region.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.cache.AbstractEHCachingMaster;
-import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.cache.EHCachingDocumentSearchCache;
-import com.opengamma.master.cache.SearchCache;
+import com.opengamma.master.cache.EHCachingPagedSearchCache;
 import com.opengamma.master.region.RegionDocument;
 import com.opengamma.master.region.RegionHistoryRequest;
 import com.opengamma.master.region.RegionHistoryResult;
@@ -40,9 +39,12 @@ public class EHCachingRegionMaster extends AbstractEHCachingMaster<RegionDocumen
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(EHCachingRegionMaster.class);
 
-  /** The search cache */
-  private EHCachingDocumentSearchCache _documentSearchCache;
-  
+  /** The document search cache */
+  private EHCachingPagedSearchCache _documentSearchCache;
+
+  /** The history search cache */
+  private EHCachingPagedSearchCache _historySearchCache;
+
   /**
    * Creates an instance over an underlying source specifying the cache manager.
    *
@@ -54,34 +56,53 @@ public class EHCachingRegionMaster extends AbstractEHCachingMaster<RegionDocumen
     super(name, underlying, cacheManager);
  
     // Create the doc search cache and register a region master searcher
-    _documentSearchCache = new EHCachingDocumentSearchCache(name, new SearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
       @Override
-      public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
+      public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
-        RegionSearchResult result = ((RegionMaster) getUnderlying()).search((RegionSearchRequest) request);
+        RegionSearchResult result = ((RegionMaster) getUnderlying()).search((RegionSearchRequest)
+            EHCachingPagedSearchCache.withPagingRequest((RegionSearchRequest) request, pagingRequest));
 
         // Cache the result documents
-        EHCachingDocumentSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+        EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
 
         // Return the list of result UniqueIds
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
-                                 EHCachingDocumentSearchCache.extractUniqueIds(result.getDocuments()));
+                                 EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
     }, cacheManager);
 
-    // Prime search cache
+    // Create the history search cache and register a security master searcher
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+      @Override
+      public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
+        // Fetch search results from underlying master
+        RegionHistoryResult result = ((RegionMaster) getUnderlying()).history((RegionHistoryRequest)
+            EHCachingPagedSearchCache.withPagingRequest((RegionHistoryRequest) request, pagingRequest));
+
+        // Cache the result documents
+        EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+
+        // Return the list of result UniqueIds
+        return new ObjectsPair<>(result.getPaging().getTotalItems(),
+                                 EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
+      }
+    }, cacheManager);
+
+    // Prime document search cache
     RegionSearchRequest defaultSearch = new RegionSearchRequest();
-    defaultSearch.setPagingRequest(PagingRequest.FIRST_PAGE);
-    _documentSearchCache.backgroundPrefetch(defaultSearch);
+    _documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
   }
 
   @Override
   public RegionSearchResult search(RegionSearchRequest request) {
     // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
-    _documentSearchCache.backgroundPrefetch(request);
+    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
-    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(request, false); // don't block until cached
+    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(
+        EHCachingPagedSearchCache.withPagingRequest(request, null),
+        request.getPagingRequest(), false); // don't block until cached
 
     List<RegionDocument> documents = new ArrayList<>();
     for (UniqueId uniqueId : pair.getSecond()) {
@@ -95,7 +116,23 @@ public class EHCachingRegionMaster extends AbstractEHCachingMaster<RegionDocumen
 
   @Override
   public RegionHistoryResult history(RegionHistoryRequest request) {
-    return ((RegionMaster) getUnderlying()).history(request); //TODO
+
+    // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
+    _historySearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
+
+    // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
+    ObjectsPair<Integer, List<UniqueId>> pair = _historySearchCache.search(
+        EHCachingPagedSearchCache.withPagingRequest(request, null),
+        request.getPagingRequest(), false); // don't block until cached
+
+    List<RegionDocument> documents = new ArrayList<>();
+    for (UniqueId uniqueId : pair.getSecond()) {
+      documents.add(get(uniqueId));
+    }
+
+    RegionHistoryResult result = new RegionHistoryResult(documents);
+    result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
+    return result;
   }
 
 }
