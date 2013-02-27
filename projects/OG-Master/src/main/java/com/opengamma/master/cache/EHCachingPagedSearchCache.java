@@ -33,7 +33,8 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
 /**
- * A cache for search results, providing common caching logic to caching masters with a search facility.
+ * A cache for search results, providing common search caching logic across caching masters and across search types.
+ *
  * <p>
  * The cache is implemented using {@code EHCache}.
  *
@@ -123,7 +124,8 @@ public class EHCachingPagedSearchCache {
    * If result is entirely cached return it immediately; otherwise, fetch any missing ranges from the underlying
    * master in the foreground, cache and return it.
    *
-   * @param requestBean       the search request
+   * @param requestBean       the search request, without paging
+   * @param pagingRequest     the paging request
    * @param blockUntilCached  if true, block the request until all caching, including related prefetching, is done
    * @return                  the total number of results (ignoring paging), and the unique IDs of the requested result page
    */
