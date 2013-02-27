@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 
 import org.joda.beans.JodaBeanUtils;
+import org.joda.beans.impl.direct.DirectBean;
 
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.UniqueIdentifiable;
@@ -42,7 +43,7 @@ import net.sf.ehcache.config.CacheConfiguration;
  * TODO OPTIMIZE add front cache maps to keep EHCache happy (is this still necessary?)
  * TODO externalise configuration in xml file
  */
-public class DocumentSearchCache {
+public class EHCachingDocumentSearchCache implements SearchCache {
 
   /** The number of units to prefetch on either side of the current paging request */
   private static final int PREFETCH_RADIUS = 2;
@@ -64,7 +65,7 @@ public class DocumentSearchCache {
   private final ExecutorService _executorService;
 
   /** The searcher provides access to a master-specific search operation */
-  private CacheSearcher _searcher;
+  private Searcher _searcher;
 
   /**
    * Create a new search cache.
@@ -73,7 +74,7 @@ public class DocumentSearchCache {
    * @param cacheManager  The cache manager to use, not null
    * @param searcher      The CacheSearcher to use for passing search requests to an underlying master, not null
    */
-  public DocumentSearchCache(String name, CacheSearcher searcher, CacheManager cacheManager) {
+  public EHCachingDocumentSearchCache(String name, Searcher searcher, CacheManager cacheManager) {
     ArgumentChecker.notNull(cacheManager, "cacheManager");
     ArgumentChecker.notEmpty(name, "name");
     ArgumentChecker.notNull(searcher, "searcher");
@@ -117,33 +118,35 @@ public class DocumentSearchCache {
    * Calculate the range that should be prefetched for the supplied request and initiate the fetching of any uncached
    * ranges from the underlying master in the background, without blocking.
    *
-   * @param request the search request
+   * @param requestBean the search request
    */
-  public void backgroundPrefetch(final AbstractSearchRequest originalRequest) {
+  public void backgroundPrefetch(final DirectBean requestBean) {
+
+    AbstractSearchRequest request = (AbstractSearchRequest) requestBean;
 
     // Build larger range to prefetch
     final int start =
-        (originalRequest.getPagingRequest().getFirstItem() / PREFETCH_GRANULARITY >= PREFETCH_RADIUS)
-        ? ((originalRequest.getPagingRequest().getFirstItem() / PREFETCH_GRANULARITY) * PREFETCH_GRANULARITY)
+        (request.getPagingRequest().getFirstItem() / PREFETCH_GRANULARITY >= PREFETCH_RADIUS)
+        ? ((request.getPagingRequest().getFirstItem() / PREFETCH_GRANULARITY) * PREFETCH_GRANULARITY)
               - (PREFETCH_RADIUS * PREFETCH_GRANULARITY)
         : 0;
     final int end =
-        (originalRequest.getPagingRequest().getLastItem() < Integer.MAX_VALUE - (PREFETCH_RADIUS * PREFETCH_GRANULARITY))
-        ? ((originalRequest.getPagingRequest().getLastItem() / PREFETCH_GRANULARITY) * PREFETCH_GRANULARITY)
+        (request.getPagingRequest().getLastItem() < Integer.MAX_VALUE - (PREFETCH_RADIUS * PREFETCH_GRANULARITY))
+        ? ((request.getPagingRequest().getLastItem() / PREFETCH_GRANULARITY) * PREFETCH_GRANULARITY)
               + (PREFETCH_RADIUS * PREFETCH_GRANULARITY)
         : Integer.MAX_VALUE;
 
     PagingRequest superPagingRequest = PagingRequest.ofIndex(start, end - start);
 
     // Build new search request with larger range
-    final AbstractSearchRequest superRequest = withoutPagingRequest(originalRequest);
+    final AbstractSearchRequest superRequest = withoutPagingRequest(request);
     superRequest.setPagingRequest(superPagingRequest);
 
     // Submit search task to background executor
     _executorService.submit(new Runnable() {
       @Override
       public void run() {
-        doSearch(superRequest, true); // block until cached
+        search(superRequest, true); // block until cached
       }
     });
   }
@@ -155,7 +158,9 @@ public class DocumentSearchCache {
    * @param request the search request
    * @return        the search result
    */
-  public ObjectsPair<Integer, List<UniqueId>> doSearch(final AbstractSearchRequest request, boolean blockUntilCached) {
+  public ObjectsPair<Integer, List<UniqueId>> search(final DirectBean requestBean, boolean blockUntilCached) {
+
+    AbstractSearchRequest request = (AbstractSearchRequest) requestBean;
 
     // Fetch the total #results and cached ranges for the search request (without paging)
     final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>> info =
@@ -192,7 +197,7 @@ public class DocumentSearchCache {
    *                paging
    */
   protected ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>
-                      getCachedRequestInfo(final Cache cache, final AbstractSearchRequest originalRequest) {
+                      getCachedRequestInfo(final Ehcache cache, final AbstractSearchRequest originalRequest) {
 
     AbstractSearchRequest request = withoutPagingRequest(originalRequest);
 
@@ -342,18 +347,6 @@ public class DocumentSearchCache {
   }
 
   /**
-   * A cache searcher, used by the  search cache to pass search requests to an underlying master without
-   * knowing its type and retrieve the result unique Ids without knowing the document type.
-   */
-  public interface CacheSearcher {
-    /** Searches an underlying master, casting search requests/results as required for a specific master
-     * @param request   The search request (will be cast to a search request for a specific master)
-     * @return          The search result
-     */
-    ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request);
-  }
-
-  /**
    * Extract a list of unique Ids from a list of uniqueIdentifiable objects
    *
    * @param uniqueIdentifiables The uniquely identifiable objects
@@ -388,7 +381,7 @@ public class DocumentSearchCache {
    *
    * @return the cache, not null
    */
-  protected Cache getSearchRequestCache() {
+  public Ehcache getSearchRequestCache() {
     return _searchRequestCache;
   }
 
@@ -397,7 +390,7 @@ public class DocumentSearchCache {
    *
    * @return the cache searcher instance
    */
-  protected CacheSearcher getSearcher() {
+  public Searcher getSearcher() {
     return _searcher;
   }
 }

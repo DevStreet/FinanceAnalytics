@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.id.UniqueId;
 import com.opengamma.master.cache.AbstractEHCachingMaster;
 import com.opengamma.master.AbstractSearchRequest;
-import com.opengamma.master.cache.DocumentSearchCache;
+import com.opengamma.master.cache.EHCachingDocumentSearchCache;
+import com.opengamma.master.cache.SearchCache;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityHistoryRequest;
 import com.opengamma.master.security.SecurityHistoryResult;
@@ -42,7 +43,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
   private static final Logger s_logger = LoggerFactory.getLogger(EHCachingSecurityMaster.class);
 
   /** The search cache */
-  private DocumentSearchCache _documentSearchCache;
+  private EHCachingDocumentSearchCache _documentSearchCache;
 
   /**
    * Creates an instance over an underlying source specifying the cache manager.
@@ -55,18 +56,18 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     super(name, underlying, cacheManager);
 
     // Create the doc search cache and register a security master searcher
-    _documentSearchCache = new DocumentSearchCache(name, new DocumentSearchCache.CacheSearcher() {
+    _documentSearchCache = new EHCachingDocumentSearchCache(name, new SearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(AbstractSearchRequest request) {
         // Fetch search results from underlying master
         SecuritySearchResult result = ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest) request);
 
         // Cache the result documents
-        DocumentSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
+        EHCachingDocumentSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
 
         // Return the list of result UniqueIds
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
-                                 DocumentSearchCache.extractUniqueIds(result.getDocuments()));
+                                 EHCachingDocumentSearchCache.extractUniqueIds(result.getDocuments()));
       }
     }, cacheManager);
 
@@ -83,7 +84,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     _documentSearchCache.backgroundPrefetch(request);
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
-    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.doSearch(request, false); // don't block until cached
+    ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(request, false); // don't block until cached
 
     List<SecurityDocument> documents = new ArrayList<>();
     for (UniqueId uniqueId : pair.getSecond()) {
