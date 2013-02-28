@@ -14,7 +14,7 @@ import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 
 /**
- * Tests complex square root
+ * Tests complex cos
  */
 @Test
 public class ZACOSTest {
