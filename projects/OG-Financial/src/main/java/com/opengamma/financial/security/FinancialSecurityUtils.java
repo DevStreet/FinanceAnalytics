@@ -292,6 +292,11 @@ public class FinancialSecurityUtils {
         public ExternalId visitStockFutureSecurity(final StockFutureSecurity security) {
           return ExternalId.of(ExternalSchemes.ISO_MIC, security.getTradingExchange());
         }
+
+        @Override
+        public ExternalId visitEquityIndexFutureOptionSecurity(final EquityIndexFutureOptionSecurity security) {
+          return ExternalId.of(ExternalSchemes.ISO_MIC, security.getExchange());
+        }
       });
       return regionId;
     }
@@ -723,12 +728,12 @@ public class FinancialSecurityUtils {
 
         @Override
         public Collection<Currency> visitCommodityFutureOptionSecurity(final CommodityFutureOptionSecurity commodityFutureOptionSecurity) {
-          return null;
+          return Collections.singleton(commodityFutureOptionSecurity.getCurrency());
         }
 
         @Override
         public Collection<Currency> visitFxFutureOptionSecurity(final FxFutureOptionSecurity security) {
-          return null;
+          return Collections.singleton(security.getCurrency());
         }
 
         @Override
@@ -952,9 +957,9 @@ public class FinancialSecurityUtils {
           equityIndexOptionVisitor(true).
           equityOptionVisitor(true).
           equityBarrierOptionVisitor(true).
-              bondFutureOptionSecurityVisitor(true).
-              equityIndexFutureOptionVisitor(true).
-              create());
+          bondFutureOptionSecurityVisitor(true).
+          equityIndexFutureOptionVisitor(true).
+          create());
 
       result = isExchangeTraded == null ? false : isExchangeTraded;
     }
@@ -972,6 +977,11 @@ public class FinancialSecurityUtils {
       final FinancialSecurity finSec = (FinancialSecurity) security;
       final ExternalId id = finSec.accept(new FinancialSecurityVisitorAdapter<ExternalId>() {
 
+        @Override
+        public ExternalId visitFxFutureOptionSecurity(final FxFutureOptionSecurity security) {
+          return security.getUnderlyingId();
+        }
+        
         @Override
         public ExternalId visitEnergyForwardSecurity(final EnergyForwardSecurity security) {
           return security.getUnderlyingId();

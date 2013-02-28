@@ -18,43 +18,6 @@ $.register_module({
                 routes.go(hash);
             });
         };
-        var context_items = function (cell) {
-            var items = [];
-            var position_edit = function () {
-                var arr = cell.row_value.positionId.split('~'), id = arr[0] + '~' + arr[1];
-                og.api.rest.blotter.positions.get({id: id}).pipe(function(data){
-                    data.data.trade.uniqueId = id;
-                    new og.blotter.Dialog({
-                        details: data, portfolio:{name: id, id: id}, 
-                        handler: function (data) {og.api.rest.blotter.positions.put(data);}
-                    });
-                });
-            };
-            var trade_edit = function () {
-                og.api.rest.blotter.trades.get({id: cell.row_value.tradeId}).pipe(function(data){
-                    new og.blotter.Dialog({
-                        details: data, portfolio:{name: cell.row_value.nodeId, id: cell.row_value.nodeId},
-                        handler: function (data) {og.api.rest.blotter.trades.put(data);}
-                    });
-                });
-            };
-            var trade_insert = function () {
-                new og.blotter.Dialog({portfolio:{name: cell.row_value.nodeId, id: cell.row_value.nodeId}, 
-                    handler: function (data) {og.api.rest.blotter.trades.put(data);}
-                });
-            };
-            items.push({name: 'Insert', handler: trade_insert});
-            if ((cell.type === "POSITION" && cell.row in og.analytics.grid.meta.nodes) || cell.type === "NODE") {
-                return items;
-            }
-            if((cell.type === "OTC_TRADE" || cell.type === "FUNGIBLE_TRADE") && cell.row_value.tradeId){
-                items.push({name: 'Edit', handler: trade_edit}); 
-            } 
-            else {
-                items.push({name: 'Edit', handler: position_edit}); 
-            }
-            return items;
-        };
         return url = {
             add: function (container, params, silent) {
                 return (last_object[container] || (last_object[container] = [])).push(params), (!silent && go()), url;
@@ -91,8 +54,7 @@ $.register_module({
                             url.main($.extend({}, og.analytics.grid.source, {type: view}));
                         }).on('fatal', url.clear_main);
                         if (og.analytics.blotter) og.analytics.grid.on('contextmenu', function (event, cell, col) {
-                            if (cell) return og.common.util.ui.contextmenu({defaults: true, zindex: 4, 
-                                items: context_items(cell)}, event, cell);
+                            if (cell) return og.blotter.contextmenu(cell, event);
                         });
                     } else {
                         new og.analytics.Form2({callback: og.analytics.url.main, data: config.main});
