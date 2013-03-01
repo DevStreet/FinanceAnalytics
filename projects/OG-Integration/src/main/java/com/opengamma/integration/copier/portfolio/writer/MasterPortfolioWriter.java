@@ -361,7 +361,12 @@ public class MasterPortfolioWriter implements PortfolioWriter {
       // If keeping original portfolio nodes and merging positions, populate position map with existing positions in node
       if (_keepCurrentPositions && _mergePositions && _originalNode != null) {
         for (ObjectId positionId : _originalNode.getPositionIds()) {
-          ManageablePosition position = _positionMaster.get(positionId, VersionCorrection.LATEST).getPosition();
+          ManageablePosition position = null;
+          try {
+            position = _positionMaster.get(positionId, VersionCorrection.LATEST).getPosition();
+          } catch (Exception e) {
+            // no action
+          }
           if (position != null) {
             position.getSecurityLink().resolve(_securitySource);
             if (position.getSecurity() != null) {
@@ -482,8 +487,7 @@ public class MasterPortfolioWriter implements PortfolioWriter {
 
         portfolio.setRootNode(rootNode);
         _portfolioDocument.setPortfolio(portfolio);
-        _portfolioDocument = _portfolioMaster.update(_portfolioDocument);
-      }      
+      }
     }
     // Set current node to the root node
     _currentNode = _portfolioDocument.getPortfolio().getRootNode();

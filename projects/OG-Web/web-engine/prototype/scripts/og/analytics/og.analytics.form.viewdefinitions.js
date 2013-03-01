@@ -45,10 +45,12 @@ $.register_module({
             form.Block.call(block, {
                 content: tmpl_header,
                 processor: function (data) {
-                    var vd = viewdefs_store.filter(function (entry) {
-                        return entry.name === menu.$input.val();
-                    });
-                    data.viewdefinition = vd[0].id;
+                    var vw, vd = viewdefs_store.filter(function (entry) {
+                            return entry.name === menu.$input.val();
+                        });
+                    if (vd && vd.length && vd[0].id) vw = vd[0].id;
+                    else vw = menu.$input.val();
+                    data.viewdefinition = vw;
                 }
             });
 
@@ -58,6 +60,9 @@ $.register_module({
                     placeholder: 'Search...',
                     source: ac_source(og.api.rest.viewdefinitions, store_viewdefinitions)
                 });
+                menu.$input.on('keydown', function (event) {
+                    if (event.keyCode === $.ui.keyCode.ENTER) form.submit();
+                });
                 if (config.val) {
                     og.api.rest.viewdefinitions.get().pipe(function (resp) {
                         store_viewdefinitions(resp);
@@ -65,7 +70,7 @@ $.register_module({
                         if (val.length && val[0].name) menu.$input.val(val[0].name);
                     });
                 }
-            });
+            })
         };
 
         ViewDefinitions.prototype = new Block;

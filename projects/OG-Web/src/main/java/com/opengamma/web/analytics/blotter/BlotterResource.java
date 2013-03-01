@@ -24,11 +24,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.beans.Bean;
 import org.joda.beans.JodaBeanUtils;
 import org.joda.beans.MetaBean;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZonedDateTime;
 
 import com.google.common.collect.ImmutableMap;
@@ -203,6 +205,9 @@ public class BlotterResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("securities/{securityExternalId}")
   public String getSecurityJSON(@PathParam("securityExternalId") String securityExternalIdStr) {
+    if (StringUtils.isEmpty(securityExternalIdStr)) {
+      return new JSONObject().toString();
+    }
     ExternalId securityExternalId = ExternalId.parse(securityExternalIdStr);
     SecuritySearchResult searchResult = _securityMaster.search(new SecuritySearchRequest(securityExternalId));
     if (searchResult.getSecurities().size() == 0) {
@@ -248,6 +253,8 @@ public class BlotterResource {
     }
     ManageableSecurityLink securityLink = position.getSecurityLink();
     ManageableTrade trade = new ManageableTrade();
+    trade.setTradeDate(LocalDate.now());
+    trade.setCounterpartyExternalId(ExternalId.of(AbstractTradeBuilder.CPTY_SCHEME, AbstractTradeBuilder.DEFAULT_COUNTERPARTY));
     trade.setQuantity(position.getQuantity());
     trade.setSecurityLink(securityLink);
     return buildTradeJSON(trade, securityLink);
@@ -372,7 +379,6 @@ public class BlotterResource {
       // TODO tell don't ask - ask each of the existing trade builders until one of them can handle it?
       if (tradeTypeName.equals(OtcTradeBuilder.TRADE_TYPE_NAME)) {
         updateOtcPosition(positionId, json, tradeJson);
-        throw new IllegalArgumentException("direct update of positions not implemented for OTC securities");
       } else if (tradeTypeName.equals(FungibleTradeBuilder.TRADE_TYPE_NAME)) {
         _fungibleTradeBuilder.updatePosition(new JsonBeanDataSource(tradeJson), positionId);
       } else {
