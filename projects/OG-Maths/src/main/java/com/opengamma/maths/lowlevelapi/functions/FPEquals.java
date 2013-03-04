@@ -57,7 +57,11 @@ public class FPEquals {
   public static boolean fuzzyEqualsDynamicTol(int count, double[] a, int offseta, double[] b, int offsetb) {
     double tolerance;
     for (int i = 0; i < count; i++) {
-      tolerance = 100 * Math.ulp(b[i + offsetb]);
+      if (b[i + offsetb] == 0) {
+        tolerance = 10 * D1MACH.four();
+      } else {
+        tolerance = Math.ulp(b[i + offsetb]) > D1MACH.four() ? 100 * Math.ulp(b[i + offsetb]) : 10 * D1MACH.four();
+      }
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
         s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
         return false;

@@ -23,8 +23,7 @@ package com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking;
  * The reason for this packing is down to internal representation of complex data structures in native libraries.
  */
 public interface IZYAPIInterface {
- 
-  
+
   /**
    * Double Precision Vectorised y:=acos(a).
    * Computes the inverse cosine of {@code a}
@@ -389,7 +388,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_addx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -402,7 +401,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_div(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -415,7 +414,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vd_divx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -441,7 +440,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */     
+   */
   void vd_mulx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -452,7 +451,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_sqr(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -465,7 +464,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_sub(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -478,7 +477,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vd_subx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -500,7 +499,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_floor(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -535,7 +534,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_rint(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -546,7 +545,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_round(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -557,7 +556,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vd_trunc(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -578,7 +577,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vd_erf(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -589,7 +588,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vd_erfc(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -610,7 +609,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */     
+   */
   void vd_lgamma(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -621,7 +620,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vd_tgamma(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -634,7 +633,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vz_abs(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -646,7 +645,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_acos(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -658,7 +657,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */      
+   */
   void vz_acosh(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -672,7 +671,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vz_add(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -686,7 +685,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vz_addx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -698,7 +697,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_arg(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -710,7 +709,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_asin(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -722,7 +721,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vz_asinh(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -734,7 +733,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */   
+   */
   void vz_atan(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -746,7 +745,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_atanh(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -758,7 +757,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_conj(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -770,7 +769,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_cos(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -782,7 +781,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */    
+   */
   void vz_cosh(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -796,7 +795,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */  
+   */
   void vz_div(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -810,7 +809,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */   
+   */
   void vz_divx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -860,7 +859,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_mul(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -874,7 +873,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */   
+   */
   void vz_mulx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -888,7 +887,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */     
+   */
   void vz_mulbyconj(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -928,7 +927,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_sin(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -940,7 +939,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_sinh(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -966,7 +965,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_sub(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -980,7 +979,7 @@ public interface IZYAPIInterface {
    * @param offsetb the first element in this array denotes position in {@code b} from which the constant shall be taken
    * @param y the double precision vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_subx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
@@ -992,7 +991,7 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_tan(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 
   /**
@@ -1004,6 +1003,6 @@ public interface IZYAPIInterface {
    * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
    * @param y the double precision complex representation vector in which the result shall be placed
    * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
-   */ 
+   */
   void vz_tanh(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
 }
