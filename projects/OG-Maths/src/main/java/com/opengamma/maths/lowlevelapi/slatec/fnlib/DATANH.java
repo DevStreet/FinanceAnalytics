@@ -14,7 +14,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 /**
  * Computes the inverse hyperbolic tangent at position 'x'
  * This code is an approximate translation of the equivalent function in the "Public Domain" code from SLATEC, see:
- * http://www.netlib.org/slatec/fnlib/dasinh.f
+ * http://www.netlib.org/slatec/fnlib/datanh.f
  */
 public class DATANH {
 
@@ -72,7 +72,7 @@ public class DATANH {
     if (y > s_sqeps && y <= 0.5d) {
       return x * (1 + DCSEVL.dcsevl(8 * x * x - 1.d, s_atnhcs, s_nterms));
     } else if (y > 0.5d) {
-      return 0.5d * Math.log((1.d + x) / (1.d - x));
+      return 0.5d * (Math.log1p(x) - Math.log1p(-x)); // builtin log1p used
     } else {
       return x;
     }
