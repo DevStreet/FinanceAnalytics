@@ -10,7 +10,7 @@ $.register_module({
             gadgets = common.gadgets, content = '.OG-gadget-container', $content = $(content);
         return view = {
             init: function () {
-                for (var rule in view.rules) 
+                for (var rule in view.rules)
                     routes.add(view.rules[rule]);
             },
             block: function (args) {
