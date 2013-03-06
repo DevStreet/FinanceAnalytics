@@ -1,5 +1,6 @@
 package com.opengamma.integration.tool.portfolio;
 
+import com.google.common.collect.ImmutableList;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.financial.tool.ToolContext;
 import com.opengamma.integration.copier.portfolio.PortfolioCopierVisitor;
@@ -13,6 +14,8 @@ import com.opengamma.integration.copier.portfolio.writer.MasterPortfolioWriter;
 import com.opengamma.integration.copier.portfolio.writer.PortfolioWriter;
 import com.opengamma.integration.copier.portfolio.writer.PrettyPrintingPortfolioWriter;
 import com.opengamma.integration.copier.sheet.SheetFormat;
+import com.opengamma.integration.tool.portfolio.xml.SchemaRegister;
+import com.opengamma.integration.tool.portfolio.xml.XmlPortfolioReader;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -110,21 +113,26 @@ public class PortfolioLoader {
    */
   public void execute() {
 
-    PortfolioWriter portfolioWriter = constructPortfolioWriter(_toolContext, _portfolioName, _write, _overwrite,
-                                                               _mergePositions, _keepCurrentPositions);
-    PortfolioReader portfolioReader = constructPortfolioReader(_fileName, _securityType, _ignoreVersion);
-    SimplePortfolioCopier portfolioCopier = new SimplePortfolioCopier();
+    for (PortfolioReader portfolioReader : constructPortfolioReaders(_fileName, _securityType, _ignoreVersion)) {
 
-    // Create visitor for verbose/quiet mode
-    PortfolioCopierVisitor portfolioCopierVisitor =
-        _verbose ? new VerbosePortfolioCopierVisitor() : new QuietPortfolioCopierVisitor();
+      // Get the name from the portfolio reader if it supplies one
+      String name = portfolioReader.getPortfolioName();
 
-    // Call the portfolio loader with the supplied arguments
-    portfolioCopier.copy(portfolioReader, portfolioWriter, portfolioCopierVisitor);
+      PortfolioWriter portfolioWriter = constructPortfolioWriter(_toolContext, name != null ? name : _portfolioName, _write, _overwrite,
+                                                                 _mergePositions, _keepCurrentPositions);
+      SimplePortfolioCopier portfolioCopier = new SimplePortfolioCopier();
 
-    // close stuff
-    portfolioReader.close();
-    portfolioWriter.close();
+      // Create visitor for verbose/quiet mode
+      PortfolioCopierVisitor portfolioCopierVisitor =
+          _verbose ? new VerbosePortfolioCopierVisitor() : new QuietPortfolioCopierVisitor();
+
+      // Call the portfolio loader with the supplied arguments
+      portfolioCopier.copy(portfolioReader, portfolioWriter, portfolioCopierVisitor);
+
+      // close stuff
+      portfolioReader.close();
+      portfolioWriter.close();
+    }
   }
 
   private PortfolioWriter constructPortfolioWriter(ToolContext toolContext, String portfolioName, boolean write,
@@ -152,7 +160,7 @@ public class PortfolioLoader {
     }
   }
 
-  private PortfolioReader constructPortfolioReader(String filename, String securityType, boolean ignoreVersion) {
+  private Iterable<? extends PortfolioReader> constructPortfolioReaders(String filename, String securityType, boolean ignoreVersion) {
 
     SheetFormat sheetFormat = SheetFormat.of(filename);
     switch (sheetFormat) {
@@ -166,13 +174,16 @@ public class PortfolioLoader {
 //          if (securityType.equalsIgnoreCase("exchangetraded")) {
 //            return new SingleSheetSimplePortfolioReader(filename, new ExchangeTradedRowParser(s_context.getBloombergSecuritySource()));
 //          } else {
-          return new SingleSheetSimplePortfolioReader(filename, securityType);
+          return ImmutableList.of(new SingleSheetSimplePortfolioReader(filename, securityType));
 //          }
         }
+      case XML:
+        // XMl multi-asset portfolio
+        return new XmlPortfolioReader(filename, new SchemaRegister());
 
       case ZIP:
         // Create zipped multi-asset class loader
-        return new ZippedPortfolioReader(filename, ignoreVersion);
+        return ImmutableList.of(new ZippedPortfolioReader(filename, ignoreVersion));
 
       default:
         throw new OpenGammaRuntimeException("Input filename should end in .CSV, .XLS or .ZIP");

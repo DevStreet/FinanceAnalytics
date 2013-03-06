@@ -215,6 +215,11 @@ public class IZY implements IZYAPIInterface {
   }
 
   @Override
+  public void vd_xdiv(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    _localIZY.vd_xdiv(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
   public void vd_mul(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     _localIZY.vd_mul(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
   }
@@ -237,6 +242,16 @@ public class IZY implements IZYAPIInterface {
   @Override
   public void vd_subx(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     _localIZY.vd_subx(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
+  public void vd_xsub(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    _localIZY.vd_xsub(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
+  public void vd_negate(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    _localIZY.vd_negate(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
@@ -390,6 +405,11 @@ public class IZY implements IZYAPIInterface {
   }
 
   @Override
+  public void vz_xdiv(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    _localIZY.vz_xdiv(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
   public void vz_exp(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
     _localIZY.vz_exp(count, arg0, offsetarg0, out0, offsetout0);
   }
@@ -430,6 +450,16 @@ public class IZY implements IZYAPIInterface {
   }
 
   @Override
+  public void vz_negate(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    _localIZY.vz_negate(count, arg0, offsetarg0, out0, offsetout0);
+  }
+
+  @Override
+  public void vz_negatereal(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    _localIZY.vz_negatereal(count, arg0, offsetarg0, out0, offsetout0);
+  }
+
+  @Override
   public void vz_sin(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
     _localIZY.vz_sin(count, arg0, offsetarg0, out0, offsetout0);
   }
@@ -452,6 +482,11 @@ public class IZY implements IZYAPIInterface {
   @Override
   public void vz_subx(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     _localIZY.vz_subx(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
+  public void vz_xsub(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    _localIZY.vz_xsub(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
   }
 
   @Override
