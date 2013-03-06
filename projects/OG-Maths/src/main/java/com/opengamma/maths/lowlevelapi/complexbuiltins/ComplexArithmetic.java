@@ -21,10 +21,75 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZTAN;
 
 /**
  * These are equivalent to the built in functions in other languages for handling complex arithmetic
+ * There is no safety, the onus is on the user to ensure inputs are correctly handled (typical uses are for inlined calls)
  */
 public class ComplexArithmetic {
   private static final double s_sqeps = Math.sqrt(D1MACH.four());
   private static Logger s_log = LoggerFactory.getLogger(ComplexArithmetic.class);
+
+  /**
+  * Complex addition 
+  * @param arg0 the first complex number
+  * @param arg1 the second complex number
+  * @return the sum arg0+arg1 
+  */
+  public static double[] cadd(double[] arg0, double[] arg1) {
+    double[] tmp = new double[2];
+    caddInline(arg0, 0, arg1, 0, tmp, 0);
+    return tmp;
+  }
+
+  /**
+   * Complex inlined addition, use to prevent memcpy
+   * @param arg0 the first complex number
+   * @param offsetarg0 the offset into the 'arg0' vector at which the value shall be accessed, this value assumes 128 bit wide strides
+   * @param arg1 the second complex number
+   * @param offsetarg1 the offset into the 'arg1' vector at which the value shall be accessed, this value assumes 128 bit wide strides
+   * @param result the sum arg0+arg1 
+   * @param offsetresult the offset into the 'result' vector at which the result shall be placed, this value assumes 128 bit wide strides
+   */
+  public static void caddInline(double[] arg0, int offsetarg0, double[] arg1, int offsetarg1, double[] result, int offsetresult) {
+    final int offsetresult128_0 = 2 * offsetresult; //CSIGNORE
+    final int offsetresult128_1 = 2 * offsetresult + 1; //CSIGNORE 
+    final int offsetarg0128_0 = 2 * offsetarg0; //CSIGNORE
+    final int offsetarg0128_1 = 2 * offsetarg0 + 1; //CSIGNORE 
+    final int offsetarg1128_0 = 2 * offsetarg1; //CSIGNORE
+    final int offsetarg1128_1 = 2 * offsetarg1 + 1; //CSIGNORE
+    result[offsetresult128_0] = arg0[offsetarg0128_0] + arg1[offsetarg1128_0];
+    result[offsetresult128_1] = arg0[offsetarg0128_1] + arg1[offsetarg1128_1];
+  }
+
+  /**
+  * Complex subtraction 
+  * @param arg0 the first complex number
+  * @param arg1 the second complex number
+  * @return the sum arg0+arg1 
+  */
+  public static double[] csubtract(double[] arg0, double[] arg1) {
+    double[] tmp = new double[2];
+    csubtractInline(arg0, 0, arg1, 0, tmp, 0);
+    return tmp;
+  }
+
+  /**
+   * Complex inlined subtraction, use to prevent memcpy
+   * @param arg0 the first complex number
+   * @param offsetarg0 the offset into the 'arg0' vector at which the value shall be accessed, this value assumes 128 bit wide strides
+   * @param arg1 the second complex number
+   * @param offsetarg1 the offset into the 'arg1' vector at which the value shall be accessed, this value assumes 128 bit wide strides
+   * @param result the sum arg0+arg1 
+   * @param offsetresult the offset into the 'result' vector at which the result shall be placed, this value assumes 128 bit wide strides
+   */
+  public static void csubtractInline(double[] arg0, int offsetarg0, double[] arg1, int offsetarg1, double[] result, int offsetresult) {
+    final int offsetresult128_0 = 2 * offsetresult; //CSIGNORE
+    final int offsetresult128_1 = 2 * offsetresult + 1; //CSIGNORE 
+    final int offsetarg0128_0 = 2 * offsetarg0; //CSIGNORE
+    final int offsetarg0128_1 = 2 * offsetarg0 + 1; //CSIGNORE 
+    final int offsetarg1128_0 = 2 * offsetarg1; //CSIGNORE
+    final int offsetarg1128_1 = 2 * offsetarg1 + 1; //CSIGNORE
+    result[offsetresult128_0] = arg0[offsetarg0128_0] - arg1[offsetarg1128_0];
+    result[offsetresult128_1] = arg0[offsetarg0128_1] - arg1[offsetarg1128_1];
+  }
 
   /**
   * Complex division 
@@ -277,7 +342,7 @@ public class ComplexArithmetic {
   public static void ccosInline(double[] x, int offsetx, double[] result, int offsetresult) {
     final int offsetx2 = 2 * offsetx;
     double[] rewrite = {-x[offsetx2 + 1], x[offsetx2 + 0] };
-    ccoshInline(rewrite, offsetx, result, offsetresult);
+    ccoshInline(rewrite, 0, result, offsetresult);
   }
 
   /**
@@ -655,13 +720,13 @@ public class ComplexArithmetic {
     result[offsetresult128_1] = x[offsetx2 + 1];
     lhs[0] = x[offsetx2] - 1;
     lhs[1] = x[offsetx2 + 1];
-    ComplexArithmetic.cdivideInline(result, offsetresult128_0, s_twoAsCplx, 0, result, offsetresult128_0);
+    ComplexArithmetic.cdivideInline(result, offsetresult, s_twoAsCplx, 0, result, offsetresult);
     ComplexArithmetic.cdivideInline(lhs, 0, s_twoAsCplx, 0, lhs, 0);
-    ComplexArithmetic.csqrtInline(result, offsetresult128_0, result, offsetresult128_0);
+    ComplexArithmetic.csqrtInline(result, offsetresult, result, offsetresult);
     ComplexArithmetic.csqrtInline(lhs, 0, lhs, 0);
     result[offsetresult128_0] += lhs[0];
     result[offsetresult128_1] += lhs[1];
-    ComplexArithmetic.clogInline(result, offsetresult128_0, result, offsetresult128_0);
+    ComplexArithmetic.clogInline(result, offsetresult, result, offsetresult);
     result[offsetresult128_0] *= 2;
     result[offsetresult128_1] *= 2;
   }
@@ -692,7 +757,7 @@ public class ComplexArithmetic {
     final int offsetx2 = 2 * offsetx;
     result[offsetresult128_0] = -x[offsetx2 + 1];
     result[offsetresult128_1] = x[offsetx2];
-    csinInline(result, offsetresult128_0, result, offsetresult128_0);
+    csinInline(result, offsetresult, result, offsetresult);
     double tmp = result[offsetresult128_0];
     result[offsetresult128_0] = result[offsetresult128_1];
     result[offsetresult128_1] = -tmp;
@@ -724,7 +789,7 @@ public class ComplexArithmetic {
     final int offsetx2 = 2 * offsetx;
     result[offsetresult128_0] = -x[offsetx2 + 1];
     result[offsetresult128_1] = x[offsetx2];
-    ctanInline(result, offsetresult128_0, result, offsetresult128_0);
+    ctanInline(result, offsetresult, result, offsetresult);
     double tmp = result[offsetresult128_0];
     result[offsetresult128_0] = result[offsetresult128_1];
     result[offsetresult128_1] = -tmp;
