@@ -116,6 +116,20 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
 
     PositionSearchResult result = new PositionSearchResult(documents);
     result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
+
+    // Debug: check result against underlying
+    if (EHCachingPagedSearchCache.TEST_AGAINST_UNDERLYING) {
+      PositionSearchResult check = ((PositionMaster) getUnderlying()).search(request);
+      if (!result.getPaging().equals(check.getPaging())) {
+        s_logger.error("_documentSearchCache.getCache().getName() + \" returned paging:\\n\"" + result.getPaging() +
+                           "\nbut the underlying master returned paging:\n" + check.getPaging());
+      }
+      if (!result.getDocuments().equals(check.getDocuments())) {
+        s_logger.error(_documentSearchCache.getCache().getName() + " returned documents:\n" + result.getDocuments() +
+                           "\nbut the underlying master returned documents:\n" + check.getDocuments());
+      }
+    }
+
     return result;
   }
 

@@ -16,11 +16,10 @@ import java.util.concurrent.ExecutorService;
 import org.joda.beans.Bean;
 import org.joda.beans.JodaBeanUtils;
 
+import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.master.AbstractDocument;
-import com.opengamma.master.AbstractHistoryRequest;
-import com.opengamma.master.AbstractSearchRequest;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ExecutorServiceFactoryBean;
 import com.opengamma.util.paging.PagingRequest;
@@ -55,7 +54,7 @@ public class EHCachingPagedSearchCache {
   /** Cache name. */
   private static final String CACHE_NAME_SUFFIX = "PagedSearchCache";
   /** Check cached results against results from underlying */
-  private static final boolean TEST_AGAINST_UNDERLYING = false; // s_logger.isDebugEnabled()
+  public static final boolean TEST_AGAINST_UNDERLYING = true; // s_logger.isDebugEnabled()
 
   /** The cache manager */
   private final CacheManager _cacheManager;
@@ -138,8 +137,8 @@ public class EHCachingPagedSearchCache {
     final ConcurrentNavigableMap<Integer, List<UniqueId>> rangeMap = info.getSecond();
 
     // Fix unpaged requests and end indexes larger than the total doc count
-    if (pagingRequest.getPagingSize() > totalResults) {
-      pagingRequest = PagingRequest.ofIndex(pagingRequest.getFirstItem(), totalResults);
+    if (pagingRequest.getLastItem() >= totalResults) {
+      pagingRequest = PagingRequest.ofIndex(pagingRequest.getFirstItem(), totalResults - pagingRequest.getFirstItem());
     }
 
     // Ensure that the required range is cached in its entirety
@@ -200,10 +199,10 @@ public class EHCachingPagedSearchCache {
    *                paging
    */
   private ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>
-      getCachedRequestInfo(final Bean requestBean, PagingRequest pagingRequest) {
+                                            getCachedRequestInfo(final Bean requestBean, PagingRequest pagingRequest) {
 
     // Get cache entry for current request (or create and get a primed cache entry if not found)
-    final Element element = getCache().get(requestBean);
+    final Element element = getCache().get(withPagingRequest(requestBean, null));
     if (element != null) {
       return (ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>) element.getObjectValue();
     } else {
@@ -216,7 +215,7 @@ public class EHCachingPagedSearchCache {
 
       final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>> newResult =
           new ObjectsPair<>(resultToCache.getFirst(), rangeMapToCache);
-      getCache().put(new Element(requestBean, newResult));
+      getCache().put(new Element(withPagingRequest(requestBean, null), newResult));
       return newResult;
     }
   }
@@ -365,29 +364,20 @@ public class EHCachingPagedSearchCache {
   /**
    * Return a clone of the supplied search request, but with its paging request replaced
    *
-   * @param request the document search request whose paging request to replace
+   * @param requestBean the search request whose paging request to replace (currently a doc or history search request)
    * @param pagingRequest the paging request, null allowed
    * @return        a clone of the supplied search request, with its paging request replaced
    */
-  public static AbstractSearchRequest withPagingRequest(final AbstractSearchRequest request,
-                                                        final PagingRequest pagingRequest) {
-    final AbstractSearchRequest newRequest = JodaBeanUtils.clone(request);
-    newRequest.setPagingRequest(pagingRequest);
-    return newRequest;
-  }
 
-  /**
-   * Return a clone of the supplied search request, but with its paging request replaced
-   *
-   * @param request the history search request whose paging request to replace
-   * @param pagingRequest the paging request, null allowed
-   * @return        a clone of the supplied search request, with its paging request replaced
-   */
-  public static AbstractHistoryRequest withPagingRequest(final AbstractHistoryRequest request,
-                                                         final PagingRequest pagingRequest) {
-    final AbstractHistoryRequest newRequest = JodaBeanUtils.clone(request);
-    newRequest.setPagingRequest(pagingRequest);
-    return newRequest;
+  public static Bean withPagingRequest(final Bean requestBean, final PagingRequest pagingRequest) {
+    if (requestBean.propertyNames().contains("pagingRequest")) {
+      final Bean newRequest = JodaBeanUtils.clone(requestBean);
+      newRequest.property("pagingRequest").set(pagingRequest);
+      return newRequest;
+    } else {
+      throw new OpenGammaRuntimeException(
+          "Could not invoke setPagingRequest() on request object of type " + requestBean.getClass());
+    }
   }
 
   /**

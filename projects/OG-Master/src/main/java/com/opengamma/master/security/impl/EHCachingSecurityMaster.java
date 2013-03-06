@@ -11,8 +11,10 @@ import java.util.List;
 import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.Instant;
 
 import com.opengamma.id.UniqueId;
+import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.cache.AbstractEHCachingMaster;
 import com.opengamma.master.cache.EHCachingPagedSearchCache;
 import com.opengamma.master.security.SecurityDocument;
@@ -23,7 +25,6 @@ import com.opengamma.master.security.SecurityMetaDataRequest;
 import com.opengamma.master.security.SecurityMetaDataResult;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.SecuritySearchResult;
-import com.opengamma.master.security.SecuritySearchSortOrder;
 import com.opengamma.util.paging.Paging;
 import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.tuple.ObjectsPair;
@@ -92,15 +93,15 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     }, cacheManager);
 
     // Prime document search cache
-    SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
-    defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
-    _documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
+    //SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
+    //defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
+    //_documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
   }
 
   @Override
   public SecuritySearchResult search(SecuritySearchRequest request) {
     // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
-    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
+//    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
     ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(
@@ -114,6 +115,23 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
 
     SecuritySearchResult result = new SecuritySearchResult(documents);
     result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
+
+    final VersionCorrection vc = request.getVersionCorrection().withLatestFixed(Instant.now());
+    result.setVersionCorrection(vc);
+
+    // Debug: check result against underlying
+    if (EHCachingPagedSearchCache.TEST_AGAINST_UNDERLYING) {
+      SecuritySearchResult check = ((SecurityMaster) getUnderlying()).search(request);
+      if (!result.getPaging().equals(check.getPaging())) {
+        s_logger.error("_documentSearchCache.getCache().getName() + \" returned paging:\\n\"" + result.getPaging() +
+                           "\nbut the underlying master returned paging:\n" + check.getPaging());
+      }
+      if (!result.getDocuments().equals(check.getDocuments())) {
+        s_logger.error(_documentSearchCache.getCache().getName() + " returned documents:\n" + result.getDocuments() +
+                           "\nbut the underlying master returned documents:\n" + check.getDocuments());
+      }
+    }
+
     return result;
   }
 
