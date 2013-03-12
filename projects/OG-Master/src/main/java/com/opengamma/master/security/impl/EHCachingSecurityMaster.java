@@ -59,12 +59,12 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     super(name, underlying, cacheManager);
 
     // Create the document search cache and register a security master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         SecuritySearchResult result = ((SecurityMaster) getUnderlying()).search((SecuritySearchRequest)
-            EHCachingPagedSearchCache.withPagingRequest((SecuritySearchRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -73,15 +73,15 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a security master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         SecurityHistoryResult result = ((SecurityMaster) getUnderlying()).history((SecurityHistoryRequest)
-            EHCachingPagedSearchCache.withPagingRequest((SecurityHistoryRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -90,7 +90,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Prime document search cache
     //SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
@@ -106,7 +106,7 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
     ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(
         EHCachingPagedSearchCache.withPagingRequest(request, null),
-        request.getPagingRequest(), false); // don't block until cached
+        request.getPagingRequest(), true); // TODO don't block until cached
 
     List<SecurityDocument> documents = new ArrayList<>();
     for (UniqueId uniqueId : pair.getSecond()) {
@@ -123,12 +123,23 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     if (EHCachingPagedSearchCache.TEST_AGAINST_UNDERLYING) {
       SecuritySearchResult check = ((SecurityMaster) getUnderlying()).search(request);
       if (!result.getPaging().equals(check.getPaging())) {
-        s_logger.error("_documentSearchCache.getCache().getName() + \" returned paging:\\n\"" + result.getPaging() +
-                           "\nbut the underlying master returned paging:\n" + check.getPaging());
+        s_logger.error(_documentSearchCache.getCache().getName()
+                           + "\n\tCache:\t" + result.getPaging()
+                           + "\n\tUnderlying:\t" + check.getPaging());
       }
       if (!result.getDocuments().equals(check.getDocuments())) {
-        s_logger.error(_documentSearchCache.getCache().getName() + " returned documents:\n" + result.getDocuments() +
-                           "\nbut the underlying master returned documents:\n" + check.getDocuments());
+        System.out.println(_documentSearchCache.getCache().getName() + ": ");
+        if (check.getDocuments().size() != result.getDocuments().size()) {
+          System.out.println("\tSizes differ (Underlying " + check.getDocuments().size()
+                             + "; Cache " + result.getDocuments().size() + ")");
+        } else {
+          for (int i = 0; i < check.getDocuments().size(); i++) {
+            if (!check.getDocuments().get(i).equals(result.getDocuments().get(i))) {
+              System.out.println("\tUnderlying\t" + i + ":\t" + check.getDocuments().get(i).getUniqueId());
+              System.out.println("\tCache     \t" + i + ":\t" + result.getDocuments().get(i).getUniqueId());
+            }
+          }
+        }
       }
     }
 

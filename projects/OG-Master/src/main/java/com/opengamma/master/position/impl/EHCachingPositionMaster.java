@@ -11,8 +11,10 @@ import java.util.List;
 import org.joda.beans.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.Instant;
 
 import com.opengamma.id.UniqueId;
+import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.cache.AbstractEHCachingMaster;
 import com.opengamma.master.cache.EHCachingPagedSearchCache;
 import com.opengamma.master.position.ManageableTrade;
@@ -56,12 +58,12 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
     super(name, underlying, cacheManager);
 
     // Create the doc search cache and register a position master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         PositionSearchResult result = ((PositionMaster) getUnderlying()).search((PositionSearchRequest)
-            EHCachingPagedSearchCache.withPagingRequest((PositionSearchRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -70,15 +72,15 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a security master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         PositionHistoryResult result = ((PositionMaster) getUnderlying()).history((PositionHistoryRequest)
-            EHCachingPagedSearchCache.withPagingRequest((PositionHistoryRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -87,11 +89,11 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
     
     // Prime search cache
-    PositionSearchRequest defaultSearch = new PositionSearchRequest();
-    _documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
+    //PositionSearchRequest defaultSearch = new PositionSearchRequest();
+    //_documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
   }
 
   @Override
@@ -102,7 +104,7 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
   @Override
   public PositionSearchResult search(PositionSearchRequest request) {
     // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
-    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
+//    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
     ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(
@@ -117,16 +119,29 @@ public class EHCachingPositionMaster extends AbstractEHCachingMaster<PositionDoc
     PositionSearchResult result = new PositionSearchResult(documents);
     result.setPaging(Paging.of(request.getPagingRequest(), pair.getFirst()));
 
+    final VersionCorrection vc = request.getVersionCorrection().withLatestFixed(Instant.now());
+    result.setVersionCorrection(vc);
+
     // Debug: check result against underlying
     if (EHCachingPagedSearchCache.TEST_AGAINST_UNDERLYING) {
       PositionSearchResult check = ((PositionMaster) getUnderlying()).search(request);
       if (!result.getPaging().equals(check.getPaging())) {
-        s_logger.error("_documentSearchCache.getCache().getName() + \" returned paging:\\n\"" + result.getPaging() +
-                           "\nbut the underlying master returned paging:\n" + check.getPaging());
+        s_logger.error(_documentSearchCache.getCache().getName()
+                           + "\n\tCache:\t" + result.getPaging()
+                           + "\n\tUnderlying:\t" + check.getPaging());
       }
       if (!result.getDocuments().equals(check.getDocuments())) {
-        s_logger.error(_documentSearchCache.getCache().getName() + " returned documents:\n" + result.getDocuments() +
-                           "\nbut the underlying master returned documents:\n" + check.getDocuments());
+        System.out.println(_documentSearchCache.getCache().getName() + ": ");
+        if (check.getDocuments().size() != result.getDocuments().size()) {
+          System.out.println("\tSizes differ (Underlying " + check.getDocuments().size()
+                             + "; Cache " + result.getDocuments().size() + ")");
+        } else {
+          for (int i = 0; i < check.getDocuments().size(); i++) {
+            if (!check.getDocuments().get(i).equals(result.getDocuments().get(i))) {
+              System.out.println("\tUnderlying\t" + i + ":\t" + check.getDocuments().get(i).getUniqueId());
+            }
+          }
+        }
       }
     }
 

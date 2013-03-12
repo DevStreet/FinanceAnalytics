@@ -60,7 +60,7 @@ public class EHCachingConfigMaster extends AbstractEHCachingMaster<ConfigDocumen
     super(name, underlying, cacheManager);
 
         // Create the doc search cache and register a config master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
 
@@ -76,10 +76,10 @@ public class EHCachingConfigMaster extends AbstractEHCachingMaster<ConfigDocumen
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a security master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
@@ -93,7 +93,7 @@ public class EHCachingConfigMaster extends AbstractEHCachingMaster<ConfigDocumen
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
     
     // Prime search cache
     ConfigSearchRequest defaultSearch = new ConfigSearchRequest();

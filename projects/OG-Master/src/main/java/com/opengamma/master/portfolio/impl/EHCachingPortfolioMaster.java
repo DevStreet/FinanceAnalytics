@@ -61,7 +61,7 @@ public class EHCachingPortfolioMaster extends AbstractEHCachingMaster<PortfolioD
     super(name, underlying, cacheManager);
 
     // Create the doc search cache and register a security master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
 
@@ -76,10 +76,10 @@ public class EHCachingPortfolioMaster extends AbstractEHCachingMaster<PortfolioD
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a security master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
@@ -93,7 +93,7 @@ public class EHCachingPortfolioMaster extends AbstractEHCachingMaster<PortfolioD
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
     
     // Prime search cache
     PortfolioSearchRequest defaultSearch = new PortfolioSearchRequest();
@@ -143,12 +143,23 @@ public class EHCachingPortfolioMaster extends AbstractEHCachingMaster<PortfolioD
     if (EHCachingPagedSearchCache.TEST_AGAINST_UNDERLYING) {
       PortfolioSearchResult check = ((PortfolioMaster) getUnderlying()).search(request);
       if (!result.getPaging().equals(check.getPaging())) {
-        s_logger.error("_documentSearchCache.getCache().getName() + \" returned paging:\\n\"" + result.getPaging() +
-                           "\nbut the underlying master returned paging:\n" + check.getPaging());
+        s_logger.error(_documentSearchCache.getCache().getName()
+                           + "\n\tCache:\t" + result.getPaging()
+                           + "\n\tUnderlying:\t" + check.getPaging());
       }
       if (!result.getDocuments().equals(check.getDocuments())) {
-        s_logger.error(_documentSearchCache.getCache().getName() + " returned documents:\n" + result.getDocuments() +
-                           "\nbut the underlying master returned documents:\n" + check.getDocuments());
+        System.out.println(_documentSearchCache.getCache().getName() + ": ");
+        if (check.getDocuments().size() != result.getDocuments().size()) {
+          System.out.println("\tSizes differ (Underlying " + check.getDocuments().size()
+                             + "; Cache " + result.getDocuments().size() + ")");
+        } else {
+          for (int i = 0; i < check.getDocuments().size(); i++) {
+            if (!check.getDocuments().get(i).equals(result.getDocuments().get(i))) {
+              System.out.println("\tUnderlying\t" + i + ":\t" + check.getDocuments().get(i));
+              System.out.println("\tCache     \t" + i + ":\t" + result.getDocuments().get(i));
+            }
+          }
+        }
       }
     }
 

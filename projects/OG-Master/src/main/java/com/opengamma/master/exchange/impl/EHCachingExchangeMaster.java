@@ -57,12 +57,12 @@ public class EHCachingExchangeMaster extends AbstractEHCachingMaster<ExchangeDoc
     super(name, underlying, cacheManager);
     
     // Create the doc search cache and register a exchange master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         ExchangeSearchResult result = ((ExchangeMaster) getUnderlying()).search((ExchangeSearchRequest)
-            EHCachingPagedSearchCache.withPagingRequest((ExchangeSearchRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -71,15 +71,15 @@ public class EHCachingExchangeMaster extends AbstractEHCachingMaster<ExchangeDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a security master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         ExchangeHistoryResult result = ((ExchangeMaster) getUnderlying()).history((ExchangeHistoryRequest)
-            EHCachingPagedSearchCache.withPagingRequest((ExchangeHistoryRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -88,7 +88,7 @@ public class EHCachingExchangeMaster extends AbstractEHCachingMaster<ExchangeDoc
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
     
     // Prime search cache
     ExchangeSearchRequest defaultSearch = new ExchangeSearchRequest();

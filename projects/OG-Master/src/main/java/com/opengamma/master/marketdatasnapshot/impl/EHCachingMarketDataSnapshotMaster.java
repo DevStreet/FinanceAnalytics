@@ -59,7 +59,7 @@ public class EHCachingMarketDataSnapshotMaster extends AbstractEHCachingMaster<M
     super(name, underlying, cacheManager);
 
     // Create the document search cache and register a marketDataSnapshot master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
@@ -73,15 +73,15 @@ public class EHCachingMarketDataSnapshotMaster extends AbstractEHCachingMaster<M
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a marketDataSnapshot master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         MarketDataSnapshotHistoryResult result = ((MarketDataSnapshotMaster) getUnderlying()).history((MarketDataSnapshotHistoryRequest)
-            EHCachingPagedSearchCache.withPagingRequest((MarketDataSnapshotHistoryRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -90,7 +90,7 @@ public class EHCachingMarketDataSnapshotMaster extends AbstractEHCachingMaster<M
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Prime document search cache
     //MarketDataSnapshotSearchRequest defaultSearch = new MarketDataSnapshotSearchRequest();

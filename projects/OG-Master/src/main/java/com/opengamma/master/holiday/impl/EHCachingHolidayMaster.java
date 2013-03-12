@@ -59,12 +59,12 @@ public class EHCachingHolidayMaster extends AbstractEHCachingMaster<HolidayDocum
     super(name, underlying, cacheManager);
 
     // Create the doc search cache and register a holiday master searcher
-    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", new EHCachingPagedSearchCache.Searcher() {
+    _documentSearchCache = new EHCachingPagedSearchCache(name + "Document", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         HolidaySearchResult result = ((HolidayMaster) getUnderlying()).search((HolidaySearchRequest)
-            EHCachingPagedSearchCache.withPagingRequest((HolidaySearchRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -73,15 +73,15 @@ public class EHCachingHolidayMaster extends AbstractEHCachingMaster<HolidayDocum
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
 
     // Create the history search cache and register a security master searcher
-    _historySearchCache = new EHCachingPagedSearchCache(name + "History", new EHCachingPagedSearchCache.Searcher() {
+    _historySearchCache = new EHCachingPagedSearchCache(name + "History", cacheManager, new EHCachingPagedSearchCache.Searcher() {
       @Override
       public ObjectsPair<Integer, List<UniqueId>> search(Bean request, PagingRequest pagingRequest) {
         // Fetch search results from underlying master
         HolidayHistoryResult result = ((HolidayMaster) getUnderlying()).history((HolidayHistoryRequest)
-            EHCachingPagedSearchCache.withPagingRequest((HolidayHistoryRequest) request, pagingRequest));
+            EHCachingPagedSearchCache.withPagingRequest(request, pagingRequest));
 
         // Cache the result documents
         EHCachingPagedSearchCache.cacheDocuments(result.getDocuments(), getUidToDocumentCache());
@@ -90,7 +90,7 @@ public class EHCachingHolidayMaster extends AbstractEHCachingMaster<HolidayDocum
         return new ObjectsPair<>(result.getPaging().getTotalItems(),
                                  EHCachingPagedSearchCache.extractUniqueIds(result.getDocuments()));
       }
-    }, cacheManager);
+    });
     
     // Prime search cache
     HolidaySearchRequest defaultSearch = new HolidaySearchRequest();

@@ -91,7 +91,7 @@ public class EHCachingPagedSearchCache {
    * @param cacheManager  The cache manager to use, not null
    * @param searcher      The CacheSearcher to use for passing search requests to an underlying master, not null
    */
-  public EHCachingPagedSearchCache(String name, Searcher searcher, CacheManager cacheManager) {
+  public EHCachingPagedSearchCache(String name, CacheManager cacheManager, Searcher searcher) {
     ArgumentChecker.notNull(cacheManager, "cacheManager");
     ArgumentChecker.notEmpty(name, "name");
     ArgumentChecker.notNull(searcher, "searcher");
@@ -129,6 +129,8 @@ public class EHCachingPagedSearchCache {
    * @return                  the total number of results (ignoring paging), and the unique IDs of the requested result page
    */
   public ObjectsPair<Integer, List<UniqueId>> search(final Bean requestBean, PagingRequest pagingRequest, boolean blockUntilCached) {
+    ArgumentChecker.notNull(requestBean, "requestBean");
+    ArgumentChecker.notNull(pagingRequest, "pagingRequest");
 
     // Fetch the total #results and cached ranges for the search request (without paging)
     final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>> info =

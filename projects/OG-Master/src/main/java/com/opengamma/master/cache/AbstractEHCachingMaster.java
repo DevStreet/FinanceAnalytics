@@ -64,7 +64,7 @@ public abstract class AbstractEHCachingMaster<D extends AbstractDocument> implem
   /** Cache name. */
   private static final String CACHE_NAME_SUFFIX = "UidToDocumentCache";
   /** Check cached results against results from underlying */
-  private static final boolean TEST_AGAINST_UNDERLYING = false; // s_logger.isDebugEnabled()
+  public static final boolean TEST_AGAINST_UNDERLYING = false; // s_logger.isDebugEnabled()
 
   /** The underlying master. */
   private final AbstractChangeProvidingMaster<D> _underlying;
