@@ -26,7 +26,7 @@ $.register_module({
                         data.sort((function(){
                             return function (a, b) {return (a === b ? 0 : (a < b ? -1 : 1));};
                         })());
-                        res(data.reduce(function (acc, val) {
+                        res(XXX = data.reduce(function (acc, val) {
                             if (!req.term || val && matcher.test(val)) acc.push({label: htmlize(val)});
                             return acc;
                         }, []));
@@ -41,7 +41,6 @@ $.register_module({
 
         var ViewDefinitions = function (config, callback) {
             var block = this, menu, form = config.form;
-
             form.Block.call(block, {
                 content: tmpl_header,
                 processor: function (data) {
@@ -74,7 +73,6 @@ $.register_module({
         };
 
         ViewDefinitions.prototype = new Block;
-
         return ViewDefinitions;
     }
 });
