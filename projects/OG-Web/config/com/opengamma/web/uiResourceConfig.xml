@@ -98,6 +98,7 @@
     <fragment>/styles/common/classes/og.common.classes.OG-icon.og-icon-surface.css</fragment>
     <fragment>/styles/common/classes/og.common.classes.OG-icon.og-icon-temporal.css</fragment>
     <fragment>/styles/common/classes/og.common.classes.OG-icon.og-icon-aggregation.css</fragment>
+    <fragment>/styles/common/classes/og.common.classes.OG-icon.og-icon-text.css</fragment>
     <fragment>/styles/common/classes/og.common.classes.OG-icon.og-icon-filter.css</fragment>
     <fragment>/styles/common/classes/og.common.classes.OG-background.css</fragment>
     <fragment>/styles/common/classes/og.common.classes.OG-tooltip.css</fragment>
@@ -390,14 +391,6 @@
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.frasecurity.js</fragment>
     <!--Fungible Trades-->
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.fungibletrade.js</fragment>
-    <!--Lifecycle-->
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_cap_floor.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_equity_option.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_forward.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_fra.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_fx_option.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_ir_swap.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.edit_swaption.js</fragment>
   </bundle>
   <bundle id="views_common.js">
     <fragment>/scripts/og/views/common/og.views.common.state.js</fragment>
@@ -440,6 +433,7 @@
     <fragment>/scripts/og/views/og.views.holidays.js</fragment>
     <fragment>/scripts/og/views/og.views.regions.js</fragment>
     <fragment>/scripts/og/views/og.views.configs.js</fragment>
+    <bundle idref="blotter.js" />
   </bundle>
   <bundle id="ie.js">
     <fragment>/scripts/lib/excanvas.js</fragment>

@@ -50,15 +50,15 @@ public class AnnuityCouponIborRatchetLMMMethodTest {
   private static final Currency EUR = EURIBOR3M.getCurrency();
   private static final Calendar TARGET = EURIBOR3M.getCalendar();
 
-  public static final String NOT_USED = "Not used";
-  public static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
+  private static final String NOT_USED = "Not used";
+  private static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
 
   private static final ZonedDateTime REFERENCE_DATE = DateUtils.getUTCDate(2011, 9, 5);
 
   // Annuity description
   private static final ZonedDateTime SETTLEMENT_DATE = DateUtils.getUTCDate(2011, 9, 7);
   private static final int ANNUITY_TENOR_YEAR = 2;
-  private static final Period ANNUITY_TENOR = DateUtils.periodOfYears(ANNUITY_TENOR_YEAR);
+  private static final Period ANNUITY_TENOR = Period.ofYears(ANNUITY_TENOR_YEAR);
   private static final boolean IS_PAYER = false;
   private static final double NOTIONAL = 100000000; // 100m
   private static final double[] MAIN_COEF = new double[] {0.20, 0.80, 0.0010};
@@ -199,7 +199,7 @@ public class AnnuityCouponIborRatchetLMMMethodTest {
     long startTime, endTime;
     final int nbTest = 5;
     final int nbPath = 12500;
-    final AnnuityCouponIborRatchetDefinition annuityRatchetIbor20Definition = AnnuityCouponIborRatchetDefinition.withFirstCouponIborGearing(SETTLEMENT_DATE, DateUtils.periodOfYears(5), NOTIONAL, EURIBOR3M,
+    final AnnuityCouponIborRatchetDefinition annuityRatchetIbor20Definition = AnnuityCouponIborRatchetDefinition.withFirstCouponIborGearing(SETTLEMENT_DATE, Period.ofYears(5), NOTIONAL, EURIBOR3M,
         IS_PAYER, MAIN_COEF, FLOOR_COEF, CAP_COEF);
     final ZonedDateTime referenceDate = DateUtils.getUTCDate(2011, 8, 18);
     final LiborMarketModelDisplacedDiffusionParameters parameterLMM = TestsDataSetLiborMarketModelDisplacedDiffusion.createLMMParameters(referenceDate, annuityRatchetIbor20Definition);

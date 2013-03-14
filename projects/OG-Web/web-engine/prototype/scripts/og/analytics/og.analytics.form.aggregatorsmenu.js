@@ -59,9 +59,10 @@ $.register_module({
             };
 
             var serialize = function () {
-                return remove_orphans(), query.pluck('val').filter(function (entry) {
+                var q = query.pluck('val').filter(function (entry) {
                     return entry !== default_sel_txt;
                 });
+                return remove_orphans(), q;
             };
 
             var init = function () {
@@ -138,12 +139,10 @@ $.register_module({
                     data.aggregators = serialize();
                 }
             });
-
             form.on('form:load', init);
         };
 
         AggregatorsMenu.prototype = new Block;
-
         return AggregatorsMenu;
     }
 });

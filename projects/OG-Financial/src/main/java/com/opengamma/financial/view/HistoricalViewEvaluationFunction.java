@@ -32,12 +32,12 @@ public class HistoricalViewEvaluationFunction extends ViewEvaluationFunction<His
   public HistoricalViewEvaluationFunction() {
     super(ValueRequirementNames.HISTORICAL_TIME_SERIES, HistoricalViewEvaluationTarget.class);
   }
-  
+
   @Override
   protected ViewCycleExecutionOptions getDefaultCycleOptions(FunctionExecutionContext context) {
-    return ViewCycleExecutionOptions.builder().setValuationTime(context.getValuationTime()).create();
+    return ViewCycleExecutionOptions.builder().setValuationTime(context.getValuationTime()).setResolverVersionCorrection(context.getComputationTargetResolver().getVersionCorrection()).create();
   }
-  
+
   @Override
   protected HistoricalViewEvaluationResultBuilder createResultBuilder(ViewEvaluationTarget target) {
     return new HistoricalViewEvaluationResultBuilder(target.getViewDefinition());
@@ -55,17 +55,17 @@ public class HistoricalViewEvaluationFunction extends ViewEvaluationFunction<His
 
   @Override
   protected Set<ComputedValue> buildResults(ComputationTarget target, HistoricalViewEvaluationResultBuilder resultBuilder) {
-    final Map<String, ViewEvaluationResult> viewResults = resultBuilder.getResults();
+    final Map<String, HistoricalViewEvaluationResult> viewResults = resultBuilder.getResults();
     final Set<ComputedValue> results = Sets.newHashSetWithExpectedSize(viewResults.size());
     final ComputationTargetSpecification targetSpec = target.toSpecification();
-    for (final Map.Entry<String, ViewEvaluationResult> viewResult : viewResults.entrySet()) {
+    for (final Map.Entry<String, HistoricalViewEvaluationResult> viewResult : viewResults.entrySet()) {
       String calcConfigName = viewResult.getKey();
-      ViewEvaluationResult value = viewResult.getValue();
+      HistoricalViewEvaluationResult value = viewResult.getValue();
       results.add(new ComputedValue(getResultSpec(calcConfigName, targetSpec), value));
     }
     return results;
   }
-  
+
   //-------------------------------------------------------------------------
   private LocalDate getResultsDate(ViewCycleExecutionOptions cycleExecutionOptions) {
     // NOTE jonathan 2013-02-28 -- could imagine using constraints
@@ -81,5 +81,4 @@ public class HistoricalViewEvaluationFunction extends ViewEvaluationFunction<His
     return ((FixedHistoricalMarketDataSpecification) marketDataSpec).getSnapshotDate();
   }
 
-  
 }

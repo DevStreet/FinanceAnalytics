@@ -47,7 +47,6 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.conversion.CreditDefaultSwapSecurityConverter;
 import com.opengamma.financial.analytics.model.cds.ISDAFunctionConstants;
-import com.opengamma.financial.credit.CreditCurveIdentifier;
 import com.opengamma.financial.security.FinancialSecurityTypes;
 import com.opengamma.financial.security.cds.LegacyVanillaCDSSecurity;
 import com.opengamma.id.ExternalId;
@@ -57,6 +56,7 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.region.ManageableRegion;
 import com.opengamma.util.async.AsynchronousExecution;
+import com.opengamma.util.credit.CreditCurveIdentifier;
 import com.opengamma.util.i18n.Country;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.DateUtils;
@@ -177,6 +177,7 @@ public class ISDABucketedCS01VanillaCDSFunction extends AbstractFunction.NonComp
         //.withAny(ValuePropertyNames.CURVE)
         .withAny(ISDAFunctionConstants.ISDA_CURVE_OFFSET)
         .withAny(ISDAFunctionConstants.ISDA_CURVE_DATE)
+        .withAny(ISDAFunctionConstants.ISDA_IMPLEMENTATION)
         .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, ISDAFunctionConstants.ISDA_METHOD_NAME)
         .get();
     return Collections.singleton(new ValueSpecification(ValueRequirementNames.BUCKETED_CS01, target.toSpecification(), properties));
@@ -200,12 +201,18 @@ public class ISDABucketedCS01VanillaCDSFunction extends AbstractFunction.NonComp
       return null;
     }
 
+    final String isdaCurveMethod = desiredValue.getConstraint(ISDAFunctionConstants.ISDA_IMPLEMENTATION);
+    if (isdaCurveMethod == null) {
+      return null;
+    }
+
     // isda curve
     final ValueProperties isdaProperties = ValueProperties.builder()
         .with(ValuePropertyNames.CURVE, "ISDA_" + curveIdentifier.toString())
         .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, ISDAFunctionConstants.ISDA_METHOD_NAME)
         .with(ISDAFunctionConstants.ISDA_CURVE_OFFSET, isdaOffset)
         .with(ISDAFunctionConstants.ISDA_CURVE_DATE, isdaCurveDate)
+        .with(ISDAFunctionConstants.ISDA_IMPLEMENTATION, isdaCurveMethod)
         .get();
     final ValueRequirement isdaRequirment = new ValueRequirement(ValueRequirementNames.YIELD_CURVE, ComputationTargetType.CURRENCY, ccy.getUniqueId(), isdaProperties);
 

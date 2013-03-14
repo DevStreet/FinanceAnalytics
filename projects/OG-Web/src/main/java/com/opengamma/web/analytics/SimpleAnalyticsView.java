@@ -22,8 +22,8 @@ import com.opengamma.core.position.Trade;
 import com.opengamma.core.position.impl.PortfolioMapper;
 import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.view.ViewResultModel;
-import com.opengamma.engine.view.calc.ViewCycle;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
+import com.opengamma.engine.view.cycle.ViewCycle;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueIdentifiable;
 import com.opengamma.id.VersionCorrection;
@@ -91,7 +91,12 @@ import com.opengamma.web.analytics.blotter.BlotterColumnMapper;
     _targetResolver = targetResolver;
     _portfolioSupplier = portfolioSupplier;
     _portfolioEntityExtractor = portfolioEntityExtractor;
-    List<UniqueIdentifiable> entities = PortfolioMapper.flatMap(portfolio.getRootNode(), _portfolioEntityExtractor);
+    List<UniqueIdentifiable> entities;
+    if (portfolio != null) {
+      entities = PortfolioMapper.flatMap(portfolio.getRootNode(), _portfolioEntityExtractor);
+    } else {
+      entities = Collections.emptyList();
+    }
     _cache.put(entities);
     if (showBlotterColumns) {
       _portfolioGrid = PortfolioAnalyticsGrid.forBlotter(portoflioCallbackId,
@@ -273,7 +278,9 @@ import com.opengamma.web.analytics.blotter.BlotterColumnMapper;
             _cache.put(trade);
           }
         }
-        return _portfolioGrid.updateEntities(_cache, entityIds);
+        List<String> ids = _portfolioGrid.updateEntities(_cache, entityIds);
+        s_logger.debug("Entity changed {}, firing updates for viewports {}", notification.getEntity().getUniqueId(), ids);
+        return ids;
       }
     } else {
       return Collections.emptyList();

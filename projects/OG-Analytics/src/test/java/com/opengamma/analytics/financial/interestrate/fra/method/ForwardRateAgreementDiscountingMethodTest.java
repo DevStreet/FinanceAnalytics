@@ -47,7 +47,7 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 public class ForwardRateAgreementDiscountingMethodTest {
   // Index
-  private static final Period TENOR = Period.of(3, MONTHS);
+  private static final Period TENOR = Period.ofMonths(3);
   private static final int SETTLEMENT_DAYS = 2;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final DayCount DAY_COUNT_INDEX = DayCountFactory.INSTANCE.getDayCount("Actual/360");
@@ -128,9 +128,9 @@ public class ForwardRateAgreementDiscountingMethodTest {
   public void sensitivity() {
     final YieldCurveBundle curves = TestsDataSetsSABR.createCurves1();
     // Par rate sensitivity
-    final InterestRateCurveSensitivity prsFra = FRA_METHOD.parRateCurveSensitivity(FRA, curves);
+    InterestRateCurveSensitivity prsFra = FRA_METHOD.parRateCurveSensitivity(FRA, curves);
     final InterestRateCurveSensitivity pvsFra = FRA_METHOD.presentValueCurveSensitivity(FRA, curves);
-    prsFra.cleaned();
+    prsFra = prsFra.cleaned();
     final double deltaTolerancePrice = 1.0E+2;
     final double deltaToleranceRate = 1.0E-7;
     //Testing note: Sensitivity is for a movement of 1. 1E+2 = 1 cent for a 1 bp move. Tolerance increased to cope with numerical imprecision of finite difference.

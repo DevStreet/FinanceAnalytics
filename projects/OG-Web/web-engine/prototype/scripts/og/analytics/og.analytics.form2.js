@@ -6,7 +6,7 @@ $.register_module({
     name: 'og.analytics.Form2',
     dependencies: [],
     obj: function () {
-        var constructor, callback,
+        var constructor, callback, avail_blocks = 0,
             tashes = { form_container:  'og.analytics.form_tash' },
             selectors = {
                 form_container: 'OG-analytics-form',
@@ -56,7 +56,7 @@ $.register_module({
                 dom.menus[entry] = $('.'+selectors.menus[entry], dom.form_container);
                 dom.form_controls[entry] = $(selectors.form_controls, dom.menus[entry]);
             });
-            dom.menus.portfolios.find('input').select();
+            dom.menus.views.find('input').select();
         };
 
         var load_form = function (data) {
