@@ -41,8 +41,6 @@ public class UserMarketDataProvider extends AbstractMarketDataProvider {
   private final Object _initSnapshotLock = new Object();
   private volatile UserMarketDataSnapshot _snapshot;
 
-  private MarketDataAvailabilityProvider _baseMarketDataAvailabilityProvider;
-
   public UserMarketDataProvider(final MarketDataSnapshotSource snapshotSource, final UniqueId snapshotId) {
     ArgumentChecker.notNull(snapshotSource, "snapshotSource");
     ArgumentChecker.notNull(snapshotId, "snapshotId");
@@ -110,7 +108,7 @@ public class UserMarketDataProvider extends AbstractMarketDataProvider {
   @Override
   public void subscribe(final Set<ValueSpecification> valueSpecifications) {
     _listeningValueSpecifications.addAll(valueSpecifications);
-    subscriptionSucceeded(valueSpecifications);
+    subscriptionsSucceeded(valueSpecifications);
   }
 
   @Override
@@ -126,8 +124,7 @@ public class UserMarketDataProvider extends AbstractMarketDataProvider {
   //-------------------------------------------------------------------------
   @Override
   public MarketDataAvailabilityProvider getAvailabilityProvider(final MarketDataSpecification marketDataSpec) {
-    final UserMarketDataSnapshot snapshot = getSnapshot();
-    return snapshot.getAvailabilityProvider();
+    return getSnapshot().getAvailabilityProvider();
   }
 
   @Override
@@ -160,15 +157,6 @@ public class UserMarketDataProvider extends AbstractMarketDataProvider {
 
   private MarketDataSnapshotSource getSnapshotSource() {
     return _snapshotSource;
-  }
-
-  //-------------------------------------------------------------------------
-  public MarketDataAvailabilityProvider getBaseMarketDataAvailabilityProvider() {
-    return _baseMarketDataAvailabilityProvider;
-  }
-
-  public void setBaseMarketDataAvailabilityProvider(final MarketDataAvailabilityProvider baseMarketDataAvailabilityProvider) {
-    _baseMarketDataAvailabilityProvider = baseMarketDataAvailabilityProvider;
   }
 
 }
