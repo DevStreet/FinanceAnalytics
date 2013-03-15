@@ -1,18 +1,9 @@
 <ivysettings>
   <properties file="credentials.properties" />
-  <credentials host="ivyrepos.opengamma.com" username="${opengamma.username}" passwd="${opengamma.password}" realm="OpenGammaIvyRepos"/>
-  <property name="ivy.account.default.ivy.pattern"      value="[organization]/[module]/[revision]/ivy.xml" />
-  <property name="ivy.account.default.jars.artifact.pattern" value="[organization]/[module]/[revision]/[artifact]-[revision].[ext]" />
-  <property name="ivy.account.default.sources.artifact.pattern" value="[organization]/[module]/[revision]/[artifact]-src-[revision].[ext]" />
-  <property name="ivy.account.default.javadocs.artifact.pattern" value="[organization]/[module]/[revision]/[artifact]-javadoc-[revision].[ext]" />
+  <credentials host="maven.opengamma.com" username="${opengamma.username}" passwd="${opengamma.password}" realm="Sonatype Nexus Repository Manager"/>
   <resolvers>
     <chain name="account" returnFirst="true">
-      <url name="opengamma-account">
-        <ivy pattern="http://ivyrepos.opengamma.com/accounts/${opengamma.username}/${ivy.account.default.ivy.pattern}" />
-        <artifact pattern="http://ivyrepos.opengamma.com/accounts/${opengamma.username}/${ivy.account.default.jars.artifact.pattern}" />
-        <artifact pattern="http://ivyrepos.opengamma.com/accounts/${opengamma.username}/${ivy.account.default.sources.artifact.pattern}" />
-        <artifact pattern="http://ivyrepos.opengamma.com/accounts/${opengamma.username}/${ivy.account.default.javadocs.artifact.pattern}" />        
-      </url>
+        <ibiblio name="opengamna-account" m2compatible="true" root="http://maven.opengamma.com/nexus/content/groups/${opengamma.username}"/>
     </chain>
   </resolvers>
 </ivysettings>

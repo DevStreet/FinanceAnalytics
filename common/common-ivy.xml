@@ -29,11 +29,13 @@
 
 	<path id="lib.path.id.full">
 		<fileset dir="${lib.dir}/jar" />
+		<fileset dir="${lib.dir}/bundle" erroronmissingdir="false" />
 	</path>
 	<path id="lib.path.id">
 		<fileset dir="${lib.dir}/jar">
 			<exclude name="org.apache.ant/ant/*.jar" />
 		</fileset>
+		<fileset dir="${lib.dir}/bundle" erroronmissingdir="false" />
 	</path>
 	<path id="run.path.id">
 		<path refid="lib.path.id" />
@@ -57,7 +59,7 @@
     <condition property="ivy.useSymlinks" value="false" else="true">
       <os family="windows" />
     </condition>
-		<ivy:resolve file="${ivy.file}" log="quiet" />
+		<ivy:resolve file="${ivy.file}" />
 		<ivy:retrieve symlink="${ivy.useSymlinks}"
 			pattern="${lib.dir}/[type]/[organization]/[module]/[artifact]-[revision].[ext]" />
 		<manifestclasspath property="lib.path.mf" maxParentLevels="254" jarfile="${lib.path.jar.file}">
@@ -78,6 +80,7 @@
 	</target>
 
 	<target name="pom2ivy" depends="taskdef-ivy">
+    <ivy:settings file="${common.dir}/ivysettings.xml" />
     <ivy:convertpom pomFile="pom.xml" ivyFile="ivy.xml" />
 	</target>
 

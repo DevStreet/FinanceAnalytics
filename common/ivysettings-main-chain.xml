@@ -19,7 +19,7 @@
 <ivysettings>
 	<resolvers>
 		<chain name="main" returnFirst="true">
-			<resolver ref="shared-chain"/>
+			<!-- <resolver ref="shared-chain"/> -->
 			<resolver ref="account"/>
 			<resolver ref="public"/>
 		</chain>
