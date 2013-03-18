@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.mockito.Mockito;
@@ -43,7 +45,7 @@ public class MarketDataProviderWithOverrideTest {
     p2.awaitSubscriptionResponses();
 
     verify(listener).subscriptionFailed(spec, "p2");
-    verify(listener, VerificationModeFactory.noMoreInteractions()).subscriptionSucceeded(Mockito.<ValueSpecification>anyObject());
+    verify(listener, VerificationModeFactory.noMoreInteractions()).subscriptionsSucceeded(Collections.singleton(Mockito.<ValueSpecification>anyObject()));
     verify(listener, VerificationModeFactory.noMoreInteractions()).subscriptionFailed(Mockito.<ValueSpecification>anyObject(), Mockito.anyString());
   }
 
@@ -60,8 +62,8 @@ public class MarketDataProviderWithOverrideTest {
     p1.awaitSubscriptionResponses();
     p2.awaitSubscriptionResponses();
 
-    verify(listener).subscriptionSucceeded(spec);
-    verify(listener, VerificationModeFactory.noMoreInteractions()).subscriptionSucceeded(Mockito.<ValueSpecification>anyObject());
+    verify(listener).subscriptionsSucceeded(new ArrayList<ValueSpecification>(Arrays.asList(spec)));
+    verify(listener, VerificationModeFactory.noMoreInteractions()).subscriptionsSucceeded(Collections.singleton(Mockito.<ValueSpecification>anyObject()));
     verify(listener, VerificationModeFactory.noMoreInteractions()).subscriptionFailed(Mockito.<ValueSpecification>anyObject(), Mockito.anyString());
 
     p1.valuesChanged(Collections.singleton(spec));
