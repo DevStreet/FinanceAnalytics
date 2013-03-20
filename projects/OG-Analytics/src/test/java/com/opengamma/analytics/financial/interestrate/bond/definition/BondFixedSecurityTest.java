@@ -17,8 +17,6 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDe
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityPaymentFixedDefinition;
 import com.opengamma.analytics.financial.instrument.bond.BondFixedSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.payment.PaymentFixedDefinition;
-import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
-import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityPaymentFixed;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
@@ -37,14 +35,14 @@ public class BondFixedSecurityTest {
 
   //Semi-annual 2Y
   private static final Currency CUR = Currency.EUR;
-  private static final Period PAYMENT_TENOR = Period.of(6, MONTHS);
+  private static final Period PAYMENT_TENOR = Period.ofMonths(6);
   private static final int PAYMENT_PER_YEAR = 2;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final String ISSUER_NAME = "Issuer";
   private static final DayCount DAY_COUNT = DayCountFactory.INSTANCE.getDayCount("Actual/Actual ICMA");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following");
   private static final boolean IS_EOM = false;
-  private static final Period BOND_TENOR = Period.of(2, YEARS);
+  private static final Period BOND_TENOR = Period.ofYears(2);
   private static final int SETTLEMENT_DAYS = 2;
   private static final ZonedDateTime START_ACCRUAL_DATE = DateUtils.getUTCDate(2011, 7, 13);
   private static final ZonedDateTime MATURITY_DATE = START_ACCRUAL_DATE.plus(BOND_TENOR);
@@ -59,7 +57,7 @@ public class BondFixedSecurityTest {
   private static final String CREDIT_CURVE_NAME = "Credit";
   private static final String REPO_CURVE_NAME = "Repo";
   private static final String[] CURVES_NAME = {CREDIT_CURVE_NAME, REPO_CURVE_NAME};
-  YieldCurveBundle CURVES = TestsDataSetsSABR.createCurves1();
+  //private static final YieldCurveBundle CURVES = TestsDataSetsSABR.createCurves1();
   // to derivatives: first coupon
   private static final DayCount ACT_ACT = DayCountFactory.INSTANCE.getDayCount("Actual/Actual ISDA");
   private static final ZonedDateTime REFERENCE_DATE_1 = DateUtils.getUTCDate(2011, 8, 18);

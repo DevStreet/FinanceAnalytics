@@ -30,9 +30,6 @@ $.register_module({
             get_checkbox : function (name) {
                 return $('input:checkbox[name="'+ name +'"]').is(':checked').toString();
             },
-            set_datetime : function (name, value){
-                $('input[name="'+ name +'"]').datetimepicker('setDate', value);
-            },
             get_attributes : function () {
                 var attributes = {};
                 $('.og-attributes-add-list li').each(function (i, elm) {
@@ -43,19 +40,18 @@ $.register_module({
             },
             toggle_fixed : function (ele, selection) {
                 var option = ele.find("option[value='FixedInterestRateLeg']");
-                if(selection == 'FixedInterestRateLeg')
-                    option.attr("disabled", "disabled");
-                else
-                    option.removeAttr("disabled");
+                if(selection == 'FixedInterestRateLeg') option.attr("disabled", "disabled");
+                else option.removeAttr("disabled");
             },
             cleanup : function (obj) {
                 Object.keys(obj).forEach(function (key) {
                     var value = obj[key];
-                    if (typeof value === 'string' && !value.length) 
-                        delete obj[key];
-                    else if (value instanceof Object) 
-                        util.cleanup(value);
+                    if (typeof value === 'string' && !value.length) delete obj[key];
+                    else if (value instanceof Object) util.cleanup(value);
                 });
+            },
+            set_initial_focus : function () {
+                $('input[name="trade.counterparty"]').focus();
             },
             /* Util data */
             otc_trade : {

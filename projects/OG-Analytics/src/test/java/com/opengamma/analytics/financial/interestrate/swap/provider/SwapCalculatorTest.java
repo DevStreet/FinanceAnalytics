@@ -19,7 +19,6 @@ import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.swap.SwapDefinition;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
 import com.opengamma.analytics.financial.instrument.swap.SwapIborIborDefinition;
-import com.opengamma.analytics.financial.interestrate.TodayPaymentCalculator;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
@@ -29,6 +28,7 @@ import com.opengamma.analytics.financial.provider.calculator.discounting.PV01Cur
 import com.opengamma.analytics.financial.provider.calculator.discounting.ParSpreadMarketQuoteDiscountingCalculator;
 import com.opengamma.analytics.financial.provider.calculator.discounting.PresentValueCurveSensitivityDiscountingCalculator;
 import com.opengamma.analytics.financial.provider.calculator.discounting.PresentValueDiscountingCalculator;
+import com.opengamma.analytics.financial.provider.calculator.generic.TodayPaymentCalculator;
 import com.opengamma.analytics.financial.provider.description.MulticurveProviderDiscountDataSets;
 import com.opengamma.analytics.financial.provider.description.interestrate.MulticurveProviderDiscount;
 import com.opengamma.analytics.financial.provider.description.interestrate.MulticurveProviderInterface;
@@ -54,7 +54,7 @@ public class SwapCalculatorTest {
 
   // Swap Fixed-Ibor
   private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M", NYC);
-  private static final Period SWAP_TENOR = DateUtils.periodOfYears(5);
+  private static final Period SWAP_TENOR = Period.ofYears(5);
   private static final ZonedDateTime SETTLEMENT_DATE = DateUtils.getUTCDate(2012, 5, 17);
   private static final double NOTIONAL = 100000000; //100m
   private static final double RATE_FIXED = 0.025;
@@ -68,8 +68,8 @@ public class SwapCalculatorTest {
   private static final SwapDefinition SWAP_IBOR_IBORSPREAD_DEFINITION = new SwapDefinition(AnnuityCouponIborDefinition.from(SETTLEMENT_DATE, SWAP_TENOR, NOTIONAL, USDLIBOR3M, true),
       AnnuityCouponIborSpreadDefinition.from(SETTLEMENT_DATE, SWAP_TENOR, NOTIONAL, USDLIBOR6M, SPREAD6, false));
 
-  public static final String NOT_USED = "Not used";
-  public static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED, NOT_USED };
+  private static final String NOT_USED = "Not used";
+  private static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED, NOT_USED };
 
   // Calculators
   private static final ParSpreadMarketQuoteDiscountingCalculator PSMQDC = ParSpreadMarketQuoteDiscountingCalculator.getInstance();
@@ -92,7 +92,7 @@ public class SwapCalculatorTest {
 
   //  private static final double TOLERANCE_SPREAD_DELTA = 1.0E-6;
 
-  private static final double BP1 = 1.0E-4; // The size of the scaling: 1 basis point. 
+  private static final double BP1 = 1.0E-4; // The size of the scaling: 1 basis point.
 
   @Test
   public void parSpreadFixedIborBeforeFirstFixing() {
@@ -216,14 +216,14 @@ public class SwapCalculatorTest {
   public void pv01CurveParametersBeforeFirstFixing() {
     final ZonedDateTime referenceDate = DateUtils.getUTCDate(2012, 5, 14);
     final SwapFixedCoupon<Coupon> swap = SWAP_FIXED_IBOR_DEFINITION.toDerivative(referenceDate, NOT_USED_A);
-    ReferenceAmount<Pair<String, Currency>> pv01Computed = swap.accept(PV01CPC, MULTICURVES);
-    ReferenceAmount<Pair<String, Currency>> pv01Expected = new ReferenceAmount<>();
-    MultipleCurrencyParameterSensitivity pvps = PSPVC.calculateSensitivity(swap, MULTICURVES, MULTICURVES.getAllNames());
-    for (Pair<String, Currency> nameCcy : pvps.getAllNamesCurrency()) {
+    final ReferenceAmount<Pair<String, Currency>> pv01Computed = swap.accept(PV01CPC, MULTICURVES);
+    final ReferenceAmount<Pair<String, Currency>> pv01Expected = new ReferenceAmount<>();
+    final MultipleCurrencyParameterSensitivity pvps = PSPVC.calculateSensitivity(swap, MULTICURVES, MULTICURVES.getAllNames());
+    for (final Pair<String, Currency> nameCcy : pvps.getAllNamesCurrency()) {
       double total = 0.0;
-      double[] array = pvps.getSensitivity(nameCcy).getData();
-      for (int loopa = 0; loopa < array.length; loopa++) {
-        total += array[loopa];
+      final double[] array = pvps.getSensitivity(nameCcy).getData();
+      for (final double element : array) {
+        total += element;
       }
       total *= BP1;
       pv01Expected.add(nameCcy, total);

@@ -43,8 +43,8 @@ import com.opengamma.util.time.DateUtils;
  */
 public class DeliverableSwapFuturesSecurityHullWhiteMethodTest {
 
-  public static final String NOT_USED = "Not used";
-  public static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
+  private static final String NOT_USED = "Not used";
+  private static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
 
   private static final MulticurveProviderDiscount MULTICURVES = MulticurveProviderDiscountDataSets.createMulticurveEurUsd();
   private static final IborIndex[] INDEX_LIST = MulticurveProviderDiscountDataSets.getIndexesIborMulticurveEurUsd();
@@ -54,7 +54,7 @@ public class DeliverableSwapFuturesSecurityHullWhiteMethodTest {
   private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M", NYC);
   private static final ZonedDateTime EFFECTIVE_DATE = DateUtils.getUTCDate(2012, 12, 19);
   private static final ZonedDateTime LAST_TRADING_DATE = ScheduleCalculator.getAdjustedDate(EFFECTIVE_DATE, -USD6MLIBOR3M.getSpotLag(), NYC);
-  private static final Period TENOR = DateUtils.periodOfYears(10);
+  private static final Period TENOR = Period.ofYears(10);
   private static final double NOTIONAL = 100000;
   private static final double RATE = 0.0175;
   private static final SwapFixedIborDefinition SWAP_DEFINITION = SwapFixedIborDefinition.from(EFFECTIVE_DATE, TENOR, USD6MLIBOR3M, 1.0, RATE, false);

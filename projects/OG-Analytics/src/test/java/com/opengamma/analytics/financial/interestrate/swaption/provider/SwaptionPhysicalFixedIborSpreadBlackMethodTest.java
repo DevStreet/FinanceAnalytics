@@ -23,7 +23,7 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.interestrate.swap.provider.SwapFixedIborSpreadDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
-import com.opengamma.analytics.financial.model.option.definition.BlackSwaptionParameters;
+import com.opengamma.analytics.financial.model.option.parameters.BlackFlatSwaptionParameters;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackPriceFunction;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.EuropeanVanillaOption;
@@ -47,17 +47,17 @@ public class SwaptionPhysicalFixedIborSpreadBlackMethodTest {
   private static final Calendar TARGET = EURIBOR3M.getCalendar();
   private static final Currency EUR = EURIBOR3M.getCurrency();
 
-  private static final BlackSwaptionParameters BLACK = TestsDataSetsBlack.createBlackSwaptionEUR3();
+  private static final BlackFlatSwaptionParameters BLACK = TestsDataSetsBlack.createBlackSwaptionEUR3();
   private static final BlackSwaptionFlatProvider BLACK_MULTICURVES = new BlackSwaptionFlatProvider(MULTICURVES, BLACK);
-  public static final String NOT_USED = "Not used";
-  public static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
+  private static final String NOT_USED = "Not used";
+  private static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
   private static final GeneratorSwapFixedIbor EUR1YEURIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("EUR1YEURIBOR3M", TARGET);
 
   private static final GeneratorSwapFixedIbor EUR3MEURIBOR3M = new GeneratorSwapFixedIbor("EUR3MEURIBOR3M", EURIBOR3M.getTenor(), EURIBOR3M.getDayCount(), EURIBOR3M);
 
   private static final ZonedDateTime REFERENCE_DATE = DateUtils.getUTCDate(2012, 8, 31);
-  private static final Period START_TENOR = DateUtils.periodOfMonths(6);
-  private static final Period SWAP_TENOR = DateUtils.periodOfYears(5);
+  private static final Period START_TENOR = Period.ofMonths(6);
+  private static final Period SWAP_TENOR = Period.ofYears(5);
   private static final ZonedDateTime START_DATE = ScheduleCalculator.getAdjustedDate(REFERENCE_DATE, START_TENOR, EURIBOR3M);
   private static final double NOTIONAL = 123000000;
   private static final double SPREAD = 0.0010;

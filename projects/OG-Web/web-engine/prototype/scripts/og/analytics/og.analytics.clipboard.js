@@ -12,6 +12,7 @@ $.register_module({
                 return (is_array(value) ? value : value.v || []).map(function (row) {return row.join(tab);}).join(line);
             },
             DOUBLE: function (value) {return value.v || '';},
+            DOUBLE_GADGET: function (value) {return value.v || '';},
             FUNGIBLE_TRADE: function (value) {return value.v && value.v.name || '';},
             LABELLED_MATRIX_1D: function (value, single) {
                 if (!single) return value.v || '**1D MATRIX**';
@@ -22,13 +23,19 @@ $.register_module({
                 if (!single) return value.v || '**2D MATRIX**';
                 var rows, cols, matrix;
                 value = value.v || value;
-                cols = [''].concat(value['xLabels']);
                 rows = value['yLabels'];
                 matrix = value.matrix;
+                cols = value['xLabels'].length === 1 + matrix[0].length ? value['xLabels']
+                    : [''].concat(value['xLabels']);
                 return cols.join(tab) + line + matrix
                     .map(function (row, idx) {return rows[idx] + tab + row.join(tab);}).join(line);
             },
             LABELLED_MATRIX_3D: function (value, single) {return '**3D MATRIX**';},
+            MATRIX_2D: function (value, single) {
+                if (!single) return value.v || '**2D MATRIX**';
+                value = value.v || value;
+                return  value.map(function (row, idx) {return row.join(tab);}).join(line);
+            },
             NODE: function (value) {return value.v && value.v.name || '';},
             OTC_TRADE: function (value) {return value.v && value.v.name || '';},
             POSITION: function (value) {return value.v && value.v.name || '';},

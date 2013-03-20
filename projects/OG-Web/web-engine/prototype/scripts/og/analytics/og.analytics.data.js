@@ -7,6 +7,34 @@ $.register_module({
     dependencies: ['og.api.rest'],
     obj: function () {
         var module = this;
+        var ConnectionPool = new function () {
+            var pool = this, children = [], parents = [];
+            pool.add = function (data) {children.push(data);};
+            pool.parent = function (data) {
+                var parent, source;
+                if (data.pool) return null;
+                source = JSON.parse(JSON.stringify(data.source)); // make a copy
+                ['col', 'depgraph', 'row', 'type'].forEach(function (key) {delete source[key]}); // normalize sources
+                parent = parents.filter(function (parent) {return Object.equals(parent.source, source);});
+                if (parent.length && (parent = parent[0])) return parent.refcount.push(data.id), parent;
+                parent = new Data(source, {pool: true, label: 'pool'});
+                parent.refcount = [data.id];
+                return parents.push(parent), parent;
+            };
+            pool.remove = function (data) {
+                children = children.filter(function (child) {return child.id !== data.id;});
+                if (!data.parent) return; else if (data.parent.refcount) {
+                    data.parent.refcount = data.parent.refcount.filter(function (id) {return id !== data.id;});
+                    if (data.parent.refcount.length) return;
+                }
+                data.parent.kill();
+                parents = parents.filter(function (parent) {return parent.id !== data.parent.id;});
+            };
+            $(window).on('unload', function () {
+                children.forEach(function (child) {try {child.kill();} catch (error) {}});  // should be no parents left
+                parents.forEach(function (parent) {try {parent.kill();} catch (error) {}}); // but just in case
+            });
+        };
         var Data = function (source, config) {
             var data = this, api = og.api.rest.views, meta, label = config.label ? config.label + '-' : '',
                 viewport = null, viewport_id, viewport_cache, prefix, view_id = config.view_id, viewport_version,
@@ -67,6 +95,8 @@ $.register_module({
                 var message, put_options = ['viewdefinition', 'aggregators', 'providers']
                     .reduce(function (acc, val) {return (acc[val] = source[val]), acc;}, {blotter: !!source.blotter});
                 if (depgraph || bypass_types) grid_type = source.type; // don't bother with type_setup
+                if (view_id && grid_type && data.parent.connection.structure) // if parent connection supplies structure
+                    return structure_handler(data.parent.connection.structure);
                 if (view_id && grid_type) return structure_setup(data.parent.connection);
                 if (view_id) return type_setup();
                 if (grid_type) return api.put(put_options).pipe(view_handler).pipe(structure_handler);
@@ -81,7 +111,6 @@ $.register_module({
                 data.disconnect();
                 view_id = connection.view_id;
                 graph_id = connection.graph_id;
-                grid_type = void 0; // not null, so that type_setup does not think this is the initial run
                 initialize();
             };
             var reconnect_handler = function () {initialize();};
@@ -101,20 +130,17 @@ $.register_module({
                 meta.structure = result.data[ROOT] || [];
                 meta.columns.fixed = [{name: fixed_set[grid_type], columns: result.data[SETS][0].columns}];
                 meta.columns.scroll = result.data[SETS].slice(1);
-                data.connection = {grid_type: grid_type, view_id: view_id, graph_id: graph_id};
+                data.connection = {grid_type: grid_type, view_id: view_id, graph_id: graph_id, structure: result};
                 fire('meta', meta, data.connection);
                 if (!subscribed) return data_setup();
             };
             var structure_setup = function (update) {
-                var initial = !update;
                 if (update && viewport_id) {
                     (depgraph ? api.grid.depgraphs : api.grid).viewports.del({ // remove the old registrations
                         grid_type: grid_type, view_id: view_id, graph_id: graph_id, viewport_id: viewport_id, dry: true
                     });
                     viewport_id = subscribed = null; // create a new viewport because things have changed
                 }
-                if (initial) return api.grid.structure
-                    .get({view_id: view_id, grid_type: grid_type, update: structure_setup, dry: true});
                 api.grid.structure.get({view_id: view_id, grid_type: grid_type, update: structure_setup})
                     .pipe(function (result) {
                         if (result.error) return fire('fatal', data.prefix + result.message);
@@ -132,9 +158,9 @@ $.register_module({
                 var port_request, prim_request, initial = grid_type === null;
                 grid_type = source.type;
                 port_request = api.grid.structure
-                    .get({dry: initial, view_id: view_id, update: initial ? type_setup : null, grid_type: 'portfolio'});
+                    .get({dry: initial, view_id: view_id, update: initial ? type_setup : null, grid_type: 'portfolio', label: 'one ' + config.label});
                 if (initial) return; /* just register interest and bail*/ else prim_request = api.grid.structure
-                    .get({view_id: view_id, grid_type: 'primitives'});
+                    .get({view_id: view_id, grid_type: 'primitives', label: 'two ' + config.label});
                 $.when(port_request, prim_request).then(function (port_struct, prim_struct) {
                     var portfolio = port_struct.data &&
                             !!(port_struct.data[ROOT] && port_struct.data[ROOT].length ? port_struct.data[ROOT][1] + 1
@@ -145,7 +171,7 @@ $.register_module({
                     if (!grid_type) grid_type = portfolio ? 'portfolio' : primitives ? 'primitives' : grid_type;
                     if (data.parent) source.type = grid_type; // keep parent connections' sources immutable
                     api.grid.structure
-                        .get({dry: true, view_id: view_id, grid_type: grid_type, update: structure_setup});
+                        .get({dry: true, view_id: view_id, grid_type: grid_type, update: structure_setup, label: 'three ' + config.label});
                     structure_handler(grid_type === 'portfolio' ? port_struct : prim_struct);
                     fire('types', {portfolio: portfolio, primitives: primitives});
                 });
@@ -153,6 +179,7 @@ $.register_module({
             var view_handler = function (result) {
                 if (result.error) return fire('fatal', data.prefix + result.message);
                 data.prefix = module.name + ' (' + label + (view_id = result.meta.id) + '):\n';
+                if (config.pool) return fire('meta', null, data.connection = {view_id: view_id});
                 return grid_type ? structure_setup() : type_setup();
             };
             data.disconnect = function () {
@@ -167,10 +194,15 @@ $.register_module({
                 data.connection = view_id = graph_id = viewport_id = subscribed = null;
             };
             data.id = og.common.id('data');
+            data.kill = function () {
+                data.disconnect.apply(data, Array.prototype.slice.call(arguments));
+                ConnectionPool.remove(data);
+                if (!data.parent) og.api.rest.off('disconnect', disconnect_handler).off('reconnect', reconnect_handler);
+            };
             data.meta = meta = {columns: {}};
             data.source = source;
             data.pool = config.pool;
-            data.parent = config.parent || Pool.parent(data);
+            data.parent = config.parent || ConnectionPool.parent(data);
             data.prefix = prefix = module.name + ' (' + label + 'undefined' + '):\n';
             data.viewport = function (new_viewport) {
                 var promise, viewports = (depgraph ? api.grid.depgraphs : api.grid).viewports;
@@ -199,49 +231,15 @@ $.register_module({
             data.on('fatal', function (message) {data.kill(message);});
             if (data.parent) { // use parent's connection information
                 if (data.parent.connection) parent_meta_handler(null, data.parent.connection);
-                data.parent.on('meta', parent_meta_handler);
+                data.parent.on('meta', parent_meta_handler)
+                    .on('fatal', function (message) {fire('fatal', data.prefix + ' caught fatal error: ' + message);});
             } else {
                 og.api.rest.on('disconnect', disconnect_handler).on('reconnect', reconnect_handler);
                 setTimeout(initialize); // allow events to be attached
             }
         };
-        Data.prototype.kill = function () {
-            var data = this;
-            data.disconnect.apply(data, Array.prototype.slice.call(arguments));
-            Pool.remove(data);
-            if (!data.parent)
-                og.api.rest.off('disconnect', disconnect_handler).off('reconnect', reconnect_handler);
-        };
         Data.prototype.off = og.common.events.off;
         Data.prototype.on = og.common.events.on;
-        var Pool = new function () {
-            var pool = this, children = [], parents = [];
-            pool.add = function (data) {children.push(data);};
-            pool.parent = function (data) {
-                var parent, source;
-                if (data.pool) return null;
-                source = JSON.parse(JSON.stringify(data.source)); // make a copy
-                ['col', 'depgraph', 'row', 'type'].forEach(function (key) {delete source[key]}); // normalize sources
-                parent = parents.filter(function (candidate) {return Object.equals(candidate.source, source);});
-                if (parent.length && (parent = parent[0])) return parent.refcount.push(data.id), parent;
-                parent = new Data(source, {pool: true, label: 'pool'});
-                parent.refcount = [data.id];
-                return parents.push(parent), parent;
-            };
-            pool.remove = function (data) {
-                children = children.filter(function (child) {return child.id !== data.id;});
-                if (data.parent && data.parent.refcount) {
-                    data.parent.refcount = data.parent.refcount.filter(function (id) {return id !== data.id;});
-                    if (data.parent.refcount.length) return;
-                }
-                data.parent.kill();
-                parents = parents.filter(function (parent) {return parent.id !== data.parent.id;});
-            };
-            $(window).on('unload', function () {
-                children.forEach(function (child) {try {child.kill();} catch (error) {}});
-                parents.forEach(function (child) {try {parent.kill();} catch (error) {}});
-            });
-        };
         return Data;
     }
 });

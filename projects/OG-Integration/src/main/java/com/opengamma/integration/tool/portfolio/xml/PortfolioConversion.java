@@ -15,16 +15,25 @@ import javax.xml.validation.Schema;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.util.ArgumentChecker;
-import com.sun.xml.internal.bind.IDResolver;
 
+/**
+ * Defines the schema-insensitive interface for convering a portfolio
+ * document. The schema version is parsed and if available used to
+ * parse the xml document.
+ */
 public abstract class PortfolioConversion {
 
   public static final String SCHEMA_LOCATION = "portfolio-schemas";
 
+  public static final File SCHEMA_DIRECTORY =
+      new File(PortfolioConversion.class.getClassLoader().getResource(SCHEMA_LOCATION).getFile());
+
+  private static final FilesystemPortfolioSchemaLocator SCHEMA_LOCATOR =
+      new FilesystemPortfolioSchemaLocator(SCHEMA_DIRECTORY);
+
   private final Class _portfolioDocumentClass;
-  private final PortfolioDocumentConverter _portfolioConverter;
+  private final PortfolioDocumentConverter<Object> _portfolioConverter;
   private final IdRefResolverFactory _idRefResolverFactory;
-  private final FilesystemPortfolioSchemaLocator _schemaLocator = new FilesystemPortfolioSchemaLocator(new File(getClass().getClassLoader().getResource(SCHEMA_LOCATION).getFile()));
   private final Schema _schema;
 
   public PortfolioConversion(SchemaVersion schemaVersion,
@@ -35,7 +44,7 @@ public abstract class PortfolioConversion {
     _portfolioDocumentClass = portfolioDocumentClass;
     _portfolioConverter = converter;
     _idRefResolverFactory = idRefResolverFactory;
-    _schema = _schemaLocator.lookupSchema(schemaVersion);
+    _schema = SCHEMA_LOCATOR.lookupSchema(schemaVersion);
 
     ArgumentChecker.notNull(_schema, "schema");
   }
@@ -64,7 +73,7 @@ public abstract class PortfolioConversion {
     // that have the same id. With this a trade and position can both have
     // id = 1 in the xml file, yet be resolved correctly based on context.
     // TODO can this be done without using a sun.internal class?
-    unmarshaller.setProperty(IDResolver.class.getName(), _idRefResolverFactory.create());
+    //unmarshaller.setProperty(IDResolver.class.getName(), _idRefResolverFactory.create());
     return unmarshaller;
   }
 }

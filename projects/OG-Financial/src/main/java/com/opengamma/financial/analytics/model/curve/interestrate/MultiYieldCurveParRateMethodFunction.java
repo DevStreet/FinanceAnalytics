@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -25,13 +26,13 @@ import java.util.Set;
 import org.threeten.bp.Clock;
 import org.threeten.bp.ZonedDateTime;
 
+import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureTransactionDefinition;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
-import com.opengamma.analytics.financial.interestrate.LastTimeCalculator;
 import com.opengamma.analytics.financial.interestrate.MultipleYieldCurveFinderDataBundle;
 import com.opengamma.analytics.financial.interestrate.MultipleYieldCurveFinderFunction;
 import com.opengamma.analytics.financial.interestrate.MultipleYieldCurveFinderIRSJacobian;
@@ -39,6 +40,7 @@ import com.opengamma.analytics.financial.interestrate.ParSpreadRateCalculator;
 import com.opengamma.analytics.financial.interestrate.ParSpreadRateCurveSensitivityCalculator;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.financial.provider.calculator.generic.LastTimeCalculator;
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
@@ -50,6 +52,7 @@ import com.opengamma.analytics.math.rootfinding.newton.BroydenVectorRootFinder;
 import com.opengamma.analytics.math.rootfinding.newton.NewtonVectorRootFinder;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.Security;
 import com.opengamma.core.security.SecuritySource;
@@ -75,7 +78,6 @@ import com.opengamma.financial.analytics.ircurve.calcconfig.ConfigDBCurveCalcula
 import com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfig;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
 import com.opengamma.financial.convention.ConventionBundleSource;
-import com.opengamma.id.ExternalId;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.util.money.Currency;
 
@@ -119,7 +121,7 @@ public class MultiYieldCurveParRateMethodFunction extends MultiYieldCurveFunctio
     final List<InstrumentDerivative> derivatives = new ArrayList<>();
     final DoubleArrayList marketValues = new DoubleArrayList();
     final DoubleArrayList initialRatesGuess = new DoubleArrayList();
-    final String[] curveNames = curveCalculationConfig.getYieldCurveNames();
+    final Collection<String> curveNames = Sets.newHashSet(curveCalculationConfig.getYieldCurveNames()); // curve names may be duplicated - loop over each once
     final LinkedHashMap<String, double[]> curveNodes = new LinkedHashMap<>();
     final LinkedHashMap<String, Interpolator1D> interpolators = new LinkedHashMap<>();
     final Map<String, Integer> nodesPerCurve = new HashMap<>();
@@ -128,10 +130,10 @@ public class MultiYieldCurveParRateMethodFunction extends MultiYieldCurveFunctio
       int nInstruments = 0;
       final InterpolatedYieldCurveSpecificationWithSecurities spec = getYieldCurveSpecification(inputs, targetSpec, curveName);
       final Interpolator1D interpolator = spec.getInterpolator();
-      final Map<ExternalId, Double> marketDataMap = getMarketData(inputs, targetSpec, curveName);
+      final SnapshotDataBundle marketData = getMarketData(inputs, targetSpec, curveName);
       final DoubleArrayList nodeTimes = new DoubleArrayList();
       for (final FixedIncomeStripWithSecurity strip : spec.getStrips()) {
-        final Double marketValue = marketDataMap.get(strip.getSecurityIdentifier());
+        final Double marketValue = marketData.getDataPoint(strip.getSecurityIdentifier());
         if (marketValue == null) {
           throw new OpenGammaRuntimeException("Could not get market data for " + strip.getSecurityIdentifier());
         }

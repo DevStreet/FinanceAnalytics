@@ -8,8 +8,8 @@ package com.opengamma.web.analytics;
 import java.util.List;
 
 import com.opengamma.engine.view.ViewResultModel;
-import com.opengamma.engine.view.calc.ViewCycle;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
+import com.opengamma.engine.view.cycle.ViewCycle;
 
 /**
  * <p>This is the top level object of the back-end of the the analytics user interface. A view displays analytics data
@@ -31,7 +31,7 @@ public interface AnalyticsView {
    * @param compiledViewDefinition The compiled view definition whose data will be displayed in the grids
    * @return Callback IDs of grids that were updated
    */
-  List<String> updateColumns(CompiledViewDefinition compiledViewDefinition);
+  List<String> updateStructure(CompiledViewDefinition compiledViewDefinition);
 
   /**
    * Updates the data in the grids when a cycle completes in the calculation engine.

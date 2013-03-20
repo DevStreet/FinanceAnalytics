@@ -38,15 +38,15 @@ public class SwapFixedCouponMethodTest {
 
   private static final GeneratorSwapFixedIbor EUR1YEURIBOR6M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("EUR1YEURIBOR6M", CALENDAR);
 
-  public static final String NOT_USED = "Not used";
-  public static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
+  private static final String NOT_USED = "Not used";
+  private static final String[] NOT_USED_A = {NOT_USED, NOT_USED, NOT_USED};
 
   private static final ZonedDateTime START_DATE = DateUtils.getUTCDate(2013, 9, 9);
   private static final double NOTIONAL = 100000000.0; // 100m
   private static final double RATE = 0.0250; // 2.5%
 
   private static final int ANNUITY_TENOR_YEAR = 5;
-  private static final Period ANNUITY_TENOR = DateUtils.periodOfYears(ANNUITY_TENOR_YEAR);
+  private static final Period ANNUITY_TENOR = Period.ofYears(ANNUITY_TENOR_YEAR);
   private static final SwapFixedIborDefinition SWAP_PAYER_DEFINITION = SwapFixedIborDefinition.from(START_DATE, ANNUITY_TENOR, EUR1YEURIBOR6M, NOTIONAL, RATE, true);
   private static final SwapFixedIborDefinition SWAP_RECEIVER_DEFINITION = SwapFixedIborDefinition.from(START_DATE, ANNUITY_TENOR, EUR1YEURIBOR6M, NOTIONAL, RATE, false);
 

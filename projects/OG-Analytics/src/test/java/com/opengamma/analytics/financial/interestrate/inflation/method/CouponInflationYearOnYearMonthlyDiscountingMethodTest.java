@@ -39,16 +39,16 @@ import com.opengamma.util.time.DateUtils;
 public class CouponInflationYearOnYearMonthlyDiscountingMethodTest {
 
   private static final InflationIssuerProviderDiscount MARKET = MulticurveProviderDiscountDataSets.createMarket1();
-  private static final IndexPrice[] PRICE_INDEXES = MARKET.getPriceIndexes().toArray(new IndexPrice[0]);
+  private static final IndexPrice[] PRICE_INDEXES = MARKET.getPriceIndexes().toArray(new IndexPrice[MARKET.getPriceIndexes().size()]);
   private static final IndexPrice PRICE_INDEX_EUR = PRICE_INDEXES[0];
-  private static final IborIndex[] IBOR_INDEXES = MARKET.getIndexesIbor().toArray(new IborIndex[0]);
+  private static final IborIndex[] IBOR_INDEXES = MARKET.getIndexesIbor().toArray(new IborIndex[MARKET.getIndexesIbor().size()]);
   private static final IborIndex EURIBOR3M = IBOR_INDEXES[0];
   private static final Calendar CALENDAR_EUR = EURIBOR3M.getCalendar();
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final ZonedDateTime START_DATE = DateUtils.getUTCDate(2008, 8, 18);
-  private static final Period COUPON_TENOR = DateUtils.periodOfYears(10);
+  private static final Period COUPON_TENOR = Period.ofYears(10);
   private static final ZonedDateTime PAYMENT_DATE = ScheduleCalculator.getAdjustedDate(START_DATE, COUPON_TENOR, BUSINESS_DAY, CALENDAR_EUR);
-  private static final ZonedDateTime PAYMENT_DATE_MINUS1 = ScheduleCalculator.getAdjustedDate(START_DATE, DateUtils.periodOfYears(9), BUSINESS_DAY, CALENDAR_EUR);
+  private static final ZonedDateTime PAYMENT_DATE_MINUS1 = ScheduleCalculator.getAdjustedDate(START_DATE, Period.ofYears(9), BUSINESS_DAY, CALENDAR_EUR);
   private static final double NOTIONAL = 98765432;
   private static final int MONTH_LAG = 3;
   private static final ZonedDateTime PRICING_DATE = DateUtils.getUTCDate(2011, 8, 3);
@@ -146,7 +146,7 @@ public class CouponInflationYearOnYearMonthlyDiscountingMethodTest {
   @Test
   /**
    * Test the present value curves sensitivity.
-  */
+   */
   public void presentValueCurveSensitivityWithNotional() {
 
     final MultipleCurrencyParameterSensitivity pvicsFD = PS_PV_FDC.calculateSensitivity(YEAR_ON_YEAR_WITH, MARKET.getInflationProvider());
@@ -158,7 +158,7 @@ public class CouponInflationYearOnYearMonthlyDiscountingMethodTest {
 
   @Test
   /**
-    * Test the present value curves sensitivity.
+   * Test the present value curves sensitivity.
    */
   public void presentValueCurveSensitivityNoNotional() {
 
