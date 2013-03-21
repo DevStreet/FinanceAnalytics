@@ -15,6 +15,8 @@ import java.util.concurrent.ExecutorService;
 
 import org.joda.beans.Bean;
 import org.joda.beans.JodaBeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.id.UniqueId;
@@ -46,6 +48,8 @@ import net.sf.ehcache.config.CacheConfiguration;
  * TODO OPTIMIZE underlying search request coalescing
  */
 public class EHCachingPagedSearchCache {
+  /** Logger. */
+  private static final Logger s_logger = LoggerFactory.getLogger(EHCachingPagedSearchCache.class);
   /** The number of units to prefetch on either side of the current paging request */
   protected static final int PREFETCH_RADIUS = 2;
   /** The size of a prefetch unit */
@@ -55,7 +59,7 @@ public class EHCachingPagedSearchCache {
   /** Cache name. */
   private static final String CACHE_NAME_SUFFIX = "PagedSearchCache";
   /** Check cached results against results from underlying */
-  public static final boolean TEST_AGAINST_UNDERLYING = true; // s_logger.isDebugEnabled()
+  public static final boolean TEST_AGAINST_UNDERLYING = false; //s_logger.isDebugEnabled();
 
   /** The cache manager */
   private final CacheManager _cacheManager;
