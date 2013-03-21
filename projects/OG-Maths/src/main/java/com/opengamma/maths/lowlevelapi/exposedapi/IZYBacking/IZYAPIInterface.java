@@ -418,6 +418,20 @@ public interface IZYAPIInterface {
   void vd_divx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
+   * Double Precision Vectorised y:=(constant)a/b.
+   * Computes the arithmetic division of a constant {@code a} by a vector {@code b} such that y:=(constant)a/b
+   * @param n number of elements of {@code b} to process
+   * @param a the double precision vector from which the constant will be taken
+   * @param offseta the first element in this array denotes position in {@code a} from which the constant shall be taken
+   * @param b the double precision vector on which the operation shall be performed
+   * @param offsetb the first element in this array denotes position in {@code a} from which the operations shall take place
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vd_xdiv(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
+
+  
+  /**
    * Double Precision Vectorised y:=a*b.
    * Computes the arithmetic multiplication of {@code a} by {@code b} such that y:=a*b
    * @param n number of elements of {@code a} to process
@@ -480,6 +494,30 @@ public interface IZYAPIInterface {
    */
   void vd_subx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
+  /**
+   * Double Precision Vectorised y:=(constant)a-b.
+   * Computes the arithmetic subtraction of {@code b} from a constant {@code a} such that y:=(constant)a-b
+   * @param n number of elements of {@code b} to process
+   * @param a the double precision vector from which the constant will be taken
+   * @param offseta the first element in this array denotes position in {@code a} from which the constant shall be taken
+   * @param b the double precision vector on which the operation shall be performed
+   * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vd_xsub(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);  
+
+  /**
+   * Double Precision Vectorised y:=-a.
+   * Computes the negation of {@code a}
+   * @param n number of elements of {@code a} to process
+   * @param a the double precision vector on which the operation shall be performed
+   * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vd_negate(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
+  
   /**
    * Double Precision Vectorised y:=ceil(a).
    * Computes the ceiling of {@code a} (the smallest integer value more positive than a)
@@ -813,6 +851,20 @@ public interface IZYAPIInterface {
   void vz_divx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
+   * Double Precision Complex Vectorised y:=(constant)a/b.
+   * Computes the complex arithmetic division of a constant {@code a} by {@code b} such that y:=(constant)a/b
+   * See note on complex number representation {@link IZYAPIInterface}
+   * @param n number of elements of {@code b} to process
+   * @param a the double precision vector from which the constant will be taken
+   * @param offseta the first element in this array denotes position in {@code a} from which the constant shall be taken
+   * @param b the double precision vector on which the operation shall be performed
+   * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place 
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vz_xdiv(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);  
+  
+  /**
    * Double Precision Complex Vectorised y:=exp(a).
    * Computes the complex base 'e' (natural base) exponential of {@code a}
    * See note on complex number representation {@link IZYAPIInterface}
@@ -890,6 +942,31 @@ public interface IZYAPIInterface {
    */
   void vz_mulbyconj(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
+  
+  /**
+   * Double Precision Complex Vectorised y:=-a.
+   * Computes complex negation of {@code a}. Both real and imaginary parts of {@code a} are negated
+   * See note on complex number representation {@link IZYAPIInterface}
+   * @param n number of elements of {@code a} to process
+   * @param a the double precision vector on which the operation shall be performed
+   * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vz_negate(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
+  
+  /**
+   * Double Precision Complex Vectorised y:=-real(a)+imag(a).
+   * Computes complex negation of the real part of {@code a}, the imaginary part is ignored.
+   * See note on complex number representation {@link IZYAPIInterface}
+   * @param n number of elements of {@code a} to process
+   * @param a the double precision vector on which the operation shall be performed
+   * @param offseta the first element in this array denotes position in {@code a} from which the operations shall take place
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vz_negatereal(int[] n, double[] a, int[] offseta, double[] y, int[] offsety);
+  
   /**
    * Double Precision Complex Vectorised y:=pow(a,b).
    * Computes complex {@code a} raised to the power of complex {@code b}
@@ -969,8 +1046,8 @@ public interface IZYAPIInterface {
   void vz_sub(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
   /**
-   * Double Precision Complex Vectorised y:=a*(constant)b.
-   * Computes the complex arithmetic subtraction of {@code b} from a constant {@code b} such that y:=a-(constant)b
+   * Double Precision Complex Vectorised y:=a-(constant)b.
+   * Computes the complex arithmetic subtraction of a constant {@code b} from {@code a} such that y:=a-(constant)b
    * See note on complex number representation {@link IZYAPIInterface}
    * @param n number of elements of {@code a} to process
    * @param a the double precision vector on which the operation shall be performed
@@ -982,6 +1059,20 @@ public interface IZYAPIInterface {
    */
   void vz_subx(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);
 
+  /**
+   * Double Precision Complex Vectorised y:=(constant)a-b.
+   * Computes the complex arithmetic subtraction of {@code b} from a constant {@code a} such that y:=(constant)a-b
+   * See note on complex number representation {@link IZYAPIInterface}
+   * @param n number of elements of {@code b} to process
+   * @param a the double precision vector from which the constant will be taken
+   * @param offseta the first element in this array denotes position in {@code a} from which the constant shall be taken
+   * @param b the double precision vector on which the operation shall be performed
+   * @param offsetb the first element in this array denotes position in {@code b} from which the operations shall take place 
+   * @param y the double precision vector in which the result shall be placed
+   * @param offsety the first element in this array denotes the position in {@code y} at which the result shall be placed
+   */
+  void vz_xsub(int[] n, double[] a, int[] offseta, double[] b, int[] offsetb, double[] y, int[] offsety);  
+  
   /**
    * Double Precision Complex Vectorised: y:=tan(a).
    * Computes the tangent of the complex number {@code a}

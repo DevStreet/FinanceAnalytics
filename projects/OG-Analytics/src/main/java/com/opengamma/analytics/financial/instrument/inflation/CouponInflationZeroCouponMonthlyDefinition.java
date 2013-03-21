@@ -27,7 +27,7 @@ import com.opengamma.util.timeseries.DoubleTimeSeries;
  * The pay-off is (Index_End / Index_Start - X) with X=0 for notional payment and X=1 for no notional payment.
  */
 public class CouponInflationZeroCouponMonthlyDefinition extends CouponInflationDefinition implements
-    InstrumentDefinitionWithData<Payment, DoubleTimeSeries<ZonedDateTime>> {
+InstrumentDefinitionWithData<Payment, DoubleTimeSeries<ZonedDateTime>> {
 
   /**
    * The reference date for the index at the coupon start. May not be relevant as the index value is known.
@@ -137,9 +137,7 @@ public class CouponInflationZeroCouponMonthlyDefinition extends CouponInflationD
     final ZonedDateTime referenceStartDate;
     referenceStartDate = refInterpolatedDate.withDayOfMonth(1);
     final Double indexStartValue = priceIndexTimeSeries.getValue(referenceStartDate);
-    if (indexStartValue == null) { // Fixing not known
-      ArgumentChecker.isTrue(false, "Required price index fixing unavailable");
-    }
+    ArgumentChecker.notNull(indexStartValue, "Required price index fixing unavailable"); // Fixing not known
     return from(accrualStartDate, paymentDate, notional, priceIndex, indexStartValue, monthLag, payNotional);
   }
 
@@ -209,10 +207,10 @@ public class CouponInflationZeroCouponMonthlyDefinition extends CouponInflationD
     ArgumentChecker.notNull(yieldCurveNames, "yield curve names");
     ArgumentChecker.isTrue(yieldCurveNames.length > 0, "at least one curve required");
     ArgumentChecker.isTrue(!date.isAfter(getPaymentDate()), "date is after payment date");
-    final LocalDate dayConversion = date.getDate();
+    final LocalDate dayConversion = date.toLocalDate();
     final String discountingCurveName = yieldCurveNames[0];
     final double paymentTime = TimeCalculator.getTimeBetween(date, getPaymentDate());
-    final LocalDate dayFixing = getReferenceEndDate().getDate();
+    final LocalDate dayFixing = getReferenceEndDate().toLocalDate();
     if (dayConversion.isAfter(dayFixing)) {
       final Double fixedEndIndex = priceIndexTimeSeries.getValue(getReferenceEndDate());
       if (fixedEndIndex != null) {

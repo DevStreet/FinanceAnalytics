@@ -183,6 +183,11 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
   }
 
   @Override
+  public void vd_xdiv(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vd_xdiv(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
   public void vd_mul(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     OGIZYRawWrapper.vd_mul(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
   }
@@ -205,6 +210,16 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
   @Override
   public void vd_subx(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     OGIZYRawWrapper.vd_subx(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
+  public void vd_xsub(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vd_xsub(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
+  public void vd_negate(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vd_negate(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
@@ -251,7 +266,7 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
   @Override
   public void vd_cdfnorminv(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
     throw new MathsExceptionNotImplemented("cdfnorminv is not implemented");
-//    OGIZYRawWrapper.vd_cdfnorminv(count, arg0, offsetarg0, out0, offsetout0);
+    //    OGIZYRawWrapper.vd_cdfnorminv(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
@@ -267,13 +282,13 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
   @Override
   public void vd_erfinv(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
     throw new MathsExceptionNotImplemented("erfinv is not implemented");
-//    OGIZYRawWrapper.vd_erfinv(count, arg0, offsetarg0, out0, offsetout0);
+    //    OGIZYRawWrapper.vd_erfinv(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
   public void vd_erfcinv(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
     throw new MathsExceptionNotImplemented("erfcinv is not implemented");
-//    OGIZYRawWrapper.vd_erfcinv(count, arg0, offsetarg0, out0, offsetout0);
+    //    OGIZYRawWrapper.vd_erfcinv(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
@@ -392,6 +407,16 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
   }
 
   @Override
+  public void vz_negate(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vz_negate(count, arg0, offsetarg0, out0, offsetout0);
+  }
+
+  @Override
+  public void vz_negatereal(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vz_negatereal(count, arg0, offsetarg0, out0, offsetout0);
+  }
+
+  @Override
   public void vz_pow(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     OGIZYRawWrapper.vz_pow(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
   }
@@ -434,6 +459,16 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
   @Override
   public void vz_tanh(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
     OGIZYRawWrapper.vz_tanh(count, arg0, offsetarg0, out0, offsetout0);
+  }
+
+  @Override
+  public void vz_xdiv(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vz_xdiv(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
+  }
+
+  @Override
+  public void vz_xsub(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    OGIZYRawWrapper.vz_xsub(count, arg0, offsetarg0, arg1, offsetarg1, out0, offsetout0);
   }
 
 }

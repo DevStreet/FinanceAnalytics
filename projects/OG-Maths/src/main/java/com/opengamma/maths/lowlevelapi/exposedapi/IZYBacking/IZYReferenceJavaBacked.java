@@ -372,6 +372,18 @@ public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIIn
   }
 
   @Override
+  public void vd_xdiv(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    int n = count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmparg1 = offsetarg1[0];
+    int jmpout0 = offsetout0[0];
+    double constant = arg0[jmparg0];
+    for (int i = 0; i < n; i++) {
+      out0[i + jmpout0] = constant / arg1[i + jmparg1];
+    }
+  }
+
+  @Override
   public void vd_mul(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     int n = count[0];
     int jmparg0 = offsetarg0[0];
@@ -426,6 +438,28 @@ public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIIn
     double constant = arg1[jmparg1];
     for (int i = 0; i < n; i++) {
       out0[i + jmpout0] = arg0[i + jmparg0] - constant;
+    }
+  }
+
+  @Override
+  public void vd_xsub(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    int n = count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmparg1 = offsetarg1[0];
+    int jmpout0 = offsetout0[0];
+    double constant = arg0[jmparg0];
+    for (int i = 0; i < n; i++) {
+      out0[i + jmpout0] = constant - arg1[i + jmparg1];
+    }
+  }
+
+  @Override
+  public void vd_negate(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    int n = count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmpout0 = offsetout0[0];
+    for (int i = 0; i < n; i++) {
+      out0[i + jmpout0] = -(arg0[i + jmparg0]);
     }
   }
 
@@ -777,6 +811,27 @@ public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIIn
   }
 
   @Override
+  public void vz_negate(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    int n = 2 * count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmpout0 = offsetout0[0];
+    for (int i = 0; i < n; i++) {
+      out0[i + jmpout0] = -arg0[i + jmparg0];
+    }
+  }
+
+  @Override
+  public void vz_negatereal(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
+    int n = 2 * count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmpout0 = offsetout0[0];
+    for (int i = 0; i < n; i += 2) {
+      out0[i + jmpout0] = -arg0[i + jmparg0];
+      out0[i + jmpout0 + 1] = arg0[i + jmparg0 + 1];      
+    }
+  }
+
+  @Override
   public void vz_pow(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
     final int n = count[0];
     for (int i = 0; i < n; i++) {
@@ -869,6 +924,38 @@ public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIIn
     final int n = count[0];
     for (int i = 0; i < n; i++) {
       ComplexArithmetic.ctanhInline(arg0, offsetarg0[0] + i, out0, offsetout0[0] + i);
+    }
+  }
+
+  @Override
+  public void vz_xsub(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    int n = 2 * count[0];
+    int jmparg0 = offsetarg0[0];
+    int jmparg1 = offsetarg1[0];
+    int jmpout0 = offsetout0[0];
+    double constantr = arg0[jmparg0];
+    double constanti = arg0[jmparg0 + 1];
+    if (constantr == 0) {
+      for (int i = 1; i < n; i += 2) {
+        out0[i + jmpout0] = constanti - arg1[i + jmparg1];
+      }
+    } else if (constanti == 0) {
+      for (int i = 0; i < n; i += 2) {
+        out0[i + jmpout0] = constantr - arg1[i + jmparg1];
+      }
+    } else {
+      for (int i = 0; i < n; i += 2) {
+        out0[i + jmpout0] = constantr - arg1[i + jmparg1];
+        out0[i + jmpout0 + 1] = constanti - arg1[i + jmparg1 + 1];
+      }
+    }
+  }
+
+  @Override
+  public void vz_xdiv(int[] count, double[] arg0, int[] offsetarg0, double[] arg1, int[] offsetarg1, double[] out0, int[] offsetout0) {
+    final int n = count[0];
+    for (int i = 0; i < n; i++) {
+      ComplexArithmetic.cdivideInline(arg0, offsetarg0[0], arg1, offsetarg1[0] + i, out0, offsetout0[0] + i);
     }
   }
 

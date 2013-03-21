@@ -11,7 +11,7 @@ $.register_module({
             if(config.details) {data = config.details.data; data.id = config.details.data.trade.uniqueId;}
             else {data = {security: {type: "CapFloorSecurity", externalIdBundle: "", attributes: {}}, 
                 trade: og.blotter.util.otc_trade};}
-            data.nodeId = config.portfolio.id;
+            data.nodeId = config.portfolio ? config.portfolio.id : null;
             constructor.load = function () {
                 constructor.title = 'Cap/Floor';
                 form = new og.common.util.ui.Form({
@@ -60,6 +60,7 @@ $.register_module({
                 form.on('form:load', function (){
                     og.blotter.util.add_date_picker('.blotter-date');
                     og.blotter.util.add_time_picker('.blotter-time');
+                    og.blotter.util.set_initial_focus();
                     if(data.security.length) return;
                     og.blotter.util.set_select("security.currency", data.security.currency);
                     og.blotter.util.check_radio("security.cap", data.security.cap);

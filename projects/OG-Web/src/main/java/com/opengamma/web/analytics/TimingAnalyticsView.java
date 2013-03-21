@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.engine.view.ViewResultModel;
-import com.opengamma.engine.view.calc.ViewCycle;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
+import com.opengamma.engine.view.cycle.ViewCycle;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -31,10 +31,10 @@ import com.opengamma.util.ArgumentChecker;
   }
 
   @Override
-  public List<String> updateColumns(CompiledViewDefinition compiledViewDefinition) {
+  public List<String> updateStructure(CompiledViewDefinition compiledViewDefinition) {
     long startTime = System.currentTimeMillis();
     s_logger.trace("Executing AnalyticsView.updateStructure");
-    List<String> retVal = _delegate.updateColumns(compiledViewDefinition);
+    List<String> retVal = _delegate.updateStructure(compiledViewDefinition);
     s_logger.trace("Method updateStructure completed in " + (System.currentTimeMillis() - startTime) + "ms");
     return retVal;
   }

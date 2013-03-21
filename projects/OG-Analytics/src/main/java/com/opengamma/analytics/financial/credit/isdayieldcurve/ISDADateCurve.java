@@ -1,17 +1,12 @@
 /**
  * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.analytics.financial.credit.isdayieldcurve;
 
-import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.FLAT_EXTRAPOLATOR;
-import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.ISDA_EXTRAPOLATOR;
-import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.ISDA_INTERPOLATOR;
-
-import org.threeten.bp.ZonedDateTime;
-
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.interestrate.PeriodicInterestRate;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
 import com.opengamma.analytics.math.curve.DoublesCurve;
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
@@ -19,9 +14,16 @@ import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolat
 import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolatorFactory;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCountFactory;
+import org.threeten.bp.ZonedDateTime;
+
+import java.util.Arrays;
+
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.FLAT_EXTRAPOLATOR;
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.ISDA_EXTRAPOLATOR;
+import static com.opengamma.analytics.math.interpolation.Interpolator1DFactory.ISDA_INTERPOLATOR;
 
 /**
- * 
+ *
  */
 public class ISDADateCurve {
 
@@ -43,6 +45,46 @@ public class ISDADateCurve {
   private final double[] _shiftedTimePoints;
 
   private final double _zeroDiscountFactor;
+
+  // ------------------------------------------------------------------------------------------------------------------------------------
+
+  // Overloaded ctor to take in the output from the native ISDA yield curve construction model
+  public ISDADateCurve(final String name, final ZonedDateTime baseDate, final ZonedDateTime[] curveTenors, final double[] rates, final double offset) {
+
+    _name = name;
+    _offset = offset;
+
+    _curveTenors = curveTenors;
+
+    double[] xData = new double[curveTenors.length];
+    double[] yData = new double[curveTenors.length];
+
+    for (int i = 0; i < curveTenors.length; i++) {
+
+      // Convert the tenor ZonedDateTime's to double's
+      xData[i] = ACT_365.getDayCountFraction(baseDate, curveTenors[i]);
+
+      // Convert the discrete rates to continuous ones
+      yData[i] = new PeriodicInterestRate(rates[i], 1).toContinuous().getRate();
+    }
+
+    // Choose interpolation/extrapolation to match the behaviour of curves in the ISDA CDS reference code
+    if (xData.length > 1) {
+      _curve = InterpolatedDoublesCurve.fromSorted(xData, yData, INTERPOLATOR);
+    } else if (xData.length == 1) {
+      _curve = ConstantDoublesCurve.from(yData[0]);  // Unless the curve is flat, in which case use a constant curve
+    } else {
+      throw new OpenGammaRuntimeException("Cannot construct a curve with no points");
+    }
+
+    _shiftedTimePoints = new double[xData.length];
+
+    for (int i = 0; i < xData.length; ++i) {
+      _shiftedTimePoints[i] = xData[i] + _offset;
+    }
+
+    _zeroDiscountFactor = Math.exp(_offset * getInterestRate(0.0));
+  }
 
   // ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -118,4 +160,17 @@ public class ISDADateCurve {
   }
 
   // ------------------------------------------------------------------------------------------------------------------------------------
+
+
+  @Override
+  public String toString() {
+    return "ISDADateCurve{" +
+        "_name='" + _name + '\'' +
+        ", _offset=" + _offset +
+        ", _curveTenors=" + (_curveTenors == null ? null : Arrays.asList(_curveTenors)) +
+        ", _curve=" + _curve +
+        ", _shiftedTimePoints=" + _shiftedTimePoints +
+        ", _zeroDiscountFactor=" + _zeroDiscountFactor +
+        '}';
+  }
 }

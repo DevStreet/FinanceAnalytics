@@ -153,8 +153,14 @@ public class EquityIndexFutureOptionDefinition implements InstrumentDefinition<E
 
   @Override
   public EquityIndexFutureOption toDerivative(final ZonedDateTime date, final String... yieldCurveNames) {
-    ArgumentChecker.inOrderOrEqual(date, _expiryDate, "valuation date", "expiry");
-    final double timeToExpiry = TimeCalculator.getTimeBetween(date, _expiryDate);
+    ArgumentChecker.notNull(date, "date");
+    ArgumentChecker.inOrderOrEqual(date.toLocalDate(), _expiryDate.toLocalDate(), "valuation date", "expiry");
+    double timeToExpiry = TimeCalculator.getTimeBetween(date, getExpiryDate());
+    if (timeToExpiry == 0) { // Day of expiration: Still time value if option has not expired.
+      // REVIEW Stephen and Casey - This essentially assumes an Expiry with accuracy of 1 day.
+      // The intended behaviour is that an option is still alive on the expiry date
+      timeToExpiry = 0.0015; // Approximately half a day
+    } 
     final double timeToFutureFixing = TimeCalculator.getTimeBetween(date, _underlying.getExpiryDate());
     final double timeToFutureDelivery = TimeCalculator.getTimeBetween(date, _underlying.getSettlementDate());
     final double futureStrike = _underlying.getStrikePrice();
