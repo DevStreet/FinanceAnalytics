@@ -38,6 +38,7 @@ import net.sf.ehcache.config.CacheConfiguration;
  * The cache is implemented using {@code EHCache}.
  *
  * TODO externalise configuration in xml file
+ * TODO set aggressive expiry for cached searches
  * TODO investigate possibility of using SelfPopulatingCache for the search cache too
  * TODO eliminate/minimise duplicate caching of similar searches (e.g. history searches with different date ranges)
  * TODO OPTIMIZE finer grain range locking
@@ -128,7 +129,9 @@ public class EHCachingPagedSearchCache {
    * @param blockUntilCached  if true, block the request until all caching, including related prefetching, is done
    * @return                  the total number of results (ignoring paging), and the unique IDs of the requested result page
    */
-  public ObjectsPair<Integer, List<UniqueId>> search(final Bean requestBean, PagingRequest pagingRequest, boolean blockUntilCached) {
+  public ObjectsPair<Integer, List<UniqueId>> search(final Bean requestBean, PagingRequest pagingRequest,
+                                                     boolean blockUntilCached) {
+
     ArgumentChecker.notNull(requestBean, "requestBean");
     ArgumentChecker.notNull(pagingRequest, "pagingRequest");
 
@@ -144,7 +147,9 @@ public class EHCachingPagedSearchCache {
     }
 
     // Ensure that the required range is cached in its entirety
-    ObjectsPair<Integer, List<UniqueId>> pair = cacheSuperRange(requestBean, pagingRequest, rangeMap, blockUntilCached);
+    ObjectsPair<Integer, List<UniqueId>> pair =
+        cacheSuperRange(requestBean, pagingRequest, rangeMap, totalResults, blockUntilCached);
+
     final int superIndex = pair.getFirst();
     final List<UniqueId> superRange = pair.getSecond();
 
@@ -204,6 +209,7 @@ public class EHCachingPagedSearchCache {
                                             getCachedRequestInfo(final Bean requestBean, PagingRequest pagingRequest) {
 
     // Get cache entry for current request (or create and get a primed cache entry if not found)
+    // TODO investigate atomicity
     final Element element = getCache().get(withPagingRequest(requestBean, null));
     if (element != null) {
       return (ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>>) element.getObjectValue();
@@ -230,10 +236,12 @@ public class EHCachingPagedSearchCache {
    * @param requestBean     the search request, without paging
    * @param pagingRequest   the paging request
    * @param rangeMap        the range map of cached UniqueIds for the supplied search request without paging
+   * @param totalResults    the total number of results without paging
    * @return                a super-range of cached UniqueIds that contains at least the requested UniqueIds
    */
   private ObjectsPair<Integer, List<UniqueId>> cacheSuperRange(final Bean requestBean, PagingRequest pagingRequest,
-                            final ConcurrentNavigableMap<Integer, List<UniqueId>> rangeMap, boolean blockUntilCached) {
+                            final ConcurrentNavigableMap<Integer, List<UniqueId>> rangeMap, int totalResults,
+                            boolean blockUntilCached) {
 
     final int startIndex = pagingRequest.getFirstItem();
     final int endIndex = pagingRequest.getLastItem();
@@ -311,6 +319,10 @@ public class EHCachingPagedSearchCache {
 
         // put expanded super range into range map
         rangeMap.put(superIndex, superRange);
+
+        final ObjectsPair<Integer, ConcurrentNavigableMap<Integer, List<UniqueId>>> newValue =
+             new ObjectsPair<>(totalResults, rangeMap);
+         getCache().put(new Element(withPagingRequest(requestBean, null), newValue));
       }
 
     } else {
@@ -374,7 +386,12 @@ public class EHCachingPagedSearchCache {
   public static Bean withPagingRequest(final Bean requestBean, final PagingRequest pagingRequest) {
     if (requestBean.propertyNames().contains("pagingRequest")) {
       final Bean newRequest = JodaBeanUtils.clone(requestBean);
-      newRequest.property("pagingRequest").set(pagingRequest);
+      if (pagingRequest != null) {
+        newRequest.property("pagingRequest").set(
+            PagingRequest.ofIndex(pagingRequest.getFirstItem(), pagingRequest.getPagingSize()));
+      } else {
+        newRequest.property("pagingRequest").set(null);
+      }
       return newRequest;
     } else {
       throw new OpenGammaRuntimeException(
