@@ -28,16 +28,16 @@ public class DOGMAIO implements DOGMAIOAPI {
 
   @Override
   public OGArray<Double> smartImport(double[][] aMatrix) {
-    return _si.fromNativeDoubleDouble(aMatrix);
+    return _si.fromNativeArrayOfArrays(aMatrix);
   }
 
   @Override
   public OGArray<Double> smartImport(double[] aMatrix, orientation o) {
-    return _si.fromNativeDouble(aMatrix, o);
+    return _si.fromNativeArray(aMatrix, o);
   }
 
   public OGArray<Double> smartImport(double[] aMatrix) {   
-    return _si.fromNativeDouble(aMatrix, orientation.column);
+    return _si.fromNativeArray(aMatrix, orientation.column);
   }  
   
 }
