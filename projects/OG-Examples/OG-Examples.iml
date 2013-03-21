@@ -26,7 +26,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../OG-Component/config" />
+          <root url="file://$USER_DIR$/opengamma/OG-Platform/projects/OG-Component/config" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -35,7 +35,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../OG-Web/config" />
+          <root url="file://$USER_DIR$/opengamma/OG-Platform/projects/OG-Web/config" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
