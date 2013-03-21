@@ -49,6 +49,35 @@ public class EHCachingPagedSearchCacheTest {
     }
   }
 
+  @Test
+  public void testSearchCachePrefetching() {
+    for (int requestSize = 1; requestSize < TOTAL_SIZE; requestSize = requestSize + 17) {
+      for (int requestStartStepSize = 1; requestStartStepSize < TOTAL_SIZE / 2; requestStartStepSize = requestStartStepSize + 71) {
+        EHCachingPagedSearchCache searchCache = getCleanSearchCache();
+        for (int requestStartPos = 0; requestStartPos * requestStartStepSize < TOTAL_SIZE * 4; requestStartPos++) {
+          PagingRequest pagingRequest = PagingRequest.ofIndex((requestStartPos * requestStartStepSize) % TOTAL_SIZE, requestSize);
+          System.out.println(pagingRequest);
+          searchCache.prefetch(new SecuritySearchRequest(), pagingRequest);
+          //try {
+          //  Thread.sleep(1000);
+          //} catch (InterruptedException e) {
+          //  e.printStackTrace();  // TODO
+          //}
+          assertEquals(searchCache.search(new SecuritySearchRequest(), pagingRequest, false).getSecond(),
+                       buildResultIDs(
+                         PagingRequest.ofIndex(
+                           pagingRequest.getFirstItem(),
+                           Math.min(pagingRequest.getLastItem() - pagingRequest.getFirstItem(),
+                                    TOTAL_SIZE - pagingRequest.getFirstItem()
+                           )
+                         )
+                       )
+          );
+        }
+      }
+    }
+  }
+
   /**
    * Returns an empty cache manager
    * @return the cache manager
