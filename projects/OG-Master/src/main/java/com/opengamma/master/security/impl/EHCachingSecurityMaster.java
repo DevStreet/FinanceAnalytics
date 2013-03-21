@@ -25,6 +25,7 @@ import com.opengamma.master.security.SecurityMetaDataRequest;
 import com.opengamma.master.security.SecurityMetaDataResult;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.SecuritySearchResult;
+import com.opengamma.master.security.SecuritySearchSortOrder;
 import com.opengamma.util.paging.Paging;
 import com.opengamma.util.paging.PagingRequest;
 import com.opengamma.util.tuple.ObjectsPair;
@@ -93,20 +94,20 @@ public class EHCachingSecurityMaster extends AbstractEHCachingMaster<SecurityDoc
     });
 
     // Prime document search cache
-    //SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
-    //defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
-    //_documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
+    SecuritySearchRequest defaultSearch = new SecuritySearchRequest();
+    defaultSearch.setSortOrder(SecuritySearchSortOrder.NAME_ASC);
+    _documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
   }
 
   @Override
   public SecuritySearchResult search(SecuritySearchRequest request) {
     // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
-//    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
+    _documentSearchCache.prefetch(EHCachingPagedSearchCache.withPagingRequest(request, null), request.getPagingRequest());
 
     // Fetch the paged request range; if not entirely cached then fetch and cache it in foreground
     ObjectsPair<Integer, List<UniqueId>> pair = _documentSearchCache.search(
         EHCachingPagedSearchCache.withPagingRequest(request, null),
-        request.getPagingRequest(), true); // TODO don't block until cached
+        request.getPagingRequest(), false);
 
     List<SecurityDocument> documents = new ArrayList<>();
     for (UniqueId uniqueId : pair.getSecond()) {
