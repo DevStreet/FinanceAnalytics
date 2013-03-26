@@ -435,6 +435,7 @@ public class IZY implements IZYAPIInterface {
 
   @Override
   public void vd_sincos(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0, double[] out1, int[] offsetout1) {
+    check_real_izy_rvrvrv(count, arg0, offsetarg0, out0, offsetout0, out1, offsetout1);
     _localIZY.vd_sincos(count, arg0, offsetarg0, out0, offsetout0, out1, offsetout1);
   }
 
