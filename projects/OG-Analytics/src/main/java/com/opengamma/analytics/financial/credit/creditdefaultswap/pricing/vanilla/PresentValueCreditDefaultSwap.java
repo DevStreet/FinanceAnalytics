@@ -232,8 +232,6 @@ public class PresentValueCreditDefaultSwap {
 
       //final double discount = yieldCurve.getDiscountFactor(today, accrualEndDate);
 
-      //System.out.println(i + "\t" + accTime + "\t" + survival + "\t" + discount);
-
       thisPV += delta * accTime * discount * survival;
 
       // ---------------------------------------------
@@ -455,8 +453,6 @@ public class PresentValueCreditDefaultSwap {
      */
 
     // ----------------------------------------------------------------------------------------------------------------------------------------
-
-    //System.out.println(cds.getNotional() * presentValuePremiumLeg);
 
     return cds.getNotional() * presentValuePremiumLeg;
 
@@ -900,11 +896,6 @@ public class PresentValueCreditDefaultSwap {
 
     // Build a hazard rate curve object based on the input market data
     final HazardRateCurve calibratedHazardRateCurve = new HazardRateCurve(marketTenors, times, modifiedHazardRateCurve/*calibratedHazardRates*/, 0.0);
-
-    // ----------------------------------------------------------------------------------------------------------------------------------------
-
-    // TODO : Remember to take this out - just used for testing purposes
-    //valuationCDS = valuationCDS.withRecoveryRate(1.0);
 
     // Calculate the CDS PV using the just calibrated hazard rate term structure
     final double presentValue = creditDefaultSwap.getPresentValueLegacyCreditDefaultSwap(valuationDate, valuationCDS, yieldCurve, calibratedHazardRateCurve, priceType);
