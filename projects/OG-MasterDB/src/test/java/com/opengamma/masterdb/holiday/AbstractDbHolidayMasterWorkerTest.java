@@ -13,10 +13,6 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 import java.util.Arrays;
 
-import javax.time.Instant;
-import javax.time.TimeSource;
-import javax.time.calendar.LocalDate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -26,6 +22,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.threeten.bp.Clock;
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZoneOffset;
 
 import com.opengamma.core.holiday.HolidayType;
 import com.opengamma.id.ExternalId;
@@ -34,10 +35,12 @@ import com.opengamma.master.holiday.HolidayDocument;
 import com.opengamma.master.holiday.ManageableHoliday;
 import com.opengamma.masterdb.DbMasterTestUtils;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Base tests for DbHolidayMasterWorker via DbHolidayMaster.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public abstract class AbstractDbHolidayMasterWorkerTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractDbHolidayMasterWorkerTest.class);
@@ -87,7 +90,7 @@ public abstract class AbstractDbHolidayMasterWorkerTest extends DbTest {
 //    exchange_value varchar(255),
 //    currency_iso varchar(255),
     Instant now = Instant.now();
-    _holMaster.setTimeSource(TimeSource.fixed(now));
+    _holMaster.setClock(Clock.fixed(now, ZoneOffset.UTC));
     _version1Instant = now.minusSeconds(100);
     _version2Instant = now.minusSeconds(50);
     s_logger.debug("test data now:   {}", _version1Instant);

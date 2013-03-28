@@ -10,22 +10,23 @@ import static org.testng.AssertJUnit.assertEquals;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.time.Instant;
-
 import org.eclipse.jetty.server.Server;
 import org.json.JSONException;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.threeten.bp.Instant;
 
 import com.opengamma.core.change.ChangeType;
 import com.opengamma.id.UniqueId;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.tuple.Pair;
 
 /**
- *
+ * Test.
  */
+@Test(groups = TestGroup.UNIT)
 public class RestEntitySubscriptionTest {
 
   private final String _uidStr = "Tst~101";

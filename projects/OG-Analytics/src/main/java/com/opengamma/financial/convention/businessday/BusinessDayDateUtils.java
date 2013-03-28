@@ -5,9 +5,9 @@
  */
 package com.opengamma.financial.convention.businessday;
 
-import javax.time.calendar.DateAdjuster;
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.temporal.TemporalAdjuster;
 
 /**
  * Utilities for managing the business day convention.
@@ -26,7 +26,7 @@ public class BusinessDayDateUtils {
   //-------------------------------------------------------------------------
   /**
    * Calculates the number of days in between two dates with the date count
-   * rule specified by the {@code DateAdjuster}.
+   * rule specified by the {@code TemporalAdjuster}.
    * 
    * @param startDate  the start date-time, not null
    * @param includeStart  whether to include the start
@@ -38,7 +38,7 @@ public class BusinessDayDateUtils {
   public static int getDaysBetween(
       final ZonedDateTime startDate, final boolean includeStart,
       final ZonedDateTime endDate, final boolean includeEnd,
-      final DateAdjuster convention) {
+      final TemporalAdjuster convention) {
     LocalDate date = startDate.toLocalDate();
     LocalDate localEndDate = endDate.toLocalDate();
     int mult = 1;

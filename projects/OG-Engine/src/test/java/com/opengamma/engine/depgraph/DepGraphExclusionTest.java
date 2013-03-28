@@ -18,11 +18,12 @@ import com.opengamma.engine.function.exclusion.AbstractFunctionExclusionGroups;
 import com.opengamma.engine.function.exclusion.FunctionExclusionGroup;
 import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.FunctionPriority;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Tests the function exclusion group mechansim.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class DepGraphExclusionTest extends AbstractDependencyGraphBuilderTest {
   
   private static abstract class Group extends AbstractFunctionExclusionGroups<String> {
@@ -46,7 +47,7 @@ public class DepGraphExclusionTest extends AbstractDependencyGraphBuilderTest {
     priority.put(helper.addFunctionProducing(helper.getValue1Bar()), 1); // 4
     priority.put(helper.addFunctionProducing(helper.getValue2Bar()), 1); // 5
     priority.put(helper.addFunctionProducing(helper.getValue2Foo()), 1); // 6
-    final DependencyGraphBuilder builder = helper.getBuilder(new FunctionPriority() {
+    final DependencyGraphBuilder builder = helper.createBuilder(new FunctionPriority() {
       @Override
       public int getPriority(final CompiledFunctionDefinition function) {
         return priority.get(function);

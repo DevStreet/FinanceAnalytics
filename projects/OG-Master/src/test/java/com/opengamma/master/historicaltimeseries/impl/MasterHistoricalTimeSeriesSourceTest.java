@@ -12,11 +12,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.AssertJUnit.assertEquals;
 
-import javax.time.calendar.LocalDate;
-
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.id.ExternalIdBundle;
@@ -31,14 +30,15 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolutionR
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeries;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.time.DateUtils;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 
 /**
  * Test {@link MasterHistoricalTimeSeriesSource}.
  * Ensure it makes the right method calls to the underlying master and resolver.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class MasterHistoricalTimeSeriesSourceTest {
 
   private static final String TEST_CONFIG = "TEST_CONFIG";

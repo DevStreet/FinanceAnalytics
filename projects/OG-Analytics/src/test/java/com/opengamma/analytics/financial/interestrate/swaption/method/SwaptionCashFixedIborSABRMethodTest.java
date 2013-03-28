@@ -13,10 +13,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
@@ -70,7 +69,7 @@ public class SwaptionCashFixedIborSABRMethodTest {
   private static final boolean IS_LONG = true;
   private static final int SETTLEMENT_DAYS = 2;
   // Swap 5Y description
-  private static final Currency CUR = Currency.USD;
+  private static final Currency CUR = Currency.EUR;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean IS_EOM = true;
@@ -275,7 +274,7 @@ public class SwaptionCashFixedIborSABRMethodTest {
     final PresentValueSABRSensitivityDataBundle pvsLongPayer = METHOD.presentValueSABRSensitivity(SWAPTION_LONG_PAYER, SABR_BUNDLE);
     PresentValueSABRSensitivityDataBundle pvsShortPayer = METHOD.presentValueSABRSensitivity(SWAPTION_SHORT_PAYER, SABR_BUNDLE);
     // Long/short parity
-    pvsShortPayer = PresentValueSABRSensitivityDataBundle.multiplyBy(pvsShortPayer, -1.0);
+    pvsShortPayer = pvsShortPayer.multiplyBy(-1.0);
     assertEquals(pvsLongPayer.getAlpha(), pvsShortPayer.getAlpha());
     // SABR sensitivity vs finite difference
     final double pvLongPayer = METHOD.presentValue(SWAPTION_LONG_PAYER, SABR_BUNDLE).getAmount();

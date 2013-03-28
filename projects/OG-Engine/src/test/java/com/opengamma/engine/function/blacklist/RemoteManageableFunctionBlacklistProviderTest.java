@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.engine.function.blacklist;
@@ -28,6 +28,7 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 import com.opengamma.util.jms.JmsConnector;
 import com.opengamma.util.rest.UniformInterfaceException404NotFound;
 import com.opengamma.util.test.ActiveMQTestUtils;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.test.Timeout;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterface;
@@ -36,7 +37,7 @@ import com.sun.jersey.api.client.UniformInterface;
  * Tests the {@link RemoteManageableFunctionBlacklistProvider}, {@RemoteManageableFunctionBlacklist}, {@link DataManageableFunctionBlacklistProviderResource}, and
  * {@link DataManageableFunctionBlacklistResource} classes.
  */
-@Test
+@Test(groups = TestGroup.INTEGRATION)
 public class RemoteManageableFunctionBlacklistProviderTest {
 
   private ManageableFunctionBlacklistProvider createClient(final ExecutorService executor, final JmsConnector jmsConnector, final DataManageableFunctionBlacklistProviderResource server) {
@@ -51,7 +52,7 @@ public class RemoteManageableFunctionBlacklistProviderTest {
           public Object answer(final InvocationOnMock invocation) throws Throwable {
             try {
               return answerGet(server, s).getEntity();
-            } catch (WebApplicationException e) {
+            } catch (final WebApplicationException e) {
               assertEquals(e.getResponse().getStatus(), 404);
               throw new UniformInterfaceException404NotFound(new ClientResponse(404, null, null, null), false);
             }
@@ -62,7 +63,7 @@ public class RemoteManageableFunctionBlacklistProviderTest {
           public Object answer(final InvocationOnMock invocation) throws Throwable {
             try {
               return answerPost(server, invocation.getArguments()[0], s).getEntity();
-            } catch (WebApplicationException e) {
+            } catch (final WebApplicationException e) {
               assertEquals(e.getResponse().getStatus(), 404);
               throw new UniformInterfaceException404NotFound(new ClientResponse(404, null, null, null), false);
             }
@@ -96,10 +97,9 @@ public class RemoteManageableFunctionBlacklistProviderTest {
     return Response.ok().build();
   }
 
-  @Test(invocationCount = 5, successPercentage = 19)
   public void testGetBlacklist() {
     final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector();
+    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector("RemoteManageableFunctionBlacklistProviderTest.testGetBlacklist");
     try {
       final InMemoryFunctionBlacklistProvider underlying = new InMemoryFunctionBlacklistProvider(executor);
       final DataManageableFunctionBlacklistProviderResource server = new DataManageableFunctionBlacklistProviderResource(underlying, OpenGammaFudgeContext.getInstance(), jmsConnector);
@@ -127,10 +127,9 @@ public class RemoteManageableFunctionBlacklistProviderTest {
     }
   }
 
-  @Test(invocationCount = 5, successPercentage = 19)
   public void testReceiveUpdates() throws InterruptedException {
     final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector();
+    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector("RemoteManageableFunctionBlacklistProviderTest.testReceiveUpdates");
     try {
       final InMemoryFunctionBlacklistProvider underlying = new InMemoryFunctionBlacklistProvider(executor);
       final DataManageableFunctionBlacklistProviderResource server = new DataManageableFunctionBlacklistProviderResource(underlying, OpenGammaFudgeContext.getInstance(), jmsConnector);
@@ -144,10 +143,9 @@ public class RemoteManageableFunctionBlacklistProviderTest {
     }
   }
 
-  @Test(invocationCount = 5, successPercentage = 19)
   public void testPostUpdates() throws InterruptedException {
     final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector();
+    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector("RemoteManageableFunctionBlacklistProviderTest.testPostUpdates");
     try {
       final InMemoryFunctionBlacklistProvider underlying = new InMemoryFunctionBlacklistProvider(executor);
       final DataManageableFunctionBlacklistProviderResource server = new DataManageableFunctionBlacklistProviderResource(underlying, OpenGammaFudgeContext.getInstance(), jmsConnector);

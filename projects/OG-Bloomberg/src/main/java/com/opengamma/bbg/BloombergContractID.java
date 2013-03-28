@@ -9,8 +9,6 @@ package com.opengamma.bbg;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import javax.time.calendar.MonthOfYear;
-
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -24,7 +22,11 @@ import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.Month;
+import org.threeten.bp.format.DateTimeFormatter;
 
+import com.google.common.base.Strings;
 import com.opengamma.bbg.util.BloombergDataUtils;
 import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.security.option.OptionType;
@@ -39,6 +41,8 @@ public class BloombergContractID extends DirectBean {
   
   private static final Logger s_logger = LoggerFactory.getLogger(BloombergContractID.class);
   
+  private static final DateTimeFormatter MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MM/yyyy");
+  
   /**
    * The prefix in classic bloomberg ticker
    */
@@ -52,13 +56,18 @@ public class BloombergContractID extends DirectBean {
   private String _marketSector;
   
   
-  public BloombergContractID() {
+  /*
+   * Constructor for builder
+   */
+  private BloombergContractID() {
   }
   
   public BloombergContractID(String contractCode, String marketSector) {
     ArgumentChecker.notNull(contractCode, "contractCode");
     ArgumentChecker.notNull(marketSector, "marketSector");
-    setContractCode(contractCode);
+    // ticker must be at least 2 characters long - pad with spaces if shorter
+    final String paddedCode = Strings.padEnd(contractCode, 2, ' ');
+    setContractCode(paddedCode);
     setMarketSector(marketSector);
   }
   
@@ -67,7 +76,7 @@ public class BloombergContractID extends DirectBean {
     ArgumentChecker.notNull(year, "year");
     
     ExternalId futureId = null;
-    String futureMonthCode = BloombergDataUtils.futureMonthCode(MonthOfYear.of(month));
+    String futureMonthCode = BloombergDataUtils.futureMonthCode(Month.of(month));
     if (futureMonthCode != null) {
       String yearStr = String.valueOf(year);
       if (yearStr.length() > 1) {
@@ -76,19 +85,19 @@ public class BloombergContractID extends DirectBean {
       futureId = ExternalSchemes.bloombergTickerSecurityId(String.format("%s%s%s %s", 
           getContractCode(), futureMonthCode, yearStr, getMarketSector()).toUpperCase());
     } else {
-      s_logger.warn("Unable to resolve month {} to its future month's code", MonthOfYear.of(month));
+      s_logger.warn("Unable to resolve month {} to its future month's code", Month.of(month));
     }
     return futureId;
   }
   
-  public ExternalId toOptionExternalId(Integer month, Integer year, Double strike, OptionType optionType) {
+  public ExternalId toFutureOptionExternalId(Integer month, Integer year, Double strike, OptionType optionType) {
     ArgumentChecker.notNull(month, "month");
     ArgumentChecker.notNull(year, "year");
     ArgumentChecker.notNull(strike, "strike");
     ArgumentChecker.notNull(optionType, "optionType");
     
     ExternalId optionId = null;
-    String monthCode = BloombergDataUtils.futureMonthCode(MonthOfYear.of(month));
+    String monthCode = BloombergDataUtils.futureMonthCode(Month.of(month));
     if (monthCode != null) {
       String yearStr = String.valueOf(year);
       if (yearStr.length() > 1) {
@@ -97,12 +106,23 @@ public class BloombergContractID extends DirectBean {
       optionId = ExternalSchemes.bloombergTickerSecurityId(String.format("%s%s%s%s %s %s", 
           getContractCode(), monthCode, yearStr, optionType.name().charAt(0), getRoundedPrice(strike, 3), getMarketSector()).toUpperCase());
     } else {
-      s_logger.warn("Unable to resolve month {} to its future month's code", MonthOfYear.of(month));
+      s_logger.warn("Unable to resolve month {} to its future month's code", Month.of(month));
     }
     return optionId;
   }
   
-  private String getRoundedPrice(final Double doubleValue, final int scale) {
+  public ExternalId toOptionExternalId(Integer month, Integer year, Double strike, OptionType optionType) {
+    ArgumentChecker.notNull(month, "month");
+    ArgumentChecker.notNull(year, "year");
+    ArgumentChecker.notNull(strike, "strike");
+    ArgumentChecker.notNull(optionType, "optionType");
+    
+    LocalDate expiry = LocalDate.of(year, month, 1);
+    return ExternalSchemes.bloombergTickerSecurityId(String.format("%s %s %s%s %s", 
+        getContractCode(), expiry.toString(MONTH_YEAR_FORMATTER), optionType.name().charAt(0), getRoundedPrice(strike, 3), getMarketSector()).toUpperCase());
+  }
+  
+  protected String getRoundedPrice(final Double doubleValue, final int scale) {
     BigDecimal bigDecimal = BigDecimal.valueOf(doubleValue).setScale(scale, BigDecimal.ROUND_HALF_UP);
     return bigDecimal.toString();
   }

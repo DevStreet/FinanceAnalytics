@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.opengamma.lang.annotation.ExternalFunction;
 import com.opengamma.language.function.AbstractFunctionProvider;
 import com.opengamma.language.function.MetaFunction;
+import com.opengamma.util.annotation.AnnotationCache;
+import com.opengamma.util.annotation.ClasspathScanner;
 
 /**
  * Creates and exposes functions based on methods that are annotated with
@@ -24,12 +26,12 @@ import com.opengamma.language.function.MetaFunction;
 public class ExternalFunctionProvider extends AbstractFunctionProvider {
 
   private static final Logger s_logger = LoggerFactory.getLogger(ExternalFunctionProvider.class);
-  private static boolean s_excludeTests;
+  private static boolean s_excludeTests = true;
 
-  private final List<MetaFunction> _functions = functions();
+  private List<MetaFunction> _functions;
 
   private static List<MetaFunction> functions() {
-    ExternalFunctionCache cache = ExternalFunctionCache.load();
+    AnnotationCache cache = AnnotationCache.load(ExternalFunction.class);
     final ClasspathScanner scanner = new ClasspathScanner();
     if (!scanner.getTimestamp().isAfter(cache.getTimestamp())) {
       s_logger.info("Loading external functions from cache");
@@ -40,7 +42,13 @@ public class ExternalFunctionProvider extends AbstractFunctionProvider {
       s_logger.warn("One or more errors loading functions from cache");
     }
     s_logger.info("Scanning class path for annotated external functions");
-    cache = scanner.scan();
+    
+    scanner.setScanClassAnnotations(false);
+    scanner.setScanMethodAnnotations(true);
+    scanner.setScanFieldAnnotations(false);
+    scanner.setScanParameterAnnotations(false);
+    
+    cache = scanner.scan(ExternalFunction.class);
     final List<MetaFunction> functions = createFunctions(cache);
     if (functions != null) {
       cache.save();
@@ -50,7 +58,7 @@ public class ExternalFunctionProvider extends AbstractFunctionProvider {
     return Collections.emptyList();
   }
 
-  public static void setExcludeTests(boolean excludeTests) {
+  public static void setExcludeTests(final boolean excludeTests) {
     s_excludeTests = excludeTests;
   }
 
@@ -59,8 +67,8 @@ public class ExternalFunctionProvider extends AbstractFunctionProvider {
   }
 
   private static boolean isTestClass(final Class<?> clazz) {
-    String[] cs = clazz.getName().split("[\\.\\$]");
-    for (String c : cs) {
+    final String[] cs = clazz.getName().split("[\\.\\$]");
+    for (final String c : cs) {
       if (c.endsWith("Test")) {
         return true;
       }
@@ -68,9 +76,9 @@ public class ExternalFunctionProvider extends AbstractFunctionProvider {
     return false;
   }
 
-  private static List<MetaFunction> createFunctions(final ExternalFunctionCache cache) {
+  private static List<MetaFunction> createFunctions(final AnnotationCache cache) {
     final List<MetaFunction> functions = new ArrayList<MetaFunction>();
-    for (Class<?> clazz : cache.getClasses()) {
+    for (final Class<?> clazz : cache.getClasses()) {
       if (isExcludeTests() && isTestClass(clazz)) {
         continue;
       }
@@ -80,12 +88,24 @@ public class ExternalFunctionProvider extends AbstractFunctionProvider {
     return functions;
   }
 
-  protected List<MetaFunction> getFunctions() {
+  public ExternalFunctionProvider() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        getFunctions();
+      }
+    }).start();
+  }
+
+  protected synchronized List<MetaFunction> getFunctions() {
+    if (_functions == null) {
+      _functions = functions();
+    }
     return _functions;
   }
 
   @Override
-  protected void loadDefinitions(Collection<MetaFunction> definitions) {
+  protected void loadDefinitions(final Collection<MetaFunction> definitions) {
     definitions.addAll(getFunctions());
   }
 

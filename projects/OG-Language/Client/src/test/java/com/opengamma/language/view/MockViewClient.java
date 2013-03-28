@@ -11,21 +11,20 @@ import static org.testng.Assert.assertFalse;
 import java.util.Set;
 
 import com.opengamma.engine.marketdata.MarketDataInjector;
+import com.opengamma.engine.resource.EngineResourceReference;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.engine.view.ExecutionLogMode;
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewDefinition;
 import com.opengamma.engine.view.ViewProcessor;
-import com.opengamma.engine.view.calc.EngineResourceReference;
-import com.opengamma.engine.view.calc.ViewCycle;
 import com.opengamma.engine.view.client.ViewClient;
 import com.opengamma.engine.view.client.ViewClientState;
 import com.opengamma.engine.view.client.ViewResultMode;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
+import com.opengamma.engine.view.cycle.ViewCycle;
 import com.opengamma.engine.view.execution.ViewExecutionOptions;
 import com.opengamma.engine.view.listener.ViewResultListener;
 import com.opengamma.id.UniqueId;
-import com.opengamma.id.VersionCorrection;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.util.tuple.Pair;
 
@@ -109,11 +108,6 @@ import com.opengamma.util.tuple.Pair;
 
   public void setLiveDataOverrideInjector(final MarketDataInjector marketDataInjector) {
     _marketDataInjector = marketDataInjector;
-  }
-
-  @Override
-  public VersionCorrection getProcessVersionCorrection() {
-    throw new UnsupportedOperationException();
   }
 
   @Override

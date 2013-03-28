@@ -45,19 +45,43 @@ LOGGING(com.opengamma.language.service.Settings);
 # endif /* ifndef DEFAULT_SDDL */
 #endif /* ifdef _WIN32 */
 #ifndef DEFAULT_SERVICE_NAME
-# define DEFAULT_SERVICE_NAME		TEXT ("OpenGammaLanguageAPI")
-#endif /* ifndef DEFAULT_SERVICE_NAME */
-#ifndef DEFAULT_CONNECTION_PIPE
-# ifndef DEFAULT_PIPE_NAME
-#  define DEFAULT_PIPE_NAME			TEXT ("Connection")
-# endif /* ifndef DEFAULT_PIPE_NAME */
 # ifdef _WIN32
-#  define DEFAULT_CONNECTION_PIPE	TEXT ("\\\\.\\pipe\\") DEFAULT_SERVICE_NAME TEXT ("-") DEFAULT_PIPE_NAME
+#  define DEFAULT_SERVICE_NAME		TEXT ("OpenGammaLanguageAPI")
+# else /* ifdef _WIN32 */
+#  define DEFAULT_SERVICE_NAME		TEXT ("og-language")
+# endif /* ifdef _WIN32 */
+#endif /* ifndef DEFAULT_SERVICE_NAME */
+#ifndef _WIN32
+# ifndef SERVICE_CTRL_CHK_PREFIX
+#  define SERVICE_CTRL_CHK_PREFIX	TEXT ("/etc/init.d/")
+# endif /* ifndef SERVICE_CTRL_CHK_PREFIX */
+# ifndef SERVICE_CTRL_CHK_SUFFIX
+#  define SERVICE_CTRL_CHK_SUFFIX	TEXT ("")
+# endif /* ifndef SERVICE_CTRL_CHK_SUFFIX */
+# ifndef SERVICE_CTRL_CMD_PREFIX
+#  define SERVICE_CTRL_CMD_PREFIX	TEXT ("/sbin/service ")
+# endif /* ifndef SERVICE_CTRL_CMD_PREFIX */
+# ifndef SERVICE_CTRL_CMD_SUFFIX
+#  define SERVICE_CTRL_CMD_SUFFIX	TEXT (" %s > /dev/null")
+# endif /* ifdef SERVICE_CTRL_CMD_SUFFIX */
+# ifndef SERVICE_CTRL_QUERY_PARAM
+#  define SERVICE_CTRL_QUERY_PARAM	TEXT ("status")
+# endif /* ifndef SERVICE_CTRL_QUERY_PARAM */
+# ifndef SERVICE_CTRL_START_PARAM
+#  define SERVICE_CTRL_START_PARAM	TEXT ("start")
+# endif /* ifdef SERVICE_CTRL_START_PARAM */
+# ifndef SERVICE_CTRL_STOP_PARAM
+#  define SERVICE_CTRL_STOP_PARAM	TEXT ("stop")
+# endif /* ifdef SERVICE_CTRL_STOP_PARAM */
+#endif /* ifndef _WIN32 */
+#ifndef DEFAULT_CONNECTION_PIPE
+# ifdef _WIN32
+#  define DEFAULT_CONNECTION_PIPE	TEXT ("\\\\.\\pipe\\") DEFAULT_SERVICE_NAME TEXT ("-Connection")
 # else /* ifdef _WIN32 */
 #  ifndef DEFAULT_PIPE_FOLDER
-#   define DEFAULT_PIPE_FOLDER		TEXT ("/var/run/OG-Language/")
+#   define DEFAULT_PIPE_FOLDER		TEXT ("/var/run/opengamma/")
 #  endif /* ifndef DEFAULT_PIPE_FOLDER */
-#  define DEFAULT_CONNECTION_PIPE	DEFAULT_PIPE_FOLDER DEFAULT_PIPE_NAME TEXT (".sock")
+#  define DEFAULT_CONNECTION_PIPE	DEFAULT_PIPE_FOLDER DEFAULT_SERVICE_NAME TEXT (".sock")
 # endif /* ifdef _WIN32 */
 #endif /* ifndef DEFAULT_CONNECTION_PIPE */
 #ifndef DEFAULT_JVM_MIN_HEAP
@@ -67,7 +91,7 @@ LOGGING(com.opengamma.language.service.Settings);
 # define DEFAULT_JVM_MAX_HEAP		512
 #endif /* ifndef DEFAULT_JVM_MAX_HEAP */
 #ifndef DEFAULT_PID_FILE
-# define DEFAULT_PID_FILE			DEFAULT_PIPE_FOLDER TEXT ("LanguageIntegration.pid")
+# define DEFAULT_PID_FILE			DEFAULT_PIPE_FOLDER TEXT ("og-language.pid")
 #endif /* ifndef DEFAULT_PID_FILE */
 
 /// Returns the default name of the pipe for incoming client connections.
@@ -84,6 +108,100 @@ const TCHAR *ServiceDefaultServiceName () {
 	return DEFAULT_SERVICE_NAME;
 }
 
+#ifndef _WIN32
+
+static size_t _maxstrlen (const TCHAR *pszA, const TCHAR *pszB) {
+	size_t cchA = _tcslen (pszA);
+	size_t cchB = _tcslen (pszB);
+	if (cchA < cchB) {
+		return cchB;
+	} else {
+		return cchA;
+	}
+}
+
+/// Creates a service control string by checking for a file which is based on the service name and
+/// then composing the service name with the operation. For example it might search for
+/// "/etc/init.d/<service>" and then execute "service <service> <command>"
+///
+/// This will allocate memory for the returned string if successful. The caller must release this
+/// when done.
+///
+/// @param[in] pszServiceName the service name, not NULL
+/// @param[in] pszOperation the operation string, not NULL
+/// @return the service control command, or NULL if there is a problem
+static TCHAR *_ServiceCreateControl (const TCHAR *pszServiceName, const TCHAR *pszOperation) {
+	TCHAR *pszTemp1 = NULL;
+	TCHAR *pszResult = NULL;
+	do {
+		size_t cb = (_maxstrlen (SERVICE_CTRL_CHK_PREFIX, SERVICE_CTRL_CMD_PREFIX) + _tcslen (pszServiceName) + _maxstrlen (SERVICE_CTRL_CHK_SUFFIX, SERVICE_CTRL_CMD_SUFFIX) + 1) * sizeof (TCHAR);
+		pszTemp1 = (TCHAR*)malloc (cb);
+		if (!pszTemp1) {
+			LOGFATAL (TEXT ("Out of memory"));
+			break;
+		}
+		StringCbPrintf (pszTemp1, cb, TEXT ("%s%s%s"), SERVICE_CTRL_CHK_PREFIX, pszServiceName, SERVICE_CTRL_CHK_SUFFIX);
+		LOGDEBUG (TEXT ("Testing for ") << pszTemp1);
+		struct stat statBuf;
+		if (stat (pszTemp1, &statBuf)) {
+			LOGWARN (TEXT ("Couldn't stat ") << pszTemp1);
+			break;
+		}
+		LOGDEBUG (TEXT ("Found ") << pszTemp1 << TEXT (" with mode ") << statBuf.st_mode);
+		if (!(statBuf.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))) {
+			LOGWARN (TEXT ("Service script ") << pszTemp1 << TEXT (" doesn't have execute bit set"));
+			break;
+		}
+		StringCbPrintf (pszTemp1, cb, TEXT ("%s%s%s"), SERVICE_CTRL_CMD_PREFIX, pszServiceName, SERVICE_CTRL_CMD_SUFFIX);
+		LOGDEBUG (TEXT ("Forming service operation \"") << pszTemp1 << TEXT ("\" with ") << pszOperation);
+		cb = (_tcslen (pszTemp1) + _tcslen (pszOperation) - 1) * sizeof (TCHAR);
+		pszResult = (TCHAR*)malloc (cb);
+		if (!pszResult) {
+			LOGFATAL (TEXT ("Out of memory"));
+			break;
+		}
+		StringCbPrintf (pszResult, cb, pszTemp1, pszOperation);
+		LOGINFO (TEXT ("Found service control command: ") << pszResult);
+	} while (false);
+	if (pszTemp1) free (pszTemp1);
+	return pszResult;
+}
+
+TCHAR *ServiceCreateQueryCmd (const TCHAR *pszServiceName) {
+	return _ServiceCreateControl (pszServiceName, SERVICE_CTRL_QUERY_PARAM);
+}
+
+TCHAR *ServiceCreateStartCmd (const TCHAR *pszServiceName) {
+	return _ServiceCreateControl (pszServiceName, SERVICE_CTRL_START_PARAM);
+}
+
+TCHAR *ServiceCreateStopCmd (const TCHAR *pszServiceName) {
+	return _ServiceCreateControl (pszServiceName, SERVICE_CTRL_STOP_PARAM);
+}
+
+#endif /* ifndef _WIN32 */
+
+/// Extracts the numeric version fragment from a string.
+///
+/// @param[in] pszVersion the version string, e.g. "1.7"
+/// @param[in] nFragment the version fragment, e.g. 0 for the major version number, 1 for the minor
+/// @return the version number
+int JavaVersionFragment (const TCHAR *pszVersion, int nFragment) {
+	int nValue;
+	size_t cch = _tcslen (pszVersion), i = 0;
+	do {
+		nValue = 0;
+		while ((i < cch) && (pszVersion[i] != '.')) {
+			if ((pszVersion[i] >= '0') && (pszVersion[i] <= '9')) {
+				nValue = (nValue * 10) + (pszVersion[i] - '0');
+			}
+			i++;
+		}
+		if (i < cch) i++;
+	} while (nFragment-- > 0);
+	return nValue;
+}
+
 /// Locates the JVM library by inspecting the registry or making other educated guesses
 class CJvmLibraryDefault : public CAbstractSettingProvider {
 private:
@@ -94,17 +212,20 @@ private:
 	/// write the correct version code to the CurrentVersion value which will be used. In the future we might
 	/// want to load a specific JVM (e.g. if a newer one raises compatability issues)
 	///
+	/// @param[in] hkeyPublisher the JVM publisher key, not NULL
+	/// @param[in] pszVersion the version string, not NULL
 	/// @return the path to the JVM DLL if found, or NULL if there is none
-	static TCHAR *SearchJavaVersion (HKEY hkeyJRE, const TCHAR *pszVersion) {
+	static TCHAR *SearchJavaVersion (HKEY hkeyPublisher, const TCHAR *pszVersion) {
 		TCHAR szPath[MAX_PATH];
 		DWORD cbPath = sizeof (szPath);
 		LOGDEBUG (TEXT ("Trying JRE ") << pszVersion);
-		if (RegGetValue (hkeyJRE, pszVersion, TEXT ("RuntimeLib"), RRF_RT_REG_SZ, NULL, szPath, &cbPath) != ERROR_SUCCESS) {
+		if (RegGetValue (hkeyPublisher, pszVersion, TEXT ("RuntimeLib"), RRF_RT_REG_SZ, NULL, szPath, &cbPath) != ERROR_SUCCESS) {
 			return NULL;
 		}
 		HANDLE hFile = CreateFile (szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		// JRE 1.7 32-bit doesn't seem to have this bug but 64-bit version does
 		if (hFile == INVALID_HANDLE_VALUE) {
-			// JDK1.6 puts the wrong path into the registry. It ends \client\jvm.dll but should be \server\jvm.dll
+			// JDK1.7 64-bit puts the wrong path into the registry. It ends \client\jvm.dll but should be \server\jvm.dll
 			int cchPath = _tcslen (szPath);
 			if ((cchPath > 15) && !_tcscmp (szPath + cchPath - 15, TEXT ("\\client\\jvm.dll"))) {
 				LOGDEBUG (TEXT ("Applying hack for broken JDK installer"));
@@ -135,29 +256,49 @@ private:
 		TCHAR sz[256];
 		StringCbPrintf (sz, sizeof (sz), TEXT ("SOFTWARE\\%s\\Java Runtime Environment"), pszPublisher);
 		if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, sz, 0, KEY_READ, &hkeyJRE) != ERROR_SUCCESS) {
-			LOGDEBUG (TEXT ("No JRE registry key"));
+			LOGDEBUG (TEXT ("No JRE registry key for ") << pszPublisher);
 			return NULL;
 		}
-		DWORD cbVersion = sizeof (sz);
+		DWORD cbVersion;
 		TCHAR *pszPath = NULL;
 		do {
 			// Try the published default
+			cbVersion = sizeof (sz);
 			if (RegGetValue (hkeyJRE, NULL, TEXT ("CurrentVersion"), RRF_RT_REG_SZ, NULL, sz, &cbVersion) == ERROR_SUCCESS) {
+				LOGDEBUG (TEXT ("Found JRE v") << sz << TEXT (" from ") << pszPublisher);
+				int nMajorVersion = JavaVersionFragment (sz, 0);
+				if ((nMajorVersion > 1) || ((nMajorVersion == 1) && (JavaVersionFragment (sz, 1) >= 7))) {
+					pszPath = SearchJavaVersion (hkeyJRE, sz);
+					if (pszPath) {
+						LOGINFO (TEXT ("Found default JVM ") << pszPath << TEXT (" from ") << pszPublisher << TEXT (" in registry"));
+						break;
+					} else {
+						LOGWARN (TEXT ("No RuntimeLib found for JRE v") << sz << TEXT (" from ") << pszPublisher);
+					}
+				} else {
+					LOGWARN (TEXT ("Version ") << sz << TEXT (" from ") << pszPublisher << TEXT (" not supported"));
+				}
+			} else {
+				LOGDEBUG (TEXT ("No default JVM installed from ") << pszPublisher);
+			}
+			// Try the Java7 version
+			cbVersion = sizeof (sz);
+			if (RegGetValue (hkeyJRE, NULL, TEXT ("Java7FamilyVersion"), RRF_RT_REG_SZ, NULL, sz, &cbVersion) == ERROR_SUCCESS) {
 				LOGDEBUG (TEXT ("Found JRE v") << sz);
 				pszPath = SearchJavaVersion (hkeyJRE, sz);
 				if (pszPath) {
-					LOGINFO (TEXT ("Found default JVM ") << pszPath << TEXT (" in registry"));
+					LOGINFO (TEXT ("Found default Java7 JVM ") << pszPath << TEXT (" from ") << pszPublisher << TEXT (" in registry"));
 					break;
 				} else {
-					LOGWARN (TEXT ("No RuntimeLib found for JRE v") << sz);
+					LOGWARN (TEXT ("No RuntimeLib found for JRE v") << sz << TEXT (" from ") << pszPublisher);
 				}
 			} else {
-				LOGDEBUG (TEXT ("No default JVM installed"));
+				LOGDEBUG (TEXT ("No default Java7 JVM installed from ") << pszPublisher);
 			}
-			// Try v1.6 regardless
-			pszPath = SearchJavaVersion (hkeyJRE, TEXT ("1.6"));
+			// Try v1.7 regardless
+			pszPath = SearchJavaVersion (hkeyJRE, TEXT ("1.7"));
 			if (pszPath) {
-				LOGINFO (TEXT ("Found non-default JRE v1.6"));
+				LOGINFO (TEXT ("Found non-default JRE v1.7 from ") << pszPublisher);
 				break;
 			}
 		} while (false);
@@ -193,7 +334,11 @@ private:
 		LOGDEBUG (TEXT ("Scanning folder ") << pszPath);
 		DIR *dir = opendir (pszPath);
 		if (!dir) {
-			LOGWARN (TEXT ("Can't read folder ") << pszPath << TEXT (", error ") << GetLastError ());
+			if (nDepth == 0) {
+				LOGWARN (TEXT ("Can't read folder ") << pszPath << TEXT (", error ") << GetLastError ());
+			} else {
+				LOGDEBUG (TEXT ("Can't read folder ") << pszPath << TEXT (", error ") << GetLastError ());
+			}
 			return NULL;
 		}
 		TCHAR *pszLibrary = NULL;
@@ -202,7 +347,7 @@ private:
 			if (dp->d_name[0] == '.') {
 				continue;
 			}
-			if (dp->d_type & DT_DIR) {
+			if ((dp->d_type == DT_DIR) || (dp->d_type == DT_LNK)) {
 				LOGDEBUG (TEXT ("Recursing into folder ") << dp->d_name);
 				size_t cchNewPath = _tcslen (pszPath) + _tcslen (dp->d_name) + 2;
 				TCHAR *pszNewPath = new TCHAR[cchNewPath];
@@ -225,7 +370,23 @@ private:
 					break;
 				}
 				StringCbPrintf (pszLibrary, cchLibrary * sizeof (TCHAR), TEXT ("%s/%s"), pszPath, dp->d_name);
-				break;
+				// TODO: /proc/self/exe probably isn't portable, but seems to work on Fedora
+				CProcess *poCheck = CProcess::Start (TEXT ("/proc/self/exe"), TEXT ("jvm"), pszLibrary);
+				if (poCheck) {
+					int status = 1;
+					LOGDEBUG (TEXT ("Waiting on JVM check"));
+					wait (&status);
+					poCheck->Terminate (); // Terminate if still running
+					delete poCheck;
+					LOGDEBUG (TEXT ("JVM check returned ") << status);
+					if (status == 0) {
+						// Confirmed the JVM version
+						break;
+					}
+				}
+				LOGWARN (TEXT ("Couldn't verify JVM version"));
+				delete pszLibrary;
+				pszLibrary = NULL;
 			}
 		}
 		closedir (dir);
@@ -236,8 +397,9 @@ private:
 
 	/// Checks for a JVM library from the registry (Windows), or by scanning the file system (Posix)
 	///
+	/// @param[in] poSettings ignored
 	/// @return the path to the JVM DLL, a default best guess, or NULL if there is a problem
-	TCHAR *CalculateString () const {
+	TCHAR *CalculateString (const CAbstractSettings *poSettings) const {
 		TCHAR *pszLibrary = NULL;
 		do {
 #ifdef _WIN32
@@ -317,8 +479,9 @@ protected:
 #define CLIENT_JAR_LEN		10
 	/// Scans backwards from the service executable's folder until it finds one containing client.jar
 	///
+	/// @param[in] poSettings ignored
 	/// @return the path, or a default best guess if none is found
-	TCHAR *CalculateString () const {
+	TCHAR *CalculateString (const CAbstractSettings *poSettings) const {
 		TCHAR *pszJarPath = NULL;
 		// Scan backwards from the module to find a path which has Client.jar in. This works if all of the
 		// JARs and DLLs are in the same folder, but also in the case of a build system where we have sub-folders
@@ -384,8 +547,8 @@ const TCHAR *CSettings::GetJarPath () const {
 /// Locates the ext folder by searching for the client.jar
 class CExtPathDefault : public CAbstractSettingProvider {
 protected:
-	TCHAR *CalculateString () const {
-		const TCHAR *pszJarPath = g_oJarPathDefault.GetString ();
+	TCHAR *CalculateString (const CAbstractSettings *poSettings) const {
+		const TCHAR *pszJarPath = g_oJarPathDefault.GetString (poSettings);
 		if (!pszJarPath) {
 			LOGERROR (TEXT ("No JAR path to base EXT from"));
 			return NULL;

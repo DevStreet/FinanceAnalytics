@@ -5,7 +5,7 @@
  */
 package com.opengamma.analytics.financial.commodity.definition;
 
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.commodity.derivative.AgricultureFuture;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
@@ -112,7 +112,7 @@ public class AgricultureFutureDefinition extends CommodityFutureDefinition<Agric
     final double timeToFixing = TimeCalculator.getTimeBetween(date, this.getExpiryDate());
     final double timeToSettlement = TimeCalculator.getTimeBetween(date, this.getSettlementDate());
     return new AgricultureFuture(timeToFixing, getUnderlying(), getUnitAmount(), getFirstDeliveryDate(), getLastDeliveryDate(), getAmount(), getUnitName(), getSettlementType(),
-        timeToSettlement, getReferencePrice(), getCurrency());
+        timeToSettlement, referencePrice, getCurrency());
   }
 
   /**

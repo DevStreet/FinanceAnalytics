@@ -8,12 +8,14 @@ package com.opengamma.analytics.financial.forex.method;
 import static com.opengamma.util.money.Currency.EUR;
 import static com.opengamma.util.money.Currency.GBP;
 import static com.opengamma.util.money.Currency.USD;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
@@ -48,7 +50,6 @@ public class TestsDataSetsForex {
     FX_MATRIX.addCurrency(KRW, USD, KRW_USD);
     FX_MATRIX.addCurrency(GBP, USD, GBP_USD);
   }
-
 
   /**
    * Create a yield curve bundle with three curves. One called "Discounting EUR" with a constant rate of 2.50%, one called "Discounting USD" with a constant rate of 1.00%

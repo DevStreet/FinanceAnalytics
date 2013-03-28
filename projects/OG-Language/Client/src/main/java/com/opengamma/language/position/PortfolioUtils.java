@@ -11,9 +11,10 @@ import com.opengamma.core.position.Portfolio;
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.engine.view.compilation.PortfolioCompiler;
 import com.opengamma.id.UniqueId;
+import com.opengamma.id.VersionCorrection;
 import com.opengamma.language.context.GlobalContext;
-import com.opengamma.language.debug.Profiler;
 import com.opengamma.util.ArgumentChecker;
+import com.opengamma.util.test.Profiler;
 
 /**
  * Common utilities for working with portfolios.
@@ -50,7 +51,7 @@ public final class PortfolioUtils {
     }
     s_profilerGet.begin();
     try {
-      return positionSource.getPortfolio(identifier);
+      return positionSource.getPortfolio(identifier, VersionCorrection.LATEST);
     } catch (DataNotFoundException ex) {
       return null;
     } catch (IllegalArgumentException ex) {

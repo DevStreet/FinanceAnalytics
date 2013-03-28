@@ -8,11 +8,10 @@ package com.opengamma.bbg;
 import java.util.Map;
 import java.util.Set;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.MonthOfYear;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.Month;
 
 import com.google.common.collect.Maps;
 import com.opengamma.core.change.ChangeManager;
@@ -25,9 +24,9 @@ import com.opengamma.id.UniqueIdSupplier;
 import com.opengamma.provider.historicaltimeseries.HistoricalTimeSeriesProvider;
 import com.opengamma.provider.historicaltimeseries.HistoricalTimeSeriesProviderGetRequest;
 import com.opengamma.provider.historicaltimeseries.HistoricalTimeSeriesProviderGetResult;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.time.LocalDateRange;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -39,7 +38,7 @@ public class BloombergHistoricalTimeSeriesSource implements HistoricalTimeSeries
   /**
    * Default start date for loading time-series
    */
-  public static final LocalDate DEFAULT_START_DATE = LocalDate.of(1900, MonthOfYear.JANUARY, 01);
+  public static final LocalDate DEFAULT_START_DATE = LocalDate.of(1900, Month.JANUARY, 01);
 
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(BloombergHistoricalTimeSeriesSource.class);

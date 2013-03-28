@@ -8,9 +8,8 @@ package com.opengamma.examples.convention;
 import static com.opengamma.core.id.ExternalSchemes.syntheticSecurityId;
 import static com.opengamma.financial.convention.InMemoryConventionBundleMaster.simpleNameSecurityId;
 
-import javax.time.calendar.Period;
-
 import org.apache.commons.lang.Validate;
+import org.threeten.bp.Period;
 
 import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.convention.ConventionBundleMaster;
@@ -24,6 +23,7 @@ import com.opengamma.financial.convention.frequency.PeriodFrequency;
 import com.opengamma.financial.convention.frequency.SimpleFrequencyFactory;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
+import com.opengamma.util.time.DateUtils;
 
 /**
  * Synthetic US Conventions

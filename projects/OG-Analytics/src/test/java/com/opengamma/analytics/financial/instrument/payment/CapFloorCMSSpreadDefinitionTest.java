@@ -6,13 +6,15 @@
 package com.opengamma.analytics.financial.instrument.payment;
 
 import static org.testng.AssertJUnit.assertEquals;
-
-import javax.time.calendar.LocalDateTime;
-import javax.time.calendar.Period;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
@@ -35,7 +37,7 @@ import com.opengamma.util.time.DateUtils;
 public class CapFloorCMSSpreadDefinitionTest {
 
   //Swaps
-  private static final Currency CUR = Currency.USD;
+  private static final Currency CUR = Currency.EUR;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean IS_EOM = true;
@@ -79,7 +81,7 @@ public class CapFloorCMSSpreadDefinitionTest {
   private static final SwapFixedCoupon<? extends Payment> SWAP_1 = SWAP_DEFINITION_1.toDerivative(REFERENCE_DATE, CURVES_2_NAME);
   private static final SwapFixedCoupon<? extends Payment> SWAP_2 = SWAP_DEFINITION_2.toDerivative(REFERENCE_DATE, CURVES_2_NAME);
   private static final DayCount ACT_ACT = DayCountFactory.INSTANCE.getDayCount("Actual/Actual ISDA");
-  private static final ZonedDateTime REFERENCE_DATE_ZONED = ZonedDateTime.of(LocalDateTime.ofMidnight(REFERENCE_DATE), TimeZone.UTC);
+  private static final ZonedDateTime REFERENCE_DATE_ZONED = ZonedDateTime.of(LocalDateTime.of(REFERENCE_DATE.toLocalDate(), LocalTime.MIDNIGHT), ZoneOffset.UTC);
   private static final double PAYMENT_TIME = ACT_ACT.getDayCountFraction(REFERENCE_DATE_ZONED, PAYMENT_DATE);
   private static final double FIXING_TIME = ACT_ACT.getDayCountFraction(REFERENCE_DATE_ZONED, FIXING_DATE);
   private static final double SETTLEMENT_TIME = ACT_ACT.getDayCountFraction(REFERENCE_DATE_ZONED, SWAP_DEFINITION_1.getFixedLeg().getNthPayment(0).getAccrualStartDate());
@@ -154,7 +156,7 @@ public class CapFloorCMSSpreadDefinitionTest {
         SWAP_DEFINITION_1, CMS_INDEX_1, SWAP_DEFINITION_2, CMS_INDEX_2, STRIKE, IS_CAP);
     assertEquals(newCMSSpread.equals(CMS_SPREAD_DEFINITION), true);
     assertEquals(newCMSSpread.hashCode() == CMS_SPREAD_DEFINITION.hashCode(), true);
-    final Currency newCur = Currency.EUR;
+    final Currency newCur = Currency.USD;
     final CapFloorCMSSpreadDefinition cmsSpreadCur = new CapFloorCMSSpreadDefinition(newCur, PAYMENT_DATE, ACCRUAL_START_DATE, ACCRUAL_END_DATE, PAYMENT_ACCRUAL_FACTOR, NOTIONAL, FIXING_DATE,
         SWAP_DEFINITION_1, CMS_INDEX_1, SWAP_DEFINITION_2, CMS_INDEX_2, STRIKE, IS_CAP);
     assertEquals(cmsSpreadCur.equals(CMS_SPREAD_DEFINITION), false);
@@ -185,8 +187,7 @@ public class CapFloorCMSSpreadDefinitionTest {
     assertEquals(SWAP_1, cmsSpread.getUnderlyingSwap1());
     assertEquals(SWAP_2, cmsSpread.getUnderlyingSwap2());
     final CapFloorCMSSpread cmsSpreadExpected = new CapFloorCMSSpread(CUR, PAYMENT_TIME, PAYMENT_ACCRUAL_FACTOR, NOTIONAL, FIXING_TIME, SWAP_1, CMS_INDEX_1, SWAP_2, CMS_INDEX_2, SETTLEMENT_TIME,
-        STRIKE,
-        IS_CAP, FUNDING_CURVE_NAME);
+        STRIKE, IS_CAP, FUNDING_CURVE_NAME);
     assertEquals("CMS Spread to derivatives", cmsSpreadExpected, cmsSpread);
 
   }

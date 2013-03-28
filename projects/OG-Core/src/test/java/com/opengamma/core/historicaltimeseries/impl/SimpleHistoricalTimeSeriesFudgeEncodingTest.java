@@ -9,22 +9,23 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.MonthOfYear;
-
 import org.fudgemsg.FudgeContext;
 import org.fudgemsg.FudgeMsgEnvelope;
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.Month;
 
 import com.opengamma.id.UniqueId;
+import com.opengamma.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ListLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.MapLocalDateDoubleTimeSeries;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
-import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.ListLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.MapLocalDateDoubleTimeSeries;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Test SimpleHistoricalTimeSeries Fudge support.
  */
+@Test(groups = TestGroup.UNIT)
 public class SimpleHistoricalTimeSeriesFudgeEncodingTest {
   
   private static final UniqueId UID = UniqueId.of("A", "B", "V");
@@ -63,12 +64,12 @@ public class SimpleHistoricalTimeSeriesFudgeEncodingTest {
 
  
   private static LocalDate[] testTimes() {
-    LocalDate one = LocalDate.of(2010, MonthOfYear.FEBRUARY, 8);
-    LocalDate two = LocalDate.of(2010, MonthOfYear.FEBRUARY, 9);
-    LocalDate three = LocalDate.of(2010, MonthOfYear.FEBRUARY, 10);
-    LocalDate four = LocalDate.of(2010, MonthOfYear.FEBRUARY, 11);
-    LocalDate five = LocalDate.of(2010, MonthOfYear.FEBRUARY, 12);
-    LocalDate six = LocalDate.of(2010, MonthOfYear.FEBRUARY, 13);
+    LocalDate one = LocalDate.of(2010, Month.FEBRUARY, 8);
+    LocalDate two = LocalDate.of(2010, Month.FEBRUARY, 9);
+    LocalDate three = LocalDate.of(2010, Month.FEBRUARY, 10);
+    LocalDate four = LocalDate.of(2010, Month.FEBRUARY, 11);
+    LocalDate five = LocalDate.of(2010, Month.FEBRUARY, 12);
+    LocalDate six = LocalDate.of(2010, Month.FEBRUARY, 13);
     return new LocalDate[] {one, two, three, four, five, six };
   }
 

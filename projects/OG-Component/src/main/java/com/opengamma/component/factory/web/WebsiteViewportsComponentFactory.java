@@ -5,8 +5,6 @@
  */
 package com.opengamma.component.factory.web;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,34 +23,43 @@ import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import org.springframework.web.context.ServletContextAware;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.opengamma.component.ComponentRepository;
 import com.opengamma.component.factory.AbstractComponentFactory;
 import com.opengamma.core.change.AggregatingChangeManager;
 import com.opengamma.core.change.ChangeManager;
 import com.opengamma.core.change.ChangeProvider;
+import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.position.PositionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.ComputationTargetResolver;
 import com.opengamma.engine.marketdata.NamedMarketDataSpecificationRepository;
 import com.opengamma.engine.view.ViewProcessor;
 import com.opengamma.financial.aggregation.PortfolioAggregationFunctions;
+import com.opengamma.financial.currency.ConfigDBCurrencyPairsSource;
+import com.opengamma.financial.currency.CurrencyPairs;
+import com.opengamma.financial.currency.CurrencyPairsSource;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.impl.MasterConfigSource;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.marketdatasnapshot.MarketDataSnapshotMaster;
+import com.opengamma.master.orgs.OrganizationMaster;
 import com.opengamma.master.portfolio.PortfolioMaster;
 import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
-import com.opengamma.web.analytics.AnalyticsColumnsJsonWriter;
 import com.opengamma.web.analytics.AnalyticsViewManager;
+import com.opengamma.web.analytics.GridColumnsJsonWriter;
 import com.opengamma.web.analytics.ViewportResultsJsonWriter;
+import com.opengamma.web.analytics.blotter.BlotterColumnMapper;
 import com.opengamma.web.analytics.blotter.BlotterResource;
+import com.opengamma.web.analytics.blotter.DefaultBlotterColumnMappings;
 import com.opengamma.web.analytics.formatting.ResultsFormatter;
-import com.opengamma.web.analytics.json.AnalyticsColumnGroupsMessageBodyWriter;
 import com.opengamma.web.analytics.json.Compressor;
 import com.opengamma.web.analytics.json.DependencyGraphGridStructureMessageBodyWriter;
+import com.opengamma.web.analytics.json.GridColumnGroupsMessageBodyWriter;
 import com.opengamma.web.analytics.json.PortfolioGridStructureMessageBodyWriter;
 import com.opengamma.web.analytics.json.PrimitivesGridStructureMessageBodyWriter;
 import com.opengamma.web.analytics.json.ViewportResultsMessageBodyWriter;
@@ -117,6 +124,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
   @PropertyDefinition(validate = "notNull")
   private HistoricalTimeSeriesMaster _historicalTimeSeriesMaster;
   /**
+   * The organization master.
+   */
+  @PropertyDefinition(validate = "notNull")
+  private OrganizationMaster _organizationMaster;
+  /**
    * The user master.
    */
   @PropertyDefinition(validate = "notNull")
@@ -131,6 +143,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
    */
   @PropertyDefinition(validate = "notNull")
   private ConfigMaster _userConfigMaster;
+  /**
+   * The combined config source.
+   */
+  @PropertyDefinition(validate = "notNull")
+  private ConfigSource _combinedConfigSource;
   /**
    * The view processor.
    */
@@ -176,18 +193,28 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     AggregatedViewDefinitionManager aggregatedViewDefManager = new AggregatedViewDefinitionManager(
         getPositionSource(),
         getSecuritySource(),
-        configSource, 
+        getCombinedConfigSource(),
         getUserConfigMaster(),
         getUserPortfolioMaster(),
         getUserPositionMaster(),
         getPortfolioAggregationFunctions().getMappedFunctions());
+    CurrencyPairsSource currencyPairsSource = new ConfigDBCurrencyPairsSource(configSource);
+    // TODO should be able to configure the currency pairs
+    CurrencyPairs currencyPairs = currencyPairsSource.getCurrencyPairs(CurrencyPairs.DEFAULT_CURRENCY_PAIRS);
+    BlotterColumnMapper blotterColumnMapper = DefaultBlotterColumnMappings.create(currencyPairs);
     AnalyticsViewManager analyticsViewManager = new AnalyticsViewManager(getViewProcessor(),
                                                                          aggregatedViewDefManager,
                                                                          getMarketDataSnapshotMaster(),
                                                                          getComputationTargetResolver(),
-                                                                         getMarketDataSpecificationRepository());
+                                                                         getMarketDataSpecificationRepository(),
+                                                                         blotterColumnMapper,
+                                                                         getPositionSource(),
+                                                                         getCombinedConfigSource(),
+                                                                         getSecuritySource(),
+                                                                         getSecurityMaster(),
+                                                                         getPositionMaster());
     ResultsFormatter resultsFormatter = new ResultsFormatter();
-    AnalyticsColumnsJsonWriter columnWriter = new AnalyticsColumnsJsonWriter(resultsFormatter);
+    GridColumnsJsonWriter columnWriter = new GridColumnsJsonWriter(resultsFormatter);
     ViewportResultsJsonWriter viewportResultsWriter = new ViewportResultsJsonWriter(resultsFormatter);
 
     repo.getRestComponents().publishResource(aggregatorsResource);
@@ -196,12 +223,12 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     repo.getRestComponents().publishResource(new ViewsResource(analyticsViewManager, connectionMgr));
     repo.getRestComponents().publishResource(new Compressor());
     repo.getRestComponents().publishResource(new LogResource());
-    repo.getRestComponents().publishResource(new BlotterResource(getSecurityMaster()));
+    repo.getRestComponents().publishResource(new BlotterResource(getSecurityMaster(), getPortfolioMaster(), getPositionMaster()));
     repo.getRestComponents().publishResource(new TimeSeriesResolverKeysResource(getConfigMaster()));
     repo.getRestComponents().publishHelper(new PrimitivesGridStructureMessageBodyWriter(columnWriter));
     repo.getRestComponents().publishHelper(new PortfolioGridStructureMessageBodyWriter(columnWriter));
     repo.getRestComponents().publishHelper(new DependencyGraphGridStructureMessageBodyWriter(columnWriter));
-    repo.getRestComponents().publishHelper(new AnalyticsColumnGroupsMessageBodyWriter(columnWriter));
+    repo.getRestComponents().publishHelper(new GridColumnGroupsMessageBodyWriter(columnWriter));
     repo.getRestComponents().publishHelper(new ViewportResultsMessageBodyWriter(viewportResultsWriter));
     repo.getRestComponents().publishHelper(new ViewDefinitionEntriesResource(configSource));
 
@@ -220,22 +247,24 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
   }
 
   protected ChangeManager buildChangeManager() {
-    List<ChangeProvider> providers = new ArrayList<ChangeProvider>();
+    List<ChangeProvider> providers = Lists.newArrayList();
     providers.add(getPositionMaster());
     providers.add(getPortfolioMaster());
     providers.add(getSecurityMaster());
     providers.add(getHistoricalTimeSeriesMaster());
     providers.add(getConfigMaster());
+    providers.add(getOrganizationMaster());
     return new AggregatingChangeManager(providers);
   }
 
   protected MasterChangeManager buildMasterChangeManager() {
-    Map<MasterType, ChangeProvider> providers = new HashMap<MasterType, ChangeProvider>();
+    Map<MasterType, ChangeProvider> providers = Maps.newHashMap();
     providers.put(MasterType.POSITION, getPositionMaster());
     providers.put(MasterType.PORTFOLIO, getPortfolioMaster());
     providers.put(MasterType.SECURITY, getSecurityMaster());
     providers.put(MasterType.TIME_SERIES, getHistoricalTimeSeriesMaster());
     providers.put(MasterType.CONFIG, getConfigMaster());
+    providers.put(MasterType.ORGANIZATION, getOrganizationMaster());
     return new MasterChangeManager(providers);
   }
 
@@ -276,12 +305,16 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
         return getComputationTargetResolver();
       case 173967376:  // historicalTimeSeriesMaster
         return getHistoricalTimeSeriesMaster();
+      case -1158737547:  // organizationMaster
+        return getOrganizationMaster();
       case 1808868758:  // userPositionMaster
         return getUserPositionMaster();
       case 686514815:  // userPortfolioMaster
         return getUserPortfolioMaster();
       case -763459665:  // userConfigMaster
         return getUserConfigMaster();
+      case -774734430:  // combinedConfigSource
+        return getCombinedConfigSource();
       case -1697555603:  // viewProcessor
         return getViewProcessor();
       case 940303425:  // portfolioAggregationFunctions
@@ -325,6 +358,9 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
       case 173967376:  // historicalTimeSeriesMaster
         setHistoricalTimeSeriesMaster((HistoricalTimeSeriesMaster) newValue);
         return;
+      case -1158737547:  // organizationMaster
+        setOrganizationMaster((OrganizationMaster) newValue);
+        return;
       case 1808868758:  // userPositionMaster
         setUserPositionMaster((PositionMaster) newValue);
         return;
@@ -333,6 +369,9 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
         return;
       case -763459665:  // userConfigMaster
         setUserConfigMaster((ConfigMaster) newValue);
+        return;
+      case -774734430:  // combinedConfigSource
+        setCombinedConfigSource((ConfigSource) newValue);
         return;
       case -1697555603:  // viewProcessor
         setViewProcessor((ViewProcessor) newValue);
@@ -366,9 +405,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     JodaBeanUtils.notNull(_positionSource, "positionSource");
     JodaBeanUtils.notNull(_computationTargetResolver, "computationTargetResolver");
     JodaBeanUtils.notNull(_historicalTimeSeriesMaster, "historicalTimeSeriesMaster");
+    JodaBeanUtils.notNull(_organizationMaster, "organizationMaster");
     JodaBeanUtils.notNull(_userPositionMaster, "userPositionMaster");
     JodaBeanUtils.notNull(_userPortfolioMaster, "userPortfolioMaster");
     JodaBeanUtils.notNull(_userConfigMaster, "userConfigMaster");
+    JodaBeanUtils.notNull(_combinedConfigSource, "combinedConfigSource");
     JodaBeanUtils.notNull(_viewProcessor, "viewProcessor");
     JodaBeanUtils.notNull(_portfolioAggregationFunctions, "portfolioAggregationFunctions");
     JodaBeanUtils.notNull(_marketDataSnapshotMaster, "marketDataSnapshotMaster");
@@ -393,9 +434,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
           JodaBeanUtils.equal(getPositionSource(), other.getPositionSource()) &&
           JodaBeanUtils.equal(getComputationTargetResolver(), other.getComputationTargetResolver()) &&
           JodaBeanUtils.equal(getHistoricalTimeSeriesMaster(), other.getHistoricalTimeSeriesMaster()) &&
+          JodaBeanUtils.equal(getOrganizationMaster(), other.getOrganizationMaster()) &&
           JodaBeanUtils.equal(getUserPositionMaster(), other.getUserPositionMaster()) &&
           JodaBeanUtils.equal(getUserPortfolioMaster(), other.getUserPortfolioMaster()) &&
           JodaBeanUtils.equal(getUserConfigMaster(), other.getUserConfigMaster()) &&
+          JodaBeanUtils.equal(getCombinedConfigSource(), other.getCombinedConfigSource()) &&
           JodaBeanUtils.equal(getViewProcessor(), other.getViewProcessor()) &&
           JodaBeanUtils.equal(getPortfolioAggregationFunctions(), other.getPortfolioAggregationFunctions()) &&
           JodaBeanUtils.equal(getMarketDataSnapshotMaster(), other.getMarketDataSnapshotMaster()) &&
@@ -418,9 +461,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     hash += hash * 31 + JodaBeanUtils.hashCode(getPositionSource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getComputationTargetResolver());
     hash += hash * 31 + JodaBeanUtils.hashCode(getHistoricalTimeSeriesMaster());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getOrganizationMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getUserPositionMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getUserPortfolioMaster());
     hash += hash * 31 + JodaBeanUtils.hashCode(getUserConfigMaster());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getCombinedConfigSource());
     hash += hash * 31 + JodaBeanUtils.hashCode(getViewProcessor());
     hash += hash * 31 + JodaBeanUtils.hashCode(getPortfolioAggregationFunctions());
     hash += hash * 31 + JodaBeanUtils.hashCode(getMarketDataSnapshotMaster());
@@ -640,6 +685,32 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
 
   //-----------------------------------------------------------------------
   /**
+   * Gets the organization master.
+   * @return the value of the property, not null
+   */
+  public OrganizationMaster getOrganizationMaster() {
+    return _organizationMaster;
+  }
+
+  /**
+   * Sets the organization master.
+   * @param organizationMaster  the new value of the property, not null
+   */
+  public void setOrganizationMaster(OrganizationMaster organizationMaster) {
+    JodaBeanUtils.notNull(organizationMaster, "organizationMaster");
+    this._organizationMaster = organizationMaster;
+  }
+
+  /**
+   * Gets the the {@code organizationMaster} property.
+   * @return the property, not null
+   */
+  public final Property<OrganizationMaster> organizationMaster() {
+    return metaBean().organizationMaster().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * Gets the user master.
    * @return the value of the property, not null
    */
@@ -714,6 +785,32 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
    */
   public final Property<ConfigMaster> userConfigMaster() {
     return metaBean().userConfigMaster().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the combined config source.
+   * @return the value of the property, not null
+   */
+  public ConfigSource getCombinedConfigSource() {
+    return _combinedConfigSource;
+  }
+
+  /**
+   * Sets the combined config source.
+   * @param combinedConfigSource  the new value of the property, not null
+   */
+  public void setCombinedConfigSource(ConfigSource combinedConfigSource) {
+    JodaBeanUtils.notNull(combinedConfigSource, "combinedConfigSource");
+    this._combinedConfigSource = combinedConfigSource;
+  }
+
+  /**
+   * Gets the the {@code combinedConfigSource} property.
+   * @return the property, not null
+   */
+  public final Property<ConfigSource> combinedConfigSource() {
+    return metaBean().combinedConfigSource().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
@@ -923,6 +1020,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     private final MetaProperty<HistoricalTimeSeriesMaster> _historicalTimeSeriesMaster = DirectMetaProperty.ofReadWrite(
         this, "historicalTimeSeriesMaster", WebsiteViewportsComponentFactory.class, HistoricalTimeSeriesMaster.class);
     /**
+     * The meta-property for the {@code organizationMaster} property.
+     */
+    private final MetaProperty<OrganizationMaster> _organizationMaster = DirectMetaProperty.ofReadWrite(
+        this, "organizationMaster", WebsiteViewportsComponentFactory.class, OrganizationMaster.class);
+    /**
      * The meta-property for the {@code userPositionMaster} property.
      */
     private final MetaProperty<PositionMaster> _userPositionMaster = DirectMetaProperty.ofReadWrite(
@@ -937,6 +1039,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
      */
     private final MetaProperty<ConfigMaster> _userConfigMaster = DirectMetaProperty.ofReadWrite(
         this, "userConfigMaster", WebsiteViewportsComponentFactory.class, ConfigMaster.class);
+    /**
+     * The meta-property for the {@code combinedConfigSource} property.
+     */
+    private final MetaProperty<ConfigSource> _combinedConfigSource = DirectMetaProperty.ofReadWrite(
+        this, "combinedConfigSource", WebsiteViewportsComponentFactory.class, ConfigSource.class);
     /**
      * The meta-property for the {@code viewProcessor} property.
      */
@@ -971,7 +1078,7 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
-      this, (DirectMetaPropertyMap) super.metaPropertyMap(),
+        this, (DirectMetaPropertyMap) super.metaPropertyMap(),
         "configMaster",
         "securityMaster",
         "securitySource",
@@ -980,9 +1087,11 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
         "positionSource",
         "computationTargetResolver",
         "historicalTimeSeriesMaster",
+        "organizationMaster",
         "userPositionMaster",
         "userPortfolioMaster",
         "userConfigMaster",
+        "combinedConfigSource",
         "viewProcessor",
         "portfolioAggregationFunctions",
         "marketDataSnapshotMaster",
@@ -1015,12 +1124,16 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
           return _computationTargetResolver;
         case 173967376:  // historicalTimeSeriesMaster
           return _historicalTimeSeriesMaster;
+        case -1158737547:  // organizationMaster
+          return _organizationMaster;
         case 1808868758:  // userPositionMaster
           return _userPositionMaster;
         case 686514815:  // userPortfolioMaster
           return _userPortfolioMaster;
         case -763459665:  // userConfigMaster
           return _userConfigMaster;
+        case -774734430:  // combinedConfigSource
+          return _combinedConfigSource;
         case -1697555603:  // viewProcessor
           return _viewProcessor;
         case 940303425:  // portfolioAggregationFunctions
@@ -1118,6 +1231,14 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
     }
 
     /**
+     * The meta-property for the {@code organizationMaster} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<OrganizationMaster> organizationMaster() {
+      return _organizationMaster;
+    }
+
+    /**
      * The meta-property for the {@code userPositionMaster} property.
      * @return the meta-property, not null
      */
@@ -1139,6 +1260,14 @@ public class WebsiteViewportsComponentFactory extends AbstractComponentFactory {
      */
     public final MetaProperty<ConfigMaster> userConfigMaster() {
       return _userConfigMaster;
+    }
+
+    /**
+     * The meta-property for the {@code combinedConfigSource} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<ConfigSource> combinedConfigSource() {
+      return _combinedConfigSource;
     }
 
     /**

@@ -117,7 +117,7 @@ public class SavePortfolio {
     final List<Future<Pair<UniqueId, ObjectId>>> futures = new LinkedList<Future<Pair<UniqueId, ObjectId>>>();
     PortfolioNodeTraverser.depthFirst(new AbstractPortfolioNodeTraversalCallback() {
       @Override
-      public void preOrderOperation(final Position position) {
+      public void preOrderOperation(final PortfolioNode parentNode, final Position position) {
         final ExternalId positionId = position.getUniqueId().toExternalId();
         ObjectId id = s_cache.get(positionId);
         if (id == null) {
@@ -214,6 +214,7 @@ public class SavePortfolio {
     final ManageablePortfolio manageablePortfolio = new ManageablePortfolio();
     manageablePortfolio.setName(getPortfolioName(portfolio));
     manageablePortfolio.setRootNode(createManageablePortfolioNode(portfolio.getRootNode()));
+    manageablePortfolio.setAttributes(portfolio.getAttributes());
     return manageablePortfolio;
   }
 

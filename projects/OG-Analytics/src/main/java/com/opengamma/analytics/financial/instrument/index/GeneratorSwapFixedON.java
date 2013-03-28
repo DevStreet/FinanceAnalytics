@@ -5,22 +5,22 @@
  */
 package com.opengamma.analytics.financial.instrument.index;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedONDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
+import com.opengamma.util.ArgumentChecker;
 
 /**
  * Generator (or template) for OIS.
  */
-public class GeneratorSwapFixedON extends GeneratorInstrument {
+public class GeneratorSwapFixedON extends GeneratorInstrument<GeneratorAttributeIR> {
 
   /**
    * The ON index of the floating leg.
@@ -200,19 +200,12 @@ public class GeneratorSwapFixedON extends GeneratorInstrument {
   /**
    * The effective date is date+_spotLag. The end of fixing period is effective date+tenor.
    */
-  public SwapFixedONDefinition generateInstrument(ZonedDateTime date, Period tenor, double fixedRate, double notional, Object... objects) {
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(date, _spotLag, _index.getCalendar());
-    return SwapFixedONDefinition.from(startDate, tenor, notional, this, fixedRate, true);
-  }
-
-  @Override
-  /**
-   * The effective date is spot+startTenor. The end of fixing period is effective date+endTenor.
-   */
-  public SwapFixedONDefinition generateInstrument(final ZonedDateTime date, final Period startTenor, final Period endTenor, double fixedRate, double notional, Object... objects) {
+  public SwapFixedONDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+    ArgumentChecker.notNull(date, "Reference date");
+    ArgumentChecker.notNull(attribute, "Attributes");
     final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _spotLag, _index.getCalendar());
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, startTenor, _businessDayConvention, _index.getCalendar(), _endOfMonth);
-    return SwapFixedONDefinition.from(startDate, endTenor, notional, this, fixedRate, true);
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartPeriod(), _businessDayConvention, _index.getCalendar(), _endOfMonth);
+    return SwapFixedONDefinition.from(startDate, attribute.getEndPeriod(), notional, this, rate, true);
   }
 
   @Override

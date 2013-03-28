@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.engine.function.blacklist;
@@ -31,6 +31,7 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 import com.opengamma.util.jms.JmsConnector;
 import com.opengamma.util.rest.UniformInterfaceException404NotFound;
 import com.opengamma.util.test.ActiveMQTestUtils;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.test.Timeout;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterface;
@@ -39,7 +40,7 @@ import com.sun.jersey.api.client.UniformInterface;
  * Tests the {@link RemoteFunctionBlacklistProvider}, {@RemoteFunctionBlacklist}, {@link DataFunctionBlacklistProviderResource}, and {@link DataFunctionBlacklistResource}
  * classes.
  */
-@Test
+@Test(groups = TestGroup.INTEGRATION)
 public class RemoteFunctionBlacklistProviderTest {
 
   private FunctionBlacklistProvider createClient(final ExecutorService executor, final JmsConnector jmsConnector, final DataFunctionBlacklistProviderResource server) {
@@ -54,7 +55,7 @@ public class RemoteFunctionBlacklistProviderTest {
           public Object answer(final InvocationOnMock invocation) throws Throwable {
             try {
               return answerGet(server, s).getEntity();
-            } catch (WebApplicationException e) {
+            } catch (final WebApplicationException e) {
               assertEquals(e.getResponse().getStatus(), 404);
               throw new UniformInterfaceException404NotFound(new ClientResponse(404, null, null, null), false);
             }
@@ -77,7 +78,7 @@ public class RemoteFunctionBlacklistProviderTest {
 
   public void testGetBlacklist () {
     final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector();
+    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector("RemoteFunctionBlacklistProviderTest.testGetBlacklist");
     try {
       final InMemoryFunctionBlacklistProvider underlying = new InMemoryFunctionBlacklistProvider(executor);
       final DataFunctionBlacklistProviderResource server = new DataFunctionBlacklistProviderResource(underlying, OpenGammaFudgeContext.getInstance(), jmsConnector);
@@ -108,12 +109,12 @@ public class RemoteFunctionBlacklistProviderTest {
   protected static void testRuleUpdates(final ManageableFunctionBlacklist update, final FunctionBlacklist receive) throws InterruptedException {
     assertTrue(update.getRules().isEmpty());
     assertTrue(receive.getRules().isEmpty());
-    final FunctionBlacklistRule rule1 = new FunctionBlacklistRule(new ComputationTargetSpecification(UniqueId.of("Test", "1")));
-    final FunctionBlacklistRule rule2 = new FunctionBlacklistRule(new ComputationTargetSpecification(UniqueId.of("Test", "2")));
-    final FunctionBlacklistRule rule3 = new FunctionBlacklistRule(new ComputationTargetSpecification(UniqueId.of("Test", "3")));
-    final FunctionBlacklistRule rule1b = new FunctionBlacklistRule(new ComputationTargetSpecification(UniqueId.of("Test", "1b")));
-    final FunctionBlacklistRule rule2b = new FunctionBlacklistRule(new ComputationTargetSpecification(UniqueId.of("Test", "2b")));
-    final FunctionBlacklistRule rule3b = new FunctionBlacklistRule(new ComputationTargetSpecification(UniqueId.of("Test", "3b")));
+    final FunctionBlacklistRule rule1 = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("Test", "1")));
+    final FunctionBlacklistRule rule2 = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("Test", "2")));
+    final FunctionBlacklistRule rule3 = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("Test", "3")));
+    final FunctionBlacklistRule rule1b = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("Test", "1b")));
+    final FunctionBlacklistRule rule2b = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("Test", "2b")));
+    final FunctionBlacklistRule rule3b = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("Test", "3b")));
     update.addBlacklistRule(rule1);
     waitForModificationCount(receive, 1);
     assertEquals(receive.getRules().size(), 1);
@@ -145,7 +146,7 @@ public class RemoteFunctionBlacklistProviderTest {
 
   public void testReceiveUpdates() throws InterruptedException {
     final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector();
+    final JmsConnector jmsConnector = ActiveMQTestUtils.createTestJmsConnector("RemoteFunctionBlacklistProviderTest.testReceiveUpdates");
     try {
       final InMemoryFunctionBlacklistProvider underlying = new InMemoryFunctionBlacklistProvider(executor);
       final DataFunctionBlacklistProviderResource server = new DataFunctionBlacklistProviderResource(underlying, OpenGammaFudgeContext.getInstance(), jmsConnector);

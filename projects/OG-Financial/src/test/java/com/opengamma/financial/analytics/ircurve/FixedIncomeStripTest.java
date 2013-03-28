@@ -9,16 +9,17 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.time.calendar.Period;
-
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
 
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.time.Tenor;
 
 /**
  * Test FixedIncomeStrip.
  */
+@Test(groups = TestGroup.UNIT)
 public class FixedIncomeStripTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)

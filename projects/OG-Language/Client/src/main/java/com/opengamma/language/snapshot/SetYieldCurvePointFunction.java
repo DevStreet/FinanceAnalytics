@@ -9,9 +9,9 @@ package com.opengamma.language.snapshot;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opengamma.core.marketdatasnapshot.MarketDataValueType;
+import com.opengamma.core.marketdatasnapshot.impl.ManageableUnstructuredMarketDataSnapshot;
 import com.opengamma.core.marketdatasnapshot.impl.ManageableYieldCurveSnapshot;
-import com.opengamma.id.UniqueId;
+import com.opengamma.id.ExternalId;
 import com.opengamma.language.context.SessionContext;
 import com.opengamma.language.definition.Categories;
 import com.opengamma.language.definition.DefinitionAnnotater;
@@ -37,7 +37,7 @@ public class SetYieldCurvePointFunction extends AbstractFunctionInvoker implemen
     return Arrays.asList(
         new MetaParameter("snapshot", JavaTypeInfo.builder(ManageableYieldCurveSnapshot.class).get()),
         new MetaParameter("valueName", JavaTypeInfo.builder(String.class).get()),
-        new MetaParameter("identifier", JavaTypeInfo.builder(UniqueId.class).get()),
+        new MetaParameter("identifier", JavaTypeInfo.builder(ExternalId.class).get()),
         new MetaParameter("overrideValue", JavaTypeInfo.builder(Double.class).allowNull().get()),
         new MetaParameter("marketValue", JavaTypeInfo.builder(Double.class).allowNull().get()));
   }
@@ -53,12 +53,12 @@ public class SetYieldCurvePointFunction extends AbstractFunctionInvoker implemen
     this(new DefinitionAnnotater(SetYieldCurvePointFunction.class));
   }
 
-  public static ManageableYieldCurveSnapshot invoke(final ManageableYieldCurveSnapshot snapshot, final String valueName, final UniqueId identifier,
+  public static ManageableYieldCurveSnapshot invoke(final ManageableYieldCurveSnapshot snapshot, final String valueName, final ExternalId identifier,
       final Double overrideValue, final Double marketValue) {
     if (snapshot.getValues() == null) {
-      snapshot.setValues(UnstructuredMarketDataSnapshotUtil.create());
+      snapshot.setValues(new ManageableUnstructuredMarketDataSnapshot());
     }
-    UnstructuredMarketDataSnapshotUtil.setValue(snapshot.getValues(), valueName, identifier, overrideValue, marketValue, MarketDataValueType.SECURITY);
+    UnstructuredMarketDataSnapshotUtil.setValue(snapshot.getValues(), valueName, identifier, overrideValue, marketValue);
     return snapshot;
   }
 
@@ -66,7 +66,7 @@ public class SetYieldCurvePointFunction extends AbstractFunctionInvoker implemen
 
   @Override
   protected Object invokeImpl(final SessionContext sessionContext, final Object[] parameters) {
-    return invoke((ManageableYieldCurveSnapshot) parameters[0], (String) parameters[1], (UniqueId) parameters[2], (Double) parameters[3], (Double) parameters[4]);
+    return invoke((ManageableYieldCurveSnapshot) parameters[0], (String) parameters[1], (ExternalId) parameters[2], (Double) parameters[3], (Double) parameters[4]);
   }
 
   // PublishedFunction

@@ -6,31 +6,67 @@ $.register_module({
     name: 'og.blotter.util',
     dependencies: [],
     obj: function () {
-        return {
-            update_block : function (section, extras){
-                section.block.html(function (html) {
-                    $(section.selector).html(html);
-                }, extras);
+        var util = this, bools = {"false": false, "true": true};
+        return util = {
+            /* Util methods */
+            create_name : function (data){
+                return data.security.type + " " + data.trade.tradeDate;
             },
-            option : Handlebars.compile('<option value="{{{value}}}">{{{name}}}</option>'),
-            FAKE_DROPDOWN : [
-                    {name:'Select', value:''},
-                    {name:'Value 1', value:'0'},
-                    {name:'Value 2', value:'1'},
-                    {name:'Value 3', value:'2'},
-                    {name:'Value 4', value:'3'}
-            ],
-            FAKE_IDS : [
-                {bloomberg:'bloomberg 1', ric: 'ric 1', cusip: 'cusip 1', isin: 'isin 1', sedol: 'sedol 1'},
-                {bloomberg:'bloomberg 2', ric: 'ric 2', cusip: 'cusip 2', isin: 'isin 2', sedol: 'sedol 2'},
-                {bloomberg:'bloomberg 3', ric: 'ric 3', cusip: 'cusip 3', isin: 'isin 3', sedol: 'sedol 3'},
-                {bloomberg:'bloomberg 4', ric: 'ric 4', cusip: 'cusip 4', isin: 'isin 4', sedol: 'sedol 4'}
-            ],
-            FAKE_BOND : [
-                {issuer:'issuer 1',currency: 'currency 1',coupon_type: 'type 1',coupon_rate: 'rate 1',date: 'date 1'},
-                {issuer:'issuer 2',currency: 'currency 2',coupon_type: 'type 2',coupon_rate: 'rate 2',date: 'date 2'},
-                {issuer:'issuer 3',currency: 'currency 3',coupon_type: 'type 3',coupon_rate: 'rate 3',date: 'date 3'},
-                {issuer:'issuer 4',currency: 'currency 4',coupon_type: 'type 4',coupon_rate: 'rate 4',date: 'date 4'}
+            check_radio : function (name, value){
+                $('input:radio[name="'+ name +'"]').filter('[value='+ value + ']').attr('checked', true);
+            },
+            set_select : function (name, value){
+                $('select[name="'+ name +'"]').val(value);
+            },
+            check_checkbox : function (name, value){
+                $('input:checkbox[name="'+ name +'"]').prop('checked', bools[value]);
+            },
+            add_date_picker : function (selector){
+                $(selector).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true });
+            },
+            add_time_picker : function (selector) {
+                $(selector).datetimepicker({ timeOnly:true });
+            },
+            get_checkbox : function (name) {
+                return $('input:checkbox[name="'+ name +'"]').is(':checked').toString();
+            },
+            get_attributes : function () {
+                var attributes = {};
+                $('.og-attributes-add-list li').each(function (i, elm) {
+                    var arr = $(elm).text().split(' = ');
+                    attributes[arr[0]] = arr[1];
+                });
+                return attributes;
+            },
+            toggle_fixed : function (ele, selection) {
+                var option = ele.find("option[value='FixedInterestRateLeg']");
+                if(selection == 'FixedInterestRateLeg') option.attr("disabled", "disabled");
+                else option.removeAttr("disabled");
+            },
+            cleanup : function (obj) {
+                Object.keys(obj).forEach(function (key) {
+                    var value = obj[key];
+                    if (typeof value === 'string' && !value.length) delete obj[key];
+                    else if (value instanceof Object) util.cleanup(value);
+                });
+            },
+            set_initial_focus : function () {
+                $('input[name="trade.counterparty"]').focus();
+            },
+            /* Util data */
+            otc_trade : {
+                attributes: {},
+                type: "OtcTrade"
+            },
+            fungible_trade : {
+                attributes: {},
+                type: "FungibleTrade"
+            },
+            swap_types : [
+                {text:'Floating Interest Rate Leg', value:'FloatingInterestRateLeg'},
+                {text:'Floating Gearing Interest Rate Leg', value:'FloatingGearingIRLeg'},
+                {text:'Floating Spread Interest Rate Leg', value:'FloatingSpreadIRLeg'},
+                {text:'Fixed Interest Rate Leg', value:'FixedInterestRateLeg'}
             ]
         };
     }

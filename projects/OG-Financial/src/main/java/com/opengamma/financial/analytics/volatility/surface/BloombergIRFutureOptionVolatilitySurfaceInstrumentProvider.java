@@ -7,7 +7,7 @@ package com.opengamma.financial.analytics.volatility.surface;
 
 import java.text.DecimalFormat;
 
-import javax.time.calendar.LocalDate;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.ArgumentChecker;
@@ -50,7 +50,8 @@ public class BloombergIRFutureOptionVolatilitySurfaceInstrumentProvider extends 
 
   @Override
   /**
-   * Provides ExternalID for Bloomberg ticker, e.g. EDZ3C  99.250 Comdty,
+   * {@inheritDoc}
+   * Provides ExternalID for Bloomberg ticker, e.g. EDZ3C 99.250 Comdty,
    * given a reference date and an integer offset, the n'th subsequent option
    * The format is futurePrefix + month + year + callPutFlag + strike + postfix
    *

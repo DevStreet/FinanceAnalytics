@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.Period;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.ObjectUtils;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
@@ -27,10 +26,10 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Paymen
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.timeseries.DoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
 
 /**
  * Class describing a OIS-like floating coupon.
@@ -71,8 +70,8 @@ public class CouponOISDefinition extends CouponDefinition implements InstrumentD
     ArgumentChecker.isTrue(currency.equals(index.getCurrency()), "Coupon and index currencies are not compatible. Expected to be the same");
     _index = index;
 
-    final List<ZonedDateTime> fixingDateList = new ArrayList<ZonedDateTime>();
-    final List<Double> fixingAccrualFactorList = new ArrayList<Double>();
+    final List<ZonedDateTime> fixingDateList = new ArrayList<>();
+    final List<Double> fixingAccrualFactorList = new ArrayList<>();
 
     ZonedDateTime currentDate = fixingPeriodStartDate;
     fixingDateList.add(currentDate);
@@ -83,8 +82,8 @@ public class CouponOISDefinition extends CouponDefinition implements InstrumentD
       fixingAccrualFactorList.add(index.getDayCount().getDayCountFraction(currentDate, nextDate));
       currentDate = nextDate;
     }
-    _fixingPeriodDate = fixingDateList.toArray(new ZonedDateTime[0]);
-    _fixingPeriodAccrualFactor = fixingAccrualFactorList.toArray(new Double[0]);
+    _fixingPeriodDate = fixingDateList.toArray(new ZonedDateTime[fixingDateList.size()]);
+    _fixingPeriodAccrualFactor = fixingAccrualFactorList.toArray(new Double[fixingAccrualFactorList.size()]);
   }
 
   /**
@@ -178,7 +177,7 @@ public class CouponOISDefinition extends CouponDefinition implements InstrumentD
     }
 
     // FIXME Historical time series do not have time information to begin with.
-    final LocalDateDoubleTimeSeries indexFixingDateSeries = indexFixingTimeSeries.toDateDoubleTimeSeries().toLocalDateDoubleTimeSeries(TimeZone.UTC);
+    final LocalDateDoubleTimeSeries indexFixingDateSeries = indexFixingTimeSeries.toDateDoubleTimeSeries().toLocalDateDoubleTimeSeries(ZoneOffset.UTC);
 
     // Accrue notional for fixings before today; up to and including yesterday
     int fixedPeriod = 0;
@@ -186,14 +185,21 @@ public class CouponOISDefinition extends CouponDefinition implements InstrumentD
     while (valDate.isAfter(_fixingPeriodDate[fixedPeriod + _index.getPublicationLag()].toLocalDate()) && (fixedPeriod < _fixingPeriodDate.length - 1)) {
 
       final LocalDate currentDate = _fixingPeriodDate[fixedPeriod].toLocalDate();
-      final Double fixedRate = indexFixingDateSeries.getValue(currentDate);
+      Double fixedRate = indexFixingDateSeries.getValue(currentDate);
 
       if (fixedRate == null) {
         final LocalDate latestDate = indexFixingDateSeries.getLatestTime();
         if (currentDate.isAfter(latestDate)) {
           throw new OpenGammaRuntimeException("Could not get fixing value of index " + _index.getName() + " for date " + currentDate + ". The last data is available on " + latestDate);
         }
-        throw new OpenGammaRuntimeException("Could not get fixing value of index " + _index.getName() + " for date " + currentDate);
+        // Don't remove this until we've worked out what's going on with INR calendars
+        for (int i = 0; i < 7; i++) {
+          final LocalDate previousDate = currentDate.minusDays(1);
+          fixedRate = indexFixingDateSeries.getValue(previousDate);
+        }
+        if (fixedRate == null) {
+          throw new OpenGammaRuntimeException("Could not get fixing value of index " + _index.getName() + " for date " + currentDate);
+        }
       }
       accruedNotional *= 1 + _fixingPeriodAccrualFactor[fixedPeriod] * fixedRate;
       fixedPeriod++;

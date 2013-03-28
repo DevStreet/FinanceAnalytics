@@ -9,10 +9,9 @@ import static org.testng.AssertJUnit.assertEquals;
 
 import java.util.List;
 
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.future.FederalFundsFutureSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.future.FederalFundsFutureTransactionDefinition;
@@ -26,9 +25,9 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.FederalF
 import com.opengamma.analytics.financial.interestrate.method.SensitivityFiniteDifference;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
+import com.opengamma.timeseries.zoneddatetime.ArrayZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.time.DateUtils;
-import com.opengamma.util.timeseries.zoneddatetime.ArrayZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.tuple.DoublesPair;
 
 public class FederalFundsFutureTransactionDiscountingMethodTest {

@@ -57,11 +57,12 @@ $.register_module({
                 [[SETS, SPEC, INDX, SPVN].join('.'),                                            Form.type.STR],
                 ['currency',                                                                    Form.type.STR],
                 ['identifier',                                                                  Form.type.STR],
-                ['maxDeltaCalcPeriod',                                                          Form.type.SHR],
-                ['maxFullCalcPeriod',                                                           Form.type.SHR],
-                ['minDeltaCalcPeriod',                                                          Form.type.SHR],
-                ['minFullCalcPeriod',                                                           Form.type.SHR],
+                ['maxDeltaCalcPeriod',                                                          Form.type.LNG],
+                ['maxFullCalcPeriod',                                                           Form.type.LNG],
+                ['minDeltaCalcPeriod',                                                          Form.type.LNG],
+                ['minFullCalcPeriod',                                                           Form.type.LNG],
                 ['name',                                                                        Form.type.STR],
+                ['persistent',                                                                  Form.type.IND],
                 [[RMDF, 'aggregatePositionOutputMode'].join('.'),                               Form.type.STR],
                 [[RMDF, 'positionOutputMode'].join('.'),                                        Form.type.STR],
                 [[RMDF, 'primitiveOutputMode'].join('.'),                                       Form.type.STR],
@@ -146,7 +147,11 @@ $.register_module({
             form.children = [
                 new form.Block({ // form item_0
                     module: 'og.views.forms.view-definition-identifier-currency_tash',
-                    extras: {name: master.name},
+                    extras: {name: master.name, persistent: 'persistent' in master},
+                    processor: function (data) {
+                        if ($(form_id + ' input[name=persistent]').is(':checked')) data.persistent = null;
+                        else delete data.persistent;
+                    },
                     children: [
                         new ui.Dropdown({
                             form: form, resource: 'portfolios', index: 'identifier', value: master.identifier,
@@ -185,7 +190,11 @@ $.register_module({
                     });
                 })(),
                 new form.Block({ // form item_2
-                    module: 'og.views.forms.view-definition-execution-parameters_tash'
+                    module: 'og.views.forms.view-definition-execution-parameters_tash',
+                    processor: function (data) {
+                        ['maxDeltaCalcPeriod', 'maxFullCalcPeriod', 'minDeltaCalcPeriod', 'minFullCalcPeriod']
+                            .forEach(function (param) {if (data[param] === '') delete data[param];});
+                    }
                 }).on('form:load', function () {
                     ['DeltaCalcPeriod', 'FullCalcPeriod'].forEach(function (suffix) {
                         ['min', 'max'].forEach(function (prefix) {
@@ -223,12 +232,12 @@ $.register_module({
                 });
                 var new_col_set = function (set, set_idx) {
                     var set_id = '#' + og.common.id(prefix),
-                        spec_vals = new form.Block({wrap: '<ul class="og-js-spec-holder">{{{html}}}</ul>'}),
-                        col_vals = new form.Block({wrap: '{{{html}}}'}),
-                        col_tabs = new form.Block({wrap: '{{{html}}}'}),
+                        spec_vals = new form.Block({template: '<ul class="og-js-spec-holder">{{{children}}}</ul>'}),
+                        col_vals = new form.Block({template: '{{{children}}}'}),
+                        col_tabs = new form.Block({template: '{{{children}}}'}),
                         column_set = new form.Block({
-                            wrap: '<div class="og-mod-content OG-clearFix og-js-colset-holder" id="' +
-                                set_id.substring(1) + '">{{{html}}}</div>'
+                            template: '<div class="og-mod-content OG-clearFix og-js-colset-holder" id="' +
+                                set_id.substring(1) + '">{{{children}}}</div>'
                         });
                     column_set.on('form:load', function () {
                         if (!$(set_id + ' .og-js-col-holder').length)
@@ -332,7 +341,7 @@ $.register_module({
                     var new_col_val = function (col, col_idx) {
                         var col_id = og.common.id(prefix),
                             dropdown_name = [SETS, set_idx, COLS, col_idx, SECU].join('.'),
-                            reqs_block = new form.Block({wrap: '<ul class="og-js-port-req">{{{html}}}</ul>'});
+                            reqs_block = new form.Block({template: '<ul class="og-js-port-req">{{{children}}}</ul>'});
                         var new_port_req = function (req, req_idx) {
                             var sel_name = [SETS, set_idx, COLS, col_idx, REQS, req_idx, REQO].join('.'),
                                 cons_name = [SETS, set_idx, COLS, col_idx, REQS, req_idx, CONS].join('.');

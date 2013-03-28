@@ -11,10 +11,6 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
-import javax.time.Instant;
-import javax.time.TimeSource;
-import javax.time.calendar.OffsetDateTime;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -24,6 +20,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.threeten.bp.Clock;
+import org.threeten.bp.Instant;
+import org.threeten.bp.OffsetDateTime;
+import org.threeten.bp.ZoneOffset;
 
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
@@ -32,10 +33,12 @@ import com.opengamma.master.portfolio.ManageablePortfolioNode;
 import com.opengamma.master.portfolio.PortfolioDocument;
 import com.opengamma.masterdb.DbMasterTestUtils;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Base tests for DbPortfolioMasterWorker via DbPortfolioMaster.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public abstract class AbstractDbPortfolioMasterWorkerTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(AbstractDbPortfolioMasterWorkerTest.class);
@@ -77,7 +80,7 @@ public abstract class AbstractDbPortfolioMasterWorkerTest extends DbTest {
     _prtMaster = (DbPortfolioMaster) context.getBean(getDatabaseType() + "DbPortfolioMaster");
     
     _now = OffsetDateTime.now();
-    _prtMaster.setTimeSource(TimeSource.fixed(_now.toInstant()));
+    _prtMaster.setClock(Clock.fixed(_now.toInstant(), ZoneOffset.UTC));
     _version1Instant = _now.toInstant().minusSeconds(100);
     _version2Instant = _now.toInstant().minusSeconds(50);
     s_logger.debug("test data now:   {}", _version1Instant);

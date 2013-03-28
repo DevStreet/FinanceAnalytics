@@ -8,9 +8,9 @@ package com.opengamma.analytics.financial.instrument.annuity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborON;
@@ -18,8 +18,8 @@ import com.opengamma.analytics.financial.instrument.payment.CouponOISDefinition;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
+import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
 
 /**
  * A wrapper class for a AnnuityDefinition containing CouponOISDefinition.

@@ -11,7 +11,7 @@ import static com.opengamma.language.convert.TypeMap.ZERO_LOSS;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.time.calendar.LocalDate;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.language.Value;
 import com.opengamma.language.ValueUtils;
@@ -19,8 +19,8 @@ import com.opengamma.language.convert.TypeMap;
 import com.opengamma.language.convert.ValueConversionContext;
 import com.opengamma.language.definition.JavaTypeInfo;
 import com.opengamma.language.invoke.AbstractTypeConverter;
-import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 
 /**
  * Converts a {@link LocalDateDoubleTimeSeries} to/from a 2D value array.

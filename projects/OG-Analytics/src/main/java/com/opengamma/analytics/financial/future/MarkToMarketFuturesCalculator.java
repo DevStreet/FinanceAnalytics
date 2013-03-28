@@ -8,12 +8,17 @@ package com.opengamma.analytics.financial.future;
 import com.opengamma.analytics.financial.commodity.derivative.AgricultureFuture;
 import com.opengamma.analytics.financial.commodity.derivative.EnergyFuture;
 import com.opengamma.analytics.financial.commodity.derivative.MetalFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.CashSettledFuture;
 import com.opengamma.analytics.financial.equity.future.derivative.EquityFuture;
 import com.opengamma.analytics.financial.equity.future.derivative.EquityIndexDividendFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.EquityIndexFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.IndexFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.VolatilityIndexFuture;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisitorAdapter;
+import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
+import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureTransaction;
 import com.opengamma.analytics.financial.simpleinstruments.pricing.SimpleFutureDataBundle;
 import com.opengamma.util.ArgumentChecker;
-
 
 /**
  * 
@@ -27,35 +32,77 @@ public abstract class MarkToMarketFuturesCalculator extends InstrumentDerivative
   public Double visitAgricultureFuture(final AgricultureFuture future, final SimpleFutureDataBundle dataBundle) {
     ArgumentChecker.notNull(future, "future");
     ArgumentChecker.notNull(dataBundle, "data bundle");
-    return getResult(dataBundle, future.getReferencePrice(), future.getUnitAmount(), future.getExpiry());
+    return Double.valueOf(getResult(dataBundle, future.getReferencePrice(), future.getUnitAmount(), future.getExpiry()));
   }
 
   @Override
   public Double visitEnergyFuture(final EnergyFuture future, final SimpleFutureDataBundle dataBundle) {
     ArgumentChecker.notNull(future, "future");
     ArgumentChecker.notNull(dataBundle, "data bundle");
-    return getResult(dataBundle, future.getReferencePrice(), future.getUnitAmount(), future.getExpiry());
+    return Double.valueOf(getResult(dataBundle, future.getReferencePrice(), future.getUnitAmount(), future.getExpiry()));
   }
 
   @Override
   public Double visitEquityFuture(final EquityFuture future, final SimpleFutureDataBundle dataBundle) {
     ArgumentChecker.notNull(future, "future");
     ArgumentChecker.notNull(dataBundle, "data bundle");
-    return getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement());
+    return Double.valueOf(getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement()));
   }
 
   @Override
   public Double visitEquityIndexDividendFuture(final EquityIndexDividendFuture future, final SimpleFutureDataBundle dataBundle) {
     ArgumentChecker.notNull(future, "future");
     ArgumentChecker.notNull(dataBundle, "data bundle");
-    return getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement());
+    return Double.valueOf(getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement()));
   }
 
   @Override
   public Double visitMetalFuture(final MetalFuture future, final SimpleFutureDataBundle dataBundle) {
     ArgumentChecker.notNull(future, "future");
     ArgumentChecker.notNull(dataBundle, "data bundle");
-    return getResult(dataBundle, future.getReferencePrice(), future.getUnitAmount(), future.getExpiry());
+    return Double.valueOf(getResult(dataBundle, future.getReferencePrice(), future.getUnitAmount(), future.getExpiry()));
+  }
+
+  @Override
+  public Double visitInterestRateFutureTransaction(final InterestRateFutureTransaction future, final SimpleFutureDataBundle dataBundle) {
+    ArgumentChecker.notNull(future, "future");
+    ArgumentChecker.notNull(dataBundle, "data bundle");
+    return Double.valueOf(getResult(dataBundle, future.getReferencePrice(), future.getNotional() * future.getPaymentAccrualFactor(), future.getLastTradingTime()));
+  }
+
+  @Override
+  public Double visitBondFuture(final BondFuture future, final SimpleFutureDataBundle dataBundle) {
+    ArgumentChecker.notNull(future, "future");
+    ArgumentChecker.notNull(dataBundle, "data bundle");
+    return Double.valueOf(getResult(dataBundle, future.getReferencePrice(), future.getNotional(), future.getTradingLastTime()));
+  }
+
+  @Override
+  public Double visitCashSettledFuture(final CashSettledFuture future, final SimpleFutureDataBundle dataBundle) {
+    ArgumentChecker.notNull(future, "future");
+    ArgumentChecker.notNull(dataBundle, "data bundle");
+    return Double.valueOf(getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement()));
+  }
+
+  @Override
+  public Double visitIndexFuture(final IndexFuture future, final SimpleFutureDataBundle dataBundle) {
+    ArgumentChecker.notNull(future, "future");
+    ArgumentChecker.notNull(dataBundle, "data bundle");
+    return Double.valueOf(getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement()));
+  }
+  
+  @Override
+  public Double visitEquityIndexFuture(final EquityIndexFuture future, final SimpleFutureDataBundle dataBundle) {
+    ArgumentChecker.notNull(future, "future");
+    ArgumentChecker.notNull(dataBundle, "data bundle");
+    return Double.valueOf(getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement()));
+  }
+  
+  @Override
+  public Double visitVolatilityIndexFuture(final VolatilityIndexFuture future, final SimpleFutureDataBundle dataBundle) {
+    ArgumentChecker.notNull(future, "future");
+    ArgumentChecker.notNull(dataBundle, "data bundle");
+    return Double.valueOf(getResult(dataBundle, future.getStrike(), future.getUnitAmount(), future.getTimeToSettlement()));
   }
 
   abstract double getResult(SimpleFutureDataBundle dataBundle, double strike, double unitAmount, double t);
@@ -75,7 +122,7 @@ public abstract class MarkToMarketFuturesCalculator extends InstrumentDerivative
 
     @Override
     double getResult(final SimpleFutureDataBundle dataBundle, final double strike, final double unitAmount, final double t) {
-      return (dataBundle.getMarketPrice() - strike) * unitAmount;
+      return (dataBundle.getMarketPrice().doubleValue() - strike) * unitAmount;
     }
 
   }
@@ -114,7 +161,7 @@ public abstract class MarkToMarketFuturesCalculator extends InstrumentDerivative
 
     @Override
     double getResult(final SimpleFutureDataBundle dataBundle, final double strike, final double unitAmount, final double t) {
-      return t * dataBundle.getMarketPrice() * unitAmount;
+      return t * dataBundle.getMarketPrice().doubleValue() * unitAmount;
     }
   }
 
@@ -152,7 +199,10 @@ public abstract class MarkToMarketFuturesCalculator extends InstrumentDerivative
 
     @Override
     double getResult(final SimpleFutureDataBundle dataBundle, final double strike, final double unitAmount, final double t) {
-      return dataBundle.getSpotValue();
+      if (dataBundle.getSpotValue() == null) {
+        throw new UnsupportedOperationException("Spot value for future underlying was null");
+      }
+      return dataBundle.getSpotValue().doubleValue();
     }
 
   }
@@ -172,7 +222,7 @@ public abstract class MarkToMarketFuturesCalculator extends InstrumentDerivative
 
     @Override
     double getResult(final SimpleFutureDataBundle dataBundle, final double strike, final double unitAmount, final double t) {
-      return dataBundle.getMarketPrice();
+      return dataBundle.getMarketPrice().doubleValue();
     }
 
   }

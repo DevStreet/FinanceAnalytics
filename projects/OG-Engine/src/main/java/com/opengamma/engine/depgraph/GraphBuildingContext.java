@@ -13,6 +13,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opengamma.engine.ComputationTargetResolver;
+import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.MemoryUtils;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.ParameterizedFunction;
@@ -20,6 +22,8 @@ import com.opengamma.engine.function.exclusion.FunctionExclusionGroup;
 import com.opengamma.engine.function.exclusion.FunctionExclusionGroups;
 import com.opengamma.engine.function.resolver.CompiledFunctionResolver;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
+import com.opengamma.engine.target.ComputationTargetReference;
+import com.opengamma.engine.target.ComputationTargetResolverUtils;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.util.tuple.Pair;
@@ -65,6 +69,10 @@ import com.opengamma.util.tuple.Pair;
 
   // Operations
 
+  public void submit(final ContextRunnable runnable) {
+    getBuilder().addToRunQueue(runnable);
+  }
+
   /**
    * Schedule the task for execution.
    * 
@@ -72,7 +80,7 @@ import com.opengamma.util.tuple.Pair;
    */
   public void run(final ResolveTask runnable) {
     runnable.addRef();
-    getBuilder().addToRunQueue(runnable);
+    submit(runnable);
   }
 
   /**
@@ -83,7 +91,7 @@ import com.opengamma.util.tuple.Pair;
   public void pump(final ResolutionPump pump) {
     s_logger.debug("Pumping {}", pump);
     if (++_stackDepth > MAX_CALLBACK_DEPTH) {
-      getBuilder().addToRunQueue(new ResolutionPump.Pump(pump));
+      submit(new ResolutionPump.Pump(pump));
     } else {
       pump.pump(this);
     }
@@ -98,7 +106,7 @@ import com.opengamma.util.tuple.Pair;
   public void close(final ResolutionPump pump) {
     s_logger.debug("Closing {}", pump);
     if (++_stackDepth > MAX_CALLBACK_DEPTH) {
-      getBuilder().addToRunQueue(new ResolutionPump.Close(pump));
+      submit(new ResolutionPump.Close(pump));
     } else {
       pump.close(this);
     }
@@ -116,7 +124,7 @@ import com.opengamma.util.tuple.Pair;
   public void resolved(final ResolvedValueCallback callback, final ValueRequirement valueRequirement, final ResolvedValue resolvedValue, final ResolutionPump pump) {
     s_logger.debug("Resolved {} to {}", valueRequirement, resolvedValue);
     _stackDepth++;
-    // Scheduling failure and resolved callbacks from the run queue is a real headache to debug, so always call them inline 
+    // Scheduling failure and resolved callbacks from the run queue is a real headache to debug, so always call them inline
     callback.resolved(this, valueRequirement, resolvedValue, pump);
     _stackDepth--;
   }
@@ -131,7 +139,7 @@ import com.opengamma.util.tuple.Pair;
   public void failed(final ResolvedValueCallback callback, final ValueRequirement valueRequirement, final ResolutionFailure failure) {
     s_logger.debug("Couldn't resolve {}", valueRequirement);
     _stackDepth++;
-    // Scheduling failure and resolved callbacks from the run queue is a real headache to debug, so always call them inline 
+    // Scheduling failure and resolved callbacks from the run queue is a real headache to debug, so always call them inline
     callback.failed(this, valueRequirement, failure);
     _stackDepth--;
   }
@@ -149,8 +157,9 @@ import com.opengamma.util.tuple.Pair;
     ExceptionWrapper.createAndPut(t, _exceptions);
   }
 
-  public ResolvedValueProducer resolveRequirement(final ValueRequirement rawRequirement, final ResolveTask dependent, final Set<FunctionExclusionGroup> functionExclusion) {
-    final ValueRequirement requirement = MemoryUtils.instance(rawRequirement);
+  public ResolvedValueProducer resolveRequirement(final ValueRequirement rawRequirement, final ResolveTask dependent,
+      final Map<ComputationTargetSpecification, Set<FunctionExclusionGroup>> functionExclusion) {
+    final ValueRequirement requirement = simplifyType(rawRequirement);
     s_logger.debug("Resolve requirement {}", requirement);
     if ((dependent != null) && dependent.hasParent(requirement)) {
       dependent.setRecursionDetected();
@@ -160,7 +169,7 @@ import com.opengamma.util.tuple.Pair;
     RequirementResolver resolver = null;
     final ResolveTask[] tasks = getTasksResolving(requirement);
     if (tasks != null) {
-      for (ResolveTask task : tasks) {
+      for (final ResolveTask task : tasks) {
         if ((dependent == null) || !dependent.hasParent(task)) {
           if (resolver == null) {
             resolver = new RequirementResolver(requirement, dependent, functionExclusion);
@@ -179,7 +188,8 @@ import com.opengamma.util.tuple.Pair;
     }
   }
 
-  public ResolveTask getOrCreateTaskResolving(final ValueRequirement valueRequirement, final ResolveTask parentTask, final Set<FunctionExclusionGroup> functionExclusion) {
+  public ResolveTask getOrCreateTaskResolving(final ValueRequirement valueRequirement, final ResolveTask parentTask,
+      final Map<ComputationTargetSpecification, Set<FunctionExclusionGroup>> functionExclusion) {
     final ResolveTask newTask = new ResolveTask(valueRequirement, parentTask, functionExclusion);
     do {
       ResolveTask task;
@@ -223,7 +233,7 @@ import com.opengamma.util.tuple.Pair;
         }
         result = new ResolveTask[tasks.size()];
         int i = 0;
-        for (ResolveTask task : tasks.keySet()) {
+        for (final ResolveTask task : tasks.keySet()) {
           result[i++] = task;
           task.addRef();
         }
@@ -249,7 +259,7 @@ import com.opengamma.util.tuple.Pair;
           resultTasks = new ResolveTask[tasks.size()];
           resultProducers = new ResolvedValueProducer[tasks.size()];
           int i = 0;
-          for (Map.Entry<ResolveTask, ResolvedValueProducer> task : (Set<Map.Entry<ResolveTask, ResolvedValueProducer>>) tasks.entrySet()) {
+          for (final Map.Entry<ResolveTask, ResolvedValueProducer> task : (Set<Map.Entry<ResolveTask, ResolvedValueProducer>>) tasks.entrySet()) {
             // Don't ref-count the tasks; they're just used for parent comparisons
             resultTasks[i] = task.getKey();
             resultProducers[i++] = task.getValue();
@@ -277,7 +287,14 @@ import com.opengamma.util.tuple.Pair;
         if (tasks.containsKey(null)) {
           continue;
         }
-        if (tasks.remove(task) == null) {
+        final ResolveTask removed = tasks.remove(task);
+        if (removed == null) {
+          // Task has already been discarded
+          return;
+        }
+        if (removed != task) {
+          // Task has already been discarded and replaced by an equivalent; don't discard that
+          tasks.put(removed, removed);
           return;
         }
       }
@@ -364,6 +381,46 @@ import com.opengamma.util.tuple.Pair;
     getBuilder().addResolvedValue(resolvedValue);
   }
 
+  public ComputationTargetSpecification resolveTargetReference(final ComputationTargetReference reference) {
+    final ComputationTargetSpecification specification = getBuilder().resolveTargetReference(reference);
+    if (specification == null) {
+      s_logger.warn("Couldn't resolve {}", reference);
+    }
+    return specification;
+  }
+
+  /**
+   * Simplifies the type based on the associated {@link ComputationTargetResolver}.
+   * 
+   * @param valueSpec the specification to process, not null
+   * @return the possibly simplified specification, not null
+   */
+  public ValueSpecification simplifyType(final ValueSpecification valueSpec) {
+    final ComputationTargetSpecification oldTargetSpec = valueSpec.getTargetSpecification();
+    final ComputationTargetSpecification newTargetSpec = ComputationTargetResolverUtils.simplifyType(oldTargetSpec, getCompilationContext().getComputationTargetResolver());
+    if (newTargetSpec == oldTargetSpec) {
+      return valueSpec;
+    } else {
+      return MemoryUtils.instance(new ValueSpecification(valueSpec.getValueName(), newTargetSpec, valueSpec.getProperties()));
+    }
+  }
+
+  /**
+   * Simplifies the type based on the associated {@link ComputationTargetResolver}.
+   * 
+   * @param valueReq the requirement to process, not null
+   * @return the possibly simplified requirement, not null
+   */
+  public ValueRequirement simplifyType(final ValueRequirement valueReq) {
+    final ComputationTargetReference oldTargetRef = valueReq.getTargetReference();
+    final ComputationTargetReference newTargetRef = ComputationTargetResolverUtils.simplifyType(oldTargetRef, getCompilationContext().getComputationTargetResolver());
+    if (newTargetRef == oldTargetRef) {
+      return valueReq;
+    } else {
+      return MemoryUtils.instance(new ValueRequirement(valueReq.getValueName(), newTargetRef, valueReq.getConstraints()));
+    }
+  }
+
   // Failure reporting
 
   public ResolutionFailure recursiveRequirement(final ValueRequirement valueRequirement) {
@@ -414,14 +471,6 @@ import com.opengamma.util.tuple.Pair;
     }
   }
 
-  public ResolutionFailure suppressed(final ValueRequirement valueRequirement) {
-    if (getBuilder().isDisableFailureReporting()) {
-      return NullResolutionFailure.INSTANCE;
-    } else {
-      return ResolutionFailureImpl.suppressed(valueRequirement);
-    }
-  }
-
   // Collation
 
   /**
@@ -434,7 +483,7 @@ import com.opengamma.util.tuple.Pair;
       _exceptions = new HashMap<ExceptionWrapper, ExceptionWrapper>();
     }
     if (context._exceptions != null) {
-      for (ExceptionWrapper exception : context._exceptions.keySet()) {
+      for (final ExceptionWrapper exception : context._exceptions.keySet()) {
         final ExceptionWrapper existing = _exceptions.get(exception);
         if (existing != null) {
           existing.incrementCount(exception.getCount());
@@ -450,7 +499,7 @@ import com.opengamma.util.tuple.Pair;
       return Collections.emptyMap();
     }
     final Map<Throwable, Integer> result = new HashMap<Throwable, Integer>();
-    for (ExceptionWrapper exception : _exceptions.keySet()) {
+    for (final ExceptionWrapper exception : _exceptions.keySet()) {
       result.put(exception.getException(), exception.getCount());
     }
     return result;

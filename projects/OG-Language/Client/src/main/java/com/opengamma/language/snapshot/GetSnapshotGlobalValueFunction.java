@@ -9,8 +9,9 @@ package com.opengamma.language.snapshot;
 import java.util.Arrays;
 import java.util.List;
 
+import com.opengamma.core.marketdatasnapshot.ValueSnapshot;
 import com.opengamma.core.marketdatasnapshot.impl.ManageableMarketDataSnapshot;
-import com.opengamma.id.UniqueId;
+import com.opengamma.id.ExternalId;
 import com.opengamma.language.context.SessionContext;
 import com.opengamma.language.definition.Categories;
 import com.opengamma.language.definition.DefinitionAnnotater;
@@ -37,7 +38,7 @@ public class GetSnapshotGlobalValueFunction extends AbstractFunctionInvoker impl
     return Arrays.asList(
         new MetaParameter("snapshot", JavaTypeInfo.builder(ManageableMarketDataSnapshot.class).get()),
         new MetaParameter("valueName", JavaTypeInfo.builder(String.class).get()),
-        new MetaParameter("identifier", JavaTypeInfo.builder(UniqueId.class).get()));
+        new MetaParameter("identifier", JavaTypeInfo.builder(ExternalId.class).get()));
   }
 
   private GetSnapshotGlobalValueFunction(final DefinitionAnnotater info) {
@@ -49,19 +50,19 @@ public class GetSnapshotGlobalValueFunction extends AbstractFunctionInvoker impl
     this(new DefinitionAnnotater(GetSnapshotGlobalValueFunction.class));
   }
 
-  public static List<Double> invoke(final ManageableMarketDataSnapshot snapshot, final String valueName, final UniqueId identifier) {
-    final List<Double> result = UnstructuredMarketDataSnapshotUtil.getValue(snapshot.getGlobalValues(), valueName, identifier);
-    if (result == null) {
+  public static List<Double> invoke(final ManageableMarketDataSnapshot snapshot, final String valueName, final ExternalId identifier) {
+    final ValueSnapshot values = snapshot.getGlobalValues().getValue(identifier, valueName);
+    if (values == null) {
       throw new InvokeInvalidArgumentException(0, "Snapshot does not contain value");
     }
-    return result;
+    return Arrays.asList(values.getOverrideValue(), values.getMarketValue());
   }
 
   // AbstractFunctionInvoker
 
   @Override
   protected Object invokeImpl(final SessionContext sessionContext, final Object[] parameters) {
-    return invoke((ManageableMarketDataSnapshot) parameters[0], (String) parameters[1], (UniqueId) parameters[2]);
+    return invoke((ManageableMarketDataSnapshot) parameters[0], (String) parameters[1], (ExternalId) parameters[2]);
   }
 
   // PublishedFunction

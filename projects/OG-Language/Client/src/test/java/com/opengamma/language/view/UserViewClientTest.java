@@ -7,23 +7,23 @@ package com.opengamma.language.view;
 
 import static org.testng.Assert.assertEquals;
 
-import javax.time.Instant;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.Instant;
 
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewDeltaResultModel;
-import com.opengamma.engine.view.calc.ViewCycleMetadata;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
+import com.opengamma.engine.view.cycle.ViewCycleMetadata;
 import com.opengamma.engine.view.execution.ViewCycleExecutionOptions;
 import com.opengamma.engine.view.listener.ViewResultListener;
 import com.opengamma.id.UniqueId;
 import com.opengamma.livedata.UserPrincipal;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Tests the {@link UserViewClient} class.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class UserViewClientTest {
 
   private static class CustomData extends UserViewClientData {

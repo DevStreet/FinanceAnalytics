@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.core.config.ConfigSource;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.value.ValueProperties;
@@ -22,9 +21,9 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.OpenGammaCompilationContext;
 import com.opengamma.financial.analytics.CurrencyPairsFunction;
+import com.opengamma.financial.analytics.model.CalculationPropertyNamesAndValues;
 import com.opengamma.financial.analytics.model.InterpolatedDataProperties;
 import com.opengamma.financial.analytics.model.forex.ForexVisitors;
-import com.opengamma.financial.currency.ConfigDBCurrencyPairsSource;
 import com.opengamma.financial.currency.CurrencyPair;
 import com.opengamma.financial.currency.CurrencyPairs;
 import com.opengamma.financial.security.FinancialSecurity;
@@ -56,9 +55,7 @@ public abstract class FXOptionBlackSingleValuedFunction extends FXOptionBlackFun
       }
     }
     assert currencyPairConfigName != null;
-    final ConfigSource configSource = OpenGammaCompilationContext.getConfigSource(context);
-    final ConfigDBCurrencyPairsSource currencyPairsSource = new ConfigDBCurrencyPairsSource(configSource);
-    final CurrencyPairs baseQuotePairs = currencyPairsSource.getCurrencyPairs(currencyPairConfigName);
+    final CurrencyPairs baseQuotePairs = OpenGammaCompilationContext.getCurrencyPairsSource(context).getCurrencyPairs(currencyPairConfigName);
     final FinancialSecurity security = (FinancialSecurity) target.getSecurity();
     final Currency putCurrency = security.accept(ForexVisitors.getPutCurrencyVisitor());
     final Currency callCurrency = security.accept(ForexVisitors.getCallCurrencyVisitor());
@@ -69,11 +66,10 @@ public abstract class FXOptionBlackSingleValuedFunction extends FXOptionBlackFun
     return baseQuotePair;
   }
 
-
   @Override
   protected ValueProperties.Builder getResultProperties(final ComputationTarget target) {
     return createValueProperties()
-        .with(ValuePropertyNames.CALCULATION_METHOD, BLACK_METHOD)
+        .with(ValuePropertyNames.CALCULATION_METHOD, CalculationPropertyNamesAndValues.BLACK_METHOD)
         .withAny(PUT_CURVE)
         .withAny(PUT_CURVE_CALC_CONFIG)
         .withAny(CALL_CURVE)
@@ -87,7 +83,7 @@ public abstract class FXOptionBlackSingleValuedFunction extends FXOptionBlackFun
 
   protected ValueProperties.Builder getResultProperties(final ComputationTarget target, final CurrencyPair baseQuotePair) {
     return createValueProperties()
-        .with(ValuePropertyNames.CALCULATION_METHOD, BLACK_METHOD)
+        .with(ValuePropertyNames.CALCULATION_METHOD, CalculationPropertyNamesAndValues.BLACK_METHOD)
         .withAny(PUT_CURVE)
         .withAny(PUT_CURVE_CALC_CONFIG)
         .withAny(CALL_CURVE)
@@ -110,7 +106,7 @@ public abstract class FXOptionBlackSingleValuedFunction extends FXOptionBlackFun
     final String leftExtrapolatorName = desiredValue.getConstraint(InterpolatedDataProperties.LEFT_X_EXTRAPOLATOR_NAME);
     final String rightExtrapolatorName = desiredValue.getConstraint(InterpolatedDataProperties.RIGHT_X_EXTRAPOLATOR_NAME);
     return createValueProperties()
-        .with(ValuePropertyNames.CALCULATION_METHOD, BLACK_METHOD)
+        .with(ValuePropertyNames.CALCULATION_METHOD, CalculationPropertyNamesAndValues.BLACK_METHOD)
         .with(PUT_CURVE, putCurveName)
         .with(PUT_CURVE_CALC_CONFIG, putCurveConfig)
         .with(CALL_CURVE, callCurveName)

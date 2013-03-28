@@ -25,6 +25,7 @@ import com.opengamma.engine.function.AbstractFunction;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionInputs;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
@@ -32,17 +33,28 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.model.pnl.YieldCurveNodePnLFunction;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
+import com.opengamma.timeseries.DoubleTimeSeries;
 
 /**
  * 
  */
-public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCompiledInvoker {
+public class NormalHistoricalVaRFunction extends AbstractFunction.NonCompiledInvoker {
+  
   private static final Logger s_logger = LoggerFactory.getLogger(NormalHistoricalVaRFunction.class);
-  /** The property for the VaR distribution type */
-  public static final String PROPERTY_VAR_DISTRIBUTION = "VaRDistributionType";
-  /** The name for the normal historical VaR calculation method */
+
+  /**
+   * The name for the normal historical VaR calculation method
+   */
   public static final String NORMAL_VAR = "Normal";
+  
+  /**
+   * The property for the VaR distribution type
+   */
+  public static final String PROPERTY_VAR_DISTRIBUTION = "VaRDistributionType";
+  /**
+   * The default PnLContribution property value.
+   */
+  public static final String DEFAULT_PNL_CONTRIBUTIONS = "Delta";
 
   @Override
   public Set<ComputedValue> execute(final FunctionExecutionContext executionContext, final FunctionInputs inputs, final ComputationTarget target, final Set<ValueRequirement> desiredValues) {
@@ -117,6 +129,7 @@ public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCo
         .withAny(ValuePropertyNames.CONFIDENCE_LEVEL)
         .withAny(ValuePropertyNames.HORIZON)
         .withAny(ValuePropertyNames.AGGREGATION)
+        .withAny(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS)
         .with(PROPERTY_VAR_DISTRIBUTION, NORMAL_VAR).get();
     final ValueSpecification hVaRSpec = new ValueSpecification(ValueRequirementNames.HISTORICAL_VAR, target.toSpecification(), properties);
     // TODO kirk 2012-06-22 -- These are certainly not the optimal properties. Rather,
@@ -150,12 +163,17 @@ public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCo
     if (stdDevCalculatorName == null || stdDevCalculatorName.size() != 1) {
       return null;
     }
+    final Set<String> pnlContributionNames = constraints.getValues(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS);
+    if (pnlContributionNames != null && pnlContributionNames.size() != 1) {
+      return null;
+    }
+    String pnlContributionName = pnlContributionNames != null ? pnlContributionNames.iterator().next() : DEFAULT_PNL_CONTRIBUTIONS;
     final Set<String> aggregationStyle = constraints.getValues(ValuePropertyNames.AGGREGATION);
     final ValueProperties.Builder properties = ValueProperties.builder()
         .with(ValuePropertyNames.SAMPLING_PERIOD, samplingPeriodName.iterator().next())
         .with(ValuePropertyNames.SCHEDULE_CALCULATOR, scheduleCalculatorName.iterator().next())
         .with(ValuePropertyNames.SAMPLING_FUNCTION, samplingFunctionName.iterator().next())
-        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, "Delta"); //TODO
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, pnlContributionName); //TODO
     final Set<String> desiredCurrencyValues = desiredValue.getConstraints().getValues(ValuePropertyNames.CURRENCY);
     if (desiredCurrencyValues == null || desiredCurrencyValues.isEmpty()) {
       properties.withAny(ValuePropertyNames.CURRENCY);
@@ -185,14 +203,14 @@ public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCo
     if (currency == null) {
       return null;
     }
-    final ValueProperties properties = getResultProperties(currency, input.getProperty(ValuePropertyNames.AGGREGATION));
+    final ValueProperties properties = getResultProperties(currency, input.getProperty(ValuePropertyNames.AGGREGATION), input.getProperty(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS));
     // see note above in other getResults().
     final ValueSpecification varSpecification = new ValueSpecification(ValueRequirementNames.HISTORICAL_VAR, target.toSpecification(), properties);
     final ValueSpecification stddevSpecification = new ValueSpecification(ValueRequirementNames.HISTORICAL_VAR_STDDEV, target.toSpecification(), properties);
     return Sets.newHashSet(varSpecification, stddevSpecification);
   }
 
-  private ValueProperties getResultProperties(final String currency, final String aggregationStyle) {
+  private ValueProperties getResultProperties(final String currency, final String aggregationStyle, final String pnlContribution) {
     final ValueProperties.Builder properties = createValueProperties()
         .with(ValuePropertyNames.CURRENCY, currency)
         .withAny(ValuePropertyNames.SAMPLING_PERIOD)
@@ -202,6 +220,7 @@ public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCo
         .withAny(ValuePropertyNames.STD_DEV_CALCULATOR)
         .withAny(ValuePropertyNames.CONFIDENCE_LEVEL)
         .withAny(ValuePropertyNames.HORIZON)
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, pnlContribution)
         .with(PROPERTY_VAR_DISTRIBUTION, NORMAL_VAR);
     if (aggregationStyle != null) {
       properties.with(ValuePropertyNames.AGGREGATION, aggregationStyle);
@@ -219,6 +238,7 @@ public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCo
         .with(ValuePropertyNames.STD_DEV_CALCULATOR, desiredValue.getConstraint(ValuePropertyNames.STD_DEV_CALCULATOR))
         .with(ValuePropertyNames.CONFIDENCE_LEVEL, desiredValue.getConstraint(ValuePropertyNames.CONFIDENCE_LEVEL))
         .with(ValuePropertyNames.HORIZON, desiredValue.getConstraint(ValuePropertyNames.HORIZON))
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, desiredValue.getConstraint(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS))
         .with(PROPERTY_VAR_DISTRIBUTION, NORMAL_VAR);
     final String aggregationStyle = desiredValue.getConstraint(ValuePropertyNames.AGGREGATION);
     if (aggregationStyle != null) {
@@ -255,4 +275,10 @@ public abstract class NormalHistoricalVaRFunction extends AbstractFunction.NonCo
         new DoubleTimeSeriesStatisticsCalculator(StatisticsCalculatorFactory.getCalculator(stdDevCalculatorNames.iterator().next()));
     return new NormalLinearVaRCalculator<DoubleTimeSeries<?>>(meanCalculator, stdDevCalculator);
   }
+
+  @Override
+  public ComputationTargetType getTargetType() {
+    return ComputationTargetType.PORTFOLIO_NODE.or(ComputationTargetType.POSITION);
+  }
+
 }

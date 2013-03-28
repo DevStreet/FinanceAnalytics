@@ -7,17 +7,16 @@ package com.opengamma.analytics.financial.timeseries.filter;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import javax.time.calendar.LocalDate;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
 
 import cern.colt.Arrays;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.MersenneTwister64;
 import cern.jet.random.engine.RandomEngine;
 
-import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 
 /**
  * 
@@ -69,26 +68,26 @@ public class ZeroValueDoubleTimeSeriesFilterTest {
     for (int i = 0; i < 100; i++) {
       d = RANDOM.nextDouble();
       h = i + 1;
-      dates[i] = LocalDate.ofEpochDays(h);
+      dates[i] = LocalDate.ofEpochDay(h);
       if (d < 0.3) {
         if (d > 0.25) {
           data[i] = smallValue;
-          largeZeroRejectedDates[j] = LocalDate.ofEpochDays(h);
+          largeZeroRejectedDates[j] = LocalDate.ofEpochDay(h);
           largeZeroRejectedData[j++] = smallValue;
-          smallZeroFilteredDates[k] = LocalDate.ofEpochDays(h);
+          smallZeroFilteredDates[k] = LocalDate.ofEpochDay(h);
           smallZeroFilteredData[k++] = smallValue;
         } else {
           data[i] = 0;
-          largeZeroRejectedDates[j] = LocalDate.ofEpochDays(h);
+          largeZeroRejectedDates[j] = LocalDate.ofEpochDay(h);
           largeZeroRejectedData[j++] = 0;
-          smallZeroRejectedDates[l] = LocalDate.ofEpochDays(h);
+          smallZeroRejectedDates[l] = LocalDate.ofEpochDay(h);
           smallZeroRejectedData[l++] = 0;
         }
       } else {
         data[i] = d;
-        smallZeroFilteredDates[k] = LocalDate.ofEpochDays(h);
+        smallZeroFilteredDates[k] = LocalDate.ofEpochDay(h);
         smallZeroFilteredData[k++] = d;
-        largeZeroFilteredDates[m] = LocalDate.ofEpochDays(h);
+        largeZeroFilteredDates[m] = LocalDate.ofEpochDay(h);
         largeZeroFilteredData[m++] = d;
       }
     }

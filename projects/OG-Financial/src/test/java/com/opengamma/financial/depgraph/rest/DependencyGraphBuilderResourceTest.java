@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.depgraph.rest;
@@ -13,21 +13,20 @@ import static org.testng.Assert.fail;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
-
-import javax.time.Duration;
-import javax.time.Instant;
 
 import org.fudgemsg.FudgeMsg;
 import org.fudgemsg.FudgeMsgEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
-import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.DefaultComputationTargetResolver;
 import com.opengamma.engine.InMemorySecuritySource;
 import com.opengamma.engine.function.AbstractFunction;
@@ -41,22 +40,26 @@ import com.opengamma.engine.marketdata.MarketDataListener;
 import com.opengamma.engine.marketdata.MarketDataPermissionProvider;
 import com.opengamma.engine.marketdata.MarketDataProvider;
 import com.opengamma.engine.marketdata.MarketDataSnapshot;
-import com.opengamma.engine.marketdata.availability.DomainMarketDataAvailabilityProvider;
+import com.opengamma.engine.marketdata.availability.DefaultMarketDataAvailabilityProvider;
+import com.opengamma.engine.marketdata.availability.DomainMarketDataAvailabilityFilter;
 import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
 import com.opengamma.engine.marketdata.resolver.SingleMarketDataProviderResolver;
 import com.opengamma.engine.marketdata.spec.MarketDataSpecification;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.id.ExternalScheme;
+import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Tests the diagnostic REST exposure of a dependency graph builder.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class DependencyGraphBuilderResourceTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(DependencyGraphBuilderResourceTest.class);
@@ -71,17 +74,17 @@ public class DependencyGraphBuilderResourceTest {
       }
 
       @Override
-      public boolean canApplyTo(FunctionCompilationContext context, ComputationTarget target) {
+      public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
         return true;
       }
 
       @Override
-      public Set<ValueRequirement> getRequirements(FunctionCompilationContext context, ComputationTarget target, ValueRequirement desiredValue) {
+      public Set<ValueRequirement> getRequirements(final FunctionCompilationContext context, final ComputationTarget target, final ValueRequirement desiredValue) {
         throw new OpenGammaRuntimeException("test");
       }
 
       @Override
-      public Set<ValueSpecification> getResults(FunctionCompilationContext context, ComputationTarget target) {
+      public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
         return Collections.singleton(new ValueSpecification(ValueRequirementNames.FAIR_VALUE, target.toSpecification(), ValueProperties.with(
             ValuePropertyNames.FUNCTION, "Test").get()));
       }
@@ -96,52 +99,53 @@ public class DependencyGraphBuilderResourceTest {
     final FunctionCompilationContext context = new FunctionCompilationContext();
     final InMemorySecuritySource securities = new InMemorySecuritySource();
     context.setSecuritySource(securities);
-    context.setComputationTargetResolver(new DefaultComputationTargetResolver(securities));
+    context.setRawComputationTargetResolver(new DefaultComputationTargetResolver(securities));
+    context.setComputationTargetResolver(context.getRawComputationTargetResolver().atVersionCorrection(VersionCorrection.LATEST));
     return new CompiledFunctionService(functions, new CachingFunctionRepositoryCompiler(), context);
   }
 
   private DependencyGraphBuilderResourceContextBean createContextBean() {
     final DependencyGraphBuilderResourceContextBean bean = new DependencyGraphBuilderResourceContextBean();
-    final CompiledFunctionService cfs = createFunctionCompilationService ();
+    final CompiledFunctionService cfs = createFunctionCompilationService();
     cfs.initialize();
     bean.setFunctionCompilationContext(cfs.getFunctionCompilationContext());
-    bean.setFunctionResolver (new DefaultFunctionResolver(cfs));
+    bean.setFunctionResolver(new DefaultFunctionResolver(cfs));
     bean.setMarketDataProviderResolver(new SingleMarketDataProviderResolver(new MarketDataProvider() {
 
       @Override
-      public void addListener(MarketDataListener listener) {
+      public void addListener(final MarketDataListener listener) {
         fail();
       }
 
       @Override
-      public void removeListener(MarketDataListener listener) {
+      public void removeListener(final MarketDataListener listener) {
         fail();
       }
 
       @Override
-      public void subscribe(ValueRequirement valueRequirement) {
+      public void subscribe(final ValueSpecification valueSpecification) {
         fail();
       }
 
       @Override
-      public void subscribe(Set<ValueRequirement> valueRequirements) {
+      public void subscribe(final Set<ValueSpecification> valueSpecifications) {
         fail();
       }
 
       @Override
-      public void unsubscribe(ValueRequirement valueRequirement) {
+      public void unsubscribe(final ValueSpecification valueSpecification) {
         fail();
       }
 
       @Override
-      public void unsubscribe(Set<ValueRequirement> valueRequirements) {
+      public void unsubscribe(final Set<ValueSpecification> valueSpecifications) {
         fail();
       }
 
       @Override
-      public MarketDataAvailabilityProvider getAvailabilityProvider() {
-        return new DomainMarketDataAvailabilityProvider(cfs.getFunctionCompilationContext().getSecuritySource(), Arrays.asList(ExternalScheme.of("Foo")), Arrays
-            .asList(MarketDataRequirementNames.MARKET_VALUE));
+      public MarketDataAvailabilityProvider getAvailabilityProvider(final MarketDataSpecification marketDataSpec) {
+        return new DomainMarketDataAvailabilityFilter(Arrays.asList(ExternalScheme.of("Foo")), Arrays.asList(MarketDataRequirementNames.MARKET_VALUE))
+            .withProvider(new DefaultMarketDataAvailabilityProvider());
       }
 
       @Override
@@ -151,19 +155,19 @@ public class DependencyGraphBuilderResourceTest {
       }
 
       @Override
-      public boolean isCompatible(MarketDataSpecification marketDataSpec) {
+      public boolean isCompatible(final MarketDataSpecification marketDataSpec) {
         fail();
         return false;
       }
 
       @Override
-      public MarketDataSnapshot snapshot(MarketDataSpecification marketDataSpec) {
+      public MarketDataSnapshot snapshot(final MarketDataSpecification marketDataSpec) {
         fail();
         return null;
       }
 
       @Override
-      public Duration getRealTimeDuration(Instant fromInstant, Instant toInstant) {
+      public Duration getRealTimeDuration(final Instant fromInstant, final Instant toInstant) {
         fail();
         return null;
       }
@@ -182,8 +186,10 @@ public class DependencyGraphBuilderResourceTest {
     final DependencyGraphBuilderResource prime = resource.setValuationTime("2007-12-03T10:15:30+01:00[Europe/Paris]");
     final Instant i2 = prime.getValuationTime();
     assertEquals(i1, resource.getValuationTime()); // original unchanged
-    assertFalse(i1.equals(i2));
+    assertFalse(Objects.equals(i1, i2));
   }
+
+  // TODO: testSetResolutionTime method
 
   public void testSetCalculationConfigurationName() {
     final DependencyGraphBuilderResource resource = createResource();
@@ -206,9 +212,9 @@ public class DependencyGraphBuilderResourceTest {
   public void testAddValue() {
     final DependencyGraphBuilderResource resource = createResource();
     final Collection<ValueRequirement> r1 = resource.getRequirements();
-    final DependencyGraphBuilderResource prime = resource.addValueRequirement("Foo", "PRIMITIVE", "Test~1");
+    final DependencyGraphBuilderResource prime = resource.addValueRequirementByUniqueId("Foo", "PRIMITIVE", "Test~1");
     final Collection<ValueRequirement> r2 = prime.getRequirements();
-    final DependencyGraphBuilderResource prime2 = prime.addValueRequirement("Bar", "PRIMITIVE", "Test~2");
+    final DependencyGraphBuilderResource prime2 = prime.addValueRequirementByUniqueId("Bar", "PRIMITIVE", "Test~2");
     final Collection<ValueRequirement> r3 = prime2.getRequirements();
     assertEquals(r1, resource.getRequirements()); // original unchanged
     assertEquals(r2, prime.getRequirements()); // unchanged
@@ -219,8 +225,8 @@ public class DependencyGraphBuilderResourceTest {
 
   public void testBuild_ok() {
     final DependencyGraphBuilderResource resource = createResource();
-    final FudgeMsgEnvelope env = resource.addValueRequirement(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Foo~1")
-        .addValueRequirement(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Foo~2").build();
+    final FudgeMsgEnvelope env = resource.addValueRequirementByExternalId(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Foo~1")
+        .addValueRequirementByExternalId(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Foo~2").build();
     final FudgeMsg msg = env.getMessage();
     s_logger.debug("testBuild_ok = {}", msg);
     assertTrue(msg.hasField("dependencyGraph"));
@@ -230,8 +236,8 @@ public class DependencyGraphBuilderResourceTest {
 
   public void testBuild_exceptions() {
     final DependencyGraphBuilderResource resource = createResource();
-    final FudgeMsgEnvelope env = resource.addValueRequirement(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Foo~1")
-        .addValueRequirement(ValueRequirementNames.FAIR_VALUE, "PRIMITIVE", "Foo~Bar").build();
+    final FudgeMsgEnvelope env = resource.addValueRequirementByExternalId(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Foo~1")
+        .addValueRequirementByUniqueId(ValueRequirementNames.FAIR_VALUE, "PRIMITIVE", "Foo~Bar").build();
     final FudgeMsg msg = env.getMessage();
     s_logger.debug("testBuild_exceptions = {}", msg);
     assertTrue(msg.hasField("dependencyGraph"));
@@ -241,8 +247,8 @@ public class DependencyGraphBuilderResourceTest {
 
   public void testBuild_failures() {
     final DependencyGraphBuilderResource resource = createResource();
-    final FudgeMsgEnvelope env = resource.addValueRequirement(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Bar~1")
-        .addValueRequirement(ValueRequirementNames.PRESENT_VALUE, "PRIMITIVE", "Bar~2").build();
+    final FudgeMsgEnvelope env = resource.addValueRequirementByExternalId(MarketDataRequirementNames.MARKET_VALUE, "PRIMITIVE", "Bar~1")
+        .addValueRequirementByUniqueId(ValueRequirementNames.PRESENT_VALUE, "PRIMITIVE", "Bar~2").build();
     final FudgeMsg msg = env.getMessage();
     s_logger.debug("testBuild_failures = {}", msg);
     assertTrue(msg.hasField("dependencyGraph"));

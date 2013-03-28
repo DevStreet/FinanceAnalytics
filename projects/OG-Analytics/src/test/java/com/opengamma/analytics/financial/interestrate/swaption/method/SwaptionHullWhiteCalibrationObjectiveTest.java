@@ -7,10 +7,9 @@ package com.opengamma.analytics.financial.interestrate.swaption.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
@@ -42,7 +41,7 @@ public class SwaptionHullWhiteCalibrationObjectiveTest {
   private static final boolean IS_LONG = true;
   private static final int SETTLEMENT_DAYS = 2;
   // Swap 5Y description
-  private static final Currency CUR = Currency.USD;
+  private static final Currency CUR = Currency.EUR;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean IS_EOM = true;
@@ -118,6 +117,7 @@ public class SwaptionHullWhiteCalibrationObjectiveTest {
     double meanReversion = 0.01;
     long startTime, endTime;
     final int nbTest = 100;
+
     startTime = System.currentTimeMillis();
     for (int looptest = 0; looptest < nbTest; looptest++) {
       HullWhiteOneFactorPiecewiseConstantParameters HwParameters = new HullWhiteOneFactorPiecewiseConstantParameters(meanReversion, new double[] {0.01}, new double[0]);
@@ -130,7 +130,8 @@ public class SwaptionHullWhiteCalibrationObjectiveTest {
     }
     endTime = System.currentTimeMillis();
     System.out.println(nbTest + " Hull-White calibration to swaption (5 swaptions): " + (endTime - startTime) + " ms");
-    // Performance note: calibration: 31-Aug-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 415 ms for 100 calibration with 5 swaptions.
+    // Performance note: calibration: 31-Aug-11: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 410 ms for 100 calibration with 5 swaptions.
+
   }
 
 }

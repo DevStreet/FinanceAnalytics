@@ -9,9 +9,9 @@ package com.opengamma.language.snapshot;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opengamma.core.marketdatasnapshot.MarketDataValueType;
 import com.opengamma.core.marketdatasnapshot.impl.ManageableMarketDataSnapshot;
-import com.opengamma.id.UniqueId;
+import com.opengamma.core.marketdatasnapshot.impl.ManageableUnstructuredMarketDataSnapshot;
+import com.opengamma.id.ExternalId;
 import com.opengamma.language.context.SessionContext;
 import com.opengamma.language.definition.Categories;
 import com.opengamma.language.definition.DefinitionAnnotater;
@@ -32,22 +32,20 @@ public class SetSnapshotGlobalValueFunction extends AbstractFunctionInvoker impl
   public static final SetSnapshotGlobalValueFunction INSTANCE = new SetSnapshotGlobalValueFunction();
 
   private final MetaFunction _meta;
-  
+
   private static final int SNAPSHOT = 0;
   private static final int VALUE_NAME = 1;
   private static final int IDENTIFIER = 2;
   private static final int OVERRIDE_VALUE = 3;
   private static final int MARKET_VALUE = 4;
-  private static final int TYPE = 5;
 
   private static List<MetaParameter> parameters() {
     return Arrays.asList(
         new MetaParameter("snapshot", JavaTypeInfo.builder(ManageableMarketDataSnapshot.class).get()),
         new MetaParameter("valueName", JavaTypeInfo.builder(String.class).get()),
-        new MetaParameter("identifier", JavaTypeInfo.builder(UniqueId.class).get()),
+        new MetaParameter("identifier", JavaTypeInfo.builder(ExternalId.class).get()),
         new MetaParameter("overrideValue", JavaTypeInfo.builder(Double.class).allowNull().get()),
-        new MetaParameter("marketValue", JavaTypeInfo.builder(Double.class).allowNull().get()),
-        new MetaParameter("type", JavaTypeInfo.builder(MarketDataValueType.class).defaultValue(MarketDataValueType.SECURITY).get()));
+        new MetaParameter("marketValue", JavaTypeInfo.builder(Double.class).allowNull().get()));
   }
 
   private SetSnapshotGlobalValueFunction(final DefinitionAnnotater info) {
@@ -59,12 +57,12 @@ public class SetSnapshotGlobalValueFunction extends AbstractFunctionInvoker impl
     this(new DefinitionAnnotater(SetSnapshotGlobalValueFunction.class));
   }
 
-  public static ManageableMarketDataSnapshot invoke(final ManageableMarketDataSnapshot snapshot, final String valueName, final UniqueId identifier, final Double overrideValue,
-      final Double marketValue, MarketDataValueType type) {
+  public static ManageableMarketDataSnapshot invoke(final ManageableMarketDataSnapshot snapshot, final String valueName, final ExternalId identifier, final Double overrideValue,
+      final Double marketValue) {
     if (snapshot.getGlobalValues() == null) {
-      snapshot.setGlobalValues(UnstructuredMarketDataSnapshotUtil.create());
+      snapshot.setGlobalValues(new ManageableUnstructuredMarketDataSnapshot());
     }
-    UnstructuredMarketDataSnapshotUtil.setValue(snapshot.getGlobalValues(), valueName, identifier, overrideValue, marketValue, type);
+    UnstructuredMarketDataSnapshotUtil.setValue(snapshot.getGlobalValues(), valueName, identifier, overrideValue, marketValue);
     return snapshot;
   }
 
@@ -72,13 +70,8 @@ public class SetSnapshotGlobalValueFunction extends AbstractFunctionInvoker impl
 
   @Override
   protected Object invokeImpl(final SessionContext sessionContext, final Object[] parameters) {
-    return invoke(
-        (ManageableMarketDataSnapshot) parameters[SNAPSHOT],
-        (String) parameters[VALUE_NAME],
-        (UniqueId) parameters[IDENTIFIER],
-        (Double) parameters[OVERRIDE_VALUE],
-        (Double) parameters[MARKET_VALUE],
-        (MarketDataValueType) parameters[TYPE]);
+    return invoke((ManageableMarketDataSnapshot) parameters[SNAPSHOT], (String) parameters[VALUE_NAME], (ExternalId) parameters[IDENTIFIER], (Double) parameters[OVERRIDE_VALUE],
+        (Double) parameters[MARKET_VALUE]);
   }
 
   // PublishedFunction

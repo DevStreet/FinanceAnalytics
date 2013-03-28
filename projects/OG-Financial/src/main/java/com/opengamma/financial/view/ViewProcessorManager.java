@@ -21,28 +21,27 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.time.Instant;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.Lifecycle;
+import org.threeten.bp.Instant;
 
 import com.opengamma.core.change.ChangeEvent;
 import com.opengamma.core.change.ChangeListener;
 import com.opengamma.core.change.ChangeProvider;
 import com.opengamma.engine.function.CompiledFunctionService;
-import com.opengamma.engine.view.ViewProcessorInternal;
+import com.opengamma.engine.view.impl.ViewProcessorInternal;
 import com.opengamma.id.ObjectId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.VersionedSource;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.tuple.Pair;
+import com.opengamma.util.NamedThreadPoolFactory;
 
 /**
  * Manages a set of view processors that share common resources, making system configuration appear atomic to them.
  * <p>
- * If given a set of masters and the sources that expose them to the rest of the system, update notifications from
- * the masters can be used to "latch" the sources between view processor suspensions to create an atomic view.
+ * If given a set of masters and the sources that expose them to the rest of the system, update notifications from the masters can be used to "latch" the sources between view processor suspensions to
+ * create an atomic view.
  */
 public class ViewProcessorManager implements Lifecycle {
 
@@ -55,8 +54,8 @@ public class ViewProcessorManager implements Lifecycle {
   private Map<VersionedSource, Instant> _latchInstants = new HashMap<VersionedSource, Instant>();
   private final ReentrantLock _lifecycleLock = new ReentrantLock();
   private final ReentrantLock _changeLock = new ReentrantLock();
-  private final ExecutorService _executor = Executors.newCachedThreadPool();
-  private final Set<Pair<ObjectId, VersionCorrection>> _watchSet = new HashSet<Pair<ObjectId, VersionCorrection>>();
+  private final ExecutorService _executor = Executors.newCachedThreadPool(new NamedThreadPoolFactory("ViewProcessorManager", true));
+  private final Set<ObjectId> _watchSet = new HashSet<ObjectId>();
   private final Set<WatchSetProvider> _watchSetProviders = new HashSet<WatchSetProvider>();
   private boolean _isRunning;
 
@@ -142,7 +141,7 @@ public class ViewProcessorManager implements Lifecycle {
             _masterToListener.put(master, listener);
             s_logger.debug("Latching {} to {}", source, now);
             // TODO this isn't ideal if there is clock drift between nodes - the time needs to be the system time at the master
-            source.setVersionCorrection(VersionCorrection.ofVersionAsOf(now));  // TODO ignores correction
+            source.setVersionCorrection(VersionCorrection.ofVersionAsOf(now)); // TODO ignores correction
           }
         } finally {
           _changeLock.unlock();
@@ -153,7 +152,7 @@ public class ViewProcessorManager implements Lifecycle {
         }
         s_logger.info("Initializing functions");
         for (CompiledFunctionService function : _functions) {
-          final Set<Pair<ObjectId, VersionCorrection>> watch = function.initialize();
+          final Set<ObjectId> watch = function.initialize();
           _watchSet.addAll(watch);
           addAlternateWatchSet(watch);
         }
@@ -191,7 +190,7 @@ public class ViewProcessorManager implements Lifecycle {
   }
 
   private void onMasterChanged(final Instant latchInstant, final VersionedSource source, final ObjectId uniqueIdentifier) {
-    s_logger.debug("Change timestamp {} for {} - change from {}", new Object[] {latchInstant, source, uniqueIdentifier});
+    s_logger.debug("Change timestamp {} for {} - change from {}", new Object[] {latchInstant, source, uniqueIdentifier });
     _changeLock.lock();
     try {
       if (_latchInstants.isEmpty()) {
@@ -251,7 +250,7 @@ public class ViewProcessorManager implements Lifecycle {
       s_logger.debug("Re-initializing functions");
       _watchSet.clear();
       for (CompiledFunctionService functions : _functions) {
-        final Set<Pair<ObjectId, VersionCorrection>> watch = functions.reinitialize();
+        final Set<ObjectId> watch = functions.reinitialize();
         _watchSet.addAll(watch);
         addAlternateWatchSet(watch);
       }
@@ -266,9 +265,9 @@ public class ViewProcessorManager implements Lifecycle {
     }
   }
 
-  private void addAlternateWatchSet(final Set<Pair<ObjectId, VersionCorrection>> watchSet) {
+  private void addAlternateWatchSet(final Set<ObjectId> watchSet) {
     for (WatchSetProvider provider : _watchSetProviders) {
-      final Set<Pair<ObjectId, VersionCorrection>> additional = provider.getAdditionalWatchSet(watchSet);
+      final Set<ObjectId> additional = provider.getAdditionalWatchSet(watchSet);
       if (additional != null) {
         _watchSet.addAll(additional);
       }

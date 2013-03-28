@@ -5,9 +5,9 @@
  */
 package com.opengamma.analytics.financial.schedule;
 
-import javax.time.calendar.LocalDate;
+import org.threeten.bp.LocalDate;
 
-import com.opengamma.util.timeseries.DoubleTimeSeries;
+import com.opengamma.timeseries.DoubleTimeSeries;
 
 /**
  * 

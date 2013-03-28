@@ -49,6 +49,10 @@
     <subant buildpathref="cc.build.path" target="clean" inheritall="true" />
   </target>
 
+  <target name="clean-tests" depends="common.clean-tests">
+    <subant buildpathref="cctest.build.path" target="clean" inheritall="true" />
+  </target>
+
   <target name="dist-publish" depends="common.dist-publish,compile-msm" />
 
   <macrodef name="installer-make">
@@ -58,6 +62,15 @@
     <sequential>
       <ai-set-version version="${module.version.msi}.${module.build.number}" file="@{dir}${file.separator}@{file}" />
       <ai-build file="@{file}" build-id="@{build-id}" dir="@{dir}" />
+    </sequential>
+  </macrodef>
+  <macrodef name="fix-msm-parameters">
+    <attribute name="file" default="${ai.build.file}" />
+    <attribute name="dir" default="Installer" />
+    <sequential>
+      <java classname="com.opengamma.install.msi.MergeModDefaultParameters" classpathref="lib.path.id" logError="true" fork="true" dir="@{dir}">
+        <arg value="@{file}" />
+      </java>
     </sequential>
   </macrodef>
   <target name="installer-impl" />

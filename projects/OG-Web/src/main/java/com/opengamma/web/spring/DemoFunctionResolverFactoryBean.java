@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.web.spring;
@@ -16,8 +16,8 @@ import com.opengamma.financial.analytics.model.bond.BondPV01CurrencyCurveFunctio
 import com.opengamma.financial.analytics.model.bond.BondPresentValueCountryCurveFunction;
 import com.opengamma.financial.analytics.model.bond.BondPresentValueCurrencyCurveFunction;
 import com.opengamma.financial.currency.CurrencyConversionFunction;
-import com.opengamma.financial.currency.CurrencyMatrixSourcingFunction;
-import com.opengamma.financial.currency.PnlSeriesCurrencyConversionFunction;
+import com.opengamma.financial.currency.CurrencyMatrixLookupFunction;
+import com.opengamma.financial.currency.CurrencySeriesConversionFunction;
 import com.opengamma.financial.property.DefaultPropertyFunction;
 import com.opengamma.util.SingletonFactoryBean;
 
@@ -40,8 +40,7 @@ public class DemoFunctionResolverFactoryBean extends SingletonFactoryBean<Functi
     return new DefaultFunctionResolver(functionCompilationSerice, new FunctionPriority() {
       @Override
       public int getPriority(final CompiledFunctionDefinition function) {
-        if (function instanceof CurrencyConversionFunction || function instanceof PnlSeriesCurrencyConversionFunction) {
-          //TODO set up priorities for the deprecated version of the fixed income P&L function (FixedIncomeInstrumentPnLSeriesCurrencyConversionFunctionDeprecated)
+        if (function instanceof CurrencyConversionFunction || function instanceof CurrencySeriesConversionFunction) {
           return Integer.MIN_VALUE;
         }
         if (function instanceof DefaultPropertyFunction) {
@@ -71,9 +70,9 @@ public class DemoFunctionResolverFactoryBean extends SingletonFactoryBean<Functi
           // to all of its inputs
           return -1;
         }
-        if (function instanceof CurrencyMatrixSourcingFunction) {
-          final CurrencyMatrixSourcingFunction currencyMatrixSourcingFunction = (CurrencyMatrixSourcingFunction) function;
-          return currencyMatrixSourcingFunction.getPriority();
+        if (function instanceof CurrencyMatrixLookupFunction) {
+          final CurrencyMatrixLookupFunction currencyMatrixLookupFunction = (CurrencyMatrixLookupFunction) function;
+          return currencyMatrixLookupFunction.getPriority();
         }
         return 0;
       }

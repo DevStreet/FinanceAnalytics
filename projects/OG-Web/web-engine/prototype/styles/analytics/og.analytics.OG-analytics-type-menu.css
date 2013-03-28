@@ -141,3 +141,23 @@
     top: 3px;
     height: 14px;
 }
+
+.OG-analytics-typemenu .og-menu-toggle .og-icon-ExpandedPositions {
+    top: 3px;
+    height: 12px;
+}
+
+.OG-analytics-typemenu .og-menu .og-icon-ExpandedPositions {
+    top: 3px;
+    height: 12px;
+}
+
+.OG-analytics-typemenu .og-menu-toggle .og-icon-Text {
+    top: 4px;
+    height: 12px;
+}
+
+.OG-analytics-typemenu .og-menu .og-icon-Text {
+    top: 3px;
+    height: 12px;
+}

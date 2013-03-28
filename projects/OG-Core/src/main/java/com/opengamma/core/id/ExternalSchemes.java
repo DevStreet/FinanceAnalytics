@@ -5,14 +5,13 @@
  */
 package com.opengamma.core.id;
 
-import javax.time.CalendricalException;
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.format.DateTimeFormatters;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.DateTimeException;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalScheme;
@@ -80,7 +79,7 @@ public class ExternalSchemes {
    */
   public static final ExternalScheme OG_SYNTHETIC_TICKER = ExternalScheme.of("OG_SYNTHETIC_TICKER");
   /**
-   * Identification scheme for Tullet-Prebon SURF tickers.
+   * Identification scheme for Tullett Prebon SURF tickers.
    */
   public static final ExternalScheme SURF = ExternalScheme.of("SURF");
   /**
@@ -91,6 +90,12 @@ public class ExternalSchemes {
    * Identification scheme for GMI contracts.
    */
   public static final ExternalScheme GMI = ExternalScheme.of("GMI");
+  // --------------------- SCHEMES FOR EXCHANGES ---------------------------
+
+/**
+   * Identification scheme for CDS Index and Obligors.
+   */
+  public static final ExternalScheme MARKIT_RED_CODE = ExternalScheme.of("MARKIT_RED_CODE");
 
   //-------------------- SCHEMES FOR REGIONS ---------------------
 
@@ -125,7 +130,7 @@ public class ExternalSchemes {
    */
   public static final ExternalScheme FINANCIAL = ExternalScheme.of("FINANCIAL_REGION");
 
-  // --------------------- SCHEMES FOR EXCHANGES ---------------------------
+
   /**
    * Identification scheme for the MIC exchange code ISO standard.
    */
@@ -236,7 +241,7 @@ public class ExternalSchemes {
     }
     return ExternalId.of(BLOOMBERG_TICKER, ticker);
   }
-
+  
   /**
    * Creates a Synthetic ticker.
    * <p>
@@ -290,10 +295,10 @@ public class ExternalSchemes {
     }
     if (s_logger.isDebugEnabled()) {
       try {
-        LocalDate.parse(maturity, DateTimeFormatters.pattern("MM/dd/YY"));
+        LocalDate.parse(maturity, DateTimeFormatter.ofPattern("MM/dd/yy"));
       } catch (final UnsupportedOperationException uoe) {
         s_logger.warn("Problem parsing maturity " + maturity + " ticker=" + tickerWithoutSector + ", coupon=" + coupon);
-      } catch (final CalendricalException ce) {
+      } catch (final DateTimeException ex) {
         s_logger.warn("Problem parsing maturity " + maturity + " ticker=" + tickerWithoutSector + ", coupon=" + coupon);
       }
     }
@@ -382,6 +387,19 @@ public class ExternalSchemes {
     }
     return ExternalId.of(GMI, ticker);
   }
+  
+  /**
+   * Creates a RED_CODE identifier
+   * <p>
+   * @param redcode the redcode identifier, not null or empty
+   * @return the security redcode identifier, not null
+   */
+  public static ExternalId redCode(String redcode) {
+    ArgumentChecker.notNull(redcode, "redcode");
+    ArgumentChecker.isFalse(redcode.isEmpty(), "Empty redcode is invalid");
+    return ExternalId.of(MARKIT_RED_CODE, redcode);
+  }
+  
   // -------------------------- METHODS FOR REGIONS ---------------------------
 
   /**
@@ -406,9 +424,9 @@ public class ExternalSchemes {
    * @param zone  the time-zone, not null
    * @return the region identifier, not null
    */
-  public static ExternalId timeZoneRegionId(final TimeZone zone) {
+  public static ExternalId timeZoneRegionId(final ZoneId zone) {
     ArgumentChecker.notNull(zone, "zone");
-    return ExternalId.of(ExternalSchemes.TZDB_TIME_ZONE, zone.getID());
+    return ExternalId.of(ExternalSchemes.TZDB_TIME_ZONE, zone.getId());
   }
 
   /**

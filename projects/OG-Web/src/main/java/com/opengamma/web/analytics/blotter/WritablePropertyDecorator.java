@@ -15,21 +15,21 @@ import com.opengamma.util.ArgumentChecker;
  * Decorator that filters out read-only properties.
  * TODO is this ever going to be used?
  */
-/* package */ class WritablePropertyDecorator<T> implements BeanVisitorDecorator<T> {
+/* package */ class WritablePropertyDecorator implements BeanVisitorDecorator {
 
-  private final BeanVisitor<T> _delegate;
+  private final BeanVisitor<?> _delegate;
 
-  /* package */ WritablePropertyDecorator(BeanVisitor<T> delegate) {
+  /* package */ WritablePropertyDecorator(BeanVisitor<?> delegate) {
     ArgumentChecker.notNull(delegate, "delegate");
     _delegate = delegate;
   }
 
   @Override
-  public BeanVisitor<T> decorate(BeanVisitor<T> visitor) {
-    return new BeanVisitor<T>() {
+  public BeanVisitor<?> decorate(BeanVisitor<?> visitor) {
+    return new BeanVisitor<Object>() {
       @Override
-      public void visitBean(MetaBean metaBean) {
-        _delegate.visitBean(metaBean);
+      public void visitMetaBean(MetaBean metaBean) {
+        _delegate.visitMetaBean(metaBean);
       }
 
       @Override
@@ -40,42 +40,42 @@ import com.opengamma.util.ArgumentChecker;
       }
 
       @Override
-      public void visitCollectionProperty(MetaProperty<?> property) {
+      public void visitCollectionProperty(MetaProperty<?> property, BeanTraverser traverser) {
         if (isWriteable(property)) {
-          _delegate.visitCollectionProperty(property);
+          _delegate.visitCollectionProperty(property, traverser);
         }
       }
 
       @Override
-      public void visitSetProperty(MetaProperty<?> property) {
+      public void visitSetProperty(MetaProperty<?> property, BeanTraverser traverser) {
         if (isWriteable(property)) {
-          _delegate.visitSetProperty(property);
+          _delegate.visitSetProperty(property, traverser);
         }
       }
 
       @Override
-      public void visitListProperty(MetaProperty<?> property) {
+      public void visitListProperty(MetaProperty<?> property, BeanTraverser traverser) {
         if (isWriteable(property)) {
-          _delegate.visitListProperty(property);
+          _delegate.visitListProperty(property, traverser);
         }
       }
 
       @Override
-      public void visitMapProperty(MetaProperty<?> property) {
+      public void visitMapProperty(MetaProperty<?> property, BeanTraverser traverser) {
         if (isWriteable(property)) {
-          _delegate.visitMapProperty(property);
+          _delegate.visitMapProperty(property, traverser);
         }
       }
 
       @Override
-      public void visitProperty(MetaProperty<?> property) {
+      public void visitProperty(MetaProperty<?> property, BeanTraverser traverser) {
         if (isWriteable(property)) {
-          _delegate.visitProperty(property);
+          _delegate.visitProperty(property, traverser);
         }
       }
 
       @Override
-      public T finish() {
+      public Object finish() {
         return _delegate.finish();
       }
     };

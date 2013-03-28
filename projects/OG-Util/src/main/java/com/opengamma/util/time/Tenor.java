@@ -5,8 +5,8 @@
  */
 package com.opengamma.util.time;
 
-import javax.time.Duration;
-import javax.time.calendar.Period;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Period;
 
 /**
  * A tenor.
@@ -122,25 +122,41 @@ public class Tenor implements Comparable<Tenor> {
    */
   public static final Tenor FIVE_YEARS = new Tenor(Period.ofYears(5));
   /**
-   * A tenor of 5 years.
+   * A tenor of 6 years.
+   */
+  public static final Tenor SIX_YEARS = new Tenor(Period.ofYears(6));
+  /**
+   * A tenor of 7 years.
+   */
+  public static final Tenor SEVEN_YEARS = new Tenor(Period.ofYears(7));
+  /**
+   * A tenor of 8 years.
+   */
+  public static final Tenor EIGHT_YEARS = new Tenor(Period.ofYears(8));
+  /**
+   * A tenor of 9 years.
+   */
+  public static final Tenor NINE_YEARS = new Tenor(Period.ofYears(9));
+  /**
+   * A tenor of 10 years.
    */
   public static final Tenor TEN_YEARS = new Tenor(Period.ofYears(10));
   /**
    * A tenor of one working week (5 days).
    */
   public static final Tenor WORKING_WEEK = new Tenor(Period.ofDays(5));
-  /**
-   * A tenor of the working days in a year measured in hours (250 * 24 hours).
-   */
-  public static final Tenor WORKING_DAYS_IN_YEAR = new Tenor(Period.ofHours(252 * 24)); // TODO: should be days???
-  /**
-   * A tenor of the working days in a month measured in hours (250 * 24 / 12 hours).
-   */
-  public static final Tenor WORKING_DAYS_IN_MONTH = new Tenor(WORKING_DAYS_IN_YEAR.getPeriod().dividedBy(12));
-  /**
-   * A tenor of one financial year measured in hours (365.25 * 24 hours).
-   */
-  public static final Tenor FINANCIAL_YEAR = new Tenor(Period.ofHours((int) (365.25 * 24)));
+//  /**
+//   * A tenor of the working days in a year measured in hours (250 * 24 hours).
+//   */
+//  public static final Tenor WORKING_DAYS_IN_YEAR = new Tenor(Period.of(252 * 24, HOURS)); // TODO: should be days???
+//  /**
+//   * A tenor of the working days in a month measured in hours (250 * 24 / 12 hours).
+//   */
+//  public static final Tenor WORKING_DAYS_IN_MONTH = new Tenor(Period.of(WORKING_DAYS_IN_YEAR.getPeriod().toDuration().dividedBy(12)));
+//  /**
+//   * A tenor of one financial year measured in hours (365.25 * 24 hours).
+//   */
+//  public static final Tenor FINANCIAL_YEAR = new Tenor(Period.of((int) (365.25 * 24), HOURS));
   /**
    * A tenor of the days in a standard year (365 days).
    */
@@ -149,14 +165,10 @@ public class Tenor implements Comparable<Tenor> {
    * A tenor of the days in a leap year (366 days).
    */
   public static final Tenor LEAP_YEAR = new Tenor(Period.ofDays(366));
-  /**
-   * A tenor of two financial years measured in hours (365.25 * 24 * 2 hours).
-   */
-  public static final Tenor TWO_FINANCIAL_YEARS = new Tenor(FINANCIAL_YEAR.getPeriod().multipliedBy(2));
-  /**
-   * A tenor of the days in a standard year (365 / 12 days).
-   */
-  public static final Tenor MONTH = new Tenor(YEAR.getPeriod().dividedBy(12));
+//  /**
+//   * A tenor of two financial years measured in hours (365.25 * 24 * 2 hours).
+//   */
+//  public static final Tenor TWO_FINANCIAL_YEARS = new Tenor(FINANCIAL_YEAR.getPeriod().multipliedBy(2));
 
   /**
    * The period of the tenor.
@@ -195,6 +207,7 @@ public class Tenor implements Comparable<Tenor> {
     return new Tenor(Period.ofYears(years)); // TODO: what do we do here
   }
 
+  @Override
   public boolean equals(Object o) {
     if (o == null) {
       return false;
@@ -206,10 +219,12 @@ public class Tenor implements Comparable<Tenor> {
     return getPeriod().equals(other.getPeriod());
   }
 
+  @Override
   public int hashCode() {
     return getPeriod().hashCode();
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("Tenor[");
@@ -221,8 +236,8 @@ public class Tenor implements Comparable<Tenor> {
   //TODO [PLAT-1013] not the best way to do this
   @Override
   public int compareTo(Tenor other) {
-    Duration duration = _period.toEstimatedDuration();
-    Duration otherDuration = other._period.toEstimatedDuration();
-    return duration.compareTo(otherDuration);
+    Duration thisDur = DateUtils.estimatedDuration(this._period);
+    Duration otherDur = DateUtils.estimatedDuration(other._period);
+    return thisDur.compareTo(otherDur);
   }
 }

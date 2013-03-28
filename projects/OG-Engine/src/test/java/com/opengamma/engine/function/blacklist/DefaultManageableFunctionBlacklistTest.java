@@ -17,7 +17,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.testng.annotations.Test;
 
 import com.opengamma.engine.ComputationTargetSpecification;
-import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.function.EmptyFunctionParameters;
 import com.opengamma.engine.function.ParameterizedFunction;
 import com.opengamma.engine.test.MockFunction;
@@ -25,12 +24,13 @@ import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.id.UniqueId;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.test.Timeout;
 
 /**
  * Tests the {@link DefaultManageableFunctionBlacklist} class.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class DefaultManageableFunctionBlacklistTest {
 
   private final ParameterizedFunction _function;
@@ -40,7 +40,7 @@ public class DefaultManageableFunctionBlacklistTest {
 
   public DefaultManageableFunctionBlacklistTest() {
     _function = new ParameterizedFunction(new MockFunction("F1", null), new EmptyFunctionParameters());
-    _target = new ComputationTargetSpecification(ComputationTargetType.PRIMITIVE, UniqueId.of("Test", "Foo"));
+    _target = ComputationTargetSpecification.of(UniqueId.of("Test", "Foo"));
     _inputs = Collections.singleton(new ValueSpecification("Foo", _target, ValueProperties.with(ValuePropertyNames.FUNCTION, "X").get()));
     _outputs = Collections.singleton(new ValueSpecification("Bar", _target, ValueProperties.with(ValuePropertyNames.FUNCTION, "Y").get()));
   }
@@ -99,6 +99,7 @@ public class DefaultManageableFunctionBlacklistTest {
     }
   }
 
+  @Test(invocationCount = 5, successPercentage = 19)
   public void testExpiry() throws Exception {
     final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     try {

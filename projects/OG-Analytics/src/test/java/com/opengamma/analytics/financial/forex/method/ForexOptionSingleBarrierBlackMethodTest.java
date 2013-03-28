@@ -7,12 +7,13 @@ package com.opengamma.analytics.financial.forex.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
 import org.testng.internal.junit.ArrayAsserts;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.forex.calculator.CurrencyExposureBlackSmileForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.PresentValueBlackSmileForexCalculator;
@@ -86,7 +87,7 @@ public class ForexOptionSingleBarrierBlackMethodTest {
   private static final SmileDeltaTermStructureParametersStrikeInterpolation SMILE_TERM = new SmileDeltaTermStructureParametersStrikeInterpolation(TIME_TO_EXPIRY, DELTA, ATM, RISK_REVERSAL, STRANGLE);
   // Methods and curves
   private static final YieldCurveBundle CURVES = TestsDataSetsForex.createCurvesForex();
-  private static final String[] CURVES_NAME = CURVES.getAllNames().toArray(new String[0]);
+  private static final String[] CURVES_NAME = CURVES.getAllNames().toArray(new String[CURVES.size()]);
   private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE = new SmileDeltaTermStructureDataBundle(CURVES, SMILE_TERM, Pair.of(CUR_1, CUR_2));
   private static final ForexOptionVanillaBlackSmileMethod METHOD_VANILLA = ForexOptionVanillaBlackSmileMethod.getInstance();
   private static final ForexOptionSingleBarrierBlackMethod METHOD_BARRIER = ForexOptionSingleBarrierBlackMethod.getInstance();
@@ -131,7 +132,7 @@ public class ForexOptionSingleBarrierBlackMethodTest {
 
   @Test
   /**
-   * In-Out Parity. To get this exact, we must set the payment date equal to expiry date. 
+   * In-Out Parity. To get this exact, we must set the payment date equal to expiry date.
    * The treatment of the vanilla is: Z(t,T_pay) * FwdPrice(t,T_exp) where as
    * the treatment of the barrier is: Price(t,T_exp) (roughly :))
    */
@@ -153,8 +154,7 @@ public class ForexOptionSingleBarrierBlackMethodTest {
     final double priceBarrierDown = METHOD_BARRIER.presentValue(impossibleKnockOut, SMILE_BUNDLE).getAmount(CUR_2);
     assertTrue("PV : Knock-Out + Knock-In Barriers do not sum to the underlying vanilla (as approximated by a barrierOption with an impossibly low barrier",
         Math.abs((priceBarrierKO + priceBarrierKI) / priceBarrierDown - 1.0) < 1e-4);
-    assertTrue("PV : Knock-Out + Knock-In Barriers do not sum to the underlying vanilla",
-        ((priceBarrierKO + priceBarrierKI) / priceVanilla - 1.0) < 1e-4);
+    assertTrue("PV : Knock-Out + Knock-In Barriers do not sum to the underlying vanilla", ((priceBarrierKO + priceBarrierKI) / priceVanilla - 1.0) < 1e-4);
   }
 
   @Test
@@ -292,16 +292,16 @@ public class ForexOptionSingleBarrierBlackMethodTest {
     final MultipleCurrencyInterestRateCurveSensitivity sensi = METHOD_BARRIER.presentValueCurveSensitivity(OPTION_BARRIER, SMILE_BUNDLE);
     final double dfDomestic = CURVES.getCurve(CURVES_NAME[1]).getDiscountFactor(payTime);
     final double dfForeign = CURVES.getCurve(CURVES_NAME[0]).getDiscountFactor(payTime);
-    final double costOfCarry = rateDomestic - rateForeign;
+    //    final double costOfCarry = rateDomestic - rateForeign;
     final double forward = SPOT * dfForeign / dfDomestic;
     final double volatility = SMILE_TERM.getVolatility(new Triple<Double, Double, Double>(VANILLA_LONG.getTimeToExpiry(), STRIKE, forward));
     final double rebateByForeignUnit = REBATE / Math.abs(NOTIONAL);
     // Finite difference
     final double deltaShift = 0.00001; // 0.1 bp
-    final double bumpedPvForeignPlus = BLACK_BARRIER_FUNCTION.getPrice(VANILLA_LONG, BARRIER_KI, rebateByForeignUnit, SPOT, rateDomestic - (rateForeign + deltaShift), rateDomestic, volatility) *
-        NOTIONAL;
-    final double bumpedPvForeignMinus = BLACK_BARRIER_FUNCTION.getPrice(VANILLA_LONG, BARRIER_KI, rebateByForeignUnit, SPOT, rateDomestic - (rateForeign - deltaShift), rateDomestic, volatility) *
-        NOTIONAL;
+    final double bumpedPvForeignPlus = BLACK_BARRIER_FUNCTION.getPrice(VANILLA_LONG, BARRIER_KI, rebateByForeignUnit, SPOT, rateDomestic - (rateForeign + deltaShift), rateDomestic, volatility)
+        * NOTIONAL;
+    final double bumpedPvForeignMinus = BLACK_BARRIER_FUNCTION.getPrice(VANILLA_LONG, BARRIER_KI, rebateByForeignUnit, SPOT, rateDomestic - (rateForeign - deltaShift), rateDomestic, volatility)
+        * NOTIONAL;
     final double resultForeign = (bumpedPvForeignPlus - bumpedPvForeignMinus) / (2 * deltaShift);
     assertEquals("Forex vanilla option: curve exposure", payTime, sensi.getSensitivity(CUR_2).getSensitivities().get(CURVES_NAME[0]).get(0).first, 1E-2);
     assertEquals("Forex vanilla option: curve exposure", resultForeign, sensi.getSensitivity(CUR_2).getSensitivities().get(CURVES_NAME[0]).get(0).second, 1E-8 * NOTIONAL);
@@ -502,7 +502,6 @@ public class ForexOptionSingleBarrierBlackMethodTest {
     final double d2PdSdsig100 = METHOD_BARRIER.d2PriceDSpotDVolFD(BARRIER_SHORT, SMILE_BUNDLE, 0.01).getAmount();
     final double d2PdSdsig1 = METHOD_BARRIER.d2PriceDSpotDVolFD(BARRIER_SHORT, SMILE_BUNDLE, 0.0001).getAmount();
     assertTrue(true);
-
   }
 
   @Test
@@ -514,12 +513,12 @@ public class ForexOptionSingleBarrierBlackMethodTest {
    * This works well for the one-dimensional sensitivities above, but not well at all for the cross-derivative, Vanna. Comparison below, and in test above.
    * 
    */
-  public void TestOfFiniteDifferenceMethods() {
+  public void testOfFiniteDifferenceMethods() {
     final ForexOptionSingleBarrier optionForex = OPTION_BARRIER;
     final SmileDeltaTermStructureDataBundle smile = SMILE_BUNDLE;
     final double bp10 = 0.001;
     final double relShift = 0.001;
-    // repackage for calls to BARRIER_FUNCTION 
+    // repackage for calls to BARRIER_FUNCTION
     final String domesticCurveName = optionForex.getUnderlyingOption().getUnderlyingForex().getPaymentCurrency2().getFundingCurveName();
     final String foreignCurveName = optionForex.getUnderlyingOption().getUnderlyingForex().getPaymentCurrency1().getFundingCurveName();
     final double payTime = optionForex.getUnderlyingOption().getUnderlyingForex().getPaymentTime();
@@ -531,8 +530,8 @@ public class ForexOptionSingleBarrierBlackMethodTest {
     final double foreignAmount = optionForex.getUnderlyingOption().getUnderlyingForex().getPaymentCurrency1().getAmount();
     final double rebateByForeignUnit = optionForex.getRebate() / Math.abs(foreignAmount);
     final double sign = (optionForex.getUnderlyingOption().isLong() ? 1.0 : -1.0);
-    final double vol = FXVolatilityUtils.getVolatility(smile, optionForex.getCurrency1(), optionForex.getCurrency2(), optionForex.getUnderlyingOption().getTimeToExpiry(),
-        optionForex.getUnderlyingOption().getStrike(), forward);
+    final double vol = FXVolatilityUtils.getVolatility(smile, optionForex.getCurrency1(), optionForex.getCurrency2(), optionForex.getUnderlyingOption().getTimeToExpiry(), optionForex
+        .getUnderlyingOption().getStrike(), forward);
 
     // Bump scenarios
     final double volUp = (1.0 + relShift) * vol;

@@ -8,14 +8,9 @@ package com.opengamma.master.historicaltimeseries.impl;
 import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.time.calendar.LocalDate;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
@@ -26,6 +21,10 @@ import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesI
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ehcache.EHCacheUtils;
 import com.opengamma.util.tuple.Triple;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 /**
  * A <code>HistoricalTimeSeriesResolver</code> that tries to find the distribution spec in a cache. If it doesn't find it, it will delegate to an underlying <code>HistoricalTimeSeriesResolver</code>.
@@ -158,7 +157,6 @@ public class EHCachingHistoricalTimeSeriesResolver implements HistoricalTimeSeri
   @Override
   public HistoricalTimeSeriesResolutionResult resolve(final ExternalIdBundle identifierBundle, final LocalDate identifierValidityDate,
       final String dataSource, final String dataProvider, final String dataField, final String resolutionKey) {
-    HistoricalTimeSeriesResolutionResult resolveResult;
     boolean knownPresent = false;
     Element e;
     if ((identifierBundle != null) && isOptimisticFieldResolution()) {
@@ -192,28 +190,31 @@ public class EHCachingHistoricalTimeSeriesResolver implements HistoricalTimeSeri
         return null;
       }
     }
-    final String validityDate = (identifierValidityDate != null) ? identifierValidityDate.toString() : "";
+    HistoricalTimeSeriesResolutionResult resolveResult;
     for (ExternalId id : identifierBundle) {
       String key = id.toString() + SEPARATOR +
                 dataField + SEPARATOR +
                 (dataSource != null ? dataSource : "") + SEPARATOR +
                 (dataProvider != null ? dataProvider : "") + SEPARATOR +
-                resolutionKey + SEPARATOR +
-                validityDate;
+                resolutionKey;
       e = _cache.get(key);
-      if (e != null) {
-        resolveResult = (HistoricalTimeSeriesResolutionResult) e.getObjectValue();
-        if (isAutomaticFieldResolutionOptimisation()) {
-          if (isOptimisticFieldResolution()) {
-            if (resolveResult != null) {
-              _optimisticFieldMetric1.incrementAndGet();
-            } else {
-              _optimisticFieldMetric1.decrementAndGet();
+      HistoricalTimeSeriesResolutionCacheItem cacheItem = e != null ? (HistoricalTimeSeriesResolutionCacheItem) e.getObjectValue() : null;
+      if (cacheItem != null) {
+        boolean isInvalid = cacheItem.isInvalid(identifierValidityDate);
+        resolveResult = !isInvalid ? cacheItem.get(identifierValidityDate) : null;
+        if (isInvalid || resolveResult != null) {
+          if (isAutomaticFieldResolutionOptimisation()) {
+            if (isOptimisticFieldResolution()) {
+              if (resolveResult != null) {
+                _optimisticFieldMetric1.incrementAndGet();
+              } else {
+                _optimisticFieldMetric1.decrementAndGet();
+              }
             }
+            updateAutoFieldResolutionOptimisation();
           }
-          updateAutoFieldResolutionOptimisation();
+          return resolveResult;
         }
-        return resolveResult;
       }
     }
     if (!knownPresent) {
@@ -225,42 +226,34 @@ public class EHCachingHistoricalTimeSeriesResolver implements HistoricalTimeSeri
     if (resolveResult != null) {
       ManageableHistoricalTimeSeriesInfo info = resolveResult.getHistoricalTimeSeriesInfo();
       for (ExternalIdWithDates id : info.getExternalIdBundle()) {
-        String key;
         if (id.isValidOn(identifierValidityDate)) {
-          key = id.getExternalId().toString() + SEPARATOR +
+          String key = id.getExternalId().toString() + SEPARATOR +
                   dataField + SEPARATOR +
                   info.getDataSource() + SEPARATOR +
                   info.getDataProvider() + SEPARATOR +
-                  resolutionKey + SEPARATOR +
-                  validityDate;
-          _cache.put(new Element(key, resolveResult));
-        }
-        if (id.isValidOn(identifierValidityDate)) {
+                  resolutionKey;
+          addResultToCache(key, id, resolveResult);
+          
           key = id.getExternalId().toString() + SEPARATOR +
                   dataField + SEPARATOR +
                   SEPARATOR +
                   info.getDataProvider() + SEPARATOR +
-                  resolutionKey + SEPARATOR +
-                  validityDate;
-          _cache.put(new Element(key, resolveResult));
-        }
-        if (id.isValidOn(identifierValidityDate)) {
+                  resolutionKey;
+          addResultToCache(key, id, resolveResult);
+          
           key = id.getExternalId().toString() + SEPARATOR +
                 dataField + SEPARATOR +
                 info.getDataSource() + SEPARATOR +
                 SEPARATOR +
-                resolutionKey + SEPARATOR +
-                validityDate;
-          _cache.put(new Element(key, resolveResult));
-        }
-        if (id.isValidOn(identifierValidityDate)) {
+                resolutionKey;
+          addResultToCache(key, id, resolveResult);
+
           key = id.getExternalId().toString() + SEPARATOR +
                 dataField + SEPARATOR +
                 SEPARATOR +
                 SEPARATOR +
-                resolutionKey + SEPARATOR +
-                validityDate;
-          _cache.put(new Element(key, resolveResult));
+                resolutionKey;
+          addResultToCache(key, id, resolveResult);
         }
       }
       if (isAutomaticFieldResolutionOptimisation()) {
@@ -276,9 +269,8 @@ public class EHCachingHistoricalTimeSeriesResolver implements HistoricalTimeSeri
                 dataField + SEPARATOR +
                 (dataSource != null ? dataSource : "") + SEPARATOR +
                 (dataProvider != null ? dataProvider : "") + SEPARATOR +
-                resolutionKey + SEPARATOR +
-                validityDate;
-        _cache.put(new Element(key, null));
+                resolutionKey;
+        addInvalidDateToCache(key, identifierValidityDate, id);
       }
       if (isAutomaticFieldResolutionOptimisation()) {
         if (isOptimisticFieldResolution()) {
@@ -288,6 +280,41 @@ public class EHCachingHistoricalTimeSeriesResolver implements HistoricalTimeSeri
       }
     }
     return resolveResult;
+  }
+
+  private void addResultToCache(String key, ExternalIdWithDates externalIdWithDates, HistoricalTimeSeriesResolutionResult result) {
+    Element cacheElement = _cache.get(key);
+    if (cacheElement == null) {
+      HistoricalTimeSeriesResolutionCacheItem cacheItem = new HistoricalTimeSeriesResolutionCacheItem(externalIdWithDates.getExternalId());
+      cacheElement = new Element(key, cacheItem);
+      Element existingCacheElement = _cache.putIfAbsent(cacheElement);
+      if (existingCacheElement != null) {
+        cacheElement = existingCacheElement;
+      }
+    }
+    HistoricalTimeSeriesResolutionCacheItem cacheItem = (HistoricalTimeSeriesResolutionCacheItem) cacheElement.getObjectValue();
+    cacheItem.put(externalIdWithDates, result);
+  }
+  
+  private void addInvalidDateToCache(String key, LocalDate identifierValidityDate, ExternalId externalId) {
+    Element cacheElement = _cache.get(key);
+    if (cacheElement == null) {
+      HistoricalTimeSeriesResolutionCacheItem cacheItem = new HistoricalTimeSeriesResolutionCacheItem(externalId);
+      cacheElement = new Element(key, cacheItem);
+      Element existingCacheElement = _cache.putIfAbsent(cacheElement);
+      if (existingCacheElement != null) {
+        cacheElement = existingCacheElement;
+      }
+    }
+    HistoricalTimeSeriesResolutionCacheItem cacheItem = (HistoricalTimeSeriesResolutionCacheItem) cacheElement.getObjectValue();
+    cacheItem.putInvalid(identifierValidityDate);
+  }
+
+  /**
+   * Call this at the end of a unit test run to clear the state of EHCache. It should not be part of a generic lifecycle method.
+   */
+  protected void shutdown() {
+    _cacheManager.removeCache(_cache.getName());
   }
 
 }

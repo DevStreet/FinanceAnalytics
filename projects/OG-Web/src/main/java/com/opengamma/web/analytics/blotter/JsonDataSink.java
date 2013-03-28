@@ -10,16 +10,26 @@ import java.util.Map;
 
 import org.joda.beans.Bean;
 import org.joda.beans.MetaBean;
+import org.joda.beans.MetaProperty;
 import org.json.JSONObject;
 
 import com.google.common.collect.Maps;
+import com.opengamma.util.ArgumentChecker;
 
 /**
  * Receives data from a Joda bean and writes it into a JSON object.
  */
 /* package */ class JsonDataSink implements BeanDataSink<JSONObject> {
 
+  /** The JSON structure. */
   private final Map<String, Object> _json = Maps.newHashMap();
+  /** For converting object values to strings to populate the JSON. */
+  private final Converters _converters;
+
+  /* package */ JsonDataSink(Converters converters) {
+    ArgumentChecker.notNull(converters, "converters");
+    _converters = converters;
+  }
 
   @Override
   public void setBeanData(MetaBean metaBean, Bean bean) {
@@ -32,30 +42,35 @@ import com.google.common.collect.Maps;
   }
 
   @Override
-  public void setCollectionValues(String propertyName, Collection<?> values) {
+  public void setCollection(String propertyName, Collection<?> values) {
     _json.put(propertyName, values);
   }
 
   @Override
-  public void setMapValues(String propertyName, Map<?, ?> values) {
+  public void setMap(String propertyName, Map<?, ?> values) {
     _json.put(propertyName, values);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setBeanValue(String propertyName, Bean bean, BeanTraverser traverser) {
-    Object value;
-    if (bean == null) {
-      value = null;
-    } else {
-      BuildingBeanVisitor<JSONObject> visitor = new BuildingBeanVisitor<JSONObject>(bean, new JsonDataSink());
-      value = traverser.traverse(bean.metaBean(), visitor);
+  public Object convert(Object value, MetaProperty<?> property, Class<?> type, BeanTraverser traverser) {
+    Object convertedValue = _converters.convert(value, property, type);
+    if (convertedValue != Converters.CONVERSION_FAILED) {
+      return convertedValue;
     }
-    _json.put(propertyName, value);
+    if (Bean.class.isAssignableFrom(value.getClass())) {
+      Bean bean = (Bean) value;
+      BuildingBeanVisitor<JSONObject> visitor = new BuildingBeanVisitor<>(bean, new JsonDataSink(_converters));
+      return traverser.traverse(bean.metaBean(), visitor);
+    } else {
+      throw new IllegalArgumentException("Unable to convert " + value.getClass().getName());
+    }
   }
 
   @Override
   public JSONObject finish() {
     return new JSONObject(_json);
   }
+
 }
 

@@ -7,16 +7,16 @@ package com.opengamma.analytics.financial.interestrate.swap.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.horizon.ConstantSpreadHorizonThetaCalculator;
 import com.opengamma.analytics.financial.horizon.ConstantSpreadYieldCurveBundleRolldownFunction;
@@ -36,7 +36,6 @@ import com.opengamma.analytics.financial.interestrate.ParSpreadMarketQuoteCalcul
 import com.opengamma.analytics.financial.interestrate.ParSpreadMarketQuoteCurveSensitivityCalculator;
 import com.opengamma.analytics.financial.interestrate.PresentValueCalculator;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
-import com.opengamma.analytics.financial.interestrate.TodayPaymentCalculator;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
@@ -46,13 +45,14 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
 import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
+import com.opengamma.analytics.financial.provider.calculator.generic.TodayPaymentCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
+import com.opengamma.timeseries.zoneddatetime.ArrayZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.MultipleCurrencyAmount;
 import com.opengamma.util.time.DateUtils;
-import com.opengamma.util.timeseries.zoneddatetime.ArrayZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.tuple.DoublesPair;
 
 public class SwapCalculatorTest {
@@ -175,12 +175,12 @@ public class SwapCalculatorTest {
     final List<DoublesPair> sensiDscFD = FDCurveSensitivityCalculator.curveSensitvityFDCalculator(swap, PSC, CURVES, swap.getFirstLeg().getDiscountCurve(), timesDsc, 1.0E-10);
     final List<DoublesPair> sensiDscComputed = pscsComputed.getSensitivities().get(swap.getFirstLeg().getDiscountCurve());
     assertTrue("parSpread: curve sensitivity - dsc", InterestRateCurveSensitivityUtils.compare(sensiDscFD, sensiDscComputed, TOLERANCE_SPREAD_DELTA));
-    final Set<Double> timesFwdSet = new TreeSet<Double>();
+    final Set<Double> timesFwdSet = new TreeSet<>();
     for (int loopcpn = 0; loopcpn < swap.getSecondLeg().getNumberOfPayments(); loopcpn++) {
       timesFwdSet.add(((CouponIbor) swap.getSecondLeg().getNthPayment(loopcpn)).getFixingPeriodStartTime());
       timesFwdSet.add(((CouponIbor) swap.getSecondLeg().getNthPayment(loopcpn)).getFixingPeriodEndTime());
     }
-    final Double[] timesFwd = timesFwdSet.toArray(new Double[0]);
+    final Double[] timesFwd = timesFwdSet.toArray(new Double[timesFwdSet.size()]);
     final List<DoublesPair> sensiFwdFD = FDCurveSensitivityCalculator.curveSensitvityFDCalculator(swap, PSC, CURVES, fwdCurveName, ArrayUtils.toPrimitive(timesFwd), 1.0E-10);
     final List<DoublesPair> sensiFwdComputed = pscsComputed.getSensitivities().get(fwdCurveName);
     assertTrue("parSpread: curve sensitivity - fwd", InterestRateCurveSensitivityUtils.compare(sensiFwdFD, sensiFwdComputed, TOLERANCE_SPREAD_DELTA));
@@ -201,7 +201,7 @@ public class SwapCalculatorTest {
     final List<DoublesPair> sensiDscComputed = pscsComputed.getSensitivities().get(swap.getFirstLeg().getDiscountCurve());
     assertTrue("parSpread: curve sensitivity - dsc", InterestRateCurveSensitivityUtils.compare(sensiDscFD, sensiDscComputed, TOLERANCE_SPREAD_DELTA));
 
-    final Set<Double> timesFwdSet = new TreeSet<Double>();
+    final Set<Double> timesFwdSet = new TreeSet<>();
     for (int loopcpn = 0; loopcpn < swap.getFirstLeg().getNumberOfPayments(); loopcpn++) {
       timesFwdSet.add(((CouponIborSpread) swap.getFirstLeg().getNthPayment(loopcpn)).getFixingPeriodStartTime());
       timesFwdSet.add(((CouponIborSpread) swap.getFirstLeg().getNthPayment(loopcpn)).getFixingPeriodEndTime());
@@ -210,7 +210,7 @@ public class SwapCalculatorTest {
       timesFwdSet.add(((CouponIborSpread) swap.getSecondLeg().getNthPayment(loopcpn)).getFixingPeriodStartTime());
       timesFwdSet.add(((CouponIborSpread) swap.getSecondLeg().getNthPayment(loopcpn)).getFixingPeriodEndTime());
     }
-    final Double[] timesFwd = timesFwdSet.toArray(new Double[0]);
+    final Double[] timesFwd = timesFwdSet.toArray(new Double[timesFwdSet.size()]);
     final List<DoublesPair> sensiFwdFD = FDCurveSensitivityCalculator.curveSensitvityFDCalculator(swap, PSC, CURVES, fwdCurveName, ArrayUtils.toPrimitive(timesFwd), 1.0E-10);
     final List<DoublesPair> sensiFwdComputed = pscsComputed.getSensitivities().get(fwdCurveName);
     assertTrue("parSpread: curve sensitivity - fwd", InterestRateCurveSensitivityUtils.compare(sensiFwdFD, sensiFwdComputed, TOLERANCE_SPREAD_DELTA));

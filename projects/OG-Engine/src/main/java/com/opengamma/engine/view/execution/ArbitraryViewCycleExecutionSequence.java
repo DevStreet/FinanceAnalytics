@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.time.InstantProvider;
+import org.threeten.bp.Instant;
 
 import com.opengamma.util.ArgumentChecker;
 
@@ -22,12 +22,12 @@ import com.opengamma.util.ArgumentChecker;
 public class ArbitraryViewCycleExecutionSequence extends MergingViewCycleExecutionSequence {
 
   private final LinkedList<ViewCycleExecutionOptions> _executionSequence;
-  
+
   public ArbitraryViewCycleExecutionSequence(Collection<ViewCycleExecutionOptions> executionSequence) {
     ArgumentChecker.notNull(executionSequence, "executionSequence");
     _executionSequence = new LinkedList<ViewCycleExecutionOptions>(executionSequence);
   }
-  
+
   /**
    * Gets a sequence for a single cycle which relies on default cycle execution options.
    * 
@@ -36,43 +36,44 @@ public class ArbitraryViewCycleExecutionSequence extends MergingViewCycleExecuti
   public static ArbitraryViewCycleExecutionSequence single() {
     return new ArbitraryViewCycleExecutionSequence(Collections.singletonList(new ViewCycleExecutionOptions()));
   }
-  
+
   /**
    * Gets a sequence for a single cycle.
    * 
-   * @param executionOptions  the execution options for the single cycle, not null
+   * @param executionOptions the execution options for the single cycle, not null
    * @return the sequence, not null
    */
   public static ArbitraryViewCycleExecutionSequence single(ViewCycleExecutionOptions executionOptions) {
     return new ArbitraryViewCycleExecutionSequence(Collections.singletonList(executionOptions));
   }
-  
+
   /**
    * Gets a sequence for a collection of valuation times.
    * 
-   * @param valuationTimeProviders  the valuation times, not null
+   * @param valuationTimeProviders the valuation times, not null
    * @return the sequence, not null
    */
-  public static ArbitraryViewCycleExecutionSequence of(InstantProvider... valuationTimeProviders) {
+  public static ArbitraryViewCycleExecutionSequence of(Instant... valuationTimeProviders) {
     return of(Arrays.asList(valuationTimeProviders));
   }
 
   /**
    * Gets a sequence for a collection of valuation times.
    * 
-   * @param valuationTimeProviders  the valuation times, not  null
+   * @param valuationTimeProviders the valuation times, not null
    * @return the sequence, not null
    */
-  public static ArbitraryViewCycleExecutionSequence of(Collection<InstantProvider> valuationTimeProviders) {
+  public static ArbitraryViewCycleExecutionSequence of(Collection<Instant> valuationTimeProviders) {
     ArgumentChecker.notNull(valuationTimeProviders, "valuationTimeProviders");
     List<ViewCycleExecutionOptions> executionSequence = new ArrayList<ViewCycleExecutionOptions>(valuationTimeProviders.size());
-    for (InstantProvider valuationTimeProvider : valuationTimeProviders) {
-      ViewCycleExecutionOptions options = new ViewCycleExecutionOptions(valuationTimeProvider);
+    final ViewCycleExecutionOptions.Builder builder = ViewCycleExecutionOptions.builder();
+    for (Instant valuationTimeProvider : valuationTimeProviders) {
+      ViewCycleExecutionOptions options = builder.setValuationTime(valuationTimeProvider).create();
       executionSequence.add(options);
     }
     return new ArbitraryViewCycleExecutionSequence(executionSequence);
   }
-  
+
   /**
    * Gets a sequence for a collection of cycles.
    * 
@@ -82,19 +83,29 @@ public class ArbitraryViewCycleExecutionSequence extends MergingViewCycleExecuti
   public static ArbitraryViewCycleExecutionSequence of(ViewCycleExecutionOptions... executionSequence) {
     return new ArbitraryViewCycleExecutionSequence(Arrays.asList(executionSequence));
   }
-  
+
   public List<ViewCycleExecutionOptions> getRemainingSequence() {
     return Collections.unmodifiableList(_executionSequence);
   }
-  
+
   @Override
   public ViewCycleExecutionOptions getNext(ViewCycleExecutionOptions defaultExecutionOptions) {
-    return merge(_executionSequence.poll(), defaultExecutionOptions);
+    final ViewCycleExecutionOptions cycleOptions = _executionSequence.poll();
+    if (cycleOptions != null) {
+      return merge(cycleOptions, defaultExecutionOptions);
+    } else {
+      return null;
+    }
   }
 
   @Override
   public boolean isEmpty() {
     return _executionSequence.isEmpty();
   }
- 
+
+  @Override
+  public int estimateRemaining() {
+    return _executionSequence.size();
+  }
+
 }

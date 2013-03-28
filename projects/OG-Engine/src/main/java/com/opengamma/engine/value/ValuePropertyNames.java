@@ -6,6 +6,7 @@
 package com.opengamma.engine.value;
 
 import com.opengamma.engine.function.FunctionDefinition;
+import com.opengamma.engine.marketdata.availability.MarketDataAvailabilityProvider;
 import com.opengamma.util.PublicAPI;
 
 /**
@@ -78,6 +79,12 @@ public final class ValuePropertyNames {
   public static final String CURVE_CURRENCY = "CurveCurrency";
 
   /**
+   * The data provider used to source external values into the view cycle. This may be used by {@link MarketDataAvailabilityProvider} instances that work with multiple underlying providers to indicate
+   * which data provider should be queried for the value. In the case of a "route" of nested data providers existing, the {@code /} character can be used as a separator between elements.
+   */
+  public static final String DATA_PROVIDER = "DataProvider";
+
+  /**
    * The function identifier that produced a value.
    * <p>
    * If there are multiple functions in a repository that can compute a given value, this can
@@ -105,6 +112,18 @@ public final class ValuePropertyNames {
   public static final String RECEIVE_CURVE = "ReceiveCurve";
 
   /**
+   * The name of the curve calculation configuration used for the pay leg of an instrument (e.g.
+   * an FX forward or a cross-currency swap).
+   */
+  public static final String PAY_CURVE_CALCULATION_CONFIG = "PayCurveCalculationConfig";
+
+  /**
+   * The name of the curve calculation configuration used for the receive leg of an instrument
+   * (e.g. an FX forward or a cross-currency swap).
+   */
+  public static final String RECEIVE_CURVE_CALCULATION_CONFIG = "ReceiveCurveCalculationConfig";
+
+  /**
    * The symbolic name of a surface used to produce a value, valid within the naming context of
    * the function repository containing the function definition used.
    * <p>
@@ -130,6 +149,11 @@ public final class ValuePropertyNames {
   public static final String SURFACE_CALCULATION_METHOD = "SurfaceCalculationMethod";
 
   /**
+   * A general name for a property describing how a surface was calculated
+   */
+  public static final String CUBE_CALCULATION_METHOD = "CubeCalculationMethod";
+
+  /**
    * A general name for a property describing how volatility smiles were modelled (e.g. Heston, SABR)
    */
   public static final String SMILE_FITTING_METHOD = "SmileFittingMethod";
@@ -142,8 +166,9 @@ public final class ValuePropertyNames {
   public static final String OUTPUT_RESERVED_PREFIX = ".";
 
   /**
-   * A general name for a property describing the sampling period for a time series (e.g. daily, weekly)
+   * A general name for a property describing the period of time over which a time-series applies (e.g. P2Y).
    */
+  // NOTE jonathan 2013-03-12 -- PERIOD would be a better name
   public static final String SAMPLING_PERIOD = "SamplingPeriod";
 
   /**
@@ -225,16 +250,21 @@ public final class ValuePropertyNames {
 
   // REVIEW 2012-08-29 andrew -- The Javadoc for SHIFT above is bad; it's a common name that will be used for things other than DV01.
   // REVIEW 2012-10-13 casey -- One doesn't even shift DV01. The shift in DV01 is in its name - Delta Value of One Basis Point..
-
+  // REVIEW 2013-01-02 emcleod -- In the case of DV01, "Shift" refers to the scale factor applied (1 or -1). It was added to allow comparisons of results
+  // from other libraries. The general point about the javadoc is valid.
   /**
    *
    */
   public static final String VALUE_AGGREGATION = "ValueAggregation";
-
 
   /**
    * The underlying ticker is used in Equity Options to tie results to the vol surface used,
    * such that each column may represent, for example, the vega of all positions sensitive to changes in that specific surface
    */
   public static final String UNDERLYING_TICKER = "UnderlyingTicker";
+
+  /**
+   * Controls the number formatting of the barrier distance - e.g. abs, percentage
+   */
+  public static final String BARRIER_DISTANCE_OUTPUT_FORMAT = "BarrierDistanceOutputFormat";
 }

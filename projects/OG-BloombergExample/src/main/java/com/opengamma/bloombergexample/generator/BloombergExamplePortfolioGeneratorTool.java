@@ -17,9 +17,15 @@ import com.opengamma.util.money.Currency;
  */
 public class BloombergExamplePortfolioGeneratorTool extends AbstractPortfolioGeneratorTool {
 
+  @Override
   protected void configureChain(final SecurityGenerator<?> securityGenerator) {
     super.configureChain(securityGenerator);
-    securityGenerator.setCurrencyCurveName("FUNDING");
+    securityGenerator.setCurrencyCurveName("Discounting");
+    securityGenerator.setCurveCalculationConfig(Currency.CHF, "DefaultTwoCurveCHFConfig");
+    securityGenerator.setCurveCalculationConfig(Currency.EUR, "DefaultTwoCurveEURConfig");
+    securityGenerator.setCurveCalculationConfig(Currency.GBP, "DefaultTwoCurveGBPConfig");
+    securityGenerator.setCurveCalculationConfig(Currency.JPY, "DefaultTwoCurveJPYConfig");
+    securityGenerator.setCurveCalculationConfig(Currency.USD, "DefaultTwoCurveUSDConfig");
     securityGenerator.setPreferredScheme(ExternalSchemes.BLOOMBERG_TICKER);
     securityGenerator.setSpotRateIdentifier(new Function2<Currency, Currency, ExternalId>() {
       @Override
@@ -29,4 +35,3 @@ public class BloombergExamplePortfolioGeneratorTool extends AbstractPortfolioGen
     });
   }
 }
-  

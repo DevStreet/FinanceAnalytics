@@ -11,10 +11,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.TimeZone;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZoneId;
 
 import com.opengamma.core.exchange.Exchange;
 import com.opengamma.core.exchange.ExchangeSource;
@@ -32,11 +31,14 @@ import com.opengamma.id.ObjectId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.money.Currency;
+import com.opengamma.util.test.TestGroup;
 
 /**
- *
+ * Test.
  */
+@Test(groups = TestGroup.UNIT)
 public class SecurityToFixedIncomeFutureDefinitionConverterTest {
+
   private static final HolidaySource HOLIDAY_SOURCE = new MyHolidaySource();
   private static final ExchangeSource EXCHANGE_SOURCE = new MyExchangeSource();
   private static final ConventionBundleSource CONVENTION_SOURCE = new DefaultConventionBundleSource(
@@ -111,7 +113,7 @@ public class SecurityToFixedIncomeFutureDefinitionConverterTest {
       }
 
       @Override
-      public TimeZone getTimeZone() {
+      public ZoneId getTimeZone() {
         return null;
       }
 

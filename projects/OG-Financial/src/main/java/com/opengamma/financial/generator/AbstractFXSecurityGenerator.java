@@ -8,7 +8,7 @@ package com.opengamma.financial.generator;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.core.position.Counterparty;
@@ -213,7 +213,7 @@ public abstract class AbstractFXSecurityGenerator<T extends ManageableSecurity> 
     if (security == null) {
       return null;
     }
-    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetTime(), 
+    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetDateTime().toOffsetTime(), 
         ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
     trade.setPremium(security.getCallAmount());
     trade.setPremiumCurrency(security.getCallCurrency());
@@ -225,7 +225,7 @@ public abstract class AbstractFXSecurityGenerator<T extends ManageableSecurity> 
     if (security == null) {
       return null;
     }
-    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetTime(), 
+    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetDateTime().toOffsetTime(), 
         ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
     trade.setPremium(security.getCallAmount());
     trade.setPremiumCurrency(security.getCallCurrency());
@@ -237,7 +237,7 @@ public abstract class AbstractFXSecurityGenerator<T extends ManageableSecurity> 
     if (security == null) {
       return null;
     }
-    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetTime(), 
+    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetDateTime().toOffsetTime(), 
         ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
     trade.setPremium(security.getPayAmount());
     trade.setPremiumCurrency(security.getPayCurrency());
@@ -250,7 +250,7 @@ public abstract class AbstractFXSecurityGenerator<T extends ManageableSecurity> 
     if (security == null) {
       return null;
     }
-    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetTime(), 
+    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetDateTime().toOffsetTime(), 
         ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
     trade.setPremium(security.getPayAmount());
     trade.setPremiumCurrency(security.getPayCurrency());
@@ -262,7 +262,7 @@ public abstract class AbstractFXSecurityGenerator<T extends ManageableSecurity> 
     if (security == null) {
       return null;
     }
-    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetTime(), 
+    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetDateTime().toOffsetTime(), 
         ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
     trade.setPremium(security.getCallAmount());
     trade.setPremiumCurrency(security.getCallCurrency());
@@ -274,7 +274,7 @@ public abstract class AbstractFXSecurityGenerator<T extends ManageableSecurity> 
     if (security == null) {
       return null;
     }
-    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetTime(), 
+    ManageableTrade trade = new ManageableTrade(quantity, persister.storeSecurity(security), bundle._tradeDate.toLocalDate(), bundle._tradeDate.toOffsetDateTime().toOffsetTime(), 
         ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
     trade.setPremium(security.getCallAmount());
     trade.setPremiumCurrency(security.getCallCurrency());

@@ -7,11 +7,11 @@ package com.opengamma.analytics.financial.interestrate.future.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.future.DeliverableSwapFuturesSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;

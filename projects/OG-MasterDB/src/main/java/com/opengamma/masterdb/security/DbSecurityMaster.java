@@ -273,7 +273,10 @@ public class DbSecurityMaster
   @Override
   protected SecurityDocument insert(final SecurityDocument document) {
     ArgumentChecker.notNull(document.getSecurity(), "document.security");
-    
+    ArgumentChecker.notNull(document.getSecurity().getName(), "document.security.name");
+    ArgumentChecker.notNull(document.getSecurity().getSecurityType(), "document.security.securityTYpe");
+    ArgumentChecker.notNull(document.getSecurity().getExternalIdBundle(), "document.security.externalIdBundle");
+
     final long docId = nextId("sec_security_seq");
     final long docOid = (document.getUniqueId() != null ? extractOid(document.getUniqueId()) : docId);
     // the arguments for inserting into the security table
@@ -423,7 +426,7 @@ public class DbSecurityMaster
   }
 
   @Override
-  public AbstractHistoryResult<SecurityDocument> historyByVersionsCorrections(AbstractHistoryRequest request) {
+  protected AbstractHistoryResult<SecurityDocument> historyByVersionsCorrections(AbstractHistoryRequest request) {
     SecurityHistoryRequest historyRequest = new SecurityHistoryRequest();
     historyRequest.setCorrectionsFromInstant(request.getCorrectionsFromInstant());
     historyRequest.setCorrectionsToInstant(request.getCorrectionsToInstant());
@@ -432,4 +435,5 @@ public class DbSecurityMaster
     historyRequest.setObjectId(request.getObjectId());
     return history(historyRequest);
   }
+
 }

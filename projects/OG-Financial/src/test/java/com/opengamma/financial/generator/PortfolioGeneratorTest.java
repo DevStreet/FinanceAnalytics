@@ -12,9 +12,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
 
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.core.position.Counterparty;
 import com.opengamma.core.position.Portfolio;
@@ -25,11 +24,12 @@ import com.opengamma.engine.InMemorySecuritySource;
 import com.opengamma.id.ExternalId;
 import com.opengamma.master.position.ManageableTrade;
 import com.opengamma.master.security.RawSecurity;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Tests the {@link PortfolioGenerator}, {@link LeafPortfolioNodeGenerator}, and {@link SimplePositionGenerator} classes.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class PortfolioGeneratorTest {
 
   private PositionGenerator createSimplePositionGenerator(final InMemorySecuritySource source) {
@@ -44,7 +44,7 @@ public class PortfolioGeneratorTest {
         ManageableTrade trade = null;
         RawSecurity security = createSecurity();
         ZonedDateTime tradeDate = ZonedDateTime.now();
-        trade = new ManageableTrade(quantityGenerator.createQuantity(), securityPersister.storeSecurity(security), tradeDate.toLocalDate(), tradeDate.toOffsetTime(), 
+        trade = new ManageableTrade(quantityGenerator.createQuantity(), securityPersister.storeSecurity(security), tradeDate.toLocalDate(), tradeDate.toOffsetDateTime().toOffsetTime(),
             ExternalId.of(Counterparty.DEFAULT_SCHEME, counterPartyGenerator.createName()));
         return trade;
       }

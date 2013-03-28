@@ -5,13 +5,12 @@
  */
 package com.opengamma.web.analytics.blotter;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.time.calendar.ZonedDateTime;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -22,82 +21,96 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.beans.Bean;
+import org.joda.beans.JodaBeanUtils;
 import org.joda.beans.MetaBean;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.opengamma.DataNotFoundException;
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.financial.conversion.JodaBeanConverters;
-import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
-import com.opengamma.financial.security.capfloor.CapFloorSecurity;
-import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
-import com.opengamma.financial.security.fra.FRASecurity;
+import com.opengamma.analytics.financial.credit.DebtSeniority;
+import com.opengamma.analytics.financial.credit.RestructuringClause;
+import com.opengamma.analytics.financial.credit.StubType;
+import com.opengamma.core.security.Security;
+import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.financial.convention.daycount.DayCount;
+import com.opengamma.financial.convention.frequency.Frequency;
+import com.opengamma.financial.security.FinancialSecurity;
+import com.opengamma.financial.security.LongShort;
 import com.opengamma.financial.security.future.InterestRateFutureSecurity;
-import com.opengamma.financial.security.fx.FXForwardSecurity;
-import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
-import com.opengamma.financial.security.option.FXOptionSecurity;
+import com.opengamma.financial.security.option.BarrierDirection;
+import com.opengamma.financial.security.option.BarrierType;
+import com.opengamma.financial.security.option.ExerciseType;
 import com.opengamma.financial.security.option.IRFutureOptionSecurity;
-import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
+import com.opengamma.financial.security.option.MonitoringType;
+import com.opengamma.financial.security.option.SamplingFrequency;
 import com.opengamma.financial.security.option.SwaptionSecurity;
-import com.opengamma.financial.security.swap.FixedInterestRateLeg;
-import com.opengamma.financial.security.swap.FloatingGearingIRLeg;
-import com.opengamma.financial.security.swap.FloatingInterestRateLeg;
-import com.opengamma.financial.security.swap.FloatingSpreadIRLeg;
-import com.opengamma.financial.security.swap.InterestRateNotional;
+import com.opengamma.financial.security.swap.FloatingRateType;
 import com.opengamma.financial.security.swap.SwapSecurity;
+import com.opengamma.id.ExternalId;
 import com.opengamma.id.UniqueId;
+import com.opengamma.id.VersionCorrection;
+import com.opengamma.master.portfolio.PortfolioMaster;
+import com.opengamma.master.position.ManageablePosition;
+import com.opengamma.master.position.ManageableTrade;
+import com.opengamma.master.position.PositionMaster;
 import com.opengamma.master.security.ManageableSecurity;
+import com.opengamma.master.security.ManageableSecurityLink;
 import com.opengamma.master.security.SecurityDocument;
 import com.opengamma.master.security.SecurityMaster;
+import com.opengamma.master.security.SecuritySearchRequest;
+import com.opengamma.master.security.SecuritySearchResult;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.OpenGammaClock;
 import com.opengamma.web.FreemarkerOutputter;
+import com.opengamma.web.analytics.OtcSecurityVisitor;
 
 /**
- * TODO move some of this into subresources?
+ * REST resource for the trade blotter and trade entry forms.
  */
 @Path("blotter")
 public class BlotterResource {
 
-  // TODO this should be configurable, should be able to add from client projects
-  private static final Set<MetaBean> s_metaBeans = Sets.<MetaBean>newHashSet(
-      FXForwardSecurity.meta(),
-      SwapSecurity.meta(),
-      SwaptionSecurity.meta(),
-      FixedInterestRateLeg.meta(),
-      FloatingInterestRateLeg.meta(),
-      FloatingSpreadIRLeg.meta(),
-      FloatingGearingIRLeg.meta(),
-      InterestRateNotional.meta(),
-      CapFloorCMSSpreadSecurity.meta(),
-      NonDeliverableFXOptionSecurity.meta(),
-      FXOptionSecurity.meta(),
-      FRASecurity.meta(),
-      CapFloorSecurity.meta(),
-      EquityVarianceSwapSecurity.meta(),
-      FXBarrierOptionSecurity.meta(),
-      NonDeliverableFXOptionSecurity.meta());
-
-  private final SecurityBuilder _securityBuilder = new SecurityBuilder(s_metaBeans);
-
+  /** Map of underlying security types keyed by the owning security type. */
   private static final Map<Class<?>, Class<?>> s_underlyingSecurityTypes = ImmutableMap.<Class<?>, Class<?>>of(
       IRFutureOptionSecurity.class, InterestRateFutureSecurity.class,
       SwaptionSecurity.class, SwapSecurity.class);
 
-  private static final List<String> s_otherTypeNames = Lists.newArrayList();
+  /** Map of paths to the endpoints for looking up values, keyed by the value class. */
+  private static final Map<Class<?>, String> s_endpoints = Maps.newHashMap();
+  /** OTC Security types that can be created by the trade entry froms. */
   private static final List<String> s_securityTypeNames = Lists.newArrayList();
+  /** Types that can be created by the trade entry forms that aren't securities by are required by them (e.g. legs). */
+  private static final List<String> s_otherTypeNames = Lists.newArrayList();
+  /** Meta beans for types that can be created by the trade entry forms keyed by type name. */
   private static final Map<String, MetaBean> s_metaBeansByTypeName = Maps.newHashMap();
 
   static {
-    JodaBeanConverters.getInstance();
-    for (MetaBean metaBean : s_metaBeans) {
+    s_endpoints.put(Frequency.class, "frequencies");
+    s_endpoints.put(ExerciseType.class, "exercisetypes");
+    s_endpoints.put(DayCount.class, "daycountconventions");
+    s_endpoints.put(BusinessDayConvention.class, "businessdayconventions");
+    s_endpoints.put(BarrierType.class, "barriertypes");
+    s_endpoints.put(BarrierDirection.class, "barrierdirections");
+    s_endpoints.put(SamplingFrequency.class, "samplingfrequencies");
+    s_endpoints.put(FloatingRateType.class, "floatingratetypes");
+    s_endpoints.put(LongShort.class, "longshort");
+    s_endpoints.put(MonitoringType.class, "monitoringtype");
+    s_endpoints.put(DebtSeniority.class, "debtseniority");
+    s_endpoints.put(RestructuringClause.class, "restructuringclause");
+    s_endpoints.put(StubType.class, "stubtype");
+
+    for (MetaBean metaBean : BlotterUtils.getMetaBeans()) {
       Class<? extends Bean> beanType = metaBean.beanType();
       String typeName = beanType.getSimpleName();
       s_metaBeansByTypeName.put(typeName, metaBean);
@@ -107,17 +120,39 @@ public class BlotterResource {
         s_otherTypeNames.add(typeName);
       }
     }
+    s_otherTypeNames.add(OtcTradeBuilder.TRADE_TYPE_NAME);
+    s_otherTypeNames.add(FungibleTradeBuilder.TRADE_TYPE_NAME);
     Collections.sort(s_otherTypeNames);
     Collections.sort(s_securityTypeNames);
   }
 
+  /** For loading and saving securities. */
   private final SecurityMaster _securityMaster;
-
+  /** For loading and saving positions. */
+  private final PositionMaster _positionMaster;
+  /** For creating output from Freemarker templates. */
   private FreemarkerOutputter _freemarker;
+  /** For building and saving new trades and associated securities. */
+  private final OtcTradeBuilder _otcTradeBuilder;
+  /** For building trades in fungible securities. */
+  private final FungibleTradeBuilder _fungibleTradeBuilder;
 
-  public BlotterResource(SecurityMaster securityMaster) {
+  public BlotterResource(SecurityMaster securityMaster, PortfolioMaster portfolioMaster, PositionMaster positionMaster) {
     ArgumentChecker.notNull(securityMaster, "securityMaster");
+    ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
+    ArgumentChecker.notNull(positionMaster, "positionMaster");
     _securityMaster = securityMaster;
+    _positionMaster = positionMaster;
+    _fungibleTradeBuilder = new FungibleTradeBuilder(_positionMaster,
+                                                     portfolioMaster,
+                                                     _securityMaster,
+                                                     BlotterUtils.getMetaBeans(),
+                                                     BlotterUtils.getStringConvert());
+    _otcTradeBuilder = new OtcTradeBuilder(positionMaster,
+                                           portfolioMaster,
+                                           securityMaster,
+                                           BlotterUtils.getMetaBeans(),
+                                           BlotterUtils.getStringConvert());
   }
 
   /* package */ static boolean isSecurity(Class<?> type) {
@@ -145,106 +180,283 @@ public class BlotterResource {
     return _freemarker.build("blotter/bean-types.ftl", data);
   }
 
+  @SuppressWarnings("unchecked")
   @GET
   @Produces(MediaType.TEXT_HTML)
   @Path("types/{typeName}")
   public String getStructure(@PathParam("typeName") String typeName) {
-    MetaBean metaBean = s_metaBeansByTypeName.get(typeName);
-    if (metaBean == null) {
-      throw new DataNotFoundException("Unknown type name " + typeName);
+    Map<String, Object> beanData;
+    // TODO tell don't ask
+    if (typeName.equals(OtcTradeBuilder.TRADE_TYPE_NAME)) {
+      beanData = OtcTradeBuilder.tradeStructure();
+    } else if (typeName.equals(FungibleTradeBuilder.TRADE_TYPE_NAME)) {
+      beanData = FungibleTradeBuilder.tradeStructure();
+    } else {
+      MetaBean metaBean = s_metaBeansByTypeName.get(typeName);
+      if (metaBean == null) {
+        throw new DataNotFoundException("Unknown type name " + typeName);
+      }
+      BeanStructureBuilder structureBuilder = new BeanStructureBuilder(BlotterUtils.getMetaBeans(),
+                                                                       s_underlyingSecurityTypes,
+                                                                       s_endpoints,
+                                                                       BlotterUtils.getStringConvert());
+      BeanTraverser traverser = BlotterUtils.structureBuildingTraverser();
+      beanData = (Map<String, Object>) traverser.traverse(metaBean, structureBuilder);
     }
-    BeanStructureBuilder structureBuilder = new BeanStructureBuilder(s_metaBeans, s_underlyingSecurityTypes);
-    // filter out underlying ID property for security types whose underlying is another OTC security
-    PropertyFilter<Map<String, Object>> filter = new PropertyFilter<Map<String, Object>>(SwaptionSecurity.meta().underlyingId());
-    Map<String,Object> beanData = new BeanTraverser(filter).traverse(metaBean, structureBuilder);
     return _freemarker.build("blotter/bean-structure.ftl", beanData);
   }
 
+  // for getting the security for fungible trades - the user can change the ID and see the trade details update
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("securities/{securityId}")
-  public String getJSON(@PathParam("securityId") String securityIdStr) {
-    UniqueId securityId = UniqueId.parse(securityIdStr);
-    SecurityDocument document = _securityMaster.get(securityId);
-    ManageableSecurity security = document.getSecurity();
-    MetaBean metaBean = s_metaBeansByTypeName.get(security.getClass().getSimpleName());
-    if (metaBean == null) {
-      throw new DataNotFoundException("No MetaBean is registered for security type " + security.getClass().getName());
+  @Path("securities/{securityExternalId}")
+  public String getSecurityJSON(@PathParam("securityExternalId") String securityExternalIdStr) {
+    if (StringUtils.isEmpty(securityExternalIdStr)) {
+      return new JSONObject().toString();
     }
-    BeanVisitor<JSONObject> writingVisitor = new BuildingBeanVisitor<JSONObject>(security, new JsonDataSink());
-    // TODO filter out underlyingId for securities with OTC underlying
-    JSONObject json = new BeanTraverser().traverse(metaBean, writingVisitor);
+    ExternalId securityExternalId = ExternalId.parse(securityExternalIdStr);
+    SecuritySearchResult searchResult = _securityMaster.search(new SecuritySearchRequest(securityExternalId));
+    if (searchResult.getSecurities().size() == 0) {
+      throw new DataNotFoundException("No security found with ID " + securityExternalId);
+    }
+    ManageableSecurity security = searchResult.getFirstSecurity();
+    BeanVisitor<JSONObject> securityVisitor =
+        new BuildingBeanVisitor<>(security, new JsonDataSink(BlotterUtils.getJsonBuildingConverters()));
+    BeanTraverser securityTraverser = BlotterUtils.securityJsonBuildingTraverser();
+    MetaBean securityMetaBean = JodaBeanUtils.metaBean(security.getClass());
+    JSONObject securityJson = (JSONObject) securityTraverser.traverse(securityMetaBean, securityVisitor);
+    return securityJson.toString();
+  }
+
+  // for getting the trade and security data for an OTC trade/security/position
+  // TODO move this logic to trade builder? can it populate a BeanDataSink to build the JSON?
+  // TODO refactor this, it's ugly. can the security and trade logic be cleanly moved into classes for OTC & fungible?
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("trades/{tradeId}")
+  public String getTradeJSON(@PathParam("tradeId") String tradeIdStr) {
+    UniqueId tradeId = UniqueId.parse(tradeIdStr);
+    if (!tradeId.isLatest()) {
+      throw new IllegalArgumentException("The blotter can only be used to update the latest version of a trade");
+    }
+    ManageableTrade trade = _positionMaster.getTrade(tradeId);
+    ManageableSecurityLink securityLink = trade.getSecurityLink();
+    return buildTradeJSON(trade, securityLink);
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("positions/{positionId}")
+  public String getPositionJSON(@PathParam("positionId") String positionIdStr) {
+    UniqueId positionId = UniqueId.parse(positionIdStr);
+    if (!positionId.isLatest()) {
+      throw new IllegalArgumentException("The blotter can only be used to update the latest version of a trade");
+    }
+    ManageablePosition position = _positionMaster.get(positionId).getPosition();
+    ManageableSecurityLink securityLink = position.getSecurityLink();
+    ManageableTrade trade = new ManageableTrade();
+    trade.setSecurityLink(securityLink);
+    if (position.getTrades().size() == 0) {
+      trade.setTradeDate(LocalDate.now());
+      trade.setCounterpartyExternalId(ExternalId.of(AbstractTradeBuilder.CPTY_SCHEME, AbstractTradeBuilder.DEFAULT_COUNTERPARTY));
+      trade.setQuantity(position.getQuantity());
+    }
+    return buildTradeJSON(trade, securityLink);
+  }
+
+  private String buildTradeJSON(ManageableTrade trade, ManageableSecurityLink securityLink) {
+    ManageableSecurity security = findSecurity(securityLink);
     JSONObject root = new JSONObject();
     try {
-      root.put("security", json);
+      JsonDataSink tradeSink = new JsonDataSink(BlotterUtils.getJsonBuildingConverters());
+      if (isOtc(security)) {
+        _otcTradeBuilder.extractTradeData(trade, tradeSink);
+        MetaBean securityMetaBean = s_metaBeansByTypeName.get(security.getClass().getSimpleName());
+        if (securityMetaBean == null) {
+          throw new DataNotFoundException("No MetaBean is registered for security type " + security.getClass().getName());
+        }
+        BeanVisitor<JSONObject> securityVisitor =
+            new BuildingBeanVisitor<>(security, new JsonDataSink(BlotterUtils.getJsonBuildingConverters()));
+        BeanTraverser securityTraverser = BlotterUtils.securityJsonBuildingTraverser();
+        JSONObject securityJson = (JSONObject) securityTraverser.traverse(securityMetaBean, securityVisitor);
+        if (security instanceof FinancialSecurity) {
+          UnderlyingSecurityVisitor visitor = new UnderlyingSecurityVisitor(VersionCorrection.LATEST, _securityMaster);
+          ManageableSecurity underlying = ((FinancialSecurity) security).accept(visitor);
+          if (underlying != null) {
+            BeanVisitor<JSONObject> underlyingVisitor =
+                new BuildingBeanVisitor<>(underlying, new JsonDataSink(BlotterUtils.getJsonBuildingConverters()));
+            MetaBean underlyingMetaBean = s_metaBeansByTypeName.get(underlying.getClass().getSimpleName());
+            JSONObject underlyingJson = (JSONObject) securityTraverser.traverse(underlyingMetaBean, underlyingVisitor);
+            root.put("underlying", underlyingJson);
+          }
+        }
+        root.put("security", securityJson);
+      } else {
+        _fungibleTradeBuilder.extractTradeData(trade, tradeSink, BlotterUtils.getStringConvert());
+      }
+      JSONObject tradeJson = tradeSink.finish();
+      root.put("trade", tradeJson);
     } catch (JSONException e) {
-      throw new OpenGammaRuntimeException("", e);
+      throw new OpenGammaRuntimeException("Failed to build JSON", e);
     }
-    // TODO underlying for securities with OTC underlying securities
     return root.toString();
   }
 
-  // TODO this is only here for my benefit during development - delete
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  @Path("securities/{securityId}")
-  public String getText(@PathParam("securityId") String securityIdStr) {
-    return getJSON(securityIdStr);
+  private static boolean isOtc(ManageableSecurity security) {
+    if (security instanceof FinancialSecurity) {
+      return ((FinancialSecurity) security).accept(new OtcSecurityVisitor());
+    } else {
+      return false;
+    }
   }
 
-  // TODO PUT to update existing security? how should the URL be handled?
+  /**
+   * Finds the security referred to by securityLink. This basically does the same thing as resolving the link but
+   * it returns a {@link ManageableSecurity} instead of a {@link Security}.
+   * @param securityLink Contains the security ID(s)
+   * @return The security, not null
+   * @throws DataNotFoundException If a matching security can't be found
+   */
+  private ManageableSecurity findSecurity(ManageableSecurityLink securityLink) {
+    SecurityDocument securityDocument;
+    if (securityLink.getObjectId() != null) {
+      // TODO do we definitely want the LATEST?
+      securityDocument = _securityMaster.get(securityLink.getObjectId(), VersionCorrection.LATEST);
+    } else {
+      SecuritySearchRequest searchRequest = new SecuritySearchRequest(securityLink.getExternalId());
+      SecuritySearchResult searchResult = _securityMaster.search(searchRequest);
+      securityDocument = searchResult.getFirstDocument();
+      if (securityDocument == null) {
+        throw new DataNotFoundException("No security found with external IDs " + securityLink.getExternalId());
+      }
+    }
+    return securityDocument.getSecurity();
+  }
+
   @POST
-  @Path("securities")
+  @Path("trades")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.APPLICATION_JSON)
-  // TODO the config endpoint uses form params for the JSON. why? better to use a MessageBodyWriter?
-  public String createOtcSecurity(@FormParam("security") String securityJsonStr) {
-    JSONObject securityJson;
+  public Response createTrade(@Context UriInfo uriInfo, @FormParam("trade") String jsonStr) {
+    // TODO need to make sure this can't be used for updating existing trades, only for creating new ones
     try {
-      JSONObject json = new JSONObject(securityJsonStr);
-      securityJson = json.getJSONObject("security");
-      // TODO this needs to happen for swaptions and possibly some others
-      //underlyingJson = json.getJSONObject("underlying");
+      JSONObject json = new JSONObject(jsonStr);
+      JSONObject tradeJson = json.getJSONObject("trade");
+      UniqueId nodeId = UniqueId.parse(json.getString("nodeId"));
+      String tradeTypeName = tradeJson.getString("type");
+      // TODO tell don't ask - it is an option to ask each of the trade builders? but their interfaces are different
+      // they would have to know how to extract the subsections of the JSON
+      UniqueId tradeId;
+      if (tradeTypeName.equals(OtcTradeBuilder.TRADE_TYPE_NAME)) {
+        tradeId =  createOtcTrade(json, tradeJson, nodeId);
+      } else if (tradeTypeName.equals(FungibleTradeBuilder.TRADE_TYPE_NAME)) {
+        tradeId = _fungibleTradeBuilder.addTrade(new JsonBeanDataSource(tradeJson), nodeId);
+      } else {
+        throw new IllegalArgumentException("Unknown trade type " + tradeTypeName);
+      }
+      URI createdTradeUri = uriInfo.getAbsolutePathBuilder().path(tradeId.getObjectId().toString()).build();
+      return Response.status(Response.Status.CREATED).header("Location", createdTradeUri).build();
     } catch (JSONException e) {
-      throw new IllegalArgumentException("Failed to parse security JSON", e);
+      throw new IllegalArgumentException("Failed to parse JSON", e);
     }
-    // TODO this doesn't cover swaptions (where the underlying is an OTC security)
-    ManageableSecurity security = _securityBuilder.buildSecurity(new JsonBeanDataSource(securityJson));
-    if (security.getUniqueId() != null) {
-      throw new IllegalArgumentException("Security unique ID must not be specified for a new security");
-    }
-    SecurityDocument document = _securityMaster.add(new SecurityDocument(security));
-    UniqueId securityId = document.getUniqueId();
-    return new JSONObject(ImmutableMap.of("securityId", securityId)).toString();
   }
 
+  /* TODO endpoint for updating positions that don't have any trades?
+  create a dummy trade for the position amount?
+  what about
+    * positions with trades whose position and trade amounts are inconsistent
+    * adding trade to positions with no trades but a position amount? create 2 trades?
+    * editing a position but not by adding a trade? leave empty and update the amount?
+  should editing a position always leave it with a consistent set of trades? even if it's empty?
+  */
 
   @PUT
-  @Path("securities/{securityIdStr}")
+  @Path("positions/{positionIdStr}")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.APPLICATION_JSON)
-  // TODO the config endpoint uses form params for the JSON. why? better to use a MessageBodyWriter?
-  public String updateOtcSecurity(@FormParam("security") String securityJsonStr,
-                                  @PathParam("securityIdStr") String securityIdStr) {
-    UniqueId pathSecurityId = UniqueId.parse(securityIdStr);
-    JSONObject securityJson;
+  public void updatePosition(@FormParam("trade") String jsonStr, @PathParam("positionIdStr") String positionIdStr) {
     try {
-      JSONObject json = new JSONObject(securityJsonStr);
-      securityJson = json.getJSONObject("security");
-      // TODO this needs to happen for swaptions and possibly some others
-      //underlyingJson = json.getJSONObject("underlying");
+      UniqueId positionId = UniqueId.parse(positionIdStr);
+      JSONObject json = new JSONObject(jsonStr);
+      JSONObject tradeJson = json.getJSONObject("trade");
+      String tradeTypeName = tradeJson.getString("type");
+      // TODO tell don't ask - ask each of the existing trade builders until one of them can handle it?
+      if (tradeTypeName.equals(OtcTradeBuilder.TRADE_TYPE_NAME)) {
+        updateOtcPosition(positionId, json, tradeJson);
+      } else if (tradeTypeName.equals(FungibleTradeBuilder.TRADE_TYPE_NAME)) {
+        _fungibleTradeBuilder.updatePosition(new JsonBeanDataSource(tradeJson), positionId);
+      } else {
+        throw new IllegalArgumentException("Unknown trade type " + tradeTypeName);
+      }
     } catch (JSONException e) {
-      throw new IllegalArgumentException("Failed to parse security JSON", e);
+      throw new IllegalArgumentException("Failed to parse JSON", e);
     }
-    // TODO this doesn't cover swaptions (where the underlying is an OTC security)
-    ManageableSecurity security = _securityBuilder.buildSecurity(new JsonBeanDataSource(securityJson));
-    if (!pathSecurityId.equalObjectId(security.getUniqueId())) {
-      throw new IllegalArgumentException("Security unique ID in the path didn't match the ID in the JSON: " +
-                                             pathSecurityId + ", " + security.getUniqueId());
+  }
+
+  @PUT
+  @Path("trades/{tradeIdStr}")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces(MediaType.APPLICATION_JSON)
+  public void updateTrade(@FormParam("trade") String jsonStr, @PathParam("tradeIdStr") String tradeIdStr) {
+    try {
+      // TODO what should happen to this? the ID is also in the JSON. check they match?
+      UniqueId tradeId = UniqueId.parse(tradeIdStr);
+      JSONObject json = new JSONObject(jsonStr);
+      JSONObject tradeJson = json.getJSONObject("trade");
+      String tradeTypeName = tradeJson.getString("type");
+      // TODO tell don't ask - ask each of the existing trade builders until one of them can handle it?
+      if (tradeTypeName.equals(OtcTradeBuilder.TRADE_TYPE_NAME)) {
+        createOtcTrade(json, tradeJson, null);
+      } else if (tradeTypeName.equals(FungibleTradeBuilder.TRADE_TYPE_NAME)) {
+        _fungibleTradeBuilder.updateTrade(new JsonBeanDataSource(tradeJson));
+      } else {
+        throw new IllegalArgumentException("Unknown trade type " + tradeTypeName);
+      }
+    } catch (JSONException e) {
+      throw new IllegalArgumentException("Failed to parse JSON", e);
     }
-    SecurityDocument document = _securityMaster.update(new SecurityDocument(security));
-    UniqueId securityId = document.getUniqueId();
-    return new JSONObject(ImmutableMap.of("securityId", securityId)).toString();
+  }
+
+  // TODO this could move inside the builder
+  private UniqueId createOtcTrade(JSONObject json, JSONObject tradeJson, UniqueId nodeId) {
+    try {
+      JSONObject securityJson = json.getJSONObject("security");
+      JSONObject underlyingJson = json.optJSONObject("underlying");
+      BeanDataSource tradeData = new JsonBeanDataSource(tradeJson);
+      BeanDataSource securityData = new JsonBeanDataSource(securityJson);
+      BeanDataSource underlyingData;
+      if (underlyingJson != null) {
+        underlyingData = new JsonBeanDataSource(underlyingJson);
+      } else {
+        underlyingData = null;
+      }
+      if (nodeId == null) {
+        return _otcTradeBuilder.updateTrade(tradeData, securityData, underlyingData);
+      } else {
+        return _otcTradeBuilder.addTrade(tradeData, securityData, underlyingData, nodeId);
+      }
+    } catch (JSONException e) {
+      throw new IllegalArgumentException("Failed to parse JSON", e);
+    }
+  }
+
+  private UniqueId updateOtcPosition(UniqueId positionId, JSONObject json, JSONObject tradeJson) {
+    try {
+      JSONObject securityJson = json.getJSONObject("security");
+      JSONObject underlyingJson = json.optJSONObject("underlying");
+      BeanDataSource tradeData = new JsonBeanDataSource(tradeJson);
+      BeanDataSource securityData = new JsonBeanDataSource(securityJson);
+      BeanDataSource underlyingData;
+      if (underlyingJson != null) {
+        underlyingData = new JsonBeanDataSource(underlyingJson);
+      } else {
+        underlyingData = null;
+      }
+      return _otcTradeBuilder.updatePosition(positionId, tradeData, securityData, underlyingData);
+    } catch (JSONException e) {
+      throw new IllegalArgumentException("Failed to parse JSON", e);
+    }
   }
 
   private static Map<Object, Object> map(Object... values) {
@@ -256,69 +468,8 @@ public class BlotterResource {
     return result;
   }
 
-  // TODO return sub-resources or do it here? or do them all under a sub-path (lookup?) and have one sub-resource
-
-  @GET
-  @Path("frequencies")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getFrequencies() {
-    throw new UnsupportedOperationException();
+  @Path("lookup")
+  public BlotterLookupResource getLookupResource() {
+    return new BlotterLookupResource(BlotterUtils.getStringConvert());
   }
-
-  @GET
-  @Path("exercisetypes")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getExerciseTypes() {
-    throw new UnsupportedOperationException();
-  }
-
-  @GET
-  @Path("daycountconventions")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getDayCountConventions() {
-    throw new UnsupportedOperationException();
-  }
-
-  @GET
-  @Path("businessdayconventions")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getBusinessDayConventions() {
-    throw new UnsupportedOperationException();
-  }
-
-  @GET
-  @Path("barriertypes")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getBarrierTypes() {
-    throw new UnsupportedOperationException();
-  }
-
-  @GET
-  @Path("barrierdirections")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getBarrierDirections() {
-    throw new UnsupportedOperationException();
-  }
-
-  @GET
-  @Path("samplingfrequencies")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getSamplingFrequencies() {
-    throw new UnsupportedOperationException();
-  }
-
-  @GET
-  @Path("floatingratetypes")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getFloatingRateTypes() {
-    throw new UnsupportedOperationException();
-  }
-
-  // TODO create OTC trade - create new security, position of one, contains one trade
-
-  // TODO create fungible trade - identifier and quantity
-
-  // TODO get OTC trade (security)
-
-  // TODO what about bond futures? is the BondFutureDeliverable part of the definition from bbg?
 }

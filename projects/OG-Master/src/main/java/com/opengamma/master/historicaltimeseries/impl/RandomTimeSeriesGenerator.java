@@ -5,11 +5,11 @@
  */
 package com.opengamma.master.historicaltimeseries.impl;
 
-import javax.time.calendar.DayOfWeek;
-import javax.time.calendar.LocalDate;
+import org.threeten.bp.DayOfWeek;
+import org.threeten.bp.LocalDate;
 
+import com.opengamma.timeseries.localdate.MapLocalDateDoubleTimeSeries;
 import com.opengamma.util.time.DateUtils;
-import com.opengamma.util.timeseries.localdate.MapLocalDateDoubleTimeSeries;
 
 /**
  * Generator of random time-series for testing/demo purposes.

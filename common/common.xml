@@ -79,10 +79,8 @@
 			<exclude name="*PayoffStyle.proto" />
 			<exclude name="*SwapLeg.proto" />
 			<exclude name="*Notional.proto" />
-			<fileHeader>///CLOVER:OFF
-// CSOFF: Generated File</fileHeader>
-			<fileFooter>///CLOVER:ON
-// CSON: Generated File</fileFooter>
+			<fileHeader>///CLOVER:OFF - CSOFF</fileHeader>
+			<fileFooter>///CLOVER:ON - CSON</fileFooter>
 		</fudgeproto>
 		<fixcrlf preservelastmodified="true" srcdir="${src.dir}">
 			<include name="**/*.java"/>
@@ -276,6 +274,7 @@
 			<fileset dir="${lib.dir}/jar/org.apache.ant/ant" includes="*.jar" />
 			<pathelement path="${classes.dir}" />
 			<pathelement path="${tests.classes.dir}" />
+			<pathelement path="${tests.resources.dir}" />
 			<pathelement path="${config.dir}" />
 			<pathelement path="${clover.jar.file}" />
 			<pathelement path="${test.properties.dir}" />
@@ -288,6 +287,7 @@
 			<fileset dir="${lib.dir}/jar/org.apache.ant/ant" includes="*.jar" />
 			<pathelement path="${classes.dir}" />
 			<pathelement path="${tests.classes.dir}" />
+			<pathelement path="${tests.resources.dir}" />
 			<pathelement path="${config.dir}" />
 			<pathelement path="${clover.jar.file}" />
 			<pathelement path="${test.properties.dir}" />

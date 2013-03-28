@@ -7,12 +7,13 @@ package com.opengamma.analytics.financial.forex.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
 import org.testng.internal.junit.ArrayAsserts;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.calculator.PresentValueCurveSensitivityConvertedCurveCurrencyCalculator;
 import com.opengamma.analytics.financial.forex.calculator.CurrencyExposureBlackSmileForexCalculator;
@@ -1007,7 +1008,7 @@ public class ForexOptionVanillaBlackSmileMethodTest {
     final double df = CURVES.getCurve(CURVES_NAME[1]).getDiscountFactor(TimeCalculator.getTimeBetween(REFERENCE_DATE, payDate));
     final double forward = SPOT * CURVES.getCurve(CURVES_NAME[0]).getDiscountFactor(TimeCalculator.getTimeBetween(REFERENCE_DATE, payDate)) / df;
     final double volatility = SMILE_TERM.getVolatility(timeToExpiry, strike, forward);
-    final double thetaUnit = BlackFormulaRepository.theta(forward, strike, timeToExpiry, volatility);
+    final double thetaUnit = BlackFormulaRepository.driftlessTheta(forward, strike, timeToExpiry, volatility);
     final double thetaExpected = thetaUnit * notional;
     final CurrencyAmount thetaCallComputed = METHOD_OPTION.thetaTheoretical(call, SMILE_BUNDLE);
     assertEquals("Theta theoretical: forex option", thetaExpected, thetaCallComputed.getAmount(), TOLERANCE_PV);

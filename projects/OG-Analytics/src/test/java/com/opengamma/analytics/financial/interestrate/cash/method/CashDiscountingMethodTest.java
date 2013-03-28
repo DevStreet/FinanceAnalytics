@@ -6,14 +6,14 @@
 package com.opengamma.analytics.financial.interestrate.cash.method;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
 
 import java.util.List;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDeposit;
@@ -22,12 +22,12 @@ import com.opengamma.analytics.financial.interestrate.InterestRateCurveSensitivi
 import com.opengamma.analytics.financial.interestrate.ParSpreadMarketQuoteCalculator;
 import com.opengamma.analytics.financial.interestrate.ParSpreadMarketQuoteCurveSensitivityCalculator;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
-import com.opengamma.analytics.financial.interestrate.TodayPaymentCalculator;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
 import com.opengamma.analytics.financial.interestrate.method.SensitivityFiniteDifference;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.financial.provider.calculator.generic.TodayPaymentCalculator;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.financial.util.AssertSensivityObjects;
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;

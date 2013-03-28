@@ -12,10 +12,9 @@ import static org.testng.AssertJUnit.assertSame;
 
 import java.util.List;
 
-import javax.time.calendar.LocalDate;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
 
 import com.google.common.base.Supplier;
 import com.opengamma.DataNotFoundException;
@@ -31,13 +30,14 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchR
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchResult;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeries;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
-import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Test {@link InMemoryHistoricalTimeSeriesMaster}.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class InMemoryHistoricalTimeSeriesMasterTest {
 
   // TODO Move the logical tests from here to the generic SecurityMasterTestCase then we can just extend from that

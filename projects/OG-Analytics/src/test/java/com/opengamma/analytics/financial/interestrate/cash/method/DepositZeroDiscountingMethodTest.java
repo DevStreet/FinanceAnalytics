@@ -6,14 +6,14 @@
 package com.opengamma.analytics.financial.interestrate.cash.method;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
 
 import java.util.List;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.cash.DepositZeroDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDeposit;

@@ -5,9 +5,10 @@
  */
 package com.opengamma.masterdb.security.hibernate.cds;
 
-import org.joda.beans.BeanDefinition;
 import java.util.Map;
+
 import org.joda.beans.BeanBuilder;
+import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
 import org.joda.beans.MetaProperty;
 import org.joda.beans.impl.direct.DirectBeanBuilder;
@@ -78,7 +79,7 @@ public class StandardFixedRecoveryCDSSecurityBean extends StandardCDSSecurityBea
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
-      this, (DirectMetaPropertyMap) super.metaPropertyMap());
+        this, (DirectMetaPropertyMap) super.metaPropertyMap());
 
     /**
      * Restricted constructor.

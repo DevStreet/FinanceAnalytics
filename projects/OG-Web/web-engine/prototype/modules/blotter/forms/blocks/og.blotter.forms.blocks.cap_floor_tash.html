@@ -1,3 +1,4 @@
+<section>
 <table class="OG-table">
   <colgroup>
     <col style="width: 30%">              
@@ -9,10 +10,10 @@
         Type
       </td>
       <td class="og-double-cell">
-        <div><span><label>Cap <input type="radio" name="name1" value="cap">
-        </label><label>Floor <input type="radio" name="name1" value="floor"></label>
-        </span><span><label>Pay <input type="radio" name="name2" value="pay">
-        </label><label>Recieve <input type="radio" name="name2" value="recieve"></label></span></div>
+        <div><span><label>Cap <input type="radio" name="security.cap" value="true">
+        </label><label>Floor <input type="radio" name="security.cap" value="false"></label>
+        </span><span><label>Buy<input type="radio" name="security.payer" value="false">
+        </label><label>Sell<input type="radio" name="security.payer" value="true"></label></span></div>
       </td>
     </tr>
     <tr>
@@ -22,7 +23,7 @@
         </label>
       </td>
       <td>
-        <input name="" type="text" />
+        <input class="blotter-date" name="security.startDate" type="text" value="{{start}}"/>
       </td>
     </tr>
     <tr>
@@ -32,7 +33,7 @@
         </label>
       </td>
       <td>
-        <input name="" type="text" />
+        <input class="blotter-date" name="security.maturityDate" type="text" value="{{maturity}}"/>
       </td>
     </tr>
     <tr>
@@ -42,7 +43,8 @@
         </label>
       </td>
       <td class="og-double-cell">
-        <div><span><select></select></span><span><input name="" type="text" /></span></div>
+        <div><span>{{{item_0}}}</span><span><input name="security.notional" type="text" value="{{notional}}"/></span>
+        </div>
       </td>
     </tr>
     <tr>
@@ -52,7 +54,7 @@
         </label>
       </td>
       <td>
-        <input name="" type="text" />
+        <input name="security.strike" type="text" value="{{strike}}"/>
       </td>
     </tr>
   </tbody>
@@ -63,38 +65,7 @@
     <col style="width: 70%">              
   </colgroup>
   <tbody>
-    <tr>
-      <td>
-        <label>
-          <span>Index</span>
-        </label>
-      </td>
-      <td>
-        <input name="" type="text" />
-      </td>
-    </tr>
-    {{#if cms}}
-    <tr>
-      <td>
-        <label>
-          <span>Index 2</span>
-        </label>
-      </td>
-      <td>
-        <input name="" type="text" />
-      </td>
-    </tr>
-    {{/if}}
-    <tr>
-      <td>
-        <label>
-          <span>Currency</span>
-        </label>
-      </td>
-      <td>
-        <select></select>
-      </td>
-    </tr>
+    {{{item_1}}}
     <tr>
       <td>
         <label>
@@ -102,7 +73,7 @@
         </label>
       </td>
       <td>
-        <select></select>
+        {{{item_2}}}
       </td>
     </tr>
     <tr>
@@ -112,8 +83,16 @@
         </label>
       </td>
       <td>
-        <select></select>
+        {{{item_3}}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <input name="security.ibor" type="checkbox" /><span>Ibor</span>
       </td>
     </tr>
   </tbody>
 </table>
+</section>

@@ -24,10 +24,12 @@ import com.opengamma.master.portfolio.PortfolioSearchRequest;
 import com.opengamma.master.portfolio.PortfolioSearchResult;
 import com.opengamma.masterdb.DbMasterTestUtils;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Test DbPortfolioMaster.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public class DbPortfolioMasterTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(DbPortfolioMasterTest.class);
@@ -64,7 +66,7 @@ public class DbPortfolioMasterTest extends DbTest {
     assertNotNull(_prtMaster);
     assertEquals(true, _prtMaster.getUniqueIdScheme().equals("DbPrt"));
     assertNotNull(_prtMaster.getDbConnector());
-    assertNotNull(_prtMaster.getTimeSource());
+    assertNotNull(_prtMaster.getClock());
   }
   
   @Test(description = "[PLAT-1723]") 

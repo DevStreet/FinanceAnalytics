@@ -6,19 +6,20 @@
 package com.opengamma.financial.analytics.ircurve;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.TreeSet;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.LocalTime;
-import javax.time.calendar.Period;
-import javax.time.calendar.TimeZone;
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.core.holiday.HolidaySource;
 import com.opengamma.core.id.ExternalSchemes;
+import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.core.region.Region;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.Security;
@@ -68,7 +69,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     _holidaySource = holidaySource;
   }
 
-  public InterpolatedYieldCurveSpecificationWithSecurities resolveToSecurity(final InterpolatedYieldCurveSpecification curveSpecification, final Map<ExternalId, Double> marketValues) {
+  public InterpolatedYieldCurveSpecificationWithSecurities resolveToSecurity(final InterpolatedYieldCurveSpecification curveSpecification, final SnapshotDataBundle marketValues) {
     final Collection<FixedIncomeStripWithSecurity> securityStrips = new TreeSet<FixedIncomeStripWithSecurity>();
     final LocalDate curveDate = curveSpecification.getCurveDate();
     for (final FixedIncomeStripWithIdentifier strip : curveSpecification.getStrips()) {
@@ -81,7 +82,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
         curveSpecification.interpolateYield(), securityStrips);
   }
 
-  private Security getSecurity(final InterpolatedYieldCurveSpecification curveSpecification, final Map<ExternalId, Double> marketValues, final FixedIncomeStripWithIdentifier strip) {
+  private Security getSecurity(final InterpolatedYieldCurveSpecification curveSpecification, final SnapshotDataBundle marketValues, final FixedIncomeStripWithIdentifier strip) {
     switch (strip.getInstrumentType()) {
       case CASH:
         final CashSecurity cashSecurity = getCash(curveSpecification, strip, marketValues);
@@ -209,7 +210,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
       case CASH:
         final CashSecurity cashSecurity = (CashSecurity) security;
         final Region region = _regionSource.getHighestLevelRegion(cashSecurity.getRegionId());
-        TimeZone timeZone = region.getTimeZone();
+        ZoneId timeZone = region.getTimeZone();
         timeZone = ensureZone(timeZone);
         return curveDate.plus(strip.getMaturity().getPeriod()).atTime(CASH_EXPIRY_TIME).atZone(timeZone);
       case FRA_3M: {
@@ -230,35 +231,35 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
       case LIBOR: {
         final CashSecurity rateSecurity = (CashSecurity) security;
         final Region region2 = _regionSource.getHighestLevelRegion(rateSecurity.getRegionId());
-        TimeZone timeZone2 = region2.getTimeZone();
+        ZoneId timeZone2 = region2.getTimeZone();
         timeZone2 = ensureZone(timeZone2);
         return curveDate.plus(strip.getMaturity().getPeriod()).atTime(CASH_EXPIRY_TIME).atZone(timeZone2);
       }
       case EURIBOR: {
         final CashSecurity rateSecurity = (CashSecurity) security;
         final Region region2 = _regionSource.getHighestLevelRegion(rateSecurity.getRegionId());
-        TimeZone timeZone2 = region2.getTimeZone();
+        ZoneId timeZone2 = region2.getTimeZone();
         timeZone2 = ensureZone(timeZone2);
         return curveDate.plus(strip.getMaturity().getPeriod()).atTime(CASH_EXPIRY_TIME).atZone(timeZone2);
       }
       case CDOR: {
         final CashSecurity rateSecurity = (CashSecurity) security;
         final Region region2 = _regionSource.getHighestLevelRegion(rateSecurity.getRegionId());
-        TimeZone timeZone2 = region2.getTimeZone();
+        ZoneId timeZone2 = region2.getTimeZone();
         timeZone2 = ensureZone(timeZone2);
         return curveDate.plus(strip.getMaturity().getPeriod()).atTime(CASH_EXPIRY_TIME).atZone(timeZone2);
       }
       case CIBOR: {
         final CashSecurity rateSecurity = (CashSecurity) security;
         final Region region2 = _regionSource.getHighestLevelRegion(rateSecurity.getRegionId());
-        TimeZone timeZone2 = region2.getTimeZone();
+        ZoneId timeZone2 = region2.getTimeZone();
         timeZone2 = ensureZone(timeZone2);
         return curveDate.plus(strip.getMaturity().getPeriod()).atTime(CASH_EXPIRY_TIME).atZone(timeZone2);
       }
       case STIBOR: {
         final CashSecurity rateSecurity = (CashSecurity) security;
         final Region region2 = _regionSource.getHighestLevelRegion(rateSecurity.getRegionId());
-        TimeZone timeZone2 = region2.getTimeZone();
+        ZoneId timeZone2 = region2.getTimeZone();
         timeZone2 = ensureZone(timeZone2);
         return curveDate.plus(strip.getMaturity().getPeriod()).atTime(CASH_EXPIRY_TIME).atZone(timeZone2);
       }
@@ -282,7 +283,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
         final SwapSecurity tenorSwapSecurity = (SwapSecurity) security;
         return tenorSwapSecurity.getMaturityDate();
       case OIS_SWAP:
-        return curveDate.plus(strip.getMaturity().getPeriod()).atTime(11, 00).atZone(TimeZone.UTC);
+        return curveDate.plus(strip.getMaturity().getPeriod()).atTime(11, 00).atZone(ZoneOffset.UTC);
       case PERIODIC_ZERO_DEPOSIT:
         final PeriodicZeroDepositSecurity depositSecurity = (PeriodicZeroDepositSecurity) security;
         return depositSecurity.getMaturityDate();
@@ -294,7 +295,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     }
   }
 
-  private CashSecurity getCash(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues) {
+  private CashSecurity getCash(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues) {
     final ConventionBundle cashConvention = _conventionBundleSource.getConventionBundle(strip.getSecurity());
     if (cashConvention == null) {
       throw new OpenGammaRuntimeException("No convention for cash " + strip.getSecurity() + " so can't establish business day convention");
@@ -306,10 +307,10 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     if (calendar == null) {
       throw new OpenGammaRuntimeException("Calendar was null");
     }
-    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC);
+    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDay(ZoneOffset.UTC);
     final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(curveDate, cashConvention.getSettlementDays(), calendar);
     final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, cashConvention.getPeriod(), cashConvention.getBusinessDayConvention(), calendar, cashConvention.isEOMConvention());
-    final Double rate = marketValues.get(strip.getSecurity());
+    final Double rate = marketValues.getDataPoint(strip.getSecurity());
     if (rate == null) {
       throw new OpenGammaRuntimeException("No market data for " + strip.getSecurity());
     }
@@ -318,7 +319,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     return sec;
   }
 
-  private FRASecurity getFRA(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues, final Tenor tenor) {
+  private FRASecurity getFRA(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues, final Tenor tenor) {
     final ExternalId fraIdentifier = strip.getSecurity();
     final int months = tenor.getPeriod().getMonths();
     final ConventionBundle fraConvention = _conventionBundleSource.getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, spec.getCurrency().getCode() + "_" + months
@@ -334,24 +335,24 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     final BusinessDayConvention businessDayConvention = iborConvention.getBusinessDayConvention();
     final boolean eom = iborConvention.isEOMConvention();
     final Calendar calendar = CalendarUtils.getCalendar(_regionSource, _holidaySource, fraConvention.getSwapFloatingLegRegion());
-    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC); // TODO: review?
+    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDay(ZoneOffset.UTC); // TODO: review?
     final ZonedDateTime spotDate = ScheduleCalculator.getAdjustedDate(curveDate, iborConvention.getSettlementDays(), calendar);
     final Period endPeriod = strip.getMaturity().getPeriod();
     final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(spotDate, endPeriod, businessDayConvention, calendar, eom);
     final Period startPeriod = endPeriod.minus(fraPeriod).normalized(); // TODO: check period >0?
     final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spotDate, startPeriod, businessDayConvention, calendar, eom);
     final ZonedDateTime fixingDate = ScheduleCalculator.getAdjustedDate(startDate, -iborConvention.getSettlementDays(), calendar);
-    if (marketValues.get(strip.getSecurity()) == null) {
+    if (marketValues.getDataPoint(strip.getSecurity()) == null) {
       throw new OpenGammaRuntimeException("Could not get market data for " + strip);
     }
-    return new FRASecurity(ccy, spec.getRegion(), startDate, endDate, marketValues.get(strip.getSecurity()), 1.0d, underlyingIdentifier, fixingDate);
+    return new FRASecurity(ccy, spec.getRegion(), startDate, endDate, marketValues.getDataPoint(strip.getSecurity()), 1.0d, underlyingIdentifier, fixingDate);
   }
 
   private FutureSecurity getFuture(final FixedIncomeStripWithIdentifier strip) {
     return (FutureSecurity) _secSource.getSingle(ExternalIdBundle.of(strip.getSecurity()));
   }
 
-  private SwapSecurity getSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues, final Tenor resetTenor) {
+  private SwapSecurity getSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues, final Tenor resetTenor) {
     final ExternalId swapIdentifier = strip.getSecurity();
     final int months = resetTenor.getPeriod().getMonths();
     ConventionBundle swapConvention = _conventionBundleSource.getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, spec.getCurrency().getCode() + "_" + months
@@ -365,7 +366,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
           + ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, spec.getCurrency().getCode() + "_SWAP"));
     }
     final Calendar calendar = CalendarUtils.getCalendar(_regionSource, _holidaySource, swapConvention.getSwapFloatingLegRegion());
-    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC);
+    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDay(ZoneOffset.UTC);
     final ZonedDateTime spotDate = ScheduleCalculator.getAdjustedDate(curveDate, swapConvention.getSwapFixedLegSettlementDays(), calendar);
     final ZonedDateTime maturityDate = spotDate.plus(strip.getMaturity().getPeriod());
     final String counterparty = "";
@@ -373,7 +374,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     if (floatingRateId == null) {
       throw new OpenGammaRuntimeException("Could not get floating rate id from convention");
     }
-    final Double rate = marketValues.get(swapIdentifier);
+    final Double rate = marketValues.getDataPoint(swapIdentifier);
     if (rate == null) {
       throw new OpenGammaRuntimeException("No market data for " + swapIdentifier);
     }
@@ -388,9 +389,9 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     return swap;
   }
 
-  private SwapSecurity getBasisSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues) {
+  private SwapSecurity getBasisSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues) {
     final ExternalId swapIdentifier = strip.getSecurity();
-    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC);
+    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDay(ZoneOffset.UTC);
     final FixedIncomeStrip fixedIncomeStrip = strip.getStrip();
     final IndexType payIndexType = fixedIncomeStrip.getPayIndexType();
     final Tenor payTenor = fixedIncomeStrip.getPayTenor();
@@ -416,7 +417,7 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     final Frequency receiveFrequency = PeriodFrequency.of(fixedIncomeStrip.getReceiveTenor().getPeriod());
     final BusinessDayConvention receiveBusinessDayConvention = receiveConvention.getBusinessDayConvention();
     final FloatingRateType receiveFloatingRateType = getFloatingTypeFromIndexType(fixedIncomeStrip.getReceiveIndexType());
-    final double spread = marketValues.get(swapIdentifier);
+    final double spread = marketValues.getDataPoint(swapIdentifier);
     // Implementation note: By convention the spread is on the first leg (shorter tenor)
     final FloatingSpreadIRLeg payLeg = new FloatingSpreadIRLeg(payDayCount, payFrequency, payRegionIdentifier, payBusinessDayConvention, notional, false, payFloatingReferenceRateId,
         payFloatingRateType, spread);
@@ -428,13 +429,13 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     return swap;
   }
 
-  private SwapSecurity getTenorSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues) {
+  private SwapSecurity getTenorSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues) {
     final ExternalId swapIdentifier = strip.getSecurity();
-    final Double rate = marketValues.get(swapIdentifier);
+    final Double rate = marketValues.getDataPoint(swapIdentifier);
     final LocalDate curveDate = spec.getCurveDate();
-    final ZonedDateTime tradeDate = curveDate.atTime(11, 00).atZone(TimeZone.UTC);
-    final ZonedDateTime effectiveDate = DateUtils.previousWeekDay(curveDate.plusDays(3)).atTime(11, 00).atZone(TimeZone.UTC);
-    final ZonedDateTime maturityDate = curveDate.plus(strip.getMaturity().getPeriod()).atTime(11, 00).atZone(TimeZone.UTC);
+    final ZonedDateTime tradeDate = curveDate.atTime(11, 00).atZone(ZoneOffset.UTC);
+    final ZonedDateTime effectiveDate = DateUtils.previousWeekDay(curveDate.plusDays(3)).atTime(11, 00).atZone(ZoneOffset.UTC);
+    final ZonedDateTime maturityDate = curveDate.plus(strip.getMaturity().getPeriod()).atTime(11, 00).atZone(ZoneOffset.UTC);
     final ConventionBundle convention = _conventionBundleSource.getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, spec.getCurrency().getCode() + "_TENOR_SWAP"));
     final String counterparty = "";
     final ConventionBundle payLegFloatRateConvention = _conventionBundleSource.getConventionBundle(convention.getBasisSwapPayFloatingLegInitialRate());
@@ -450,13 +451,13 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     final SwapSecurity swap = new SwapSecurity(tradeDate, effectiveDate, maturityDate, counterparty, new FloatingInterestRateLeg(convention.getBasisSwapPayFloatingLegDayCount(),
         convention.getBasisSwapPayFloatingLegFrequency(), convention.getBasisSwapPayFloatingLegRegion(), convention.getBasisSwapPayFloatingLegBusinessDayConvention(), new InterestRateNotional(
             spec.getCurrency(), 1), false, payLegFloatRateBloombergTicker, FloatingRateType.IBOR), new FloatingSpreadIRLeg(convention.getBasisSwapReceiveFloatingLegDayCount(),
-                convention.getBasisSwapReceiveFloatingLegFrequency(), convention.getBasisSwapReceiveFloatingLegRegion(), convention.getBasisSwapReceiveFloatingLegBusinessDayConvention(),
-                new InterestRateNotional(spec.getCurrency(), 1), false, receiveLegFloatRateBloombergTicker, FloatingRateType.IBOR, spread));
+        convention.getBasisSwapReceiveFloatingLegFrequency(), convention.getBasisSwapReceiveFloatingLegRegion(), convention.getBasisSwapReceiveFloatingLegBusinessDayConvention(),
+        new InterestRateNotional(spec.getCurrency(), 1), false, receiveLegFloatRateBloombergTicker, FloatingRateType.IBOR, spread));
     swap.setExternalIdBundle(ExternalIdBundle.of(swapIdentifier));
     return swap;
   }
 
-  private SwapSecurity getOISSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues) {
+  private SwapSecurity getOISSwap(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues) {
     final FixedIncomeStrip underlyingStrip = strip.getStrip();
     final ExternalId swapIdentifier = strip.getSecurity();
     final ConventionBundle swapConvention = _conventionBundleSource.getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, spec.getCurrency().getCode() + "_OIS_SWAP"));
@@ -467,11 +468,11 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
       throw new OpenGammaRuntimeException("Payment frequencies for the fixed and floating legs did not match");
     }
     final Calendar calendar = CalendarUtils.getCalendar(_regionSource, _holidaySource, swapConvention.getSwapFloatingLegRegion());
-    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC);
+    final ZonedDateTime curveDate = spec.getCurveDate().atStartOfDay(ZoneOffset.UTC);
     final ZonedDateTime spotDate = ScheduleCalculator.getAdjustedDate(curveDate, swapConvention.getSwapFixedLegSettlementDays(), calendar);
     final ZonedDateTime maturityDate = spotDate.plus(strip.getMaturity().getPeriod());
     final String counterparty = "";
-    Double rate = marketValues.get(swapIdentifier);
+    Double rate = marketValues.getDataPoint(swapIdentifier);
     if (rate == null) {
       rate = 0.;
       //throw new OpenGammaRuntimeException("rate was null on " + strip + " from " + spec);
@@ -504,12 +505,12 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     return swap;
   }
 
-  private PeriodicZeroDepositSecurity getPeriodicZeroDeposit(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final Map<ExternalId, Double> marketValues) {
+  private PeriodicZeroDepositSecurity getPeriodicZeroDeposit(final InterpolatedYieldCurveSpecification spec, final FixedIncomeStripWithIdentifier strip, final SnapshotDataBundle marketValues) {
     final ExternalId id = strip.getSecurity();
     final Currency currency = spec.getCurrency();
-    final ZonedDateTime startDate = spec.getCurveDate().atStartOfDayInZone(TimeZone.UTC);
+    final ZonedDateTime startDate = spec.getCurveDate().atStartOfDay(ZoneOffset.UTC);
     final ZonedDateTime maturityDate = startDate.plus(strip.getMaturity().getPeriod());
-    final double rate = marketValues.get(id);
+    final double rate = marketValues.getDataPoint(id);
     final int compoundingPeriodsPerYear = strip.getStrip().getPeriodsPerYear();
     final ExternalId region = spec.getRegion();
     final PeriodicZeroDepositSecurity deposit = new PeriodicZeroDepositSecurity(currency, startDate, maturityDate, rate, compoundingPeriodsPerYear, region);
@@ -517,11 +518,11 @@ public class FixedIncomeStripIdentifierAndMaturityBuilder {
     return deposit;
   }
 
-  private TimeZone ensureZone(final TimeZone zone) {
+  private ZoneId ensureZone(final ZoneId zone) {
     if (zone != null) {
       return zone;
     }
-    return TimeZone.UTC;
+    return ZoneOffset.UTC;
   }
 
   private FloatingRateType getFloatingTypeFromIndexType(final IndexType indexType) {

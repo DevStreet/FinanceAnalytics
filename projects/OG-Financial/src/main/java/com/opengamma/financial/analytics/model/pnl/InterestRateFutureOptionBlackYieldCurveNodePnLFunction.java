@@ -11,8 +11,8 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.opengamma.engine.ComputationTarget;
-import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.function.FunctionCompilationContext;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
@@ -28,9 +28,6 @@ public class InterestRateFutureOptionBlackYieldCurveNodePnLFunction extends Yiel
 
   @Override
   public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
-    if (target.getType() != ComputationTargetType.POSITION) {
-      return false;
-    }
     return target.getPosition().getSecurity() instanceof IRFutureOptionSecurity;
   }
 
@@ -50,11 +47,14 @@ public class InterestRateFutureOptionBlackYieldCurveNodePnLFunction extends Yiel
 
   @Override
   public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target, final Map<ValueSpecification, ValueRequirement> inputs) {
-    final Set<String> curveNames = new HashSet<String>();
+    final Set<String> curveNames = new HashSet<>();
     for (final Map.Entry<ValueSpecification, ValueRequirement> entry : inputs.entrySet()) {
       if (entry.getKey().getValueName().equals(ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES)) {
         curveNames.add(entry.getValue().getConstraint(ValuePropertyNames.CURVE));
       }
+    }
+    if (curveNames.isEmpty()) {
+      return null;
     }
     final ValueProperties properties = createValueProperties()
         .withAny(ValuePropertyNames.CURRENCY)

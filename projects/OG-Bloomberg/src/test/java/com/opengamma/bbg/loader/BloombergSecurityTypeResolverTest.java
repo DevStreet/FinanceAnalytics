@@ -24,11 +24,12 @@ import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.id.ExternalScheme;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Test.
  */
-@Test(groups = "integration")
+@Test(groups = TestGroup.INTEGRATION)
 public class BloombergSecurityTypeResolverTest {
 
   private ConfigurableApplicationContext _context;
@@ -70,6 +71,16 @@ public class BloombergSecurityTypeResolverTest {
   }
 
   @Test
+  public void testEquityIndexFutureOption() {
+    assertSecurityType(Collections.singleton("ESH3C 1000 Index"), SecurityType.EQUITY_INDEX_FUTURE_OPTION);
+  }
+
+  @Test
+  public void testEquityIndexDividendFutureOption() {
+    assertSecurityType(Collections.singleton("DEDZ3C 100.00 Index"), SecurityType.EQUITY_INDEX_DIVIDEND_FUTURE_OPTION);
+  }
+
+  @Test
   public void testBondFuture() {
     assertSecurityType(Collections.singleton("USM10 Comdty"), SecurityType.BOND_FUTURE);
   }
@@ -82,6 +93,16 @@ public class BloombergSecurityTypeResolverTest {
   @Test
   public void testIRFutureOptionSecurity() {
     assertSecurityType(Collections.singleton("EDZ2C 99.500 Comdty"), SecurityType.IR_FUTURE_OPTION);
+  }
+
+  @Test
+  public void testCommodityFutureOptionSecurity() {
+    assertSecurityType(Collections.singleton("CHH3C 24.25 Comdty"), SecurityType.COMMODITY_FUTURE_OPTION);
+  }
+
+  @Test
+  public void testFxFutureOptionSecurity() {
+    assertSecurityType(Collections.singleton("JYH3P 105.0 Curncy"), SecurityType.FX_FUTURE_OPTION);
   }
 
   @Test

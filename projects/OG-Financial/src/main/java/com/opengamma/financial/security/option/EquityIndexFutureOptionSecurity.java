@@ -35,7 +35,7 @@ public class EquityIndexFutureOptionSecurity extends FinancialSecurity {
   /**
    * The security type.
    */
-  public static final String SECURITY_TYPE = "EQUITY_INDEX_FUTURE_OPTION_TEMP";
+  public static final String SECURITY_TYPE = "EQUITY_INDEX_FUTURE_OPTION";
 
   /**
    * The exchange.
@@ -528,7 +528,7 @@ public class EquityIndexFutureOptionSecurity extends FinancialSecurity {
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
-      this, (DirectMetaPropertyMap) super.metaPropertyMap(),
+        this, (DirectMetaPropertyMap) super.metaPropertyMap(),
         "exchange",
         "expiry",
         "exerciseType",

@@ -22,10 +22,12 @@ import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCountFactory;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.UniqueId;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Unit test for InMemoryConventionBundleMaster.
  */
+@Test(groups = TestGroup.UNIT)
 public class InMemoryConventionBundleMasterTest {
 
   @Test
@@ -44,7 +46,7 @@ public class InMemoryConventionBundleMasterTest {
     AssertJUnit.assertEquals(InMemoryConventionBundleMaster.IN_MEMORY_UNIQUE_SCHEME.getName(), uidON.getScheme());
     AssertJUnit.assertEquals(actact, conventions.getDayCount());
     AssertJUnit.assertEquals(following, conventions.getBusinessDayConvention());
-    AssertJUnit.assertEquals(0, conventions.getSettlementDays());
+    AssertJUnit.assertEquals(0, (int) conventions.getSettlementDays());
 
     final ConventionBundle conventions2 = source.getConventionBundle(ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, "USD LIBOR 3m"));
     AssertJUnit.assertEquals("USD LIBOR 3m", conventions2.getName());
@@ -54,7 +56,7 @@ public class InMemoryConventionBundleMasterTest {
     AssertJUnit.assertEquals(InMemoryConventionBundleMaster.IN_MEMORY_UNIQUE_SCHEME.getName(), uid3M.getScheme ());
     AssertJUnit.assertEquals(actact, conventions2.getDayCount());
     AssertJUnit.assertEquals(modified, conventions2.getBusinessDayConvention());
-    AssertJUnit.assertEquals(2, conventions2.getSettlementDays());
+    AssertJUnit.assertEquals(2, (int) conventions2.getSettlementDays());
 
     assertFalse(uidON.equals (uid3M));
 

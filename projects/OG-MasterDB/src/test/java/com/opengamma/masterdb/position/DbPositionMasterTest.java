@@ -19,10 +19,12 @@ import org.testng.annotations.Test;
 
 import com.opengamma.masterdb.DbMasterTestUtils;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Test DbPositionMaster.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public class DbPositionMasterTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(DbPositionMasterTest.class);
@@ -59,7 +61,7 @@ public class DbPositionMasterTest extends DbTest {
     assertNotNull(_posMaster);
     assertEquals(true, _posMaster.getUniqueIdScheme().equals("DbPos"));
     assertNotNull(_posMaster.getDbConnector());
-    assertNotNull(_posMaster.getTimeSource());
+    assertNotNull(_posMaster.getClock());
   }
 
   //-------------------------------------------------------------------------

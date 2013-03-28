@@ -7,11 +7,12 @@ package com.opengamma.analytics.financial.forex.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.forex.definition.ForexDefinition;
 import com.opengamma.analytics.financial.forex.definition.ForexOptionVanillaDefinition;
@@ -32,7 +33,7 @@ import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolatorFactory;
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
-import com.opengamma.analytics.util.surface.SurfaceValue;
+import com.opengamma.analytics.util.amount.SurfaceValue;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
@@ -91,8 +92,7 @@ public class ForexOptionVanillaVannaVolgaMethodTest {
   private static final ForexDiscountingMethod METHOD_DISC = ForexDiscountingMethod.getInstance();
 
   private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE_STRIKE_INT = new SmileDeltaTermStructureDataBundle(CURVES, SMILE_TERM_STRIKE_INT, Pair.of(EUR, USD));
-  private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE_STRIKE_INT_FLAT = new SmileDeltaTermStructureDataBundle(CURVES, SMILE_TERM_STRIKE_INT_FLAT, Pair.of(
-      EUR, USD));
+  private static final SmileDeltaTermStructureDataBundle SMILE_BUNDLE_STRIKE_INT_FLAT = new SmileDeltaTermStructureDataBundle(CURVES, SMILE_TERM_STRIKE_INT_FLAT, Pair.of(EUR, USD));
   private static final SmileDeltaTermStructureVannaVolgaDataBundle SMILE_BUNDLE = new SmileDeltaTermStructureVannaVolgaDataBundle(CURVES, SMILE_TERM, Pair.of(EUR, USD));
   private static final BlackImpliedVolatilityFormula BLACK_IMPLIED_VOL = new BlackImpliedVolatilityFormula();
   private static final BlackPriceFunction BLACK_FUNCTION = new BlackPriceFunction();

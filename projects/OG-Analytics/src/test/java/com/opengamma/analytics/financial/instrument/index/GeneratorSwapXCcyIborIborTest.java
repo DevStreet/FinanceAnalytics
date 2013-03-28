@@ -7,11 +7,11 @@ package com.opengamma.analytics.financial.instrument.index;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.instrument.swap.SwapXCcyIborIborDefinition;
@@ -63,14 +63,13 @@ public class GeneratorSwapXCcyIborIborTest {
     Period tenor = Period.ofMonths(6);
     double spread = -0.0050;
     double notional = 12345;
-    double fxRateUSDEUR = 0.75;
-    FXMatrix fxMatrix = new FXMatrix(USDLIBOR3M.getCurrency(), EURIBOR3M.getCurrency(), fxRateUSDEUR);
-    SwapXCcyIborIborDefinition insGenerated = EURIBOR3MUSDLIBOR3M.generateInstrument(referenceDate, tenor, spread, notional, fxRateUSDEUR);
-    SwapXCcyIborIborDefinition insGenerated2 = EURIBOR3MUSDLIBOR3M.generateInstrument(referenceDate, tenor, spread, notional, fxMatrix);
+    double fxRateEURUSD = 1.25;
+    FXMatrix fxMatrix = new FXMatrix(EURIBOR3M.getCurrency(), USDLIBOR3M.getCurrency(), fxRateEURUSD);
+    GeneratorAttributeFX attribute = new GeneratorAttributeFX(tenor, fxMatrix);
+    SwapXCcyIborIborDefinition insGenerated = EURIBOR3MUSDLIBOR3M.generateInstrument(referenceDate, spread, notional, attribute);
     ZonedDateTime settleDate = ScheduleCalculator.getAdjustedDate(referenceDate, EURIBOR3MUSDLIBOR3M.getSpotLag(), NYC);
-    SwapXCcyIborIborDefinition insExpected = SwapXCcyIborIborDefinition.from(settleDate, tenor, EURIBOR3MUSDLIBOR3M, fxRateUSDEUR * notional, notional, spread, true);
+    SwapXCcyIborIborDefinition insExpected = SwapXCcyIborIborDefinition.from(settleDate, tenor, EURIBOR3MUSDLIBOR3M, notional, notional * fxRateEURUSD, spread, true);
     assertEquals("Generator Deposit: generate instrument", insExpected, insGenerated);
-    assertEquals("Generator Deposit: generate instrument", insExpected, insGenerated2);
   }
 
 }

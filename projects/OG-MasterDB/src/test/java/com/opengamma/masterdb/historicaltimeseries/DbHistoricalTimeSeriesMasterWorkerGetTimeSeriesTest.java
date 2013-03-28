@@ -8,12 +8,11 @@ package com.opengamma.masterdb.historicaltimeseries;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 
-import javax.time.calendar.LocalDate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.DataNotFoundException;
 import com.opengamma.id.ObjectId;
@@ -21,12 +20,14 @@ import com.opengamma.id.UniqueId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesGetFilter;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.test.DbTest;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Tests DbHistoricalTimeSeriesMaster.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public class DbHistoricalTimeSeriesMasterWorkerGetTimeSeriesTest extends AbstractDbHistoricalTimeSeriesMasterWorkerTest {
   // superclass sets up dummy database
 

@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.time.calendar.ZonedDateTime;
-import javax.time.calendar.format.DateTimeFormatters;
-
 import org.apache.commons.lang.ObjectUtils;
+import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
@@ -22,9 +21,9 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.FederalF
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
+import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
 
 /**
  * Description of an Federal Funds Futures security.
@@ -65,9 +64,12 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
   private final String _name;
 
   /**
-   * Business day conventions used in some builders.
+   * The preceding business day convention.
    */
   private static final BusinessDayConvention BUSINESS_DAY_PRECEDING = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Preceding");
+  /**
+   * The following business day convention.
+   */
   private static final BusinessDayConvention BUSINESS_DAY_FOLLOWING = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following");
 
   /** Constructor from all details.
@@ -79,8 +81,8 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
    * @param paymentAccrualFactor The future payment accrual factor. Usually a standardized number of 1/12 for a 30-day future.
    * @param name The future name.
    */
-  public FederalFundsFutureSecurityDefinition(final ZonedDateTime lastTradingDate, final IndexON index, final ZonedDateTime[] fixingPeriodDate, final double[] fixingPeriodAccrualFactor,
-      final double notional, final double paymentAccrualFactor, final String name) {
+  public FederalFundsFutureSecurityDefinition(final ZonedDateTime lastTradingDate, final IndexON index, final ZonedDateTime[] fixingPeriodDate,
+      final double[] fixingPeriodAccrualFactor, final double notional, final double paymentAccrualFactor, final String name) {
     ArgumentChecker.notNull(lastTradingDate, "Last trading date");
     ArgumentChecker.notNull(index, "Index overnight");
     ArgumentChecker.notNull(fixingPeriodDate, "Fixing period dates");
@@ -110,19 +112,20 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
    * @param name The future name.
    * @return The future.
    */
-  public static FederalFundsFutureSecurityDefinition from(final ZonedDateTime monthDate, final IndexON index, final double notional, final double paymentAccrualFactor, final String name) {
+  public static FederalFundsFutureSecurityDefinition from(final ZonedDateTime monthDate, final IndexON index, final double notional, final double paymentAccrualFactor,
+      final String name) {
     ArgumentChecker.notNull(monthDate, "Reference date");
     ArgumentChecker.notNull(index, "Index overnight");
     final ZonedDateTime periodFirstDate = BUSINESS_DAY_FOLLOWING.adjustDate(index.getCalendar(), monthDate.withDayOfMonth(1));
     final ZonedDateTime periodLastDate = BUSINESS_DAY_FOLLOWING.adjustDate(index.getCalendar(), monthDate.withDayOfMonth(1).plusMonths(1));
     final ZonedDateTime last = BUSINESS_DAY_PRECEDING.adjustDate(index.getCalendar(), periodLastDate.minusDays(1));
-    final List<ZonedDateTime> fixingList = new ArrayList<ZonedDateTime>();
+    final List<ZonedDateTime> fixingList = new ArrayList<>();
     ZonedDateTime date = periodFirstDate;
     while (!date.isAfter(periodLastDate)) {
       fixingList.add(date);
       date = BUSINESS_DAY_FOLLOWING.adjustDate(index.getCalendar(), date.plusDays(1));
     }
-    final ZonedDateTime[] fixingDate = fixingList.toArray(new ZonedDateTime[0]);
+    final ZonedDateTime[] fixingDate = fixingList.toArray(new ZonedDateTime[fixingList.size()]);
     final double[] fixingAccrualFactor = new double[fixingDate.length - 1];
     for (int loopfix = 0; loopfix < fixingDate.length - 1; loopfix++) {
       fixingAccrualFactor[loopfix] = index.getDayCount().getDayCountFraction(fixingDate[loopfix], fixingDate[loopfix + 1]);
@@ -140,7 +143,7 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
   public static FederalFundsFutureSecurityDefinition fromFedFund(final ZonedDateTime monthDate, final IndexON index) {
     final double notionalFedFund = 5000000;
     final double accrualFedFund = 1.0 / 12.0;
-    return from(monthDate, index, notionalFedFund, accrualFedFund, "FF" + monthDate.toString(DateTimeFormatters.pattern("MMMyy")));
+    return from(monthDate, index, notionalFedFund, accrualFedFund, "FF" + monthDate.toString(DateTimeFormatter.ofPattern("MMMyy")));
   }
 
   /**
@@ -217,7 +220,7 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
 
   @Override
   public String toString() {
-    return _name + " - index: " + _index.toString() + " - start date: " + _fixingPeriodDate[0].toString(DateTimeFormatters.pattern("ddMMMyy"));
+    return _name + " - index: " + _index.toString() + " - start date: " + _fixingPeriodDate[0].toString(DateTimeFormatter.ofPattern("ddMMMyy"));
   }
 
   @Override
@@ -228,7 +231,8 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
     for (int loopfix = 0; loopfix < _fixingPeriodDate.length; loopfix++) {
       fixingPeriodTime[loopfix] = TimeCalculator.getTimeBetween(date, _fixingPeriodDate[loopfix]);
     }
-    return new FederalFundsFutureSecurity(_index, 0.0, fixingPeriodTime, _fixingPeriodAccrualFactor, _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name, yieldCurveNames[0]);
+    return new FederalFundsFutureSecurity(_index, 0.0, fixingPeriodTime, _fixingPeriodAccrualFactor, _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name,
+        yieldCurveNames[0]);
   }
 
   @Override
@@ -265,14 +269,14 @@ public class FederalFundsFutureSecurityDefinition implements InstrumentDefinitio
           fixingPeriodTime[loopfix] = TimeCalculator.getTimeBetween(date, _fixingPeriodDate[loopfix + fixedPeriod]);
         }
         System.arraycopy(_fixingPeriodAccrualFactor, fixedPeriod, fixingPeriodAccrualFactor, 0, _fixingPeriodDate.length - 1 - fixedPeriod);
-        return new FederalFundsFutureSecurity(_index, accruedInterest, fixingPeriodTime, fixingPeriodAccrualFactor, _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name,
-            yieldCurveNames[0]);
+        return new FederalFundsFutureSecurity(_index, accruedInterest, fixingPeriodTime, fixingPeriodAccrualFactor, _fixingTotalAccrualFactor, _notional,
+            _marginAccrualFactor, _name, yieldCurveNames[0]);
       }
-      return new FederalFundsFutureSecurity(_index, accruedInterest, new double[] {TimeCalculator.getTimeBetween(date, _fixingPeriodDate[_fixingPeriodDate.length - 1])}, new double[0],
-          _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name, yieldCurveNames[0]);
+      return new FederalFundsFutureSecurity(_index, accruedInterest, new double[] {TimeCalculator.getTimeBetween(date, _fixingPeriodDate[_fixingPeriodDate.length - 1])},
+          new double[0], _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name, yieldCurveNames[0]);
     }
-    return new FederalFundsFutureSecurity(_index, accruedInterest, new double[] {TimeCalculator.getTimeBetween(date, _fixingPeriodDate[_fixingPeriodDate.length - 1])}, new double[0],
-        _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name, yieldCurveNames[0]);
+    return new FederalFundsFutureSecurity(_index, accruedInterest, new double[] {TimeCalculator.getTimeBetween(date, _fixingPeriodDate[_fixingPeriodDate.length - 1])},
+        new double[0], _fixingTotalAccrualFactor, _notional, _marginAccrualFactor, _name, yieldCurveNames[0]);
   }
 
   @Override

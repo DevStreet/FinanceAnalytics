@@ -6,11 +6,12 @@
 package com.opengamma.analytics.financial.interestrate.swaption.method;
 
 import static org.testng.AssertJUnit.assertEquals;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
@@ -25,8 +26,8 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedIborSpreadDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
-import com.opengamma.analytics.financial.model.option.definition.BlackSwaptionParameters;
 import com.opengamma.analytics.financial.model.option.definition.YieldCurveWithBlackSwaptionBundle;
+import com.opengamma.analytics.financial.model.option.parameters.BlackFlatSwaptionParameters;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackPriceFunction;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.EuropeanVanillaOption;
@@ -72,7 +73,7 @@ public class SwaptionPhysicalFixedIborSpreadBlackMethodTest {
 
   private static final YieldCurveBundle CURVES = TestsDataSetsBlack.createCurvesEUR();
   private static final String[] CURVE_NAMES = TestsDataSetsBlack.curvesEURNames();
-  private static final BlackSwaptionParameters BLACK = TestsDataSetsBlack.createBlackSwaptionEUR3();
+  private static final BlackFlatSwaptionParameters BLACK = TestsDataSetsBlack.createBlackSwaptionEUR3();
   private static final YieldCurveWithBlackSwaptionBundle BUNDLE = new YieldCurveWithBlackSwaptionBundle(BLACK, CURVES);
 
   private static final SwapFixedCoupon<Coupon> SWAP_SPREAD_EUR1Y3M = SWAP_SPREAD_EUR1Y3M_DEFINITION.toDerivative(REFERENCE_DATE, CURVE_NAMES);

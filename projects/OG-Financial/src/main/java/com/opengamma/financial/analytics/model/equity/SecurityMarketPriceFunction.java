@@ -10,11 +10,11 @@ import java.util.Set;
 
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.ComputationTarget;
-import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.function.AbstractFunction;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionInputs;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
@@ -43,18 +43,15 @@ public class SecurityMarketPriceFunction extends AbstractFunction.NonCompiledInv
 
   @Override
   public ComputationTargetType getTargetType() {
-    return ComputationTargetType.POSITION;
+    return ComputationTargetType.POSITION_OR_TRADE;
   }
 
   @Override
   public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
-    if (target.getType() != getTargetType()) {
+    if (!(target.getPositionOrTrade().getSecurity() instanceof FinancialSecurity)) {
       return false;
     }
-    if (!(target.getPosition().getSecurity() instanceof FinancialSecurity)) {
-      return false;
-    }
-    final FinancialSecurity security = (FinancialSecurity) target.getPosition().getSecurity();
+    final FinancialSecurity security = (FinancialSecurity) target.getPositionOrTrade().getSecurity();
     return security.accept(s_judgeOfMarketSecurities);
   }
 
@@ -71,22 +68,18 @@ public class SecurityMarketPriceFunction extends AbstractFunction.NonCompiledInv
   }
 
   private ValueSpecification getSpecification(final ComputationTarget target) {
-    final Currency ccy = FinancialSecurityUtils.getCurrency(target.getPosition().getSecurity());
+    final Currency ccy = FinancialSecurityUtils.getCurrency(target.getPositionOrTrade().getSecurity());
     ValueProperties valueProperties;
     if (ccy == null) {
       valueProperties = createValueProperties().get();
     } else {
       valueProperties = createValueProperties().with(ValuePropertyNames.CURRENCY, ccy.getCode()).get();
     }
-    return new ValueSpecification(new ValueRequirement(ValueRequirementNames.SECURITY_MARKET_PRICE,
-        target.getPosition(), valueProperties), getUniqueId());
+    return new ValueSpecification(ValueRequirementNames.SECURITY_MARKET_PRICE, target.toSpecification(), valueProperties);
   }
 
   private ValueRequirement getRequirement(final ComputationTarget target) {
-    return new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, target.getPosition().getSecurity());
-    // TESTING: The following will use BLOOMBERG_TICKER_WEAK, hence will not put a strain on the amount of data requested from BBG in a day
-    // ValueRequirement(MarketDataRequirementNames.MARKET_VALUE,
-    //     ExternalId.of(ExternalSchemes.BLOOMBERG_TICKER_WEAK, target.getPosition().getSecurity().getExternalIdBundle().getValue(ExternalSchemes.BLOOMBERG_TICKER)));
+    return new ValueRequirement(MarketDataRequirementNames.MARKET_VALUE, ComputationTargetType.SECURITY, target.getPositionOrTrade().getSecurity().getUniqueId());
   }
 
 }

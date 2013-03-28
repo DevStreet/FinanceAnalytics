@@ -7,9 +7,8 @@ package com.opengamma.analytics.financial.timeseries.analysis;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import javax.time.calendar.LocalDate;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
 
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.MersenneTwister64;
@@ -17,10 +16,10 @@ import cern.jet.random.engine.MersenneTwister64;
 import com.opengamma.analytics.financial.timeseries.model.AutoregressiveTimeSeriesModel;
 import com.opengamma.analytics.math.statistics.distribution.NormalDistribution;
 import com.opengamma.analytics.math.statistics.distribution.ProbabilityDistribution;
-import com.opengamma.util.timeseries.fast.DateTimeNumericEncoding;
-import com.opengamma.util.timeseries.fast.longint.FastArrayLongDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.fast.DateTimeNumericEncoding;
+import com.opengamma.timeseries.fast.longint.FastArrayLongDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 
 /**
  * 
@@ -39,7 +38,7 @@ public class AutoregressiveTimeSeriesOrderIdentifierTest {
     final double[] random = new double[n];
     final ProbabilityDistribution<Double> normal = new NormalDistribution(2, 1, new MersenneTwister64(MersenneTwister.DEFAULT_SEED));
     for (int i = 0; i < n; i++) {
-      dates[i] = LocalDate.ofEpochDays(i);
+      dates[i] = LocalDate.ofEpochDay(i);
       random[i] = normal.nextRandom();
     }
     final int order = 3;

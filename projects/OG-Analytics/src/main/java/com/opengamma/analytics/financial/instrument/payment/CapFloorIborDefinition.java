@@ -5,9 +5,9 @@
  */
 package com.opengamma.analytics.financial.instrument.payment;
 
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.Validate;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
@@ -17,9 +17,9 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
+import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
 
 /**
  * Class describing a caplet/floorlet on Ibor. The notional is positive for long the option and negative for short the option.
@@ -57,7 +57,7 @@ public class CapFloorIborDefinition extends CouponFloatingDefinition implements 
    * @param paymentDate Coupon payment date.
    * @param accrualStartDate Start date of the accrual period.
    * @param accrualEndDate End date of the accrual period.
-   * @param accrualFactor Accrual factor of the accrual period.
+   * @param accrualFactor Accrual factor of the accrual period; used for the payment.
    * @param notional Coupon notional.
    * @param fixingDate The coupon fixing date.
    * @param index The coupon Ibor index. The index currency should be the same as the payment currency.
@@ -212,7 +212,7 @@ public class CapFloorIborDefinition extends CouponFloatingDefinition implements 
       Double fixedRate = indexFixingTS.getValue(getFixingDate());
       //TODO remove me when times are sorted out in the swap definitions or we work out how to deal with this another way
       if (fixedRate == null) {
-        final ZonedDateTime fixingDateAtLiborFixingTime = getFixingDate().withTime(11, 0);
+        final ZonedDateTime fixingDateAtLiborFixingTime = getFixingDate().with(LocalTime.of(11, 0));
         fixedRate = indexFixingTS.getValue(fixingDateAtLiborFixingTime);
       }
       if (fixedRate == null) {
@@ -220,7 +220,7 @@ public class CapFloorIborDefinition extends CouponFloatingDefinition implements 
         fixedRate = indexFixingTS.getValue(previousBusinessDay);
         //TODO remove me when times are sorted out in the swap definitions or we work out how to deal with this another way
         if (fixedRate == null) {
-          final ZonedDateTime previousBusinessDayAtLiborFixingTime = previousBusinessDay.withTime(11, 0);
+          final ZonedDateTime previousBusinessDayAtLiborFixingTime = previousBusinessDay.with(LocalTime.of(11, 0));
           fixedRate = indexFixingTS.getValue(previousBusinessDayAtLiborFixingTime);
         }
         if (fixedRate == null) {

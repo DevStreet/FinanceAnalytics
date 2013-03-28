@@ -23,8 +23,16 @@ import com.opengamma.analytics.financial.commodity.derivative.MetalForward;
 import com.opengamma.analytics.financial.commodity.derivative.MetalFuture;
 import com.opengamma.analytics.financial.commodity.derivative.MetalFutureOption;
 import com.opengamma.analytics.financial.credit.cds.ISDACDSDerivative;
+import com.opengamma.analytics.financial.equity.future.derivative.CashSettledFuture;
 import com.opengamma.analytics.financial.equity.future.derivative.EquityFuture;
 import com.opengamma.analytics.financial.equity.future.derivative.EquityIndexDividendFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.EquityIndexFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.IndexFuture;
+import com.opengamma.analytics.financial.equity.future.derivative.VolatilityIndexFuture;
+import com.opengamma.analytics.financial.equity.option.EquityIndexFutureOption;
+import com.opengamma.analytics.financial.equity.option.EquityIndexOption;
+import com.opengamma.analytics.financial.equity.option.EquityOption;
+import com.opengamma.analytics.financial.equity.variance.EquityVarianceSwap;
 import com.opengamma.analytics.financial.forex.derivative.Forex;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableForward;
 import com.opengamma.analytics.financial.forex.derivative.ForexNonDeliverableOption;
@@ -35,9 +43,7 @@ import com.opengamma.analytics.financial.forex.derivative.ForexSwap;
 import com.opengamma.analytics.financial.instrument.TestInstrumentDefinitionsAndDerivatives;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponFixed;
-import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIbor;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborRatchet;
-import com.opengamma.analytics.financial.interestrate.annuity.derivative.AnnuityCouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BillSecurity;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BillTransaction;
 import com.opengamma.analytics.financial.interestrate.bond.definition.BondCapitalIndexedSecurity;
@@ -50,18 +56,22 @@ import com.opengamma.analytics.financial.interestrate.cash.derivative.Cash;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.DepositCounterpart;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.DepositIbor;
 import com.opengamma.analytics.financial.interestrate.cash.derivative.DepositZero;
-import com.opengamma.analytics.financial.interestrate.fra.ForwardRateAgreement;
+import com.opengamma.analytics.financial.interestrate.fra.derivative.ForwardRateAgreement;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFuture;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesSecurity;
+import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureTransaction;
-import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFuture;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionPremiumTransaction;
+import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureSecurity;
+import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureTransaction;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationYearOnYearInterpolation;
+import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationYearOnYearMonthly;
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolation;
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolationGearing;
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthly;
@@ -70,31 +80,33 @@ import com.opengamma.analytics.financial.interestrate.payments.ForexForward;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponArithmeticAverageON;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixedCompounding;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
-import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborCompounded;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborAverage;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborCompounding;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborCompoundingSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborGearing;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponOIS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
-import com.opengamma.analytics.financial.interestrate.swap.derivative.CrossCurrencySwap;
-import com.opengamma.analytics.financial.interestrate.swap.derivative.FixedFloatSwap;
-import com.opengamma.analytics.financial.interestrate.swap.derivative.FloatingRateNote;
 import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
+import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCompoundingCoupon;
 import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
-import com.opengamma.analytics.financial.interestrate.swap.derivative.TenorSwap;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionBermudaFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
+import com.opengamma.analytics.financial.varianceswap.VarianceSwap;
 
 /**
  * 
  */
 public class InstrumentDerivativeVisitorTest {
   private static final Set<InstrumentDerivative> ALL_DERIVATIVES = TestInstrumentDefinitionsAndDerivatives.getAllDerivatives();
-  private static final MyVisitor<Object> VISITOR = new MyVisitor<Object>();
+  private static final MyVisitor<Object> VISITOR = new MyVisitor<>();
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullDerivative() {
@@ -136,7 +148,7 @@ public class InstrumentDerivativeVisitorTest {
   public void testDelegate() {
     final String s = "aaaa";
     final String result = s + " + data1";
-    final BondFixedVisitor<Object> visitor = new BondFixedVisitor<Object>(VISITOR, s);
+    final BondFixedVisitor<Object> visitor = new BondFixedVisitor<>(VISITOR, s);
     for (final InstrumentDerivative definition : ALL_DERIVATIVES) {
       if (definition instanceof BondFixedSecurity) {
         assertEquals(definition.accept(visitor), s);
@@ -179,7 +191,7 @@ public class InstrumentDerivativeVisitorTest {
   @Test
   public void testSameValueAdapter() {
     final Double value = Math.PI;
-    final InstrumentDerivativeVisitor<Double, Double> visitor = new InstrumentDerivativeVisitorSameValueAdapter<Double, Double>(value);
+    final InstrumentDerivativeVisitor<Double, Double> visitor = new InstrumentDerivativeVisitorSameValueAdapter<>(value);
     for (final InstrumentDerivative derivative : ALL_DERIVATIVES) {
       assertEquals(value, derivative.accept(visitor));
       assertEquals(value, derivative.accept(visitor, Math.E));
@@ -201,6 +213,7 @@ public class InstrumentDerivativeVisitorTest {
 
     public DummyVisitor() {
     }
+
   }
 
   private static class SameMethodAdapter extends InstrumentDerivativeVisitorSameMethodAdapter<String, String> {
@@ -304,11 +317,6 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public String visitFixedFloatSwap(final FixedFloatSwap swap, final T data) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
     public String visitSwaptionCashFixedIbor(final SwaptionCashFixedIbor swaption, final T data) {
       return getValue(swaption, true);
     }
@@ -321,16 +329,6 @@ public class InstrumentDerivativeVisitorTest {
     @Override
     public String visitSwaptionBermudaFixedIbor(final SwaptionBermudaFixedIbor swaption, final T data) {
       return getValue(swaption, true);
-    }
-
-    @Override
-    public String visitTenorSwap(final TenorSwap<? extends Payment> tenorSwap, final T data) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitCrossCurrencySwap(final CrossCurrencySwap ccs, final T data) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
     }
 
     @Override
@@ -439,11 +437,6 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public String visitFixedFloatSwap(final FixedFloatSwap swap) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
     public String visitSwaptionCashFixedIbor(final SwaptionCashFixedIbor swaption) {
       return getValue(swaption, false);
     }
@@ -459,17 +452,7 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public String visitCrossCurrencySwap(final CrossCurrencySwap ccs) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
     public String visitForexForward(final ForexForward fx) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitTenorSwap(final TenorSwap<? extends Payment> tenorSwap) {
       throw new NotImplementedException("Not implemented because derivative is deprecated");
     }
 
@@ -564,12 +547,7 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public String visitCouponIborCompounded(final CouponIborCompounded payment) {
-      return getValue(payment, false);
-    }
-
-    @Override
-    public String visitCouponIborCompounded(final CouponIborCompounded payment, final T data) {
+    public String visitCouponIborCompounding(final CouponIborCompounding payment, final T data) {
       return getValue(payment, true);
     }
 
@@ -644,12 +622,12 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public String visitInterestRateFuture(final InterestRateFuture future, final T data) {
+    public String visitInterestRateFutureTransaction(final InterestRateFutureTransaction future, final T data) {
       return getValue(future, true);
     }
 
     @Override
-    public String visitInterestRateFuture(final InterestRateFuture future) {
+    public String visitInterestRateFutureTransaction(final InterestRateFutureTransaction future) {
       return getValue(future, false);
     }
 
@@ -934,33 +912,8 @@ public class InstrumentDerivativeVisitorTest {
     }
 
     @Override
-    public String visitForwardLiborAnnuity(final AnnuityCouponIbor forwardLiborAnnuity, final T data) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitForwardLiborAnnuity(final AnnuityCouponIbor forwardLiborAnnuity) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitAnnuityCouponIborSpread(final AnnuityCouponIborSpread annuity, final T data) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitAnnuityCouponIborSpread(final AnnuityCouponIborSpread annuity) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitFloatingRateNote(final FloatingRateNote derivative, final T data) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
-    }
-
-    @Override
-    public String visitFloatingRateNote(final FloatingRateNote derivative) {
-      throw new NotImplementedException("Not implemented because derivative is deprecated");
+    public String visitCouponIborCompounding(final CouponIborCompounding payment) {
+      return getValue(payment, false);
     }
 
     @Override
@@ -982,5 +935,186 @@ public class InstrumentDerivativeVisitorTest {
     public String visitEquityIndexDividendFuture(final EquityIndexDividendFuture future, final T data) {
       return getValue(future, true);
     }
+
+    @Override
+    public String visitEquityIndexOption(final EquityIndexOption option, final T data) {
+      return getValue(option, true);
+    }
+
+    @Override
+    public String visitEquityIndexOption(final EquityIndexOption option) {
+      return getValue(option, false);
+    }
+
+    @Override
+    public String visitEquityIndexFutureOption(final EquityIndexFutureOption option, final T data) {
+      return getValue(option, true);
+    }
+
+    @Override
+    public String visitEquityIndexFutureOption(final EquityIndexFutureOption option) {
+      return getValue(option, false);
+    }
+
+    @Override
+    public String visitEquityOption(final EquityOption option, final T data) {
+      return getValue(option, true);
+    }
+
+    @Override
+    public String visitEquityOption(final EquityOption option) {
+      return getValue(option, false);
+    }
+
+    @Override
+    public String visitVarianceSwap(final VarianceSwap varianceSwap) {
+      return getValue(varianceSwap, false);
+    }
+
+    @Override
+    public String visitVarianceSwap(final VarianceSwap varianceSwap, final T data) {
+      return getValue(varianceSwap, true);
+    }
+
+    @Override
+    public String visitEquityVarianceSwap(final EquityVarianceSwap varianceSwap) {
+      return getValue(varianceSwap, false);
+    }
+
+    @Override
+    public String visitEquityVarianceSwap(final EquityVarianceSwap varianceSwap, final T data) {
+      return getValue(varianceSwap, true);
+    }
+
+    @Override
+    public String visitCouponIborCompoundingSpread(CouponIborCompoundingSpread payment) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponIborCompoundingSpread(CouponIborCompoundingSpread payment, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponIborAverage(CouponIborAverage payment, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponIborAverage(CouponIborAverage payment) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponInflationYearOnYearMonthly(CouponInflationYearOnYearMonthly coupon, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponInflationYearOnYearMonthly(CouponInflationYearOnYearMonthly coupon) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponInflationYearOnYearInterpolation(CouponInflationYearOnYearInterpolation coupon, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponInflationYearOnYearInterpolation(CouponInflationYearOnYearInterpolation coupon) {
+      return null;
+    }
+
+    @Override
+    public String visitInterestRateFutureSecurity(InterestRateFutureSecurity future, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponFixedCompounding(CouponFixedCompounding payment, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitInterestRateFutureSecurity(InterestRateFutureSecurity future) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponFixedCompounding(CouponFixedCompounding payment) {
+      return null;
+    }
+
+    @Override
+    public String visitFixedCompoundingCouponSwap(SwapFixedCompoundingCoupon<?> swap, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitFixedCompoundingCouponSwap(SwapFixedCompoundingCoupon<?> swap) {
+      return null;
+    }
+
+    @Override
+    public String visitCashSettledFuture(CashSettledFuture future, T data) {
+      return getValue(future, true);
+    }
+
+    @Override
+    public String visitCashSettledFuture(CashSettledFuture future) {
+      return getValue(future, false);
+    }
+
+    @Override
+    public String visitIndexFuture(IndexFuture future, T data) {
+      return getValue(future, true);
+    }
+
+    @Override
+    public String visitIndexFuture(IndexFuture future) {
+      return getValue(future, false);
+    }
+
+    @Override
+    public String visitEquityIndexFuture(EquityIndexFuture future, T data) {
+      return getValue(future, true);
+    }
+
+    @Override
+    public String visitEquityIndexFuture(EquityIndexFuture future) {
+      return getValue(future, false);// TODO Auto-generated method stub
+    }
+
+    @Override
+    public String visitVolatilityIndexFuture(VolatilityIndexFuture future, T data) {
+      return getValue(future, true);
+    }
+
+    @Override
+    public String visitVolatilityIndexFuture(VolatilityIndexFuture future) {
+      return getValue(future, false);
+    }
+
+    @Override
+    public String visitCouponArithmeticAverageON(CouponArithmeticAverageON payment, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponArithmeticAverageON(CouponArithmeticAverageON payment) {
+      return null;
+    }
+
+    @Override
+    public String visitDeliverableSwapFuturesTransaction(DeliverableSwapFuturesTransaction futures, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitDeliverableSwapFuturesTransaction(DeliverableSwapFuturesTransaction futures) {
+      return null;
+    }
   }
+
 }

@@ -5,7 +5,7 @@
  */
 package com.opengamma.masterdb.batch;
 
-import javax.time.Instant;
+import org.threeten.bp.Instant;
 
 import com.google.common.collect.Maps;
 import com.opengamma.batch.BatchRunWriter;
@@ -14,8 +14,8 @@ import com.opengamma.batch.SnapshotMode;
 import com.opengamma.batch.domain.RiskRun;
 import com.opengamma.engine.view.ViewComputationResultModel;
 import com.opengamma.engine.view.ViewDeltaResultModel;
-import com.opengamma.engine.view.calc.ViewCycleMetadata;
 import com.opengamma.engine.view.compilation.CompiledViewDefinition;
+import com.opengamma.engine.view.cycle.ViewCycleMetadata;
 import com.opengamma.engine.view.execution.ViewCycleExecutionOptions;
 import com.opengamma.engine.view.listener.ViewResultListener;
 import com.opengamma.livedata.UserPrincipal;
@@ -26,16 +26,18 @@ import com.opengamma.livedata.UserPrincipal;
 public class BatchDbViewResultListener implements ViewResultListener {
 
   private final BatchRunWriter _batchRunWriter;
+  private final UserPrincipal _user;
   
   private RiskRun _riskRun;
 
-  public BatchDbViewResultListener(BatchRunWriter batchRunWriter) {
+  public BatchDbViewResultListener(BatchRunWriter batchRunWriter, UserPrincipal user) {
     _batchRunWriter = batchRunWriter;
+    _user = user;
   }
 
   @Override
   public UserPrincipal getUser() {
-    return null;
+    return _user;
   }
 
   @Override

@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ *
+ * Please see distribution for license.
+ */
 package com.opengamma.integration.copier;
 
 import static org.mockito.Mockito.mock;
@@ -15,13 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.format.DateTimeFormatter;
-import javax.time.calendar.format.DateTimeFormatterBuilder;
-
 import org.apache.commons.io.IOUtils;
 import org.mockito.stubbing.OngoingStubbing;
 import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.format.DateTimeFormatterBuilder;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -40,10 +44,15 @@ import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoSearchR
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesMaster;
 import com.opengamma.master.historicaltimeseries.ManageableHistoricalTimeSeriesInfo;
 import com.opengamma.master.historicaltimeseries.impl.InMemoryHistoricalTimeSeriesMaster;
-import com.opengamma.util.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.ListLocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ArrayLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.ListLocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.util.test.TestGroup;
 
+/**
+ * Test.
+ */
+@Test(groups = TestGroup.UNIT)
 public class TimeSeriesLoaderTest {
   
   private static final String FILENAME = "src/test/java/com/opengamma/integration/copier/TimeSeries.csv";

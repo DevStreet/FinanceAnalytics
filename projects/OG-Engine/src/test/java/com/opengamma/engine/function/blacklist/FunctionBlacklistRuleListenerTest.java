@@ -19,17 +19,19 @@ import java.util.concurrent.TimeUnit;
 import org.testng.annotations.Test;
 
 import com.opengamma.engine.ComputationTargetSpecification;
+import com.opengamma.id.UniqueId;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.test.Timeout;
 
 /**
  * Tests the {@link AbstractFunctionBlacklistRuleListener} class.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class FunctionBlacklistRuleListenerTest {
 
   private final FunctionBlacklistRule RULE_1 = new FunctionBlacklistRule();
-  private final FunctionBlacklistRule RULE_2 = new FunctionBlacklistRule(new ComputationTargetSpecification("foo"));
-  private final FunctionBlacklistRule RULE_3 = new FunctionBlacklistRule(new ComputationTargetSpecification("bar"));
+  private final FunctionBlacklistRule RULE_2 = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("test", "foo")));
+  private final FunctionBlacklistRule RULE_3 = new FunctionBlacklistRule(ComputationTargetSpecification.of(UniqueId.of("test", "bar")));
 
   private class MockBlacklist extends HashSet<FunctionBlacklistRule> implements FunctionBlacklist {
 

@@ -57,7 +57,12 @@ public abstract class GlobalContext extends AbstractContext<AbstractContext<?>> 
    * Name under which the shared engine client is bound.
    */
   protected static final String CLIENT = "client";
-  
+
+  /**
+   * Name under which the default computation target resolver is bound.
+   */
+  protected static final String COMPUTATION_TARGET_RESOLVER = "computationTargetResolver";
+
   /**
    * Name under which the currency pairs source is bound.
    */
@@ -143,11 +148,6 @@ public abstract class GlobalContext extends AbstractContext<AbstractContext<?>> 
    */
   protected static final String POSITION_SOURCE = "positionSource";
   
-  /**
-   * Name under which the default computation target resolver is bound.
-   */
-  protected static final String COMPUTATION_TARGET_RESOLVER = "computationTargetResolver";
-
   /**
    * Name under which the region source is bound.
    */
@@ -293,6 +293,10 @@ public abstract class GlobalContext extends AbstractContext<AbstractContext<?>> 
     return getValue(CLIENT);
   }
   
+  public ComputationTargetResolver getComputationTargetResolver() {
+    return getValue(COMPUTATION_TARGET_RESOLVER);
+  }
+
   public CurrencyPairsSource getCurrencyPairsSource() {
     return getValue(CURRENCY_PAIRS_SOURCE);
   }
@@ -354,10 +358,6 @@ public abstract class GlobalContext extends AbstractContext<AbstractContext<?>> 
     return getValue(POSITION_SOURCE);
   }
   
-  public ComputationTargetResolver getComputationTargetResolver() {
-    return getValue(COMPUTATION_TARGET_RESOLVER);
-  }
-
   public ProcedureDefinitionFilter getProcedureDefinitionFilter() {
     return getValue(PROCEDURE_DEFINITION_FILTER);
   }

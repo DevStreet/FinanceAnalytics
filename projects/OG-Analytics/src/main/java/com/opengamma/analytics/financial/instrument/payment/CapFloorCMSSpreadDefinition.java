@@ -5,9 +5,9 @@
  */
 package com.opengamma.analytics.financial.instrument.payment;
 
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.ObjectUtils;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
@@ -19,9 +19,9 @@ import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedC
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
+import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
 
 /**
  * Class describing a caplet/floorlet on CMS spread. The notional is positive for long the option and negative for short the option.
@@ -266,7 +266,7 @@ public class CapFloorCMSSpreadDefinition extends CouponFloatingDefinition implem
       Double fixedRate = data.getValue(getFixingDate());
       //TODO remove me when times are sorted out in the swap definitions or we work out how to deal with this another way
       if (fixedRate == null) {
-        final ZonedDateTime fixingDateAtLiborFixingTime = getFixingDate().withTime(11, 0);
+        final ZonedDateTime fixingDateAtLiborFixingTime = getFixingDate().with(LocalTime.of(11, 0));
         fixedRate = data.getValue(fixingDateAtLiborFixingTime);
       }
       if (fixedRate == null) {
@@ -275,7 +275,7 @@ public class CapFloorCMSSpreadDefinition extends CouponFloatingDefinition implem
         fixedRate = data.getValue(previousBusinessDay);
         //TODO remove me when times are sorted out in the swap definitions or we work out how to deal with this another way
         if (fixedRate == null) {
-          final ZonedDateTime previousBusinessDayAtLiborFixingTime = previousBusinessDay.withTime(11, 0);
+          final ZonedDateTime previousBusinessDayAtLiborFixingTime = previousBusinessDay.with(LocalTime.of(11, 0));
           fixedRate = data.getValue(previousBusinessDayAtLiborFixingTime);
         }
         if (fixedRate == null) {

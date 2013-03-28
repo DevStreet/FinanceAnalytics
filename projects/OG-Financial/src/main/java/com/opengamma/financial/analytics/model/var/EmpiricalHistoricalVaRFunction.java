@@ -6,6 +6,7 @@
 package com.opengamma.financial.analytics.model.var;
 
 import static com.opengamma.financial.analytics.model.var.NormalHistoricalVaRFunction.PROPERTY_VAR_DISTRIBUTION;
+import static com.opengamma.financial.analytics.model.var.NormalHistoricalVaRFunction.DEFAULT_PNL_CONTRIBUTIONS;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,7 @@ import com.opengamma.engine.function.AbstractFunction;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionInputs;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
@@ -27,14 +29,18 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.model.pnl.YieldCurveNodePnLFunction;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
+import com.opengamma.timeseries.DoubleTimeSeries;
 
 /**
  * 
  */
-public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.NonCompiledInvoker {
-  /** The name for the empirical historical VaR calculation method */
+public class EmpiricalHistoricalVaRFunction extends AbstractFunction.NonCompiledInvoker {
+  
+  /**
+   * The name for the empirical historical VaR calculation method.
+   */
   public static final String EMPIRICAL_VAR = "Empirical";
+  
   private static final EmpiricalDistributionVaRCalculator CALCULATOR = new EmpiricalDistributionVaRCalculator();
 
   @Override
@@ -79,6 +85,7 @@ public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.No
         .withAny(ValuePropertyNames.CONFIDENCE_LEVEL)
         .withAny(ValuePropertyNames.HORIZON)
         .withAny(ValuePropertyNames.AGGREGATION)
+        .withAny(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS)
         .with(PROPERTY_VAR_DISTRIBUTION, EMPIRICAL_VAR).get();
     return Sets.newHashSet(new ValueSpecification(ValueRequirementNames.HISTORICAL_VAR, target.toSpecification(), properties));
   }
@@ -98,12 +105,17 @@ public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.No
     if (samplingFunctionName == null || samplingFunctionName.size() != 1) {
       return null;
     }
+    final Set<String> pnlContributionNames = constraints.getValues(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS);
+    if (pnlContributionNames != null && pnlContributionNames.size() != 1) {
+      return null;
+    }
+    String pnlContributionName = pnlContributionNames != null ? pnlContributionNames.iterator().next() : DEFAULT_PNL_CONTRIBUTIONS;
     final Set<String> aggregationStyle = constraints.getValues(ValuePropertyNames.AGGREGATION);
     final ValueProperties.Builder properties = ValueProperties.builder()
         .with(ValuePropertyNames.SAMPLING_PERIOD, samplingPeriodName.iterator().next())
         .with(ValuePropertyNames.SCHEDULE_CALCULATOR, scheduleCalculatorName.iterator().next())
         .with(ValuePropertyNames.SAMPLING_FUNCTION, samplingFunctionName.iterator().next())
-        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, "Delta"); //TODO
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, pnlContributionName); //TODO
     final Set<String> desiredCurrencyValues = desiredValue.getConstraints().getValues(ValuePropertyNames.CURRENCY);
     if (desiredCurrencyValues == null || desiredCurrencyValues.isEmpty()) {
       properties.withAny(ValuePropertyNames.CURRENCY);
@@ -131,11 +143,11 @@ public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.No
     if (currency == null) {
       return null;
     }
-    final ValueProperties properties = getResultProperties(currency, input.getProperty(ValuePropertyNames.AGGREGATION));
+    final ValueProperties properties = getResultProperties(currency, input.getProperty(ValuePropertyNames.AGGREGATION), input.getProperty(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS));
     return Sets.newHashSet(new ValueSpecification(ValueRequirementNames.HISTORICAL_VAR, target.toSpecification(), properties));
   }
 
-  private ValueProperties getResultProperties(final String currency, final String aggregationStyle) {
+  private ValueProperties getResultProperties(final String currency, final String aggregationStyle, final String pnlContribution) {
     final ValueProperties.Builder properties = createValueProperties()
         .with(ValuePropertyNames.CURRENCY, currency)
         .withAny(ValuePropertyNames.SAMPLING_PERIOD)
@@ -143,6 +155,7 @@ public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.No
         .withAny(ValuePropertyNames.SAMPLING_FUNCTION)
         .withAny(ValuePropertyNames.CONFIDENCE_LEVEL)
         .withAny(ValuePropertyNames.HORIZON)
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, pnlContribution)
         .with(PROPERTY_VAR_DISTRIBUTION, EMPIRICAL_VAR);
     if (aggregationStyle != null) {
       properties.with(ValuePropertyNames.AGGREGATION, aggregationStyle);
@@ -158,6 +171,7 @@ public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.No
         .with(ValuePropertyNames.SAMPLING_FUNCTION, desiredValue.getConstraint(ValuePropertyNames.SAMPLING_FUNCTION))
         .with(ValuePropertyNames.CONFIDENCE_LEVEL, desiredValue.getConstraint(ValuePropertyNames.CONFIDENCE_LEVEL))
         .with(ValuePropertyNames.HORIZON, desiredValue.getConstraint(ValuePropertyNames.HORIZON))
+        .with(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS, desiredValue.getConstraint(YieldCurveNodePnLFunction.PROPERTY_PNL_CONTRIBUTIONS))
         .with(PROPERTY_VAR_DISTRIBUTION, EMPIRICAL_VAR);
     final String aggregationStyle = desiredValue.getConstraint(ValuePropertyNames.AGGREGATION);
     if (aggregationStyle != null) {
@@ -178,6 +192,11 @@ public abstract class EmpiricalHistoricalVaRFunction extends AbstractFunction.No
     }
     return new EmpiricalDistributionVaRParameters(Double.valueOf(horizonNames.iterator().next()),
         VaRFunctionUtils.getBusinessDaysPerPeriod(scheduleCalculatorNames.iterator().next()), Double.valueOf(confidenceLevelNames.iterator().next()));
+  }
+
+  @Override
+  public ComputationTargetType getTargetType() {
+    return ComputationTargetType.PORTFOLIO_NODE.or(ComputationTargetType.POSITION);
   }
 
 }

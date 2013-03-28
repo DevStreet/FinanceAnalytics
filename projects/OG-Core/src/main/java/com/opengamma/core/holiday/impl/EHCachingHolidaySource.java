@@ -13,11 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.time.calendar.LocalDate;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.DataNotFoundException;
 import com.opengamma.core.holiday.Holiday;
@@ -31,6 +27,10 @@ import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.ehcache.EHCacheUtils;
 import com.opengamma.util.money.Currency;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 /**
  * An EHCache based {@link HolidaySource}. This is better than having no cache but is not very efficient. Also does not listen for changes to the underlying data.
@@ -70,7 +70,6 @@ public class EHCachingHolidaySource implements HolidaySource {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Holiday get(final ObjectId objectId, final VersionCorrection versionCorrection) {
     final Object key = Arrays.asList(objectId, versionCorrection);
@@ -85,7 +84,6 @@ public class EHCachingHolidaySource implements HolidaySource {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean isHoliday(final LocalDate dateToCheck, final Currency currency) {
     final Object key = Arrays.asList(dateToCheck, currency);
@@ -100,7 +98,6 @@ public class EHCachingHolidaySource implements HolidaySource {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean isHoliday(final LocalDate dateToCheck, final HolidayType holidayType, final ExternalIdBundle regionOrExchangeIds) {
     final Object key = Arrays.asList(dateToCheck, holidayType, regionOrExchangeIds);
@@ -115,7 +112,6 @@ public class EHCachingHolidaySource implements HolidaySource {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean isHoliday(final LocalDate dateToCheck, final HolidayType holidayType, final ExternalId regionOrExchangeId) {
     final Object key = Arrays.asList(dateToCheck, holidayType, regionOrExchangeId);
@@ -142,5 +138,12 @@ public class EHCachingHolidaySource implements HolidaySource {
       }
     }
     return result;
+  }
+
+  /**
+    * Call this at the end of a unit test run to clear the state of EHCache. It should not be part of a generic lifecycle method.
+    */
+  protected void shutdown() {
+    _cache.getCacheManager().removeCache(CACHE_NAME);
   }
 }

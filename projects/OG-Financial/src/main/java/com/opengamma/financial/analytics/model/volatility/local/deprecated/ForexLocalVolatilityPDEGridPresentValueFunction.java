@@ -28,11 +28,11 @@ import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.greeks.PDEResultCollection;
 import com.opengamma.engine.ComputationTarget;
-import com.opengamma.engine.ComputationTargetType;
 import com.opengamma.engine.function.AbstractFunction;
 import com.opengamma.engine.function.FunctionCompilationContext;
 import com.opengamma.engine.function.FunctionExecutionContext;
 import com.opengamma.engine.function.FunctionInputs;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ComputedValue;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
@@ -40,12 +40,12 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.analytics.model.InstrumentTypeProperties;
+import com.opengamma.financial.analytics.model.forex.ConventionBasedFXRateFunction;
+import com.opengamma.financial.security.FinancialSecurityTypes;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.money.UnorderedCurrencyPair;
 
 /**
- *
  * @deprecated Deprecated
  */
 @Deprecated
@@ -117,12 +117,7 @@ public class ForexLocalVolatilityPDEGridPresentValueFunction extends AbstractFun
 
   @Override
   public ComputationTargetType getTargetType() {
-    return ComputationTargetType.SECURITY;
-  }
-
-  @Override
-  public boolean canApplyTo(final FunctionCompilationContext context, final ComputationTarget target) {
-    return target.getType() == ComputationTargetType.SECURITY && target.getSecurity() instanceof FXOptionSecurity;
+    return FinancialSecurityTypes.FX_OPTION_SECURITY;
   }
 
   @Override
@@ -257,6 +252,6 @@ public class ForexLocalVolatilityPDEGridPresentValueFunction extends AbstractFun
   }
 
   private ValueRequirement getSpotRequirement(final FXOptionSecurity security) {
-    return new ValueRequirement(ValueRequirementNames.SPOT_RATE, UnorderedCurrencyPair.of(security.getCallCurrency(), security.getPutCurrency()));
+    return ConventionBasedFXRateFunction.getSpotRateRequirement(security.getCallCurrency(), security.getPutCurrency());
   }
 }

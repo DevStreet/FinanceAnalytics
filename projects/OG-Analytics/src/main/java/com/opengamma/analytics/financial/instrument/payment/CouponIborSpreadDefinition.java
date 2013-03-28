@@ -5,10 +5,9 @@
  */
 package com.opengamma.analytics.financial.instrument.payment;
 
-import javax.time.calendar.LocalDate;
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.ObjectUtils;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
@@ -18,9 +17,9 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
+import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.timeseries.DoubleTimeSeries;
 
 /**
  * Class describing a Ibor-like floating coupon with a spread. The coupon payment is: notional * accrual factor * (Ibor + spread).
@@ -253,7 +252,7 @@ public class CouponIborSpreadDefinition extends CouponFloatingDefinition {
       }
     }
     if (dayConversion.isAfter(dayFixing)) { // The fixing is required
-      final Double fixedRate = indexFixingTimeSeries.getValue(getFixingDate().withHourOfDay(0)); // TODO: remove time from fixing date.
+      final Double fixedRate = indexFixingTimeSeries.getValue(getFixingDate().withHour(0)); // TODO: remove time from fixing date.
       if (fixedRate == null) {
         throw new OpenGammaRuntimeException("Could not get fixing value for date " + dayFixing);
       }

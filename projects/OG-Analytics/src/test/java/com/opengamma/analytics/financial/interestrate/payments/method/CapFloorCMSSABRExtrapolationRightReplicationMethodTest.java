@@ -7,16 +7,17 @@ package com.opengamma.analytics.financial.interestrate.payments.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
@@ -61,7 +62,7 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 public class CapFloorCMSSABRExtrapolationRightReplicationMethodTest {
   //Swap 5Y
-  private static final Currency CUR = Currency.USD;
+  private static final Currency CUR = Currency.EUR;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean IS_EOM = true;
@@ -133,7 +134,7 @@ public class CapFloorCMSSABRExtrapolationRightReplicationMethodTest {
   /**
    * Tests the price of CMS coupon and cap/floor using replication in the SABR framework.  Comparison with hard-coded value.
    */
-  public void presentValueHardcoded() {
+  public void presentValueHardCoded() {
     final double pvComputed = METHOD_EXTRAPOLATION_CAP.presentValue(CMS_CAP_LONG, SABR_BUNDLE).getAmount();
     final double pvComparison = 6627.971;
     assertEquals("Extrapolation: CMS Cap present value", pvComparison, pvComputed, TOLERANCE_PRICE);

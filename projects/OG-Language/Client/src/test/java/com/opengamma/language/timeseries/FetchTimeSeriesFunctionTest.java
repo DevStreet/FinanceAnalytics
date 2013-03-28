@@ -14,11 +14,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import javax.time.calendar.LocalDate;
+import org.testng.annotations.Test;
+import org.threeten.bp.LocalDate;
 
 import com.opengamma.core.change.ChangeManager;
-import org.testng.annotations.Test;
-
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeries;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.id.ExternalId;
@@ -31,14 +30,15 @@ import com.opengamma.language.identifier.IdentifierConverter;
 import com.opengamma.language.invoke.AggregatingTypeConverterProvider;
 import com.opengamma.language.invoke.TypeConverterProviderBean;
 import com.opengamma.language.test.TestUtils;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.tuple.Pair;
 
 /**
  * Tests the {@link FetchTimeSeriesFunction} class.
  */
-@Test
+@Test(groups = TestGroup.UNIT)
 public class FetchTimeSeriesFunctionTest {
 
   private static class TestHistoricalTimeSeriesSource implements HistoricalTimeSeriesSource {

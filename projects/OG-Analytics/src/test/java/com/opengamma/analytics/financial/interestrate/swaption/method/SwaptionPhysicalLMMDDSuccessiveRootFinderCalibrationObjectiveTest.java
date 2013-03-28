@@ -7,10 +7,9 @@ package com.opengamma.analytics.financial.interestrate.swaption.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
@@ -43,7 +42,7 @@ public class SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjectiveTest {
   private static final boolean IS_LONG = true;
   private static final int SETTLEMENT_DAYS = 2;
   // Swap 5Y description
-  private static final Currency CUR = Currency.USD;
+  private static final Currency CUR = Currency.EUR;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final boolean IS_EOM = true;
@@ -105,7 +104,7 @@ public class SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjectiveTest {
     CurrencyAmount[] pvLmm = new CurrencyAmount[SWAP_TENOR_YEAR.length];
     for (int loopexp = 0; loopexp < SWAP_TENOR_YEAR.length; loopexp++) {
       pvSabr[loopexp] = METHOD_SABR.presentValue(SWAPTION_LONG_PAYER[loopexp], SABR_BUNDLE);
-      pvLmm[loopexp] = METHOD_LMM.presentValue(SWAPTION_LONG_PAYER[loopexp], objective.getLmmBundle());
+      pvLmm[loopexp] = METHOD_LMM.presentValue(SWAPTION_LONG_PAYER[loopexp], objective.getLMMBundle());
       assertEquals("Hull-White calibration: swaption " + loopexp, pvSabr[loopexp].getAmount(), pvLmm[loopexp].getAmount(), 1E-2);
     }
   }

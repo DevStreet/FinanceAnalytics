@@ -5,8 +5,6 @@
  */
 package com.opengamma.util.time;
 
-import javax.time.calendar.Period;
-
 import org.fudgemsg.FudgeMsg;
 import org.fudgemsg.MutableFudgeMsg;
 import org.fudgemsg.mapping.FudgeBuilder;
@@ -37,7 +35,7 @@ public class TenorFudgeBuilder implements FudgeBuilder<Tenor> {
     if (tenorStr == null) {
       throw new IllegalArgumentException("Fudge message is not a Tenor - field 'tenor' is not present");
     }
-    return new Tenor(Period.parse(tenorStr));
+    return new Tenor(DateUtils.toPeriod(tenorStr));
   }
 
 }

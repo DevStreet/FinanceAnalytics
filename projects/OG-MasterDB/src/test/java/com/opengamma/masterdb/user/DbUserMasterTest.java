@@ -32,10 +32,12 @@ import com.opengamma.master.user.UserSearchRequest;
 import com.opengamma.master.user.UserSearchResult;
 import com.opengamma.masterdb.DbMasterTestUtils;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.test.TestGroup;
 
 /**
- * 
+ * Test.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public class DbUserMasterTest extends DbTest {
   private static final Logger s_logger = LoggerFactory.getLogger(DbUserMasterTest.class);
 
@@ -71,7 +73,7 @@ public class DbUserMasterTest extends DbTest {
     assertNotNull(_userMaster);
     assertEquals(true, _userMaster.getUniqueIdScheme().equals("DbUsr"));
     assertNotNull(_userMaster.getDbConnector());
-    assertNotNull(_userMaster.getTimeSource());
+    assertNotNull(_userMaster.getClock());
   }
 
   //-------------------------------------------------------------------------

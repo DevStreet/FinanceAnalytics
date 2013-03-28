@@ -8,13 +8,13 @@ package com.opengamma.web.analytics.formatting;
 import java.util.List;
 import java.util.Map;
 
-import javax.time.calendar.ZonedDateTime;
+import org.threeten.bp.ZonedDateTime;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.util.timeseries.localdate.LocalDateDoubleTimeSeries;
-import com.opengamma.util.timeseries.zoneddatetime.ZonedDateTimeDoubleTimeSeries;
+import com.opengamma.timeseries.localdate.LocalDateDoubleTimeSeries;
+import com.opengamma.timeseries.zoneddatetime.ZonedDateTimeDoubleTimeSeries;
 
 /**
  *
@@ -34,14 +34,16 @@ import com.opengamma.util.timeseries.zoneddatetime.ZonedDateTimeDoubleTimeSeries
 
   @Override
   public String formatCell(LocalDateDoubleTimeSeries timeSeries, ValueSpecification valueSpec) {
-    return "Time-series (" + timeSeries.getEarliestTime().toLocalDate() + " to " + timeSeries.getLatestTime().toLocalDate() + ")";
+    String text = "Time-series ";
+    text += timeSeries.isEmpty() ? "(empty)" : "(" + timeSeries.getEarliestTime() + " to " + timeSeries.getLatestTime() + ")";
+    return text;
   }
 
   private Map<String, Object> formatExpanded(LocalDateDoubleTimeSeries value) {
     ZonedDateTimeDoubleTimeSeries series = value.toZonedDateTimeDoubleTimeSeries();
     List<Object[]> data = Lists.newArrayListWithCapacity(series.size());
     for (Map.Entry<ZonedDateTime, Double> entry : series) {
-      long timeMillis = entry.getKey().toInstant().toEpochMillisLong();
+      long timeMillis = entry.getKey().toInstant().toEpochMilli();
       Double vol = entry.getValue();
       data.add(new Object[]{timeMillis, vol});
     }

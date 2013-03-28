@@ -16,7 +16,7 @@ $.register_module({
             };
             if (typeof config.row === 'undefined' || typeof config.col === 'undefined')
                 throw new TypeError(module.name + ': {row & col} are undefined');
-            cell.dataman = new og.analytics.Data(config.source, options).on('meta', function (meta, raw) {
+            cell.dataman = new og.analytics.Data(config.source, options).on('meta', function (meta) {
                 var coordinate = [config.row, config.col].join(',');
                 cell.dataman.viewport({cells: [coordinate], format: config.format, log: config.log});
             }).on('data', function (data) {
@@ -28,11 +28,10 @@ $.register_module({
                     throw error; // let og.analytics.Data catch it
                 }
             }).on('fatal', fatal_handler);
+            cell.id = cell.dataman.id;
         };
-        Cell.prototype.fire = events.fire;
+        ['fire', 'off', 'on'].forEach(function (key) {Cell.prototype[key] = events[key];});
         Cell.prototype.kill = function () {this.dataman.kill();};
-        Cell.prototype.off = events.off;
-        Cell.prototype.on = events.on;
         return Cell;
     }
 });

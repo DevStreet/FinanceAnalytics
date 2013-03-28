@@ -6,11 +6,12 @@
 package com.opengamma.analytics.financial.forex.method;
 
 import static org.testng.AssertJUnit.assertEquals;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.forex.calculator.CurrencyExposureBlackSmileForexCalculator;
 import com.opengamma.analytics.financial.forex.calculator.ForwardRateForexCalculator;
@@ -47,7 +48,7 @@ public class ForexNonDeliverableOptionBlackMethodTest {
   private static final int SETTLEMENT_DAYS = 2;
 
   private static final Currency KRW = Currency.of("KRW");
-  private static final Currency USD = Currency.USD;
+  private static final Currency USD = Currency.EUR;
   private static final ZonedDateTime FIXING_DATE = DateUtils.getUTCDate(2012, 5, 2);
   private static final ZonedDateTime PAYMENT_DATE = DateUtils.getUTCDate(2012, 5, 4);
   private static final double NOMINAL_USD = 100000000; // 1m

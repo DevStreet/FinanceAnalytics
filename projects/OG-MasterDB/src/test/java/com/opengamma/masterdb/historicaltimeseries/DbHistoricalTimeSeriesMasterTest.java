@@ -19,10 +19,12 @@ import org.testng.annotations.Test;
 
 import com.opengamma.masterdb.DbMasterTestUtils;
 import com.opengamma.util.test.DbTest;
+import com.opengamma.util.test.TestGroup;
 
 /**
  * Test DbHistoricalTimeSeriesMaster.
  */
+@Test(groups = TestGroup.UNIT_DB)
 public class DbHistoricalTimeSeriesMasterTest extends DbTest {
 
   private static final Logger s_logger = LoggerFactory.getLogger(DbHistoricalTimeSeriesMasterTest.class);
@@ -59,7 +61,7 @@ public class DbHistoricalTimeSeriesMasterTest extends DbTest {
     assertNotNull(_htsMaster);
     assertEquals(true, _htsMaster.getUniqueIdScheme().equals("DbHts"));
     assertNotNull(_htsMaster.getDbConnector());
-    assertNotNull(_htsMaster.getTimeSource());
+    assertNotNull(_htsMaster.getClock());
   }
 
   //-------------------------------------------------------------------------

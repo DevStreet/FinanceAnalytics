@@ -7,11 +7,13 @@ package com.opengamma.analytics.financial.interestrate.bond.method;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
+import static org.threeten.bp.temporal.ChronoUnit.MONTHS;
+import static org.threeten.bp.temporal.ChronoUnit.YEARS;
 
 import org.testng.annotations.Test;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.temporal.JulianFields;
 
 import com.opengamma.analytics.financial.instrument.bond.BondFixedSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
@@ -47,7 +49,7 @@ public class BondSecurityDiscountingMethodTest {
   // T 4 5/8 11/15/16 - ISIN - US912828FY19
   private static final String ISSUER = "US TREASURY N/B";
   private static final String REPO_TYPE = "General collateral";
-  private static final Currency CUR = Currency.USD;
+  private static final Currency CUR = Currency.EUR;
   private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   private static final Period PAYMENT_TENOR_FIXED = Period.ofMonths(6);
   private static final int COUPON_PER_YEAR = 2;
@@ -485,7 +487,7 @@ public class BondSecurityDiscountingMethodTest {
     final long[] jumpDays = new long[nbDateForward - 1];
     for (int loopdate = 1; loopdate < nbDateForward; loopdate++) {
       forwardDate[loopdate] = ScheduleCalculator.getAdjustedDate(forwardDate[loopdate - 1], 1, CALENDAR);
-      jumpDays[loopdate - 1] = forwardDate[loopdate].toLocalDate().toModifiedJulianDays() - forwardDate[loopdate - 1].toLocalDate().toModifiedJulianDays();
+      jumpDays[loopdate - 1] = forwardDate[loopdate].getLong(JulianFields.MODIFIED_JULIAN_DAY) - forwardDate[loopdate - 1].getLong(JulianFields.MODIFIED_JULIAN_DAY);
     }
     final double[] cleanPriceForward = new double[nbDateForward];
     for (int loopdate = 0; loopdate < nbDateForward; loopdate++) {

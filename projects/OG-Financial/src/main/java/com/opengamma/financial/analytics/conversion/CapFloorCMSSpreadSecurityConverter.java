@@ -5,10 +5,9 @@
  */
 package com.opengamma.financial.analytics.conversion;
 
-import javax.time.calendar.Period;
-import javax.time.calendar.ZonedDateTime;
-
 import org.apache.commons.lang.Validate;
+import org.threeten.bp.Period;
+import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
@@ -25,6 +24,7 @@ import com.opengamma.financial.security.FinancialSecurityVisitorAdapter;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.money.Currency;
+import com.opengamma.util.time.DateUtils;
 
 /**
  * 

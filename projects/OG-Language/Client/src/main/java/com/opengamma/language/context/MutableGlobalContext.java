@@ -68,6 +68,10 @@ public class MutableGlobalContext extends GlobalContext {
     removeOrReplaceValue(CLIENT, client);
   }
   
+  public void setComputationTargetResolver(final DefaultComputationTargetResolver computationTargetResolver) {
+    removeOrReplaceValue(COMPUTATION_TARGET_RESOLVER, computationTargetResolver);
+  }
+
   public void setCurrencyPairsSource(final CurrencyPairsSource currencyPairsSource) {
     removeOrReplaceValue(CURRENCY_PAIRS_SOURCE, currencyPairsSource);
   }
@@ -156,10 +160,6 @@ public class MutableGlobalContext extends GlobalContext {
     removeOrReplaceValue(SECURITY_SOURCE, securitySource);
   }
   
-  public void setComputationTargetResolver(final DefaultComputationTargetResolver computationTargetResolver) {
-    removeOrReplaceValue(COMPUTATION_TARGET_RESOLVER, computationTargetResolver);
-  }
-
   @Override
   public AggregatingTypeConverterProvider getTypeConverterProvider() {
     return getTypeConverterProviderImpl();
