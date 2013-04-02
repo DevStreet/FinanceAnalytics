@@ -69,6 +69,21 @@ public class OGMatrix extends OGArray<Double> {
     _data[0] = number;
   }
 
+  /**
+   * Takes a double[] and turns it into an OGMatrix as a single row
+   * @param dataIn the backing data
+   */
+  public OGMatrix(double[] dataIn) {
+    if (dataIn == null) {
+      throw new MathsExceptionNullPointer("dataIn is null");
+    }
+    int len = dataIn.length;
+    _data = new double[len];
+    System.arraycopy(dataIn, 0, _data, 0, len);
+    _rows = 1;
+    _columns = len;
+  }
+
   @Override
   public int getNumberOfRows() {
     return _rows;
@@ -130,7 +145,6 @@ public class OGMatrix extends OGArray<Double> {
   public double[] getData() {
     return _data;
   }
-
 
   /**
    * Decide if this {@link OGMatrix} is equal to another {@link OGMatrix} with the addition of some numerical tolerance for floating point comparison

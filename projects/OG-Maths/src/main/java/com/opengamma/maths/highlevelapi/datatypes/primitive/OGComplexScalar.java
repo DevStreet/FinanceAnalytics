@@ -83,6 +83,32 @@ public class OGComplexScalar extends OGArray<Number> {
     return result;
   }
 
+  /**
+   * Decide if this {@link OGComplexScalar} is equal to another {@link OGComplexScalar} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGComplexScalar} against which a comparison is to be drawn
+   * @param tolerance the tolerance for double precision comparison of the data elements in the array
+   * @return true if they are considered equal in value, false otherwise
+   */
+  public boolean fuzzyequals(Object obj, double tolerance) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    OGComplexScalar other = (OGComplexScalar) obj;
+    double[] objData = other.getData();
+    for (int i = 0; i < _data.length; i++) {
+      if (Math.abs(_data[i] - objData[i]) > tolerance) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {

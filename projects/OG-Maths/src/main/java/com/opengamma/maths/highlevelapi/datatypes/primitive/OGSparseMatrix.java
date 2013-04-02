@@ -239,8 +239,7 @@ public class OGSparseMatrix extends OGArray<Double> {
 
   @Override
   public String toString() {
-    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _rows + "\nrows=" + _cols + "\nels=" + _els;
-
+    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _cols + "\nrows=" + _rows + "\nels=" + _els;
   }
 
   /**

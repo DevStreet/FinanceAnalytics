@@ -168,7 +168,7 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     _data[0] = number.getReal();
     _data[1] = number.getImag();
   }
-
+  
   @Override
   public int getNumberOfRows() {
     return _rows;

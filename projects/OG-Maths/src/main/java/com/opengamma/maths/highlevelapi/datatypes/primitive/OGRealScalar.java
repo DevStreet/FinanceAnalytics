@@ -68,6 +68,32 @@ public class OGRealScalar extends OGArray<Number> {
     result = prime * result + Arrays.hashCode(_data);
     return result;
   }
+  
+  /**
+   * Decide if this {@link OGRealScalar} is equal to another {@link OGRealScalar} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGRealScalar} against which a comparison is to be drawn
+   * @param tolerance the tolerance for double precision comparison of the data elements in the array
+   * @return true if they are considered equal in value, false otherwise
+   */
+  public boolean fuzzyequals(Object obj, double tolerance) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    OGRealScalar other = (OGRealScalar) obj;
+    double[] objData = other.getData();
+    for (int i = 0; i < _data.length; i++) {
+      if (Math.abs(_data[i] - objData[i]) > tolerance) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   @Override
   public boolean equals(Object obj) {
