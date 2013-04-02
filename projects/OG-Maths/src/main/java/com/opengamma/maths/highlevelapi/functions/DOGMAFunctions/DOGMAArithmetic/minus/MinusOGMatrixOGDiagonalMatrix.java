@@ -11,6 +11,7 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Minus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -32,7 +33,7 @@ public final class MinusOGMatrixOGDiagonalMatrix implements Minus<OGMatrix, OGMa
 
     OGMatrix retArray = null;
 
-    // Actually adding arrays
+    // Actually subtracting arrays
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the diag array a OGDoubleArray and ADD 
       final int n = columnsArray2 * rowsArray2;
       tmp = new double[n];
@@ -48,11 +49,7 @@ public final class MinusOGMatrixOGDiagonalMatrix implements Minus<OGMatrix, OGMa
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // diagonal array is actually a single number, so we can just deref and add
       final int n = array1.getData().length;
       tmp = new double[n];
-      System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      final double singleDouble = array2.getData()[0];
-      for (int i = 0; i < n; i++) {
-        tmp[i] -= singleDouble;
-      }
+      EasyIZY.vd_subx(array1.getData(), array2.getData()[0], tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
       retArray = new OGMatrix(tmp, retRows, retCols);

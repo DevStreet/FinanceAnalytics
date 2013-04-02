@@ -35,23 +35,10 @@ public final class MinusOGSparseMatrixOGSparseMatrix implements Minus<OGArray<? 
 
     OGArray<? extends Number> retArray = null;
 
-    // Actually adding arrays
-
-    // One array is actually a single number, so we make the an OGDoubleArray and ADD
-    boolean single = false;
     OGSparseMatrix singleNumber = null, fullSparse = null;
-    if ((rowsArray1 == 1 && columnsArray1 == 1) || (rowsArray2 == 1 && columnsArray2 == 1)) {
-      single = true;
-      if (rowsArray1 == 1) {
-        singleNumber = array1;
-        fullSparse = array2;
-      } else {
-        singleNumber = array2;
-        fullSparse = array1;
-      }
-    }
-
-    if (single) {
+    if (rowsArray1 == 1 && columnsArray1 == 1) { // single number - matrix. Fill new matrix with single number and sparse subtract 
+      singleNumber = array1;
+      fullSparse = array2;
       final int n = fullSparse.getNumberOfColumns() * fullSparse.getNumberOfRows();
       tmp = new double[n];
       final double singleDouble = singleNumber.getData()[0];
@@ -67,7 +54,27 @@ public final class MinusOGSparseMatrixOGSparseMatrix implements Minus<OGArray<? 
         }
       }
       retArray = new OGMatrix(tmp, retRows, retCols);
-    } else { // Both arrays are full dimension, do sparse add    
+    } else if (rowsArray2 == 1 && columnsArray2 == 1) { // matrix - single number. Fill new matrix with negative single number and sparse add
+      singleNumber = array2;
+      fullSparse = array1;
+      final int n = fullSparse.getNumberOfColumns() * fullSparse.getNumberOfRows();
+      tmp = new double[n];
+      final double singleDouble = -singleNumber.getData()[0];
+      Arrays.fill(tmp, singleDouble);
+      final int[] colPtr = fullSparse.getColumnPtr();
+      final int[] rowIdx = fullSparse.getRowIndex();
+      final double[] data = fullSparse.getData();
+      retRows = fullSparse.getNumberOfRows();
+      retCols = fullSparse.getNumberOfColumns();
+      for (int ir = 0; ir < retCols; ir++) {
+        for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
+          tmp[rowIdx[i] + ir * retRows] += data[i];
+        }
+      }
+      retArray = new OGMatrix(tmp, retRows, retCols);
+    } else { // Both arrays are full dimension, do sparse sub as merge sort
+      Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
+      Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
       retRows = rowsArray1;
       retCols = columnsArray1;
 
@@ -101,7 +108,7 @@ public final class MinusOGSparseMatrixOGSparseMatrix implements Minus<OGArray<? 
           rowFound1 = rowIdx1[i];
           rowFound2 = rowIdx2[j];
           if (rowFound1 < rowFound2) { // entry exists in stream 1
-            tmp[ptr] = -data1[ptrd1];
+            tmp[ptr] = data1[ptrd1]; // do not negate, straight insert as this value belong to first matrix 
             newRowIdx[ptr] = rowFound1;
             ptrd1++;
             i++;
@@ -124,7 +131,7 @@ public final class MinusOGSparseMatrixOGSparseMatrix implements Minus<OGArray<? 
         // clean up as one col has more entries than the other.
         if (i < colPtr1[ir + 1]) {
           for (int k = i; k < colPtr1[ir + 1]; k++) {
-            tmp[ptr] = -data1[ptrd1];
+            tmp[ptr] = data1[ptrd1]; // do not negate, straight insert as this value belong to first matrix
             newRowIdx[ptr] = rowIdx1[k];
             ptr++;
             ptrd1++;

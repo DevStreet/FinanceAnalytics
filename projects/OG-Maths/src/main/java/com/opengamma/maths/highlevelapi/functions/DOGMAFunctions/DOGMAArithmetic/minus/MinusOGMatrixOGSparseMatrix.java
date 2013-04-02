@@ -33,7 +33,7 @@ public final class MinusOGMatrixOGSparseMatrix implements Minus<OGMatrix, OGMatr
 
     // Actually subtracting arrays
 
-    if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the sparse array a OGDoubleArray and ADD
+    if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the sparse array a OGMatrixand sub
       final int n = columnsArray2 * rowsArray2;
       tmp = new double[n];
       final double singleDouble = array1.getData()[0];
@@ -50,7 +50,7 @@ public final class MinusOGMatrixOGSparseMatrix implements Minus<OGMatrix, OGMatr
       }
       retArray = new OGMatrix(tmp, retRows, retCols);
 
-    } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Sparse array is actually a single number, so we can just deref and add
+    } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Sparse array is actually a single number, so we can just deref and sub
       final int n = array1.getData().length;
       tmp = new double[n];
       System.arraycopy(array1.getData(), 0, tmp, 0, n);

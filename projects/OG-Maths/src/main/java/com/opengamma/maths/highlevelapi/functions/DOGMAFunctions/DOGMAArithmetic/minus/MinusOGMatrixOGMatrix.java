@@ -8,7 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Minus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -16,8 +16,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Minus.class)
 public final class MinusOGMatrixOGMatrix implements Minus<OGMatrix, OGMatrix, OGMatrix> {
-
-  private BLAS _localblas = new BLAS();
 
   @Override
   public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
@@ -30,32 +28,25 @@ public final class MinusOGMatrixOGMatrix implements Minus<OGMatrix, OGMatrix, OG
     int n = array1.getData().length;
     double[] tmp = new double[n];
     System.arraycopy(array1.getData(), 0, tmp, 0, n);
-    // Actually subtracting arrays
-    if (rowsArray1 == 1 && columnsArray1 == 1) {
+    // Actually subing arrays
+    if (rowsArray1 == 1 && columnsArray1 == 1) { // array 1 is scalar, i.e. X+iY
       n = array2.getData().length;
       tmp = new double[n];
-      System.arraycopy(array2.getData(), 0, tmp, 0, n);
-      final double singleDouble = array1.getData()[0];
-      for (int i = 0; i < n; i++) {
-        tmp[i] -= singleDouble;
-      }
+      EasyIZY.vd_xsub(array1.getData()[0], array2.getData(), tmp);
       retRows = rowsArray2;
       retCols = columnsArray2;
     } else if (rowsArray2 == 1 && columnsArray2 == 1) {
-
       n = array1.getData().length;
       tmp = new double[n];
-      System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      final double singleDouble = array2.getData()[0];
-      for (int i = 0; i < n; i++) {
-        tmp[i] -= singleDouble;
-      }
+      EasyIZY.vd_subx(array1.getData(), array2.getData()[0], tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
     } else {
       Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
       Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
-      _localblas.daxpy(n, -1, array2.getData(), 1, tmp, 1);
+      n = array1.getData().length;
+      tmp = new double[n];
+      EasyIZY.vd_sub(array1.getData(), array2.getData(), tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
     }
