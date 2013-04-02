@@ -52,6 +52,7 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutu
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesSecurity;
+import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginSecurity;
@@ -70,6 +71,7 @@ import com.opengamma.analytics.financial.interestrate.payments.ForexForward;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponArithmeticAverageON;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixedCompounding;
@@ -395,13 +397,23 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
   }
 
   @Override
-  public RESULT_TYPE visitCouponCMS(final CouponCMS payment, final DATA_TYPE data) {
+  public RESULT_TYPE visitCouponOIS(final CouponOIS payment) {
+    return getException(payment);
+  }
+
+  @Override
+  public RESULT_TYPE visitCouponArithmeticAverageON(final CouponArithmeticAverageON payment, final DATA_TYPE data) {
     return getException(payment, data);
   }
 
   @Override
-  public RESULT_TYPE visitCouponOIS(final CouponOIS payment) {
+  public RESULT_TYPE visitCouponArithmeticAverageON(final CouponArithmeticAverageON payment) {
     return getException(payment);
+  }
+
+  @Override
+  public RESULT_TYPE visitCouponCMS(final CouponCMS payment, final DATA_TYPE data) {
+    return getException(payment, data);
   }
 
   @Override
@@ -494,7 +506,7 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
   // -----     Futures     -----
 
   @Override
-  public RESULT_TYPE visitCashSettledFuture(final CashSettledFuture  future, final DATA_TYPE data) {
+  public RESULT_TYPE visitCashSettledFuture(final CashSettledFuture future, final DATA_TYPE data) {
     return getException(future, data);
   }
 
@@ -502,8 +514,7 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
   public RESULT_TYPE visitCashSettledFuture(final CashSettledFuture future) {
     return getException(future);
   }
-  
-  
+
   @Override
   public RESULT_TYPE visitBondFuture(final BondFuture bondFuture, final DATA_TYPE data) {
     return getException(bondFuture, data);
@@ -561,6 +572,16 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
 
   @Override
   public RESULT_TYPE visitDeliverableSwapFuturesSecurity(final DeliverableSwapFuturesSecurity futures) {
+    return getException(futures);
+  }
+
+  @Override
+  public RESULT_TYPE visitDeliverableSwapFuturesTransaction(final DeliverableSwapFuturesTransaction futures, final DATA_TYPE data) {
+    return getException(futures, data);
+  }
+
+  @Override
+  public RESULT_TYPE visitDeliverableSwapFuturesTransaction(final DeliverableSwapFuturesTransaction futures) {
     return getException(futures);
   }
 
@@ -855,7 +876,7 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
   public RESULT_TYPE visitIndexFuture(final IndexFuture future) {
     return getException(future);
   }
-  
+
   @Override
   public RESULT_TYPE visitEquityIndexFuture(final EquityIndexFuture future, final DATA_TYPE data) {
     return getException(future, data);
@@ -865,7 +886,7 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
   public RESULT_TYPE visitEquityIndexFuture(final EquityIndexFuture future) {
     return getException(future);
   }
-  
+
   @Override
   public RESULT_TYPE visitEquityIndexDividendFuture(final EquityIndexDividendFuture future, final DATA_TYPE data) {
     return getException(future, data);
@@ -875,7 +896,7 @@ public abstract class InstrumentDerivativeVisitorAdapter<DATA_TYPE, RESULT_TYPE>
   public RESULT_TYPE visitEquityIndexDividendFuture(final EquityIndexDividendFuture future) {
     return getException(future);
   }
-  
+
   @Override
   public RESULT_TYPE visitVolatilityIndexFuture(final VolatilityIndexFuture future, final DATA_TYPE data) {
     return getException(future, data);

@@ -60,6 +60,7 @@ import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutu
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.BondFutureOptionPremiumTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesSecurity;
+import com.opengamma.analytics.financial.interestrate.future.derivative.DeliverableSwapFuturesTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.FederalFundsFutureTransaction;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureOptionMarginSecurity;
@@ -78,6 +79,7 @@ import com.opengamma.analytics.financial.interestrate.payments.ForexForward;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorCMSSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CapFloorIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponArithmeticAverageON;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixedCompounding;
@@ -153,7 +155,7 @@ public class ForexDerivativeVisitorTest {
     testException(NDO, o);
     testException(FX_OPTION_DIGITAL);
     testException(FX_OPTION_DIGITAL, o);
-    final InstrumentDerivative[] forexArray = new InstrumentDerivative[] {FX, FX_SWAP};
+    final InstrumentDerivative[] forexArray = new InstrumentDerivative[] {FX, FX_SWAP };
     try {
       forexArray[0].accept(VISITOR_ABSTRACT);
       assertTrue(false);
@@ -252,6 +254,7 @@ public class ForexDerivativeVisitorTest {
     public String visitBondFixedSecurity(final BondFixedSecurity bond, final T data) {
       return null;
     }
+
     @Override
     public String visitBondFixedTransaction(final BondFixedTransaction bond, final T data) {
       return null;
@@ -1014,6 +1017,26 @@ public class ForexDerivativeVisitorTest {
 
     @Override
     public String visitVolatilityIndexFuture(VolatilityIndexFuture future) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponArithmeticAverageON(CouponArithmeticAverageON payment, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitCouponArithmeticAverageON(CouponArithmeticAverageON payment) {
+      return null;
+    }
+
+    @Override
+    public String visitDeliverableSwapFuturesTransaction(DeliverableSwapFuturesTransaction futures, T data) {
+      return null;
+    }
+
+    @Override
+    public String visitDeliverableSwapFuturesTransaction(DeliverableSwapFuturesTransaction futures) {
       return null;
     }
 

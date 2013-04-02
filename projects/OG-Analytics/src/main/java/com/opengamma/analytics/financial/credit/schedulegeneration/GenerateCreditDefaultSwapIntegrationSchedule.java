@@ -338,8 +338,8 @@ public class GenerateCreditDefaultSwapIntegrationSchedule {
   }
 
   // -------------------------------------------------------------------------------------------
-
-  public ZonedDateTime[] getTruncatedTimeLine(final ZonedDateTime[] fullDateList, final ZonedDateTime startDate, final ZonedDateTime endDate) {
+  @Deprecated
+  public ZonedDateTime[] getTruncatedTimeLineDeprecated(final ZonedDateTime[] fullDateList, final ZonedDateTime startDate, final ZonedDateTime endDate) {
 
     // All the timenodes in the list
     final NavigableSet<ZonedDateTime> allDates = new TreeSet<ZonedDateTime>();
