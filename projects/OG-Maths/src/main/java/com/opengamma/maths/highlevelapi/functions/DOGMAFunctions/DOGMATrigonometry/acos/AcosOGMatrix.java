@@ -5,36 +5,43 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.acos;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Acos;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
+import com.opengamma.maths.lowlevelapi.functions.memory.OGTypesMalloc;
 
 /**
- * Math.acos on OGDouble
+ * Acos() of an OGMatrix
  */
-public final class AcosOGMatrix implements AcosAbstract<OGMatrix> {
-  private static AcosOGMatrix s_instance = new AcosOGMatrix();
-
-  public static AcosOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private AcosOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Acos.class)
+public class AcosOGMatrix implements Acos<OGArray<? extends Number>, OGMatrix> {
 
   @Override
-  public OGMatrix acos(OGMatrix array1) {
-    Catchers.catchNullFromArgList(array1, 1);
-
-    final int rowsArray1 = array1.getNumberOfRows();
-    final int columnsArray1 = array1.getNumberOfColumns();
-    final double[] dataArray1 = array1.getData();
-    final int n = dataArray1.length;
-
-    double[] tmp = new double[n];
+  public OGArray<? extends Number> eval(OGMatrix array1) {
+    double[] data = array1.getData();
+    int n = data.length;
+    double[] tmp;
+    // check bounds
+    boolean complex = false;
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.acos(dataArray1[i]);
+      if (Math.abs(data[i]) > 1) {
+        complex = true;
+        break;
+      }
     }
-    return new OGMatrix(tmp, rowsArray1, columnsArray1);
+    OGArray<? extends Number> retarr;
+    if (complex) {
+      tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
+      EasyIZY.vz_acos(tmp, tmp);
+      retarr = OGTypesMalloc.OGComplexMatrixBasedOnStructureOf(array1, tmp);
+    } else {
+      tmp = new double[n];
+      EasyIZY.vd_acos(data, tmp);
+      retarr = OGTypesMalloc.OGMatrixBasedOnStructureOf(array1, tmp);
+    }
+    return retarr;
   }
-
 }

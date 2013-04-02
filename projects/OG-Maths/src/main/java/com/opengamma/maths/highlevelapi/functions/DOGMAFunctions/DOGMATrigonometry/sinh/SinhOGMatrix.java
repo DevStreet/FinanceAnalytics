@@ -5,36 +5,23 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.sinh;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sinh;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
+import com.opengamma.maths.lowlevelapi.functions.memory.OGTypesMalloc;
 
 /**
- * 
+ * Sinh() of an OGMatrix
  */
-public final class SinhOGMatrix implements SinhAbstract<OGMatrix> {
-  private static SinhOGMatrix s_instance = new SinhOGMatrix();
-
-  public static SinhOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SinhOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Sinh.class)
+public class SinhOGMatrix implements Sinh<OGMatrix, OGMatrix> {
 
   @Override
-  public OGMatrix sinh(OGMatrix array1) {
-    Catchers.catchNullFromArgList(array1, 1);
-
-    final int rowsArray1 = array1.getNumberOfRows();
-    final int columnsArray1 = array1.getNumberOfColumns();
-    final double[] dataArray1 = array1.getData();
-    final int n = dataArray1.length;
-
+  public OGMatrix eval(OGMatrix array1) {
+    int n = array1.getData().length;
     double[] tmp = new double[n];
-    for (int i = 0; i < n; i++) {
-      tmp[i] = Math.sinh(dataArray1[i]);
-    }
-    return new OGMatrix(tmp, rowsArray1, columnsArray1);
+    EasyIZY.vd_sinh(array1.getData(), tmp);
+    return OGTypesMalloc.OGMatrixBasedOnStructureOf(array1, tmp);
   }
-
 }

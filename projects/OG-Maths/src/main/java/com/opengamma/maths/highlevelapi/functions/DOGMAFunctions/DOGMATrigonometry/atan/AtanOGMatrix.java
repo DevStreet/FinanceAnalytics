@@ -5,36 +5,43 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.atan;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Atan;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
+import com.opengamma.maths.lowlevelapi.functions.memory.OGTypesMalloc;
 
 /**
- * Math.atan on OGDouble
+ * Atan() of an OGMatrix
  */
-public final class AtanOGMatrix implements AtanAbstract<OGMatrix> {
-  private static AtanOGMatrix s_instance = new AtanOGMatrix();
-
-  public static AtanOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private AtanOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Atan.class)
+public class AtanOGMatrix implements Atan<OGArray<? extends Number>, OGMatrix> {
 
   @Override
-  public OGMatrix atan(OGMatrix array1) {
-    Catchers.catchNullFromArgList(array1, 1);
-
-    final int rowsArray1 = array1.getNumberOfRows();
-    final int columnsArray1 = array1.getNumberOfColumns();
-    final double[] dataArray1 = array1.getData();
-    final int n = dataArray1.length;
-
-    double[] tmp = new double[n];
+  public OGArray<? extends Number> eval(OGMatrix array1) {
+    double[] data = array1.getData();
+    int n = data.length;
+    double[] tmp;
+    // check bounds
+    boolean complex = false;
     for (int i = 0; i < n; i++) {
-      tmp[i] = Math.atan(dataArray1[i]);
+      if (Math.abs(data[i]) > 1) {
+        complex = true;
+        break;
+      }
     }
-    return new OGMatrix(tmp, rowsArray1, columnsArray1);
+    OGArray<? extends Number> retarr;
+    if (complex) {
+      tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
+      EasyIZY.vz_atan(tmp, tmp);
+      retarr = OGTypesMalloc.OGComplexMatrixBasedOnStructureOf(array1, tmp);
+    } else {
+      tmp = new double[n];
+      EasyIZY.vd_atan(data, tmp);
+      retarr = OGTypesMalloc.OGMatrixBasedOnStructureOf(array1, tmp);
+    }
+    return retarr;
   }
-
 }

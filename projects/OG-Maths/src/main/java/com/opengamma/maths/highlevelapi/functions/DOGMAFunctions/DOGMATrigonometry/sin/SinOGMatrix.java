@@ -8,9 +8,11 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonome
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sin;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
+import com.opengamma.maths.lowlevelapi.functions.memory.OGTypesMalloc;
 
 /**
- * 
+ * Sin() of an OGMatrix
  */
 @DOGMAMethodHook(provides = Sin.class)
 public class SinOGMatrix implements Sin<OGMatrix, OGMatrix> {
@@ -19,10 +21,7 @@ public class SinOGMatrix implements Sin<OGMatrix, OGMatrix> {
   public OGMatrix eval(OGMatrix array1) {
     int n = array1.getData().length;
     double[] tmp = new double[n];
-    double[] data = array1.getData();
-    for (int i = 0; i < n; i++) {
-      tmp[i] = Math.sin(data[i]);
-    }
-    return new OGMatrix(tmp, array1.getNumberOfRows(), array1.getNumberOfColumns());
+    EasyIZY.vd_sin(array1.getData(), tmp);
+    return OGTypesMalloc.OGMatrixBasedOnStructureOf(array1, tmp);
   }
 }

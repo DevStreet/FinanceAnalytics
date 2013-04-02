@@ -5,36 +5,25 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonometry.cos;
 
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Cos;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
+import com.opengamma.maths.lowlevelapi.functions.memory.OGTypesMalloc;
 
 /**
- * 
+ * Cos OGMatrix
  */
-public final class CosOGMatrix implements CosAbstract<OGMatrix> {
-  private static CosOGMatrix s_instance = new CosOGMatrix();
-
-  public static CosOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private CosOGMatrix() {
-  }
+@DOGMAMethodHook(provides = Cos.class)
+public class CosOGMatrix implements Cos<OGArray<? extends Number>, OGMatrix> {
 
   @Override
-  public OGMatrix cos(OGMatrix array1) {
-    Catchers.catchNullFromArgList(array1, 1);
-
-    final int rowsArray1 = array1.getNumberOfRows();
-    final int columnsArray1 = array1.getNumberOfColumns();
-    final double[] dataArray1 = array1.getData();
-    final int n = dataArray1.length;
-
+  public OGArray<? extends Number> eval(OGMatrix array1) {
+    int n = array1.getData().length;
     double[] tmp = new double[n];
-    for (int i = 0; i < n; i++) {
-      tmp[i] = Math.cos(dataArray1[i]);
-    }
-    return new OGMatrix(tmp, rowsArray1, columnsArray1);
+    EasyIZY.vd_cos(array1.getData(), tmp);
+    return OGTypesMalloc.OGMatrixBasedOnStructureOf(array1, tmp);
   }
 
 }
