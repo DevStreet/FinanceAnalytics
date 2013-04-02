@@ -34,7 +34,7 @@ public class DenseMemoryManipulation {
     }
     return tmp;
   }
-  
+
   /**
    * Converts a row major int pointer to a column major single pointer
    * @param dataIn a row major int[][] non ragged array
@@ -54,7 +54,7 @@ public class DenseMemoryManipulation {
       }
     }
     return tmp;
-  }  
+  }
 
   /**
    * Converts a row major double pointer to a row major single pointer
@@ -148,7 +148,7 @@ public class DenseMemoryManipulation {
 
   public static double[] convertTwoSinglePointersToInterleavedSinglePointer(double[] dataIn1, double[] dataIn2) {
     Catchers.catchNullFromArgList(dataIn1, 1);
-    Catchers.catchNullFromArgList(dataIn2, 1);
+    Catchers.catchNullFromArgList(dataIn2, 2);
     final int len = dataIn1.length;
     if (dataIn2.length != len) {
       throw new MathsExceptionIllegalArgument("The lengths of the data provided by dataIn1 and dataIn2 are not the same.");
@@ -161,6 +161,19 @@ public class DenseMemoryManipulation {
     }
     return tmp;
   }
+
+  public static void fillArrayWithInterleavedComplexValue(double[] arrayToFill, double[] value) {
+    Catchers.catchNullFromArgList(arrayToFill, 1);
+    Catchers.catchNullFromArgList(value, 2);
+    Catchers.catchCondition(arrayToFill.length % 2 != 0, "Array must have even length");
+    Catchers.catchCondition(value.length != 2, "value must be double[] length 2, first element real, second imaginary.");
+    int n = arrayToFill.length;
+    for (int i = 0; i < n; i += 2) {
+      arrayToFill[i] = value[0];
+      arrayToFill[i + 1] = value[1];
+    }
+  }
+  
 
   /**
    * Copies and array
