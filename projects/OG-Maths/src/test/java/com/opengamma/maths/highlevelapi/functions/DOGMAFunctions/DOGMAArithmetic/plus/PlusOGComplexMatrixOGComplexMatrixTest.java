@@ -15,7 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.util.test.TestGroup;
 
 /**
- * Test plus/minus on DoubleArray/DoubleArray combo
+ * Test plus on OGComplexMatrix/OGComplexMatrix combo
  */
 @Test(groups = TestGroup.UNIT)
 public class PlusOGComplexMatrixOGComplexMatrixTest {
