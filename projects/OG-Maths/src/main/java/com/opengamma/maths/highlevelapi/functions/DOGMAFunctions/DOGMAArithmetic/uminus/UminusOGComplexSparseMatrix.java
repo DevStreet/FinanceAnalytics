@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Uminus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -22,15 +23,11 @@ public final class UminusOGComplexSparseMatrix implements Uminus<OGComplexSparse
     Catchers.catchNullFromArgList(array1, 1);
     int rowsArray1 = array1.getNumberOfRows();
     int columnsArray1 = array1.getNumberOfColumns();
-    int retRows = columnsArray1, retCols = rowsArray1;
-    double[] data = array1.getData();
-    double[] tmp = new double[rowsArray1 * columnsArray1];
 
-    final int len = data.length;
-    for (int i = 0; i < len; i++) {
-      tmp[i] = -data[i];
-    }
-    return new OGComplexSparseMatrix(array1.getColumnPtr(), array1.getRowIndex(), tmp, retRows, retCols);
+    double[] data = array1.getData();
+    double[] tmp = new double[data.length];
+    EasyIZY.vz_negate(data, tmp);
+    return new OGComplexSparseMatrix(array1.getColumnPtr(), array1.getRowIndex(), tmp, rowsArray1, columnsArray1);
   }
 
 }
