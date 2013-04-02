@@ -1,0 +1,79 @@
+/**
+ * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * 
+ * Please see distribution for license.
+ */
+package com.opengamma.maths.lowlevelapi.exposedapi;
+
+import com.opengamma.maths.commonapi.MathsConstants;
+
+/**
+ * double[] representations of complex constants
+ */
+public class ComplexConstants {
+  /**
+   * The value 0+0i
+   */
+  private static double[] s_zero = new double[] {0, 0 };
+
+  /**
+   * The value 1
+   */
+  private static double[] s_one = new double[] {1, 0 };
+
+  /**
+   * The value 1
+   */
+  private static double[] s_i = new double[] {0, 1 };
+
+  /**
+   * The value 0+(pi/2)*i
+   */
+  private final static double[] s_i_times_half_pi = new double[] {0, MathsConstants.halfpi };
+
+  /**
+   * The value pi/2+0*i
+   */
+  private final static double[] s_half_pi = new double[] {MathsConstants.halfpi, 0 };
+
+  /**
+   * The value 0
+   * @return 0
+   */
+  public static double[] zero() {
+    return s_zero;
+  }
+
+  /**
+   * The value 1
+   * @return 1
+   */
+  public static double[] one() {
+    return s_one;
+  }
+
+  /**
+   * The value i
+   * @return i
+   */
+  public static double[] i() {
+    return s_i;
+  }
+
+  /**
+   * The value 0+(pi/2)*i
+   * @return 0+(pi/2)*i
+   */
+  public static double[] i_times_half_pi() {
+    return s_i_times_half_pi;
+  }
+
+  /**
+   * The value (pi/2)+0*i
+   * @return (pi/2)+0*i
+   */
+  public static double[] half_pi() {
+    return s_half_pi;
+  }
+
+}
