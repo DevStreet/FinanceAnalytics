@@ -7,6 +7,7 @@ package com.opengamma.maths.lowlevelapi.functions.checkers;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredInf;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
@@ -783,6 +784,12 @@ public class Catchers {
   public static void catchValueShouldBeGreaterThanOrEqualToXFromArgList(double aNumber, double aValue, int pos) {
     if (aNumber < aValue) {
       throw new MathsExceptionIllegalArgument("Argument passed in position " + pos + " should be greater than or equal to " + aValue + ". STOPPING");
+    }
+  }
+
+  public static void catchCondition(boolean cond, String message) {
+    if (cond) {
+      throw new MathsExceptionGeneric("Condition failed to be met. Error message: " + message);
     }
   }
 
