@@ -24,6 +24,16 @@ public class IZY implements IZYAPIInterface {
 
   private IZYAbstractSuper _localIZY;
 
+  private static IZY s_instance = new IZY();
+
+  /**
+   * Get the default IZY instance
+   * @return the default IZY instance
+   */
+  public static IZY getInstance() {
+    return s_instance;
+  }
+
   /**
    * Backing type
    */
@@ -49,7 +59,7 @@ public class IZY implements IZYAPIInterface {
       _localIZY = new IZYNativeBacked();
     }
   }
-
+  
   /**
    * Checks the args to real domain izy calls of form f(vector,vector), before staging a call to the referenced izy implementation
    * @param count an int[], dereferencing the first entry yields the number of elements over which the computation shall take place
