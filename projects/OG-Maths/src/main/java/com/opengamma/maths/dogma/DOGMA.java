@@ -112,6 +112,148 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Acos
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> acos(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAcos.acos(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Acos
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number acos(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAcos.acos(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Acosh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> acosh(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAcosh.acosh(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Acosh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number acosh(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAcosh.acosh(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Angle
  * <p>
  * Short Description:
@@ -186,6 +328,290 @@ public class DOGMA {
 
   public static Number angle(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMAAngle.angle(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Asin
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> asin(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAsin.asin(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Asin
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number asin(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAsin.asin(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Asinh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> asinh(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAsinh.asinh(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Asinh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number asinh(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAsinh.asinh(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Atan
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> atan(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAtan.atan(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Atan
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number atan(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAtan.atan(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Atanh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> atanh(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAtanh.atanh(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Atanh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number atanh(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAAtanh.atanh(arg0);
   }
 
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1, Number arg2) {
@@ -344,6 +770,148 @@ public class DOGMA {
 
   public static Number copy(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMACopy.copy(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Cos
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> cos(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMACos.cos(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Cos
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number cos(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMACos.cos(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Cosh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> cosh(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMACosh.cosh(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Cosh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number cosh(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMACosh.cosh(arg0);
   }
 
 
@@ -2260,6 +2828,77 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Sinh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> sinh(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMASinh.sinh(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Sinh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number sinh(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMASinh.sinh(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Sparse
  * <p>
  * Short Description:
@@ -2397,6 +3036,148 @@ public class DOGMA {
 
   public static Number sqrt(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMASqrt.sqrt(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Tan
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> tan(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMATan.tan(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Tan
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number tan(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMATan.tan(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: Tanh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> tanh(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMATanh.tanh(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Tanh
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number tanh(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMATanh.tanh(arg0);
   }
 
 
