@@ -10,7 +10,7 @@ import java.util.Arrays;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Mtimes;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -18,7 +18,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGSparseMatrixOGSparseMatrix implements Mtimes<OGSparseMatrix, OGSparseMatrix, OGSparseMatrix> {
-  private BLAS _localblas = new BLAS();
 
   @Override
   public OGSparseMatrix eval(OGSparseMatrix array1, OGSparseMatrix array2) {
@@ -43,15 +42,13 @@ public final class MtimesOGSparseMatrixOGSparseMatrix implements Mtimes<OGSparse
       final double deref = data1[0];
       n = data2.length;
       tmp = new double[n];
-      System.arraycopy(data2, 0, tmp, 0, n);
-      _localblas.dscal(n, deref, tmp, 1);
+      EasyIZY.vd_mulx(data2, deref, tmp);
       ret = new OGSparseMatrix(colPtr2, rowIdx2, tmp, rowsArray2, colsArray2);
     } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have sparse matrix * scalar
       final double deref = data2[0];
       n = data1.length;
       tmp = new double[n];
-      System.arraycopy(data1, 0, tmp, 0, n);
-      _localblas.dscal(n, deref, tmp, 1);
+      EasyIZY.vd_mulx(data1, deref, tmp);
       ret = new OGSparseMatrix(colPtr1, rowIdx1, tmp, rowsArray1, colsArray1);
     } else {
       Catchers.catchBadCommute(colsArray1, "Columns in first array", rowsArray2, "Rows in second array");
@@ -93,15 +90,14 @@ public final class MtimesOGSparseMatrixOGSparseMatrix implements Mtimes<OGSparse
         }
 
       }
-      
-      // branch so column vectors don't end up with a negative colptr index on the final element i.e. [0,-1] 
-      if (colsArray2 > 1) {
-        newColPtr[colsArray2] = newPtr - 1;
-      } else {
-        newColPtr[colsArray2] = newPtr; 
-      }
 
-      System.out.println("new col ptr=" + Arrays.toString(newColPtr));
+      //TODO: review this
+      //      // branch so column vectors don't end up with a negative colptr index on the final element i.e. [0,-1] 
+      //      if (colsArray2 > 1) {
+      //        newColPtr[colsArray2] = newPtr - 1;
+      //      } else {
+      newColPtr[colsArray2] = newPtr;
+      //      }
 
       ret = new OGSparseMatrix(Arrays.copyOf(newColPtr, colsArray2 + 1), Arrays.copyOf(newRowIdx, newPtr), Arrays.copyOf(newData, newPtr), rowsArray1, colsArray2);
     }

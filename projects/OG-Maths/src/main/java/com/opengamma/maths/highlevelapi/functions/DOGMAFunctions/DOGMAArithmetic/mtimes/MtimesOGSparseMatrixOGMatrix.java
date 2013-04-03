@@ -70,11 +70,10 @@ public final class MtimesOGSparseMatrixOGMatrix implements Mtimes<OGArray<? exte
         final int fm = rowsArray1;
         final int fn = colsArray2;
         double[] cMatrix = new double[fm * fn]; // will be resized
-
         // C = A * B
         // non-zero pattern in columns of C is given by the intersection of all rows of A with columns of B. As B is dense intersection is assumed.
         int jmp1, jmp2;
-        for (int icol = 0; icol < fm; icol++) {
+        for (int icol = 0; icol < colsArray2; icol++) {
           jmp2 = icol * rowsArray2;
           jmp1 = icol * fm;
           int ptr = 0;

@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Mtimes;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -37,15 +38,13 @@ public final class MtimesOGMatrixOGMatrix implements Mtimes<OGMatrix, OGMatrix, 
       final double deref = data1[0];
       n = data2.length;
       tmp = new double[n];
-      System.arraycopy(data2, 0, tmp, 0, n);
-      _localblas.dscal(n, deref, tmp, 1);
+      EasyIZY.vd_mulx(data2, deref, tmp);
       ret = new OGMatrix(tmp, rowsArray2, colsArray2);
     } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have matrix * scalar
       final double deref = data2[0];
       n = data1.length;
       tmp = new double[n];
-      System.arraycopy(data1, 0, tmp, 0, n);
-      _localblas.dscal(n, deref, tmp, 1);
+      EasyIZY.vd_mulx(data1, deref, tmp);
       ret = new OGMatrix(tmp, rowsArray1, colsArray1);
     } else {
       Catchers.catchBadCommute(colsArray1, "Columns in first array", rowsArray2, "Rows in second array");

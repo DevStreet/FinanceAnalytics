@@ -10,7 +10,7 @@ import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Mtimes;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -18,8 +18,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGDiagonalMatrixOGMatrix implements Mtimes<OGArray<? extends Number>, OGDiagonalMatrix, OGMatrix> {
-
-  private BLAS _localblas = new BLAS();
 
   @Override
   public OGArray<? extends Number> eval(OGDiagonalMatrix array1, OGMatrix array2) {
@@ -47,8 +45,8 @@ public final class MtimesOGDiagonalMatrixOGMatrix implements Mtimes<OGArray<? ex
           tmp[i] = Double.NaN;
         }
       } else {
-        System.arraycopy(data2, 0, tmp, 0, n);
-        _localblas.dscal(n, deref, tmp, 1);
+        tmp = new double[n];
+        EasyIZY.vd_mulx(data2, deref, tmp);
       }
       ret = new OGMatrix(tmp, rowsArray2, colsArray2);
     } else if (colsArray2 == 1 && rowsArray2 == 1) { // We have matrix * scalar, matrix diagonal, scalar dense
@@ -63,8 +61,7 @@ public final class MtimesOGDiagonalMatrixOGMatrix implements Mtimes<OGArray<? ex
       } else {
         n = data1.length;
         tmp = new double[n];
-        System.arraycopy(data1, 0, tmp, 0, n);
-        _localblas.dscal(n, deref, tmp, 1);
+        EasyIZY.vd_mulx(data1, deref, tmp);
         ret = new OGDiagonalMatrix(tmp, rowsArray1, colsArray1);
       }
 
