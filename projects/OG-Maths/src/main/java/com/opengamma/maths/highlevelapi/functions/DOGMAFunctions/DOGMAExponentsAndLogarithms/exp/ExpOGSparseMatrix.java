@@ -7,27 +7,26 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponents
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Exp;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.functions.memory.SparseMemoryManipulation;
 
 /**
- * Complex exponential
+ * does exp
  */
 @DOGMAMethodHook(provides = Exp.class)
-public final class ExpOGComplexMatrix implements Exp<OGComplexMatrix, OGComplexMatrix> {
+public final class ExpOGSparseMatrix implements Exp<OGSparseMatrix, OGSparseMatrix> {
 
   @Override
-  public OGComplexMatrix eval(OGComplexMatrix array1) {
+  public OGSparseMatrix eval(OGSparseMatrix array1) {
     Catchers.catchNullFromArgList(array1, 1);
 
-    final int rowsArray1 = array1.getNumberOfRows();
-    final int columnsArray1 = array1.getNumberOfColumns();
     final double[] dataArray1 = array1.getData();
-    final int machineN = dataArray1.length;
-    double[] tmp = new double[machineN];
-    EasyIZY.vz_exp(dataArray1, tmp);
-    return new OGComplexMatrix(tmp, rowsArray1, columnsArray1);
+    final int n = dataArray1.length;
 
+    double[] tmp = new double[n];
+    EasyIZY.vd_exp(dataArray1, tmp);
+    return SparseMemoryManipulation.createFullSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, 1);
   }
 }
