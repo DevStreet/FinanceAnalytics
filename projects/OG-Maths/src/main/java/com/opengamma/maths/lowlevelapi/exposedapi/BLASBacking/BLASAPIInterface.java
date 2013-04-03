@@ -1553,7 +1553,7 @@ public interface BLASAPIInterface {
   * @param incy the increment between successive elements of 'y'
   * 
   */
-  void zgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
+  void zgemv(char trans, int m, int n, double[] alpha, double[] aMatrix, int lda, double[] x, int incx, double[] beta, double[] y, int incy);
 
   /**
    * 
@@ -1582,6 +1582,6 @@ public interface BLASAPIInterface {
    * @param cMatrix the leading part of the "C" matrix of at least dimension (LDC, n). Overwritten by the operation defined in the preamble on exit. 
    * @param ldc the first dimension of "C" at least max(1,m)
    */
-  void zgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc);
+  void zgemm(char transa, char transb, int m, int n, int k, double[] alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double[] beta, double[] cMatrix, int ldc);
 
 }

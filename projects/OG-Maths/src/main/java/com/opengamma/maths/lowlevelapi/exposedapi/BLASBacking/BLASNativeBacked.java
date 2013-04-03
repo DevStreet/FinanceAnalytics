@@ -170,14 +170,14 @@ public class BLASNativeBacked extends BLASAbstractSuper implements BLASAPIInterf
   }
 
   @Override
-  public void zgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    OGBLASRawWrapper.zgemv(new char[] {trans }, new int[] {m }, new int[] {n }, new double[] {alpha }, aMatrix, new int[] {lda }, x, new int[] {incx }, new double[] {beta }, y, new int[] {incy });
+  public void zgemv(char trans, int m, int n, double[] alpha, double[] aMatrix, int lda, double[] x, int incx, double[] beta, double[] y, int incy) {
+    OGBLASRawWrapper.zgemv(new char[] {trans }, new int[] {m }, new int[] {n }, alpha, aMatrix, new int[] {lda }, x, new int[] {incx }, beta, y, new int[] {incy });
   }
 
   @Override
-  public void zgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
-    OGBLASRawWrapper.zgemm(new char[] {transa }, new char[] {transb }, new int[] {m }, new int[] {n }, new int[] {k }, new double[] {alpha }, aMatrix, new int[] {lda }, bMatrix, new int[] {ldb },
-        new double[] {beta }, cMatrix, new int[] {ldc });    
+  public void zgemm(char transa, char transb, int m, int n, int k, double[] alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double[] beta, double[] cMatrix, int ldc) {
+    OGBLASRawWrapper.zgemm(new char[] {transa }, new char[] {transb }, new int[] {m }, new int[] {n }, new int[] {k }, alpha, aMatrix, new int[] {lda }, bMatrix, new int[] {ldb }, beta, cMatrix,
+        new int[] {ldc });
   }
 
 }
