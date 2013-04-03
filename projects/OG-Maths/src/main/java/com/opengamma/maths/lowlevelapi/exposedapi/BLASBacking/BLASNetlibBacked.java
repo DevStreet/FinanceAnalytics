@@ -185,6 +185,16 @@ public class BLASNetlibBacked extends BLASAbstractSuper implements BLASAPIInterf
     _blas.dgemm(String.valueOf(transa), String.valueOf(transb), m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);
   }
 
+  @Override
+  public void zgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
+    throw new MathsExceptionNotImplemented("zgemv is not implemented in Netlib BLAS translation");
+  }
+
+  @Override
+  public void zgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
+    throw new MathsExceptionNotImplemented("zgemm is not implemented in Netlib BLAS translation");
+  }
+
 
 
 

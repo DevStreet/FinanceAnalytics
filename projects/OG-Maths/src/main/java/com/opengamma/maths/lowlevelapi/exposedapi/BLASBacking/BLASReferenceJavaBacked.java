@@ -5,6 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dasum;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Daxpy;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.Dcopy;
@@ -193,6 +194,16 @@ public class BLASReferenceJavaBacked extends BLASAbstractSuper implements BLASAP
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     Dgemm.dgemm(transa, transb, m, n, k, alpha, aMatrix, 0, lda, bMatrix, 0, ldb, beta, cMatrix, 0, ldc);
+  }
+
+  @Override
+  public void zgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy) {
+    throw new MathsExceptionNotImplemented("zgemv is not implemented in the reference java BLAS");
+  }
+
+  @Override
+  public void zgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
+    throw new MathsExceptionNotImplemented("zgemm is not implemented in the reference java BLAS");
   }
 
 

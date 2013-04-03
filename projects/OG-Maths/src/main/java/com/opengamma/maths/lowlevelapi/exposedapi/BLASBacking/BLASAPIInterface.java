@@ -1526,4 +1526,62 @@ public interface BLASAPIInterface {
    */
   void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc);
 
+  /**
+  *
+  * Provides BLAS LEVEL 2: ZGEMV
+  * ZGEMV  performs one of the following matrix vector operations for complex matrices
+  *
+  *  y := alpha*A*x + beta*y OR y := alpha*A^T*x + beta*y,
+  *
+  *  where alpha and beta are scalars, x and y are vectors and A is an
+  *  m by n matrix stored in column major format. The ^T indicates transposition.
+  *
+  * The variable {@code char} denotes the operation to be undertaken.
+  * If trans is one of 'N' or 'n', the operation is y := alpha*A*x + beta*y
+  * If trans is one of 'T' or 't', or, 'C' or 'c', the operation is y := alpha*A^T*x + beta*y 
+  *
+  * @param trans one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+  * @param m number of rows in matrix {@code aMatrix}
+  * @param n number of columns in matrix {@code aMatrix}
+  * @param alpha scaling factor for the matrix vector product
+  * @param aMatrix the leading part of the "A" matrix of at least m by n entries
+  * @param lda the first dimension of aMatrix, max(1,{@code m})
+  * @param x a vector of minimum dimension (n-1) * |incx| + 1.
+  * @param incx the increment between successive elements of 'x'
+  * @param beta scaling factor for the variable {@code y}
+  * @param y a vector of minimum dimension (m-1) * |incy| + 1. Overwritten on output. 
+  * @param incy the increment between successive elements of 'y'
+  * 
+  */
+  void zgemv(char trans, int m, int n, double alpha, double[] aMatrix, int lda, double[] x, int incx, double beta, double[] y, int incy);
+
+  /**
+   * 
+   * Provides BLAS LEVEL 3: ZGEMM
+   * ZGEMM performs the following matrix operations for complex matrices
+   * 
+   * C := alpha*_OP_(A)*_OP_(B) + beta*C
+   * 
+   * Where _OP_(X) is one of X, X^T. Where ^T denotes transpose.
+   * If trans is one of 'N' or 'n', _OP_(X) = X
+   * If trans is one of 'T' or 't', _OP_(X) = X^T
+   * If trans is one of 'C' or 'c', _OP_(X) = X^T
+   * 
+   * 
+   * @param transa one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+   * @param transb one of 'N' or 'n', 'T' or 't', 'C' or 'c'. See above.
+   * @param m number of rows in matrix {@code _OP_(aMatrix)} and number of rows in {@code cMatrix}
+   * @param n number of columns in matrix {@code _OP_(bMatrix) and number of columns in {@code cMatrix}
+   * @param k number of columns in matrix {@code _OP_(aMatrix)} and number of rows in matrix {@code _OP_(bMatrix)}
+   * @param alpha scaling factor for the matrix-matrix product 
+   * @param aMatrix the leading part of the "A" matrix of at least dimension (LDA, ka), where ka is {@code k} when {@code transa} is 'N' or 'n' and is {@code m} otherwise.
+   * @param lda the first dimension of {@code aMatrix}, if {@code transa} is 'N' or 'n' it is max(1,m) else it is at least max(1,k)
+   * @param bMatrix the leading part of the "B" matrix of at least dimension (LDB, kb), where kb is {@code n} when {@code transb} is 'N' or 'n' and is {@code k} otherwise.
+   * @param ldb the first dimension of {@code bMatrix}, if {@code transb} is 'N' or 'n' it is max(1,k) else it is at least max(1,n)
+   * @param beta the scaling factor for the matrix "C", {@code cMatrix}
+   * @param cMatrix the leading part of the "C" matrix of at least dimension (LDC, n). Overwritten by the operation defined in the preamble on exit. 
+   * @param ldc the first dimension of "C" at least max(1,m)
+   */
+  void zgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc);
+
 }
