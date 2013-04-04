@@ -11,6 +11,7 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -62,11 +63,8 @@ public final class RdivideOGMatrixOGSparseMatrix implements Rdivide<OGMatrix, OG
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Dense matrix rdiv Single valued sparse 
       n = denseData.length;
       tmp = new double[n];
-      System.arraycopy(denseData, 0, tmp, 0, n);
       final double deref = sparseData[0];
-      for (int i = 0; i < n; i++) {
-        tmp[i] /= deref;
-      }
+      EasyIZY.vd_divx(denseData, deref, tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
       ret = new OGMatrix(tmp, retRows, retCols);

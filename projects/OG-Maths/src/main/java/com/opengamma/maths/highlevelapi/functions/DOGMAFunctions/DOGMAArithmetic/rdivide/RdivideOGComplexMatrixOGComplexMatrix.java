@@ -7,7 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Rdivide;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -15,10 +15,10 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  * Does rdivide on OGMatrix pairings
  */
 @DOGMAMethodHook(provides = Rdivide.class)
-public final class RdivideOGMatrixOGMatrix implements Rdivide<OGMatrix, OGMatrix, OGMatrix> {
+public final class RdivideOGComplexMatrixOGComplexMatrix implements Rdivide<OGComplexMatrix, OGComplexMatrix, OGComplexMatrix> {
 
   @Override
-  public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
+  public OGComplexMatrix eval(OGComplexMatrix array1, OGComplexMatrix array2) {
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
 
@@ -36,16 +36,14 @@ public final class RdivideOGMatrixOGMatrix implements Rdivide<OGMatrix, OGMatrix
     if (rowsArray1 == 1 && columnsArray1 == 1) { // single / matrix  
       n = array2.getData().length;
       tmp = new double[n];
-      final double deref =  array1.getData()[0];
-      EasyIZY.vd_xdiv(deref, array2.getData(), tmp);
+      EasyIZY.vz_xdiv(array1.getData(), array2.getData(), tmp);
       retRows = rowsArray2;
       retCols = columnsArray2;
 
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // matrix / single
       n = array1.getData().length;
       tmp = new double[n];
-      final double deref =  array2.getData()[0];
-      EasyIZY.vd_divx(array1.getData(), deref, tmp);
+      EasyIZY.vz_divx(array1.getData(), array2.getData(), tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
 
@@ -56,8 +54,8 @@ public final class RdivideOGMatrixOGMatrix implements Rdivide<OGMatrix, OGMatrix
       retCols = columnsArray1;
       n = array1.getData().length;
       tmp = new double[n];
-      EasyIZY.vd_div(array1.getData(), array2.getData(), tmp);
+      EasyIZY.vz_div(array1.getData(), array2.getData(), tmp);
     }
-    return new OGMatrix(tmp, retRows, retCols);
+    return new OGComplexMatrix(tmp, retRows, retCols);
   }
 }

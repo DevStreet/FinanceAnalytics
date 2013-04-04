@@ -12,6 +12,7 @@ import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Does elementwise OGSparse * OGSparse
@@ -69,6 +70,9 @@ public final class RdivideOGSparseMatrixOGSparseMatrix implements Rdivide<OGArra
       }
       ret = new OGSparseMatrix(colPtr1, rowIdx1, tmp, retRows, retCols);
     } else { // Sparse rdiv Sparse 
+      Catchers.catchBadCommute(rowsArray1, "Rows in arg 1", rowsArray2, "Rows in arg 2");
+      Catchers.catchBadCommute(columnsArray1, "Columns in arg 1", columnsArray2, "Columns in arg 2");
+
       retRows = rowsArray1;
       retCols = columnsArray1;
 

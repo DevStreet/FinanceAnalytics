@@ -5,13 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.rdivide;
 
-import java.util.Arrays;
-
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Rdivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -43,11 +42,7 @@ public final class RdivideOGSparseMatrixOGMatrix implements Rdivide<OGArray<? ex
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued SparseMatrix rdivide dense
       n = rowsArray2 * columnsArray2;
       tmp = new double[n];
-      final double deref = array1.getEntry(0, 0);
-      Arrays.fill(tmp, deref);
-      for (int i = 0; i < n; i++) {
-        tmp[i] /= denseData[i];
-      }
+      EasyIZY.vd_xdiv(array1.getData()[0], denseData, tmp);
       retRows = rowsArray2;
       retCols = columnsArray2;
       ret = new OGMatrix(tmp, retRows, retCols);
