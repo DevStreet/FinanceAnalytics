@@ -53,6 +53,9 @@ public class EHCachingHistoricalTimeSeriesMaster extends AbstractEHCachingMaster
   /** The history search cache */
   private EHCachingSearchCache _historySearchCache;
 
+  /** The data points cache */
+  private EHCachingDataPointCache _dataPointCache;
+
   /**
    * Creates an instance over an underlying master specifying the cache manager.
    *
@@ -97,10 +100,15 @@ public class EHCachingHistoricalTimeSeriesMaster extends AbstractEHCachingMaster
       }
     });
 
+    // Create the data point cache
+    _dataPointCache = new EHCachingDataPointCache(name, underlying, cacheManager);
+
     // Prime document search cache
     HistoricalTimeSeriesInfoSearchRequest defaultSearch = new HistoricalTimeSeriesInfoSearchRequest();
     _documentSearchCache.prefetch(defaultSearch, PagingRequest.FIRST_PAGE);
   }
+
+  //--------------------------------------------------------------------------------------------------------------------
 
   @Override
   public HistoricalTimeSeriesInfoSearchResult search(HistoricalTimeSeriesInfoSearchRequest request) {
@@ -151,46 +159,6 @@ public class EHCachingHistoricalTimeSeriesMaster extends AbstractEHCachingMaster
   }
 
   @Override
-  public ManageableHistoricalTimeSeries getTimeSeries(UniqueId uniqueId) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).getTimeSeries(uniqueId);  // TODO
-  }
-
-  @Override
-  public ManageableHistoricalTimeSeries getTimeSeries(UniqueId uniqueId, HistoricalTimeSeriesGetFilter filter) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).getTimeSeries(uniqueId, filter);  // TODO
-  }
-
-  @Override
-  public ManageableHistoricalTimeSeries getTimeSeries(ObjectIdentifiable objectId,
-                                                      VersionCorrection versionCorrection) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).getTimeSeries(objectId, versionCorrection);  // TODO
-  }
-
-  @Override
-  public ManageableHistoricalTimeSeries getTimeSeries(ObjectIdentifiable objectId,
-                                                      VersionCorrection versionCorrection,
-                                                      HistoricalTimeSeriesGetFilter filter) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).getTimeSeries(objectId, versionCorrection, filter);  // TODO
-  }
-
-  @Override
-  public UniqueId updateTimeSeriesDataPoints(ObjectIdentifiable objectId, LocalDateDoubleTimeSeries series) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).updateTimeSeriesDataPoints(objectId, series);  // TODO
-  }
-
-  @Override
-  public UniqueId correctTimeSeriesDataPoints(ObjectIdentifiable objectId, LocalDateDoubleTimeSeries series) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).correctTimeSeriesDataPoints(objectId, series);  // TODO
-  }
-
-  @Override
-  public UniqueId removeTimeSeriesDataPoints(ObjectIdentifiable objectId,
-                                             LocalDate fromDateInclusive,
-                                             LocalDate toDateInclusive) {
-    return ((HistoricalTimeSeriesMaster) getUnderlying()).removeTimeSeriesDataPoints(objectId, fromDateInclusive, toDateInclusive);  // TODO
-  }
-
-  @Override
   public HistoricalTimeSeriesInfoHistoryResult history(HistoricalTimeSeriesInfoHistoryRequest request) {
 
     // Ensure that the relevant prefetch range is cached, otherwise fetch and cache any missing sub-ranges in background
@@ -214,6 +182,47 @@ public class EHCachingHistoricalTimeSeriesMaster extends AbstractEHCachingMaster
   @Override
   public HistoricalTimeSeriesInfoMetaDataResult metaData(HistoricalTimeSeriesInfoMetaDataRequest request) {
     return ((HistoricalTimeSeriesMaster) getUnderlying()).metaData(request);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+
+  @Override
+  public ManageableHistoricalTimeSeries getTimeSeries(UniqueId uniqueId) {
+    return _dataPointCache.getTimeSeries(uniqueId);
+  }
+
+  @Override
+  public ManageableHistoricalTimeSeries getTimeSeries(UniqueId uniqueId,
+                                                      HistoricalTimeSeriesGetFilter filter) {
+    return _dataPointCache.getTimeSeries(uniqueId, filter);
+  }
+
+  @Override
+  public ManageableHistoricalTimeSeries getTimeSeries(ObjectIdentifiable objectId, VersionCorrection versionCorrection) {
+    return _dataPointCache.getTimeSeries(objectId, versionCorrection);
+  }
+
+  @Override
+  public ManageableHistoricalTimeSeries getTimeSeries(ObjectIdentifiable objectId, VersionCorrection versionCorrection,
+                                                      HistoricalTimeSeriesGetFilter filter) {
+    return _dataPointCache.getTimeSeries(objectId, versionCorrection, filter);
+  }
+
+  @Override
+  public UniqueId updateTimeSeriesDataPoints(ObjectIdentifiable objectId, LocalDateDoubleTimeSeries series) {
+    return _dataPointCache.updateTimeSeriesDataPoints(objectId, series);
+  }
+
+  @Override
+  public UniqueId correctTimeSeriesDataPoints(ObjectIdentifiable objectId, LocalDateDoubleTimeSeries series) {
+    return _dataPointCache.correctTimeSeriesDataPoints(objectId, series);
+  }
+
+  @Override
+  public UniqueId removeTimeSeriesDataPoints(ObjectIdentifiable objectId,
+                                             LocalDate fromDateInclusive,
+                                             LocalDate toDateInclusive) {
+    return _dataPointCache.removeTimeSeriesDataPoints(objectId, fromDateInclusive, toDateInclusive);
   }
 
 }
