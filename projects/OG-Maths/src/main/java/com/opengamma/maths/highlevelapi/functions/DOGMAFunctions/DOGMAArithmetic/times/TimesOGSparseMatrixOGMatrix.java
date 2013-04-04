@@ -19,8 +19,8 @@ public final class TimesOGSparseMatrixOGMatrix implements Times<OGArray<? extend
 
   @Override
   public OGArray<? extends Number> eval(OGSparseMatrix array1, OGMatrix array2) {
-    TimesOGMatrixOGSparseMatrix s_reverse = new TimesOGMatrixOGSparseMatrix();
-    return s_reverse.eval(array2, array1);
+    TimesOGMatrixOGSparseMatrix reverse = new TimesOGMatrixOGSparseMatrix();
+    return reverse.eval(array2, array1);
   }
 
 }

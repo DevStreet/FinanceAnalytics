@@ -10,7 +10,7 @@ import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -18,8 +18,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Times.class)
 public final class TimesOGMatrixOGSparseMatrix implements Times<OGArray<? extends Number>, OGMatrix, OGSparseMatrix> {
-
-  private BLAS _localblas = new BLAS();
 
   @Override
   public OGArray<? extends Number> eval(OGMatrix array1, OGSparseMatrix array2) {
@@ -40,10 +38,8 @@ public final class TimesOGMatrixOGSparseMatrix implements Times<OGArray<? extend
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Single valued DenseMatrix times Sparse = scaled Sparse 
       n = array2.getData().length;
       tmp = new double[n];
-      System.arraycopy(array2.getData(), 0, tmp, 0, n);
-      final double[] singleDouble = array1.getData();
-      final double deref = singleDouble[0];
-      _localblas.dscal(n, deref, tmp, 1);
+      final double deref = array1.getData()[0];
+      EasyIZY.vd_mulx(array2.getData(), deref, tmp);
       retRows = rowsArray2;
       retCols = columnsArray2;
 
@@ -52,10 +48,8 @@ public final class TimesOGMatrixOGSparseMatrix implements Times<OGArray<? extend
     } else if (rowsArray2 == 1 && columnsArray2 == 1) { // Dense matrix times Single valued sparse = scaled dense
       n = array1.getData().length;
       tmp = new double[n];
-      System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      final double[] singleDouble = array2.getData();
-      final double deref = singleDouble[0];
-      _localblas.dscal(n, deref, tmp, 1);
+      final double deref = array2.getData()[0];
+      EasyIZY.vd_mulx(array1.getData(), deref, tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
       ret = new OGMatrix(tmp, retRows, retCols);

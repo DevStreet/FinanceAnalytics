@@ -8,7 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -16,8 +16,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Times.class)
 public final class TimesOGMatrixOGMatrix implements Times<OGMatrix, OGMatrix, OGMatrix> {
-
-  private BLAS _localblas = new BLAS();
 
   @Override
   public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
@@ -37,36 +35,26 @@ public final class TimesOGMatrixOGMatrix implements Times<OGMatrix, OGMatrix, OG
     if (rowsArray1 == 1 && columnsArray1 == 1) {
       n = array2.getData().length;
       tmp = new double[n];
-      System.arraycopy(array2.getData(), 0, tmp, 0, n);
-
-      final double[] singleDouble = array1.getData();
-      final double deref = singleDouble[0];
-      _localblas.dscal(n, deref, tmp, 1);
+      final double deref = array1.getData()[0];
+      EasyIZY.vd_mulx(array2.getData(), deref, tmp);
       retRows = rowsArray2;
       retCols = columnsArray2;
     } else if (rowsArray2 == 1 && columnsArray2 == 1) {
       n = array1.getData().length;
       tmp = new double[n];
-      System.arraycopy(array1.getData(), 0, tmp, 0, n);
-
-      final double[] singleDouble = array2.getData();
-      final double deref = singleDouble[0];
-      _localblas.dscal(n, deref, tmp, 1);
+      final double deref = array2.getData()[0];
+      EasyIZY.vd_mulx(array1.getData(), deref, tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
 
     } else { // ew mul
       Catchers.catchBadCommute(columnsArray1, "Columns in first array", columnsArray2, "Columns in second array");
-      Catchers.catchBadCommute(rowsArray1, "Rows in first array", rowsArray2, "Rows in second array");      
+      Catchers.catchBadCommute(rowsArray1, "Rows in first array", rowsArray2, "Rows in second array");
       retRows = rowsArray1;
       retCols = columnsArray1;
       n = array1.getData().length;
       tmp = new double[n];
-      final double [] dat2 = array2.getData();
-      System.arraycopy(array1.getData(), 0, tmp, 0, n);
-      for (int i = 0; i < n; i++) {
-        tmp[i] *= dat2[i];
-      }     
+      EasyIZY.vd_mul(array1.getData(), array2.getData(), tmp);
     }
     return new OGMatrix(tmp, retRows, retCols);
   }

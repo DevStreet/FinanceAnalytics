@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Times;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -35,39 +36,15 @@ public final class TimesOGComplexMatrixOGComplexMatrix implements Times<OGComple
     if (rowsArray1 == 1 && columnsArray1 == 1) { // scalar times matrix, TODO: get this from zscal
       double[] data = array2.getData();
       int dataN = data.length;
-      int mathematicalN = dataN / 2;
       tmp = new double[dataN];
-      System.arraycopy(data, 0, tmp, 0, dataN);
-
-      final double singleReal = array1.getData()[0];
-      final double singleImag = array1.getData()[1];
-
-      int ptr = 0;
-      for (int i = 0; i < mathematicalN; i++) {
-        // real bit
-        tmp[ptr] = singleReal * data[ptr] - singleImag * data[ptr + 1];
-        // imag bit
-        tmp[ptr + 1] = singleImag * data[ptr] + singleReal * data[ptr + 1];
-        ptr += 2;
-      }
+      EasyIZY.vz_mulx(data, array1.getData(), tmp);
       retRows = rowsArray2;
       retCols = columnsArray2;
     } else if (rowsArray2 == 1 && columnsArray2 == 1) {
       double[] data = array1.getData();
       int dataN = data.length;
-      int mathematicalN = dataN / 2;
       tmp = new double[dataN];
-      System.arraycopy(data, 0, tmp, 0, dataN);
-      final double singleReal = array2.getData()[0];
-      final double singleImag = array2.getData()[1];
-      int ptr = 0;
-      for (int i = 0; i < mathematicalN; i++) {
-        // real bit
-        tmp[ptr] = singleReal * data[ptr] - singleImag * data[ptr + 1];
-        // imag bit
-        tmp[ptr + 1] = singleImag * data[ptr] + singleReal * data[ptr + 1];
-        ptr += 2;
-      }
+      EasyIZY.vz_mulx(data, array2.getData(), tmp);
       retRows = rowsArray1;
       retCols = columnsArray1;
     } else { // ew mul
