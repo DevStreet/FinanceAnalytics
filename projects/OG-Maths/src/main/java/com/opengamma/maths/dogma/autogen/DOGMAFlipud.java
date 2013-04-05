@@ -36,27 +36,27 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Dot;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Flipud;
 /**
  * Provides the DOGMA Language
  */
-public class DOGMADot {
-  private static DOGMADot s_instance;
-  DOGMADot() {
+public class DOGMAFlipud {
+  private static DOGMAFlipud s_instance;
+  DOGMAFlipud() {
   }
-  public static DOGMADot getInstance() {
+  public static DOGMAFlipud getInstance() {
     return s_instance;
   }
-  private static Logger s_log = LoggerFactory.getLogger(Dot.class);
+  private static Logger s_log = LoggerFactory.getLogger(Flipud.class);
   // switch for chatty start up
   private static boolean s_verbose;
-  public DOGMADot(boolean verbose) {
+  public DOGMAFlipud(boolean verbose) {
     s_verbose = verbose;
   };
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static InfixOpChain[][] s_dotInstructions;
+  private static UnaryFunctionChain[] s_flipudInstructions;
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//
@@ -86,24 +86,20 @@ OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunction
  OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();
 OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
-InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] DotFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Dot.class, s_verbose);
-s_dotInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),DotFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] FlipudFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Flipud.class);
+s_flipudInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),FlipudFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
 
 
 }
 
-  public static OGArray<? extends Number> dot(OGArray<? extends Number> arg0, OGArray<? extends Number> arg1) {
-    Catchers.catchNullFromArgList(arg0, 1);
-    Catchers.catchNullFromArgList(arg1, 2);
-    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0.getClass());
-    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_dotInstructions[type1][type2], arg0, arg1);
-    return tmp;
-  }
+public static OGArray<? extends Number> flipud(OGArray<? extends Number> arg0) {
+Catchers.catchNullFromArgList(arg0, 1);
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0.getClass());
+OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_flipudInstructions[type1], arg0);
+return tmp;
+}
 
-public static OGArray<? extends Number> dot(Number arg0, OGArray<? extends Number> arg1) {
-  Catchers.catchNullFromArgList(arg0, 1);
-  Catchers.catchNullFromArgList(arg1, 2);
+public static Number flipud(Number arg0) {Catchers.catchNullFromArgList(arg0, 1);
 OGArray<? extends Number> arg0rewrite;
 if (arg0.getClass() == ComplexType.class) {
 arg0rewrite = new OGComplexScalar(arg0);
@@ -111,45 +107,8 @@ arg0rewrite = new OGComplexScalar(arg0);
 arg0rewrite = new OGRealScalar(arg0.doubleValue());
 }
 int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0rewrite.getClass());
-int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_dotInstructions[type1][type2], arg0rewrite, arg1);
-  return tmp;
-}
-
-public static OGArray<? extends Number>dot(OGArray<? extends Number> arg0, Number arg1) {
-  Catchers.catchNullFromArgList(arg0, 1);
-  Catchers.catchNullFromArgList(arg1, 2);
-OGArray<? extends Number> arg1rewrite;
-if (arg1.getClass() == ComplexType.class) {
-arg1rewrite = new OGComplexScalar(arg1);
-} else {
- arg1rewrite = new OGRealScalar(arg1.doubleValue());
- }
- int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0.getClass());
- int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_dotInstructions[type1][type2], arg0, arg1rewrite);
-  return tmp;
-}
-
-public static Number dot (Number arg0, Number arg1) {
-  Catchers.catchNullFromArgList(arg0, 1);
-  Catchers.catchNullFromArgList(arg1, 2);
-OGArray<? extends Number> arg0rewrite;
-if (arg0.getClass() == ComplexType.class) {
-arg0rewrite = new OGComplexScalar(arg0);
-} else {
-arg0rewrite = new OGRealScalar(arg0.doubleValue());
-}
-OGArray<? extends Number> arg1rewrite;
-if (arg1.getClass() == ComplexType.class) {
-arg1rewrite = new OGComplexScalar(arg1);
-} else {
- arg1rewrite = new OGRealScalar(arg1.doubleValue());
- }
- int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0rewrite.getClass());
- int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
-  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_dotInstructions[type1][type2], arg0rewrite, arg1rewrite);
-  return tmp.getEntry(0,0);
+OGArray<? extends Number> tmp = s_unaryFunctionChainRunner.dispatch(s_flipudInstructions[type1], arg0rewrite);
+return tmp.getEntry(0, 0);
 }
 
 
