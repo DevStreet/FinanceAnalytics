@@ -6,7 +6,7 @@
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.horzcat;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
-import com.opengamma.maths.dogma.engine.methodhookinstances.binary.Horzcat;
+import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Horzcat;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
