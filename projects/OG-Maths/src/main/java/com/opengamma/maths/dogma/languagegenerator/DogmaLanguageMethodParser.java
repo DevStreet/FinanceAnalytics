@@ -50,7 +50,7 @@ public class DogmaLanguageMethodParser {
 
   }
 
-  List<FullToken> getTokens() {
+  public List<FullToken> getTokens() {
     return s_tokens;
   }
 
