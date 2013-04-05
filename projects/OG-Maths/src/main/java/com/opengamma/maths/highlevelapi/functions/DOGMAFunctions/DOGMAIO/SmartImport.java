@@ -10,13 +10,22 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctionCollection.DOGMAIO.orientation;
 import com.opengamma.maths.lowlevelapi.io.smartImport.SnortDataProperties;
 
 /**
  * Imports data from various formats and tries to do something data aware when it comes to array construction
  */
 public class SmartImport {
+
+  /**
+   * describes the orientation of a vector on import
+   */
+  public enum orientation {
+    /** row vector */
+    row,
+    /** column vector */
+    column
+  }
 
   /**
    * Imports data from non-ragged (each row much have the same length) array of arrays
