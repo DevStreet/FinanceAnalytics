@@ -274,17 +274,17 @@ public class EHCachingDataPointCache {
   //--------------------------------------------------------------------------------------------------------------------
 
   public UniqueId updateTimeSeriesDataPoints(ObjectIdentifiable objectId, LocalDateDoubleTimeSeries series) {
-    return getUnderlying().updateTimeSeriesDataPoints(objectId, series);  // TODO
+    return getUnderlying().updateTimeSeriesDataPoints(objectId, series);
   }
 
   public UniqueId correctTimeSeriesDataPoints(ObjectIdentifiable objectId, LocalDateDoubleTimeSeries series) {
-    return getUnderlying().correctTimeSeriesDataPoints(objectId, series);  // TODO
+    return getUnderlying().correctTimeSeriesDataPoints(objectId, series);
   }
 
   public UniqueId removeTimeSeriesDataPoints(ObjectIdentifiable objectId,
                                              LocalDate fromDateInclusive,
                                              LocalDate toDateInclusive) {
-    return getUnderlying().removeTimeSeriesDataPoints(objectId, fromDateInclusive, toDateInclusive);  // TODO
+    return getUnderlying().removeTimeSeriesDataPoints(objectId, fromDateInclusive, toDateInclusive);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
