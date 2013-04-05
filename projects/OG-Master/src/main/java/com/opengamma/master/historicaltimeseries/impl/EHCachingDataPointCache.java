@@ -179,15 +179,23 @@ public class EHCachingDataPointCache {
     // Keep track of missing date ranges, for insertion in index element
     List<LocalDate> missingDateRanges = new ArrayList<>();
 
+    NavigableSet<LocalDate> allIndexDates, indexDates;
+
     // Get the index sub-range we're interested in
-    NavigableSet<LocalDate> indexDates;
-    if (indexElement != null) { // is this required in self-populating cache?
-      indexDates = ((NavigableSet<LocalDate>) indexElement.getObjectValue())
-          .subSet(fixDate(filter.getEarliestDate(), null, LocalDate.MIN), true,
-                  fixDate(filter.getLatestDate(), null, LocalDate.MAX), true);
-     } else {
+    if (indexElement != null) {
+      allIndexDates = (NavigableSet<LocalDate>) indexElement.getObjectValue();
+      if (!allIndexDates.isEmpty()) {
+        indexDates = allIndexDates.subSet(
+            fixDate(allIndexDates.ceiling(filter.getEarliestDate()), null, LocalDate.MIN), true,
+            fixDate(allIndexDates.floor(filter.getLatestDate()), null, LocalDate.MAX), true
+        );
+      } else {
+        indexDates = allIndexDates;
+      }
+    } else {
       // Create an empty index if not yet cached (unreachable?)
-      indexDates = new ConcurrentSkipListSet<>();
+      allIndexDates = new ConcurrentSkipListSet<>();
+      indexDates = allIndexDates;
     }
 
     // TODO deal with maxpoints by fetching chunks in the appropriate direction and stopping when maxpoints have been fetched
@@ -207,20 +215,14 @@ public class EHCachingDataPointCache {
       // Keep track of where we're at, starting from the earliest date in the requested range
       LocalDate nextDate = fixDate(filter.getEarliestDate(), null, LocalDate.MIN);
 
-      // Fill out first stretch of data-points if not already cached
-      if (indexDates.first().isAfter(nextDate)) {
-        timeSeries.add(cacheMissingRange(uniqueId, filter.getEarliestDate(), indexDates.first()));
-        nextDate = indexDates.first();
-      }
-
       for (LocalDate indexDate : indexDates) {
 
         // Get missing range, if any, from underlying
         if (nextDate.isBefore(indexDate)) {
 
           // Get the missing data-points from underlying and cache them
-          timeSeries.add(cacheMissingRange(uniqueId, fixDate(nextDate, LocalDate.MIN, null), indexDate));
-
+          timeSeries = (LocalDateDoubleTimeSeries)
+              timeSeries.unionMaximum(cacheMissingRange(uniqueId, fixDate(nextDate, LocalDate.MIN, null), indexDate));
           // Add start index of missing data-points to the index
           missingDateRanges.add(nextDate);
         }
@@ -239,18 +241,24 @@ public class EHCachingDataPointCache {
 
           // Update next pointer to continue from next day after end of current range
           nextDate = fixDate(historicalTimeSeriesGetFilter.getLatestDate(), null, LocalDate.MAX);
-          if (nextDate.isBefore(LocalDate.MAX)) {
-            nextDate = nextDate.plusDays(1);
-          }
+          //if (nextDate.isBefore(LocalDate.MAX)) {
+          //  nextDate = nextDate.plusDays(1);
+          //}
         }
       }
 
+      // Fill out the final stretch of data-points if not already cached
+      if (nextDate.isBefore(fixDate(filter.getLatestDate(), null, LocalDate.MAX))) {
+        timeSeries = (LocalDateDoubleTimeSeries)
+            timeSeries.unionMaximum(cacheMissingRange(uniqueId, nextDate, filter.getLatestDate()));
+        missingDateRanges.add(nextDate);
+      }
     }
 
     // Update the cached range list only if new ranges were cached
     if (!missingDateRanges.isEmpty()) {
-      indexDates.addAll(missingDateRanges);
-      getDataPointCache().put(new Element(uniqueId, indexDates));
+      allIndexDates.addAll(missingDateRanges);
+      getDataPointCache().put(new Element(uniqueId, allIndexDates));
     }
 
     // Build the result
