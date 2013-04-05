@@ -8,13 +8,11 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponents
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Log;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZLOG;
 
 /**
  * does log() 
- * TODO: slatec calls to complex exp, or perhaps something more vectorised
- * Need log(a+bi) = sqrt(a^2+b^2)*cos() 
  */
 @DOGMAMethodHook(provides = Log.class)
 public final class LogOGComplexMatrix implements Log<OGComplexMatrix, OGComplexMatrix> {
@@ -28,19 +26,7 @@ public final class LogOGComplexMatrix implements Log<OGComplexMatrix, OGComplexM
     final double[] dataArray1 = array1.getData();
     final int machineN = dataArray1.length;
     double[] tmp = new double[machineN];
-    double[] logReal = new double[1];
-    double[] logImag = new double[1];
-    int[] ierr = new int[1];
-    for (int i = 0; i < machineN; i += 2) {
-      ZLOG.zlog(dataArray1[i], dataArray1[i + 1], logReal, logImag, ierr);
-      if (ierr[0] == 0) {
-        tmp[i] = logReal[0];
-        tmp[i + 1] = logImag[0];
-      } else {
-        tmp[i] = Double.NEGATIVE_INFINITY;
-        tmp[i + 1] = 0;
-      }
-    }
+    EasyIZY.vz_ln(dataArray1, tmp);
     return new OGComplexMatrix(tmp, rowsArray1, columnsArray1);
   }
 }

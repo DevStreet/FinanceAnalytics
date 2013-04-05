@@ -8,22 +8,20 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAExponents
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Log;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.ComplexConstants;
 import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
-import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
-import com.opengamma.maths.lowlevelapi.functions.memory.OGTypesMalloc;
+import com.opengamma.maths.lowlevelapi.functions.memory.SparseMemoryManipulation;
 
 /**
- * does log()
+ * Log() of an OGSparseMatrix
  */
 @DOGMAMethodHook(provides = Log.class)
-public final class LogOGMatrix implements Log<OGArray<? extends Number>, OGMatrix> {
+public class LogOGSparseMatrix implements Log<OGArray<? extends Number>, OGSparseMatrix> {
 
   @Override
-  public OGArray<? extends Number> eval(OGMatrix array1) {
-    Catchers.catchNullFromArgList(array1, 1);
-
+  public OGArray<? extends Number> eval(OGSparseMatrix array1) {
     double[] data = array1.getData();
     int n = data.length;
     double[] tmp;
@@ -39,11 +37,16 @@ public final class LogOGMatrix implements Log<OGArray<? extends Number>, OGMatri
     if (complex) {
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
       EasyIZY.vz_ln(tmp, tmp);
-      retarr = OGTypesMalloc.OGComplexMatrixBasedOnStructureOf(array1, tmp);
+      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf());
     } else {
       tmp = new double[n];
       EasyIZY.vd_ln(data, tmp);
-      retarr = OGTypesMalloc.OGMatrixBasedOnStructureOf(array1, tmp);
+      if (n == array1.getNumberOfNonZeroElements()) { // sparse, but fully populated
+        retarr = SparseMemoryManipulation.createFullSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, Double.NEGATIVE_INFINITY);
+      } else {
+        tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(tmp);
+        retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf());
+      }
     }
     return retarr;
   }

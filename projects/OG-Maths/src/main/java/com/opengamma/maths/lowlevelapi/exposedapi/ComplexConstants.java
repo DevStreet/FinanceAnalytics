@@ -37,6 +37,12 @@ public class ComplexConstants {
   private final static double[] s_half_pi = new double[] {MathsConstants.halfpi, 0 };
 
   /**
+   * The value -Inf + 0i
+   */
+  private final static double[] s_neg_inf = new double[] {Double.NEGATIVE_INFINITY, 0.e0 };
+  
+  
+  /**
    * The value 0
    * @return 0
    */
@@ -76,4 +82,12 @@ public class ComplexConstants {
     return s_half_pi;
   }
 
+  /**
+   * The value -Inf+0*i
+   * @return -Inf+0*i
+   */
+  public static double[] negative_inf() {
+    return s_neg_inf;
+  }
+  
 }
