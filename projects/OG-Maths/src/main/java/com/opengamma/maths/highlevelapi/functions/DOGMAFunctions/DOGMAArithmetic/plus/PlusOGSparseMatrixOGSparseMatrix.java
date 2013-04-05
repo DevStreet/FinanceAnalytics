@@ -67,7 +67,9 @@ public final class PlusOGSparseMatrixOGSparseMatrix implements Plus<OGArray<? ex
         }
       }
       retArray = new OGMatrix(tmp, retRows, retCols);
-    } else { // Both arrays are full dimension, do sparse add    
+    } else { // Both arrays are full dimension, do sparse add
+      Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
+      Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
       retRows = rowsArray1;
       retCols = columnsArray1;
 

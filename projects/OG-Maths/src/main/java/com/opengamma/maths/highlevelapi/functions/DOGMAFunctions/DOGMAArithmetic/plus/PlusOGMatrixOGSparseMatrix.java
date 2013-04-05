@@ -11,6 +11,7 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Plus;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Adds {@link OGMatrix} to {@link OGSparseMatrix}    
@@ -35,7 +36,7 @@ public final class PlusOGMatrixOGSparseMatrix implements Plus<OGMatrix, OGMatrix
     if (rowsArray1 == 1 && columnsArray1 == 1) { // Dense array is actually a single number, so we make the sparse array a OGDoubleArray and ADD
       final int n = columnsArray2 * rowsArray2;
       tmp = new double[n];
-      final double singleDouble = array2.getEntry(0, 0);
+      final double singleDouble = array1.getEntry(0, 0);
       Arrays.fill(tmp, singleDouble);
       final int[] colPtr = array2.getColumnPtr();
       final int[] rowIdx = array2.getRowIndex();
@@ -62,6 +63,8 @@ public final class PlusOGMatrixOGSparseMatrix implements Plus<OGMatrix, OGMatrix
       retCols = columnsArray1;
       retArray = new OGMatrix(tmp, retRows, retCols);
     } else { // Both arrays are full dimension, do sparse add    
+      Catchers.catchBadCommute(rowsArray1, "rows in first array", rowsArray2, "rows in second array");
+      Catchers.catchBadCommute(columnsArray1, "columns in first array", columnsArray2, "columns in second array");
       retRows = rowsArray1;
       retCols = columnsArray1;
       final int n = retRows * retCols;
