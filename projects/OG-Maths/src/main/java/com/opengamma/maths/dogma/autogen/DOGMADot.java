@@ -36,7 +36,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Dot;
+import com.opengamma.maths.dogma.engine.methodhookinstances.binary.Dot;
 /**
  * Provides the DOGMA Language
  */
