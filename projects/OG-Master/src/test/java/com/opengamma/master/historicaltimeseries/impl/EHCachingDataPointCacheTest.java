@@ -127,7 +127,7 @@ public class EHCachingDataPointCacheTest {
 
     ManageableHistoricalTimeSeries cachedResult1 =
         ehCachingDataPointCache.getTimeSeries(ObjectId.of("Hts", "1"), VersionCorrection.LATEST,
-            HistoricalTimeSeriesGetFilter.ofRange(LocalDate.of(2012, 1, 1), LocalDate.of(2012, 2, 28)));
+            HistoricalTimeSeriesGetFilter.ofRange(LocalDate.of(2012, 1, 2), LocalDate.of(2012, 2, 28)));
     ManageableHistoricalTimeSeries cachedResult2 =
         ehCachingDataPointCache.getTimeSeries(ObjectId.of("Hts", "1"), VersionCorrection.LATEST,
             HistoricalTimeSeriesGetFilter.ofRange(LocalDate.of(2012, 3, 1), LocalDate.of(2012, 4, 30)));
@@ -140,7 +140,7 @@ public class EHCachingDataPointCacheTest {
 
     ManageableHistoricalTimeSeries underlyingResult1 =
         ehCachingDataPointCache.getUnderlying().getTimeSeries(ObjectId.of("Hts", "1"), VersionCorrection.LATEST,
-            HistoricalTimeSeriesGetFilter.ofRange(LocalDate.of(2012, 1, 1), LocalDate.of(2012, 2, 28)));
+            HistoricalTimeSeriesGetFilter.ofRange(LocalDate.of(2012, 1, 2), LocalDate.of(2012, 2, 28)));
     ManageableHistoricalTimeSeries underlyingResult2 =
         ehCachingDataPointCache.getUnderlying().getTimeSeries(ObjectId.of("Hts", "1"), VersionCorrection.LATEST,
             HistoricalTimeSeriesGetFilter.ofRange(LocalDate.of(2012, 3, 1), LocalDate.of(2012, 4, 30)));
