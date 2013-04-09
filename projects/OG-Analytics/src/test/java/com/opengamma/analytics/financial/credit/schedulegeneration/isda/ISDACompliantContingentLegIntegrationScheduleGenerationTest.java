@@ -5,7 +5,8 @@
  */
 package com.opengamma.analytics.financial.credit.schedulegeneration.isda;
 
-import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 
 import org.testng.annotations.Test;
 import org.threeten.bp.ZonedDateTime;
@@ -64,7 +65,7 @@ public class ISDACompliantContingentLegIntegrationScheduleGenerationTest {
     final ZonedDateTime startDate = getStartDate(cds);
     final ZonedDateTime endDate = cds.getMaturityDate();
     final double[] deprecatedResult = DEPRECATED_CALCULATOR.constructCreditDefaultSwapContingentLegIntegrationSchedule(VALUATION_DATE, startDate, endDate, cds, YIELD_CURVE, HAZARD_RATE_CURVE);
-    final double[] result = CALCULATOR.constructCreditDefaultSwapContingentLegIntegrationSchedule(VALUATION_DATE, startDate, endDate, cds, YIELD_CURVE, HAZARD_RATE_CURVE);
+    final Double[] result = CALCULATOR.constructCreditDefaultSwapContingentLegIntegrationSchedule(VALUATION_DATE, startDate, endDate, cds, YIELD_CURVE, HAZARD_RATE_CURVE);
     assertArrayEquals(deprecatedResult, result, EPS);
   }
 
@@ -120,5 +121,16 @@ public class ISDACompliantContingentLegIntegrationScheduleGenerationTest {
       startDate = VALUATION_DATE.minusDays(1);
     }
     return startDate;
+  }
+
+  private void assertArrayEquals(final double[] expected, final Double[] actual, final double eps) {
+    if (expected == null) {
+      assertNull(actual);
+      return;
+    }
+    assertEquals(expected.length, actual.length);
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals(expected[i], actual[i], eps);
+    }
   }
 }

@@ -10,31 +10,23 @@ import org.threeten.bp.ZonedDateTime;
 import com.opengamma.analytics.financial.credit.BuySellProtection;
 import com.opengamma.analytics.financial.credit.PriceType;
 import com.opengamma.analytics.financial.credit.creditdefaultswap.definition.legacy.LegacyCreditDefaultSwapDefinition;
-import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.PresentValueCreditDefaultSwapNew;
+import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.isda.ISDACompliantContingentLegCalculator;
 import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.isda.ISDACompliantPremiumLegCalculator;
 import com.opengamma.analytics.financial.credit.hazardratecurve.HazardRateCurve;
 import com.opengamma.analytics.financial.credit.isdayieldcurve.ISDADateCurve;
 import com.opengamma.analytics.financial.credit.schedulegeneration.GenerateCreditDefaultSwapPremiumLegSchedule;
-import com.opengamma.financial.convention.businessday.BusinessDayConvention;
-import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
-import com.opengamma.financial.convention.daycount.DayCount;
-import com.opengamma.financial.convention.daycount.DayCountFactory;
 import com.opengamma.util.ArgumentChecker;
 
 /**
  *  Class containing methods for the valuation of a vanilla Legacy CDS (this valuation methodology is common to most legacy CDS's)
  */
 public class PresentValueLegacyCreditDefaultSwapNew {
-  private static final int spotDays = 3;
-  private static final boolean businessDayAdjustCashSettlementDate = true;
-  private static final BusinessDayConvention cashSettlementDateBusinessDayConvention = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("F");
-  private static final DayCount ACT_360 = DayCountFactory.INSTANCE.getDayCount("ACT/360");
+  private static final ISDACompliantPremiumLegCalculator PREMIUM_LEG_CALCULATOR = new ISDACompliantPremiumLegCalculator();
+  private static final ISDACompliantContingentLegCalculator CONTINGENT_LEG_CALCULATOR = new ISDACompliantContingentLegCalculator();
   // ----------------------------------------------------------------------------------------------------------------------------------------
   // TODO : Remember to reinstate the clean price calculation  when code is refactored
   // ----------------------------------------------------------------------------------------------------------------------------------------
   // Create a PV calculator for a CDS object
-  private static final PresentValueCreditDefaultSwapNew presentValueCreditDefaultSwap = new PresentValueCreditDefaultSwapNew();
-  private static final DayCount ACT_365 = DayCountFactory.INSTANCE.getDayCount("ACT/365");
 
   // Public method for computing the PV of a CDS based on an input CDS contract (with a hazard rate curve calibrated to market observed data)
   public double getPresentValueLegacyCreditDefaultSwap(
@@ -49,9 +41,9 @@ public class PresentValueLegacyCreditDefaultSwapNew {
     ArgumentChecker.notNull(hazardRateCurve, "HazardRateCurve");
     ArgumentChecker.notNull(priceType, "price type");
     // Calculate the value of the premium leg (including accrued if required)
-    final double presentValuePremiumLeg = new ISDACompliantPremiumLegCalculator().calculatePremiumLeg(valuationDate, cds, yieldCurve, hazardRateCurve, priceType);
+    final double presentValuePremiumLeg = PREMIUM_LEG_CALCULATOR.calculatePremiumLeg(valuationDate, cds, yieldCurve, hazardRateCurve, priceType);
     // Calculate the value of the contingent leg
-    final double presentValueContingentLeg = presentValueCreditDefaultSwap.calculateContingentLeg(valuationDate, cds, yieldCurve, hazardRateCurve);
+    final double presentValueContingentLeg = CONTINGENT_LEG_CALCULATOR.calculateContingentLeg(valuationDate, cds, yieldCurve, hazardRateCurve);
     // Calculate the PV of the CDS (assumes we are buying protection i.e. paying the premium leg, receiving the contingent leg)
     double presentValue = -(cds.getParSpread() / 10000.0) * presentValuePremiumLeg + presentValueContingentLeg;
     /*
@@ -104,10 +96,10 @@ public class PresentValueLegacyCreditDefaultSwapNew {
     // ----------------------------------------------------------------------------------------------------------------------------------------
 
     // Calculate the value of the premium leg
-    final double presentValuePremiumLeg = new ISDACompliantPremiumLegCalculator().calculatePremiumLeg(valuationDate, cds, yieldCurve, hazardRateCurve, priceType);
+    final double presentValuePremiumLeg = PREMIUM_LEG_CALCULATOR.calculatePremiumLeg(valuationDate, cds, yieldCurve, hazardRateCurve, priceType);
 
     // Calculate the value of the contingent leg
-    final double presentValueContingentLeg = presentValueCreditDefaultSwap.calculateContingentLeg(valuationDate, cds, yieldCurve, hazardRateCurve);
+    final double presentValueContingentLeg = CONTINGENT_LEG_CALCULATOR.calculateContingentLeg(valuationDate, cds, yieldCurve, hazardRateCurve);
 
     /*
     // If we require the clean price, then calculate the accrued interest and add this to the PV of the premium leg

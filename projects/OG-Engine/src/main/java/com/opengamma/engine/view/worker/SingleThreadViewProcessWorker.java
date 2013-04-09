@@ -167,9 +167,18 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
 
   private final ViewProcessWorkerContext _context;
   private final ViewExecutionOptions _executionOptions;
-  private final ViewCycleTrigger _masterCycleTrigger;
+  private final CombinedViewCycleTrigger _masterCycleTrigger = new CombinedViewCycleTrigger();
   private final FixedTimeTrigger _compilationExpiryCycleTrigger;
   private final boolean _executeCycles;
+  private final boolean _executeGraphs;
+
+  /**
+   * The changes to the master trigger that must be made during the next cycle.
+   * <p>
+   * This has been added as an immediate fix for [PLAT-3291] but could be extended to represent an arbitrary change to add/remove triggers if we wish to support the execution options changing for a
+   * running worker.
+   */
+  private ViewCycleTrigger _masterCycleTriggerChanges;
 
   private int _cycleCount;
   private EngineResourceReference<SingleComputationCycle> _previousCycleReference;
@@ -261,22 +270,9 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
     _executionOptions = executionOptions;
     _cycleRequested = !executionOptions.getFlags().contains(ViewExecutionFlags.WAIT_FOR_INITIAL_TRIGGER);
     _compilationExpiryCycleTrigger = new FixedTimeTrigger();
-    _masterCycleTrigger = createViewCycleTrigger(executionOptions);
-    _executeCycles = !getExecutionOptions().getFlags().contains(ViewExecutionFlags.COMPILE_ONLY);
-    _viewDefinition = viewDefinition;
-    _job = new Job();
-    _thread = new BorrowedThread(context.toString(), _job);
-    s_executor.submit(_thread);
-  }
-
-  private ViewCycleTrigger createViewCycleTrigger(final ViewExecutionOptions executionOptions) {
-    final CombinedViewCycleTrigger trigger = new CombinedViewCycleTrigger();
-    trigger.addTrigger(_compilationExpiryCycleTrigger);
-    if (executionOptions.getFlags().contains(ViewExecutionFlags.RUN_AS_FAST_AS_POSSIBLE)) {
-      trigger.addTrigger(new RunAsFastAsPossibleTrigger());
-    }
+    addMasterCycleTrigger(_compilationExpiryCycleTrigger);
     if (executionOptions.getFlags().contains(ViewExecutionFlags.TRIGGER_CYCLE_ON_TIME_ELAPSED)) {
-      trigger.addTrigger(new RecomputationPeriodTrigger(new Supplier<ViewDefinition>() {
+      addMasterCycleTrigger(new RecomputationPeriodTrigger(new Supplier<ViewDefinition>() {
         @Override
         public ViewDefinition get() {
           return getViewDefinition();
@@ -284,9 +280,22 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
       }));
     }
     if (executionOptions.getMaxSuccessiveDeltaCycles() != null) {
-      trigger.addTrigger(new SuccessiveDeltaLimitTrigger(executionOptions.getMaxSuccessiveDeltaCycles()));
+      addMasterCycleTrigger(new SuccessiveDeltaLimitTrigger(executionOptions.getMaxSuccessiveDeltaCycles()));
     }
-    return trigger;
+    if (executionOptions.getFlags().contains(ViewExecutionFlags.RUN_AS_FAST_AS_POSSIBLE)) {
+      if (_cycleRequested) {
+        addMasterCycleTrigger(new RunAsFastAsPossibleTrigger());
+      } else {
+        // Defer the trigger until an initial one has happened
+        _masterCycleTriggerChanges = new RunAsFastAsPossibleTrigger();
+      }
+    }
+    _executeCycles = !getExecutionOptions().getFlags().contains(ViewExecutionFlags.COMPILE_ONLY);
+    _executeGraphs = !getExecutionOptions().getFlags().contains(ViewExecutionFlags.FETCH_MARKET_DATA_ONLY);
+    _viewDefinition = viewDefinition;
+    _job = new Job();
+    _thread = new BorrowedThread(context.toString(), _job);
+    s_executor.submit(_thread);
   }
 
   private ViewProcessWorkerContext getWorkerContext() {
@@ -303,6 +312,10 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
 
   private ViewCycleTrigger getMasterCycleTrigger() {
     return _masterCycleTrigger;
+  }
+
+  private void addMasterCycleTrigger(final ViewCycleTrigger trigger) {
+    _masterCycleTrigger.addTrigger(trigger);
   }
 
   public FixedTimeTrigger getCompilationExpiryCycleTrigger() {
@@ -339,7 +352,6 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
       } catch (final InterruptedException e) {
         return;
       }
-
       ViewCycleExecutionOptions executionOptions = null;
       try {
         if (!getExecutionOptions().getExecutionSequence().isEmpty()) {
@@ -616,6 +628,12 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
           s_logger.error("Error notifying trigger of intention to execute cycle", e);
         }
         s_logger.debug("Eligible for {} cycle", cycleType);
+        if (_masterCycleTriggerChanges != null) {
+          // TODO: If we wish to support execution option changes mid-execution, we will need to add/remove any relevant triggers here
+          // Currently only the run-as-fast-as-possible trigger becomes valid for the second cycle if we've also got wait-for-initial-trigger
+          addMasterCycleTrigger(_masterCycleTriggerChanges);
+          _masterCycleTriggerChanges = null;
+        }
         return cycleType;
       }
 
@@ -663,21 +681,25 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
         deltaCycle = null;
       }
     }
-
-    try {
-      cycleReference.get().execute(deltaCycle, marketDataSnapshot, s_executor);
-    } catch (final InterruptedException e) {
-      Thread.interrupted();
-      // In reality this means that the job has been terminated, and it will end as soon as we return from this method.
-      // In case the thread has been interrupted without terminating the job, we tidy everything up as if the
-      // interrupted cycle never happened so that deltas will be calculated from the previous cycle.
-      s_logger.info("Interrupted while executing a computation cycle. No results will be output from this cycle.");
-      throw e;
-    } catch (final Exception e) {
-      s_logger.error("Error while executing view cycle", e);
-      throw e;
+    cycleReference.get().preExecute(deltaCycle, marketDataSnapshot);
+    if (_executeGraphs) {
+      try {
+        cycleReference.get().execute(s_executor);
+      } catch (final InterruptedException e) {
+        Thread.interrupted();
+        // In reality this means that the job has been terminated, and it will end as soon as we return from this method.
+        // In case the thread has been interrupted without terminating the job, we tidy everything up as if the
+        // interrupted cycle never happened so that deltas will be calculated from the previous cycle.
+        s_logger.info("Interrupted while executing a computation cycle. No results will be output from this cycle.");
+        throw e;
+      } catch (final Exception e) {
+        s_logger.error("Error while executing view cycle", e);
+        throw e;
+      }
+    } else {
+      s_logger.debug("Skipping graph execution");
     }
-
+    cycleReference.get().postExecute();
     final long durationNanos = cycleReference.get().getDuration().toNanos();
     _totalTimeNanos += durationNanos;
     _cycleCount += 1;
@@ -805,6 +827,7 @@ public class SingleThreadViewProcessWorker implements MarketDataListener, ViewPr
             }
             removal.add(requirement);
           }
+          // Anything that was in the specific requirements will be captured by the standard invalid identifier tests
         }
         if (removal != null) {
           removeSpecifications[remove] = entry.getKey();

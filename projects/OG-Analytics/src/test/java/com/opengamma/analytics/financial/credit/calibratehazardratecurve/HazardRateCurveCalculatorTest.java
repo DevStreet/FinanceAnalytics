@@ -22,11 +22,7 @@ import com.opengamma.util.time.DateUtils;
 /**
  * 
  */
-//@Test(groups = TestGroup.UNIT)
 public class HazardRateCurveCalculatorTest {
-  /**
-   * 
-   */
   private static final PresentValueCreditDefaultSwap DEPRECATED_CALCULATOR = new PresentValueCreditDefaultSwap();
   private static final HazardRateCurveCalculator CALCULATOR = new HazardRateCurveCalculator();
   private static final ZonedDateTime VALUATION_DATE = DateUtils.getUTCDate(2013, 3, 4);
