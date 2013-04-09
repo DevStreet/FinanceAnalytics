@@ -25,7 +25,7 @@ public final class UminusOGSparseMatrix implements Uminus<OGSparseMatrix, OGSpar
     int columnsArray1 = array1.getNumberOfColumns();
     int retRows = rowsArray1, retCols = columnsArray1;
     double[] data = array1.getData();
-    double[] tmp = new double[rowsArray1 * columnsArray1];
+    double[] tmp = new double[data.length];
     EasyIZY.vd_negate(data, tmp);
     return new OGSparseMatrix(array1.getColumnPtr(), array1.getRowIndex(), tmp, retRows, retCols);
   }
