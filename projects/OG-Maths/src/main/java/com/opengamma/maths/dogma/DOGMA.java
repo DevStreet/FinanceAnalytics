@@ -996,6 +996,77 @@ public class DOGMA {
 
 
 /**
+ * DOGMA Function: Diag
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> diag(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMADiag.diag(arg0);
+  }
+
+
+/**
+ * DOGMA Function: Diag
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number diag(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMADiag.diag(arg0);
+  }
+
+
+
+/**
  * DOGMA Function: Disp
  * <p>
  * Short Description:
@@ -2592,6 +2663,150 @@ public class DOGMA {
 
   public static Number plus(Number arg0, Number arg1) {
     return com.opengamma.maths.dogma.autogen.DOGMAPlus.plus(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Power
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> power(OGArray<? extends Number> arg0, OGArray<? extends Number> arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAPower.power(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Power
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> power(Number arg0, OGArray<? extends Number> arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAPower.power(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Power
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> power(OGArray<? extends Number> arg0, Number arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAPower.power(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Power
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static Number power(Number arg0, Number arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAPower.power(arg0, arg1);
   }
 
 
