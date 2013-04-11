@@ -7,7 +7,6 @@ package com.opengamma.maths.highlevelapi.datatypes.derived;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotRequested;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd;
 
 /**
  * Holds the result of an SVD computation

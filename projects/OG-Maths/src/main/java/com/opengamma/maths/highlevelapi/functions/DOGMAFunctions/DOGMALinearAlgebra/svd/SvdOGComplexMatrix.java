@@ -5,33 +5,35 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd;
 
-import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.SVD;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 
 /**
  * SVD for OGComplex 
  */
-public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
-  private static SvdOGComplexMatrix s_instance = new SvdOGComplexMatrix();
-
-  public static SvdOGComplexMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SvdOGComplexMatrix() {
-  }
+@DOGMAMethodHook(provides = SVD.class)
+public final class SvdOGComplexMatrix {
 
   private LAPACK _localLAPACK = new LAPACK();
   private CtransposeOGComplexMatrix _cmplxtranspose = new CtransposeOGComplexMatrix();
 
-  @Override
-  public OGSvdResult svd(OGComplexMatrix array1, compute these) {
+  @DOGMAMethodLiteral
+  public List<OGArray<? extends Number>> svd(OGComplexMatrix array1) {
+    return svd(array1, SVDCompute.USV);
+  }
+
+  @DOGMAMethodLiteral
+  public List<OGArray<? extends Number>> svd(OGComplexMatrix array1, SVDCompute these) {
     final int m = array1.getNumberOfRows();
     final int n = array1.getNumberOfColumns();
     final int lda = Math.max(1, m);
@@ -98,7 +100,6 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
         break;
 
       case USV:
-        System.out.println("m=" + m + " n=" + n);
         U = new double[lda * m * 2];
         VT = new double[ldvt * n * 2];
         _localLAPACK.zgesvd('A', 'A', m, n, A, lda, S, U, ldu, VT, ldvt, WORK, lwork, RWORK, info);
@@ -109,7 +110,11 @@ public final class SvdOGComplexMatrix implements SvdAbstract<OGComplexMatrix> {
         resultV = _cmplxtranspose.eval(new OGComplexMatrix(VT, n, n));
         break;
     }
-    return new OGSvdResult(resultU, resultS, resultV);
+    List<OGArray<? extends Number>> tmp = new ArrayList<>(3);
+    tmp.add(resultU);
+    tmp.add(resultS);
+    tmp.add(resultV);
+    return tmp;
   }
 
 }

@@ -5,32 +5,34 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd;
 
-import com.opengamma.maths.highlevelapi.datatypes.derived.OGSvdResult;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.SVD;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.transpose.TransposeOGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.Svd.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 
 /**
  * SVD for OGDoubleArrays 
  */
-public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
-  private static SvdOGMatrix s_instance = new SvdOGMatrix();
-
-  public static SvdOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private SvdOGMatrix() {
-  }
+@DOGMAMethodHook(provides = SVD.class)
+public final class SvdOGMatrix {
 
   private LAPACK _localLAPACK = new LAPACK();
   private TransposeOGMatrix _transpose = new TransposeOGMatrix();
 
-  @Override
-  public OGSvdResult svd(OGMatrix array1, compute these) {
+  @DOGMAMethodLiteral
+  public List<OGArray<? extends Number>> svd(OGMatrix array1) {
+    return svd(array1, SVDCompute.USV);
+  }
+
+  @DOGMAMethodLiteral
+  public List<OGArray<? extends Number>> svd(OGMatrix array1, SVDCompute these) {
     final int m = array1.getNumberOfRows();
     final int n = array1.getNumberOfColumns();
     final int lda = Math.max(1, m);
@@ -105,7 +107,11 @@ public final class SvdOGMatrix implements SvdAbstract<OGMatrix> {
         resultV = _transpose.eval(new OGMatrix(VT, n, n));
         break;
     }
-    return new OGSvdResult(resultU, resultS, resultV);
+    List<OGArray<? extends Number>> tmp = new ArrayList<>(3);
+    tmp.add(resultU);
+    tmp.add(resultS);
+    tmp.add(resultV);
+    return tmp;
   }
 
 }
