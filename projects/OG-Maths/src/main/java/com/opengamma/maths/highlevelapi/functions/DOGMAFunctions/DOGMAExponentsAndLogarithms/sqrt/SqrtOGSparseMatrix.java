@@ -10,6 +10,7 @@ import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sqrt;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
@@ -30,30 +31,35 @@ public final class SqrtOGSparseMatrix implements Sqrt<OGArray<? extends Number>,
     final double[] dataArray1 = array1.getData();
     final int n = dataArray1.length;
 
-    double[] tmp = new double[n];
-    double[] cmplxTmp;
+    double[] sqrts = new double[n];
+
+    // we are in real space so we can just carry out sqrt(abs(X)) and then shove it in the right place later if needs 
+    // be opposed to parsing the data and then having to work out if a complex sqrt call should be made 
+    EasyIZY.vd_abs(dataArray1, sqrts);
+    EasyIZY.vd_sqrt(sqrts, sqrts);
+
     boolean isCmplx = false;
     int i;
     for (i = 0; i < n; i++) {
-      if (dataArray1[i] >= 0) {
-        tmp[i] = Math.sqrt(dataArray1[i]);
-      } else {
+      if (dataArray1[i] < 0) {
         isCmplx = true;
         break;
       }
     }
     if (isCmplx) {
-      cmplxTmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(tmp);
+      double[] cmplxTmp;
+      int twoj;
+      cmplxTmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(sqrts);
       for (int j = i; j < n; j++) {
-        if (dataArray1[j] >= 0) {
-          cmplxTmp[2 * j] = Math.sqrt(dataArray1[j]);
-        } else {
-          cmplxTmp[2 * j + 1] = Math.sqrt(-dataArray1[j]);
+        twoj = 2 * j;
+        if (dataArray1[j] < 0) { // move real value to complex
+          cmplxTmp[twoj + 1] = cmplxTmp[twoj];
+          cmplxTmp[twoj] = 0;
         }
       }
       return new OGComplexSparseMatrix(colPtr, rowIdx, cmplxTmp, rowsArray1, columnsArray1);
     } else {
-      return new OGSparseMatrix(colPtr, rowIdx, tmp, rowsArray1, columnsArray1);
+      return new OGSparseMatrix(colPtr, rowIdx, sqrts, rowsArray1, columnsArray1);
     }
   }
 }
