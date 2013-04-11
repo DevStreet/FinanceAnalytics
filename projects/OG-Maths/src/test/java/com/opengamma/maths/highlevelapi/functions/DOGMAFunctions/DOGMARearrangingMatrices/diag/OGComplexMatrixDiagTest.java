@@ -10,7 +10,6 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
-import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
