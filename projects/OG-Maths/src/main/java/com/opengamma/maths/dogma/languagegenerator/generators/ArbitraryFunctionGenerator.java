@@ -52,6 +52,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     boolean methodFound;
     List<Method> methodList = new ArrayList<Method>();
     while (it.hasNext()) {
+      methodList.clear();
       methodFound = false;
       nextImplementingClass = it.next();
       localClass = nextImplementingClass.getClass();
@@ -141,7 +142,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
       return s_numberClassNames.get(clazz.getSimpleName());
     }
 
-    return clazz.getSimpleName();
+    return clazz.getCanonicalName();
   }
 
   @Override
@@ -162,6 +163,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     Method[] localMethods;
     boolean methodFound;
     while (it.hasNext()) {
+
       methodFound = false;
       nextImplementingClass = it.next();
       localClass = nextImplementingClass.getClass();
@@ -187,6 +189,9 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
 
     // for each class, reflect, look for labelled functions, add in;
 
+//    System.out.println("Generating entry point code for " + f.getSimpleName());
+//    System.out.println("Token used is:" + f.toString());
+
     StringBuffer tmp = new StringBuffer();
 
     Iterator<?> it = classesWithFunctions.iterator();
@@ -196,6 +201,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
     boolean methodFound;
     List<Method> methodList = new ArrayList<Method>();
     while (it.hasNext()) {
+      methodList.clear();
       methodFound = false;
       nextImplementingClass = it.next();
       localClass = nextImplementingClass.getClass();
@@ -210,7 +216,10 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         throw new MathsExceptionGeneric("Class: " + nextImplementingClass.getClass() + " is annotated to have a DOGMAMethodHook and is declared to provide the " +
             "ArbitraryFunction interface, however, the instantiated class has no methods annotated with DOGMAMethodLiteral.");
       }
-      //      System.out.println(methodList.toString());
+
+    //            System.out.println(f.toString());
+      //      System.out.println("METHOD LIST:" + methodList.toString());
+      //            System.out.println();
 
       Iterator<Method> mit = methodList.iterator();
       Method next;
@@ -238,10 +247,10 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
         int plen = parameterTypes.length;
         if (plen > 0) {
           for (int i = 0; i < plen - 1; i++) {
-            argbuf.append(parameterTypes[i].getSimpleName() + " arg" + i + ", ");
+            argbuf.append(parameterTypes[i].getCanonicalName() + " arg" + i + ", ");
             argnamesbuf.append("arg" + i + ", ");
           }
-          argbuf.append(parameterTypes[plen - 1].getSimpleName() + " arg" + (plen - 1));
+          argbuf.append(parameterTypes[plen - 1].getCanonicalName() + " arg" + (plen - 1));
           argnamesbuf.append("arg" + (plen - 1));
         }
         tmp.append(argbuf);
