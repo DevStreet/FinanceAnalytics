@@ -88,10 +88,10 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static int length(OGArray arg0){
+  public static int length(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0){
     return   s_lengthfunction.length( arg0);
   };
-  public static int length(Number arg0){
+  public static int length(java.lang.Number arg0){
     return   s_lengthfunction.length( arg0);
   };
 

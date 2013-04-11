@@ -614,11 +614,11 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAAtanh.atanh(arg0);
   }
 
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1, Number arg2) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(java.lang.Number arg0, java.lang.Number arg1, java.lang.Number arg2) {
     return     com.opengamma.maths.dogma.autogen.DOGMAColon.colon(arg0, arg1, arg2);
   };
 
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(java.lang.Number arg0, java.lang.Number arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMAColon.colon(arg0, arg1);
   };
 
@@ -1946,11 +1946,11 @@ public class DOGMA {
     return     com.opengamma.maths.dogma.autogen.DOGMAInvHilb.invhilb(arg0);
   };
 
-  public static int length(OGArray arg0) {
+  public static int length(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMALength.length(arg0);
   };
 
-  public static int length(Number arg0) {
+  public static int length(java.lang.Number arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMALength.length(arg0);
   };
 
@@ -2025,11 +2025,11 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMALog.log(arg0);
   }
 
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(OGArray arg0) {
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAMeshgrid.meshgrid(arg0);
   };
 
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(OGArray arg0, OGArray arg1) {
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0, com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMAMeshgrid.meshgrid(arg0, arg1);
   };
 
@@ -3032,7 +3032,7 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAReal.real(arg0);
   }
 
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix reshape(OGMatrix arg0, int arg1, int arg2) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix reshape(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, int arg1, int arg2) {
     return     com.opengamma.maths.dogma.autogen.DOGMAReshape.reshape(arg0, arg1, arg2);
   };
 
@@ -3110,6 +3110,22 @@ public class DOGMA {
   public static Number round(Number arg0) {
     return com.opengamma.maths.dogma.autogen.DOGMARound.round(arg0);
   }
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0, arg1);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0, arg1);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0);
+  };
 
 
 
@@ -3918,11 +3934,11 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMAUnique.unique(arg0);
   }
 
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(OGMatrix arg0, int arg1) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, int arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMAVander.vander(arg0, arg1);
   };
 
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(OGMatrix arg0) {
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAVander.vander(arg0);
   };
 

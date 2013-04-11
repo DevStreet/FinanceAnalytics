@@ -88,10 +88,10 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
 
 }
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1, Number arg2){
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(java.lang.Number arg0, java.lang.Number arg1, java.lang.Number arg2){
     return   s_colonfunction.colon( arg0,  arg1,  arg2);
   };
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(Number arg0, Number arg1){
+  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(java.lang.Number arg0, java.lang.Number arg1){
     return   s_colonfunction.colon( arg0,  arg1);
   };
 
