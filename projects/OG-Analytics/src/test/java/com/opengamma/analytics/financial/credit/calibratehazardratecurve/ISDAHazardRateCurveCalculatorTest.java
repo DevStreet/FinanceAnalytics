@@ -22,13 +22,9 @@ import com.opengamma.util.time.DateUtils;
 /**
  * 
  */
-//@Test(groups = TestGroup.UNIT)
-public class HazardRateCurveCalculatorTest {
-  /**
-   * 
-   */
+public class ISDAHazardRateCurveCalculatorTest {
   private static final PresentValueCreditDefaultSwap DEPRECATED_CALCULATOR = new PresentValueCreditDefaultSwap();
-  private static final HazardRateCurveCalculator CALCULATOR = new HazardRateCurveCalculator();
+  private static final ISDAHazardRateCurveCalculator CALCULATOR = new ISDAHazardRateCurveCalculator();
   private static final ZonedDateTime VALUATION_DATE = DateUtils.getUTCDate(2013, 3, 4);
   private static final ZonedDateTime[] MARKET_TENORS = new ZonedDateTime[] {DateUtils.getUTCDate(2013, 3, 20), DateUtils.getUTCDate(2013, 6, 19), DateUtils.getUTCDate(2013, 9, 18),
     DateUtils.getUTCDate(2013, 12, 18), DateUtils.getUTCDate(2014, 3, 19), DateUtils.getUTCDate(2015, 3, 18), DateUtils.getUTCDate(2016, 3, 16), DateUtils.getUTCDate(2018, 3, 15),

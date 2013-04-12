@@ -63,7 +63,7 @@ public class ISDACompliantPremiumLegCalculatorTest {
   public void regressionTest() {
     final CreditDefaultSwapDefinition cds = CreditDefaultSwapDefinitionDataSets.getLegacyVanillaCreditDefaultSwapDefinition().withMaturityDate(VALUATION_DATE.plusYears(10));
     final double deprecatedResult = DEPRECATED_CALCULATOR.calculatePremiumLeg(VALUATION_DATE, cds, YIELD_CURVE, HAZARD_RATE_CURVE, PriceType.CLEAN);
-    final double result = CALCULATOR.calculatePremiumLeg(VALUATION_DATE, cds, YIELD_CURVE, HAZARD_RATE_CURVE, PriceType.CLEAN);
+    final double result = CALCULATOR.calculateLeg(VALUATION_DATE, cds, YIELD_CURVE, HAZARD_RATE_CURVE, PriceType.CLEAN);
     assertEquals(deprecatedResult, result, EPS);
   }
 
@@ -72,7 +72,7 @@ public class ISDACompliantPremiumLegCalculatorTest {
     final CreditDefaultSwapDefinition cds = CreditDefaultSwapDefinitionDataSets.getLegacyVanillaCreditDefaultSwapDefinition().withMaturityDate(VALUATION_DATE.plusYears(10));
     final double startTime = System.currentTimeMillis();
     int j = 0;
-    for (int i = 0; i < 500000; i++) {
+    for (int i = 0; i < 100000; i++) {
       DEPRECATED_CALCULATOR.calculatePremiumLeg(VALUATION_DATE, cds, YIELD_CURVE, HAZARD_RATE_CURVE, PriceType.CLEAN);
       j++;
     }
@@ -85,8 +85,8 @@ public class ISDACompliantPremiumLegCalculatorTest {
     final CreditDefaultSwapDefinition cds = CreditDefaultSwapDefinitionDataSets.getLegacyVanillaCreditDefaultSwapDefinition().withMaturityDate(VALUATION_DATE.plusYears(10));
     final double startTime = System.currentTimeMillis();
     int j = 0;
-    for (int i = 0; i < 500000; i++) {
-      CALCULATOR.calculatePremiumLeg(VALUATION_DATE, cds, YIELD_CURVE, HAZARD_RATE_CURVE, PriceType.CLEAN);
+    for (int i = 0; i < 100000; i++) {
+      CALCULATOR.calculateLeg(VALUATION_DATE, cds, YIELD_CURVE, HAZARD_RATE_CURVE, PriceType.CLEAN);
       j++;
     }
     final double endTime = System.currentTimeMillis();
