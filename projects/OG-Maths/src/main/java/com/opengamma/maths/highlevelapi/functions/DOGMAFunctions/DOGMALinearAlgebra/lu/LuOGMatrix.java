@@ -5,33 +5,31 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.lu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.maths.highlevelapi.datatypes.derived.OGLuResult;
+import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
+import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.LU;
+import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.lu.Lu.compute;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 
 /**
  * Does LU/LUP on OGDoubleArrays 
  */
-public final class LuOGMatrix implements LuAbstract<OGMatrix> {
-  private static LuOGMatrix s_instance = new LuOGMatrix();
+@DOGMAMethodHook(provides = LU.class)
+public final class LuOGMatrix {
   private static Logger s_log = LoggerFactory.getLogger(LuOGMatrix.class);
-
-  public static LuOGMatrix getInstance() {
-    return s_instance;
-  }
-
-  private LuOGMatrix() {
-  }
 
   private LAPACK _localLAPACK = new LAPACK();
 
-  @Override
-  public OGLuResult lu(OGMatrix array1, compute these) {
+  @DOGMAMethodLiteral
+  public List<OGArray<? extends Number>> lu(OGMatrix array1, LUCompute these) {
     final int m = array1.getNumberOfRows();
     final int n = array1.getNumberOfColumns();
     final int lda = Math.max(1, m);
@@ -93,7 +91,11 @@ public final class LuOGMatrix implements LuAbstract<OGMatrix> {
         break;
 
     }
-    return new OGLuResult(retL, retU, retP);
+    List<OGArray<? extends Number>> tmp = new ArrayList<>();
+    tmp.add(retL);
+    tmp.add(retU);
+    tmp.add(retP);
+    return tmp;
   }
 
   // "reads" a pivot matrix into permutation form 
