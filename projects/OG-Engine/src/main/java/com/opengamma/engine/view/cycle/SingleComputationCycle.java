@@ -665,9 +665,11 @@ public class SingleComputationCycle implements ViewCycle, EngineResource {
       final ExecutionLogWithContext executionLogWithContext = ExecutionLogWithContext.of(node, jobResultItem.getExecutionLog());
       final AggregatedExecutionLog aggregatedExecutionLog = new DefaultAggregatedExecutionLog(executionLogWithContext, new ArrayList<AggregatedExecutionLog>(inputLogs), executionLogMode);
       final DependencyNodeJobExecutionResult jobExecutionResult = new DependencyNodeJobExecutionResult(computeNodeId, jobResultItem, aggregatedExecutionLog);
-      for (ValueSpecification terminalOutput : node.getTerminalOutputValues()) {
-        processedTerminalOutputs.put(terminalOutput, allTerminalOutputs.get(terminalOutput));
-        jobExecutionResultCache.put(terminalOutput, jobExecutionResult);
+      for (ValueSpecification output : node.getOutputValues()) {
+        jobExecutionResultCache.put(output, jobExecutionResult);
+        if (node.getTerminalOutputValues().contains(output)) {
+          processedTerminalOutputs.put(output, allTerminalOutputs.get(output));
+        }
       }
     }
     fragmentResultModel.addRequirements(processedTerminalOutputs);
