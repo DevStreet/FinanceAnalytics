@@ -1950,6 +1950,148 @@ public class DOGMA {
     return     com.opengamma.maths.dogma.autogen.DOGMAInvHilb.invhilb(arg0);
   };
 
+
+
+/**
+ * DOGMA Function: IsSquare
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> issquare(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAIsSquare.issquare(arg0);
+  }
+
+
+/**
+ * DOGMA Function: IsSquare
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number issquare(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAIsSquare.issquare(arg0);
+  }
+
+
+
+/**
+ * DOGMA Function: IsSymmetric
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> issymmetric(OGArray<? extends Number> arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAIsSymmetric.issymmetric(arg0);
+  }
+
+
+/**
+ * DOGMA Function: IsSymmetric
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0 Docs Missing - No description given
+ * <p>
+ * @return Docs Missing - No description given
+ */
+
+  public static Number issymmetric(Number arg0) {
+    return com.opengamma.maths.dogma.autogen.DOGMAIsSymmetric.issymmetric(arg0);
+  }
+
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> lu(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.lu.LUCompute arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMALU.lu(arg0, arg1);
   };
@@ -3119,19 +3261,19 @@ public class DOGMA {
     return com.opengamma.maths.dogma.autogen.DOGMARound.round(arg0);
   }
 
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0) {
-    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0);
-  };
-
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1) {
-    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0, arg1);
-  };
-
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0);
   };
 
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0, arg1);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1) {
     return     com.opengamma.maths.dogma.autogen.DOGMASVD.svd(arg0, arg1);
   };
 
