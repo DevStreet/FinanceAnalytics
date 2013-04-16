@@ -11,12 +11,10 @@ import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
-import com.opengamma.analytics.financial.instrument.InstrumentDefinitionWithData;
-import com.opengamma.analytics.financial.instrument.index.PriceIndex;
+import com.opengamma.analytics.financial.instrument.index.IndexPrice;
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponInterpolation;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
@@ -28,8 +26,7 @@ import com.opengamma.util.money.Currency;
  * The index for a given month is given in the yield curve and in the time series on the first of the month.
  * The pay-off is (Index_End / Index_Start - X) with X=0 for notional payment and X=1 for no notional payment.
  */
-public class CouponInflationZeroCouponInterpolationDefinition extends CouponInflationDefinition implements
-    InstrumentDefinitionWithData<Payment, DoubleTimeSeries<ZonedDateTime>> {
+public class CouponInflationZeroCouponInterpolationDefinition extends CouponInflationDefinition {
 
   /**
    * The reference date for the index at the coupon start. May not be relevant as the index value is known.
@@ -73,7 +70,7 @@ public class CouponInflationZeroCouponInterpolationDefinition extends CouponInfl
    * @param payNotional Flag indicating if the notional is paid (true) or not (false).
    */
   public CouponInflationZeroCouponInterpolationDefinition(final Currency currency, final ZonedDateTime paymentDate, final ZonedDateTime accrualStartDate,
-      final ZonedDateTime accrualEndDate, final double paymentYearFraction, final double notional, final PriceIndex priceIndex, final int monthLag,
+      final ZonedDateTime accrualEndDate, final double paymentYearFraction, final double notional, final IndexPrice priceIndex, final int monthLag,
       final ZonedDateTime referenceStartDate, final double indexStartValue, final ZonedDateTime[] referenceEndDate, final boolean payNotional) {
     super(currency, paymentDate, accrualStartDate, accrualEndDate, paymentYearFraction, notional, priceIndex);
     ArgumentChecker.notNull(referenceStartDate, "Reference start date");
@@ -100,7 +97,7 @@ public class CouponInflationZeroCouponInterpolationDefinition extends CouponInfl
    * @return The coupon.
    */
   public static CouponInflationZeroCouponInterpolationDefinition from(final ZonedDateTime accrualStartDate, final ZonedDateTime paymentDate, final double notional,
-      final PriceIndex priceIndex, final int monthLag, final double indexStartValue, final ZonedDateTime[] referenceEndDate, final boolean payNotional) {
+      final IndexPrice priceIndex, final int monthLag, final double indexStartValue, final ZonedDateTime[] referenceEndDate, final boolean payNotional) {
     ArgumentChecker.notNull(priceIndex, "Price index");
     return new CouponInflationZeroCouponInterpolationDefinition(priceIndex.getCurrency(), paymentDate, accrualStartDate, paymentDate, 1.0, notional, priceIndex,
         monthLag, accrualStartDate, indexStartValue, referenceEndDate, payNotional);
@@ -118,7 +115,7 @@ public class CouponInflationZeroCouponInterpolationDefinition extends CouponInfl
    * @return The inflation zero-coupon.
    */
   public static CouponInflationZeroCouponInterpolationDefinition from(final ZonedDateTime accrualStartDate, final ZonedDateTime paymentDate, final double notional,
-      final PriceIndex priceIndex, final double indexStartValue, final int monthLag, final boolean payNotional) {
+      final IndexPrice priceIndex, final double indexStartValue, final int monthLag, final boolean payNotional) {
     final ZonedDateTime referenceStartDate = accrualStartDate.minusMonths(monthLag);
     final ZonedDateTime refInterpolatedDate = paymentDate.minusMonths(monthLag);
     final ZonedDateTime[] referenceEndDate = new ZonedDateTime[2];
@@ -141,7 +138,7 @@ public class CouponInflationZeroCouponInterpolationDefinition extends CouponInfl
    * @return The inflation zero-coupon.
    */
   public static CouponInflationZeroCouponInterpolationDefinition from(final ZonedDateTime accrualStartDate, final ZonedDateTime paymentDate, final double notional,
-      final PriceIndex priceIndex, final DoubleTimeSeries<ZonedDateTime> priceIndexTimeSeries, final int monthLag, final boolean payNotional) {
+      final IndexPrice priceIndex, final DoubleTimeSeries<ZonedDateTime> priceIndexTimeSeries, final int monthLag, final boolean payNotional) {
     final ZonedDateTime refInterpolatedDate = accrualStartDate.minusMonths(monthLag);
     final ZonedDateTime[] referenceStartDate = new ZonedDateTime[2];
     referenceStartDate[0] = refInterpolatedDate.withDayOfMonth(1);

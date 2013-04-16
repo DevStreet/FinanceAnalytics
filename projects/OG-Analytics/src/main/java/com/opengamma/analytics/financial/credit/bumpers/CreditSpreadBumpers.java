@@ -17,6 +17,7 @@ public class CreditSpreadBumpers {
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
   // TODO : Add error checkers for the input arguments
+  // TODO : Replace the logic in the choice of spread bump to ensure something is bumped i.e. use if then else
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ public class CreditSpreadBumpers {
 
   public double[] getBumpedCreditSpreads(final double[] marketSpreads, final double spreadBump, final SpreadBumpType spreadBumpType) {
 
-    double[] bumpedCreditSpreads = new double[marketSpreads.length];
+    final double[] bumpedCreditSpreads = new double[marketSpreads.length];
 
     // Calculate the bumped spreads
 
@@ -48,7 +49,7 @@ public class CreditSpreadBumpers {
 
   public double[] getBumpedCreditSpreads(final double[] marketSpreads, final int spreadTenorToBump, final double spreadBump, final SpreadBumpType spreadBumpType) {
 
-    double[] bumpedCreditSpreads = Arrays.copyOf(marketSpreads, marketSpreads.length);
+    final double[] bumpedCreditSpreads = Arrays.copyOf(marketSpreads, marketSpreads.length);
 
     // Calculate the bumped spreads
 

@@ -9,6 +9,7 @@ import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.exchange.ExchangeSource;
 import com.opengamma.core.historicaltimeseries.HistoricalTimeSeriesSource;
 import com.opengamma.core.holiday.HolidaySource;
+import com.opengamma.core.organization.OrganizationSource;
 import com.opengamma.core.region.RegionSource;
 import com.opengamma.core.security.SecuritySource;
 import com.opengamma.engine.function.FunctionCompilationContext;
@@ -16,6 +17,7 @@ import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveDefinitio
 import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecificationBuilder;
 import com.opengamma.financial.analytics.ircurve.calcconfig.CurveCalculationConfigSource;
 import com.opengamma.financial.analytics.model.pnl.PnLRequirementsGatherer;
+import com.opengamma.financial.analytics.riskfactors.RiskFactorsGatherer;
 import com.opengamma.financial.analytics.volatility.cube.VolatilityCubeDefinitionSource;
 import com.opengamma.financial.convention.ConventionBundleSource;
 import com.opengamma.financial.currency.CurrencyPair;
@@ -88,12 +90,19 @@ public final class OpenGammaCompilationContext {
    * The name under which an instance of {@link TempTargetRepository} should be bound.
    */
   public static final String TEMPORARY_TARGETS_NAME = "tempTargets";
-
+  /**
+   * The name under which an instance of {@link RiskFactorsGatherer} should be bound.
+   */
+  public static final String RISK_FACTORS_GATHERER_NAME = "riskFactorsGatherer";
+  /**
+   * The name under which a {@link Boolean#TRUE} value should be bound to put functions which support it into a permissive requirement mode. Note that this is a non-default mode of behavior that is
+   * not usually required.
+   */
   private static final String PERMISSIVE_FLAG_NAME = "permissive";
-
-  private static final String PNL_REQUIREMENTS_GATHERER_NAME = "pnlRequirementsGatherer";
-
-  private static final String CURRENCY_PAIRS_SOURCE = "currencyPairsSource";
+  /**
+   * The name under which an instance of {@link PnLRequirementsGatherer} should be bound.
+   */
+  public static final String PNL_REQUIREMENTS_GATHERER_NAME = "pnlRequirementsGatherer";
 
   /**
    * Restricted constructor.
@@ -210,6 +219,14 @@ public final class OpenGammaCompilationContext {
     set(compilationContext, HOLIDAY_SOURCE_NAME, holidaySource);
   }
 
+  public static OrganizationSource getOrganizationSource(final FunctionCompilationContext compilationContext) {
+    return compilationContext.getOrganizationSource();
+  }
+
+  public static void setOrganizationSource(final FunctionCompilationContext compilationContext, final OrganizationSource organizationSource) {
+    compilationContext.setOrganizationSource(organizationSource);
+  }
+
   public static ExchangeSource getExchangeSource(final FunctionCompilationContext compilationContext) {
     return get(compilationContext, EXCHANGE_SOURCE_NAME);
   }
@@ -298,6 +315,14 @@ public final class OpenGammaCompilationContext {
     } else {
       compilationContext.remove(PERMISSIVE_FLAG_NAME);
     }
+  }
+
+  public static RiskFactorsGatherer getRiskFactorsGatherer(final FunctionCompilationContext compilationContext) {
+    return get(compilationContext, RISK_FACTORS_GATHERER_NAME);
+  }
+
+  public static void setRiskFactorsGatherer(final FunctionCompilationContext compilationContext, final RiskFactorsGatherer riskFactorsGatherer) {
+    set(compilationContext, RISK_FACTORS_GATHERER_NAME, riskFactorsGatherer);
   }
 
   public static PnLRequirementsGatherer getPnLRequirementsGatherer(final FunctionCompilationContext compilationContext) {

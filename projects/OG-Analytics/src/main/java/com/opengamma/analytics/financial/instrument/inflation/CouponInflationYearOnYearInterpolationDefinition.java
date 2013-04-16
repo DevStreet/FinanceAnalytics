@@ -12,12 +12,10 @@ import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
-import com.opengamma.analytics.financial.instrument.InstrumentDefinitionWithData;
-import com.opengamma.analytics.financial.instrument.index.PriceIndex;
+import com.opengamma.analytics.financial.instrument.index.IndexPrice;
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationYearOnYearInterpolation;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
-import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.util.time.TimeCalculator;
 import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.ArgumentChecker;
@@ -29,8 +27,7 @@ import com.opengamma.util.money.Currency;
  * The pay-off is paymentYearFraction*(Index_End / Index_Start - X) with X=0 for notional payment and X=1 for no notional payment.
  */
 
-public class CouponInflationYearOnYearInterpolationDefinition extends CouponInflationDefinition implements
-InstrumentDefinitionWithData<Payment, DoubleTimeSeries<ZonedDateTime>> {
+public class CouponInflationYearOnYearInterpolationDefinition extends CouponInflationDefinition {
 
   /**
    * The reference date for the index at the coupon start. May not be relevant as the index value is known.
@@ -75,7 +72,7 @@ InstrumentDefinitionWithData<Payment, DoubleTimeSeries<ZonedDateTime>> {
    * @param weightEnd The weight on the first month index in the interpolation of the index at the coupon end.
    */
   public CouponInflationYearOnYearInterpolationDefinition(final Currency currency, final ZonedDateTime paymentDate, final ZonedDateTime accrualStartDate,
-      final ZonedDateTime accrualEndDate, final double paymentYearFraction, final double notional, final PriceIndex priceIndex, final int monthLag,
+      final ZonedDateTime accrualEndDate, final double paymentYearFraction, final double notional, final IndexPrice priceIndex, final int monthLag,
       final ZonedDateTime[] referenceStartDate, final ZonedDateTime[] referenceEndDate, final boolean payNotional, final double weightStart, final double weightEnd) {
     super(currency, paymentDate, accrualStartDate, accrualEndDate, paymentYearFraction, notional, priceIndex);
     ArgumentChecker.notNull(referenceStartDate, "Reference start date");
@@ -101,7 +98,7 @@ InstrumentDefinitionWithData<Payment, DoubleTimeSeries<ZonedDateTime>> {
    * @return The inflation zero-coupon.
    */
   public static CouponInflationYearOnYearInterpolationDefinition from(final ZonedDateTime accrualStartDate, final ZonedDateTime paymentDate, final double notional,
-      final PriceIndex priceIndex, final int monthLag, final boolean payNotional, final double weightStart, final double weightEnd) {
+      final IndexPrice priceIndex, final int monthLag, final boolean payNotional, final double weightStart, final double weightEnd) {
     final ZonedDateTime[] referenceStartDate = new ZonedDateTime[2];
     final ZonedDateTime[] referenceEndDate = new ZonedDateTime[2];
     referenceStartDate[0] = accrualStartDate.minusMonths(monthLag).withDayOfMonth(1);

@@ -30,6 +30,7 @@ import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
 import com.opengamma.financial.security.cashflow.CashFlowSecurity;
 import com.opengamma.financial.security.cds.CDSSecurity;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
 import com.opengamma.financial.security.cds.LegacyRecoveryLockCDSSecurity;
@@ -61,6 +62,7 @@ import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.option.BondFutureOptionSecurity;
 import com.opengamma.financial.security.option.CommodityFutureOptionSecurity;
+import com.opengamma.financial.security.option.CreditDefaultSwapOptionSecurity;
 import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexFutureOptionSecurity;
@@ -609,7 +611,17 @@ public class FinancialSecurityUtils {
         }
 
         @Override
+        public Currency visitCreditDefaultSwapIndexDefinitionSecurity(final CreditDefaultSwapIndexDefinitionSecurity security) {
+          return security.getCurrency();
+        }
+
+        @Override
         public Currency visitCreditDefaultSwapIndexSecurity(final CreditDefaultSwapIndexSecurity security) {
+          return security.getNotional().getCurrency();
+        }
+
+        @Override
+        public Currency visitCreditDefaultSwapOptionSecurity(final CreditDefaultSwapOptionSecurity security) {
           return security.getCurrency();
         }
 
@@ -950,7 +962,17 @@ public class FinancialSecurityUtils {
         }
 
         @Override
+        public Collection<Currency> visitCreditDefaultSwapIndexDefinitionSecurity(final CreditDefaultSwapIndexDefinitionSecurity security) {
+          return Collections.singletonList(security.getCurrency());
+        }
+
+        @Override
         public Collection<Currency> visitCreditDefaultSwapIndexSecurity(final CreditDefaultSwapIndexSecurity security) {
+          return Collections.singletonList(security.getNotional().getCurrency());
+        }
+
+        @Override
+        public Collection<Currency> visitCreditDefaultSwapOptionSecurity(final CreditDefaultSwapOptionSecurity security) {
           return Collections.singletonList(security.getCurrency());
         }
       });
@@ -1217,6 +1239,28 @@ public class FinancialSecurityUtils {
           final double notional = security.getMinimumAmount();
           return CurrencyAmount.of(currency, notional);
         }
+
+        @Override
+        public CurrencyAmount visitSwaptionSecurity(final SwaptionSecurity security) {
+          final Currency currency = security.getCurrency();
+          final double notional = security.getNotional();
+          return CurrencyAmount.of(currency, notional);
+        }
+
+        @Override
+        public CurrencyAmount visitEquityIndexOptionSecurity(final EquityIndexOptionSecurity security) {
+          final Currency currency = security.getCurrency();
+          final double notional = security.getPointValue();
+          return CurrencyAmount.of(currency, notional);
+        }
+
+        @Override
+        public CurrencyAmount visitInterestRateFutureSecurity(final InterestRateFutureSecurity security) {
+          final Currency currency = security.getCurrency();
+          final double notional = security.getUnitAmount();
+          return CurrencyAmount.of(currency, notional);
+        }
+
       });
       return notional;
     }

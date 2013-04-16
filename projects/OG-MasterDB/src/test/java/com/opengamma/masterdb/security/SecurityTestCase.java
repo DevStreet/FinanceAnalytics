@@ -57,6 +57,7 @@ import com.opengamma.financial.security.cds.CDSIndexComponentBundle;
 import com.opengamma.financial.security.cds.CDSIndexTerms;
 import com.opengamma.financial.security.cds.CDSSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexComponent;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
 import com.opengamma.financial.security.cds.LegacyRecoveryLockCDSSecurity;
@@ -87,6 +88,7 @@ import com.opengamma.financial.security.option.BarrierPayoffStyle;
 import com.opengamma.financial.security.option.BermudanExerciseType;
 import com.opengamma.financial.security.option.CappedPoweredPayoffStyle;
 import com.opengamma.financial.security.option.CashOrNothingPayoffStyle;
+import com.opengamma.financial.security.option.CreditDefaultSwapOptionSecurity;
 import com.opengamma.financial.security.option.EquityBarrierOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexDividendFutureOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
@@ -995,9 +997,18 @@ public abstract class SecurityTestCase extends AbstractSecurityTestCaseAdapter i
   }
 
   @Override
+  public void testCreditDefaultSwapIndexDefinitionSecurity() {
+    assertSecurities(CreditDefaultSwapIndexDefinitionSecurity.class);
+  }
+
+  @Override
   public void testCreditDefaultSwapIndexSecurity() {
     assertSecurities(CreditDefaultSwapIndexSecurity.class);
   }
-  
+
+  @Override
+  public void testCreditDefaultSwapOptionSecurity() {
+    assertSecurities(CreditDefaultSwapOptionSecurity.class);
+  }
   
 }

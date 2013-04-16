@@ -32,6 +32,7 @@ import com.opengamma.masterdb.security.hibernate.capfloor.CapFloorSecurityBeanOp
 import com.opengamma.masterdb.security.hibernate.cash.CashSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.cashflow.CashFlowSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.cds.CDSSecurityBeanOperation;
+import com.opengamma.masterdb.security.hibernate.cds.CreditDefaultSwapIndexDefinitionSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.cds.CreditDefaultSwapIndexSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.cds.LegacyFixedRecoveryCDSSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.cds.LegacyRecoveryLockCDSSecurityBeanOperation;
@@ -47,6 +48,7 @@ import com.opengamma.masterdb.security.hibernate.future.FutureSecurityBeanOperat
 import com.opengamma.masterdb.security.hibernate.fx.FXForwardSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.fx.NonDeliverableFXForwardSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.option.BondFutureOptionSecurityBeanOperation;
+import com.opengamma.masterdb.security.hibernate.option.CDSOptionSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.option.CommodityFutureOptionSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.option.EquityBarrierOptionSecurityBeanOperation;
 import com.opengamma.masterdb.security.hibernate.option.EquityIndexDividendFutureOptionSecurityBeanOperation;
@@ -193,7 +195,9 @@ public class HibernateSecurityMasterDetailProvider implements SecurityMasterDeta
     loadBeanOperation(StdRecoveryLockCDSSecurityBeanOperation.INSTANCE);
     loadBeanOperation(StdVanillaCDSSecurityBeanOperation.INSTANCE);
     loadBeanOperation(CashFlowSecurityBeanOperation.INSTANCE);
+    loadBeanOperation(CreditDefaultSwapIndexDefinitionSecurityBeanOperation.INSTANCE);
     loadBeanOperation(CreditDefaultSwapIndexSecurityBeanOperation.INSTANCE);
+    loadBeanOperation(CDSOptionSecurityBeanOperation.INSTANCE);
   }
 
   //-------------------------------------------------------------------------
