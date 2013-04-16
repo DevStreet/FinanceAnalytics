@@ -97,4 +97,22 @@ public interface LAPACKAPIInterface {
   // generalised eigenvalues+vectors
   void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info);
 
+  // computes the norms of a symmetric real matrix
+  void dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work);
+
+  // computes the norms of a triangular matrix
+  void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work);
+
+  // computes the norms of a general real matrix
+  void dlange(char norm, int m, int n, double[] a, int lda, double[] work);
+
+  // reciprocal condition number estimate of a triangular matrix
+  void dtrcon(char norm, char uplo, char diag, int n, double[] a, int lda, double[] rcond, double[] work, int[] iwork, int[] info);
+
+  // reciprocal condition number estimate of a real s.p.d matrix based on cholesky factorisation from dpotrf()
+  void dpocon(char uplo, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info);
+
+  // reciprocal condition number estimate of a real general matrix based on the factorisation from dgetrf()
+  void dgecon(char norm, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info);
+
 }

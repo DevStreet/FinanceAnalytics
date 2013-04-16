@@ -65,4 +65,34 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
     OGLAPACKRawWrapper.dgeev(new char[] {jobvl }, new char[] {jobvr }, new int[] {n }, a, new int[] {lda }, wr, wi, vl, new int[] {ldvl }, vr, new int[] {ldvr }, work, new int[] {lwork }, info);
   }
 
+  @Override
+  public void dlansy(char norm, char uplo, int n, double[] ap, int lda, double[] work) {
+    OGLAPACKRawWrapper.dlansy(new char[] {norm }, new char[] {uplo }, new int[] {n }, ap, new int[] {lda }, work);
+  }
+
+  @Override
+  public void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
+    OGLAPACKRawWrapper.dlantr(new char[] {norm }, new char[] {uplo }, new char[] {diag }, new int[] {m }, new int[] {n }, a, new int[] {lda }, work);
+  }
+
+  @Override
+  public void dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
+    OGLAPACKRawWrapper.dlange(new char[] {norm }, new int[] {m }, new int[] {n }, a, new int[] {lda }, work);
+  }
+
+  @Override
+  public void dpocon(char uplo, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info) {
+    OGLAPACKRawWrapper.dpocon(new char[] {uplo }, new int[] {n }, a, new int[] {lda }, new double[] {anorm }, rcond, work, iwork, info);
+  }
+
+  @Override
+  public void dtrcon(char norm, char uplo, char diag, int n, double[] a, int lda, double[] rcond, double[] work, int[] iwork, int[] info) {
+    OGLAPACKRawWrapper.dtrcon(new char[] {norm }, new char[] {uplo }, new char[] {diag }, new int[] {n }, a, new int[] {lda }, rcond, work, iwork, info);
+  }
+
+  @Override
+  public void dgecon(char norm, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info) {
+    OGLAPACKRawWrapper.dgecon(new char[] {norm }, new int[] {n }, a, new int[] {lda }, new double[] {anorm }, rcond, work, iwork, info);
+  }
+
 }

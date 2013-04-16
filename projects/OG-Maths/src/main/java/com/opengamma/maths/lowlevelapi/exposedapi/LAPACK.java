@@ -102,4 +102,34 @@ public class LAPACK implements LAPACKAPIInterface {
     _localLAPACK.dgeev(jobvl, jobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr, work, lwork, info);
   }
 
+  @Override
+  public void dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work) {
+    _localLAPACK.dlansy(norm, uplo, n, a, lda, work);
+  }
+
+  @Override
+  public void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
+    _localLAPACK.dlantr(norm, uplo, diag, m, n, a, lda, work);
+  }
+
+  @Override
+  public void dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
+    _localLAPACK.dlange(norm, m, n, a, lda, work);
+  }
+
+  @Override
+  public void dtrcon(char norm, char uplo, char diag, int n, double[] a, int lda, double[] rcond, double[] work, int[] iwork, int[] info) {
+    _localLAPACK.dtrcon(norm, uplo, diag, n, a, lda, rcond, work, iwork, info);
+  }
+
+  @Override
+  public void dpocon(char uplo, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info) {
+    _localLAPACK.dpocon(uplo, n, a, lda, anorm, rcond, work, iwork, info);
+  }
+
+  @Override
+  public void dgecon(char norm, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info) {
+    _localLAPACK.dgecon(norm, n, a, lda, anorm, rcond, work, iwork, info);
+  }
+
 }

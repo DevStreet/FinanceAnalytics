@@ -5,15 +5,22 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 
+import org.netlib.lapack.Dgecon;
 import org.netlib.lapack.Dgeev;
 import org.netlib.lapack.Dgelsd;
 import org.netlib.lapack.Dgesvd;
 import org.netlib.lapack.Dgetrf;
 import org.netlib.lapack.Dgetrs;
+import org.netlib.lapack.Dlange;
+import org.netlib.lapack.Dlansy;
+import org.netlib.lapack.Dlantr;
+import org.netlib.lapack.Dpocon;
 import org.netlib.lapack.Dpotrf;
 import org.netlib.lapack.Dpotrs;
+import org.netlib.lapack.Dtrcon;
 import org.netlib.lapack.Dtrtrs;
 import org.netlib.lapack.Ilaenv;
+import org.netlib.util.doubleW;
 import org.netlib.util.intW;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
@@ -91,6 +98,48 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     intW infoderef = new intW(info[0]);
     Dgeev.dgeev(String.valueOf(jobvl), String.valueOf(jobvr), n, a, lda, 0, wr, 0, wi, 0, vl, 0, ldvl, vr, 0, ldvr, work, 0, lwork, infoderef);
     info[0] = infoderef.val;
+  }
+
+  @Override
+  public void dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work) {
+    Dlansy.dlansy(String.valueOf(norm), String.valueOf(uplo), n, a, 0, lda, work, 0);
+  }
+
+  @Override
+  public void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
+    Dlantr.dlantr(String.valueOf(norm), String.valueOf(uplo), String.valueOf(diag), m, n, a, 0, lda, work, 0);
+  }
+
+  @Override
+  public void dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
+    Dlange.dlange(String.valueOf(norm), m, n, a, 0, lda, work, 0);
+  }
+
+  @Override
+  public void dtrcon(char norm, char uplo, char diag, int n, double[] a, int lda, double[] rcond, double[] work, int[] iwork, int[] info) {
+    intW infoderef = new intW(info[0]);
+    doubleW rcondderef = new doubleW(rcond[0]);
+    Dtrcon.dtrcon(String.valueOf(norm), String.valueOf(uplo), String.valueOf(diag), n, a, 0, lda, rcondderef, work, 0, iwork, 0, infoderef);
+    info[0] = infoderef.val;
+    rcond[0] = rcondderef.val;
+  }
+
+  @Override
+  public void dpocon(char uplo, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info) {
+    intW infoderef = new intW(info[0]);
+    doubleW rcondderef = new doubleW(rcond[0]);
+    Dpocon.dpocon(String.valueOf(uplo), n, a, 0, lda, anorm, rcondderef, work, 0, iwork, 0, infoderef);
+    info[0] = infoderef.val;
+    rcond[0] = rcondderef.val;
+  }
+
+  @Override
+  public void dgecon(char norm, int n, double[] a, int lda, double anorm, double[] rcond, double[] work, int[] iwork, int[] info) {
+    intW infoderef = new intW(info[0]);
+    doubleW rcondderef = new doubleW(rcond[0]);
+    Dgecon.dgecon(String.valueOf(norm), n, a, 0, lda, anorm, rcondderef, work, 0, iwork, 0, infoderef);
+    info[0] = infoderef.val;
+    rcond[0] = rcondderef.val;
   }
 
 }
