@@ -7,9 +7,6 @@ package com.opengamma.core.marketdatasnapshot;
 
 import java.util.Map;
 
-import com.opengamma.util.time.Tenor;
-import com.opengamma.util.tuple.Pair;
-
 /**
  * A snapshot of volatility cube data.
  * <p>
@@ -22,22 +19,6 @@ public interface VolatilityCubeSnapshot {
    * 
    * @return the values
    */
-  Map<VolatilityPoint, ValueSnapshot> getValues();
-
-  /**
-   * Gets the unstructured market data snapshot.
-   * <p>
-   * This contains the other values that should be applied when building the cube, such as the spot rate.
-   * 
-   * @return the values which should be applied when building this curve
-   */
-  UnstructuredMarketDataSnapshot getOtherValues();
-
-  /**
-   * Gets the strikes.
-   * 
-   * @return the strikes
-   */
-  Map<Pair<Tenor, Tenor>, ValueSnapshot> getStrikes();
+  Map<VolatilityPoint<Object, Object, Object>, ValueSnapshot> getValues();
 
 }

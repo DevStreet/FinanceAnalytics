@@ -26,7 +26,7 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
  * @param <Z> The type of the z axis data
  */
 @BeanDefinition
-public class VolatilityPoint<X extends Comparable<X>, Y extends Comparable<Y>, Z extends Comparable<Z>> extends DirectBean {
+public class VolatilityPoint<X, Y, Z> extends DirectBean {
 
   /**
    * The x axis.
