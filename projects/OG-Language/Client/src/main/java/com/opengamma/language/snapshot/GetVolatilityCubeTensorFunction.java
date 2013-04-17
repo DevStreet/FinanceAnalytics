@@ -26,7 +26,6 @@ import com.opengamma.language.definition.MetaParameter;
 import com.opengamma.language.function.AbstractFunctionInvoker;
 import com.opengamma.language.function.MetaFunction;
 import com.opengamma.language.function.PublishedFunction;
-import com.opengamma.util.time.Tenor;
 
 /**
  * Fetches the data from a volatility surface as a 3D matrix tensor.
@@ -56,26 +55,27 @@ public class GetVolatilityCubeTensorFunction extends AbstractFunctionInvoker imp
     this(new DefinitionAnnotater(GetVolatilityCubeTensorFunction.class));
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked" })
   public static Value[][][] invoke(final ManageableVolatilityCubeSnapshot snapshot, final Boolean marketValue, final Boolean overrideValue) {
-    final Set<Tenor> keyXSet = new HashSet<Tenor>();
-    final Set<Tenor> keyYSet = new HashSet<Tenor>();
-    final Set<Double> keyZSet = new HashSet<Double>();
-    for (VolatilityPoint key : snapshot.getValues().keySet()) {
-      keyXSet.add(key.getSwapTenor());
-      keyYSet.add(key.getOptionExpiry());
-      keyZSet.add(key.getRelativeStrike());
+    final Set<Comparable<Object>> keyXSet = new HashSet<>();
+    final Set<Comparable<Object>> keyYSet = new HashSet<>();
+    final Set<Comparable<Object>> keyZSet = new HashSet<>();
+    for (final VolatilityPoint key : snapshot.getValues().keySet()) {
+      keyXSet.add(key.getXAxis());
+      keyYSet.add(key.getYAxis());
+      keyZSet.add(key.getZAxis());
     }
-    final List<Tenor> keyX = new ArrayList<Tenor>(keyXSet);
-    final List<Tenor> keyY = new ArrayList<Tenor>(keyYSet);
-    final List<Double> keyZ = new ArrayList<Double>(keyZSet);
+    final List<Comparable<Object>> keyX = new ArrayList<>(keyXSet);
+    final List<Comparable<Object>> keyY = new ArrayList<>(keyYSet);
+    final List<Comparable<Object>> keyZ = new ArrayList<>(keyZSet);
     Collections.sort(keyX);
     Collections.sort(keyY);
     Collections.sort(keyZ);
     final Value[][][] values = new Value[keyZ.size()][keyY.size()][keyX.size()];
     for (int i = 0; i < keyZ.size(); i++) {
-      final Double z = keyZ.get(i);
+      final Comparable<Object> z = keyZ.get(i);
       for (int j = 0; j < keyY.size(); j++) {
-        final Tenor y = keyY.get(j);
+        final Comparable<Object> y = keyY.get(j);
         for (int k = 0; k < keyX.size(); k++) {
           final ValueSnapshot value = snapshot.getValues().get(new VolatilityPoint(keyX.get(k), y, z));
           if (value == null) {

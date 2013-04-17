@@ -50,8 +50,11 @@ public class VolatilityCubeKey extends StructuredMarketDataKey implements Compar
   /**
    * Creates an instance.
    * 
-   * @param currency  the currency
+   * @param target  the target
    * @param name  the name
+   * @param instrumentType  the instrument type
+   * @param quoteType  the quote type
+   * @param quoteUnits  the quote units
    */
   public VolatilityCubeKey(final UniqueIdentifiable target, final String name, final String instrumentType, final String quoteType, final String quoteUnits) {
     ArgumentChecker.notNull(target, "target");

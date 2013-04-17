@@ -56,10 +56,11 @@ public class SetVolatilityCubePointFunction extends AbstractFunctionInvoker impl
     this(new DefinitionAnnotater(SetVolatilityCubePointFunction.class));
   }
 
-  public static ManageableVolatilityCubeSnapshot invoke(final ManageableVolatilityCubeSnapshot snapshot, final Tenor swapTenor, final Tenor optionExpiry, final double relativeStrike,
-      final Double overrideValue, final Double marketValue) {
+  @SuppressWarnings({"rawtypes", "unchecked" })
+  public static ManageableVolatilityCubeSnapshot invoke(final ManageableVolatilityCubeSnapshot snapshot, final Comparable<Object> xAxis, final Comparable<Object> yAxis,
+      final Comparable<Object> zAxis, final Double overrideValue, final Double marketValue) {
     final Map<VolatilityPoint, ValueSnapshot> points = snapshot.getValues();
-    final VolatilityPoint key = new VolatilityPoint(swapTenor, optionExpiry, relativeStrike);
+    final VolatilityPoint key = new VolatilityPoint(xAxis, yAxis, zAxis);
     if ((overrideValue != null) || (marketValue != null)) {
       final ValueSnapshot value = points.get(key);
       if (value != null) {
@@ -79,9 +80,11 @@ public class SetVolatilityCubePointFunction extends AbstractFunctionInvoker impl
 
   // AbstractFunctionInvoker
 
+  @SuppressWarnings("unchecked")
   @Override
   protected Object invokeImpl(final SessionContext sessionContext, final Object[] parameters) {
-    return invoke((ManageableVolatilityCubeSnapshot) parameters[0], (Tenor) parameters[1], (Tenor) parameters[2], (Double) parameters[3], (Double) parameters[4], (Double) parameters[5]);
+    return invoke((ManageableVolatilityCubeSnapshot) parameters[0], (Comparable<Object>) parameters[1], (Comparable<Object>) parameters[2], (Comparable<Object>) parameters[3],
+        (Double) parameters[4], (Double) parameters[5]);
   }
 
   // PublishedFunction

@@ -26,7 +26,6 @@ import com.opengamma.language.error.InvokeInvalidArgumentException;
 import com.opengamma.language.function.AbstractFunctionInvoker;
 import com.opengamma.language.function.MetaFunction;
 import com.opengamma.language.function.PublishedFunction;
-import com.opengamma.util.time.Tenor;
 
 /**
  * Modifies a volatility cube to take values from the updated 2D matrix tensor.
@@ -56,18 +55,19 @@ public class SetVolatilityCubeTensorFunction extends AbstractFunctionInvoker imp
     this(new DefinitionAnnotater(SetVolatilityCubeTensorFunction.class));
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked" })
   public static ManageableVolatilityCubeSnapshot invoke(final ManageableVolatilityCubeSnapshot snapshot, final Value[][][] overrideValue, final Value[][][] marketValue) {
-    final Set<Tenor> keyXSet = new HashSet<Tenor>();
-    final Set<Tenor> keyYSet = new HashSet<Tenor>();
-    final Set<Double> keyZSet = new HashSet<Double>();
-    for (VolatilityPoint key : snapshot.getValues().keySet()) {
-      keyXSet.add(key.getSwapTenor());
-      keyYSet.add(key.getOptionExpiry());
-      keyZSet.add(key.getRelativeStrike());
+    final Set<Comparable<Object>> keyXSet = new HashSet<>();
+    final Set<Comparable<Object>> keyYSet = new HashSet<>();
+    final Set<Comparable<Object>> keyZSet = new HashSet<>();
+    for (final VolatilityPoint key : snapshot.getValues().keySet()) {
+      keyXSet.add(key.getXAxis());
+      keyYSet.add(key.getYAxis());
+      keyZSet.add(key.getZAxis());
     }
-    final List<Tenor> keyX = new ArrayList<Tenor>(keyXSet);
-    final List<Tenor> keyY = new ArrayList<Tenor>(keyYSet);
-    final List<Double> keyZ = new ArrayList<Double>(keyZSet);
+    final List<Comparable<Object>> keyX = new ArrayList<>(keyXSet);
+    final List<Comparable<Object>> keyY = new ArrayList<>(keyYSet);
+    final List<Comparable<Object>> keyZ = new ArrayList<>(keyZSet);
     Collections.sort(keyX);
     Collections.sort(keyY);
     Collections.sort(keyZ);
@@ -78,7 +78,7 @@ public class SetVolatilityCubeTensorFunction extends AbstractFunctionInvoker imp
       throw new InvokeInvalidArgumentException(2, "Not enough planes in cube");
     }
     for (int i = 0; i < keyZ.size(); i++) {
-      final Double z = keyZ.get(i);
+      final Comparable<Object> z = keyZ.get(i);
       if ((overrideValue != null) && (overrideValue[i].length < keyY.size())) {
         throw new InvokeInvalidArgumentException(1, "Not enough rows in cube");
       }
@@ -86,7 +86,7 @@ public class SetVolatilityCubeTensorFunction extends AbstractFunctionInvoker imp
         throw new InvokeInvalidArgumentException(2, "Not enough rows in cube");
       }
       for (int j = 0; j < keyY.size(); j++) {
-        final Tenor y = keyY.get(j);
+        final Comparable<Object> y = keyY.get(j);
         if ((overrideValue != null) && (overrideValue[i][j].length < keyX.size())) {
           throw new InvokeInvalidArgumentException(1, "Not enough columns in cube");
         }
