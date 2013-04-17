@@ -91,7 +91,7 @@ public class DbMarketDataSnapshotMasterTest extends DbTest {
     final ManageableMarketDataSnapshot marketDataSnapshot = new ManageableMarketDataSnapshot();
     marketDataSnapshot.setName("Test");
 
-    final HashMap<YieldCurveKey, YieldCurveSnapshot> yieldCurves = new HashMap<YieldCurveKey, YieldCurveSnapshot>();
+    final HashMap<YieldCurveKey, YieldCurveSnapshot> yieldCurves = new HashMap<>();
 
     final ManageableUnstructuredMarketDataSnapshot globalValues = new ManageableUnstructuredMarketDataSnapshot();
     marketDataSnapshot.setGlobalValues(globalValues);
@@ -112,7 +112,7 @@ public class DbMarketDataSnapshotMasterTest extends DbTest {
     final ManageableUnstructuredMarketDataSnapshot globalValues = new ManageableUnstructuredMarketDataSnapshot();
     snapshot1.setGlobalValues(globalValues);
 
-    final HashMap<YieldCurveKey, YieldCurveSnapshot> yieldCurves = new HashMap<YieldCurveKey, YieldCurveSnapshot>();
+    final HashMap<YieldCurveKey, YieldCurveSnapshot> yieldCurves = new HashMap<>();
 
     final ExternalIdBundle specA = ExternalId.of("XXX", "AAA").toBundle();
     final ExternalIdBundle specB = ExternalIdBundle.of(ExternalId.of("XXX", "B1"), ExternalId.of("XXX", "B2"));
@@ -129,17 +129,14 @@ public class DbMarketDataSnapshotMasterTest extends DbTest {
 
     snapshot1.setYieldCurves(yieldCurves);
 
-    final HashMap<Pair<Tenor, Tenor>, ValueSnapshot> strikes = new HashMap<Pair<Tenor, Tenor>, ValueSnapshot>();
+    final HashMap<Pair<Tenor, Tenor>, ValueSnapshot> strikes = new HashMap<>();
     strikes.put(Pair.of(Tenor.DAY, Tenor.WORKING_WEEK), new ValueSnapshot(12.0, 12.0));
     strikes.put(Pair.of(Tenor.DAY, Tenor.WORKING_WEEK), null);
 
-    final HashMap<VolatilityCubeKey, VolatilityCubeSnapshot> volCubes = new HashMap<VolatilityCubeKey, VolatilityCubeSnapshot>();
+    final HashMap<VolatilityCubeKey, VolatilityCubeSnapshot> volCubes = new HashMap<>();
     final ManageableVolatilityCubeSnapshot volCube = new ManageableVolatilityCubeSnapshot();
 
-    volCube.setOtherValues(globalValues);
-    volCube.setValues(new HashMap<VolatilityPoint, ValueSnapshot>());
-    volCube.setStrikes(strikes);
-    volCube.getValues().put(new VolatilityPoint(Tenor.DAY, Tenor.YEAR, -1), new ValueSnapshot(null, null));
+    volCube.getValues().put(new VolatilityPoint<Object, Object, Object>(Tenor.DAY, Tenor.YEAR, -1), new ValueSnapshot(null, null));
 
     volCubes.put(new VolatilityCubeKey(Currency.USD, "Default", "SWAPTION", "Absolute", "VolatilityQuote"), volCube);
     snapshot1.setVolatilityCubes(volCubes);
