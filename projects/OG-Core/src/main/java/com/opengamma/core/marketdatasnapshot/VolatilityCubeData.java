@@ -5,8 +5,10 @@
  */
 package com.opengamma.core.marketdatasnapshot;
 
-import java.util.Arrays;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.opengamma.id.UniqueIdentifiable;
@@ -30,27 +32,43 @@ public class VolatilityCubeData<X extends Comparable<X>, Y extends Comparable<Y>
   private final String _yLabel;
   private final String _zLabel;
 
-  public VolatilityCubeData(final String definitionName, final String specificationName, final UniqueIdentifiable target, final X[] xs, final String xLabel,
-      final Y[] ys, final String yLabel, final Z[] zs, final String zLabel, final Map<VolatilityPoint<X, Y, Z>, Double> data) {
+  public VolatilityCubeData(final String definitionName, final String specificationName, final UniqueIdentifiable target, final String xLabel,
+      final String yLabel, final String zLabel, final Map<VolatilityPoint<X, Y, Z>, Double> data) {
     ArgumentChecker.notNull(definitionName, "definition name");
     ArgumentChecker.notNull(specificationName, "specification name");
     ArgumentChecker.notNull(target, "target");
-    ArgumentChecker.notNull(xs, "xs");
     ArgumentChecker.notNull(xLabel, "x label");
-    ArgumentChecker.notNull(ys, "ys");
     ArgumentChecker.notNull(yLabel, "y label");
-    ArgumentChecker.notNull(zs, "zs");
     ArgumentChecker.notNull(zLabel, "z label");
     _definitionName = definitionName;
     _specificationName = specificationName;
     _target = target;
-    _xs = xs;
     _xLabel = xLabel;
-    _ys = ys;
     _yLabel = yLabel;
-    _zs = zs;
     _zLabel = zLabel;
     _data = new HashMap<>(data);
+    final List<X> xsList = new ArrayList<>();
+    final List<Y> ysList = new ArrayList<>();
+    final List<Z> zsList = new ArrayList<>();
+    Class<X> xClazz = null;
+    Class<Y> yClazz = null;
+    Class<Z> zClazz = null;
+    int i = 0;
+    for (final Map.Entry<VolatilityPoint<X, Y, Z>, Double> entry : data.entrySet()) {
+      final VolatilityPoint<X, Y, Z> key = entry.getKey();
+      if (i == 0) {
+        xClazz = (Class<X>) key.getXAxis().getClass();
+        yClazz = (Class<Y>) key.getYAxis().getClass();
+        zClazz = (Class<Z>) key.getZAxis().getClass();
+      }
+      xsList.add(key.getXAxis());
+      ysList.add(key.getYAxis());
+      zsList.add(key.getZAxis());
+      i++;
+    }
+    _xs = (X[]) Array.newInstance(xClazz, xsList.size());
+    _ys = (Y[]) Array.newInstance(yClazz, ysList.size());
+    _zs = (Z[]) Array.newInstance(zClazz, zsList.size());
   }
 
   /**
@@ -150,10 +168,9 @@ public class VolatilityCubeData<X extends Comparable<X>, Y extends Comparable<Y>
     return getDefinitionName().equals(other.getDefinitionName()) &&
         getSpecificationName().equals(other.getSpecificationName()) &&
         getTarget().equals(other.getTarget()) &&
-        Arrays.equals(getXs(), other.getXs()) &&
-        Arrays.equals(getYs(), other.getYs()) &&
         getXLabel().equals(other.getXLabel()) &&
         getYLabel().equals(other.getYLabel()) &&
+        getZLabel().equals(other.getZLabel()) &&
         _data.equals(other._data);
   }
 

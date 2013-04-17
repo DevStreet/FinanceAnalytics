@@ -5,7 +5,6 @@
  */
 package com.opengamma.core.marketdatasnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,12 @@ public class VolatilityCubeDataBuilder implements FudgeBuilder<VolatilityCubeDat
   private static final String Y_FIELD = "y";
   /** The z field */
   private static final String Z_FIELD = "z";
+  /** The x field */
+  private static final String X_CLASS_FIELD = "xClass";
+  /** The y field */
+  private static final String Y_CLASS_FIELD = "yClass";
+  /** The z field */
+  private static final String Z_CLASS_FIELD = "zClass";
   /** The volatility data field */
   private static final String VOLATILITY_FIELD = "volatility";
   /** The volatilities data field */
@@ -58,6 +63,7 @@ public class VolatilityCubeDataBuilder implements FudgeBuilder<VolatilityCubeDat
     message.add(X_LABEL_FIELD, object.getXLabel());
     message.add(Y_LABEL_FIELD, object.getYLabel());
     message.add(Z_LABEL_FIELD, object.getZLabel());
+    int i = 0;
     for (final Map.Entry<?, Double> entry : object.getData().entrySet()) {
       final MutableFudgeMsg subMessage = serializer.newMessage();
       final VolatilityPoint volatilityPoint = (VolatilityPoint) entry.getKey();
@@ -69,15 +75,18 @@ public class VolatilityCubeDataBuilder implements FudgeBuilder<VolatilityCubeDat
       subMessage.add(Z_FIELD, null, serializer.objectToFudgeMsg(zAxis));
       subMessage.add(VOLATILITY_FIELD, entry.getValue());
       message.add(VOLATILITIES_FIELD, null, subMessage);
+      if (i == 0) {
+        subMessage.add(X_CLASS_FIELD, null, FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(xAxis), xAxis.getClass()));
+        subMessage.add(Y_CLASS_FIELD, null, FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(yAxis), yAxis.getClass()));
+        subMessage.add(Z_CLASS_FIELD, null, FudgeSerializer.addClassHeader(serializer.objectToFudgeMsg(zAxis), zAxis.getClass()));
+      }
+      i++;
     }
     return message;
   }
 
   @Override
   public VolatilityCubeData<?, ?, ?> buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
-    final List<Comparable<?>> xsList = new ArrayList<>();
-    final List<Comparable<?>> ysList = new ArrayList<>();
-    final List<Comparable<?>> zsList = new ArrayList<>();
     final UniqueIdentifiable target = deserializer.fieldValueToObject(UniqueIdentifiable.class, message.getByName(TARGET_FIELD));
     final String definitionName = message.getString(DEFINITION_NAME_FIELD);
     final String specificationName = message.getString(SPECIFICATION_NAME_FIELD);
@@ -85,22 +94,25 @@ public class VolatilityCubeDataBuilder implements FudgeBuilder<VolatilityCubeDat
     final String yLabel = message.getString(Y_LABEL_FIELD);
     final String zLabel = message.getString(Z_LABEL_FIELD);
     final List<FudgeField> volatilitiesField = message.getAllByName(VOLATILITIES_FIELD);
+    int i = 0;
     final Map<VolatilityPoint, Double> data = new HashMap<>();
+    Class<?> xClazz = null;
+    Class<?> yClazz = null;
+    Class<?> zClazz = null;
     for (final FudgeField field : volatilitiesField) {
       final FudgeMsg subMessage = (FudgeMsg) field.getValue();
+      if (i == 0) {
+        xClazz = deserializer.fieldValueToObject(subMessage.getByName(X_CLASS_FIELD)).getClass();
+        yClazz = deserializer.fieldValueToObject(subMessage.getByName(Y_CLASS_FIELD)).getClass();
+        zClazz = deserializer.fieldValueToObject(subMessage.getByName(Z_CLASS_FIELD)).getClass();
+      }
       final Comparable<?> x = (Comparable<?>) deserializer.fieldValueToObject(xClazz, subMessage.getByName(X_FIELD));
       final Comparable<?> y = (Comparable<?>) deserializer.fieldValueToObject(yClazz, subMessage.getByName(Y_FIELD));
       final Comparable<?> z = (Comparable<?>) deserializer.fieldValueToObject(zClazz, subMessage.getByName(Z_FIELD));
-      xsList.add(x);
-      ysList.add(y);
-      zsList.add(z);
       final double value = subMessage.getDouble(VOLATILITY_FIELD);
       data.put(new VolatilityPoint(x, y, z), value);
+      i++;
     }
-    final Comparable<?>[] xs = xsList.toArray(new Comparable[xsList.size()]);
-    final Comparable<?>[] ys = ysList.toArray(new Comparable[ysList.size()]);
-    final Comparable<?>[] zs = zsList.toArray(new Comparable[zsList.size()]);
-    return new VolatilityCubeData(definitionName, specificationName, target, xs, xLabel, ys, yLabel, zs, zLabel, data);
+    return new VolatilityCubeData(definitionName, specificationName, target, xLabel, yLabel, zLabel, data);
   }
-
 }
