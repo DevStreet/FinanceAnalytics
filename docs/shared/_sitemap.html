@@ -1,0 +1,5 @@
+{% extends 'shared/_template.html' -%}
+{% block before_content -%}
+{% from 'nav.jinja' import sitemap with context -%}
+{{ sitemap() }}
+{% endblock -%}

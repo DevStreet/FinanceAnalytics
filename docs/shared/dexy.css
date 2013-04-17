@@ -1,0 +1,11 @@
+/* Extra styles used in dexy version of static docs site. */
+
+iframe.jira {
+    border: thin solid grey;
+    height: 400px;
+    width: 820px;
+}
+
+span.note {
+    background-color: yellow;
+}

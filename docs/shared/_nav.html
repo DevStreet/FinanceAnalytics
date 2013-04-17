@@ -1,0 +1,54 @@
+<div id="og_nav">
+    <ul>
+        {% for node in root.children -%}
+        {% if node.index_page -%}
+
+        {% if node.has_children_with_index_pages() -%}
+        {# If there are children, will have a drop-down menu #}
+        <li class="og_nav_menu">
+        {% else -%}
+        {# Otherwise, just a button #}
+        <li class="og_nav_btn">
+        {% endif -%}
+
+        <a href="{{ node.location }}"><span>{{ node.index_page.title() }}</span></a>
+
+        {% if node.has_children_with_index_pages() -%}
+        {# Make the drop-down menu #}
+        <ul>
+            {% for child in node.children -%}
+            {% if child.index_page -%}
+            <li><a href="{{ child.location }}">{{ child.index_page.title() }}</a></li>
+            {% endif -%}
+            {% endfor -%}
+        </ul>
+        {% endif -%}
+
+        </li>
+        {% endif -%}
+        {% endfor -%}
+
+        {% if nav.has_children_with_index_pages() -%}
+        {# If there are children, will have a drop-down menu #}
+        <li class="og_nav_menu">
+        {% else -%}
+        {# Otherwise, just a button #}
+        <li class="og_nav_btn">
+        {% endif -%}
+        <a href="{{ nav.location }}"><span>Children</span></a>
+
+        <ul>
+            {% for node in nav.children -%}
+
+            {% if node.index_page -%}
+            <li><a href="{{ node.location }}">{{ node.index_page.title() }}</a></li>
+            {% endif -%}
+
+            {% endfor -%}
+        </ul>
+
+        </li>
+
+        <li class="og_nav_btn"> <a href="/javadoc"><span>Javadocs</span></a> </li>
+    </ul>
+</div>

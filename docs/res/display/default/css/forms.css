@@ -1,0 +1,256 @@
+#ogw .p_form {
+	margin: 20px -10px;
+	background: #edf1f3;
+	border: 1px solid #d5dbde;
+	position: relative;
+	zoom: 1;
+}
+
+#ogw .p_form div.f_block {
+	clear: left;
+	overflow: hidden;
+	margin: 12px 0;
+	padding-left: 160px;
+	padding-right: 20px;
+}
+
+#ogw .p_form div.f_block.f_stacked {
+	padding-left: 10px !important;
+	padding-right: 10px;
+}
+
+#ogw .p_form .f_block p {
+	margin: 0;
+}
+
+#ogw .p_form .f_block .f_label {
+	clear: left;
+	float: left;
+	width: 140px;
+	margin: 0 0 0 -150px;
+	display: inline;
+}
+
+#ogw .p_form .f_block.f_stacked .f_label {
+	display: block;
+	width: auto;
+	margin: 0;
+}
+
+#ogw .p_form .f_block .f_required {
+	float: right;
+	margin: 0 -20px 0 0;
+	width: 20px;
+	text-align: center;
+	overflow: hidden;
+}
+
+#ogw .p_form .f_block.f_stacked .f_required {
+	margin-right: 0;
+}
+
+#ogw .p_form .f_block .f_required abbr {
+	font-size: 190%;
+	color: #c00;
+	line-height: 1;
+	position: relative;
+	top: 4px;
+}
+
+#ogw .p_form .f_label label,
+#ogw .p_form .f_label span.f_pseudo {
+	display: block;
+	font-weight: bold;
+	padding: 3px 0;
+	line-height: 1.4;
+}
+
+#ogw .p_form .f_block .f_input,
+#ogw .p_form .f_block .f_submit {
+	float: left;
+	margin: 0;
+	width: 100%;
+	position: relative;
+	overflow: visible;
+}
+
+#ogw .p_form .f_block .f_wide_input {
+	clear: left;
+	margin: 0 -20px 0 -160px;
+	padding: 4px 0;
+	position: relative;
+	overflow: visible;
+}
+
+#ogw .p_form .f_block .f_textual {
+	background: #fff;
+	border: 1px solid #d5dbde;
+	margin: 0;
+	padding: 0 0 0 2px;
+	line-height: 1.6;
+}
+
+#ogw .p_form .f_block .f_textual input,
+#ogw .p_form .f_block .f_textual textarea {
+	width: 100%;
+	padding: 2px 0;
+	margin: 0;
+	border: 0;
+	background: #fff;
+	display: block;
+	line-height: 1.4;
+}
+
+/*#ogw .p_form .f_block .f_short {
+	width: 80px;
+	margin-right: 20px;
+}*/
+
+#ogw .p_form .f_input select {
+	background: #fff;
+	border: 1px solid #d5dbde;
+}
+
+#ogw .p_form .f_submit input {
+	margin-right: 20px;
+}
+
+#ogw .p_form .f_problem .f_label {
+	color: #c00;
+}
+
+#ogw .p_form .f_problem .f_input .f_textual,
+#ogw .p_form .f_problem .f_wide_input .f_textual,
+#ogw .p_form .f_problem .f_input select {
+	border-color: #c00;
+	background: #fffff9;
+}
+
+/*#ogw .p_form .f_block .f_extra {
+	padding-top: 6px;
+}*/
+
+#ogw .p_form .f_block div.f_notes {
+	margin: 0 0 0 -160px;
+}
+
+#ogw .p_form .f_block .f_notes p {
+	margin: 0;
+	padding: 5px 0;
+}
+
+#ogw .p_form .f_block .f_intro {
+	clear: left;
+	float: left;
+	width: 100%;
+	margin: 0 0 10px 0;
+}
+
+#ogw .p_form .f_block p.f_notes {
+	clear: left;
+	float: left;
+	width: 100%;
+	margin: 5px 0 0 0;
+	font-size: 90%;
+	color: #666;
+}
+
+/*#ogw .p_form .f_block .f_extended .f_textual {
+	width: 611px;
+}
+
+#ogw .p_form .f_block .f_extended select {
+	width: 620px;
+}
+
+#ogw .p_form .f_block .f_editor {
+	width: 450px;
+}
+
+#ogw .p_form .f_block .f_extended .f_editor {
+	width: 606px;
+}*/
+
+#ogw .p_form .f_dividered {
+	border-top: 1px solid #d5dbde;
+	padding-top: 15px;
+}
+
+#ogw .p_form .dividered .f_submit {
+	margin-top: 5px;
+}
+
+.f_ht {
+	display: none !important;
+}
+
+#ogw .f_submit button {
+	float: left;
+	border: 0 !important;
+	padding: 0 !important;
+	background: transparent !important;
+}
+
+button::-moz-focus-inner { border: 0; }
+
+#ogw .f_submit button:active,
+#ogw .f_submit button:focus {
+	outline: none;
+}
+
+#ogw .f_submit button strong {
+	display: inline-block;
+	background: #355666 url(/res/display/default/chrome/form_submit.png) 0 0 no-repeat;
+}
+
+#ogw .f_submit button span {
+	float: left;
+	margin-left: 15px;
+	padding: 0 15px 0 0;
+	line-height: 23px;
+	height: 23px;
+	vertical-align: middle;
+	background: transparent url(/res/display/default/chrome/form_submit.png) 100% 0 no-repeat;
+	color: #fff;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+#ogw .f_submit button:hover strong,
+#ogw .f_submit button:active strong,
+#ogw .f_submit button:focus strong {
+	background-position: 0 -23px;
+}
+
+#ogw .f_submit button:hover span,
+#ogw .f_submit button:active span,
+#ogw .f_submit button:focus span {
+	background-position: 100% -23px;
+}
+
+#ogw .p_form .f_submit .f_adjunct {
+	padding-left: 10px;
+	line-height: 25px;
+	vertical-align: center;
+}
+
+#ogw .p_form .f_submit .f_alignright {
+	float: right;
+	text-align: right;
+}
+
+p.error {
+	font-size: 14px;
+	color: #c00;
+	font-weight: bold;
+}
+
+#ogw ul.f_problems {
+	padding-left: 0;
+}
+
+#ogw ul.f_problems li {
+	padding-left: 30px;
+	list-style-type: none;
+	background: transparent url(/res/display/default/chrome/f_problems.png) 0 2px no-repeat;
+}

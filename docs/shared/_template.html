@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    {% include 'shared/_head.html' %}
+    <body id="ogw">
+        <div id="og_container">
+            <div id="og_masthead">
+                {% include 'shared/_logo.html' %}
+                {% include 'shared/_nav.html' %}
+            </div>
+            <div id="og_pagetitle">
+                <h1>{{ page_title }}</h1>
+            </div>
+            <div id="og_outerwrapper">
+                <div id="og_innerwrapper">
+                    <div id="og_content">
+                        {% include 'shared/_content.html' %}
+                    </div>
+                </div>
+            </div>
+            <div id="og_push"></div>
+        </div>
+        {% include 'shared/_footer.html' %}
+    </body>
+</html>

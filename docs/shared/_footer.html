@@ -1,0 +1,57 @@
+<div id="og_footer">
+    <div>
+        <p>&copy; {{ year }} OpenGamma Limited</p>
+        <ul>
+            <li><a href="http://www.opengamma.com/privacy">Privacy and Cookies</a></li>
+            <li><a href="http://www.opengamma.com/legal">Legal</a></li>
+            <li>
+            <a href="http://www.linkedin.com/company/437198" class="linkedin">LinkedIn</a>
+            <a href="http://twitter.com/OpenGamma" class="twitter">Twitter</a>
+            <a href="https://plus.google.com/100994751666988151540" class="gplus">Google+</a>
+            <a href="http://www.youtube.com/user/OpenGamma" class="youtube">YouTube</a>
+            </li>
+        </ul>
+
+        <form method="post" action="http://www.opengamma.com/newsletter">
+            <p>
+            <label for="newsletter_email">Sign up for our newsletter</label>
+            </p>
+            <p>
+            <input type="hidden" name="go" value="commit" />
+            <input type="text" name="email" id="newsletter_email" />
+            <button type="submit">Go</button>
+            </p>
+        </form>
+    </div>
+</div>
+{% if False -%}
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+    _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+    _gaq.push(['_setAccount', 'UA-12092825-1']);
+    _gaq.push(['_setDomainName', 'none']);
+    _gaq.push(['_setAllowLinker', true]);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+     var s = document.getElementsByTagName('script')[0];
+     s.parentNode.insertBefore(ga, s);
+     })();
+</script>
+<div style="display:none">
+    <script type="text/javascript">
+        var google_conversion_id = 1018278620;
+        var google_conversion_label = "mjbwCJyXoQMQ3OXG5QM";
+        var google_custom_params = window.google_tag_params;
+        var google_remarketing_only = true;
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+        </script>
+        <noscript>
+            <div style="display:inline;"><img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1018278620/?value=0&amp;label=mjbwCJyXoQMQ3OXG5QM&amp;guid=ON&amp;script=0" /></div>
+        </noscript>
+    </div>
+    {% endif -%}

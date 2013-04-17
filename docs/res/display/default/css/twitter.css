@@ -1,0 +1,58 @@
+/*#ogdv_s_twitter {
+	margin: 40px 0 0 -10px;
+	padding: 40px 0 0 10px;
+	position: relative;
+	border-top: 1px solid #ccd8df;
+}*/
+
+#ogdv_s_twitter h2 {
+	font-family: Arial, sans-serif;
+	line-height: 20px;
+	vertical-align: middle;
+	padding-left: 38px;
+	background: transparent url(/res/display/default/chrome/twitter.png) 0 0 no-repeat;
+	text-transform: none;
+	margin: 0 0 20px 0;
+	font-weight: bold;
+}
+
+
+/* Styles for jTweetsAnywhere widget */
+
+#og_sidebar #tweets .jta-tweet-body {
+	line-height: 1.4;
+}
+	
+#og_sidebar #tweets .jta-tweet-text {
+	color: #666;
+}
+
+.jta-tweet-user-name {
+	font-weight: bold;
+}
+
+#og_sidebar #tweets .jta-tweet-attributes {
+	display: block;
+   color: #477187;
+   font-size: 9px;
+   margin-top: 6px;
+}
+
+#og_sidebar #tweets .jta-tweet-attributes a:link,
+#og_sidebar #tweets .jta-tweet-attributes a:visited {
+	color: #477187;
+	border: 0;
+}
+
+#og_sidebar #tweets .jta-tweet-attributes a:hover,
+#og_sidebar #tweets .jta-tweet-attributes a:active,
+#og_sidebar #tweets .jta-tweet-attributes a:focus {
+	color: #ff6a3c;
+	border: 0;
+}
+
+.jta-tweet-retweeter {
+	display: none;
+}
+
+

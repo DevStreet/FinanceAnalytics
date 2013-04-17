@@ -1,0 +1,40 @@
+### @export "confluence-export"
+- confluence/start.txt|fetchconfluence:
+    - fetchconfluence: { limit: 15, spaces: DOC }
+    - ws-template: 'shared/_template.html'
+
+### @export "rst-inputs"
+- rst-inputs:
+    - code
+    - .rst|rstmeta
+
+### @export "rst-content"
+- rst-content:
+    - .rst|jinja|rstbody:
+        # settings
+        - ws-template: 'shared/_template.html'
+        # inputs
+        - rst-inputs
+    - .rst|jinja|rst|latex:
+        # settings
+        - rst:
+            stylesheet: 'fancyvrb,shared/pygments.sty'
+        # inputs
+        - rst-inputs
+        - assets
+
+### @export "code"
+- code:
+    - .yaml|idio|h
+    - .yaml|idio|l
+    - .html|pyg|h
+    - .html|pyg|l
+    - shared/docs.sqlite3|kv
+
+### @export "assets"
+- assets:
+    - .css
+    - .jpg
+    - .png
+    - .js
+    - .sty
