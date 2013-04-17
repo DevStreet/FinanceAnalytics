@@ -55,11 +55,10 @@ public class SetVolatilitySurfaceTensorFunction extends AbstractFunctionInvoker 
     this(new DefinitionAnnotater(SetVolatilitySurfaceTensorFunction.class));
   }
 
-  @SuppressWarnings("unchecked")
   public static ManageableVolatilitySurfaceSnapshot invoke(final ManageableVolatilitySurfaceSnapshot snapshot, final Value[][] overrideValue, final Value[][] marketValue) {
     final Set<Comparable<Object>> keyXSet = new HashSet<Comparable<Object>>();
     final Set<Comparable<Object>> keyYSet = new HashSet<Comparable<Object>>();
-    for (Pair<Object, Object> key : snapshot.getValues().keySet()) {
+    for (final Pair<Object, Object> key : snapshot.getValues().keySet()) {
       if (key.getFirst() instanceof Comparable) {
         keyXSet.add((Comparable<Object>) key.getFirst());
       } else {

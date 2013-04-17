@@ -38,14 +38,12 @@ public class SetVolatilityCubePointFunction extends AbstractFunctionInvoker impl
   private static List<MetaParameter> parameters() {
     return Arrays.asList(
         new MetaParameter("snapshot", JavaTypeInfo.builder(ManageableVolatilityCubeSnapshot.class).get()),
-        new MetaParameter("swapTenor", JavaTypeInfo.builder(Tenor.class).get()),
-        new MetaParameter("optionExpiry", JavaTypeInfo.builder(Tenor.class).get()),
-        new MetaParameter("relativeStrike", JavaTypeInfo.builder(Double.class).get()),
+        new MetaParameter("x", JavaTypeInfo.builder(Tenor.class).get()),
+        new MetaParameter("y", JavaTypeInfo.builder(Tenor.class).get()),
+        new MetaParameter("z", JavaTypeInfo.builder(Double.class).get()),
         new MetaParameter("overrideValue", JavaTypeInfo.builder(Double.class).allowNull().get()),
         new MetaParameter("marketValue", JavaTypeInfo.builder(Double.class).allowNull().get()));
   }
-
-  // TODO: functions for the "other values", and "strikes" for a cube
 
   private SetVolatilityCubePointFunction(final DefinitionAnnotater info) {
     super(info.annotate(parameters()));
@@ -56,11 +54,10 @@ public class SetVolatilityCubePointFunction extends AbstractFunctionInvoker impl
     this(new DefinitionAnnotater(SetVolatilityCubePointFunction.class));
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked" })
-  public static ManageableVolatilityCubeSnapshot invoke(final ManageableVolatilityCubeSnapshot snapshot, final Comparable<Object> xAxis, final Comparable<Object> yAxis,
-      final Comparable<Object> zAxis, final Double overrideValue, final Double marketValue) {
-    final Map<VolatilityPoint, ValueSnapshot> points = snapshot.getValues();
-    final VolatilityPoint key = new VolatilityPoint(xAxis, yAxis, zAxis);
+  public static ManageableVolatilityCubeSnapshot invoke(final ManageableVolatilityCubeSnapshot snapshot, final Object xAxis, final Object yAxis,
+      final Object zAxis, final Double overrideValue, final Double marketValue) {
+    final Map<VolatilityPoint<Object, Object, Object>, ValueSnapshot> points = snapshot.getValues();
+    final VolatilityPoint<Object, Object, Object> key = new VolatilityPoint<>(xAxis, yAxis, zAxis);
     if ((overrideValue != null) || (marketValue != null)) {
       final ValueSnapshot value = points.get(key);
       if (value != null) {

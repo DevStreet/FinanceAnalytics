@@ -60,10 +60,22 @@ public class SetVolatilityCubeTensorFunction extends AbstractFunctionInvoker imp
     final Set<Comparable<Object>> keyXSet = new HashSet<>();
     final Set<Comparable<Object>> keyYSet = new HashSet<>();
     final Set<Comparable<Object>> keyZSet = new HashSet<>();
-    for (final VolatilityPoint key : snapshot.getValues().keySet()) {
-      keyXSet.add(key.getXAxis());
-      keyYSet.add(key.getYAxis());
-      keyZSet.add(key.getZAxis());
+    for (final VolatilityPoint<Object, Object, Object> key : snapshot.getValues().keySet()) {
+      if (key.getXAxis() instanceof Comparable) {
+        keyXSet.add((Comparable<Object>) key.getXAxis());
+      } else {
+        throw new InvokeInvalidArgumentException(0, "cube X key '" + key.getXAxis() + "' is not comparable");
+      }
+      if (key.getYAxis() instanceof Comparable) {
+        keyYSet.add((Comparable<Object>) key.getYAxis());
+      } else {
+        throw new InvokeInvalidArgumentException(0, "cube Y key '" + key.getYAxis() + "' is not comparable");
+      }
+      if (key.getZAxis() instanceof Comparable) {
+        keyZSet.add((Comparable<Object>) key.getZAxis());
+      } else {
+        throw new InvokeInvalidArgumentException(0, "cube Z key '" + key.getZAxis() + "' is not comparable");
+      }
     }
     final List<Comparable<Object>> keyX = new ArrayList<>(keyXSet);
     final List<Comparable<Object>> keyY = new ArrayList<>(keyYSet);

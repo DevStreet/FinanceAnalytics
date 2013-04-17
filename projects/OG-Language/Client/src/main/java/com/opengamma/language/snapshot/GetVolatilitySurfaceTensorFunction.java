@@ -56,11 +56,10 @@ public class GetVolatilitySurfaceTensorFunction extends AbstractFunctionInvoker 
     this(new DefinitionAnnotater(GetVolatilitySurfaceTensorFunction.class));
   }
 
-  @SuppressWarnings("unchecked")
   public static Value[][] invoke(final ManageableVolatilitySurfaceSnapshot snapshot, final Boolean marketValue, final Boolean overrideValue) {
-    final Set<Comparable<Object>> keyXSet = new HashSet<Comparable<Object>>();
-    final Set<Comparable<Object>> keyYSet = new HashSet<Comparable<Object>>();
-    for (Pair<Object, Object> key : snapshot.getValues().keySet()) {
+    final Set<Comparable<Object>> keyXSet = new HashSet<>();
+    final Set<Comparable<Object>> keyYSet = new HashSet<>();
+    for (final Pair<Object, Object> key : snapshot.getValues().keySet()) {
       if (key.getFirst() instanceof Comparable) {
         keyXSet.add((Comparable<Object>) key.getFirst());
       } else {
@@ -72,8 +71,8 @@ public class GetVolatilitySurfaceTensorFunction extends AbstractFunctionInvoker 
         throw new InvokeInvalidArgumentException(0, "surface Y key '" + key.getSecond() + "' is not comparable");
       }
     }
-    final List<Comparable<Object>> keyX = new ArrayList<Comparable<Object>>(keyXSet);
-    final List<Comparable<Object>> keyY = new ArrayList<Comparable<Object>>(keyYSet);
+    final List<Comparable<Object>> keyX = new ArrayList<>(keyXSet);
+    final List<Comparable<Object>> keyY = new ArrayList<>(keyYSet);
     Collections.sort(keyX);
     Collections.sort(keyY);
     final Value[][] values = new Value[keyY.size()][keyX.size()];
