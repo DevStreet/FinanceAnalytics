@@ -253,7 +253,7 @@ public class UserMarketDataSnapshot extends AbstractMarketDataSnapshot {
       }
 
       @Override
-      protected ValueProperties resolve(final Object targetObject, ValueProperties constraints, final StructuredMarketDataSnapshot snapshot) {
+      protected ValueProperties resolve(final Object targetObject, final ValueProperties constraints, final StructuredMarketDataSnapshot snapshot) {
         final UniqueId target = ((UniqueIdentifiable) targetObject).getUniqueId();
         final Set<String> names = constraints.getValues(ValuePropertyNames.CUBE);
         final Set<String> instrumentTypes = constraints.getValues(INSTRUMENT_TYPE_PROPERTY);
@@ -289,9 +289,10 @@ public class UserMarketDataSnapshot extends AbstractMarketDataSnapshot {
         final String quoteType = properties.getValues(CUBE_QUOTE_TYPE_PROPERTY).iterator().next();
         final String quoteUnits = properties.getValues(CUBE_QUOTE_UNITS_PROPERTY).iterator().next();
         if (snapshot.getVolatilityCubes() != null) {
-          final VolatilityCubeSnapshot data = snapshot.getVolatilityCubes().get(new VolatilityCubeKey(target, name, instrumentType, quoteType, quoteUnits));
+          final VolatilityCubeKey key = new VolatilityCubeKey(target, name, instrumentType, quoteType, quoteUnits);
+          final VolatilityCubeSnapshot data = snapshot.getVolatilityCubes().get(key);
           if (data != null) {
-            return convertVolatilityCubeMarketData(data);
+            return convertVolatilityCubeMarketData(data, key);
           }
         }
         return null;
@@ -342,29 +343,34 @@ public class UserMarketDataSnapshot extends AbstractMarketDataSnapshot {
   }
 
   private static VolatilitySurfaceData<Object, Object> createVolatilitySurfaceData(final VolatilitySurfaceSnapshot volCubeSnapshot, final VolatilitySurfaceKey marketDataKey) {
-    final Set<Object> xs = new HashSet<Object>();
-    final Set<Object> ys = new HashSet<Object>();
-    final Map<Pair<Object, Object>, Double> values = new HashMap<Pair<Object, Object>, Double>();
+    final Set<Object> xs = new HashSet<>();
+    final Set<Object> ys = new HashSet<>();
+    final Map<Pair<Object, Object>, Double> values = new HashMap<>();
     final Map<Pair<Object, Object>, ValueSnapshot> snapValues = volCubeSnapshot.getValues();
     for (final Entry<Pair<Object, Object>, ValueSnapshot> entry : snapValues.entrySet()) {
       values.put(entry.getKey(), query(entry.getValue()));
       xs.add(entry.getKey().getFirst());
       ys.add(entry.getKey().getSecond());
     }
-    return new VolatilitySurfaceData<Object, Object>(marketDataKey.getName(), "UNKNOWN", marketDataKey.getTarget(),
+    return new VolatilitySurfaceData<>(marketDataKey.getName(), "UNKNOWN", marketDataKey.getTarget(),
         xs.toArray(), ys.toArray(), values);
   }
 
-  private static VolatilityCubeData convertVolatilityCubeMarketData(final VolatilityCubeSnapshot volCubeSnapshot) {
-    final Map<VolatilityPoint, ValueSnapshot> values = volCubeSnapshot.getValues();
-    final HashMap<VolatilityPoint, Double> dataPoints = buildVolValues(values);
-    final HashMap<Pair<Tenor, Tenor>, Double> strikes = buildVolStrikes(volCubeSnapshot.getStrikes());
-    final SnapshotDataBundle otherData = createSnapshotDataBundle(volCubeSnapshot.getOtherValues());
-    final VolatilityCubeData ret = new VolatilityCubeData();
-    ret.setDataPoints(dataPoints);
-    ret.setOtherData(otherData);
-    ret.setATMStrikes(strikes);
-    return ret;
+  private static VolatilityCubeData<Object, Object, Object> convertVolatilityCubeMarketData(final VolatilityCubeSnapshot volCubeSnapshot,
+      final VolatilityCubeKey marketDataKey) {
+    final Set<Object> xs = new HashSet<>();
+    final Set<Object> ys = new HashSet<>();
+    final Set<Object> zs = new HashSet<>();
+    final Map<VolatilityPoint<Object, Object, Object>, Double> values = new HashMap<>();
+    final Map<VolatilityPoint<Object, Object, Object>, ValueSnapshot> snapValues = volCubeSnapshot.getValues();
+    for (final Map.Entry<VolatilityPoint<Object, Object, Object>, ValueSnapshot> entry : snapValues.entrySet()) {
+      values.put(entry.getKey(), query(entry.getValue()));
+      xs.add(entry.getKey().getXAxis());
+      ys.add(entry.getKey().getYAxis());
+      zs.add(entry.getKey().getZAxis());
+    }
+    return new VolatilityCubeData<>(marketDataKey.getName(), "UNKNOWN", marketDataKey.getTarget(),
+        xs.toArray(), "x", ys.toArray(), "y", zs.toArray(), "z", values);
   }
 
   private static HashMap<VolatilityPoint, Double> buildVolValues(final Map<VolatilityPoint, ValueSnapshot> values) {
