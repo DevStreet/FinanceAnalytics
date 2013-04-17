@@ -141,7 +141,7 @@ public class DbMarketDataSnapshotMasterTest extends DbTest {
     volCube.setStrikes(strikes);
     volCube.getValues().put(new VolatilityPoint(Tenor.DAY, Tenor.YEAR, -1), new ValueSnapshot(null, null));
 
-    volCubes.put(new VolatilityCubeKey(Currency.USD, "Default"), volCube);
+    volCubes.put(new VolatilityCubeKey(Currency.USD, "Default", "SWAPTION", "Absolute", "VolatilityQuote"), volCube);
     snapshot1.setVolatilityCubes(volCubes);
 
     MarketDataSnapshotDocument doc1 = new MarketDataSnapshotDocument(snapshot1);

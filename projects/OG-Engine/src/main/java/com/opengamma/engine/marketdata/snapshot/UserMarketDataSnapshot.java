@@ -65,8 +65,10 @@ public class UserMarketDataSnapshot extends AbstractMarketDataSnapshot {
   private static final String INSTRUMENT_TYPE_PROPERTY = "InstrumentType";
   private static final String SURFACE_QUOTE_TYPE_PROPERTY = "SurfaceQuoteType";
   private static final String SURFACE_QUOTE_UNITS_PROPERTY = "SurfaceUnits";
+  private static final String CUBE_QUOTE_TYPE_PROPERTY = "CubeQuoteType";
+  private static final String CUBE_QUOTE_UNITS_PROPERTY = "CubeUnits";
 
-  private static final Map<String, StructuredMarketDataHandler> s_structuredDataHandler = new HashMap<String, StructuredMarketDataHandler>();
+  private static final Map<String, StructuredMarketDataHandler> s_structuredDataHandler = new HashMap<>();
 
   private InMemoryLKVMarketDataProvider _unstructured;
   private final StructuredMarketDataSnapshot _snapshot;
@@ -242,7 +244,7 @@ public class UserMarketDataSnapshot extends AbstractMarketDataSnapshot {
 
       @Override
       protected boolean isValidTarget(final Object target) {
-        return target instanceof Currency;
+        return target instanceof UniqueIdentifiable;
       }
 
       @Override
@@ -251,28 +253,43 @@ public class UserMarketDataSnapshot extends AbstractMarketDataSnapshot {
       }
 
       @Override
-      protected ValueProperties resolve(final Object target, final StructuredMarketDataSnapshot snapshot) {
-        ValueProperties.Builder properties = null;
+      protected ValueProperties resolve(final Object targetObject, ValueProperties constraints, final StructuredMarketDataSnapshot snapshot) {
+        final UniqueId target = ((UniqueIdentifiable) targetObject).getUniqueId();
+        final Set<String> names = constraints.getValues(ValuePropertyNames.CUBE);
+        final Set<String> instrumentTypes = constraints.getValues(INSTRUMENT_TYPE_PROPERTY);
+        final Set<String> quoteTypes = constraints.getValues(CUBE_QUOTE_TYPE_PROPERTY);
+        final Set<String> quoteUnits = constraints.getValues(CUBE_QUOTE_UNITS_PROPERTY);
         for (final VolatilityCubeKey cube : snapshot.getVolatilityCubes().keySet()) {
-          if (target.equals(cube.getCurrency())) {
-            if (properties == null) {
-              properties = createValueProperties();
-            }
-            properties.with(ValuePropertyNames.CUBE, cube.getName());
+          if (!target.equals(cube.getTarget())) {
+            continue;
           }
+          if ((names != null) && !names.isEmpty() && !names.contains(cube.getName())) {
+            continue;
+          }
+          if ((instrumentTypes != null) && !instrumentTypes.isEmpty() && !instrumentTypes.contains(cube.getInstrumentType())) {
+            continue;
+          }
+          if ((quoteTypes != null) && !quoteTypes.isEmpty() && !quoteTypes.contains(cube.getQuoteType())) {
+            continue;
+          }
+          if ((quoteUnits != null) && !quoteUnits.isEmpty() && !quoteUnits.contains(cube.getQuoteUnits())) {
+            continue;
+          }
+          return createValueProperties().with(ValuePropertyNames.CUBE,
+              cube.getName()).with(INSTRUMENT_TYPE_PROPERTY, cube.getInstrumentType()).with(CUBE_QUOTE_TYPE_PROPERTY, cube.getQuoteType())
+              .with(CUBE_QUOTE_UNITS_PROPERTY, cube.getQuoteUnits()).get();
         }
-        if (properties != null) {
-          return properties.get();
-        } else {
-          return null;
-        }
+        return null;
       }
 
       @Override
       protected Object query(final UniqueId target, final ValueProperties properties, final StructuredMarketDataSnapshot snapshot) {
         final String name = properties.getValues(ValuePropertyNames.CUBE).iterator().next();
+        final String instrumentType = properties.getValues(INSTRUMENT_TYPE_PROPERTY).iterator().next();
+        final String quoteType = properties.getValues(CUBE_QUOTE_TYPE_PROPERTY).iterator().next();
+        final String quoteUnits = properties.getValues(CUBE_QUOTE_UNITS_PROPERTY).iterator().next();
         if (snapshot.getVolatilityCubes() != null) {
-          final VolatilityCubeSnapshot data = snapshot.getVolatilityCubes().get(new VolatilityCubeKey(Currency.of(target.getValue()), name));
+          final VolatilityCubeSnapshot data = snapshot.getVolatilityCubes().get(new VolatilityCubeKey(target, name, instrumentType, quoteType, quoteUnits));
           if (data != null) {
             return convertVolatilityCubeMarketData(data);
           }

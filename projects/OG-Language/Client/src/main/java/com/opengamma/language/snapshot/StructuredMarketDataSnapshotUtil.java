@@ -17,7 +17,7 @@ import com.opengamma.util.tuple.Pair;
 
 /* package */final class StructuredMarketDataSnapshotUtil {
 
-  private static final CompositeStringUtil s_cubeName = new CompositeStringUtil(2, false);
+  private static final CompositeStringUtil s_cubeName = new CompositeStringUtil(5, false);
   private static final CompositeStringUtil s_curveName = new CompositeStringUtil(2, false);
   private static final CompositeStringUtil s_surfaceName = new CompositeStringUtil(5, false);
 
@@ -67,11 +67,11 @@ import com.opengamma.util.tuple.Pair;
     if (!s_cubeName.validate(parsed)) {
       return null;
     }
-    return new VolatilityCubeKey(Currency.of(parsed[0]), parsed[1]);
+    return new VolatilityCubeKey(UniqueId.parse(parsed[0]), parsed[1], parsed[2], parsed[3], parsed[4]);
   }
 
   public static String fromVolatilityCubeKey(final VolatilityCubeKey key) {
-    return s_cubeName.create(key.getCurrency().getCode(), key.getName());
+    return s_cubeName.create(key.getTarget().toString(), key.getName(), key.getQuoteType(), key.getQuoteUnits(), key.getInstrumentType());
   }
 
 }
