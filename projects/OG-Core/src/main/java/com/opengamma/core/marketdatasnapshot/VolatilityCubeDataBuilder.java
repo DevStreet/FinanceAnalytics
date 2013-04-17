@@ -5,14 +5,20 @@
  */
 package com.opengamma.core.marketdatasnapshot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.fudgemsg.FudgeField;
 import org.fudgemsg.FudgeMsg;
 import org.fudgemsg.MutableFudgeMsg;
 import org.fudgemsg.mapping.FudgeBuilder;
 import org.fudgemsg.mapping.FudgeBuilderFor;
 import org.fudgemsg.mapping.FudgeDeserializer;
 import org.fudgemsg.mapping.FudgeSerializer;
+
+import com.opengamma.id.UniqueIdentifiable;
 
 /**
  * Fudge builder for {@code VolatilityCubeData}.
@@ -27,9 +33,9 @@ public class VolatilityCubeDataBuilder implements FudgeBuilder<VolatilityCubeDat
   private static final String TARGET_FIELD = "target";
   /** The x field */
   private static final String X_FIELD = "x";
-  /** The x field */
+  /** The y field */
   private static final String Y_FIELD = "y";
-  /** The x field */
+  /** The z field */
   private static final String Z_FIELD = "z";
   /** The volatility data field */
   private static final String VOLATILITY_FIELD = "volatility";
@@ -55,18 +61,46 @@ public class VolatilityCubeDataBuilder implements FudgeBuilder<VolatilityCubeDat
     for (final Map.Entry<?, Double> entry : object.getData().entrySet()) {
       final MutableFudgeMsg subMessage = serializer.newMessage();
       final VolatilityPoint volatilityPoint = (VolatilityPoint) entry.getKey();
-      subMessage.add(X_FIELD, null, serializer.objectToFudgeMsg(volatilityPoint.getXAxis()));
-      subMessage.add(Y_FIELD, null, serializer.objectToFudgeMsg(volatilityPoint.getYAxis()));
-      subMessage.add(Z_FIELD, null, serializer.objectToFudgeMsg(volatilityPoint.getZAxis()));
+      final Comparable<?> xAxis = volatilityPoint.getXAxis();
+      final Comparable<?> yAxis = volatilityPoint.getYAxis();
+      final Comparable<?> zAxis = volatilityPoint.getZAxis();
+      subMessage.add(X_FIELD, null, serializer.objectToFudgeMsg(xAxis));
+      subMessage.add(Y_FIELD, null, serializer.objectToFudgeMsg(yAxis));
+      subMessage.add(Z_FIELD, null, serializer.objectToFudgeMsg(zAxis));
       subMessage.add(VOLATILITY_FIELD, entry.getValue());
       message.add(VOLATILITIES_FIELD, null, subMessage);
     }
-    return null;
+    return message;
   }
 
   @Override
   public VolatilityCubeData<?, ?, ?> buildObject(final FudgeDeserializer deserializer, final FudgeMsg message) {
-    return null;
+    final List<Comparable<?>> xsList = new ArrayList<>();
+    final List<Comparable<?>> ysList = new ArrayList<>();
+    final List<Comparable<?>> zsList = new ArrayList<>();
+    final UniqueIdentifiable target = deserializer.fieldValueToObject(UniqueIdentifiable.class, message.getByName(TARGET_FIELD));
+    final String definitionName = message.getString(DEFINITION_NAME_FIELD);
+    final String specificationName = message.getString(SPECIFICATION_NAME_FIELD);
+    final String xLabel = message.getString(X_LABEL_FIELD);
+    final String yLabel = message.getString(Y_LABEL_FIELD);
+    final String zLabel = message.getString(Z_LABEL_FIELD);
+    final List<FudgeField> volatilitiesField = message.getAllByName(VOLATILITIES_FIELD);
+    final Map<VolatilityPoint, Double> data = new HashMap<>();
+    for (final FudgeField field : volatilitiesField) {
+      final FudgeMsg subMessage = (FudgeMsg) field.getValue();
+      final Comparable<?> x = (Comparable<?>) deserializer.fieldValueToObject(xClazz, subMessage.getByName(X_FIELD));
+      final Comparable<?> y = (Comparable<?>) deserializer.fieldValueToObject(yClazz, subMessage.getByName(Y_FIELD));
+      final Comparable<?> z = (Comparable<?>) deserializer.fieldValueToObject(zClazz, subMessage.getByName(Z_FIELD));
+      xsList.add(x);
+      ysList.add(y);
+      zsList.add(z);
+      final double value = subMessage.getDouble(VOLATILITY_FIELD);
+      data.put(new VolatilityPoint(x, y, z), value);
+    }
+    final Comparable<?>[] xs = xsList.toArray(new Comparable[xsList.size()]);
+    final Comparable<?>[] ys = ysList.toArray(new Comparable[ysList.size()]);
+    final Comparable<?>[] zs = zsList.toArray(new Comparable[zsList.size()]);
+    return new VolatilityCubeData(definitionName, specificationName, target, xs, xLabel, ys, yLabel, zs, zLabel, data);
   }
 
 }
