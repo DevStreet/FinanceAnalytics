@@ -37,7 +37,7 @@ import com.opengamma.util.tuple.Pair;
  * Generates Example instrument codes for volatilities given points.
  */
 public final class ExampleSwaptionVolatilityCubeInstrumentProvider {
-  
+
   //TODO: other ATM surfaces
   private static final Currency ATM_INSTRUMENT_PROVIDER_CURRENCY = Currency.USD;
   private static final SurfaceInstrumentProvider<Tenor, Tenor> ATM_INSTRUMENT_PROVIDER =
@@ -51,50 +51,50 @@ public final class ExampleSwaptionVolatilityCubeInstrumentProvider {
   public static final ExampleSwaptionVolatilityCubeInstrumentProvider INSTANCE = new ExampleSwaptionVolatilityCubeInstrumentProvider();
 
   private static final String TICKER_FILE = "SyntheticVolatilityCubeIdentifierLookupTable.csv";
-  
-//  private final Set<Currency> _currencies = ImmutableSet.of(Currency.CHF, 
-//      Currency.JPY, Currency.EUR, Currency.CZK, Currency.USD, Currency.GBP, Currency.NOK, Currency.DKK, Currency.SEK);
-  
+
+  //  private final Set<Currency> _currencies = ImmutableSet.of(Currency.CHF, 
+  //      Currency.JPY, Currency.EUR, Currency.CZK, Currency.USD, Currency.GBP, Currency.NOK, Currency.DKK, Currency.SEK);
+
   private final Set<Currency> _currencies = ImmutableSet.of(Currency.USD);
-  
-  private final Set<Tenor> _swapTenors = ImmutableSet.of(Tenor.ofMonths(3), 
-      Tenor.ofYears(1), 
-      Tenor.ofYears(2), 
-      Tenor.ofYears(3), 
-      Tenor.ofYears(5), 
-      Tenor.ofYears(10), 
-      Tenor.ofYears(15), 
-      Tenor.ofYears(20), 
+
+  private final Set<Tenor> _swapTenors = ImmutableSet.of(Tenor.ofMonths(3),
+      Tenor.ofYears(1),
+      Tenor.ofYears(2),
+      Tenor.ofYears(3),
+      Tenor.ofYears(5),
+      Tenor.ofYears(10),
+      Tenor.ofYears(15),
+      Tenor.ofYears(20),
       Tenor.ofYears(30));
- 
-  private final Set<Tenor> _optionTenors = ImmutableSet.of(Tenor.ofMonths(1), 
+
+  private final Set<Tenor> _optionTenors = ImmutableSet.of(Tenor.ofMonths(1),
       Tenor.ofMonths(3),
       Tenor.ofMonths(6),
-      Tenor.ofYears(1), 
-      Tenor.ofYears(2), 
-      Tenor.ofYears(3), 
+      Tenor.ofYears(1),
+      Tenor.ofYears(2),
+      Tenor.ofYears(3),
       Tenor.ofYears(4),
-      Tenor.ofYears(5), 
-      Tenor.ofYears(10), 
-      Tenor.ofYears(15), 
-      Tenor.ofYears(20), 
+      Tenor.ofYears(5),
+      Tenor.ofYears(10),
+      Tenor.ofYears(15),
+      Tenor.ofYears(20),
       Tenor.ofYears(30));
-  
+
   private final Set<Double> _relativeStrikes = ImmutableSet.of(20.0, 25.0, 50.0, 70.0, 75.0, 100.0, 200.0, 500.0);
-  
+
   private final Map<ObjectsPair<Currency, VolatilityPoint>, Set<ExternalId>> _idsByPoint = Maps.newHashMap();
 
   private ExampleSwaptionVolatilityCubeInstrumentProvider() {
-//    for (Currency ccy : _currencies) {
-//      for (Tenor optionExpiry : _optionTenors) {
-//        for (Tenor swapTenor : _swapTenors) {
-//          for (Double relativeStrike : _relativeStrikes) {
-//            addPoint(ccy, optionExpiry, swapTenor, relativeStrike * -1, "%sSWAPTIONVOL%s%sN%s");
-//            addPoint(ccy, optionExpiry, swapTenor, relativeStrike, "%sSWAPTIONVOL%s%sP%s");
-//          }
-//        }
-//      }
-//    }
+    //    for (Currency ccy : _currencies) {
+    //      for (Tenor optionExpiry : _optionTenors) {
+    //        for (Tenor swapTenor : _swapTenors) {
+    //          for (Double relativeStrike : _relativeStrikes) {
+    //            addPoint(ccy, optionExpiry, swapTenor, relativeStrike * -1, "%sSWAPTIONVOL%s%sN%s");
+    //            addPoint(ccy, optionExpiry, swapTenor, relativeStrike, "%sSWAPTIONVOL%s%sP%s");
+    //          }
+    //        }
+    //      }
+    //    }
 
     final InputStream is = getClass().getResourceAsStream(TICKER_FILE);
     if (is == null) {
@@ -153,9 +153,9 @@ public final class ExampleSwaptionVolatilityCubeInstrumentProvider {
     }
   }
 
-  private void addPoint(Currency ccy, Tenor optionExpiry, Tenor swapTenor, Double relativeStrike, String format) {
+  private void addPoint(final Currency ccy, final Tenor optionExpiry, final Tenor swapTenor, final Double relativeStrike, final String format) {
     final VolatilityPoint point = new VolatilityPoint(swapTenor, optionExpiry, relativeStrike);
-    String ticker = String.format(format, ccy.getCode(), optionExpiry.getPeriod().toString().substring(1), swapTenor.getPeriod().toString().substring(1), Math.abs(relativeStrike));
+    final String ticker = String.format(format, ccy.getCode(), optionExpiry.getPeriod().toString().substring(1), swapTenor.getPeriod().toString().substring(1), Math.abs(relativeStrike));
     final ExternalId identifier = ExternalId.of(ExternalSchemes.OG_SYNTHETIC_TICKER, ticker);
     final ObjectsPair<Currency, VolatilityPoint> key = Pair.of(ccy, point);
     _idsByPoint.put(key, Sets.newHashSet(identifier));
@@ -166,12 +166,13 @@ public final class ExampleSwaptionVolatilityCubeInstrumentProvider {
   }
 
   public Set<ExternalId> getInstruments(final Currency currency, final VolatilityPoint point) {
-    if ((point.getRelativeStrike() == 0.0) && currency.equals(ATM_INSTRUMENT_PROVIDER_CURRENCY)) {
-      final ExternalId instrument = ATM_INSTRUMENT_PROVIDER.getInstrument(point.getSwapTenor(), point.getOptionExpiry());
-      return Sets.newHashSet(instrument);
-    } else {
-      return _idsByPoint.get(Pair.of(currency, point));
-    }
+    //    if ((point.getRelativeStrike() == 0.0) && currency.equals(ATM_INSTRUMENT_PROVIDER_CURRENCY)) {
+    //      final ExternalId instrument = ATM_INSTRUMENT_PROVIDER.getInstrument(point.getSwapTenor(), point.getOptionExpiry());
+    //      return Sets.newHashSet(instrument);
+    //    } else {
+    //      return _idsByPoint.get(Pair.of(currency, point));
+    //    }
+    return null;
   }
 
   public Set<Currency> getAllCurrencies() {
@@ -193,7 +194,8 @@ public final class ExampleSwaptionVolatilityCubeInstrumentProvider {
   }
 
   public ExternalId getStrikeInstrument(final Currency currency, final VolatilityPoint point) {
-    return getStrikeInstrument(currency, point.getSwapTenor(), point.getOptionExpiry());
+    return null;
+    //    return getStrikeInstrument(currency, point.getSwapTenor(), point.getOptionExpiry());
   }
 
   public ExternalId getStrikeInstrument(final Currency currency, final Tenor swapTenor, final Tenor optionExpiry) {

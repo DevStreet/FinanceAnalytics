@@ -118,12 +118,13 @@ public final class BloombergSwaptionVolatilityCubeInstrumentProvider {
   }
 
   public Set<ExternalId> getInstruments(final Currency currency, final VolatilityPoint point) {
-    if ((point.getRelativeStrike() == 0.0) && currency.equals(ATM_INSTRUMENT_PROVIDER_CURRENCY)) {
-      final ExternalId instrument = ATM_INSTRUMENT_PROVIDER.getInstrument(point.getSwapTenor(), point.getOptionExpiry());
-      return Sets.newHashSet(instrument);
-    } else {
-      return _idsByPoint.get(Pair.of(currency, point));
-    }
+    //    if ((point.getRelativeStrike() == 0.0) && currency.equals(ATM_INSTRUMENT_PROVIDER_CURRENCY)) {
+    //      final ExternalId instrument = ATM_INSTRUMENT_PROVIDER.getInstrument(point.getSwapTenor(), point.getOptionExpiry());
+    //      return Sets.newHashSet(instrument);
+    //    } else {
+    //      return _idsByPoint.get(Pair.of(currency, point));
+    //    }
+    return null;
   }
 
   public Set<Currency> getAllCurrencies() {
@@ -145,7 +146,8 @@ public final class BloombergSwaptionVolatilityCubeInstrumentProvider {
   }
 
   public ExternalId getStrikeInstrument(final Currency currency, final VolatilityPoint point) {
-    return getStrikeInstrument(currency, point.getSwapTenor(), point.getOptionExpiry());
+    return null;
+    //return getStrikeInstrument(currency, point.getSwapTenor(), point.getOptionExpiry());
   }
 
   public ExternalId getStrikeInstrument(final Currency currency, final Tenor swapTenor, final Tenor optionExpiry) {

@@ -42,4 +42,10 @@ public class InstrumentTypeProperties {
   public static final String PROPERTY_CUBE_INSTRUMENT_TYPE = "CubeInstrumentType";
   /** Property representing a swaption volatility cube */
   public static final String SWAPTION_CUBE = "SWAPTION_CUBE";
+  /**
+   * Name of a general type property. This allows surfaces or cubes to be distinguished by instrument type (e.g. an FX volatility
+   * surface, swaption ATM volatility surface).
+   */
+  public static final String PROPERTY_INSTRUMENT_TYPE = "InstrumentType";
+
 }

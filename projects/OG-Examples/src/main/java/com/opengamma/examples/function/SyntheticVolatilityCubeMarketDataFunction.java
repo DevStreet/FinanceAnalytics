@@ -13,7 +13,6 @@ import java.util.Set;
 import org.threeten.bp.Instant;
 
 import com.google.common.collect.Sets;
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
 import com.opengamma.core.marketdatasnapshot.VolatilityPoint;
@@ -41,7 +40,6 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
-import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 import com.opengamma.util.tuple.Triple;
 
@@ -118,11 +116,11 @@ public class SyntheticVolatilityCubeMarketDataFunction extends AbstractFunction 
 
       final ExternalId strikeInstruments = INSTRUMENT_PROVIDER.getStrikeInstrument(_helper.getCurrency(), point);
       if (strikeInstruments != null) {
-        final ObjectsPair<Tenor, Tenor> strikePoint = Pair.of(point.getSwapTenor(), point.getOptionExpiry());
-        final Pair<Tenor, Tenor> previous = strikesById.put(strikeInstruments, strikePoint);
-        if (previous != null && !previous.equals(strikePoint)) {
-          throw new OpenGammaRuntimeException("Mismatched volatility strike rate instrument");
-        }
+        //        final ObjectsPair<Tenor, Tenor> strikePoint = Pair.of(point.getSwapTenor(), point.getOptionExpiry());
+        //        final Pair<Tenor, Tenor> previous = strikesById.put(strikeInstruments, strikePoint);
+        //        if (previous != null && !previous.equals(strikePoint)) {
+        //          throw new OpenGammaRuntimeException("Mismatched volatility strike rate instrument");
+        //        }
       }
 
     }
@@ -207,44 +205,44 @@ public class SyntheticVolatilityCubeMarketDataFunction extends AbstractFunction 
       final HashMap<Pair<Tenor, Tenor>, Double> strikes = new HashMap<Pair<Tenor, Tenor>, Double>();
       final SnapshotDataBundle otherData = new SnapshotDataBundle();
       final ExternalIdBundleResolver resolver = new ExternalIdBundleResolver(targetResolver);
-      for (final ComputedValue value : inputs.getAllValues()) {
-        if (!(value.getValue() instanceof Double)) {
-          continue;
-        }
-        final Double dValue = (Double) value.getValue();
-        final ExternalIdBundle identifiers = value.getSpecification().getTargetSpecification().accept(resolver);
-        final VolatilityPoint volatilityPoint;
-        final Pair<Tenor, Tenor> strikePoint;
-        if (value.getSpecification().getValueName() != MarketDataRequirementNames.MARKET_VALUE) {
-          volatilityPoint = getByIdentifier(_pointsById, identifiers);
-          strikePoint = getByIdentifier(_strikesById, identifiers);
-        } else {
-          volatilityPoint = null;
-          strikePoint = null;
-        }
-        if (volatilityPoint == null && strikePoint == null) {
-          otherData.setDataPoint(identifiers, dValue);
-        } else if (volatilityPoint != null && strikePoint == null) {
-          if (volatilityPoint.getRelativeStrike() > -50) {
-            final Double previous = dataPoints.put(volatilityPoint, dValue);
-            final ExternalIdBundle previousIds = dataIds.put(volatilityPoint, identifiers);
-            final Double previousRelativeStrike = relativeStrikes.put(volatilityPoint, volatilityPoint.getRelativeStrike());
-            if (previous != null && previous > dValue) {
-              //TODO: this is a hack because we don't understand which tickers are for straddles, so we presume that the straddle has lower vol
-              dataPoints.put(volatilityPoint, previous);
-              dataIds.put(volatilityPoint, previousIds);
-              relativeStrikes.put(volatilityPoint, previousRelativeStrike);
-            }
-          }
-        } else if (volatilityPoint == null && strikePoint != null) {
-          final Double previous = strikes.put(strikePoint, dValue);
-          if (previous != null) {
-            throw new OpenGammaRuntimeException("Got two values for strike ");
-          }
-        } else {
-          throw new OpenGammaRuntimeException("Instrument is both a volatility and a strike");
-        }
-      }
+      //      for (final ComputedValue value : inputs.getAllValues()) {
+      //        if (!(value.getValue() instanceof Double)) {
+      //          continue;
+      //        }
+      //        final Double dValue = (Double) value.getValue();
+      //        final ExternalIdBundle identifiers = value.getSpecification().getTargetSpecification().accept(resolver);
+      //        final VolatilityPoint volatilityPoint;
+      //        final Pair<Tenor, Tenor> strikePoint;
+      //        if (value.getSpecification().getValueName() != MarketDataRequirementNames.MARKET_VALUE) {
+      //          volatilityPoint = getByIdentifier(_pointsById, identifiers);
+      //          strikePoint = getByIdentifier(_strikesById, identifiers);
+      //        } else {
+      //          volatilityPoint = null;
+      //          strikePoint = null;
+      //        }
+      //        if (volatilityPoint == null && strikePoint == null) {
+      //          otherData.setDataPoint(identifiers, dValue);
+      //        } else if (volatilityPoint != null && strikePoint == null) {
+      //          if (volatilityPoint.getRelativeStrike() > -50) {
+      //            final Double previous = dataPoints.put(volatilityPoint, dValue);
+      //            final ExternalIdBundle previousIds = dataIds.put(volatilityPoint, identifiers);
+      //            final Double previousRelativeStrike = relativeStrikes.put(volatilityPoint, volatilityPoint.getRelativeStrike());
+      //            if (previous != null && previous > dValue) {
+      //              //TODO: this is a hack because we don't understand which tickers are for straddles, so we presume that the straddle has lower vol
+      //              dataPoints.put(volatilityPoint, previous);
+      //              dataIds.put(volatilityPoint, previousIds);
+      //              relativeStrikes.put(volatilityPoint, previousRelativeStrike);
+      //            }
+      //          }
+      //        } else if (volatilityPoint == null && strikePoint != null) {
+      //          final Double previous = strikes.put(strikePoint, dValue);
+      //          if (previous != null) {
+      //            throw new OpenGammaRuntimeException("Got two values for strike ");
+      //          }
+      //        } else {
+      //          throw new OpenGammaRuntimeException("Instrument is both a volatility and a strike");
+      //        }
+      //      }
 
       final VolatilityCubeData volatilityCubeData = new VolatilityCubeData();
       volatilityCubeData.setDataPoints(dataPoints);

@@ -39,8 +39,8 @@ public class BloombergVolatilityCubeInstrumentProviderTest {
       Assert.assertNotNull(instruments);
       Assert.assertNotSame(0, instruments.size());
 
-      final ExternalId strikeInstrument = instrumentProvider.getStrikeInstrument(usd, volatilityPoint.getSwapTenor(), volatilityPoint.getOptionExpiry());
-      Assert.assertNotNull(strikeInstrument);
+      //      final ExternalId strikeInstrument = instrumentProvider.getStrikeInstrument(usd, volatilityPoint.getSwapTenor(), volatilityPoint.getOptionExpiry());
+      //      Assert.assertNotNull(strikeInstrument);
     }
 
   }

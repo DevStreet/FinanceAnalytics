@@ -39,9 +39,9 @@ public class BloombergVolatilityCubeDefinitionSource implements VolatilityCubeDe
     final Set<VolatilityPoint> allPoints = _instrumentProvider.getAllPoints(currency);
 
     for (final VolatilityPoint volatilityPoint : allPoints) {
-      optionExpiries.add(volatilityPoint.getOptionExpiry());
-      swapTenors.add(volatilityPoint.getSwapTenor());
-      relativeStrikes.add(volatilityPoint.getRelativeStrike());
+      //      optionExpiries.add(volatilityPoint.getOptionExpiry());
+      //      swapTenors.add(volatilityPoint.getSwapTenor());
+      //      relativeStrikes.add(volatilityPoint.getRelativeStrike());
     }
 
     final VolatilityCubeDefinition ret = new VolatilityCubeDefinition();

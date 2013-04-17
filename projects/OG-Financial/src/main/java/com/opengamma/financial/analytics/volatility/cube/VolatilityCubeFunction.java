@@ -13,7 +13,6 @@ import java.util.Set;
 import org.threeten.bp.Instant;
 
 import com.google.common.collect.Sets;
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
 import com.opengamma.core.marketdatasnapshot.VolatilityPoint;
 import com.opengamma.engine.ComputationTarget;
@@ -99,34 +98,34 @@ public class VolatilityCubeFunction extends AbstractFunction {
         final Map<Pair<Tenor, Tenor>, Double> atmStrikes = data.getATMStrikes();
         final Map<Pair<Tenor, Tenor>, Double> normalizedATMStrikes = new HashMap<Pair<Tenor, Tenor>, Double>();
         final Map<Pair<Tenor, Tenor>, Double> normalizedATMVols = new HashMap<Pair<Tenor, Tenor>, Double>();
-        for (final Map.Entry<VolatilityPoint, Double> entry : volatilityPoints.entrySet()) {
-          final VolatilityPoint oldPoint = entry.getKey();
-          final Tenor swapTenor = oldPoint.getSwapTenor();
-          final Tenor swaptionExpiry = oldPoint.getOptionExpiry();
-          final double relativeStrike = oldPoint.getRelativeStrike();
-          if (atmStrikes.containsKey(Pair.of(swapTenor, swaptionExpiry))) {
-            final Pair<Tenor, Tenor> tenorPair = Pair.of(swapTenor, swaptionExpiry);
-            final double absoluteStrike = atmStrikes.get(tenorPair) + relativeStrike / 10000;
-            final double vol = entry.getValue();
-            final VolatilityPoint newPoint = new VolatilityPoint(swapTenor, swaptionExpiry, absoluteStrike);
-            if (Double.doubleToLongBits(relativeStrike) == 0) {
-              if (normalizedATMStrikes.containsKey(tenorPair)) {
-                throw new OpenGammaRuntimeException("Normalized ATM strike data set already contains value for " + tenorPair);
-              }
-              normalizedATMStrikes.put(tenorPair, atmStrikes.get(tenorPair));
-              normalizedATMVols.put(tenorPair, vol);
-            }
-            normalizedVolatilityPoints.put(newPoint, vol);
-            if (volatilityPointIds != null) {
-              normalizedVolatilityPointIds.put(newPoint, volatilityPointIds.get(oldPoint));
-            }
-            if (relativeStrikes != null) {
-              normalizedRelativeStrikes.put(newPoint, relativeStrikes.get(oldPoint));
-            } else {
-              normalizedRelativeStrikes.put(newPoint, relativeStrike);
-            }
-          }
-        }
+        //        for (final Map.Entry<VolatilityPoint, Double> entry : volatilityPoints.entrySet()) {
+        //          final VolatilityPoint oldPoint = entry.getKey();
+        //          final Tenor swapTenor = oldPoint.getSwapTenor();
+        //          final Tenor swaptionExpiry = oldPoint.getOptionExpiry();
+        //          final double relativeStrike = oldPoint.getRelativeStrike();
+        //          if (atmStrikes.containsKey(Pair.of(swapTenor, swaptionExpiry))) {
+        //            final Pair<Tenor, Tenor> tenorPair = Pair.of(swapTenor, swaptionExpiry);
+        //            final double absoluteStrike = atmStrikes.get(tenorPair) + relativeStrike / 10000;
+        //            final double vol = entry.getValue();
+        //            final VolatilityPoint newPoint = new VolatilityPoint(swapTenor, swaptionExpiry, absoluteStrike);
+        //            if (Double.doubleToLongBits(relativeStrike) == 0) {
+        //              if (normalizedATMStrikes.containsKey(tenorPair)) {
+        //                throw new OpenGammaRuntimeException("Normalized ATM strike data set already contains value for " + tenorPair);
+        //              }
+        //              normalizedATMStrikes.put(tenorPair, atmStrikes.get(tenorPair));
+        //              normalizedATMVols.put(tenorPair, vol);
+        //            }
+        //            normalizedVolatilityPoints.put(newPoint, vol);
+        //            if (volatilityPointIds != null) {
+        //              normalizedVolatilityPointIds.put(newPoint, volatilityPointIds.get(oldPoint));
+        //            }
+        //            if (relativeStrikes != null) {
+        //              normalizedRelativeStrikes.put(newPoint, relativeStrikes.get(oldPoint));
+        //            } else {
+        //              normalizedRelativeStrikes.put(newPoint, relativeStrike);
+        //            }
+        //          }
+        //        }
         normalizedData.setDataPoints(normalizedVolatilityPoints);
         normalizedData.setOtherData(data.getOtherData());
         normalizedData.setATMStrikes(normalizedATMStrikes);
