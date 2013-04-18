@@ -7,6 +7,7 @@ package com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking;
 
 import org.netlib.lapack.Dgecon;
 import org.netlib.lapack.Dgeev;
+import org.netlib.lapack.Dgels;
 import org.netlib.lapack.Dgelsd;
 import org.netlib.lapack.Dgesvd;
 import org.netlib.lapack.Dgetrf;
@@ -57,6 +58,13 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
   }
 
   @Override
+  public void dgels(char trans, int m, int n, int nrhs, double[] A, int lda, double[] B, int ldb, double[] work, int lwork, int[] info) { //CSIGNORE
+    intW infoderef = new intW(info[0]);
+    Dgels.dgels(String.valueOf(trans), m, n, nrhs, A, 0, lda, B, 0, ldb, work, 0, lwork, null);
+    info[0] = infoderef.val;
+  }
+
+  @Override
   public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { //CSIGNORE
     intW rankderef = new intW(rank[0]);
     intW infoderef = new intW(info[0]);
@@ -101,18 +109,18 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
   }
 
   @Override
-  public void dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work) {
-    Dlansy.dlansy(String.valueOf(norm), String.valueOf(uplo), n, a, 0, lda, work, 0);
+  public double dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work) {
+    return Dlansy.dlansy(String.valueOf(norm), String.valueOf(uplo), n, a, 0, lda, work, 0);
   }
 
   @Override
-  public void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
-    Dlantr.dlantr(String.valueOf(norm), String.valueOf(uplo), String.valueOf(diag), m, n, a, 0, lda, work, 0);
+  public double dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
+    return Dlantr.dlantr(String.valueOf(norm), String.valueOf(uplo), String.valueOf(diag), m, n, a, 0, lda, work, 0);
   }
 
   @Override
-  public void dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
-    Dlange.dlange(String.valueOf(norm), m, n, a, 0, lda, work, 0);
+  public double dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
+    return Dlange.dlange(String.valueOf(norm), m, n, a, 0, lda, work, 0);
   }
 
   @Override
@@ -141,5 +149,4 @@ public class LAPACKNetlibBacked extends LAPACKAbstractSuper implements LAPACKAPI
     info[0] = infoderef.val;
     rcond[0] = rcondderef.val;
   }
-
 }

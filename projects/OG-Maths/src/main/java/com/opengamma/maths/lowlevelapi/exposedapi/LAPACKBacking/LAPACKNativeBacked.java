@@ -36,6 +36,11 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
   }
 
   @Override
+  public void dgels(char trans, int m, int n, int nrhs, double[] A, int lda, double[] B, int ldb, double[] work, int lwork, int[] info) { //CSIGNORE
+    OGLAPACKRawWrapper.dgels(new char[] {trans }, new int[] {m }, new int[] {n }, new int[] {nrhs }, A, new int[] {lda }, B, new int[] {ldb }, work, new int[] {lwork }, info);
+  }
+
+  @Override
   public void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) { // CSIGNORE
     OGLAPACKRawWrapper.dgelsd(new int[] {m }, new int[] {n }, new int[] {nrhs }, A, new int[] {lda }, b, new int[] {ldb }, s, new double[] {rcond }, rank, work, new int[] {lwork }, iwork, info);
   }
@@ -66,18 +71,18 @@ public class LAPACKNativeBacked extends LAPACKAbstractSuper implements LAPACKAPI
   }
 
   @Override
-  public void dlansy(char norm, char uplo, int n, double[] ap, int lda, double[] work) {
-    OGLAPACKRawWrapper.dlansy(new char[] {norm }, new char[] {uplo }, new int[] {n }, ap, new int[] {lda }, work);
+  public double dlansy(char norm, char uplo, int n, double[] ap, int lda, double[] work) {
+    return OGLAPACKRawWrapper.dlansy(new char[] {norm }, new char[] {uplo }, new int[] {n }, ap, new int[] {lda }, work);
   }
 
   @Override
-  public void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
-    OGLAPACKRawWrapper.dlantr(new char[] {norm }, new char[] {uplo }, new char[] {diag }, new int[] {m }, new int[] {n }, a, new int[] {lda }, work);
+  public double dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
+    return OGLAPACKRawWrapper.dlantr(new char[] {norm }, new char[] {uplo }, new char[] {diag }, new int[] {m }, new int[] {n }, a, new int[] {lda }, work);
   }
 
   @Override
-  public void dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
-    OGLAPACKRawWrapper.dlange(new char[] {norm }, new int[] {m }, new int[] {n }, a, new int[] {lda }, work);
+  public double dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
+    return OGLAPACKRawWrapper.dlange(new char[] {norm }, new int[] {m }, new int[] {n }, a, new int[] {lda }, work);
   }
 
   @Override

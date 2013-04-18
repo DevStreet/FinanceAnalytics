@@ -33,6 +33,11 @@ public class LAPACKOGJavaBacked extends LAPACKAbstractSuper implements LAPACKAPI
   }
 
   @Override
+  public void dgels(char trans, int m, int n, int nrhs, double[] A, int lda, double[] B, int ldb, double[] work, int lwork, int[] info) { //CSIGNORE
+    throw new MathsExceptionNotImplemented("DGELS is not implemented/wired up");
+  }
+
+  @Override
   public void dgelsd(int m, int n, int nrhs, double[] a, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info) {
     throw new MathsExceptionNotImplemented("DGELSD is not implemented/wired up");
   }
@@ -63,17 +68,17 @@ public class LAPACKOGJavaBacked extends LAPACKAbstractSuper implements LAPACKAPI
   }
 
   @Override
-  public void dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work) {
+  public double dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work) {
     throw new MathsExceptionNotImplemented("DLANSY is not implemented/wired up");
   }
 
   @Override
-  public void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
+  public double dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work) {
     throw new MathsExceptionNotImplemented("DLANTR is not implemented/wired up");
   }
 
   @Override
-  public void dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
+  public double dlange(char norm, int m, int n, double[] a, int lda, double[] work) {
     throw new MathsExceptionNotImplemented("DLANGE is not implemented/wired up");
   }
 

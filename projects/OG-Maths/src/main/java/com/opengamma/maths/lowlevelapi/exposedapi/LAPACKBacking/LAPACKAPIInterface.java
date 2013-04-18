@@ -82,6 +82,9 @@ public interface LAPACKAPIInterface {
   // linear least squares
   void dgelsd(int m, int n, int nrhs, double[] A, int lda, double[] b, int ldb, double[] s, double rcond, int[] rank, double[] work, int lwork, int[] iwork, int[] info); //CSIGNORE
 
+  // linear least squares via QR, quicker but breaks more easily
+  void dgels(char trans, int m, int n, int nrhs, double[] A, int lda, double[] B, int ldb, double[] work, int lwork, int[] info); // CSIGNORE
+
   // triangular solve
   void dtrtrs(char uplo, char trans, char diag, int n, int nrhs, double[] a, int lda, double[] b, int ldb, int[] info);
 
@@ -98,13 +101,13 @@ public interface LAPACKAPIInterface {
   void dgeev(char jobvl, char jobvr, int n, double[] a, int lda, double[] wr, double[] wi, double[] vl, int ldvl, double[] vr, int ldvr, double[] work, int lwork, int[] info);
 
   // computes the norms of a symmetric real matrix
-  void dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work);
+  double dlansy(char norm, char uplo, int n, double[] a, int lda, double[] work);
 
   // computes the norms of a triangular matrix
-  void dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work);
+  double dlantr(char norm, char uplo, char diag, int m, int n, double[] a, int lda, double[] work);
 
   // computes the norms of a general real matrix
-  void dlange(char norm, int m, int n, double[] a, int lda, double[] work);
+  double dlange(char norm, int m, int n, double[] a, int lda, double[] work);
 
   // reciprocal condition number estimate of a triangular matrix
   void dtrcon(char norm, char uplo, char diag, int n, double[] a, int lda, double[] rcond, double[] work, int[] iwork, int[] info);
