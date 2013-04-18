@@ -1,21 +1,22 @@
 ### @export "confluence-export"
 - confluence/start.txt|fetchconfluence:
-    - fetchconfluence: { limit: 15, spaces: DOC }
+    - disabled: True
+    - fetchconfluence: { spaces: DOC }
     - ws-template: 'shared/_template.html'
 
 ### @export "rst-inputs"
 - rst-inputs:
     - code
-    - .rst|rstmeta
+    - .rst|yamlargs
 
 ### @export "rst-content"
 - rst-content:
-    - .rst|jinja|rstbody:
+    - .rst|yamlargs|jinja|rstbody:
         # settings
         - ws-template: 'shared/_template.html'
         # inputs
         - rst-inputs
-    - .rst|jinja|rst|latex:
+    - .rst|yamlargs|jinja|rst|latex:
         # settings
         - rst:
             stylesheet: 'fancyvrb,shared/pygments.sty'

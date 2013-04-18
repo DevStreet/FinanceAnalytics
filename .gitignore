@@ -42,8 +42,10 @@ lib/
 .*.sw?
 logs/
 artifacts/
+.cache/
 output/
 output-long/
+output-site/
 /dist/
 /Setting-up-an-Eclipse-workspace.html
 test-output/

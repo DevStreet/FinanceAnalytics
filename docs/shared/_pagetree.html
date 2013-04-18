@@ -1,0 +1,5 @@
+{% extends 'shared/_template.html' -%}
+{% block after_content -%}
+{% from 'nav.jinja' import pagetree with context -%}
+{{ pagetree() }}
+{% endblock -%}
