@@ -15,6 +15,7 @@ import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOper
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunctions;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForVoidUnaryFunctions;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
+import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulatorLibrary;
 import com.opengamma.maths.dogma.engine.operationstack.RunInfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;
 import com.opengamma.maths.dogma.engine.operationstack.RunVoidUnaryFunctionChain;
@@ -83,9 +84,9 @@ final double[][] DefaultUnaryFunctionEvalCosts = new double[][] {//
 {20 } };
 OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunctionEvalCosts);
 // Build instructions sets
- OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();
-OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();
-OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();
+ OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = OperatorDictionaryPopulatorLibrary.getInfixOperatorDictionary();
+OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = OperatorDictionaryPopulatorLibrary.getUnaryOperatorDictionary();
+OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = OperatorDictionaryPopulatorLibrary.getVoidUnaryOperatorDictionary();
 UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] SinhFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDictUnary.getOperationsMap(),Sinh.class);
 s_sinhInstructions = MethodScraperForUnaryFunctions.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),SinhFunctionTable, defaultUnaryFunctionEvalCostsMatrix);
 

@@ -37,27 +37,27 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Meshgrid;
+import com.opengamma.maths.dogma.engine.methodhookinstances.binary.Vertcat;
 /**
  * Provides the DOGMA Language
  */
-public class DOGMAMeshgrid {
-  private static DOGMAMeshgrid s_instance;
-  DOGMAMeshgrid() {
+public class DOGMAVertcat {
+  private static DOGMAVertcat s_instance;
+  DOGMAVertcat() {
   }
-  public static DOGMAMeshgrid getInstance() {
+  public static DOGMAVertcat getInstance() {
     return s_instance;
   }
-  private static Logger s_log = LoggerFactory.getLogger(Meshgrid.class);
+  private static Logger s_log = LoggerFactory.getLogger(Vertcat.class);
   // switch for chatty start up
   private static boolean s_verbose;
-  public DOGMAMeshgrid(boolean verbose) {
+  public DOGMAVertcat(boolean verbose) {
     s_verbose = verbose;
   };
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAMeshing.meshgrid.MeshgridFunction s_meshgridfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAMeshing.meshgrid.MeshgridFunction();
+  private static InfixOpChain[][] s_vertcatInstructions;
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//
@@ -87,13 +87,71 @@ OGMatrix defaultUnaryFunctionEvalCostsMatrix = new OGMatrix(DefaultUnaryFunction
  OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = OperatorDictionaryPopulatorLibrary.getInfixOperatorDictionary();
 OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = OperatorDictionaryPopulatorLibrary.getUnaryOperatorDictionary();
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = OperatorDictionaryPopulatorLibrary.getVoidUnaryOperatorDictionary();
+InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>[][] VertcatFunctionTable = MethodScraperForInfixOperators.availableMethodsForInfixOp(operatorDictInfix.getOperationsMap(),Vertcat.class, s_verbose);
+s_vertcatInstructions = MethodScraperForInfixOperators.computeFunctions(ConversionCostAdjacencyMatrixStore.getWeightedAdjacencyMatrix(),VertcatFunctionTable, defaultInfixFunctionEvalCostsMatrix);
+
 
 }
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0){
-    return   s_meshgridfunction.meshgrid( arg0);
-  };
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0, com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg1){
-    return   s_meshgridfunction.meshgrid( arg0,  arg1);
-  };
+
+  public static OGArray<? extends Number> vertcat(OGArray<? extends Number> arg0, OGArray<? extends Number> arg1) {
+    Catchers.catchNullFromArgList(arg0, 1);
+    Catchers.catchNullFromArgList(arg1, 2);
+    int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0.getClass());
+    int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+    OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_vertcatInstructions[type1][type2], arg0, arg1);
+    return tmp;
+  }
+
+public static OGArray<? extends Number> vertcat(Number arg0, OGArray<? extends Number> arg1) {
+  Catchers.catchNullFromArgList(arg0, 1);
+  Catchers.catchNullFromArgList(arg1, 2);
+OGArray<? extends Number> arg0rewrite;
+if (arg0.getClass() == ComplexType.class) {
+arg0rewrite = new OGComplexScalar(arg0);
+} else {
+arg0rewrite = new OGRealScalar(arg0.doubleValue());
+}
+int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0rewrite.getClass());
+int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_vertcatInstructions[type1][type2], arg0rewrite, arg1);
+  return tmp;
+}
+
+public static OGArray<? extends Number>vertcat(OGArray<? extends Number> arg0, Number arg1) {
+  Catchers.catchNullFromArgList(arg0, 1);
+  Catchers.catchNullFromArgList(arg1, 2);
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+ arg1rewrite = new OGRealScalar(arg1.doubleValue());
+ }
+ int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0.getClass());
+ int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_vertcatInstructions[type1][type2], arg0, arg1rewrite);
+  return tmp;
+}
+
+public static Number vertcat (Number arg0, Number arg1) {
+  Catchers.catchNullFromArgList(arg0, 1);
+  Catchers.catchNullFromArgList(arg1, 2);
+OGArray<? extends Number> arg0rewrite;
+if (arg0.getClass() == ComplexType.class) {
+arg0rewrite = new OGComplexScalar(arg0);
+} else {
+arg0rewrite = new OGRealScalar(arg0.doubleValue());
+}
+OGArray<? extends Number> arg1rewrite;
+if (arg1.getClass() == ComplexType.class) {
+arg1rewrite = new OGComplexScalar(arg1);
+} else {
+ arg1rewrite = new OGRealScalar(arg1.doubleValue());
+ }
+ int type1 = MatrixTypeToIndexMap.getIndexFromClass(arg0rewrite.getClass());
+ int type2 = MatrixTypeToIndexMap.getIndexFromClass(arg1rewrite.getClass());
+  OGArray<? extends Number> tmp = s_infixOpChainRunner.dispatch(s_vertcatInstructions[type1][type2], arg0rewrite, arg1rewrite);
+  return tmp.getEntry(0,0);
+}
+
 
 }

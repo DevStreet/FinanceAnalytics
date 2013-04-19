@@ -31,7 +31,7 @@ public class FunctionGenerator {
     s_generationMap.put(UnaryFunction.class, UnaryFunctionGenerator.getInstance());
     s_generationMap.put(InfixOperator.class, InfixOperatorGenerator.getInstance());
     s_generationMap.put(ArbitraryFunction.class, ArbitraryFunctionGenerator.getInstance());
-    s_generationMap.put(VoidUnaryFunction.class, VoidUnaryFunctionGenerator.getInstance());    
+    s_generationMap.put(VoidUnaryFunction.class, VoidUnaryFunctionGenerator.getInstance());
   }
 
   private FullToken _tok;
@@ -66,7 +66,7 @@ public class FunctionGenerator {
     StringBuffer sbimports = new StringBuffer();
 
     g = s_generationMap.get(_tok.getInterfaceClassType());
-//    System.out.println("name = " + _tok.getSimpleName() + ". class id =" + _tok.getInterfaceClass().getSimpleName());
+    //    System.out.println("name = " + _tok.getSimpleName() + ". class id =" + _tok.getInterfaceClass().getSimpleName());
     if (g == null) {
       s_log.warn("class " + _tok.getInterfaceClassType() + " has no code generator class available");
     } else {
@@ -174,32 +174,33 @@ public class FunctionGenerator {
     tmp.append("import com.opengamma.maths.commonapi.numbers.ComplexType;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.InfixOperator;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.UnaryFunction;\n");
-    tmp.append("import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;\n");    
+    tmp.append("import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.language.Function;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.InfixOpChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunctions;\n");
-    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForVoidUnaryFunctions;\n");    
+    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForVoidUnaryFunctions;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;\n");
+    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulatorLibrary;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunInfixOpChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.RunVoidUnaryFunctionChain;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.operationstack.VoidUnaryFunctionChain;\n");
-        tmp.append("import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;\n");
+    tmp.append("import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;\n");
     tmp.append("import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;\n");
     tmp.append("import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;\n");    
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;\n");    
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;\n");
     tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;\n");
-    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;\n");    
+    tmp.append("import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;\n");
     tmp.append("import org.slf4j.Logger;\n");
     tmp.append("import org.slf4j.LoggerFactory;\n");
     return tmp.toString();
@@ -209,19 +210,22 @@ public class FunctionGenerator {
     StringBuffer tmp = new StringBuffer();
     tmp.append("  private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();\n");
     tmp.append("  private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();\n");
-    tmp.append("  private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();\n");    
+    tmp.append("  private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();\n");
     return tmp.toString();
   }
 
   private static String operationDict() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("// Build instructions sets\n ");
-    tmp.append("OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator");
-    tmp.append("<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
-    tmp.append("OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary");
-    tmp.append(" = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
-    tmp.append("OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary");
-    tmp.append(" = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();\n");    
+    //    tmp.append("OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = new OperatorDictionaryPopulator");
+    //    tmp.append("<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
+    //    tmp.append("OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary");
+    //    tmp.append(" = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();\n");
+    //    tmp.append("OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary");
+    //    tmp.append(" = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();\n");
+    tmp.append("OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = OperatorDictionaryPopulatorLibrary.getInfixOperatorDictionary();\n");
+    tmp.append("OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = OperatorDictionaryPopulatorLibrary.getUnaryOperatorDictionary();\n");
+    tmp.append("OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = OperatorDictionaryPopulatorLibrary.getVoidUnaryOperatorDictionary();\n");
     return tmp.toString();
   }
 
