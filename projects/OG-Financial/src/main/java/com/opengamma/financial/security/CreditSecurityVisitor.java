@@ -6,6 +6,7 @@
 package com.opengamma.financial.security;
 
 import com.opengamma.financial.security.cds.CDSSecurity;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
 import com.opengamma.financial.security.cds.LegacyRecoveryLockCDSSecurity;
@@ -33,6 +34,8 @@ public interface CreditSecurityVisitor<T> {
   T visitLegacyFixedRecoveryCDSSecurity(LegacyFixedRecoveryCDSSecurity security);
 
   T visitLegacyRecoveryLockCDSSecurity(LegacyRecoveryLockCDSSecurity security);
+
+  T visitCreditDefaultSwapIndexDefinitionSecurity(CreditDefaultSwapIndexDefinitionSecurity security);
 
   T visitCreditDefaultSwapIndexSecurity(CreditDefaultSwapIndexSecurity security);
 

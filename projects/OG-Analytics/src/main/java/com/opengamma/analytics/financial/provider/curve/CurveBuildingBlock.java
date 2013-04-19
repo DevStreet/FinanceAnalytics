@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.commons.lang.ObjectUtils;
 
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -28,6 +27,13 @@ public class CurveBuildingBlock {
   // TODO: Replace the curve names by some curve ID, maybe some UniqueIdentifiable objects
 
   /**
+   * Constructor.
+   */
+  public CurveBuildingBlock() {
+    _unit = new LinkedHashMap<>();
+  }
+
+  /**
    * Constructor from a map. A new map is created.
    * @param block The curve block. Not null.
    */
@@ -37,9 +43,9 @@ public class CurveBuildingBlock {
     _unit.putAll(block);
   }
 
-  public void add(String name, int start, int number) {
-    _unit.put(name, new ObjectsPair<Integer, Integer>(start, number));
-  }
+  //  public void add(String name, int start, int number) {
+  //    _unit.put(name, new ObjectsPair<Integer, Integer>(start, number));
+  //  }
 
   /**
    * Returns the start index of the given string in the array of all parameters.
@@ -47,6 +53,7 @@ public class CurveBuildingBlock {
    * @return The start index.
    */
   public Integer getStart(final String name) {
+    // TODO: Test nqme exists?
     return _unit.get(name).getFirst();
   }
 

@@ -18,6 +18,7 @@ import com.opengamma.financial.security.cds.StandardVanillaCDSSecurity;
 import com.opengamma.financial.security.equity.EquityVarianceSwapSecurity;
 import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
+import com.opengamma.financial.security.option.CreditDefaultSwapOptionSecurity;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.financial.security.option.NonDeliverableFXOptionSecurity;
@@ -120,5 +121,11 @@ public class OtcSecurityVisitor extends FinancialSecurityVisitorSameValueAdapter
   public Boolean visitCreditDefaultSwapIndexSecurity(CreditDefaultSwapIndexSecurity security) {
     return true;
   }
+
+  @Override
+  public Boolean visitCreditDefaultSwapOptionSecurity(CreditDefaultSwapOptionSecurity security) {
+    return true;
+  }
+
 
 }

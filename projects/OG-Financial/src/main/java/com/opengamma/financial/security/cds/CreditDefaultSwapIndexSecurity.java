@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
  *
  * Please see distribution for license.
  */
@@ -16,86 +16,111 @@ import org.joda.beans.PropertyDefinition;
 import org.joda.beans.impl.direct.DirectBeanBuilder;
 import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
+import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.financial.security.FinancialSecurity;
+import com.opengamma.financial.convention.StubType;
+import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.financial.convention.daycount.DayCount;
+import com.opengamma.financial.convention.frequency.Frequency;
 import com.opengamma.financial.security.FinancialSecurityVisitor;
-import com.opengamma.util.money.Currency;
+import com.opengamma.financial.security.swap.InterestRateNotional;
+import com.opengamma.id.ExternalId;
 
 /**
- * A security for Credit Default Swap Indices.
+ * A credit security based on a underlying CDS Index rather than a reference
+ * entity for a standard CDS trade.
  */
 @BeanDefinition
-public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
-  
-  /** Serialization version. */
-  private static final long serialVersionUID = 1L;
+public class CreditDefaultSwapIndexSecurity extends AbstractCreditDefaultSwapSecurity {
+
   /**
-   * The security type.
+   * The security type
    */
   public static final String SECURITY_TYPE = "CDS_INDEX";
+
   /**
-   * The version number.
+   * The date on which the upfront payment is exchanged (usually T + 3bd).
    */
   @PropertyDefinition(validate = "notNull")
-  private String _version;
+  private ZonedDateTime _settlementDate;
+
   /**
-   * The series number.
+   * Flag to determine if we business day adjust the user input settlement
+   * date (not a standard feature of index CDS positions).
    */
   @PropertyDefinition(validate = "notNull")
-  private String _series;
+  private boolean _adjustSettlementDate;
+
   /**
-   * The family
+   * The amount of upfront exchanged (usually on T+ 3bd) - can be positive or negative.
    */
   @PropertyDefinition(validate = "notNull")
-  private String _family;
+  private InterestRateNotional _upfrontPayment;
+
   /**
-   * The currency.
+   * The fixed index coupon (fixed at the issuance of the index).
    */
   @PropertyDefinition(validate = "notNull")
-  private Currency _currency;
+  private double _indexCoupon;
+
   /**
-   * The terms.
+   * Constructor for Joda bean usage.
    */
-  @PropertyDefinition(validate = "notNull")
-  private CDSIndexTerms _terms;
-  /**
-   * The index components.
-   */
-  @PropertyDefinition(validate = "notNull")
-  private CDSIndexComponentBundle _components;
-  
-  /**
-   * Creates an instance
-   */
-  CreditDefaultSwapIndexSecurity() { //For builder
+  CreditDefaultSwapIndexSecurity() {
     super(SECURITY_TYPE);
   }
-  
-  /**
-   * Creates an instance.
-   * 
-   * @param version  the version, not null
-   * @param series  the series, not null
-   * @param family  the family, not null
-   * @param currency  the currency, not null
-   * @param terms the terms, not null
-   * @param components the components, not null
-   */
-  public CreditDefaultSwapIndexSecurity(String version, String series, String family, Currency currency, CDSIndexTerms terms, CDSIndexComponentBundle components) {
-    super(SECURITY_TYPE);
-    setVersion(version);
-    setSeries(series);
-    setFamily(family);
-    setCurrency(currency);
-    setTerms(terms);
-    setComponents(components);
+
+
+  public CreditDefaultSwapIndexSecurity(boolean buy,
+                                        ExternalId protectionBuyer,
+                                        ExternalId protectionSeller,
+                                        ExternalId underlyingIndex,
+                                        ZonedDateTime startDate,
+                                        ZonedDateTime effectiveDate,
+                                        ZonedDateTime maturityDate,
+                                        StubType stubType,
+                                        Frequency couponFrequency,
+                                        DayCount dayCount,
+                                        BusinessDayConvention businessDayConvention,
+                                        boolean immAdjustMaturityDate,
+                                        boolean adjustEffectiveDate,
+                                        boolean adjustMaturityDate,
+                                        InterestRateNotional notional,
+                                        boolean includeAccruedPremium,
+                                        boolean protectionStart,
+                                        ZonedDateTime settlementDate,
+                                        boolean adjustSettlementDate,
+                                        InterestRateNotional upfrontPayment,
+                                        double indexCoupon) {
+    super(SECURITY_TYPE,
+          buy,
+          protectionBuyer,
+          protectionSeller,
+          underlyingIndex,
+          startDate,
+          effectiveDate,
+          maturityDate,
+          stubType,
+          couponFrequency,
+          dayCount,
+          businessDayConvention,
+          immAdjustMaturityDate,
+          adjustEffectiveDate,
+          adjustMaturityDate,
+          notional,
+          includeAccruedPremium,
+          protectionStart);
+    setSettlementDate(settlementDate);
+    setAdjustSettlementDate(adjustSettlementDate);
+    setUpfrontPayment(upfrontPayment);
+    setIndexCoupon(indexCoupon);
   }
-    
+
   @Override
   public <T> T accept(FinancialSecurityVisitor<T> visitor) {
     return visitor.visitCreditDefaultSwapIndexSecurity(this);
   }
-  
+
   //------------------------- AUTOGENERATED START -------------------------
   ///CLOVER:OFF
   /**
@@ -117,18 +142,14 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
   @Override
   protected Object propertyGet(String propertyName, boolean quiet) {
     switch (propertyName.hashCode()) {
-      case 351608024:  // version
-        return getVersion();
-      case -905838985:  // series
-        return getSeries();
-      case -1281860764:  // family
-        return getFamily();
-      case 575402001:  // currency
-        return getCurrency();
-      case 110250375:  // terms
-        return getTerms();
-      case -447446250:  // components
-        return getComponents();
+      case -295948169:  // settlementDate
+        return getSettlementDate();
+      case 461393382:  // adjustSettlementDate
+        return isAdjustSettlementDate();
+      case -638821960:  // upfrontPayment
+        return getUpfrontPayment();
+      case 880904088:  // indexCoupon
+        return getIndexCoupon();
     }
     return super.propertyGet(propertyName, quiet);
   }
@@ -136,23 +157,17 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
   @Override
   protected void propertySet(String propertyName, Object newValue, boolean quiet) {
     switch (propertyName.hashCode()) {
-      case 351608024:  // version
-        setVersion((String) newValue);
+      case -295948169:  // settlementDate
+        setSettlementDate((ZonedDateTime) newValue);
         return;
-      case -905838985:  // series
-        setSeries((String) newValue);
+      case 461393382:  // adjustSettlementDate
+        setAdjustSettlementDate((Boolean) newValue);
         return;
-      case -1281860764:  // family
-        setFamily((String) newValue);
+      case -638821960:  // upfrontPayment
+        setUpfrontPayment((InterestRateNotional) newValue);
         return;
-      case 575402001:  // currency
-        setCurrency((Currency) newValue);
-        return;
-      case 110250375:  // terms
-        setTerms((CDSIndexTerms) newValue);
-        return;
-      case -447446250:  // components
-        setComponents((CDSIndexComponentBundle) newValue);
+      case 880904088:  // indexCoupon
+        setIndexCoupon((Double) newValue);
         return;
     }
     super.propertySet(propertyName, newValue, quiet);
@@ -160,12 +175,10 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
 
   @Override
   protected void validate() {
-    JodaBeanUtils.notNull(_version, "version");
-    JodaBeanUtils.notNull(_series, "series");
-    JodaBeanUtils.notNull(_family, "family");
-    JodaBeanUtils.notNull(_currency, "currency");
-    JodaBeanUtils.notNull(_terms, "terms");
-    JodaBeanUtils.notNull(_components, "components");
+    JodaBeanUtils.notNull(_settlementDate, "settlementDate");
+    JodaBeanUtils.notNull(_adjustSettlementDate, "adjustSettlementDate");
+    JodaBeanUtils.notNull(_upfrontPayment, "upfrontPayment");
+    JodaBeanUtils.notNull(_indexCoupon, "indexCoupon");
     super.validate();
   }
 
@@ -176,12 +189,10 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
     }
     if (obj != null && obj.getClass() == this.getClass()) {
       CreditDefaultSwapIndexSecurity other = (CreditDefaultSwapIndexSecurity) obj;
-      return JodaBeanUtils.equal(getVersion(), other.getVersion()) &&
-          JodaBeanUtils.equal(getSeries(), other.getSeries()) &&
-          JodaBeanUtils.equal(getFamily(), other.getFamily()) &&
-          JodaBeanUtils.equal(getCurrency(), other.getCurrency()) &&
-          JodaBeanUtils.equal(getTerms(), other.getTerms()) &&
-          JodaBeanUtils.equal(getComponents(), other.getComponents()) &&
+      return JodaBeanUtils.equal(getSettlementDate(), other.getSettlementDate()) &&
+          JodaBeanUtils.equal(isAdjustSettlementDate(), other.isAdjustSettlementDate()) &&
+          JodaBeanUtils.equal(getUpfrontPayment(), other.getUpfrontPayment()) &&
+          JodaBeanUtils.equal(getIndexCoupon(), other.getIndexCoupon()) &&
           super.equals(obj);
     }
     return false;
@@ -190,222 +201,159 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getVersion());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getSeries());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getFamily());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getCurrency());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getTerms());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getComponents());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getSettlementDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(isAdjustSettlementDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getUpfrontPayment());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getIndexCoupon());
     return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
   /**
-   * Gets the version number.
+   * Gets the date on which the upfront payment is exchanged (usually T + 3bd).
    * @return the value of the property, not null
    */
-  public String getVersion() {
-    return _version;
+  public ZonedDateTime getSettlementDate() {
+    return _settlementDate;
   }
 
   /**
-   * Sets the version number.
-   * @param version  the new value of the property, not null
+   * Sets the date on which the upfront payment is exchanged (usually T + 3bd).
+   * @param settlementDate  the new value of the property, not null
    */
-  public void setVersion(String version) {
-    JodaBeanUtils.notNull(version, "version");
-    this._version = version;
+  public void setSettlementDate(ZonedDateTime settlementDate) {
+    JodaBeanUtils.notNull(settlementDate, "settlementDate");
+    this._settlementDate = settlementDate;
   }
 
   /**
-   * Gets the the {@code version} property.
+   * Gets the the {@code settlementDate} property.
    * @return the property, not null
    */
-  public final Property<String> version() {
-    return metaBean().version().createProperty(this);
+  public final Property<ZonedDateTime> settlementDate() {
+    return metaBean().settlementDate().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
   /**
-   * Gets the series number.
+   * Gets flag to determine if we business day adjust the user input settlement
+   * date (not a standard feature of index CDS positions).
    * @return the value of the property, not null
    */
-  public String getSeries() {
-    return _series;
+  public boolean isAdjustSettlementDate() {
+    return _adjustSettlementDate;
   }
 
   /**
-   * Sets the series number.
-   * @param series  the new value of the property, not null
+   * Sets flag to determine if we business day adjust the user input settlement
+   * date (not a standard feature of index CDS positions).
+   * @param adjustSettlementDate  the new value of the property, not null
    */
-  public void setSeries(String series) {
-    JodaBeanUtils.notNull(series, "series");
-    this._series = series;
+  public void setAdjustSettlementDate(boolean adjustSettlementDate) {
+    JodaBeanUtils.notNull(adjustSettlementDate, "adjustSettlementDate");
+    this._adjustSettlementDate = adjustSettlementDate;
   }
 
   /**
-   * Gets the the {@code series} property.
+   * Gets the the {@code adjustSettlementDate} property.
+   * date (not a standard feature of index CDS positions).
    * @return the property, not null
    */
-  public final Property<String> series() {
-    return metaBean().series().createProperty(this);
+  public final Property<Boolean> adjustSettlementDate() {
+    return metaBean().adjustSettlementDate().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
   /**
-   * Gets the family
+   * Gets the amount of upfront exchanged (usually on T+ 3bd) - can be positive or negative.
    * @return the value of the property, not null
    */
-  public String getFamily() {
-    return _family;
+  public InterestRateNotional getUpfrontPayment() {
+    return _upfrontPayment;
   }
 
   /**
-   * Sets the family
-   * @param family  the new value of the property, not null
+   * Sets the amount of upfront exchanged (usually on T+ 3bd) - can be positive or negative.
+   * @param upfrontPayment  the new value of the property, not null
    */
-  public void setFamily(String family) {
-    JodaBeanUtils.notNull(family, "family");
-    this._family = family;
+  public void setUpfrontPayment(InterestRateNotional upfrontPayment) {
+    JodaBeanUtils.notNull(upfrontPayment, "upfrontPayment");
+    this._upfrontPayment = upfrontPayment;
   }
 
   /**
-   * Gets the the {@code family} property.
+   * Gets the the {@code upfrontPayment} property.
    * @return the property, not null
    */
-  public final Property<String> family() {
-    return metaBean().family().createProperty(this);
+  public final Property<InterestRateNotional> upfrontPayment() {
+    return metaBean().upfrontPayment().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
   /**
-   * Gets the currency.
+   * Gets the fixed index coupon (fixed at the issuance of the index).
    * @return the value of the property, not null
    */
-  public Currency getCurrency() {
-    return _currency;
+  public double getIndexCoupon() {
+    return _indexCoupon;
   }
 
   /**
-   * Sets the currency.
-   * @param currency  the new value of the property, not null
+   * Sets the fixed index coupon (fixed at the issuance of the index).
+   * @param indexCoupon  the new value of the property, not null
    */
-  public void setCurrency(Currency currency) {
-    JodaBeanUtils.notNull(currency, "currency");
-    this._currency = currency;
+  public void setIndexCoupon(double indexCoupon) {
+    JodaBeanUtils.notNull(indexCoupon, "indexCoupon");
+    this._indexCoupon = indexCoupon;
   }
 
   /**
-   * Gets the the {@code currency} property.
+   * Gets the the {@code indexCoupon} property.
    * @return the property, not null
    */
-  public final Property<Currency> currency() {
-    return metaBean().currency().createProperty(this);
-  }
-
-  //-----------------------------------------------------------------------
-  /**
-   * Gets the terms.
-   * @return the value of the property, not null
-   */
-  public CDSIndexTerms getTerms() {
-    return _terms;
-  }
-
-  /**
-   * Sets the terms.
-   * @param terms  the new value of the property, not null
-   */
-  public void setTerms(CDSIndexTerms terms) {
-    JodaBeanUtils.notNull(terms, "terms");
-    this._terms = terms;
-  }
-
-  /**
-   * Gets the the {@code terms} property.
-   * @return the property, not null
-   */
-  public final Property<CDSIndexTerms> terms() {
-    return metaBean().terms().createProperty(this);
-  }
-
-  //-----------------------------------------------------------------------
-  /**
-   * Gets the index components.
-   * @return the value of the property, not null
-   */
-  public CDSIndexComponentBundle getComponents() {
-    return _components;
-  }
-
-  /**
-   * Sets the index components.
-   * @param components  the new value of the property, not null
-   */
-  public void setComponents(CDSIndexComponentBundle components) {
-    JodaBeanUtils.notNull(components, "components");
-    this._components = components;
-  }
-
-  /**
-   * Gets the the {@code components} property.
-   * @return the property, not null
-   */
-  public final Property<CDSIndexComponentBundle> components() {
-    return metaBean().components().createProperty(this);
+  public final Property<Double> indexCoupon() {
+    return metaBean().indexCoupon().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
   /**
    * The meta-bean for {@code CreditDefaultSwapIndexSecurity}.
    */
-  public static class Meta extends FinancialSecurity.Meta {
+  public static class Meta extends AbstractCreditDefaultSwapSecurity.Meta {
     /**
      * The singleton instance of the meta-bean.
      */
     static final Meta INSTANCE = new Meta();
 
     /**
-     * The meta-property for the {@code version} property.
+     * The meta-property for the {@code settlementDate} property.
      */
-    private final MetaProperty<String> _version = DirectMetaProperty.ofReadWrite(
-        this, "version", CreditDefaultSwapIndexSecurity.class, String.class);
+    private final MetaProperty<ZonedDateTime> _settlementDate = DirectMetaProperty.ofReadWrite(
+        this, "settlementDate", CreditDefaultSwapIndexSecurity.class, ZonedDateTime.class);
     /**
-     * The meta-property for the {@code series} property.
+     * The meta-property for the {@code adjustSettlementDate} property.
      */
-    private final MetaProperty<String> _series = DirectMetaProperty.ofReadWrite(
-        this, "series", CreditDefaultSwapIndexSecurity.class, String.class);
+    private final MetaProperty<Boolean> _adjustSettlementDate = DirectMetaProperty.ofReadWrite(
+        this, "adjustSettlementDate", CreditDefaultSwapIndexSecurity.class, Boolean.TYPE);
     /**
-     * The meta-property for the {@code family} property.
+     * The meta-property for the {@code upfrontPayment} property.
      */
-    private final MetaProperty<String> _family = DirectMetaProperty.ofReadWrite(
-        this, "family", CreditDefaultSwapIndexSecurity.class, String.class);
+    private final MetaProperty<InterestRateNotional> _upfrontPayment = DirectMetaProperty.ofReadWrite(
+        this, "upfrontPayment", CreditDefaultSwapIndexSecurity.class, InterestRateNotional.class);
     /**
-     * The meta-property for the {@code currency} property.
+     * The meta-property for the {@code indexCoupon} property.
      */
-    private final MetaProperty<Currency> _currency = DirectMetaProperty.ofReadWrite(
-        this, "currency", CreditDefaultSwapIndexSecurity.class, Currency.class);
-    /**
-     * The meta-property for the {@code terms} property.
-     */
-    private final MetaProperty<CDSIndexTerms> _terms = DirectMetaProperty.ofReadWrite(
-        this, "terms", CreditDefaultSwapIndexSecurity.class, CDSIndexTerms.class);
-    /**
-     * The meta-property for the {@code components} property.
-     */
-    private final MetaProperty<CDSIndexComponentBundle> _components = DirectMetaProperty.ofReadWrite(
-        this, "components", CreditDefaultSwapIndexSecurity.class, CDSIndexComponentBundle.class);
+    private final MetaProperty<Double> _indexCoupon = DirectMetaProperty.ofReadWrite(
+        this, "indexCoupon", CreditDefaultSwapIndexSecurity.class, Double.TYPE);
     /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
         this, (DirectMetaPropertyMap) super.metaPropertyMap(),
-        "version",
-        "series",
-        "family",
-        "currency",
-        "terms",
-        "components");
+        "settlementDate",
+        "adjustSettlementDate",
+        "upfrontPayment",
+        "indexCoupon");
 
     /**
      * Restricted constructor.
@@ -416,18 +364,14 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
     @Override
     protected MetaProperty<?> metaPropertyGet(String propertyName) {
       switch (propertyName.hashCode()) {
-        case 351608024:  // version
-          return _version;
-        case -905838985:  // series
-          return _series;
-        case -1281860764:  // family
-          return _family;
-        case 575402001:  // currency
-          return _currency;
-        case 110250375:  // terms
-          return _terms;
-        case -447446250:  // components
-          return _components;
+        case -295948169:  // settlementDate
+          return _settlementDate;
+        case 461393382:  // adjustSettlementDate
+          return _adjustSettlementDate;
+        case -638821960:  // upfrontPayment
+          return _upfrontPayment;
+        case 880904088:  // indexCoupon
+          return _indexCoupon;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -449,51 +393,35 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
 
     //-----------------------------------------------------------------------
     /**
-     * The meta-property for the {@code version} property.
+     * The meta-property for the {@code settlementDate} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<String> version() {
-      return _version;
+    public final MetaProperty<ZonedDateTime> settlementDate() {
+      return _settlementDate;
     }
 
     /**
-     * The meta-property for the {@code series} property.
+     * The meta-property for the {@code adjustSettlementDate} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<String> series() {
-      return _series;
+    public final MetaProperty<Boolean> adjustSettlementDate() {
+      return _adjustSettlementDate;
     }
 
     /**
-     * The meta-property for the {@code family} property.
+     * The meta-property for the {@code upfrontPayment} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<String> family() {
-      return _family;
+    public final MetaProperty<InterestRateNotional> upfrontPayment() {
+      return _upfrontPayment;
     }
 
     /**
-     * The meta-property for the {@code currency} property.
+     * The meta-property for the {@code indexCoupon} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<Currency> currency() {
-      return _currency;
-    }
-
-    /**
-     * The meta-property for the {@code terms} property.
-     * @return the meta-property, not null
-     */
-    public final MetaProperty<CDSIndexTerms> terms() {
-      return _terms;
-    }
-
-    /**
-     * The meta-property for the {@code components} property.
-     * @return the meta-property, not null
-     */
-    public final MetaProperty<CDSIndexComponentBundle> components() {
-      return _components;
+    public final MetaProperty<Double> indexCoupon() {
+      return _indexCoupon;
     }
 
   }
@@ -501,6 +429,3 @@ public class CreditDefaultSwapIndexSecurity extends FinancialSecurity {
   ///CLOVER:ON
   //-------------------------- AUTOGENERATED END --------------------------
 }
-
-
-

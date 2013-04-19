@@ -24,6 +24,7 @@ import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
 import com.opengamma.financial.security.cashflow.CashFlowSecurity;
 import com.opengamma.financial.security.cds.CDSSecurity;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
 import com.opengamma.financial.security.cds.LegacyRecoveryLockCDSSecurity;
@@ -376,6 +377,11 @@ public class LongShortAggregationFunction implements AggregationFunction<String>
         @Override
         public String visitDeliverableSwapFutureSecurity(final DeliverableSwapFutureSecurity security) {
           return position.getQuantity().longValue() < 0 ? SHORT : LONG;
+        }
+
+        @Override
+        public String visitCreditDefaultSwapIndexDefinitionSecurity(final CreditDefaultSwapIndexDefinitionSecurity security) {
+          throw new UnsupportedOperationException(FinancialSecurityVisitorAdapter.getUnsupportedOperationMessage(getClass(), security));
         }
 
         @Override

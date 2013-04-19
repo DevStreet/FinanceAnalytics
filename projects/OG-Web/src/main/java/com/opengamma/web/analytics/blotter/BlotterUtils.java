@@ -5,6 +5,9 @@
  */
 package com.opengamma.web.analytics.blotter;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +41,7 @@ import com.opengamma.financial.security.LongShort;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
@@ -53,6 +57,7 @@ import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.option.BarrierDirection;
 import com.opengamma.financial.security.option.BarrierType;
+import com.opengamma.financial.security.option.CreditDefaultSwapOptionSecurity;
 import com.opengamma.financial.security.option.ExerciseType;
 import com.opengamma.financial.security.option.FXBarrierOptionSecurity;
 import com.opengamma.financial.security.option.FXOptionSecurity;
@@ -107,10 +112,20 @@ import com.opengamma.util.time.Expiry;
       StandardVanillaCDSSecurity.meta(),
       StandardRecoveryLockCDSSecurity.meta(),
       StandardFixedRecoveryCDSSecurity.meta(),
-      CreditDefaultSwapIndexSecurity.meta());
+      CreditDefaultSwapIndexSecurity.meta(),
+      CreditDefaultSwapOptionSecurity.meta());
 
   /** Meta bean factory for looking up meta beans by type name. */
   private static final MetaBeanFactory s_metaBeanFactory = new MapMetaBeanFactory(s_metaBeans);
+  /** Formatter for decimal numbers, DecimalFormat isn't thread safe. */
+  private static final ThreadLocal<DecimalFormat> s_decimalFormat = new ThreadLocal<DecimalFormat>() {
+    @Override
+    protected DecimalFormat initialValue() {
+      DecimalFormat decimalFormat = new DecimalFormat("#,###.#####");
+      decimalFormat.setParseBigDecimal(true);
+      return decimalFormat;
+    }
+  };
 
   /**
    * For traversing trade and security {@link MetaBean}s and building instances from the data sent from the blotter.
@@ -156,6 +171,9 @@ import com.opengamma.util.time.Expiry;
             SwapLeg.meta().regionId(), regionIdToStringConverter);
 
     s_stringConvert = new StringConvert();
+    s_stringConvert.register(BigDecimal.class, new BigDecimalConverter());
+    s_stringConvert.register(Double.class, new DoubleConverter());
+    s_stringConvert.register(Double.TYPE, new DoubleConverter());
     s_stringConvert.register(Frequency.class, new JodaBeanConverters.FrequencyConverter());
     s_stringConvert.register(Currency.class, new JodaBeanConverters.CurrencyConverter());
     s_stringConvert.register(DayCount.class, new JodaBeanConverters.DayCountConverter());
@@ -208,12 +226,24 @@ import com.opengamma.util.time.Expiry;
   private static final PropertyFilter s_swaptionUnderlyingFilter = new PropertyFilter(SwaptionSecurity.meta().underlyingId());
 
   /**
+   * Filters out the underlying ID field of {@link CreditDefaultSwapOptionSecurity} when building the HTML showing the security
+   * structure. The back end creates the underlying security and fills this field in so it's of no interest
+   * to the client.
+   */
+  private static final PropertyFilter s_cdsOptionUnderlyingFilter = new PropertyFilter(CreditDefaultSwapOptionSecurity.meta().underlyingId());
+
+  /**
    * Filters out the {@code securityType} field for all securities when building the HTML showing the security
    * structure. This value is read-only in each security type and is of no interest to the client.
    */
   private static final PropertyFilter s_securityTypeFilter = new PropertyFilter(ManageableSecurity.meta().securityType());
 
-
+  /**
+   * @return A thread-local formatter instance set to parse numbers into BigDecimals.
+   */
+  /* package */ static DecimalFormat getDecimalFormat() {
+    return s_decimalFormat.get();
+  }
 
   /* package */ static FinancialSecurity buildSecurity(BeanDataSource data) {
     return buildSecurity(data, ExternalIdBundle.EMPTY);
@@ -252,7 +282,7 @@ import com.opengamma.util.time.Expiry;
   }
 
   /* package */ static BeanTraverser structureBuildingTraverser() {
-    return new BeanTraverser(s_externalIdBundleFilter, s_securityTypeFilter, s_swaptionUnderlyingFilter, s_fxRegionFilter);
+    return new BeanTraverser(s_externalIdBundleFilter, s_securityTypeFilter, s_swaptionUnderlyingFilter, s_cdsOptionUnderlyingFilter, s_fxRegionFilter);
   }
 
   /* package */
@@ -369,6 +399,53 @@ import com.opengamma.util.time.Expiry;
   @Override
   public String convertToString(Country country) {
     return country.getCode();
+  }
+}
+
+/**
+ * Converts doubles to strings in simple format (i.e. no scientific notation). Limits to 5DP.
+ */
+/* package */ class DoubleConverter implements StringConverter<Double> {
+
+  @Override
+  public Double convertFromString(Class<? extends Double> cls, String str) {
+    try {
+      return BlotterUtils.getDecimalFormat().parse(str).doubleValue();
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Failed to parse number", e);
+    }
+  }
+
+  @Override
+  public String convertToString(Double value) {
+    return BlotterUtils.getDecimalFormat().format(value);
+  }
+}
+
+/**
+ * Converts big decimals to strings in simple format (i.e. no scientific notation). Limits to 5DP.
+ */
+/* package */ class BigDecimalConverter implements StringConverter<BigDecimal> {
+
+  @Override
+  public BigDecimal convertFromString(Class<? extends BigDecimal> cls, String str) {
+    try {
+      Number number = BlotterUtils.getDecimalFormat().parse(str);
+      // bizarrely if you call setParseBigDecimal(true) on a DecimalFormat it returns a BigDecimal unless the number
+      // is NaN or +/- infinity in which case it returns a Double
+      if (number instanceof BigDecimal) {
+        return (BigDecimal) number;
+      } else {
+        throw new IllegalArgumentException("Failed to parse number as BigDecimal: " + number);
+      }
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Failed to parse number", e);
+    }
+  }
+
+  @Override
+  public String convertToString(BigDecimal value) {
+    return BlotterUtils.getDecimalFormat().format(value);
   }
 }
 

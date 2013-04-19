@@ -22,6 +22,7 @@ import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.model.interestrate.curve.ForwardCurve;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.financial.model.option.pricing.analytic.BaroneAdesiWhaleyModel;
 import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
 import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilitySurface;
 import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilitySurfaceMoneyness;
@@ -63,6 +64,9 @@ import com.opengamma.financial.security.FinancialSecurityUtils;
 import com.opengamma.financial.security.option.EquityIndexFutureOptionSecurity;
 import com.opengamma.financial.security.option.EquityIndexOptionSecurity;
 import com.opengamma.financial.security.option.EquityOptionSecurity;
+import com.opengamma.financial.security.option.ExerciseType;
+import com.opengamma.financial.security.option.ExerciseTypeVisitorImpl;
+import com.opengamma.financial.security.option.OptionType;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.async.AsynchronousExecution;
@@ -101,7 +105,6 @@ public abstract class ListedEquityOptionFunction extends AbstractFunction.NonCom
     _valueRequirementNames = valueRequirementNames;
   }
 
-  //TODO: INDUSTRIALISE: The types we're concerned about: EquityOptionSecurity, EquityIndexOptionSecurity, EquityIndexFutureOptionSecurity
   @Override
   public ComputationTargetType getTargetType() {
     return FinancialSecurityTypes.EQUITY_OPTION_SECURITY
@@ -208,19 +211,23 @@ public abstract class ListedEquityOptionFunction extends AbstractFunction.NonCom
     // From the Security, we get strike and expiry information to compute implied volatility
     final double strike;
     final Expiry expiry;
+    final boolean isCall;
     final Security security = target.getSecurity();
     if (security instanceof EquityOptionSecurity) {
       final EquityOptionSecurity option = (EquityOptionSecurity) security;
       strike = option.getStrike();
       expiry = option.getExpiry();
+      isCall = option.getOptionType().equals(OptionType.CALL);
     } else if (security instanceof EquityIndexOptionSecurity) {
       final EquityIndexOptionSecurity option = (EquityIndexOptionSecurity) security;
       strike = option.getStrike();
       expiry = option.getExpiry();
+      isCall = option.getOptionType().equals(OptionType.CALL);
     } else if (security instanceof EquityIndexFutureOptionSecurity) {
       final EquityIndexFutureOptionSecurity option = (EquityIndexFutureOptionSecurity) security;
       strike = option.getStrike();
       expiry = option.getExpiry();
+      isCall = option.getOptionType().equals(OptionType.CALL);
     } else {
       throw new OpenGammaRuntimeException("Security type not handled," + security.getName());
     }
@@ -245,9 +252,17 @@ public abstract class ListedEquityOptionFunction extends AbstractFunction.NonCom
       throw new OpenGammaRuntimeException("Could not get market value of underlying option");
     }
     final Double spotOptionPrice = (Double) optionPriceValue.getValue();
-    final Double forwardOptionPrice = spotOptionPrice / discountFactor;
+    final double forwardOptionPrice = spotOptionPrice / discountFactor;
 
-    double impliedVol = BlackFormulaRepository.impliedVolatility(forwardOptionPrice, forward, strike, timeToExpiry, 0.3);
+    // TODO: Have been running into problems, primarily from illiquid option prices, hence we test
+    final double impliedVol;
+    final double intrinsic =  Math.max(0.0, (forward - strike) * (isCall ? 1.0 : -1.0));
+    if (intrinsic > forwardOptionPrice) {
+      s_logger.warn("Option with intrinsic value (" + intrinsic + ") > price (" + forwardOptionPrice + ")! Setting implied volatility to zero, " + security);
+      impliedVol = 0.0;
+    } else {
+      impliedVol =  BlackFormulaRepository.impliedVolatility(forwardOptionPrice, forward, strike, timeToExpiry, isCall); 
+    }
 
     final Surface<Double, Double, Double> surface = ConstantDoublesSurface.from(impliedVol);
     final BlackVolatilitySurfaceMoneyness impliedVolatilitySurface = new BlackVolatilitySurfaceMoneyness(surface, forwardCurve);

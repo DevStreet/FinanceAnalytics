@@ -24,6 +24,7 @@ import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
 import com.opengamma.financial.security.cashflow.CashFlowSecurity;
 import com.opengamma.financial.security.cds.CDSSecurity;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
 import com.opengamma.financial.security.cds.LegacyRecoveryLockCDSSecurity;
@@ -406,6 +407,11 @@ public class AssetClassAggregationFunction implements AggregationFunction<String
         @Override
         public String visitDeliverableSwapFutureSecurity(final DeliverableSwapFutureSecurity security) {
           return DELIVERABLE_SWAP_FUTURES;
+        }
+
+        @Override
+        public String visitCreditDefaultSwapIndexDefinitionSecurity(final CreditDefaultSwapIndexDefinitionSecurity security) {
+          return CDX;
         }
 
         @Override

@@ -13,6 +13,7 @@ import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.cash.CashSecurity;
 import com.opengamma.financial.security.cashflow.CashFlowSecurity;
 import com.opengamma.financial.security.cds.CDSSecurity;
+import com.opengamma.financial.security.cds.CreditDefaultSwapIndexDefinitionSecurity;
 import com.opengamma.financial.security.cds.CreditDefaultSwapIndexSecurity;
 import com.opengamma.financial.security.cds.LegacyFixedRecoveryCDSSecurity;
 import com.opengamma.financial.security.cds.LegacyRecoveryLockCDSSecurity;
@@ -286,6 +287,11 @@ public class FinancialSecurityVisitorAdapter<T> extends FutureSecurityVisitorAda
 
   @Override
   public T visitLegacyRecoveryLockCDSSecurity(final LegacyRecoveryLockCDSSecurity security) {
+    throw new UnsupportedOperationException(getUnsupportedOperationMessage(getClass(), security));
+  }
+
+  @Override
+  public T visitCreditDefaultSwapIndexDefinitionSecurity(final CreditDefaultSwapIndexDefinitionSecurity security) {
     throw new UnsupportedOperationException(getUnsupportedOperationMessage(getClass(), security));
   }
 
@@ -1288,6 +1294,26 @@ public class FinancialSecurityVisitorAdapter<T> extends FutureSecurityVisitorAda
       return this;
     }
 
+    public Builder<T> creditDefaultSwapOptionSecurityVisitor(final T value) {
+      _visitor = new FinancialSecurityVisitorDelegate<T>(_visitor) {
+        @Override
+        public T visitCreditDefaultSwapOptionSecurity(final CreditDefaultSwapOptionSecurity security) {
+          return value;
+        }
+      };
+      return this;
+    }
+
+    public Builder<T> creditDefaultSwapIndexSecurityVisitor(final T value) {
+      _visitor = new FinancialSecurityVisitorDelegate<T>(_visitor) {
+        @Override
+        public T visitCreditDefaultSwapIndexSecurity(final CreditDefaultSwapIndexSecurity security) {
+          return value;
+        }
+      };
+      return this;
+    }
+
     public Builder<T> futureSecurityVisitor(final T value) {
       _visitor = new FinancialSecurityVisitorDelegate<T>(_visitor) {
         @Override
@@ -1603,12 +1629,17 @@ public class FinancialSecurityVisitorAdapter<T> extends FutureSecurityVisitorAda
         }
 
         @Override
-        public T visitCreditDefaultSwapIndexSecurity(final CreditDefaultSwapIndexSecurity security) {
+        public T visitCreditDefaultSwapIndexDefinitionSecurity(final CreditDefaultSwapIndexDefinitionSecurity security) {
           return value;
         }
 
         @Override
         public T visitCreditDefaultSwapOptionSecurity(final CreditDefaultSwapOptionSecurity security) {
+          return value;
+        }
+
+        @Override
+        public T visitCreditDefaultSwapIndexSecurity(final CreditDefaultSwapIndexSecurity security) {
           return value;
         }
       };

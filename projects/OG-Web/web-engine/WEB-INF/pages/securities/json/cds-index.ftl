@@ -1,15 +1,25 @@
 <#escape x as x?html>
-<#include "security-header.ftl"> 
-  "cds_version":"${security.version}",
-  "series":"${security.series}",
-  "family":"${security.family}",
-  "currency":"${security.currency}",
-  "terms":[<#list terms as tenor>"${tenor}"<#if tenor_has_next>,</#if></#list>],
-  "components":[<#list components as component>
-    {<#if component.bondId??>"bond":{"scheme":"${component.bondId.scheme.name}", "value":"${component.bondId.value}"},</#if>
-     "obligor":{"scheme":"${component.obligorRedCode.scheme.name}", "value":"${component.obligorRedCode.value}"}, 
-     "weight": ${component.weight}, 
-     "name": "${component.name}"}
-     <#if component_has_next>,</#if></#list>],
-<#include "security-footer.ftl"> 
+<#include "security-header.ftl">
+"buy": <#if security.buy> "Buy" <#else> "Sell" </#if>,
+"protectionBuyer":"${security.protectionBuyer.scheme} - ${security.protectionBuyer.value}",
+"protectionSeller":"${security.protectionSeller.scheme} - ${security.protectionSeller.value}",
+"referenceEntity":"${security.referenceEntity.scheme} - ${security.referenceEntity.value}",
+"startDate": "${security.startDate.toLocalDate()}",
+"effectiveDate": "${security.effectiveDate.toLocalDate()}",
+"maturityDate": "${security.maturityDate.toLocalDate()}",
+"stubType":"${security.stubType}",
+"couponFrequency":"${security.couponFrequency.conventionName}",
+"dayCount":"${security.dayCount.conventionName}",
+"businessDayConvention":"${security.businessDayConvention.conventionName}",
+"immAdjustMaturityDate":"${security.immAdjustMaturityDate?string}",
+"adjustEffectiveDate":"${security.adjustEffectiveDate?string}",
+"adjustMaturityDate":"${security.adjustMaturityDate?string}",
+"notional":"${security.notional.currency} ${security.notional.amount}",
+"upfrontPayment":"${security.upfrontPayment.currency} ${security.upfrontPayment.amount}",
+"includeAccruedPremium":"${security.includeAccruedPremium?string}",
+"protectionStart":"${security.protectionStart?string}",
+"indexCoupon":"${security.indexCoupon}",
+"settlementDate":"${security.settlementDate.toLocalDate()}",
+"adjustSettlementDate":"${security.adjustSettlementDate?string}",
+<#include "security-footer.ftl">
 </#escape>
