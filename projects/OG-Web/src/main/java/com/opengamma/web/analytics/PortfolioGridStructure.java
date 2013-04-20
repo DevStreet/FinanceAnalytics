@@ -5,7 +5,6 @@
  */
 package com.opengamma.web.analytics;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -139,7 +138,7 @@ public class PortfolioGridStructure extends MainGridStructure {
     for (GridColumn column : getColumnStructure().getColumns()) {
       ColumnSpecification colSpec = column.getSpecification();
       if (Inliner.isDisplayableInline(column.getType(), column.getSpecification())) {
-        // order set of the union of the column metadata for the whole set. need this to figure out how many unique
+        // ordered set of the union of the column metadata for the whole set. need this to figure out how many unique
         // columns are required
         SortedSet<ColumnMeta> allColumnMeta = Sets.newTreeSet();
         // traverse every result in the column and get the column metadata
@@ -171,20 +170,12 @@ public class PortfolioGridStructure extends MainGridStructure {
     }
   }
 
-  private Integer max(Integer count1, Integer count2) {
-    if (count1 == null) {
-      return count2;
-    } else if (count2 == null) {
-      return count1;
-    } else {
-      return Math.max(count1, count2);
-    }
-  }
-
   /* package */ static GridColumnGroup buildFixedColumns(List<PortfolioGridRow> rows) {
     GridColumn labelColumn = new GridColumn("Name", "", null, new PortfolioLabelRenderer(rows));
-    GridColumn quantityColumn = new GridColumn("Quantity", "", BigDecimal.class, new QuantityRenderer(rows), null);
-    return new GridColumnGroup("fixed", ImmutableList.of(labelColumn, quantityColumn), false);
+    // TODO make the quantity column optional until it's replaced with a function
+    //GridColumn quantityColumn = new GridColumn("Quantity", "", BigDecimal.class, new QuantityRenderer(rows), null);
+    //return new GridColumnGroup("fixed", ImmutableList.of(labelColumn, quantityColumn), false);
+    return new GridColumnGroup("fixed", ImmutableList.of(labelColumn), false);
   }
 
   /* package */ static List<GridColumnGroup> buildAnalyticsColumns(ViewDefinition viewDef, TargetLookup targetLookup) {
@@ -211,7 +202,6 @@ public class PortfolioGridStructure extends MainGridStructure {
         // ensure columnSpec isn't a duplicate
         if (columnSpecs.add(columnSpec)) {
           SortedSet<ColumnMeta> meta = inlineColumnMeta.get(columnSpec);
-          //if (true) { // column can't be inlined
           if (meta == null) { // column can't be inlined
             columns.add(GridColumn.forSpec(columnSpec, columnType, targetLookup));
           } else {
@@ -223,7 +213,7 @@ public class PortfolioGridStructure extends MainGridStructure {
               } else {
                 header = columnMeta.getHeader();
               }
-              columns.add(GridColumn.forSpec(header, columnSpec, columnType, targetLookup, columnMeta.getKey(), inlineIndex));
+              columns.add(GridColumn.forSpec(header, columnSpec, columnMeta.getColumnType(), targetLookup, columnMeta.getKey(), inlineIndex));
             }
           }
         }
