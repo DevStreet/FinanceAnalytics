@@ -20,21 +20,70 @@
 
 .OG-Openfin button {
     position: absolute;
-    top: 3px;
+    top: 5px;
+    padding:5px 10px;
+    height: 25px;
+    width: 25px;
+}
+
+.OG-Openfin button span {
+    text-indent: -9999;
 }
 
 .OG-Openfin .og-back {
-    left: 2px;
+    left: 5px;
 }
 
 .OG-Openfin .og-forward {
-    left: 54px;
+    left: 35px;
+}
+
+.OG-Openfin .og-back span:before{
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #586576;
+    border-top: 7px solid transparent;
+    content: '';
+    display: inline-block;
+    left: 4px;
+    margin-top: -7px;
+    position: absolute;
+    top: 50%;
+}
+
+.OG-Openfin .og-back span:after{
+    border: 2px solid #586576;
+    content: '';
+    margin-top: -2px;
+    margin-left: -1px;
+    position: absolute;
+    width: 2px;
+}
+
+.OG-Openfin .og-forward span:before{
+    border-bottom: 7px solid transparent;
+    border-left: 7px solid #586576;
+    border-top: 7px solid transparent;
+    content: '';
+    display: inline-block;
+    margin-top: -7px;
+    position: absolute;
+    right: 4px;
+    top: 50%;
+}
+
+.OG-Openfin .og-forward span:after{
+    border: 2px solid #586576;
+    content: '';
+    margin-top: -2px;
+    margin-left: -6px;
+    position: absolute;
+    width: 2px;
 }
 
 .OG-Openfin .og-url {
     border: 1px solid #a3a3a3;
     border-radius: 3px;
-    left: 130px;
+    left: 65px;
     min-width: 300px;
     padding:5px 10px;
     position: absolute;
