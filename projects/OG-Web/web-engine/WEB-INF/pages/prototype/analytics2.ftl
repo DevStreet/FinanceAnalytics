@@ -5,8 +5,8 @@ ${ogStyle.print('og_all.css', 'all',false)}
 <body>
 <div class="OG-Openfin">
     <form>
-        <button class="og-back"><span></span></button>
-        <button class="og-forward"><span></span></button>
+        <div class="og-back og-disabled"></div>
+        <div class="og-forward"></div>
         <input class="og-url" value="test data" type="text" />
     </form>
 </div>
