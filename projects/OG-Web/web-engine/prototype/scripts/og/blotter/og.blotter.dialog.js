@@ -49,9 +49,6 @@ $.register_module({
                             constructor.populate($(event.target).attr('data-type'), config);
                             $('.OG-blotter-trade-select').hide();
                         });
-                        /*.on('change', function (event) {
-                            constructor.populate($(event.target).val(), config);
-                        });*/
                         constructor.create_dialog();
                         setup_existing();
                     });
@@ -99,6 +96,8 @@ $.register_module({
                     form_wrapper = new inner(config);
                     $('.OG-blotter-trade-save').show();
                     $('.ui-dialog-title').html(form_wrapper.title);
+                } else {
+                    og.dev.warn('no form found for ' + str);
                 }
             };
             constructor.create_dialog = function () {

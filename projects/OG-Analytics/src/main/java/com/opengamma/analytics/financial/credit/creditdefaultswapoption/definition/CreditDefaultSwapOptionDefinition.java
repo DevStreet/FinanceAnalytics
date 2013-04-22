@@ -36,7 +36,9 @@ public class CreditDefaultSwapOptionDefinition {
   // NOTE : but for the sake of flexibility we allow the more general case where all the contract counterparties are different
 
   // NOTE : The maturity of the underlying CDS is not included as part of this contract definition as it is assumed that
-  // NOTE : the maturity of the underlying CDS is included as part of the underlying CDS contract definition
+  // NOTE : the maturity of the underlying CDS is included as part of the underlying CDS contract definition. It is up to the 
+  // NOTE : User to specify what the maturity of the underlying CDS is e.g. a 1Y option to exercise into a 5Y CDS requires the 
+  // NOTE : user to construct the underlying CDS with a maturity of the option exercise date + 5Y (as an absolute value)
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -231,6 +233,72 @@ public class CreditDefaultSwapOptionDefinition {
         isPayer(),
         getOptionExerciseType(),
         modifiedCDS);                 // This is the CDS Swaption contract field that has been modified
+  }
+
+  // ----------------------------------------------------------------------------------------------------------------------------------------
+
+  // Builder method to modify the option strike in a CDS Swaption contract
+
+  public CreditDefaultSwapOptionDefinition withOptionstrike(final double optionStrike) {
+
+    // Return the modified CDS Swaption contract
+    return new CreditDefaultSwapOptionDefinition(
+        getBuySellProtection(),
+        getProtectionBuyer(),
+        getProtectionSeller(),
+        getCurrency(),
+        getStartDate(),
+        getOptionExerciseDate(),
+        getNotional(),
+        optionStrike,
+        isKnockOut(),
+        isPayer(),
+        getOptionExerciseType(),
+        getUnderlyingCDS());                 // This is the CDS Swaption contract field that has been modified
+  }
+
+  // ----------------------------------------------------------------------------------------------------------------------------------------
+
+  // Builder method to modify the payer/receiver flag in a CDS Swaption contract
+
+  public CreditDefaultSwapOptionDefinition withIsPayer(final boolean isPayer) {
+
+    // Return the modified CDS Swaption contract
+    return new CreditDefaultSwapOptionDefinition(
+        getBuySellProtection(),
+        getProtectionBuyer(),
+        getProtectionSeller(),
+        getCurrency(),
+        getStartDate(),
+        getOptionExerciseDate(),
+        getNotional(),
+        getOptionStrike(),
+        isKnockOut(),
+        isPayer,
+        getOptionExerciseType(),
+        getUnderlyingCDS());                 // This is the CDS Swaption contract field that has been modified
+  }
+
+  // ----------------------------------------------------------------------------------------------------------------------------------------
+
+  // Builder method to modify the knockout/non-knockout flag in a CDS Swaption contract
+
+  public CreditDefaultSwapOptionDefinition withIsKnockout(final boolean isKnockOut) {
+
+    // Return the modified CDS Swaption contract
+    return new CreditDefaultSwapOptionDefinition(
+        getBuySellProtection(),
+        getProtectionBuyer(),
+        getProtectionSeller(),
+        getCurrency(),
+        getStartDate(),
+        getOptionExerciseDate(),
+        getNotional(),
+        getOptionStrike(),
+        isKnockOut,
+        isPayer(),
+        getOptionExerciseType(),
+        getUnderlyingCDS());                 // This is the CDS Swaption contract field that has been modified
   }
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
