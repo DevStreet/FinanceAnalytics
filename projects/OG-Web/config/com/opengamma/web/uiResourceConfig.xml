@@ -38,6 +38,7 @@
     <fragment>/styles/common/og.common.OG-grid-options.css</fragment>
     <fragment>/styles/common/og.common.OG-tab-overflow-panel.css</fragment>
     <fragment>/styles/common/og.common.OG-tooltip.css</fragment>
+    <fragment>/styles/common/og.common.openfin.css</fragment>
   </bundle>
   <bundle id="common.util.css">
     <fragment>/styles/common/util/og.common.util.OG-clearFix.css</fragment>

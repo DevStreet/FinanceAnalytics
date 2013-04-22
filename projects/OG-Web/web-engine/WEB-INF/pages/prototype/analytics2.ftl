@@ -3,6 +3,13 @@
 ${ogStyle.print('og_all.css', 'all',false)}
 </head>
 <body>
+<div class="OG-Openfin">
+    <form>
+        <button class="og-back">Back</button>
+        <button class="og-forward">Forward</button>
+        <input class="og-url" value="test data" type="text" />
+    </form>
+</div>
 <div class="OG-layout-analytics-container">
   <div class="ui-layout-north">
       <#include "modules/common/og.common.masthead.ftl">

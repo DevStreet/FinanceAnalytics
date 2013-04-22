@@ -1,0 +1,43 @@
+/**
+ * Copyright 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Please see distribution for license.
+ */
+
+.OG-Openfin{
+    background-color: #e2e2e2;
+    white-space: nowrap;
+    height: 36px;
+}
+
+.OG-Openfin form {
+    position: relative;
+}
+
+.OG-Openfin button,
+.OG-Openfin input {
+    font-size: 13px;
+}
+
+.OG-Openfin button {
+    position: absolute;
+    top: 3px;
+}
+
+.OG-Openfin .og-back {
+    left: 2px;
+}
+
+.OG-Openfin .og-forward {
+    left: 54px;
+}
+
+.OG-Openfin .og-url {
+    border: 1px solid #a3a3a3;
+    border-radius: 3px;
+    left: 130px;
+    min-width: 300px;
+    padding:5px 10px;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+}
