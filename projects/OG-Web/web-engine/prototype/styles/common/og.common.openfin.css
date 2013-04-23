@@ -37,8 +37,8 @@
     cursor: default;
 }
 
-.OG-Openfin div{
-    text-indent: -9999;
+.OG-Openfin div:active{
+    background-color: #a3a3a3;
 }
 
 .OG-Openfin .og-back {
