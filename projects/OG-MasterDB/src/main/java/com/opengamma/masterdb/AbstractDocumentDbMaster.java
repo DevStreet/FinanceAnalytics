@@ -74,7 +74,7 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
   private Timer _getByOidInstantsTimer = new Timer();
   private Timer _getByIdTimer = new Timer();
   private Timer _historyTimer = new Timer();
-  private Timer _searchWithPagingTimer = new Timer();
+  private Timer _searchTimer = new Timer();
   private Timer _addTimer = new Timer();
   private Timer _updateTimer = new Timer();
   private Timer _removeTimer = new Timer();
@@ -98,7 +98,7 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     _getByOidInstantsTimer = registry.timer(namePrefix + ".getByOidInstants");
     _getByIdTimer = registry.timer(namePrefix + ".getById");
     _historyTimer = registry.timer(namePrefix + ".history");
-    _searchWithPagingTimer = registry.timer(namePrefix + ".searchWithPaging");
+    _searchTimer = registry.timer(namePrefix + ".search");
     _addTimer = registry.timer(namePrefix + ".add");
     _updateTimer = registry.timer(namePrefix + ".update");
     _updateTimer = registry.timer(namePrefix + ".remove");
@@ -270,7 +270,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     s_logger.debug("history {}", request);
     
     Timer.Context context = _historyTimer.time();
-
     try {
       final DbMapSqlParameterSource args = argsHistory(request);
       final String[] sql = {getElSqlBundle().getSql("History", args), getElSqlBundle().getSql("HistoryCount", args)};
@@ -310,6 +309,27 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
   }
 
   //-------------------------------------------------------------------------
+  /**
+   * Searches for documents with paging.
+   *
+   * @param <T>  the type of the document
+   * @param pagingRequest  the paging request, not null
+   * @param sql  the array of SQL, query and count, not null
+   * @param args  the query arguments, not null
+   * @param extractor  the extractor of results, not null
+   * @param result  the object to populate, not null
+   */
+  protected <T extends AbstractDocument> void doSearch(
+      final PagingRequest pagingRequest, final String[] sql, final DbMapSqlParameterSource args,
+      final ResultSetExtractor<List<T>> extractor, final AbstractDocumentsResult<T> result) {
+    
+    Timer.Context context = _searchTimer.time();
+    try {
+      searchWithPaging(pagingRequest, sql, args, extractor, result);
+    } finally {
+      context.stop();
+    }
+  }
 
   /**
    * Searches for documents with paging.
@@ -322,30 +342,23 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
    * @param result  the object to populate, not null
    */
   protected <T extends AbstractDocument> void searchWithPaging(
-    final PagingRequest pagingRequest, final String[] sql, final DbMapSqlParameterSource args,
-    final ResultSetExtractor<List<T>> extractor, final AbstractDocumentsResult<T> result) {
-
+      final PagingRequest pagingRequest, final String[] sql, final DbMapSqlParameterSource args,
+      final ResultSetExtractor<List<T>> extractor, final AbstractDocumentsResult<T> result) {
     s_logger.debug("with args {}", args);
     
-    Timer.Context context = _searchWithPagingTimer.time();
-    try {
-      final NamedParameterJdbcOperations namedJdbc = getDbConnector().getJdbcTemplate().getNamedParameterJdbcOperations();
-      if (pagingRequest.equals(PagingRequest.ALL)) {
+    final NamedParameterJdbcOperations namedJdbc = getDbConnector().getJdbcTemplate().getNamedParameterJdbcOperations();
+    if (pagingRequest.equals(PagingRequest.ALL)) {
+      result.getDocuments().addAll(namedJdbc.query(sql[0], args, extractor));
+      result.setPaging(Paging.of(pagingRequest, result.getDocuments()));
+    } else {
+      s_logger.debug("executing sql {}", sql[1]);
+      final int count = namedJdbc.queryForInt(sql[1], args);
+      result.setPaging(Paging.of(pagingRequest, count));
+      if (count > 0 && pagingRequest.equals(PagingRequest.NONE) == false) {
+        s_logger.debug("executing sql {}", sql[0]);
         result.getDocuments().addAll(namedJdbc.query(sql[0], args, extractor));
-        result.setPaging(Paging.of(pagingRequest, result.getDocuments()));
-      } else {
-        s_logger.debug("executing sql {}", sql[1]);
-        final int count = namedJdbc.queryForInt(sql[1], args);
-        result.setPaging(Paging.of(pagingRequest, count));
-        if (count > 0 && pagingRequest.equals(PagingRequest.NONE) == false) {
-          s_logger.debug("executing sql {}", sql[0]);
-          result.getDocuments().addAll(namedJdbc.query(sql[0], args, extractor));
-        }
       }
-    } finally {
-      context.stop();
     }
-    
   }
 
   //-------------------------------------------------------------------------
@@ -353,6 +366,7 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
   public D add(final D document) {
     ArgumentChecker.notNull(document, "document");
     s_logger.debug("add {}", document);
+    
     Timer.Context context = _addTimer.time();
     try {
       final D added = getTransactionTemplateRetrying(getMaxRetries()).execute(new TransactionCallback<D>() {
@@ -395,7 +409,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     s_logger.debug("update {}", document);
     
     Timer.Context context = _updateTimer.time();
-
     try {
       final UniqueId beforeId = document.getUniqueId();
       ArgumentChecker.isTrue(beforeId.isVersioned(), "UniqueId must be versioned");
@@ -410,7 +423,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     } finally {
       context.stop();
     }
-    
   }
 
   /**
@@ -458,7 +470,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     } finally {
       context.stop();
     }
-    
   }
 
   /**
@@ -490,7 +501,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     s_logger.debug("correct {}", document);
     
     Timer.Context context = _correctTimer.time();
-
     try {
       final UniqueId beforeId = document.getUniqueId();
       ArgumentChecker.isTrue(beforeId.isVersioned(), "UniqueId must be versioned");
@@ -540,11 +550,9 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
       ArgumentChecker.notNull(replacementDocument, "replacementDocument");
     }
     final Instant now = now();
-
     ArgumentChecker.isTrue(MasterUtils.checkUniqueVersionsFrom(replacementDocuments), "No two versioned documents may have the same \"version from\" instant");
     
     Timer.Context context = _replaceVersionTimer.time();
-    
     try {
       return getTransactionTemplateRetrying(getMaxRetries()).execute(new TransactionCallback<List<UniqueId>>() {
         @Override
@@ -566,12 +574,8 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
           storedDocument.setCorrectionToInstant(now);
           updateCorrectionToInstant(storedDocument);
 
-
-
           final List<D> orderedReplacementDocuments = MasterUtils.adjustVersionInstants(now, storedVersionFrom, storedVersionTo, replacementDocuments);
-
           final List<D> newVersions = newArrayList();
-
           if (orderedReplacementDocuments.isEmpty()) {
             // since we don't have replacement documents we rather act as versionRemove than versionReplace
             final D previousDocument = getPreviousDocument(uniqueId.getObjectId(), now, storedVersionFrom);
@@ -604,7 +608,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     } finally {
       context.stop();
     }
-
   }
 
   private D getPreviousDocument(final ObjectId oid, final Instant now, final Instant thisVersionFrom) {
@@ -792,7 +795,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     } finally {
       context.stop();
     }
-
   }
 
   @Override
@@ -801,13 +803,11 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     final Instant now = now();
 
     if (!replacementDocuments.isEmpty()) {
-
       for (final D replacementDocument : replacementDocuments) {
         ArgumentChecker.notNull(replacementDocument.getVersionFromInstant(), "Each replacement document must have version from defined.");
       }
 
       final List<D> orderedReplacementDocuments = MasterUtils.adjustVersionInstants(now, null, null, replacementDocuments);
-
       final Instant lowestVersionFrom = orderedReplacementDocuments.get(0).getVersionFromInstant();
       final Instant highestVersionTo = orderedReplacementDocuments.get(orderedReplacementDocuments.size() - 1).getVersionToInstant();
       
@@ -816,9 +816,7 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
         return getTransactionTemplateRetrying(getMaxRetries()).execute(new TransactionCallback<List<UniqueId>>() {
           @Override
           public List<UniqueId> doInTransaction(final TransactionStatus status) {
-
             boolean terminatedAny = false;
-
             final List<D> storedDocuments = getCurrentDocumentsInRange(objectId.getObjectId(), now, lowestVersionFrom, highestVersionTo);
 
             if (!storedDocuments.isEmpty()) {
@@ -875,7 +873,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
       } finally {
         context.stop();
       }
-
     }
     // nothing to replace with
     return Collections.emptyList();
@@ -907,9 +904,7 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
     }
   }
 
-
   //-------------------------------------------------------------------------
-
   /**
    * Merges any fields from the old document that have not been updated.
    * <p>
@@ -937,7 +932,6 @@ public abstract class AbstractDocumentDbMaster<D extends AbstractDocument> exten
   protected abstract D insert(D document);
 
   //-------------------------------------------------------------------------
-
   /**
    * Gets the document ensuring that it is the latest version.
    *
