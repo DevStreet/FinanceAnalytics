@@ -55,7 +55,7 @@ public class SortOGMatrix {
     final int cols = array1.getNumberOfColumns();
     double[] values;
     double[] sortedData, idxValues;
-    int[] idx, idxOrig, subsort;
+    int[] idx, idxOrig = null, subsort;
     int rowredef, colredef, useDimension;
     boolean descend = false;
     List<OGArray<? extends Number>> ret = new ArrayList<>(2);
@@ -95,10 +95,12 @@ public class SortOGMatrix {
       throw new MathsExceptionIllegalArgument("Unrecognised option to sort(). String must be \"ascend\" or \"descend\", got \"" + direction + "\"");
     }
 
-    // set up values
-    idxOrig = new int[rowredef];
-    for (int i = 0; i < rowredef; i++) {
-      idxOrig[i] = i;
+    if (compute != SortCompute.values) {
+      // set up values
+      idxOrig = new int[rowredef];
+      for (int i = 0; i < rowredef; i++) {
+        idxOrig[i] = i;
+      }
     }
 
     sortedData = new double[data.length];
@@ -110,11 +112,15 @@ public class SortOGMatrix {
       // copy in a column of data
       System.arraycopy(data, i * rowredef, values, 0, rowredef);
 
-      // copy in a corresponding set of indices to mangle
-      System.arraycopy(idxOrig, 0, idx, 0, rowredef);
+      if (compute != SortCompute.values) {
+        // copy in a corresponding set of indices to mangle
+        System.arraycopy(idxOrig, 0, idx, 0, rowredef);
 
-      // sort them
-      ParallelArrayBinarySort.parallelBinarySort(values, idx);
+        // sort them
+        ParallelArrayBinarySort.parallelBinarySort(values, idx);
+      } else { // just use system sort
+        Arrays.sort(values);
+      }
 
       // glue them back in
       if (descend) { // values
@@ -127,56 +133,66 @@ public class SortOGMatrix {
         }
       }
 
-      if (descend) {
-        for (int j = 0; j < rowredef; j++) {
-          idxValues[i * rowredef + j] = idx[rowredef - 1 - j];
+      if (compute != SortCompute.values) { // only do this if we care for keys
+        if (descend) {
+          for (int j = 0; j < rowredef; j++) {
+            idxValues[i * rowredef + j] = idx[rowredef - 1 - j];
+          }
+        } else {
+          for (int j = 0; j < rowredef; j++) { // indexes
+            idxValues[i * rowredef + j] = idx[j];
+          }
         }
-      } else {
-        for (int j = 0; j < rowredef; j++) { // indexes
-          idxValues[i * rowredef + j] = idx[j];
-        }
-      }
 
-      // parse the sorted data, if there's repeats then the indices need sorting too, sort is not necessarily order-preserving
-      double vbase;
-      int ptr = 0, count = 0;
-      for (int j = 0; j < rowredef - 1; j++) {
-        // look forward, see if value matches
-        if (values[j] == values[j + 1]) {
-          vbase = values[j];
-          ptr = j + 1;
-          // continue looking forward for further matches
-          while (ptr < rowredef && vbase == values[ptr]) {
-            ptr++;
-          }
-          subsort = Arrays.copyOfRange(idx, j, ptr);
-          Arrays.sort(subsort);
-          // indexes
-          if (descend) {
-            for (int k = j; k < ptr; k++) {
-              count++;
-              // vars ptr and j refer to values in the ascending order so we have to work backwards in both assigner and assignee
-              idxValues[(i + 1) * rowredef - 1 - k] = subsort[subsort.length - count];
+        // parse the sorted data, if there's repeats then the indices need sorting too, sort is not necessarily order-preserving
+        double vbase;
+        int ptr = 0, count = 0;
+        for (int j = 0; j < rowredef - 1; j++) {
+          // look forward, see if value matches
+          if (values[j] == values[j + 1]) {
+            vbase = values[j];
+            ptr = j + 1;
+            // continue looking forward for further matches
+            while (ptr < rowredef && vbase == values[ptr]) {
+              ptr++;
             }
-          } else {
-            for (int k = j; k < ptr; k++) {
-              idxValues[i * rowredef + k] = subsort[count++];
+            subsort = Arrays.copyOfRange(idx, j, ptr);
+            Arrays.sort(subsort);
+            // indexes
+            if (descend) {
+              for (int k = j; k < ptr; k++) {
+                count++;
+                // vars ptr and j refer to values in the ascending order so we have to work backwards in both assigner and assignee
+                idxValues[(i + 1) * rowredef - 1 - k] = subsort[subsort.length - count];
+              }
+            } else {
+              for (int k = j; k < ptr; k++) {
+                idxValues[i * rowredef + k] = subsort[count++];
+              }
             }
+            j += ptr - 1;
+            ptr = 0;
+            count = 0;
           }
-          j += ptr - 1;
-          ptr = 0;
-          count = 0;
         }
+
       }
     }
 
     if (useDimension == 0) {
-      ret.add(new OGMatrix(sortedData, rowredef, colredef));
-      ret.add(new OGMatrix(idxValues, rowredef, colredef));
+      if (compute != SortCompute.keys) {
+        ret.add(new OGMatrix(sortedData, rowredef, colredef));
+      }
+      if (compute != SortCompute.values) {
+        ret.add(new OGMatrix(idxValues, rowredef, colredef));
+      }
     } else {
-
-      ret.add(s_transpose.eval(new OGMatrix(sortedData, rowredef, colredef)));
-      ret.add(s_transpose.eval(new OGMatrix(idxValues, rowredef, colredef)));
+      if (compute != SortCompute.keys) {
+        ret.add(s_transpose.eval(new OGMatrix(sortedData, rowredef, colredef)));
+      }
+      if (compute != SortCompute.values) {
+        ret.add(s_transpose.eval(new OGMatrix(idxValues, rowredef, colredef)));
+      }
     }
 
     return ret;
