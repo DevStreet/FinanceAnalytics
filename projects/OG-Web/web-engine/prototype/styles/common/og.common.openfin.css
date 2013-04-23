@@ -45,10 +45,6 @@
     left: 5px;
 }
 
-.OG-Openfin .og-forward {
-    left: 35px;
-}
-
 .OG-Openfin .og-back:before{
     border-bottom: 7px solid transparent;
     border-right: 7px solid #586576;
@@ -99,6 +95,10 @@
     margin-left: 13px;
     position: absolute;
     width: 1px;
+}
+
+.OG-Openfin .og-forward {
+    left: 35px;
 }
 
 .OG-Openfin .og-forward:before{
