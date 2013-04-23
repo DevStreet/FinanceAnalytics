@@ -19,8 +19,6 @@
 }
 
 .OG-Openfin div {
-    border:1px solid #a3a3a3;
-    border-radius: 2px;
     position: absolute;
     top: 5px;
     height: 25px;
@@ -28,10 +26,15 @@
     cursor: pointer;
 }
 
+.OG-Openfin div:hover {
+    border:1px solid #a3a3a3;
+    border-radius: 2px;
+}
+
 .OG-Openfin div.og-disabled {
     border:none;
     background: transparent;
-    cursor: pointer;
+    cursor: default;
 }
 
 .OG-Openfin div{
@@ -52,7 +55,7 @@
     border-top: 7px solid transparent;
     content: '';
     display: inline-block;
-    left: 4px;
+    left: 6px;
     margin-top: -7px;
     position: absolute;
     top: 50%;
@@ -62,9 +65,40 @@
     border: 2px solid #586576;
     content: '';
     margin-top: 11px;
-    margin-left: 11px;
+    margin-left: 13px;
     position: absolute;
-    width: 2px;
+    width: 1px;
+}
+
+.OG-Openfin .og-back:hover:before{
+    margin-top: -8px;
+    left: 5px;
+}
+
+.OG-Openfin .og-back:hover:after{
+    margin-top: 10px;
+    margin-left: 12px;
+}
+
+.OG-Openfin .og-back.og-disabled:before{
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #a6a6a6;
+    border-top: 7px solid transparent;
+    content: '';
+    display: inline-block;
+    left: 6px;
+    margin-top: -7px;
+    position: absolute;
+    top: 50%;
+}
+
+.OG-Openfin .og-back.og-disabled:after{
+    border: 2px solid #a6a6a6;
+    content: '';
+    margin-top: 11px;
+    margin-left: 13px;
+    position: absolute;
+    width: 1px;
 }
 
 .OG-Openfin .og-forward:before{
@@ -73,16 +107,47 @@
     border-top: 7px solid transparent;
     content: '';
     display: inline-block;
-    margin-top: -8px;
+    margin-top: -7px;
     position: absolute;
-    right: 4px;
+    right: 5px;
     top: 50%;
 }
 
 .OG-Openfin .og-forward:after{
     border: 2px solid #586576;
     content: '';
+    margin-top: 11px;
+    margin-left: 8px;
+    position: absolute;
+    width: 2px;
+}
+
+.OG-Openfin .og-forward:hover:before{
+    margin-top: -8px;
+    right: 6px;
+}
+
+.OG-Openfin .og-forward:hover:after{
     margin-top: 10px;
+    margin-left: 7px;
+}
+
+.OG-Openfin .og-forward.og-disabled:before{
+    border-bottom: 7px solid transparent;
+    border-left: 7px solid #a6a6a6;
+    border-top: 7px solid transparent;
+    content: '';
+    display: inline-block;
+    margin-top: -7px;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+}
+
+.OG-Openfin .og-forward.og-disabled:after{
+    border: 2px solid #a6a6a6;
+    content: '';
+    margin-top: 11px;
     margin-left: 8px;
     position: absolute;
     width: 2px;
