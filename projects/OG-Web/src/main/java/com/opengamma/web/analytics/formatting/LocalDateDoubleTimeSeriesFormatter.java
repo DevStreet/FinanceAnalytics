@@ -21,11 +21,14 @@ import com.opengamma.timeseries.date.localdate.LocalDateDoubleTimeSeries;
  */
 /* package */ class LocalDateDoubleTimeSeriesFormatter extends AbstractFormatter<LocalDateDoubleTimeSeries> {
 
+  /** The number of milliseconds per day. */
+  private static final long MILLIS_PER_DAY = 86400L * 1000;
+
   /* package */ LocalDateDoubleTimeSeriesFormatter() {
     super(LocalDateDoubleTimeSeries.class);
     addFormatter(new Formatter<LocalDateDoubleTimeSeries>(Format.EXPANDED) {
       @Override
-      Object format(LocalDateDoubleTimeSeries value, ValueSpecification valueSpec) {
+      Object format(LocalDateDoubleTimeSeries value, ValueSpecification valueSpec, Object inlineKey) {
         return formatExpanded(value);
       }
     });
@@ -33,7 +36,7 @@ import com.opengamma.timeseries.date.localdate.LocalDateDoubleTimeSeries;
   }
 
   @Override
-  public String formatCell(LocalDateDoubleTimeSeries timeSeries, ValueSpecification valueSpec) {
+  public String formatCell(LocalDateDoubleTimeSeries timeSeries, ValueSpecification valueSpec, Object inlineKey) {
     String text = "Time-series ";
     text += timeSeries.isEmpty() ? "(empty)" : "(" + timeSeries.getEarliestTime() + " to " + timeSeries.getLatestTime() + ")";
     return text;
@@ -43,7 +46,7 @@ import com.opengamma.timeseries.date.localdate.LocalDateDoubleTimeSeries;
     List<Object[]> data = Lists.newArrayListWithCapacity(value.size());
     for (LocalDateDoubleEntryIterator it = value.iterator(); it.hasNext(); ) {
       LocalDate date = it.nextTime();
-      long epochMillis = date.toEpochDay() * 86400;
+      long epochMillis = date.toEpochDay() * MILLIS_PER_DAY;
       data.add(new Object[]{epochMillis, it.currentValue()});
     }
     Map<String, String> templateData = ImmutableMap.of("data_field", "Historical Time Series",
