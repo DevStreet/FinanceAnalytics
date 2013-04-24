@@ -62,13 +62,21 @@ public class OGRealScalar extends OGArray<Number> {
   }
 
   @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index != 0) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    return new OGRealScalar(_data[0]);
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + Arrays.hashCode(_data);
     return result;
   }
-  
+
   /**
    * Decide if this {@link OGRealScalar} is equal to another {@link OGRealScalar} with the addition of some numerical tolerance for floating point comparison
    * @param obj the {@link OGRealScalar} against which a comparison is to be drawn

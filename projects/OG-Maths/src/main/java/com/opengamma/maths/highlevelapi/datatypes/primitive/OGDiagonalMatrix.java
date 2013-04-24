@@ -93,6 +93,18 @@ public class OGDiagonalMatrix extends OGArray<Double> {
     this((double) diag, 1, 1);
   }
 
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[_rows];
+    if (index < _data.length) { // data might be short if there's zeros on diag
+      tmp[index] = _data[index];
+    }
+    return new OGMatrix(tmp, _rows, 1);
+  }
+
   public int getNumberOfRows() {
     return _rows;
   }

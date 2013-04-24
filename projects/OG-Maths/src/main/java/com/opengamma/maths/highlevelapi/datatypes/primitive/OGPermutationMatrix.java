@@ -61,14 +61,14 @@ public class OGPermutationMatrix extends OGArray<Integer> {
     }
     return tmp;
   }
-  
+
   /**
    * Get as int data
    * @return the data as int[]
    */
   public int[] getIntData() {
     return _data;
-  }  
+  }
 
   @Override
   public int getNumberOfRows() {
@@ -96,6 +96,16 @@ public class OGPermutationMatrix extends OGArray<Integer> {
       ret = 1;
     }
     return ret;
+  }
+
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[_rows];
+    tmp[index] = _data[index];
+    return new OGMatrix(tmp, _rows, 1);
   }
 
   @Override
@@ -159,7 +169,7 @@ public class OGPermutationMatrix extends OGArray<Integer> {
     }
     return true;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {

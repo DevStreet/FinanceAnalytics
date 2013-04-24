@@ -194,6 +194,17 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     return _columns;
   }
 
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[2 * _rows];
+    tmp[index * 2] = _data[index * 2];
+    tmp[index * 2 + 1] = _data[index * 2 + 1];
+    return new OGComplexMatrix(tmp, _rows, 1);
+  }
+
   /**
    * Returns the backing data
    * @return the backing data

@@ -62,6 +62,14 @@ public class OGComplexScalar extends OGArray<Number> {
   }
 
   @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index != 0) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    return new OGComplexScalar(_data[0], _data[1]);
+  }
+
+  @Override
   public ComplexType getEntry(int... indices) {
     if (indices.length > 2) {
       throw new MathsExceptionIllegalArgument("OGComplexScalar only has 2 indicies, more than 2 were given");
@@ -108,7 +116,7 @@ public class OGComplexScalar extends OGArray<Number> {
     }
     return true;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {

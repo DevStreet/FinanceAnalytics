@@ -32,7 +32,7 @@ public class OGComplexSparseMatrixTest {
   int[] compressedRowIdx = {0, 1, 2, 0, 1, 2, 0, 1, 2, 3, 2, 3 };
   double[][] dataAsFullTransposed = { {1, 10, 5, 0, 0, 90, 0, 0 }, {2, 20, 0, 60, 10, 100, 0, 0 }, {0, 30, 7, 70, 11, 0, 15, 0 }, {0, 0, 0, 0, 0, 120, 0, 160 } };
   double[][] dataForEqualsTests = { {1, 2, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } };
-  
+
   ComplexType[][] complexTData = { //
   {new ComplexType(1, 10), new ComplexType(2, 20), new ComplexType(0, 30), new ComplexType(0, 0) }, //
       {new ComplexType(5, 0), new ComplexType(0, 60), new ComplexType(7, 70), new ComplexType(0, 0) }, //
@@ -490,7 +490,7 @@ public class OGComplexSparseMatrixTest {
       assertTrue(tmp.equals(D.getFullColumn(i)));
     }
   }
-  
+
   // test get full row neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullColBadIndexLow() {
@@ -503,7 +503,32 @@ public class OGComplexSparseMatrixTest {
   public void testGetFullColBadIndexHigh() {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
     D.getFullColumn(12);
-  }  
+  }
+
+  // test get full col
+  @Test
+  public void testGetColumn() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    double[][] rp = new double[][] { {2 }, {0 }, {10 }, {0 } };
+    double[][] ip = new double[][] { {20 }, {60 }, {100 }, {0 } };
+    OGComplexSparseMatrix tmp = new OGComplexSparseMatrix(rp, ip);
+    assertTrue(tmp.equals(D.getColumn(1)));
+
+  }
+
+  // test get full row neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColBadIndexLow() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getFullColumn(-1);
+  }
+
+  // test get full row index overflow
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColBadIndexHigh() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getFullColumn(12);
+  }
 
   // test get nnz
   @Test
@@ -547,7 +572,6 @@ public class OGComplexSparseMatrixTest {
     D.toString();
   }
 
-  
   // test equals obj points to obj
   @Test
   public void testEqualsObjeqObj() {
@@ -686,5 +710,4 @@ public class OGComplexSparseMatrixTest {
     assertTrue(D.fuzzyequals(Same, 10 * D1MACH.four()));
   }
 
-  
 }

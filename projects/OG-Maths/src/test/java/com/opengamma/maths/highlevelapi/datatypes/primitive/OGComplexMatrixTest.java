@@ -358,6 +358,29 @@ public class OGComplexMatrixTest {
     assertTrue(col.equals(getCol));
   }    
   
+  // test get col neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getColumn(-1);
+  }    
+    
+  
+  // test get col bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getColumn(23);
+  }  
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGArray<? extends Number> col = D.getColumn(1);
+    assertTrue(col.equals(getCol));
+  }    
+  
   
   // test get No elements
   @Test

@@ -229,191 +229,213 @@ public class OGComplexDiagonalMatrixTest {
   }
 
   // test get rows
-    @Test
-    public void testGetRowsTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertTrue(D.getNumberOfRows() == 4);
-    }
-  
-    // test get cols
-    @Test
-    public void testGetColumnsTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertTrue(D.getNumberOfColumns() == 3);
-    }
-  
-    // test get entry bad index count
-    @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
-    public void testGetEntryBadIndexCountTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.getEntry(1, 2, 3);
-    }
-  
-    // test get entry bad row index
-    @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
-    public void testGetEntryBadRowIndicesTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.getEntry(23, 1);
-    }
-  
-    // test get entry bad row index
-    @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
-    public void testGetEntryBadColumnIndicesTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.getEntry(1, 23);
-    }
-    
-    // test get entry neg row index
-    @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
-    public void testGetEntryNegRowIndicesTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.getEntry(-1, 1);
-    }
-  
-    // test get entry neg row index
-    @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
-    public void testGetEntryNegColumnIndicesTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.getEntry(1, -1);
-    }
-    
+  @Test
+  public void testGetRowsTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertTrue(D.getNumberOfRows() == 4);
+  }
+
+  // test get cols
+  @Test
+  public void testGetColumnsTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertTrue(D.getNumberOfColumns() == 3);
+  }
+
+  // test get entry bad index count
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetEntryBadIndexCountTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getEntry(1, 2, 3);
+  }
+
+  // test get entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetEntryBadRowIndicesTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getEntry(23, 1);
+  }
+
+  // test get entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetEntryBadColumnIndicesTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getEntry(1, 23);
+  }
+
+  // test get entry neg row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetEntryNegRowIndicesTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getEntry(-1, 1);
+  }
+
+  // test get entry neg row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetEntryNegColumnIndicesTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getEntry(1, -1);
+  }
 
   // test get entry ok
-    @Test
-    public void testGetEntryOKIndicesTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal,data4x3diagdimag, 4, 3);
-      for (int i = 0; i < D.getNumberOfRows(); i++) {
-        for (int j = 0; j < D.getNumberOfColumns(); j++) {
-          assertTrue(D.getEntry(i, j).equals(data4x3full[i][j]));
-        }
+  @Test
+  public void testGetEntryOKIndicesTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, data4x3diagdimag, 4, 3);
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        assertTrue(D.getEntry(i, j).equals(data4x3full[i][j]));
       }
     }
+  }
 
-   //test get data
-    @Test
-    public void testGetDataTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal,data4x3diagdimag, 4, 3);
-      assertTrue(Arrays.equals(D.getData(),interleavedfull4x3));
-    }
-  
-    // test equals obj points to obj
-    @Test
-    public void testEqualsObjeqObj() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertTrue(D.equals(D));
-    }
-  
-    // test equals obj not = null
-    @Test
-    public void testEqualsObjNull() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertFalse(D.equals(null));
-    }
-  
-    // test equals obj class different
-    @Test
-    public void testEqualsObjDifferentClass() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertFalse(D.equals(new Double(1.)));
-    }
-  
-    // test equals obj class ok, diff cols
-    @Test
-    public void testEqualsObjDifferentCols() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(7);
-      assertFalse(D.equals(Diff));
-    }
-  
-    // test equals obj class ok, same cols diff rows
-    @Test
-    public void testEqualsObjDifferentRows() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {1, 2, 3 }, 3, 3);
-      assertFalse(D.equals(Diff));
-    }
-  
-    // test equals obj class ok, same cols same rows different data
-    @Test
-    public void testEqualsObjDifferentData() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {999, 2, 3 }, 4, 3);
-      assertFalse(D.equals(Diff));
-    }
-  
-    // test equals obj class ok, same cols same rows same data
-    @Test
-    public void testEqualsObjStructurallyIdentical() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {1.00, 2.00, 3.00 }, 4, 3);
-      assertTrue(D.equals(Diff));
-    }
-  
-    // test fuzzy equals obj points to obj
-    @Test
-    public void testFuzzyEqualsObjeqObj() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertTrue(D.fuzzyequals(D, 10 * D1MACH.four()));
-    }
-  
-    // test fuzzy equals obj not = null
-    @Test
-    public void testFuzzyEqualsObjNull() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertFalse(D.fuzzyequals(null, 10 * D1MACH.four()));
-    }
-  
-    // test fuzzy equals obj class different
-    @Test
-    public void testFuzzyEqualsObjDifferentClass() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      assertFalse(D.fuzzyequals(new Double(1.), 10 * D1MACH.four()));
-    }
-  
-    // test fuzzy equals obj class ok, diff cols
-    @Test
-    public void testFuzzyEqualsObjDifferentCols() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(7);
-      assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
-    }
-  
-    // test fuzzy equals obj class ok, same cols diff rows
-    @Test
-    public void testFuzzyEqualsObjDifferentRows() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {1, 2, 3 }, 4, 13);
-      assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
-    }
-  
-    // test fuzzy equals obj class ok, same cols same rows different data
-    @Test
-    public void testFuzzyEqualsObjDifferentData() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {999.00, 2.00, 3.00 }, 4, 3);
-      assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
-    }
-  
-    // test fuzzy equals obj class ok, same cols same rows same data
-    @Test
-    public void testFuzzyEqualsObjStructurallyIdentical() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      OGComplexDiagonalMatrix Same = new OGComplexDiagonalMatrix(new double[] {1.00 + 9 * D1MACH.four(), 2.00, 3.00 }, 4, 3);
-      assertTrue(D.fuzzyequals(Same, 10 * D1MACH.four()));
-    }
-  
-    // test hash code
-    @Test
-    public void testHashCodeTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.hashCode();
-    }
-  
-    // test hash code
-    @Test
-    public void testToStringTest() {
-      OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
-      D.toString();
-    }
+  // test get col neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getColumn(-1);
+  }
+
+  // test get col bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getColumn(23);
+  }
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, data4x3diagdimag, 4, 3);
+    OGArray<? extends Number> col = D.getColumn(1);
+    OGComplexMatrix getCol = new OGComplexMatrix(new double[] {0, 0, 2, 20, 0, 0, 0, 0 }, 4, 1);
+    assertTrue(col.equals(getCol));
+  }
+
+  //test get data
+  @Test
+  public void testGetDataTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, data4x3diagdimag, 4, 3);
+    assertTrue(Arrays.equals(D.getData(), interleavedfull4x3));
+  }
+
+  // test equals obj points to obj
+  @Test
+  public void testEqualsObjeqObj() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertTrue(D.equals(D));
+  }
+
+  // test equals obj not = null
+  @Test
+  public void testEqualsObjNull() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertFalse(D.equals(null));
+  }
+
+  // test equals obj class different
+  @Test
+  public void testEqualsObjDifferentClass() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertFalse(D.equals(new Double(1.)));
+  }
+
+  // test equals obj class ok, diff cols
+  @Test
+  public void testEqualsObjDifferentCols() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(7);
+    assertFalse(D.equals(Diff));
+  }
+
+  // test equals obj class ok, same cols diff rows
+  @Test
+  public void testEqualsObjDifferentRows() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {1, 2, 3 }, 3, 3);
+    assertFalse(D.equals(Diff));
+  }
+
+  // test equals obj class ok, same cols same rows different data
+  @Test
+  public void testEqualsObjDifferentData() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {999, 2, 3 }, 4, 3);
+    assertFalse(D.equals(Diff));
+  }
+
+  // test equals obj class ok, same cols same rows same data
+  @Test
+  public void testEqualsObjStructurallyIdentical() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {1.00, 2.00, 3.00 }, 4, 3);
+    assertTrue(D.equals(Diff));
+  }
+
+  // test fuzzy equals obj points to obj
+  @Test
+  public void testFuzzyEqualsObjeqObj() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertTrue(D.fuzzyequals(D, 10 * D1MACH.four()));
+  }
+
+  // test fuzzy equals obj not = null
+  @Test
+  public void testFuzzyEqualsObjNull() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertFalse(D.fuzzyequals(null, 10 * D1MACH.four()));
+  }
+
+  // test fuzzy equals obj class different
+  @Test
+  public void testFuzzyEqualsObjDifferentClass() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    assertFalse(D.fuzzyequals(new Double(1.), 10 * D1MACH.four()));
+  }
+
+  // test fuzzy equals obj class ok, diff cols
+  @Test
+  public void testFuzzyEqualsObjDifferentCols() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(7);
+    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
+
+  // test fuzzy equals obj class ok, same cols diff rows
+  @Test
+  public void testFuzzyEqualsObjDifferentRows() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {1, 2, 3 }, 4, 13);
+    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
+
+  // test fuzzy equals obj class ok, same cols same rows different data
+  @Test
+  public void testFuzzyEqualsObjDifferentData() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Diff = new OGComplexDiagonalMatrix(new double[] {999.00, 2.00, 3.00 }, 4, 3);
+    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
+
+  // test fuzzy equals obj class ok, same cols same rows same data
+  @Test
+  public void testFuzzyEqualsObjStructurallyIdentical() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    OGComplexDiagonalMatrix Same = new OGComplexDiagonalMatrix(new double[] {1.00 + 9 * D1MACH.four(), 2.00, 3.00 }, 4, 3);
+    assertTrue(D.fuzzyequals(Same, 10 * D1MACH.four()));
+  }
+
+  // test hash code
+  @Test
+  public void testHashCodeTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.hashCode();
+  }
+
+  // test hash code
+  @Test
+  public void testToStringTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.toString();
+  }
 
 }

@@ -130,6 +130,16 @@ public class OGMatrix extends OGArray<Double> {
     return new OGMatrix(tmp, _rows, 1);
   }
 
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[_rows];
+    System.arraycopy(_data, index * _rows, tmp, 0, _rows);
+    return new OGMatrix(tmp, _rows, 1);
+  }
+
   /**
    * Gets the number of elements in the matrix (full population assumed).
    * @return the number of elements in the matrix

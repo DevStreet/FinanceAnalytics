@@ -196,6 +196,31 @@ public class OGMatrixTest {
     assertTrue(col.equals(getCol));
   }  
   
+  
+  // test get col neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.getColumn(-1);
+  }    
+    
+  
+  // test get col bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.getColumn(23);
+  }  
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGArray<? extends Number> col = D.getColumn(1);
+    assertTrue(col.equals(getCol));
+  }  
+  
+  
   // test get No elements
   @Test
   public void testGetNoElementsTest() {

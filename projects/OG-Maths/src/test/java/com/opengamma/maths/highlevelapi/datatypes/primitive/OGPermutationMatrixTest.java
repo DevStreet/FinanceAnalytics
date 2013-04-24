@@ -19,13 +19,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 public class OGPermutationMatrixTest {
 
   int[] data = new int[] {3, 1, 2, 4, 0 };
-  int[][] fullData = new int[][] {
-      {0, 0, 0, 1, 0 },
-      {0, 1, 0, 0, 0 },
-      {0, 0, 1, 0, 0 },
-      {0, 0, 0, 0, 1 },
-      {1, 0, 0, 0, 0 }
-  };
+  int[][] fullData = new int[][] { {0, 0, 0, 1, 0 }, {0, 1, 0, 0, 0 }, {0, 0, 1, 0, 0 }, {0, 0, 0, 0, 1 }, {1, 0, 0, 0, 0 } };
 
   // sending in null ptr int[] constructor
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
@@ -85,7 +79,7 @@ public class OGPermutationMatrixTest {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     assertTrue(Arrays.equals(D.getIntData(), data));
   }
-  
+
   // test get entry bad index count
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetEntryBadIndexCountTest() {
@@ -106,7 +100,7 @@ public class OGPermutationMatrixTest {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     D.getEntry(1, 23);
   }
-  
+
   // test get entry ok
   @Test
   public void testGetEntryOKIndicesTest() {
@@ -116,6 +110,30 @@ public class OGPermutationMatrixTest {
         assertTrue(D.getEntry(i, j) == fullData[i][j]);
       }
     }
+  }
+
+  // test get col neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getColumn(-1);
+  }
+
+  // test get col bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getColumn(23);
+  }
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    OGArray<? extends Number> col = D.getColumn(1);
+    double[][] tmp = new double[][] { {0 }, {1 }, {0 }, {0 }, {0 } };
+    OGMatrix answer = new OGMatrix(tmp);
+    assertTrue(col.equals(answer));
   }
 
   // test equals obj points to obj
@@ -130,51 +148,51 @@ public class OGPermutationMatrixTest {
   public void testEqualsObjNull() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     assertFalse(D.equals(null));
-  }  
-  
+  }
+
   // test equals obj class different
   @Test
   public void testEqualsObjDifferentClass() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     assertFalse(D.equals(new OGMatrix(1)));
-  }  
+  }
 
   // test equals obj class ok, diff cols
   @Test
   public void testEqualsObjDifferentCols() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
-    OGPermutationMatrix Diff = new OGPermutationMatrix(new int[] {0});    
+    OGPermutationMatrix Diff = new OGPermutationMatrix(new int[] {0 });
     assertFalse(D.equals(Diff));
-  }    
-  
+  }
+
   // test equals obj class ok, same cols same rows different data
   @Test
   public void testEqualsObjDifferentData() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
-    OGPermutationMatrix Diff = new OGPermutationMatrix(new int []{0,1,2,3,4});    
+    OGPermutationMatrix Diff = new OGPermutationMatrix(new int[] {0, 1, 2, 3, 4 });
     assertFalse(D.equals(Diff));
-  }    
+  }
 
   // test equals obj class ok, same cols same rows same data
   @Test
   public void testEqualsObjStructurallyIdentical() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
-    OGPermutationMatrix Diff = new OGPermutationMatrix(new int[]{3, 1, 2, 4, 0 });     
+    OGPermutationMatrix Diff = new OGPermutationMatrix(new int[] {3, 1, 2, 4, 0 });
     assertTrue(D.equals(Diff));
-  }      
-  
+  }
+
   // test hash code
   @Test
   public void testHashCodeTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     D.hashCode();
   }
-  
+
   // test toString code
   @Test
   public void testToStringTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     D.toString();
   }
-  
+
 }

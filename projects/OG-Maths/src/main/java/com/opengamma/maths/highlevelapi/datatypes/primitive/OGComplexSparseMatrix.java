@@ -491,6 +491,26 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
   }
 
   @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _cols) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] dataTmp;
+    int[] colPtrTmp, rowIdxTmp;
+    int start = _colPtr[index];
+    int end = _colPtr[index + 1];
+    dataTmp = new double[2 * (end - start)];
+    System.arraycopy(_values, 2 * start, dataTmp, 0, 2 * (end - start));
+    rowIdxTmp = new int[end - start];
+    System.arraycopy(_rowIdx, start, rowIdxTmp, 0, end - start);
+    colPtrTmp = new int[2];
+    colPtrTmp[0] = 0;
+    colPtrTmp[1] = end - start;
+
+    return new OGComplexSparseMatrix(colPtrTmp, rowIdxTmp, dataTmp, _rows, 1);
+  }
+
+  @Override
   public ComplexType getEntry(int... indices) {
     if (indices.length > 2) {
       throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
@@ -535,8 +555,8 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
         sb.append("\n");
       }
     }
-
-    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _rows + "\nrows=" + _cols + "\nels=" + _els + "\n" +
+    formatter.close();
+    return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _cols + "\nrows=" + _rows + "\nels=" + _els + "\n" +
         sb.toString();
 
   }

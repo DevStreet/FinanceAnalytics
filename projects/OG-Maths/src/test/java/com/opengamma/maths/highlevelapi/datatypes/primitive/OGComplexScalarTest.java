@@ -69,6 +69,27 @@ public class OGComplexScalarTest {
     defaultVal.getEntry(0, -1);
   }
 
+  // test get col neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    defaultVal.getColumn(-1);
+  }    
+    
+  
+  // test get col bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    defaultVal.getColumn(23);
+  }  
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGComplexScalar getCol = new OGComplexScalar(1.2, 3.4);
+    OGArray<? extends Number> col = defaultVal.getColumn(0);
+    assertTrue(col.equals(getCol));
+  } 
+  
   // test get entry ok
   @Test
   public void testGetEntryOKIndicesTest() {

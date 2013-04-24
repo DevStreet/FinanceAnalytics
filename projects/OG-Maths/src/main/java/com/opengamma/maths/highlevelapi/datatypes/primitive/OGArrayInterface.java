@@ -27,4 +27,6 @@ public interface OGArrayInterface<T extends Number> {
    */
   boolean fuzzyequals(Object obj, double tolerance);
 
+  OGArray<? extends Number> getColumn(int col);
+
 }

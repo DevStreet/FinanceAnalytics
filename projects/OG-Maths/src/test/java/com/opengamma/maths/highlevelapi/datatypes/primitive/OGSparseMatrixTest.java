@@ -5,11 +5,12 @@
  */
 package com.opengamma.maths.highlevelapi.datatypes.primitive;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Arrays;
 
 import org.testng.annotations.Test;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
@@ -121,8 +122,8 @@ public class OGSparseMatrixTest {
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadColPtrValuesIsNegativeTest() {
     new OGSparseMatrix(new int[] {-1, 2, 0, 7, 7 }, compressedRowIdx, compressedData, 4, 4);
-  }  
-  
+  }
+
   // sending in bad rowIdx  int[], int[], double[], int, int  constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testDoublePtrConstructorbadRowIdxTooHighTest() {
@@ -241,6 +242,34 @@ public class OGSparseMatrixTest {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGMatrix col = D.getFullColumn(1);
     assertTrue(col.equals(getCol));
+  }
+
+  // test get col neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getColumn(-1);
+  }
+
+  // test get col bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getColumn(23);
+  }
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    OGArray<? extends Number> col = D.getColumn(1);
+    double[][] tmp = new double[4][1];
+    for (int i = 0; i < 4; i++) {
+      tmp[i][0] = getCol.getEntry(i, 0);
+    }
+    OGSparseMatrix answer = new OGSparseMatrix(tmp);
+    assertTrue(col.equals(answer));
+    answer = new OGSparseMatrix(new double[][] {{1},{0},{2},{0},{3},{0}});
   }
 
   // test get No elements

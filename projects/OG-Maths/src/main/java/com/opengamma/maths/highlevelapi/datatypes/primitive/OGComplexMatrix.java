@@ -168,7 +168,7 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     _data[0] = number.getReal();
     _data[1] = number.getImag();
   }
-  
+
   @Override
   public int getNumberOfRows() {
     return _rows;
@@ -218,6 +218,16 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     System.arraycopy(_data, 2 * index * _rows, tmp, 0, tmp.length);
     return new OGComplexMatrix(tmp, _rows, 1);
 
+  }
+
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[2 * _rows];
+    System.arraycopy(_data, index * 2 * _rows, tmp, 0, 2 * _rows);
+    return new OGComplexMatrix(tmp, _rows, 1);
   }
 
   /**

@@ -146,6 +146,29 @@ public class OGDiagonalMatrixTest {
     D.getEntry(1, 23);
   }
 
+  // test get col neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getColumn(-1);
+  }
+
+  // test get col bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getColumn(23);
+  }
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> col = D.getColumn(1);
+    OGMatrix getCol = new OGMatrix(new double[] {0, 2, 0, 0 }, 4, 1);
+    assertTrue(col.equals(getCol));
+  }
+
   // test get entry ok
   @Test
   public void testGetEntryOKIndicesTest() {
@@ -250,7 +273,7 @@ public class OGDiagonalMatrixTest {
   @Test
   public void testFuzzyEqualsObjDifferentRows() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    OGDiagonalMatrix Diff = new OGDiagonalMatrix(new double[]{1, 2, 3},4,13);
+    OGDiagonalMatrix Diff = new OGDiagonalMatrix(new double[] {1, 2, 3 }, 4, 13);
     assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
   }
 
@@ -266,7 +289,7 @@ public class OGDiagonalMatrixTest {
   @Test
   public void testFuzzyEqualsObjStructurallyIdentical() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    OGDiagonalMatrix Same = new OGDiagonalMatrix(new double[] {1.00+9 * D1MACH.four(), 2.00, 3.00 }, 4, 3);
+    OGDiagonalMatrix Same = new OGDiagonalMatrix(new double[] {1.00 + 9 * D1MACH.four(), 2.00, 3.00 }, 4, 3);
     assertTrue(D.fuzzyequals(Same, 10 * D1MACH.four()));
   }
 

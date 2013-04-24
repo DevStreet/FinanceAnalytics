@@ -124,6 +124,16 @@ public class OGIndexMatrix extends OGArray<Integer> {
     return new OGIndexMatrix(tmp, _rows, 1);
   }
 
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _columns) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    int[] tmp = new int[_rows];
+    System.arraycopy(_data, index * _rows, tmp, 0, _rows);
+    return new OGIndexMatrix(tmp, _rows, 1);
+  }
+
   /**
    * Gets the number of rows
    * @return _rows the number of rows
@@ -151,15 +161,15 @@ public class OGIndexMatrix extends OGArray<Integer> {
     }
     return tmp;
   }
-  
+
   /**
    * Get as int data
    * @return the data as int[]
    */
   public int[] getIntData() {
     return _data;
-  }  
-  
+  }
+
   /**
    * ToString for pretty printing
    * @return A string representation of the matrix
@@ -186,7 +196,7 @@ public class OGIndexMatrix extends OGArray<Integer> {
     result = prime * result + _rows;
     return result;
   }
-  
+
   /**
    * Decide if this {@link OGIndexMatrix} is equal to another {@link OGIndexMatrix} with the addition of some numerical tolerance for floating point comparison
    * @param obj the {@link OGIndexMatrix} against which a comparison is to be drawn
@@ -242,7 +252,5 @@ public class OGIndexMatrix extends OGArray<Integer> {
     }
     return true;
   }
-
-
 
 }

@@ -116,6 +116,29 @@ public class OGIndexMatrixTest {
     OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
     assertTrue(D.getNumberOfColumns() == 3);
   }
+  
+  // test get col neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColNegIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getColumn(-1);
+  }    
+    
+  
+  // test get col bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetColumnBadIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getColumn(23);
+  }  
+
+  // test get col ok
+  @Test
+  public void testGetColumnOkIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    OGArray<? extends Number> col = D.getColumn(1);
+    assertTrue(col.equals(getCol));
+  } 
 
   // test get entry bad index count
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)

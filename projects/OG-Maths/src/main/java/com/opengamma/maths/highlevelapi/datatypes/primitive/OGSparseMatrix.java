@@ -228,13 +228,33 @@ public class OGSparseMatrix extends OGArray<Double> {
       throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _cols + " columns");
     }
     //translate an index and see if it exists, if it doesn't then return 0
-    for (int i = _colPtr[indices[1]]; i <= _colPtr[indices[1] + 1] - 1; i++) { // loops through elements of correct column
+    for (int i = _colPtr[indices[1]]; i < _colPtr[indices[1] + 1]; i++) { // loops through elements of correct column
       // looks for col index
       if (_rowIdx[i] == indices[0]) {
         return _values[i];
       }
     }
     return 0.0;
+  }
+
+  @Override
+  public OGArray<? extends Number> getColumn(int index) {
+    if (index < 0 || index >= _cols) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] dataTmp;
+    int[] colPtrTmp, rowIdxTmp;
+    int start = _colPtr[index];
+    int end = _colPtr[index + 1];
+    dataTmp = new double[end - start];
+    System.arraycopy(_values, start, dataTmp, 0, end - start);
+    rowIdxTmp = new int[end - start];
+    System.arraycopy(_rowIdx, start, rowIdxTmp, 0, end - start);
+    colPtrTmp = new int[2];
+    colPtrTmp[0] = 0;
+    colPtrTmp[1] = end - start;
+
+    return new OGSparseMatrix(colPtrTmp, rowIdxTmp, dataTmp, _rows, 1);
   }
 
   @Override
