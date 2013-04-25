@@ -222,6 +222,29 @@ public class OGSparseMatrixTest {
     assertTrue(row.equals(getRow));
   }
 
+  // test get row neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getRow(-1);
+  }
+
+  // test get row bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getRow(23);
+  }
+
+  // test get row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    OGSparseMatrix expected = new OGSparseMatrix(new double[][] {{3, 0, 4, 0 } });
+    OGArray<? extends Number> row = D.getRow(1);
+    assertTrue(row.fuzzyequals(expected, 10 * D1MACH.four()));
+  }
+
   // test get full col neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullColNegIndexTest() {
@@ -269,7 +292,7 @@ public class OGSparseMatrixTest {
     }
     OGSparseMatrix answer = new OGSparseMatrix(tmp);
     assertTrue(col.equals(answer));
-    answer = new OGSparseMatrix(new double[][] {{1},{0},{2},{0},{3},{0}});
+    answer = new OGSparseMatrix(new double[][] { {1 }, {0 }, {2 }, {0 }, {3 }, {0 } });
   }
 
   // test get No elements

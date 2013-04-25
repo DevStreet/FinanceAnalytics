@@ -193,6 +193,28 @@ public class OGIndexMatrixTest {
     OGIndexMatrix row = D.getFullRow(2);
     assertTrue(row.equals(getRow));
   }    
+  
+  // test get row neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getRow(-1);
+  }    
+  
+  // test get row bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getRow(23);
+  }  
+  
+  // test get row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    OGIndexMatrix row = D.getRow(2);
+    assertTrue(row.equals(getRow));
+  }    
 
   // test get full col neg index
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)

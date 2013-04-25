@@ -135,6 +135,30 @@ public class OGPermutationMatrixTest {
     OGMatrix answer = new OGMatrix(tmp);
     assertTrue(col.equals(answer));
   }
+  
+  // test get row neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getRow(-1);
+  }
+
+  // test get row bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getRow(23);
+  }
+
+  // test get row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    OGArray<? extends Number> row = D.getRow(1);
+    double[][] tmp = new double[][] { {0 , 1 , 0 , 0 , 0 } };
+    OGMatrix answer = new OGMatrix(tmp);
+    assertTrue(row.equals(answer));
+  }
 
   // test equals obj points to obj
   @Test

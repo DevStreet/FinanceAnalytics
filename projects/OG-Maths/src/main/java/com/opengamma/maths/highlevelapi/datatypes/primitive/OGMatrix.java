@@ -119,6 +119,18 @@ public class OGMatrix extends OGArray<Double> {
     return new OGMatrix(tmp, 1, _columns);
   }
 
+  @Override
+  public OGMatrix getRow(int index) {
+    if (index < 0 || index >= _rows) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[_columns];
+    for (int i = 0; i < _columns; i++) {
+      tmp[i] = _data[i * _rows + index];
+    }
+    return new OGMatrix(tmp, 1, _columns);
+  }
+
   public OGMatrix getFullColumn(int index) {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);

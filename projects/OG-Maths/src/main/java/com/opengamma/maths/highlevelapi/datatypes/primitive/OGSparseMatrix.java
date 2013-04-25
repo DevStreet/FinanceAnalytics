@@ -160,7 +160,7 @@ public class OGSparseMatrix extends OGArray<Double> {
     if (index < 0 || index >= _cols) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_cols];
+    double[] tmp = new double[_rows];
     for (int i = _colPtr[index]; i < _colPtr[index + 1]; i++) { // loops through elements of correct column
       tmp[_rowIdx[i]] = _values[i];
     }
@@ -171,8 +171,8 @@ public class OGSparseMatrix extends OGArray<Double> {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_rows];
-    for (int i = 0; i < _rows; i++) {
+    double[] tmp = new double[_cols];
+    for (int i = 0; i < _cols; i++) {
       tmp[i] = this.getEntry(index, i);
     }
     return new OGMatrix(tmp, 1, _cols);
@@ -255,6 +255,30 @@ public class OGSparseMatrix extends OGArray<Double> {
     colPtrTmp[1] = end - start;
 
     return new OGSparseMatrix(colPtrTmp, rowIdxTmp, dataTmp, _rows, 1);
+  }
+
+  @Override
+  public OGSparseMatrix getRow(int index) { // getting rows in CSC form is generally bad
+    if (index < 0 || index >= _rows) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] dataTmp = new double[_cols];
+    int[] colPtrTmp = new int[_cols + 1];
+    int dataptr = 0;
+    int idxptr = 0;
+    for (int i = 0; i < _cols; i++) {
+      colPtrTmp[i] = idxptr;
+      for (int j = _colPtr[i]; j < _colPtr[i + 1]; j++) { // loops through elements of correct column
+        if (_rowIdx[j] == index) {
+          dataTmp[dataptr] = _values[j];
+          dataptr++;
+          idxptr++;
+        }
+      }
+    }
+    int[] rowIdxTmp = new int[idxptr];
+    colPtrTmp[_cols] = idxptr; // tie up end
+    return new OGSparseMatrix(colPtrTmp, rowIdxTmp, Arrays.copyOf(dataTmp, dataptr), 1, _cols);
   }
 
   @Override

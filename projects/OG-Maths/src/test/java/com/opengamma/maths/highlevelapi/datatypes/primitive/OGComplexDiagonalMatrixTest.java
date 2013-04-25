@@ -311,6 +311,29 @@ public class OGComplexDiagonalMatrixTest {
     assertTrue(col.equals(getCol));
   }
 
+  // test get col neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getRow(-1);
+  }
+
+  // test get col bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getRow(23);
+  }
+
+  // test get col ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, data4x3diagdimag, 4, 3);
+    OGArray<? extends Number> col = D.getRow(1);
+    OGComplexMatrix getCol = new OGComplexMatrix(new double[] {0, 0, 2, 20, 0, 0 }, 1, 3);
+    assertTrue(col.equals(getCol));
+  }
+
   //test get data
   @Test
   public void testGetDataTest() {

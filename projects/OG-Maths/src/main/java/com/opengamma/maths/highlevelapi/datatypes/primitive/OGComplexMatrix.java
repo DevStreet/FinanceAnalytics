@@ -230,6 +230,22 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     return new OGComplexMatrix(tmp, _rows, 1);
   }
 
+  public OGComplexMatrix getRow(int index) {
+    if (index < 0 || index >= _rows) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    int count = 0;
+    double[] tmp = new double[_columns * 2];
+    int jmp;
+    for (int i = 0; i < _columns; i++) {
+      jmp = 2 * (i * _rows + index);
+      tmp[count] = _data[jmp];
+      tmp[count + 1] = _data[jmp + 1];
+      count += 2;
+    }
+    return new OGComplexMatrix(tmp, 1, _columns);
+  }
+  
   /**
    * Gets the number of elements in the matrix (full population assumed).
    * @return the number of elements in the matrix

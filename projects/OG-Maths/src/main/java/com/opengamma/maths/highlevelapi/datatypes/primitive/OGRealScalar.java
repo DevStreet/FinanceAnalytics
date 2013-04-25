@@ -68,6 +68,14 @@ public class OGRealScalar extends OGArray<Number> {
     }
     return new OGRealScalar(_data[0]);
   }
+  
+  @Override
+  public OGArray<? extends Number> getRow(int index) {
+    if (index != 0) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    return new OGRealScalar(_data[0]);
+  }
 
   @Override
   public int hashCode() {

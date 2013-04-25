@@ -481,6 +481,30 @@ public class OGComplexSparseMatrixTest {
     D.getFullRow(12);
   }
 
+  // test get row
+  @Test
+  public void testGetRow() {
+    double[][] rp = new double[][] {{1., 2., 0., 0. } };
+    double[][] ip = new double[][] {{10., 20., 30., 0. } };
+    OGComplexSparseMatrix expected = new OGComplexSparseMatrix(rp, ip);
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    assertTrue(expected.fuzzyequals(D.getRow(0), 10*D1MACH.four()));
+  }
+
+  // test get row neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexLow() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getFullRow(-1);
+  }
+
+  // test get ow index overflow
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexHigh() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getRow(12);
+  }
+
   // test get full col
   @Test
   public void testGetFullColumn() {

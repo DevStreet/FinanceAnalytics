@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
- * Tests the OGDoubleArray Class
+ * Tests the OGMatrix Class
  */
 public class OGMatrixTest {
 
@@ -171,7 +171,29 @@ public class OGMatrixTest {
     OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
     OGMatrix row = D.getFullRow(2);
     assertTrue(row.equals(getRow));
+  }   
+  
+  // test get row neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.getRow(-1);
   }    
+  
+  // test get row bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.getRow(23);
+  }  
+  
+  // test get row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGMatrix row = D.getRow(2);
+    assertTrue(row.equals(getRow));
+  }  
 
   // test get full col neg index
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)

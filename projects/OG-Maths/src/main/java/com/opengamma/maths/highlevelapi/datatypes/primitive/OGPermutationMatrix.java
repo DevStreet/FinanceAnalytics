@@ -109,6 +109,16 @@ public class OGPermutationMatrix extends OGArray<Integer> {
   }
 
   @Override
+  public OGArray<? extends Number> getRow(int index) {
+    if (index < 0 || index >= _rows) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    double[] tmp = new double[_columns];
+    tmp[index] = _data[index];
+    return new OGMatrix(tmp, 1, _columns);
+  }
+
+  @Override
   public String toString() {
     String str = "OGPermutationArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";

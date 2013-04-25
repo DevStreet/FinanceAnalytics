@@ -88,6 +88,27 @@ public class OGRealScalarTest {
     OGArray<? extends Number> col = defaultVal.getColumn(0);
     assertTrue(col.equals(getCol));
   } 
+  
+  // test get row neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    defaultVal.getRow(-1);
+  }    
+    
+  
+  // test get row bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    defaultVal.getRow(23);
+  }  
+
+  // test get row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGRealScalar getRow = new OGRealScalar(1.4);
+    OGArray<? extends Number> row = defaultVal.getRow(0);
+    assertTrue(row.equals(getRow));
+  } 
 
   // test get entry ok
   @Test

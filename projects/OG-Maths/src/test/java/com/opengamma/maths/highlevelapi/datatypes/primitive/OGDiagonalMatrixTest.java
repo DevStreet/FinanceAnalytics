@@ -139,7 +139,7 @@ public class OGDiagonalMatrixTest {
     D.getEntry(23, 1);
   }
 
-  // test get entry bad row index
+  // test get entry bad col index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetEntryBadColumnIndicesTest() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
@@ -167,6 +167,29 @@ public class OGDiagonalMatrixTest {
     OGArray<? extends Number> col = D.getColumn(1);
     OGMatrix getCol = new OGMatrix(new double[] {0, 2, 0, 0 }, 4, 1);
     assertTrue(col.equals(getCol));
+  }
+
+  // test get row neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getRow(-1);
+  }
+
+  // test get row bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getRow(23);
+  }
+
+  // test get row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> row = D.getRow(1);
+    OGMatrix getRow = new OGMatrix(new double[] {0, 2, 0 }, 1, 3);
+    assertTrue(row.equals(getRow));
   }
 
   // test get entry ok

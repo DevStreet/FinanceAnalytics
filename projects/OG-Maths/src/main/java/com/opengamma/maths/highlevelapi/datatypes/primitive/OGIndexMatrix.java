@@ -112,6 +112,18 @@ public class OGIndexMatrix extends OGArray<Integer> {
     }
     return new OGIndexMatrix(tmp, 1, _columns);
   }
+  
+  @Override
+  public OGIndexMatrix getRow(int index) {
+    if (index < 0 || index >= _rows) {
+      throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+    }
+    int[] tmp = new int[_columns];
+    for (int i = 0; i < _columns; i++) {
+      tmp[i] = _data[i * _rows + index];
+    }
+    return new OGIndexMatrix(tmp, 1, _columns);
+  }
 
   public OGIndexMatrix getFullColumn(int index) {
     if (index < 0 || index >= _columns) {

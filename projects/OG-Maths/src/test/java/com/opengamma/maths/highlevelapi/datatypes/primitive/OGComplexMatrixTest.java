@@ -334,6 +334,29 @@ public class OGComplexMatrixTest {
     OGComplexMatrix row = D.getFullRow(2);
     assertTrue(row.equals(getRow));
   }    
+  
+  // test get full row neg index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowNegIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getFullRow(-1);
+  }    
+  
+  // test get full row bad index
+  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  public void testGetRowBadIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getFullRow(23);
+  }  
+  
+  // test get full row ok
+  @Test
+  public void testGetRowOkIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGComplexMatrix row = D.getFullRow(2);
+    assertTrue(row.equals(getRow));
+  }    
+  
 
   // test get full col neg index
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
