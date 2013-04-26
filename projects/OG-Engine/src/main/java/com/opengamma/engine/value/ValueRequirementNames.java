@@ -7,6 +7,7 @@ package com.opengamma.engine.value;
 
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.function.FunctionDefinition;
+import com.opengamma.engine.function.TargetSourcingFunction;
 
 /**
  * Standard names used to refer to particular computed values.
@@ -183,6 +184,10 @@ public final class ValueRequirementNames {
    */
   public static final String YIELD_CURVE_MARKET_DATA = "YieldCurveMarketData";
   /**
+   * The raw market data that is used in curve construction.
+   */
+  public static final String CURVE_MARKET_DATA = "CurveMarketData";
+  /**
    * The sensitivities of a cash-flow based fixed-income instrument to each of the nodal points in a yield curve.
    */
   public static final String YIELD_CURVE_NODE_SENSITIVITIES = "Yield Curve Node Sensitivities";
@@ -190,6 +195,14 @@ public final class ValueRequirementNames {
    * Curve property metadata.
    */
   public static final String YIELD_CURVE_SPEC = "YieldCurveSpec";
+  /**
+   * Curve specifications.
+   */
+  public static final String CURVE_SPECIFICATION = "CurveSpecification";
+  /**
+   * Curve definitions.
+   */
+  public static final String CURVE_DEFINITION = "CurveDefinition";
   /**
    * Curve calculation property metadata
    */
@@ -1365,8 +1378,11 @@ public final class ValueRequirementNames {
    */
   public static final String AFFINE_DIVIDENDS = "Affine Dividends";
 
+  ///// Miscellaneous
+
   /**
-   * The object referenced by a target specification. Can be used to load an item, referenced by a target specification, directly from a database and receive it as an input to a function.
+   * The object referenced by a target specification. Can be used to load an item, referenced by a target specification, directly from a database and receive it as an input to a function. See the
+   * documentation for {@link TargetSourcingFunction} for details on requesting target resolved items.
    */
   public static final String TARGET = "Target";
 
