@@ -112,7 +112,7 @@ public class OGIndexMatrix extends OGArray<Integer> {
     }
     return new OGIndexMatrix(tmp, 1, _columns);
   }
-  
+
   @Override
   public OGIndexMatrix getRow(int index) {
     if (index < 0 || index >= _rows) {
@@ -144,6 +144,36 @@ public class OGIndexMatrix extends OGArray<Integer> {
     int[] tmp = new int[_rows];
     System.arraycopy(_data, index * _rows, tmp, 0, _rows);
     return new OGIndexMatrix(tmp, _rows, 1);
+  }
+
+  @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    boolean seq = true;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (indexes[i] != indexes[i - 1] + 1) {
+          seq = false;
+        }
+      }
+    }
+    int[] tmp = new int[nindex * _rows];
+    if (seq) { // sequential indices requested, do single memcpy
+      index = indexes[0];
+      System.arraycopy(_data, index * _rows, tmp, 0, nindex * _rows);
+    } else {
+      for (int i = 0; i < nindex; i++) {
+        index = indexes[i];
+        System.arraycopy(_data, index * _rows, tmp, i * _rows, _rows);
+      }
+    }
+    return new OGIndexMatrix(tmp, _rows, nindex);
   }
 
   /**

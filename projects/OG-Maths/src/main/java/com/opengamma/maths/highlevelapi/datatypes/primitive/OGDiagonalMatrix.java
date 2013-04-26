@@ -106,6 +106,30 @@ public class OGDiagonalMatrix extends OGArray<Double> {
   }
 
   @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] tmp = new double[nindex * _rows];
+    int idx, ir;
+    for (int i = 0; i < nindex; i++) {
+      idx = indexes[i];
+      if (idx < _data.length) { // data might be short if there's zeros on diag      
+        ir = i * _rows;
+        tmp[ir + idx] = _data[idx];
+      }
+    }
+    return new OGMatrix(tmp, _rows, nindex);
+  }
+
+  @Override
   public OGArray<? extends Number> getRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);

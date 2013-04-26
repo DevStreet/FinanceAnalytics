@@ -27,14 +27,20 @@ public interface OGArrayInterface<T extends Number> {
    */
   boolean fuzzyequals(Object obj, double tolerance);
 
-  
   /**
    * Gets a column of the matrix
    * @param index the column to get
    * @return the column
    */
   OGArray<? extends Number> getColumn(int index);
-  
+
+  /**
+   * Gets specified columns of the matrix
+   * @param index the columns to get
+   * @return the columns
+   */
+  OGArray<? extends Number> getColumns(int... index);
+
   /**
    * Gets a row of the matrix
    * @param index the row to get

@@ -311,21 +311,55 @@ public class OGComplexDiagonalMatrixTest {
     assertTrue(col.equals(getCol));
   }
 
-  // test get col neg index
+  // test get cols null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNullTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getColumns(null);
+  }
+
+  // test get cols neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsNegIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getColumns(-1);
+  }
+
+  // test get cols bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
+    D.getColumns(23);
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetColumnsOkIndexTest() {
+    OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, data4x3diagdimag, 4, 3);
+    OGArray<? extends Number> col = D.getColumns(2, 0);
+    double[][] rp = new double[][] { {0.0000000000000000, 1.0000000000000000 }, {0.0000000000000000, 0.0000000000000000 }, {3.0000000000000000, 0.0000000000000000 },
+        {0.0000000000000000, 0.0000000000000000 } };
+    double[][] ip = new double[][] { {0.0000000000000000, 10.0000000000000000 }, {0.0000000000000000, 0.0000000000000000 }, {30.0000000000000000, 0.0000000000000000 },
+        {0.0000000000000000, 0.0000000000000000 } };
+    OGComplexMatrix getCol = new OGComplexMatrix(rp, ip);
+    assertTrue(col.equals(getCol));
+  }
+
+  // test get row neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowNegIndexTest() {
     OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
     D.getRow(-1);
   }
 
-  // test get col bad index
+  // test get row bad index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowBadIndexTest() {
     OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, 4, 3);
     D.getRow(23);
   }
 
-  // test get col ok
+  // test get row ok
   @Test
   public void testGetRowOkIndexTest() {
     OGComplexDiagonalMatrix D = new OGComplexDiagonalMatrix(data4x3diagdreal, data4x3diagdimag, 4, 3);

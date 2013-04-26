@@ -152,6 +152,36 @@ public class OGMatrix extends OGArray<Double> {
     return new OGMatrix(tmp, _rows, 1);
   }
 
+  @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    boolean seq = true;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (indexes[i] != indexes[i - 1] + 1) {
+          seq = false;
+        }
+      }
+    }
+    double[] tmp = new double[nindex * _rows];
+    if (seq) { // sequential indices requested, do single memcpy
+      index = indexes[0];
+      System.arraycopy(_data, index * _rows, tmp, 0, nindex * _rows);
+    } else {
+      for (int i = 0; i < nindex; i++) {
+        index = indexes[i];
+        System.arraycopy(_data, index * _rows, tmp, i * _rows, _rows);
+      }
+    }
+    return new OGMatrix(tmp, _rows, nindex);
+  }
+
   /**
    * Gets the number of elements in the matrix (full population assumed).
    * @return the number of elements in the matrix

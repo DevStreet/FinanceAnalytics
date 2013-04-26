@@ -295,6 +295,46 @@ public class OGSparseMatrixTest {
     answer = new OGSparseMatrix(new double[][] { {1 }, {0 }, {2 }, {0 }, {3 }, {0 } });
   }
 
+  // test get cols
+  @Test
+  public void testGetConsecutiveColumns() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    double[][] rp = new double[][] { {2., 0. }, {0., 4. }, {5., 6. }, {0., 7. } };
+    ;
+    OGSparseMatrix tmp = new OGSparseMatrix(rp);
+    assertTrue(tmp.equals(D.getColumns(1, 2)));
+  }
+
+  // test get cols
+  @Test
+  public void testGetRandomColumns() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    double[][] rp = new double[][] { {0., 1. }, {4., 3. }, {6., 0. }, {7., 0. } };
+    OGSparseMatrix tmp = new OGSparseMatrix(rp);
+    assertTrue(tmp.equals(D.getColumns(2, 0)));
+  }
+
+  // test get columns null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNull() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getColumns(null);
+  }
+
+  // test get columns neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexLow() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getColumns(-1);
+  }
+
+  // test get columns index overflow
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexHigh() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getColumns(12);
+  }
+
   // test get No elements
   @Test
   public void testGetNoElementsTest() {

@@ -536,6 +536,62 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
   }
 
   @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    boolean seq = true;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _cols) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (indexes[i] != indexes[i - 1] + 1) {
+          seq = false;
+        }
+      }
+    }
+    double[] dataTmp = null;
+    int[] colPtrTmp = null, rowIdxTmp = null;
+
+    int start;
+    int end;
+
+    if (seq) {
+      end = _colPtr[indexes[nindex - 1] + 1];
+      start = _colPtr[indexes[0]];
+      dataTmp = new double[2 * (end - start)];
+      System.arraycopy(_values, 2 * start, dataTmp, 0, 2 * (end - start));
+      rowIdxTmp = new int[end - start];
+      System.arraycopy(_rowIdx, start, rowIdxTmp, 0, end - start);
+      colPtrTmp = new int[nindex + 1];
+      System.arraycopy(_colPtr, indexes[0], colPtrTmp, 0, nindex + 1);
+      for (int i = 0; i <= nindex; i++) {
+        colPtrTmp[i] -= _colPtr[indexes[0]];
+      }
+      return new OGComplexSparseMatrix(colPtrTmp, rowIdxTmp, dataTmp, _rows, nindex);
+    } else {
+      dataTmp = new double[2 * _rows * nindex];
+      rowIdxTmp = new int[_rows * nindex];
+      int jmp = 0;
+      colPtrTmp = new int[nindex + 1];
+      for (int i = 0; i < nindex; i++) {
+        colPtrTmp[i] = jmp;
+        index = indexes[i];
+        start = _colPtr[index];
+        end = _colPtr[index + 1];
+        System.arraycopy(_values, 2 * start, dataTmp, 2 * jmp, 2 * (end - start));
+        System.arraycopy(_rowIdx, start, rowIdxTmp, jmp, end - start);
+        jmp += (end - start);
+      }
+      colPtrTmp[nindex] = jmp;
+      return new OGComplexSparseMatrix(colPtrTmp, Arrays.copyOf(rowIdxTmp, jmp), Arrays.copyOf(dataTmp, 2 * jmp), _rows, nindex);
+    }
+
+  }
+
+  @Override
   public ComplexType getEntry(int... indices) {
     if (indices.length > 2) {
       throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");

@@ -70,17 +70,16 @@ public class OGComplexScalarTest {
   }
 
   // test get col neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColNegIndexTest() {
     defaultVal.getColumn(-1);
-  }    
-    
-  
+  }
+
   // test get col bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColumnBadIndexTest() {
     defaultVal.getColumn(23);
-  }  
+  }
 
   // test get col ok
   @Test
@@ -88,20 +87,56 @@ public class OGComplexScalarTest {
     OGComplexScalar getCol = new OGComplexScalar(1.2, 3.4);
     OGArray<? extends Number> col = defaultVal.getColumn(0);
     assertTrue(col.equals(getCol));
-  } 
-  
+  }
+
+  // test get cols null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNullTest() {
+    OGComplexScalar getCol = new OGComplexScalar(1.2, 3.4);
+    getCol.getColumns(null);
+  }
+
+  // test get cols neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsNegIndexTest() {
+    OGComplexScalar getCol = new OGComplexScalar(1.2, 3.4);
+    getCol.getColumns(new int[] {-1 });
+  }
+
+  // test get cols bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexTest() {
+    OGComplexScalar getCol = new OGComplexScalar(1.2, 3.4);
+    getCol.getColumns(23);
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetSingleColumnsOkIndexTest() {
+    OGComplexScalar getCol = new OGComplexScalar(1.2, 3.4);
+    OGArray<? extends Number> col = defaultVal.getColumns(0);
+    assertTrue(col.equals(getCol));
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetSingleColumnsOkRepeatSelectIndexTest() {
+    OGArray<? extends Number> col = defaultVal.getColumns(0, 0, 0, 0);
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 4, 1);
+    assertTrue(expected.equals(col));
+  }
+
   // test get row neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testRowColNegIndexTest() {
     defaultVal.getRow(-1);
-  }    
-    
-  
+  }
+
   // test get row bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowBadIndexTest() {
     defaultVal.getRow(23);
-  }  
+  }
 
   // test get row ok
   @Test
@@ -109,13 +144,13 @@ public class OGComplexScalarTest {
     OGComplexScalar getRow = new OGComplexScalar(1.2, 3.4);
     OGArray<? extends Number> row = defaultVal.getRow(0);
     assertTrue(row.equals(getRow));
-  } 
-    
+  }
+
   // test get entry ok
   @Test
   public void testGetEntryOKIndicesTest() {
     assertTrue(defaultVal.getEntry(0, 0).getReal() == 1.2d);
-    assertTrue(defaultVal.getEntry(0, 0).getImag() == 3.4d);    
+    assertTrue(defaultVal.getEntry(0, 0).getImag() == 3.4d);
   }
 
   // test equals obj points to obj
@@ -151,7 +186,7 @@ public class OGComplexScalarTest {
   @Test
   public void testEqualsObjStructurallyIdenticalTest() {
     OGComplexScalar D = defaultVal;
-    OGComplexScalar Diff = new OGComplexScalar(1.2d,3.4d);
+    OGComplexScalar Diff = new OGComplexScalar(1.2d, 3.4d);
     assertTrue(D.equals(Diff));
   }
 

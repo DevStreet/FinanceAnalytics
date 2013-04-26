@@ -104,8 +104,39 @@ public class OGPermutationMatrix extends OGArray<Integer> {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
     double[] tmp = new double[_rows];
-    tmp[index] = _data[index];
+    for (int k = 0; k < _rows; k++) {
+      if (_data[k] == index) {
+        tmp[k] = 1;
+        break;
+      }
+    }
     return new OGMatrix(tmp, _rows, 1);
+  }
+
+  @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] tmp = new double[nindex * _rows];
+    int idx, ir;
+    for (int i = 0; i < nindex; i++) {
+      idx = indexes[i];
+      ir = i * _rows;
+      for (int k = 0; k < _rows; k++) {
+        if (_data[k] == idx) {
+          tmp[ir + k] = 1;
+          break;
+        }
+      }
+    }
+    return new OGMatrix(tmp, _rows, nindex);
   }
 
   @Override

@@ -120,7 +120,7 @@ public class OGDiagonalMatrixTest {
 
   // test get cols
   @Test
-  public void testGetColumnsTest() {
+  public void testGetNumColumnsTest() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     assertTrue(D.getNumberOfColumns() == 3);
   }
@@ -166,6 +166,36 @@ public class OGDiagonalMatrixTest {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGArray<? extends Number> col = D.getColumn(1);
     OGMatrix getCol = new OGMatrix(new double[] {0, 2, 0, 0 }, 4, 1);
+    assertTrue(col.equals(getCol));
+  }
+
+  // test get cols null index
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNullTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getColumns(null);
+  }
+
+  // test get cols neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsNegIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getColumns(-1);
+  }
+
+  // test get cols bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getColumns(23);
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetColumnsOkIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> col = D.getColumns(2, 0);
+    OGMatrix getCol = new OGMatrix(new double[][] { {0., 1. }, {0., 0. }, {3., 0. }, {0., 0. } });
     assertTrue(col.equals(getCol));
   }
 

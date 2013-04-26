@@ -130,11 +130,43 @@ public class OGPermutationMatrixTest {
   @Test
   public void testGetColumnOkIndexTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
-    OGArray<? extends Number> col = D.getColumn(1);
-    double[][] tmp = new double[][] { {0 }, {1 }, {0 }, {0 }, {0 } };
+    OGArray<? extends Number> col = D.getColumn(3);
+    double[][] tmp = new double[][] { {1 }, {0 }, {0 }, {0 }, {0 } };
     OGMatrix answer = new OGMatrix(tmp);
     assertTrue(col.equals(answer));
   }
+  
+  
+  // test get cols null index
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNullTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getColumns(null);
+  }
+
+  // test get cols neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsNegIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getColumns(-1);
+  }
+
+  // test get cols bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getColumns(23);
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetColumnsOkIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    OGArray<? extends Number> col = D.getColumns(2, 0);
+    OGMatrix getCol = new OGMatrix(new double[][] { {0., 0. }, {0., 0. }, {1., 0. }, {0., 0. }, {0., 1. }});
+    assertTrue(col.equals(getCol));
+  }
+
   
   // test get row neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)

@@ -488,7 +488,7 @@ public class OGComplexSparseMatrixTest {
     double[][] ip = new double[][] {{10., 20., 30., 0. } };
     OGComplexSparseMatrix expected = new OGComplexSparseMatrix(rp, ip);
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
-    assertTrue(expected.fuzzyequals(D.getRow(0), 10*D1MACH.four()));
+    assertTrue(expected.fuzzyequals(D.getRow(0), 10 * D1MACH.four()));
   }
 
   // test get row neg index
@@ -529,7 +529,7 @@ public class OGComplexSparseMatrixTest {
     D.getFullColumn(12);
   }
 
-  // test get full col
+  // test get col
   @Test
   public void testGetColumn() {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
@@ -544,14 +544,55 @@ public class OGComplexSparseMatrixTest {
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColBadIndexLow() {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
-    D.getFullColumn(-1);
+    D.getColumn(-1);
   }
 
   // test get full row index overflow
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColBadIndexHigh() {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
-    D.getFullColumn(12);
+    D.getColumn(12);
+  }
+
+  // test get cols
+  @Test
+  public void testGetConsecutiveColumns() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    double[][] rp = new double[][] { {2., 0. }, {0., 7. }, {10., 11. }, {0., 15. } };
+    double[][] ip = new double[][] { {20., 30. }, {60., 70. }, {100., 0. }, {0., 0. } };
+    OGComplexSparseMatrix tmp = new OGComplexSparseMatrix(rp, ip);
+    assertTrue(tmp.equals(D.getColumns(1, 2)));
+  }
+
+  // test get cols
+  @Test
+  public void testGetRandomColumns() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    double[][] rp = new double[][] { {0., 1. }, {7., 5. }, {11., 0. }, {15., 0. } };
+    double[][] ip = new double[][] { {30., 10. }, {70., 0. }, {0., 90. }, {0., 0. } };
+    OGComplexSparseMatrix tmp = new OGComplexSparseMatrix(rp, ip);
+    assertTrue(tmp.equals(D.getColumns(2, 0)));
+  }
+
+  // test get columns null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNull() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getColumns(null);
+  }
+
+  // test get columns neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexLow() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getColumns(-1);
+  }
+
+  // test get columns index overflow
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexHigh() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getColumns(12);
   }
 
   // test get nnz

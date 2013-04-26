@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
  * Scalar real number
@@ -67,6 +68,25 @@ public class OGRealScalar extends OGArray<Number> {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
     return new OGRealScalar(_data[0]);
+  }
+  
+  @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index != 0) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    if (nindex == 1) {
+      return getColumn(0);
+    }
+    double[] tmp = new double[nindex];
+    Arrays.fill(tmp, _data[0]);
+    return new OGMatrix(tmp,  nindex, 1);
   }
   
   @Override

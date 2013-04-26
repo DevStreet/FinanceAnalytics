@@ -19,7 +19,7 @@ import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
- * Tests the OGComlpexArray class 
+ * Tests the OGComplexMatrix class 
  */
 public class OGComplexMatrixTest {
 
@@ -166,7 +166,7 @@ public class OGComplexMatrixTest {
     tmp2[1] = new double[] {1, 2, 3 };
     new OGComplexMatrix(tmp1, tmp2);
   }
-  
+
   // sending in ragged ComplexType[][] constructor
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testComplexTypePtrPtrConstructorRaggedTest() {
@@ -174,7 +174,7 @@ public class OGComplexMatrixTest {
     tmp[0] = new ComplexType[] {new ComplexType(1), new ComplexType(2) };
     tmp[1] = new ComplexType[] {new ComplexType(1) };
     new OGComplexMatrix(tmp);
-  }  
+  }
 
   // sending in ok double[][] constructor
   @Test
@@ -243,7 +243,7 @@ public class OGComplexMatrixTest {
     assertTrue(D.getNumberOfRows() == 1);
     assertTrue(D.getNumberOfColumns() == 1);
   }
-  
+
   // sending in null ptr ComplexType constructor
   @Test
   public void testComplexTypeConstructorInternalDataTest() {
@@ -307,71 +307,69 @@ public class OGComplexMatrixTest {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     for (int i = 0; i < D.getNumberOfRows(); i++) {
       for (int j = 0; j < D.getNumberOfColumns(); j++) {
-        assertTrue(D.getEntry(i, j).getReal()==realdata4x3[i][j]);
-        assertTrue(D.getEntry(i, j).getImag()==imagdata4x3[i][j]);
+        assertTrue(D.getEntry(i, j).getReal() == realdata4x3[i][j]);
+        assertTrue(D.getEntry(i, j).getImag() == imagdata4x3[i][j]);
       }
     }
   }
- 
+
   // test get full row neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullRowNegIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getFullRow(-1);
-  }    
-  
+  }
+
   // test get full row bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullRowBadIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getFullRow(23);
-  }  
-  
+  }
+
   // test get full row ok
   @Test
   public void testGetFullRowOkIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     OGComplexMatrix row = D.getFullRow(2);
     assertTrue(row.equals(getRow));
-  }    
-  
+  }
+
   // test get full row neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowNegIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getFullRow(-1);
-  }    
-  
+  }
+
   // test get full row bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowBadIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getFullRow(23);
-  }  
-  
+  }
+
   // test get full row ok
   @Test
   public void testGetRowOkIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     OGComplexMatrix row = D.getFullRow(2);
     assertTrue(row.equals(getRow));
-  }    
-  
+  }
 
   // test get full col neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullColNegIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getFullColumn(-1);
-  }    
-    
-  
+  }
+
   // test get full col bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullColumnBadIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getFullColumn(23);
-  }  
+  }
 
   // test get full col ok
   @Test
@@ -379,22 +377,21 @@ public class OGComplexMatrixTest {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     OGComplexMatrix col = D.getFullColumn(1);
     assertTrue(col.equals(getCol));
-  }    
-  
+  }
+
   // test get col neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColNegIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getColumn(-1);
-  }    
-    
-  
+  }
+
   // test get col bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColumnBadIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.getColumn(23);
-  }  
+  }
 
   // test get col ok
   @Test
@@ -402,15 +399,57 @@ public class OGComplexMatrixTest {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     OGArray<? extends Number> col = D.getColumn(1);
     assertTrue(col.equals(getCol));
-  }    
-  
-  
+  }
+
+  // test get cols null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetColumnsNullTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getColumns(null);
+  }
+
+  // test get cols neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsNegIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getColumns(new int[] {-1 });
+  }
+
+  // test get cols bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetColumnsBadIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getColumn(23);
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetConsecutiveColumnsOkIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    double[][] rp = new double[][] { {2., 3. }, {5., 6. }, {8., 9. }, {11., 12. } };
+    double[][] ip = new double[][] { {20., 30. }, {50., 60. }, {80., 90. }, {110., 120. } };
+    OGComplexMatrix expected = new OGComplexMatrix(rp, ip);
+    OGArray<? extends Number> col = D.getColumns(new int[] {1, 2 });
+    assertTrue(col.equals(expected));
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetRandomColumnsOkIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    double[][] rp = new double[][] {{      3.,      1.},{      6.,      4.},{      9.,      7.},{     12.,     10.}};
+    double[][] ip = new double[][] { {30., 10. }, {60., 40. }, {90., 70. }, {120., 100. }};
+    OGComplexMatrix expected = new OGComplexMatrix(rp, ip);
+    OGArray<? extends Number> col = D.getColumns(new int[] {2, 0 });
+    assertTrue(col.equals(expected));
+  }
+
   // test get No elements
   @Test
   public void testGetNoElementsTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    assertTrue(D.getNumberOfElements()==12);
-  }  
+    assertTrue(D.getNumberOfElements() == 12);
+  }
 
   // test get data
   @Test
@@ -418,7 +457,7 @@ public class OGComplexMatrixTest {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     assertTrue(Arrays.equals(D.getData(), interleaved4x3));
   }
-  
+
   // test equals obj points to obj
   @Test
   public void testEqualsObjeqObj() {
@@ -431,116 +470,116 @@ public class OGComplexMatrixTest {
   public void testEqualsObjNull() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     assertFalse(D.equals(null));
-  }  
-  
+  }
+
   // test equals obj class different
   @Test
   public void testEqualsObjDifferentClass() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     assertFalse(D.equals(new Double(1.)));
-  }  
+  }
 
   // test equals obj class ok, diff cols
   @Test
   public void testEqualsObjDifferentCols() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(7);    
+    OGComplexMatrix Diff = new OGComplexMatrix(7);
     assertFalse(D.equals(Diff));
-  }    
-  
+  }
+
   // test equals obj class ok, same cols diff rows
   @Test
   public void testEqualsObjDifferentRows() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(new double[][] {{1,2,3}});    
+    OGComplexMatrix Diff = new OGComplexMatrix(new double[][] {{1, 2, 3 } });
     assertFalse(D.equals(Diff));
-  }  
+  }
 
   // test equals obj class ok, same cols same rows different data
   @Test
   public void testEqualsObjDifferentData() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(new double[]{999.00, 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00, 9.00, 90.00, 12.00,
-      120.00 },4,3);    
+    OGComplexMatrix Diff = new OGComplexMatrix(new double[] {999.00, 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00,
+        9.00, 90.00, 12.00, 120.00 }, 4, 3);
     assertFalse(D.equals(Diff));
-  }    
+  }
 
   // test equals obj class ok, same cols same rows same data
   @Test
   public void testEqualsObjStructurallyIdentical() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(new double[]{1.00, 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00, 9.00, 90.00, 12.00,
-        120.00 },4,3);    
+    OGComplexMatrix Diff = new OGComplexMatrix(new double[] {1.00, 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00,
+        9.00, 90.00, 12.00, 120.00 }, 4, 3);
     assertTrue(D.equals(Diff));
-  }      
-    
+  }
+
   // test equals obj points to obj
   @Test
   public void testFuzzyEqualsObjeqObj() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    assertTrue(D.fuzzyequals(D,10*D1MACH.four()));
+    assertTrue(D.fuzzyequals(D, 10 * D1MACH.four()));
   }
 
   // test equals obj not = null
   @Test
   public void testFuzzyEqualsObjNull() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    assertFalse(D.fuzzyequals(null,10*D1MACH.four()));
-  }  
-  
+    assertFalse(D.fuzzyequals(null, 10 * D1MACH.four()));
+  }
+
   // test equals obj class different
   @Test
   public void testFuzzyEqualsObjDifferentClass() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    assertFalse(D.fuzzyequals(new Double(1.),10*D1MACH.four()));
-  }  
+    assertFalse(D.fuzzyequals(new Double(1.), 10 * D1MACH.four()));
+  }
 
   // test equals obj class ok, diff cols
   @Test
   public void testFuzzyEqualsObjDifferentCols() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(7);    
-    assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
-  }    
-  
+    OGComplexMatrix Diff = new OGComplexMatrix(7);
+    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
+
   // test equals obj class ok, same cols diff rows
   @Test
   public void testFuzzyEqualsObjDifferentRows() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(new double[][] {{1,2,3}});    
-    assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
-  }  
+    OGComplexMatrix Diff = new OGComplexMatrix(new double[][] {{1, 2, 3 } });
+    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
 
   // test equals obj class ok, same cols same rows different data
   @Test
   public void testFuzzyEqualsObjDifferentData() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(new double[]{999.00, 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00, 9.00, 90.00, 12.00,
-      120.00 },4,3);    
-    assertFalse(D.fuzzyequals(Diff,10*D1MACH.four()));
-  }    
+    OGComplexMatrix Diff = new OGComplexMatrix(new double[] {999.00, 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00,
+        9.00, 90.00, 12.00, 120.00 }, 4, 3);
+    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
 
   // test equals obj class ok, same cols same rows same data
   @Test
   public void testFuzzyEqualsObjStructurallyIdentical() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix Diff = new OGComplexMatrix(new double[]{1.00+9*D1MACH.four(), 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00, 30.00, 6.00, 60.00, 9.00, 90.00, 12.00,
-        120.00 },4,3);    
-    assertTrue(D.fuzzyequals(Diff,10*D1MACH.four()));
-  }     
-  
+    OGComplexMatrix Diff = new OGComplexMatrix(new double[] {1.00 + 9 * D1MACH.four(), 10.00, 4.00, 40.00, 7.00, 70.00, 10.00, 100.00, 2.00, 20.00, 5.00, 50.00, 8.00, 80.00, 11.00, 110.00, 3.00,
+        30.00, 6.00, 60.00, 9.00, 90.00, 12.00, 120.00 }, 4, 3);
+    assertTrue(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+  }
+
   // test hash code
   @Test
   public void testHashCodeTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.hashCode();
   }
-  
+
   // test toString code
   @Test
   public void testToStringTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.toString();
   }
-  
+
 }

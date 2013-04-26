@@ -199,10 +199,38 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
+    if (index >= _data.length) {
+      return new OGComplexMatrix(new double[2 * _rows], _rows, 1);
+    }
     double[] tmp = new double[2 * _rows];
     tmp[index * 2] = _data[index * 2];
     tmp[index * 2 + 1] = _data[index * 2 + 1];
     return new OGComplexMatrix(tmp, _rows, 1);
+  }
+
+  @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] tmp = new double[2 * nindex * _rows];
+    int it2, ir, twor = 2 * _rows;
+    for (int i = 0; i < nindex; i++) {
+      it2 = indexes[i] * 2;
+      if (indexes[i] < _data.length) {
+        ir = i * twor;
+        tmp[ir + it2] = _data[it2];
+        tmp[ir + it2 + 1] = _data[it2 + 1];
+      }
+    }
+    return new OGComplexMatrix(tmp, _rows, nindex);
   }
 
   @Override
@@ -212,7 +240,7 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     }
     double[] tmp = new double[2 * _columns];
     tmp[index * 2] = _data[index * 2];
-    tmp[index * 2 + 1] = _data[index * 2 + 1];  
+    tmp[index * 2 + 1] = _data[index * 2 + 1];
     return new OGComplexMatrix(tmp, 1, _columns);
   }
 

@@ -230,6 +230,37 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     return new OGComplexMatrix(tmp, _rows, 1);
   }
 
+  @Override
+  public OGArray<? extends Number> getColumns(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    boolean seq = true;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (indexes[i] != indexes[i - 1] + 1) {
+          seq = false;
+        }
+      }
+    }
+    final int twor = 2 * _rows;
+    double[] tmp = new double[2 * nindex * _rows];
+    if (seq) { // sequential indices requested, do single memcpy
+      index = indexes[0];
+      System.arraycopy(_data, index * twor, tmp, 0, nindex * twor);
+    } else {
+      for (int i = 0; i < nindex; i++) {
+        index = indexes[i];
+        System.arraycopy(_data, index * twor, tmp, i * twor, twor);
+      }
+    }
+    return new OGComplexMatrix(tmp, _rows, nindex);
+  }
+
   public OGComplexMatrix getRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
@@ -245,7 +276,7 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     }
     return new OGComplexMatrix(tmp, 1, _columns);
   }
-  
+
   /**
    * Gets the number of elements in the matrix (full population assumed).
    * @return the number of elements in the matrix
