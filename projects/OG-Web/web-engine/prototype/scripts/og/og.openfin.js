@@ -19,6 +19,7 @@ $.register_module({
                         window.history.go(-1);
                         url_bar.val(window.location.href);
                     });
+                    container.find('form').submit(function (event) { return false; });
                     $('a[href]').live('click', function (e) { url_bar.val($(this)[0].href) });
                     $(window).on('hashchange', function () {
                         url_bar.val(window.location.href);
