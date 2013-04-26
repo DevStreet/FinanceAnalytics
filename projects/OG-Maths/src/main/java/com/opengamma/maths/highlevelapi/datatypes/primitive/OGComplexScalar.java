@@ -86,7 +86,7 @@ public class OGComplexScalar extends OGArray<Number> {
     }
     double[] tmp = new double[2 * nindex];
     DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
-    return new OGComplexMatrix(tmp,  nindex, 1);
+    return new OGComplexMatrix(tmp, nindex, 1);
   }
 
   @Override
@@ -95,6 +95,25 @@ public class OGComplexScalar extends OGArray<Number> {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
     return new OGComplexScalar(_data[0], _data[1]);
+  }
+
+  @Override
+  public OGArray<? extends Number> getRows(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index != 0) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    if (nindex == 1) {
+      return getRow(0);
+    }
+    double[] tmp = new double[2 * nindex];
+    DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
+    return new OGComplexMatrix(tmp, 1, nindex);
   }
 
   @Override

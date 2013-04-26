@@ -437,11 +437,54 @@ public class OGComplexMatrixTest {
   @Test
   public void testGetRandomColumnsOkIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    double[][] rp = new double[][] {{      3.,      1.},{      6.,      4.},{      9.,      7.},{     12.,     10.}};
-    double[][] ip = new double[][] { {30., 10. }, {60., 40. }, {90., 70. }, {120., 100. }};
+    double[][] rp = new double[][] { {3., 1. }, {6., 4. }, {9., 7. }, {12., 10. } };
+    double[][] ip = new double[][] { {30., 10. }, {60., 40. }, {90., 70. }, {120., 100. } };
     OGComplexMatrix expected = new OGComplexMatrix(rp, ip);
     OGArray<? extends Number> col = D.getColumns(new int[] {2, 0 });
     assertTrue(col.equals(expected));
+  }
+
+  // test get Rows null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNullTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getRows(null);
+  }
+
+  // test get Rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsNegIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getRows(new int[] {-1 });
+  }
+
+  // test get Rows bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.getRows(23);
+  }
+
+  // test get Rows ok
+  @Test
+  public void testGetConsecutiveRowsOkIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    double[][] rp = new double[][] { {4., 5., 6. }, {7., 8., 9. } };
+    double[][] ip = new double[][] { {40., 50., 60. }, {70., 80., 90. } };
+    OGComplexMatrix expected = new OGComplexMatrix(rp, ip);
+    OGArray<? extends Number> row = D.getRows(new int[] {1, 2 });
+    assertTrue(row.equals(expected));
+  }
+
+  // test get cols ok
+  @Test
+  public void testGetRandomRowsOkIndexTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    double[][] rp = new double[][] { {7., 8., 9. }, {1., 2., 3. } };
+    double[][] ip = new double[][] { {70., 80., 90. }, {10., 20., 30. } };
+    OGComplexMatrix expected = new OGComplexMatrix(rp, ip);
+    OGArray<? extends Number> row = D.getRows(new int[] {2, 0 });
+    assertTrue(row.equals(expected));
   }
 
   // test get No elements

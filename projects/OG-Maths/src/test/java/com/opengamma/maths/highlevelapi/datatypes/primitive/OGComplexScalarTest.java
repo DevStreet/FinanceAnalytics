@@ -125,6 +125,43 @@ public class OGComplexScalarTest {
     OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 4, 1);
     assertTrue(expected.equals(col));
   }
+  
+  // test get rows null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNullTest() {
+    OGComplexScalar getrow = new OGComplexScalar(1.2, 3.4);
+    getrow.getRows(null);
+  }
+
+  // test get rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsNegIndexTest() {
+    OGComplexScalar getRow = new OGComplexScalar(1.2, 3.4);
+    getRow.getRows(new int[] {-1 });
+  }
+
+  // test get rows bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexTest() {
+    OGComplexScalar getRow = new OGComplexScalar(1.2, 3.4);
+    getRow.getRows(23);
+  }
+
+  // test get rows ok
+  @Test
+  public void testGetSingleRowsOkIndexTest() {
+    OGComplexScalar getRow = new OGComplexScalar(1.2, 3.4);
+    OGArray<? extends Number> row = defaultVal.getRows(0);
+    assertTrue(row.equals(getRow));
+  }
+
+  // test get rows ok
+  @Test
+  public void testGetSingleRowsOkRepeatSelectIndexTest() {
+    OGArray<? extends Number> row = defaultVal.getRows(0, 0, 0, 0);
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 },  1, 4);
+    assertTrue(expected.equals(row));
+  }
 
   // test get row neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)

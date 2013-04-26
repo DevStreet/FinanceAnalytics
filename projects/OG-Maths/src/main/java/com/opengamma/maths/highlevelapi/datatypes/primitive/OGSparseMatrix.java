@@ -194,7 +194,7 @@ public class OGSparseMatrix extends OGArray<Double> {
       end = _colPtr[indexes[nindex - 1] + 1];
       start = _colPtr[indexes[0]];
       dataTmp = new double[(end - start)];
-      System.arraycopy(_values, start, dataTmp, 0,(end - start));
+      System.arraycopy(_values, start, dataTmp, 0, (end - start));
       rowIdxTmp = new int[end - start];
       System.arraycopy(_rowIdx, start, rowIdxTmp, 0, end - start);
       colPtrTmp = new int[nindex + 1];
@@ -222,7 +222,7 @@ public class OGSparseMatrix extends OGArray<Double> {
     }
 
   }
-  
+
   public OGMatrix getFullRow(int index) { // getting rows in CSC form is generally bad
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);

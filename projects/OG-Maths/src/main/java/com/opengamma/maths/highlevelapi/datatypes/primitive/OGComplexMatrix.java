@@ -277,6 +277,46 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     return new OGComplexMatrix(tmp, 1, _columns);
   }
 
+  @Override
+  public OGComplexMatrix getRows(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    boolean seq = true;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (indexes[i] != indexes[i - 1] + 1) {
+          seq = false;
+        }
+      }
+    }
+    double[] tmp = new double[2 * nindex * _columns];
+    if (seq) {
+      int in = 2 * nindex;
+      for (int i = 0; i < _columns; i++) {
+        System.arraycopy(_data, 2 * (i * _rows + indexes[0]), tmp, i * in, in);
+      }
+    } else {
+      int in, ir, twoi, twojin, twoidxj;
+      for (int i = 0; i < _columns; i++) {
+        twoi = 2 * i;
+        in = twoi * nindex;
+        ir = twoi * _rows;
+        for (int j = 0; j < nindex; j++) {
+          twojin = 2 * j + in;
+          twoidxj = ir + 2 * indexes[j];
+          tmp[twojin] = _data[twoidxj];
+          tmp[twojin + 1] = _data[twoidxj + 1];
+        }
+      }
+    }
+    return new OGComplexMatrix(tmp, nindex, _columns);
+  }
+
   /**
    * Gets the number of elements in the matrix (full population assumed).
    * @return the number of elements in the matrix

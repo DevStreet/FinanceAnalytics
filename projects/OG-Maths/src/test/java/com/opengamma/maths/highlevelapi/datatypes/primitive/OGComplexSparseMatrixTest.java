@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
@@ -593,6 +594,47 @@ public class OGComplexSparseMatrixTest {
   public void testGetColumnsBadIndexHigh() {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
     D.getColumns(12);
+  }
+
+  // test get Rows
+  @Test
+  public void testGetConsecutiveRows() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    double[][] rp = new double[][] { {5., 0., 7., 0. }, {0., 10., 11., 0. } };
+    double[][] ip = new double[][] { {0., 60., 70., 0. }, {90., 100., 0., 120. } };
+    OGComplexSparseMatrix tmp = new OGComplexSparseMatrix(rp, ip);
+    assertTrue(tmp.equals(D.getRows(1, 2)));
+  }
+
+  // test get Rows
+  @Test
+  public void testGetRandomRows() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    double[][] rp = new double[][] { {0., 10., 11., 0. }, {1., 2., 0., 0. } };
+    double[][] ip = new double[][] { {90., 100., 0., 120. }, {10., 20., 30., 0. } };
+    OGComplexSparseMatrix tmp = new OGComplexSparseMatrix(rp, ip);
+    assertTrue(tmp.equals(D.getRows(2, 0)));
+  }
+
+  // test get Rows null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNull() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getRows(null);
+  }
+
+  // test get Rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexLow() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getRows(-1);
+  }
+
+  // test get Rows index overflow
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexHigh() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.getRows(12);
   }
 
   // test get nnz

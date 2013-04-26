@@ -477,6 +477,40 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
     return new OGComplexSparseMatrix(colPtrTmp, rowIdxTmp, Arrays.copyOf(dataTmp, dataptr), 1, _cols);
   }
 
+  @Override
+  public OGComplexSparseMatrix getRows(int... indexes) { // getting rows in CSC form is generally bad
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _cols) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] dataTmp = new double[2 * _cols * nindex];
+    int[] rowIdxTmp = new int[2 * _cols * nindex];
+    int[] colPtrTmp = new int[_cols + 1];
+    int dataptr = 0;
+    int idxptr = 0;
+    for (int i = 0; i < _cols; i++) {
+      colPtrTmp[i] = idxptr;
+      for (int k = 0; k < nindex; k++) {
+        for (int j = _colPtr[i]; j < _colPtr[i + 1]; j++) { // loops through elements of correct column
+          if (_rowIdx[j] == indexes[k]) {
+            dataTmp[dataptr] = _values[j * 2];
+            dataTmp[dataptr + 1] = _values[j * 2 + 1];
+            dataptr += 2;
+            rowIdxTmp[idxptr] = k;
+            idxptr++;
+          }
+        }
+      }
+    }
+    colPtrTmp[_cols] = idxptr; // tie up end
+    return new OGComplexSparseMatrix(colPtrTmp, Arrays.copyOf(rowIdxTmp, idxptr), Arrays.copyOf(dataTmp, dataptr), nindex, _cols);
+  }
+
   public int getNumberOfNonZeroElements() {
     return _values.length / 2;
   }

@@ -48,4 +48,11 @@ public interface OGArrayInterface<T extends Number> {
    */
   OGArray<? extends Number> getRow(int index);
 
+  /**
+   * Gets specified rows of the matrix
+   * @param index the rows to get
+   * @return the rows
+   */
+  OGArray<? extends Number> getRows(int... index);
+
 }
