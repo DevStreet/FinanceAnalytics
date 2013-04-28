@@ -304,17 +304,17 @@ public class OGMatrixTest {
   public void testGetConsecutiveRowsOkIndexTest() {
     OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
     OGMatrix expected = new OGMatrix(new double[][] { {4., 5., 6. }, {7., 8., 9. } });
-    OGArray<? extends Number> col = D.getRows(new int[] {1, 2 });
-    assertTrue(col.equals(expected));
+    OGArray<? extends Number> row = D.getRows(new int[] {1, 2 });
+    assertTrue(row.equals(expected));
   }
 
   // test get Rows ok
   @Test
   public void testGetRandomRowsOkIndexTest() {
     OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
-    OGArray<? extends Number> col = D.getRows(new int[] {2, 0 });
+    OGArray<? extends Number> row = D.getRows(new int[] {2, 0 });
     OGMatrix expected = new OGMatrix(new double[][] { {7., 8., 9. }, {1., 2., 3. } });
-    assertTrue(col.equals(expected));
+    assertTrue(row.equals(expected));
   }
 
   // test get No elements

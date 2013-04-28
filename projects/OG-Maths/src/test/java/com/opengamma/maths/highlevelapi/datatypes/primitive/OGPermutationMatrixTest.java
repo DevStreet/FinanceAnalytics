@@ -135,8 +135,7 @@ public class OGPermutationMatrixTest {
     OGMatrix answer = new OGMatrix(tmp);
     assertTrue(col.equals(answer));
   }
-  
-  
+
   // test get cols null index
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testGetColumnsNullTest() {
@@ -163,11 +162,10 @@ public class OGPermutationMatrixTest {
   public void testGetColumnsOkIndexTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     OGArray<? extends Number> col = D.getColumns(2, 0);
-    OGMatrix getCol = new OGMatrix(new double[][] { {0., 0. }, {0., 0. }, {1., 0. }, {0., 0. }, {0., 1. }});
+    OGMatrix getCol = new OGMatrix(new double[][] { {0., 0. }, {0., 0. }, {1., 0. }, {0., 0. }, {0., 1. } });
     assertTrue(col.equals(getCol));
   }
 
-  
   // test get row neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowNegIndexTest() {
@@ -187,9 +185,40 @@ public class OGPermutationMatrixTest {
   public void testGetRowOkIndexTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     OGArray<? extends Number> row = D.getRow(1);
-    double[][] tmp = new double[][] { {0 , 1 , 0 , 0 , 0 } };
+    double[][] tmp = new double[][] {{0, 1, 0, 0, 0 } };
     OGMatrix answer = new OGMatrix(tmp);
     assertTrue(row.equals(answer));
+  }
+
+  // test get rows null index
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNullTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getRows(null);
+  }
+
+  // test get rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsNegIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getRows(-1);
+  }
+
+  // test get rows bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.getRows(23);
+  }
+
+  // test get rows ok
+  @Test
+  public void testGetRowsOkIndexTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    OGArray<? extends Number> col = D.getRows(2, 0);
+    System.out.println(col.toString());
+    OGMatrix getCol = new OGMatrix(new double[][] { {0., 0., 1., 0., 0. }, {0., 0., 0., 1., 0. }});
+    assertTrue(col.equals(getCol));
   }
 
   // test equals obj points to obj

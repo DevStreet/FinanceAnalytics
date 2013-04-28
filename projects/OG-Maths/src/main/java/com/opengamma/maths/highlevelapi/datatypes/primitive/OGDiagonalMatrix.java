@@ -141,6 +141,28 @@ public class OGDiagonalMatrix extends OGArray<Double> {
     return new OGMatrix(tmp, 1, _columns);
   }
 
+  @Override
+  public OGArray<? extends Number> getRows(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] tmp = new double[_columns * nindex];
+    int idx;
+    for (int i = 0; i < nindex; i++) {
+      idx = indexes[i];
+      if (idx < _data.length) {
+        tmp[idx * nindex + i] = _data[idx];
+      }
+    }
+    return new OGMatrix(tmp, nindex, _columns);
+  }
+
   public int getNumberOfRows() {
     return _rows;
   }

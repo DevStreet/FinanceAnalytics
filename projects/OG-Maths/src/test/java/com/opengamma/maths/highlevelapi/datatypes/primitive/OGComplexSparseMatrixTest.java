@@ -15,7 +15,6 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
-import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**

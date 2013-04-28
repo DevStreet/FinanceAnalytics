@@ -233,6 +233,36 @@ public class OGDiagonalMatrixTest {
     }
   }
 
+  // test get rows null index
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNullTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getRows(null);
+  }
+
+  // test get rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsNegIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getRows(-1);
+  }
+
+  // test get rows bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.getRows(23);
+  }
+
+  // test get rows ok
+  @Test
+  public void testGetRowsOkIndexTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> row = D.getRows(2, 0);
+    OGMatrix getRows = new OGMatrix(new double[][] { {0., 0., 3. }, {1., 0., 0. } });
+    assertTrue(row.equals(getRows));
+  }
+
   // test get data
   @Test
   public void testGetDataTest() {

@@ -86,7 +86,7 @@ public class OGComplexScalar extends OGArray<Number> {
     }
     double[] tmp = new double[2 * nindex];
     DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
-    return new OGComplexMatrix(tmp, nindex, 1);
+    return new OGComplexMatrix(tmp, 1, nindex);
   }
 
   @Override
@@ -113,7 +113,7 @@ public class OGComplexScalar extends OGArray<Number> {
     }
     double[] tmp = new double[2 * nindex];
     DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
-    return new OGComplexMatrix(tmp, 1, nindex);
+    return new OGComplexMatrix(tmp, nindex, 1);
   }
 
   @Override

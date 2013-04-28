@@ -338,6 +338,37 @@ public class OGSparseMatrix extends OGArray<Double> {
   }
 
   @Override
+  public OGSparseMatrix getRows(int... indexes) { // getting rows in CSC form is generally bad
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _cols) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] dataTmp = new double[_cols * nindex];
+    int[] rowIdxTmp = new int[_cols * nindex];
+    int[] colPtrTmp = new int[_cols + 1];
+    int idxptr = 0;
+    for (int i = 0; i < _cols; i++) {
+      colPtrTmp[i] = idxptr;
+      for (int k = 0; k < nindex; k++) {
+        for (int j = _colPtr[i]; j < _colPtr[i + 1]; j++) { // loops through elements of correct column
+          if (_rowIdx[j] == indexes[k]) {
+            dataTmp[idxptr] = _values[j];
+            rowIdxTmp[idxptr] = k;
+            idxptr++;
+          }
+        }
+      }
+    }
+    colPtrTmp[_cols] = idxptr; // tie up end
+    return new OGSparseMatrix(colPtrTmp, Arrays.copyOf(rowIdxTmp, idxptr), Arrays.copyOf(dataTmp, idxptr), nindex, _cols);
+  }
+
+  @Override
   public String toString() {
     return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _cols + "\nrows=" + _rows + "\nels=" + _els;
   }

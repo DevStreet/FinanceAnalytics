@@ -67,19 +67,18 @@ public class OGRealScalarTest {
     defaultVal.getEntry(0, 23);
     defaultVal.getEntry(0, -1);
   }
-  
+
   // test get col neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColNegIndexTest() {
     defaultVal.getColumn(-1);
-  }    
-    
-  
+  }
+
   // test get col bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColumnBadIndexTest() {
     defaultVal.getColumn(23);
-  }  
+  }
 
   // test get col ok
   @Test
@@ -87,8 +86,8 @@ public class OGRealScalarTest {
     OGRealScalar getCol = new OGRealScalar(1.4);
     OGArray<? extends Number> col = defaultVal.getColumn(0);
     assertTrue(col.equals(getCol));
-  } 
-  
+  }
+
   // test get cols null
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testGetColumnsNullTest() {
@@ -122,22 +121,21 @@ public class OGRealScalarTest {
   @Test
   public void testGetSingleColumnsOkRepeatSelectIndexTest() {
     OGArray<? extends Number> col = defaultVal.getColumns(0, 0, 0, 0);
-    OGMatrix expected = new OGMatrix(new double[] {1.4, 1.4, 1.4, 1.4 }, 4, 1);
+    OGMatrix expected = new OGMatrix(new double[] {1.4, 1.4, 1.4, 1.4 }, 1, 4);
     assertTrue(expected.equals(col));
-  }  
-  
+  }
+
   // test get row neg index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowNegIndexTest() {
     defaultVal.getRow(-1);
-  }    
-    
-  
+  }
+
   // test get row bad index
-  @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowBadIndexTest() {
     defaultVal.getRow(23);
-  }  
+  }
 
   // test get row ok
   @Test
@@ -145,7 +143,44 @@ public class OGRealScalarTest {
     OGRealScalar getRow = new OGRealScalar(1.4);
     OGArray<? extends Number> row = defaultVal.getRow(0);
     assertTrue(row.equals(getRow));
-  } 
+  }
+
+  // test get rows null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNullTest() {
+    OGRealScalar getCol = new OGRealScalar(1.4);
+    getCol.getRows(null);
+  }
+
+  // test get rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsNegIndexTest() {
+    OGRealScalar getCol = new OGRealScalar(1.4);
+    getCol.getRows(new int[] {-1 });
+  }
+
+  // test get rows bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexTest() {
+    OGRealScalar getCol = new OGRealScalar(1.4);
+    getCol.getRows(23);
+  }
+
+  // test get rows ok
+  @Test
+  public void testGetSingleRowsOkIndexTest() {
+    OGRealScalar getCol = new OGRealScalar(1.4);
+    OGArray<? extends Number> col = defaultVal.getRows(0);
+    assertTrue(col.equals(getCol));
+  }
+
+  // test get rows ok
+  @Test
+  public void testGetSingleRowsOkRepeatSelectIndexTest() {
+    OGArray<? extends Number> col = defaultVal.getRows(0, 0, 0, 0);
+    OGMatrix expected = new OGMatrix(new double[] {1.4, 1.4, 1.4, 1.4 }, 4, 1);
+    assertTrue(expected.equals(col));
+  }
 
   // test get entry ok
   @Test

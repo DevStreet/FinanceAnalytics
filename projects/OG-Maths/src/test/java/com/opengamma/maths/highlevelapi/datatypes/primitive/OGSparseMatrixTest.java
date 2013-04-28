@@ -245,6 +245,45 @@ public class OGSparseMatrixTest {
     assertTrue(row.fuzzyequals(expected, 10 * D1MACH.four()));
   }
 
+  // test get rows
+  @Test
+  public void testGetConsecutiveRows() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    double[][] rp = new double[][] { {3., 0., 4., 0. }, {0., 5., 6., 0. } };
+    OGSparseMatrix tmp = new OGSparseMatrix(rp);
+    assertTrue(tmp.equals(D.getRows(1, 2)));
+  }
+
+  // test get rows
+  @Test
+  public void testGetRandomRows() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    double[][] rp = new double[][] { {0., 5., 6., 0. }, {1., 2., 0., 0. }};
+    OGSparseMatrix tmp = new OGSparseMatrix(rp);
+    assertTrue(tmp.equals(D.getRows(2, 0)));
+  }
+
+  // test get rows null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNull() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getRows(null);
+  }
+
+  // test get rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexLow() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getRows(-1);
+  }
+
+  // test get rows index overflow
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexHigh() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.getRows(12);
+  }
+
   // test get full col neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullColNegIndexTest() {

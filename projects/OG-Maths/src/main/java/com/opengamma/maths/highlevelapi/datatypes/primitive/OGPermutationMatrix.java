@@ -150,6 +150,31 @@ public class OGPermutationMatrix extends OGArray<Integer> {
   }
 
   @Override
+  public OGArray<? extends Number> getRows(int... indexes) {
+    Catchers.catchNullFromArgList(indexes, 1);
+    final int nindex = indexes.length;
+    int index;
+    for (int i = 0; i < nindex; i++) {
+      index = indexes[i];
+      if (index < 0 || index >= _rows) {
+        throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
+      }
+    }
+    double[] tmp = new double[nindex * _columns];
+    int idx;
+    for (int i = 0; i < nindex; i++) {
+      idx = indexes[i];
+      for (int k = 0; k < _rows; k++) {
+        if (_data[k] == idx) {
+          tmp[idx + idx * nindex] = 1;
+          break;
+        }
+      }
+    }
+    return new OGMatrix(tmp, nindex, _columns);
+  }
+
+  @Override
   public String toString() {
     String str = "OGPermutationArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";

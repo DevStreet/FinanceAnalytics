@@ -122,7 +122,7 @@ public class OGComplexScalarTest {
   @Test
   public void testGetSingleColumnsOkRepeatSelectIndexTest() {
     OGArray<? extends Number> col = defaultVal.getColumns(0, 0, 0, 0);
-    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 4, 1);
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 1, 4);
     assertTrue(expected.equals(col));
   }
   
@@ -159,7 +159,7 @@ public class OGComplexScalarTest {
   @Test
   public void testGetSingleRowsOkRepeatSelectIndexTest() {
     OGArray<? extends Number> row = defaultVal.getRows(0, 0, 0, 0);
-    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 },  1, 4);
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 },  4, 1);
     assertTrue(expected.equals(row));
   }
 

@@ -254,6 +254,46 @@ public class OGIndexMatrixTest {
     OGIndexMatrix row = D.getRow(2);
     assertTrue(row.equals(getRow));
   }    
+  
+  // test get Rows null
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetRowsNullTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getRows(null);
+  }
+
+  // test get Rows neg index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsNegIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getRows(new int[] {-1 });
+  }
+
+  // test get Rows bad index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetRowsBadIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.getRows(23);
+  }
+
+  // test get Rows ok
+  @Test
+  public void testGetConsecutiveRowsOkIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    OGIndexMatrix expected = new OGIndexMatrix(new int[][] { {4, 5, 6 }, {7, 8, 9 } });
+    OGArray<? extends Number> row = D.getRows(new int[] {1, 2 });
+    assertTrue(row.equals(expected));
+  }
+
+  // test get Rows ok
+  @Test
+  public void testGetRandomRowsOkIndexTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    OGArray<? extends Number> row = D.getRows(new int[] {2, 0 });
+    OGIndexMatrix expected = new OGIndexMatrix(new int[][] { {7, 8, 9 }, {1, 2, 3 } });
+    assertTrue(row.equals(expected));
+  }
+
 
   // test get full col neg index
   @Test(expectedExceptions=MathsExceptionIllegalArgument.class)
