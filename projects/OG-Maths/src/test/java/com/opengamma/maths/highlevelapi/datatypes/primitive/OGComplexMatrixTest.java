@@ -487,6 +487,66 @@ public class OGComplexMatrixTest {
     assertTrue(row.equals(expected));
   }
 
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.get(null, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.get(new int[] {1, 2, 3 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.get(new int[] {-1 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.get(new int[] {1, 2, 3 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.get(new int[] {23 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.get(new int[] {1, 2, 3 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetSeqRowsSeqColsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {5, 50, 8, 80, 11, 110, 6, 60, 9, 90, 12, 120 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetSeqRowsRandomColsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {2, 0 });
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {6, 60, 9, 90, 12, 120, 4, 40, 7, 70, 10, 100 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetRandomRowsRandomColsTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {0, 3, 2 }, new int[] {2, 0 });
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {3,30,12,120,9,90,1,10,10,100,7,70}, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
   // test get No elements
   @Test
   public void testGetNoElementsTest() {

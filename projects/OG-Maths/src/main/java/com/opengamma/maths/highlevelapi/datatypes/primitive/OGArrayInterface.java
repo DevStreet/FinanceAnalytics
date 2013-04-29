@@ -55,4 +55,13 @@ public interface OGArrayInterface<T extends Number> {
    */
   OGArray<? extends Number> getRows(int... index);
 
+ 
+  /**
+   * Gets a matrix formed from the intersection of data "rows" and "columns"
+   * @param rows the rows to get
+   * @param columns the columns to get
+   * @return the intersection matrix
+   */
+  OGArray<? extends Number> get(int[] rows, int[] columns);
+  
 }
