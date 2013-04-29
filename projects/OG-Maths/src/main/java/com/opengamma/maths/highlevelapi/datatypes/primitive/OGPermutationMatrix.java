@@ -164,12 +164,7 @@ public class OGPermutationMatrix extends OGArray<Integer> {
     int idx;
     for (int i = 0; i < nindex; i++) {
       idx = indexes[i];
-      for (int k = 0; k < _rows; k++) {
-        if (_data[k] == idx) {
-          tmp[idx + idx * nindex] = 1;
-          break;
-        }
-      }
+      tmp[i + _data[idx] * nindex] = 1;
     }
     return new OGMatrix(tmp, nindex, _columns);
   }
