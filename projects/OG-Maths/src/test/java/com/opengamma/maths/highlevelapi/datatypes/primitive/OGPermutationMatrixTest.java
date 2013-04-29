@@ -216,7 +216,6 @@ public class OGPermutationMatrixTest {
   public void testGetRowsOkIndexTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     OGArray<? extends Number> col = D.getRows(2, 0);
-    System.out.println(col.toString());
     OGMatrix getCol = new OGMatrix(new double[][] { {0., 0., 1., 0., 0. }, {0., 0., 0., 1., 0. }});
     assertTrue(col.equals(getCol));
   }
