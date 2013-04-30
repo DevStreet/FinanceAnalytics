@@ -258,7 +258,7 @@ public class OGSparseMatrixTest {
   @Test
   public void testGetRandomRows() {
     OGSparseMatrix D = new OGSparseMatrix(data);
-    double[][] rp = new double[][] { {0., 5., 6., 0. }, {1., 2., 0., 0. }};
+    double[][] rp = new double[][] { {0., 5., 6., 0. }, {1., 2., 0., 0. } };
     OGSparseMatrix tmp = new OGSparseMatrix(rp);
     assertTrue(tmp.equals(D.getRows(2, 0)));
   }
@@ -372,6 +372,50 @@ public class OGSparseMatrixTest {
   public void testGetColumnsBadIndexHigh() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     D.getColumns(12);
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.get(null, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.get(new int[] {1, 2, 3 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.get(new int[] {-1 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.get(new int[] {1, 2, 3 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.get(new int[] {23 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.get(new int[] {1, 2, 3 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetRandomSelection() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    OGArray<? extends Number> answer = D.get(new int[] {3, 1, 2 }, new int[] {2, 0 });
+    OGSparseMatrix expected = new OGSparseMatrix(new double[][] { {7, 0 }, {4, 3 }, {6, 0 } });
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
   }
 
   // test get No elements

@@ -511,6 +511,7 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
     return new OGComplexSparseMatrix(colPtrTmp, Arrays.copyOf(rowIdxTmp, idxptr), Arrays.copyOf(dataTmp, dataptr), nindex, _cols);
   }
 
+  @Override
   public OGArray<? extends Number> get(int[] rows, int[] columns) {
     Catchers.catchNullFromArgList(rows, 1);
     Catchers.catchNullFromArgList(columns, 1);

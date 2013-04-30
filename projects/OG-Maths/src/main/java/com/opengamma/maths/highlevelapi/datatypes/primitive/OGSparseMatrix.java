@@ -369,6 +369,49 @@ public class OGSparseMatrix extends OGArray<Double> {
   }
 
   @Override
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index < 0 || index >= _rows) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+    }
+
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index < 0 || index >= _cols) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+    }
+
+    double[] dataTmp = new double[ncols * nrows];
+    int[] colPtrTmp = new int[ncols + 1];
+    int[] rowIdxTmp = new int[ncols * nrows];
+    int idxi, idxj, idxptr = 0;
+    for (int i = 0; i < ncols; i++) {
+      colPtrTmp[i] = idxptr;
+      idxi = columns[i];
+      for (int j = 0; j < nrows; j++) {
+        idxj = rows[j];
+        for (int k = _colPtr[idxi]; k < _colPtr[idxi + 1]; k++) {
+          if (_rowIdx[k] == idxj) {
+            dataTmp[idxptr] = _values[k];
+            rowIdxTmp[idxptr] = j;
+            idxptr++;
+          }
+        }
+      }
+    }
+    colPtrTmp[ncols] = idxptr; // tie up end
+    return new OGSparseMatrix(colPtrTmp, Arrays.copyOf(rowIdxTmp, idxptr), Arrays.copyOf(dataTmp, idxptr), nrows, ncols);
+  }
+
+  @Override
   public String toString() {
     return "\nvalues=" + Arrays.toString(_values) + "\nrowInd=" + Arrays.toString(_rowIdx) + "\ncolPtr=" + Arrays.toString(_colPtr) + "\ncols=" + _cols + "\nrows=" + _rows + "\nels=" + _els;
   }
