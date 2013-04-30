@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
  * Tests the real scalar class
@@ -180,6 +181,66 @@ public class OGRealScalarTest {
     OGArray<? extends Number> col = defaultVal.getRows(0, 0, 0, 0);
     OGMatrix expected = new OGMatrix(new double[] {1.4, 1.4, 1.4, 1.4 }, 4, 1);
     assertTrue(expected.equals(col));
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    D.get(null, new int[] {0 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    D.get(new int[] {0 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    D.get(new int[] {-1 }, new int[] {0 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    D.get(new int[] {0 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    D.get(new int[] {23 }, new int[] {0 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    D.get(new int[] {0 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetSeqRowsSeqColsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    OGArray<? extends Number> answer = D.get(new int[] {0 }, new int[] {0 });
+    OGRealScalar expected = new OGRealScalar(1.4);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetRepeatedRowsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    OGArray<? extends Number> answer = D.get(new int[] {0, 0, 0, 0 }, new int[] {0 });
+    OGMatrix expected = new OGMatrix(new double[] {1.4, 1.4, 1.4, 1.4 }, 4, 1);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetRepeatedColsTest() {
+    OGRealScalar D = new OGRealScalar(1.4);
+    OGArray<? extends Number> answer = D.get(new int[] {0 }, new int[] {0, 0, 0, 0 });
+    OGMatrix expected = new OGMatrix(new double[] {1.4, 1.4, 1.4, 1.4 }, 1, 4);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
   }
 
   // test get entry ok

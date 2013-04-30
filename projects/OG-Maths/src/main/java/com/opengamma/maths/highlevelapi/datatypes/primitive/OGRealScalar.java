@@ -116,6 +116,35 @@ public class OGRealScalar extends OGArray<Number> {
   }
 
   @Override
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index != 0) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+    }
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index != 0) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+    }
+
+    double[] tmp = new double[nrows * ncols];
+    Arrays.fill(tmp, _data[0]);
+    if (nrows > 1 || ncols > 1) {
+      return new OGMatrix(tmp, nrows, ncols);
+    } else {
+      return new OGRealScalar(tmp[0]);
+    }
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
