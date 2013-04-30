@@ -317,6 +317,66 @@ public class OGMatrixTest {
     assertTrue(row.equals(expected));
   }
 
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.get(null, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.get(new int[] {1, 2, 3 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.get(new int[] {-1 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.get(new int[] {1, 2, 3 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.get(new int[] {23 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.get(new int[] {1, 2, 3 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetSeqRowsSeqColsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
+    OGMatrix expected = new OGMatrix(new double[] {5, 8, 11, 6, 9, 12 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetSeqRowsRandomColsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {2, 0 });
+    OGMatrix expected = new OGMatrix(new double[] {6, 9, 12, 4, 7, 10 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetRandomRowsRandomColsTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {0, 3, 2 }, new int[] {2, 0 });
+    OGMatrix expected = new OGMatrix(new double[] {3, 12, 9, 1, 10, 7 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
   // test get No elements
   @Test
   public void testGetNoElementsTest() {
