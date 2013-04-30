@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGComplexSparseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
@@ -634,6 +635,50 @@ public class OGComplexSparseMatrixTest {
   public void testGetRowsBadIndexHigh() {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
     D.getRows(12);
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.get(null, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.get(new int[] {1, 2, 3 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.get(new int[] {-1 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.get(new int[] {1, 2, 3 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.get(new int[] {23 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.get(new int[] {1, 2, 3 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetRandomSelection() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    OGArray<? extends Number> answer = D.get(new int[] {3, 1, 2 }, new int[] {2, 0 });
+    OGComplexSparseMatrix expected = new OGComplexSparseMatrix(new double[][] { {15, 0 }, {7, 5 }, {11, 0 } }, new double[][] { {0, 0 }, {70, 0 }, {0, 90 } });
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
   }
 
   // test get nnz
