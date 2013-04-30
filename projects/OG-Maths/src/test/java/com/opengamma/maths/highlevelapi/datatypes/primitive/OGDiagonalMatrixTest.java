@@ -221,6 +221,68 @@ public class OGDiagonalMatrixTest {
     OGMatrix getRow = new OGMatrix(new double[] {0, 2, 0 }, 1, 3);
     assertTrue(row.equals(getRow));
   }
+  
+  
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.get(null, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.get(new int[] {1, 2, 3 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.get(new int[] {-1 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.get(new int[] {1, 2, 3 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.get(new int[] {23 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.get(new int[] {1, 2, 3 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetSeqRowsSeqColsInRangeTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
+    OGDiagonalMatrix expected = new OGDiagonalMatrix(new double[] {2, 3 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetSeqRowsSeqColsOutOfRangeTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {3 }, new int[] {1, 2 });
+    OGMatrix expected = new OGMatrix(new double[] {0, 0 }, 1, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetNonSeqTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGArray<? extends Number> answer = D.get(new int[] {2, 0, 3 }, new int[] {2, 0 });
+    OGMatrix expected = new OGMatrix(new double[] {3.0, 0.0, 0.0, 0.0, 1.0, 0.0}, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
 
   // test get entry ok
   @Test

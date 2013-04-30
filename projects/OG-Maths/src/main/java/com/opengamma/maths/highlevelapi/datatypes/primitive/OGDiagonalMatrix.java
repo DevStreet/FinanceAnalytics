@@ -163,6 +163,73 @@ public class OGDiagonalMatrix extends OGArray<Double> {
     return new OGMatrix(tmp, nindex, _columns);
   }
 
+  @Override
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    boolean seqRows = true, seqCols = true; //TODO: at some point we should probably check for decreasing sequences too
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index < 0 || index >= _rows) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (rows[i] != rows[i - 1] + 1) {
+          seqRows = false;
+        }
+      }
+    }
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (columns[i] != columns[i - 1] + 1) {
+          seqCols = false;
+        }
+      }
+    }
+
+    OGArray<? extends Number> retarr = null;
+    double[] tmp;
+    int dataExtent = _data.length;
+    if (seqCols && seqRows) { // its a smaller diagonal matrix, possibly!
+      // how much does the current data stick out in comparison to the requested area
+      int minRow = rows[0];
+      int maxRow = rows[rows.length - 1];
+      int minCol = columns[0];
+      int maxCol = columns[columns.length - 1];
+      int requestedStart = Math.max(minRow, minCol);
+      int requestedEnd = Math.max(maxRow, maxCol);
+      if (requestedStart >= dataExtent) { // asking for data outside of range of nonzero diag, return
+        retarr = new OGMatrix(new double[nrows * ncols], nrows, ncols);
+      } else { // (requestedEnd  <= dataExtent) { // entire request is in data range
+        tmp = Arrays.copyOfRange(_data, requestedStart, requestedEnd);
+        retarr = new OGDiagonalMatrix(tmp, nrows, ncols);
+      }
+    } else {
+      tmp = new double[ncols * nrows];
+      int idxi, idxj;
+      for (int i = 0; i < ncols; i++) {
+        idxi = columns[i];
+        for (int j = 0; j < nrows; j++) {
+          idxj = rows[j];
+          if (idxi == idxj) {
+            if (idxi < dataExtent) {
+              tmp[i * nrows + j] = _data[idxi];
+            }
+          }
+        }
+      }
+      retarr = new OGMatrix(tmp, nrows, ncols);
+    }
+    return retarr;
+  }
+
   public int getNumberOfRows() {
     return _rows;
   }

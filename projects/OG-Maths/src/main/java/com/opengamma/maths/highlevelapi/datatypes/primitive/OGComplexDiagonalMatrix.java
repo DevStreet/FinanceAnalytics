@@ -269,6 +269,7 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     return new OGComplexMatrix(tmp, nindex, _columns);
   }
 
+  @Override
   public OGArray<? extends Number> get(int[] rows, int[] columns) {
     Catchers.catchNullFromArgList(rows, 1);
     Catchers.catchNullFromArgList(columns, 1);
