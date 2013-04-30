@@ -269,6 +269,79 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     return new OGComplexMatrix(tmp, nindex, _columns);
   }
 
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    boolean seqRows = true, seqCols = true; //TODO: at some point we should probably check for decreasing sequences too
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index < 0 || index >= _rows) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (rows[i] != rows[i - 1] + 1) {
+          seqRows = false;
+        }
+      }
+    }
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (columns[i] != columns[i - 1] + 1) {
+          seqCols = false;
+        }
+      }
+    }
+
+    OGArray<? extends Number> retarr = null;
+    double[] tmp;
+    int dataExtent = _data.length;
+    if (seqCols && seqRows) { // its a smaller diagonal matrix, possibly!
+      // how much does the current data stick out in comparison to the requested area
+      int minRow = rows[0];
+      int maxRow = rows[rows.length - 1];
+      int minCol = columns[0];
+      int maxCol = columns[columns.length - 1];
+      int requestedStart = Math.max(minRow, minCol);
+      int requestedEnd = Math.max(maxRow, maxCol);
+      if (requestedStart * 2 >= dataExtent) { // asking for data outside of range of nonzero diag, return
+        retarr = new OGMatrix(new double[nrows * ncols], nrows, ncols);
+      } else { // (requestedEnd * 2 <= dataExtent) { // entire request is in data range
+        tmp = Arrays.copyOfRange(_data, 2 * requestedStart, 2 * requestedEnd);
+        double[] realtmp = new double[tmp.length / 2];
+        double[] imagtmp = new double[tmp.length / 2];
+        for (int i = 0; i < realtmp.length; i++) {
+          realtmp[i] = tmp[i * 2];
+          imagtmp[i] = tmp[i * 2 + 1];
+        }
+        retarr = new OGComplexDiagonalMatrix(realtmp, imagtmp, nrows, ncols);
+      }
+    } else { // we are essentially picking bits at random *yay* TODO: this could be considerable more efficient
+      tmp = new double[ncols * nrows * 2];
+      int idxi, idxj;
+      for (int i = 0; i < ncols; i++) {
+        idxi = columns[i];
+        for (int j = 0; j < nrows; j++) {
+          idxj = rows[j];
+          if (idxi == idxj) {
+            if (idxi < dataExtent) {
+              tmp[(i * nrows + j) * 2] = _data[idxi * 2];
+              tmp[(i * nrows + j) * 2 + 1] = _data[idxi * 2 + 1];
+            }
+          }
+        }
+      }
+      retarr = new OGComplexMatrix(tmp, nrows, ncols);
+    }
+    return retarr;
+  }
+
   /**
    * Returns the backing data
    * @return the backing data
@@ -330,13 +403,15 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
 
   @Override
   public String toString() {
-    String str = "OGDiagonalArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
+    String str = "OGComplexDiagonalArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";
-    String zeroStr = String.format("%24.18f ", 0.d);
-    for (int i = 0; i < _rows; i++) {
-      for (int j = 0; j < _columns; j++) {
+    String zeroStr = String.format("%24.18f + %24.18fi ", 0.d, 0.d);
+    double imag;
+    for (int i = 0; i < 2 * _rows; i += 2) {
+      for (int j = 0; j < 2 * _columns; j += 2) {
         if (i == j && i < _data.length && j < _data.length) {
-          str += String.format("%24.18f ", _data[i]);
+          imag = _data[i + 1];
+          str += String.format("%24.18f " + (imag >= 0 ? "+" : "-") + "%24.18fi, ", _data[i], Math.abs(imag));
         } else {
           str += zeroStr;
         }
