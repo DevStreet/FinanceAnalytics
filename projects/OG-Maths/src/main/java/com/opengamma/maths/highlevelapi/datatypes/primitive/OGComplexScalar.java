@@ -117,6 +117,35 @@ public class OGComplexScalar extends OGArray<Number> {
   }
 
   @Override
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index != 0) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+    }
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index != 0) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+    }
+
+    double[] tmp = new double[nrows * ncols * 2];
+    DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
+    if (nrows > 1 || ncols > 1) {
+      return new OGComplexMatrix(tmp, nrows, ncols);
+    } else {
+      return new OGComplexScalar(tmp[0], tmp[1]);
+    }
+  }
+
+  @Override
   public ComplexType getEntry(int... indices) {
     if (indices.length > 2) {
       throw new MathsExceptionIllegalArgument("OGComplexScalar only has 2 indicies, more than 2 were given");

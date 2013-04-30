@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
  * Tests the real scalar class
@@ -125,7 +126,7 @@ public class OGComplexScalarTest {
     OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 1, 4);
     assertTrue(expected.equals(col));
   }
-  
+
   // test get rows null
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testGetRowsNullTest() {
@@ -159,7 +160,7 @@ public class OGComplexScalarTest {
   @Test
   public void testGetSingleRowsOkRepeatSelectIndexTest() {
     OGArray<? extends Number> row = defaultVal.getRows(0, 0, 0, 0);
-    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 },  4, 1);
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 4, 1);
     assertTrue(expected.equals(row));
   }
 
@@ -181,6 +182,66 @@ public class OGComplexScalarTest {
     OGComplexScalar getRow = new OGComplexScalar(1.2, 3.4);
     OGArray<? extends Number> row = defaultVal.getRow(0);
     assertTrue(row.equals(getRow));
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.get(null, new int[] {0 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.get(new int[] {0 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.get(new int[] {-1 }, new int[] {0 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.get(new int[] {0 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.get(new int[] {23 }, new int[] {0 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.get(new int[] {0 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetSeqRowsSeqColsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    OGArray<? extends Number> answer = D.get(new int[] {0 }, new int[] {0 });
+    OGComplexScalar expected = new OGComplexScalar(1.2, 3.4);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetRepeatedRowsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    OGArray<? extends Number> answer = D.get(new int[] {0, 0, 0, 0 }, new int[] {0 });
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 4, 1);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+
+  @Test
+  public void testGetRepeatedColsTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    OGArray<? extends Number> answer = D.get(new int[] {0 }, new int[] {0, 0, 0, 0 });
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 1, 4);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
   }
 
   // test get entry ok
