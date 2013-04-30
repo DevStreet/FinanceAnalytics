@@ -211,6 +211,64 @@ public class OGIndexMatrix extends OGArray<Integer> {
     return new OGIndexMatrix(tmp, _rows, nindex);
   }
 
+  @Override
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    boolean seqRows = true, seqCols = true; //TODO: at some point we should probably check for decreasing sequences too
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index < 0 || index >= _rows) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (rows[i] != rows[i - 1] + 1) {
+          seqRows = false;
+        }
+      }
+    }
+
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+      if (i > 0) {
+        if (columns[i] != columns[i - 1] + 1) {
+          seqCols = false;
+        }
+      }
+    }
+
+    int[] tmp = new int[nrows * ncols];
+    int idxi, idxj;
+    if (seqCols && seqRows) { // sequential rows, with seq cols: straight memcpy loop
+      int offset = columns[0] * _rows + rows[0];
+      for (int i = 0; i < ncols; i++) {
+        System.arraycopy(_data, offset + i * _rows, tmp, i * nrows, nrows);
+      }
+    } else {
+      if (seqRows) {
+        for (int i = 0; i < ncols; i++) { // seq rows, random columns, memcpy loop with dereference to column
+          idxi = columns[i];
+          System.arraycopy(_data, (idxi * _rows + rows[0]), tmp, i * nrows, nrows);
+        }
+      } else { // essentially a random intersection
+        for (int i = 0; i < ncols; i++) {
+          for (int j = 0; j < nrows; j++) {
+            idxi = columns[i];
+            idxj = rows[j];
+            tmp[i * nrows + j] = _data[idxi * _rows + idxj];
+          }
+        }
+      }
+    }
+    return new OGIndexMatrix(tmp, nrows, ncols);
+  }
+
   /**
    * Gets the number of rows
    * @return _rows the number of rows
