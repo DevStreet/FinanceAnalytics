@@ -12,6 +12,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
 
 /**
  * Tests the OGPermutation Array class
@@ -216,10 +217,54 @@ public class OGPermutationMatrixTest {
   public void testGetRowsOkIndexTest() {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     OGArray<? extends Number> col = D.getRows(2, 0);
-    OGMatrix getCol = new OGMatrix(new double[][] { {0., 0., 1., 0., 0. }, {0., 0., 0., 1., 0. }});
+    OGMatrix getCol = new OGMatrix(new double[][] { {0., 0., 1., 0., 0. }, {0., 0., 0., 1., 0. } });
     assertTrue(col.equals(getCol));
   }
 
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullRowsTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.get(null, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testGetNullColsTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.get(new int[] {1, 2, 3 }, null);
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegRowsTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.get(new int[] {-1 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetNegColsTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.get(new int[] {1, 2, 3 }, new int[] {-1 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBRowsTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.get(new int[] {23 }, new int[] {1, 2 });
+  }
+
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testGetOOBColsTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.get(new int[] {1, 2, 3 }, new int[] {23 });
+  }
+
+  @Test
+  public void testGetRandomSelectionTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
+    OGMatrix expected = new OGMatrix(new double[] {1,0,0,0,1,0 }, 3, 2);
+    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+  }
+  
   // test equals obj points to obj
   @Test
   public void testEqualsObjeqObj() {

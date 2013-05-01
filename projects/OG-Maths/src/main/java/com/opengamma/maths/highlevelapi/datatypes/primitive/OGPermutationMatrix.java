@@ -170,6 +170,37 @@ public class OGPermutationMatrix extends OGArray<Integer> {
   }
 
   @Override
+  public OGArray<? extends Number> get(int[] rows, int[] columns) {
+    Catchers.catchNullFromArgList(rows, 1);
+    Catchers.catchNullFromArgList(columns, 1);
+    final int nrows = rows.length;
+    final int ncols = columns.length;
+    int index;
+    for (int i = 0; i < nrows; i++) {
+      index = rows[i];
+      if (index < 0 || index >= _rows) {
+        throw new MathsExceptionIllegalArgument("Invalid row index. Value given was " + index);
+      }
+    }
+    for (int i = 0; i < ncols; i++) {
+      index = columns[i];
+      if (index < 0 || index >= _columns) {
+        throw new MathsExceptionIllegalArgument("Invalid column index. Value given was " + index);
+      }
+    }
+    //TODO: at some point optimise this, need to get on with something else ATM
+    double[] tmp = new double[_rows * _columns];
+    for (int i = 0; i < _rows; i++) {
+      for (int j = 0; j < _columns; j++) {
+        if (j == _data[i]) {
+          tmp[i * _rows + j] = 1;
+        }
+      }
+    }
+    return new OGMatrix(tmp, _rows, _columns).get(rows, columns);
+  }
+
+  @Override
   public String toString() {
     String str = "OGPermutationArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";
