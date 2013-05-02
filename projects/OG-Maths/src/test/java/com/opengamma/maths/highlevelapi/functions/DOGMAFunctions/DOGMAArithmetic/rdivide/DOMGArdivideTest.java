@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.dogma.DogmaLanguage;
+import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
@@ -20,7 +20,6 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  * Tests the rdivide() function in DOGMA 
  */
 public class DOMGArdivideTest {
-  DogmaLanguage DA = DogmaLanguage.getInstance();
   double NaN= Double.NaN;
   
   // OGDoubles
@@ -69,79 +68,79 @@ public class DOMGArdivideTest {
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput1okinput2() {
     OGMatrix tmp = null;
-    DA.rdivide(tmp, new OGMatrix(1));
+    DOGMA.rdivide(tmp, new OGMatrix(1));
   }
 
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testNullinput2okinput1() {
     OGMatrix tmp = null;
-    DA.rdivide(new OGMatrix(1), tmp);
+    DOGMA.rdivide(new OGMatrix(1), tmp);
   }
 
   // Operations on classes
   // OGDoubleArray and OGDoubleArray
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public void testOGDandOGDNonConformantArgsTest() {
-    DA.rdivide(OGD5x2, OGD3x5A);
+    DOGMA.rdivide(OGD5x2, OGD3x5A);
   }
 
   @Test
   public void testDouble3x5ArdivDouble1x1Test() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, OGD1x1);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, OGD1x1);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble1x1rdivDouble3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD1x1, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD1x1, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGD3x5A));
   }
 
   @Test
   public void testDouble3x5ArdivDouble3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, OGD3x5A);
     assertTrue(tmp.equals(OGD3x5Ardiv3x5A));
   }
 
   @Test
   public void testDouble3x5ArdivDouble3x5BTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, OGD3x5B);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, OGD3x5B);
     assertTrue(tmp.equals(OGD3x5Ardiv3x5B));
   }
 
   // OGDoubleArray and OGSparseArray
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public void testOGDandOGSNonConformantArgsTest() {
-    DA.rdivide(OGD5x2, OGS3x5A);
+    DOGMA.rdivide(OGD5x2, OGS3x5A);
   }
 
   @Test
   public void testDouble3x5ArdivSparse1x1Test() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, OGS1x1);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, OGS1x1);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble1x1rdivSparse3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD1x1, OGS3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD1x1, OGS3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGS3x5A));
   }
 
   @Test
   public void testDouble3x5ArdivSparse3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, OGS3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, OGS3x5A);
     assertTrue(tmp.equals(OGD3x5ArdivOGS3x5A));
   }
 
   @Test
   public void testDoublerdivSparseIEEENaNdivisionTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(new OGMatrix(Double.NaN), OGS3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(new OGMatrix(Double.NaN), OGS3x5A);
     assertTrue(tmp.equals(OGDAllNaN));
   }
 
   @Test
   public void testDoublerdivSparseIEEEArraywiseNaNdivisionTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5AwNaN, OGS3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5AwNaN, OGS3x5A);
     assertTrue(tmp.equals(OGD3x5AwNaNrdivideOGS3x5A));
   }
   
@@ -149,48 +148,48 @@ public class DOMGArdivideTest {
   // OGSparseArray and OGDoubleArray
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public void testOGSandOGDNonConformantArgsTest() {
-    DA.rdivide(OGS3x5A, OGD5x2);
+    DOGMA.rdivide(OGS3x5A, OGD5x2);
   }
 
   @Test
   public void testSparse3x5ArdivDouble1x1Test() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS3x5A, OGD1x1);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS3x5A, OGD1x1);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testSparse1x1rdivDouble3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS1x1, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS1x1, OGD3x5A);
     assertTrue(tmp.equals(OGS1x1rdivOGD3x5));
   }
 
   @Test
   public void testSparse3x5ArdivDouble3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS3x5A, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS3x5A, OGD3x5A);
     assertTrue(tmp.equals(OGS3x5ArdivOGD3x5A));
   }
 
   // OGSparseArray and OGSparseArray
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public void testOGSandOGSNonConformantArgsTest() {
-    DA.rdivide(OGS3x5A, OGD5x2);
+    DOGMA.rdivide(OGS3x5A, OGD5x2);
   }
 
   @Test
   public void testSparse3x5ArdivSparse1x1Test() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS3x5A, OGD1x1);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS3x5A, OGD1x1);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testSparse1x1rdivSparse3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS1x1, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS1x1, OGD3x5A);
     assertTrue(tmp.equals(OGS1x1rdivOGD3x5));
   }
 
   @Test
   public void testSparse3x5ArdivSparse3x5BTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS3x5A, OGS3x5B);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS3x5A, OGS3x5B);
     assertTrue(tmp.equals(OGS3x5ArdivOGS3x5B));
   }
 
@@ -198,49 +197,49 @@ public class DOMGArdivideTest {
   // OGDoubleArray operate on natives
   @Test
   public void testDouble3x5ArdividedoubleTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, 10.e0);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, 10.e0);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble3x5ArdivideintTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGD3x5A, 10);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, 10);
     assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testdoublerdivideDouble3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(10.e0, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(10.e0, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGD3x5A));
   }
 
   @Test
   public void testintrdivideDouble3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(10, OGD3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(10, OGD3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGD3x5A));
   }
   // OGSparseArray operate on natives
   @Test
   public void testSparse3x5ArdividedoubleTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS3x5A, 10.e0);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS3x5A, 10.e0);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testSparse3x5ArdivideintTest() {
-    OGArray<? extends Number> tmp = DA.rdivide(OGS3x5A, 10);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(OGS3x5A, 10);
     assertTrue(tmp.equals(OGS3x5ArdivOGD1x1));
   }
 
   @Test
   public void testdoublerdivideSparse3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(10.e0, OGS3x5A); 
+    OGArray<? extends Number> tmp = DOGMA.rdivide(10.e0, OGS3x5A); 
     assertTrue(tmp.equals(OGD1x1rdivOGS3x5A));
   }
 
   @Test
   public void testintrdivideSparse3x5ATest() {
-    OGArray<? extends Number> tmp = DA.rdivide(10, OGS3x5A);
+    OGArray<? extends Number> tmp = DOGMA.rdivide(10, OGS3x5A);
     assertTrue(tmp.equals(OGD1x1rdivOGS3x5A));
   }  
   
