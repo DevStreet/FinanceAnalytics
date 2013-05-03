@@ -21,7 +21,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 // TODO: Check lower triangle permutation possibilities, at the minute, permutations are assumed to be upper, this means the shuffle is guaranteed inefficient
 @DOGMAMethodHook(provides = Mldivide.class)
-public class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatrix, OGMatrix> {
+public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatrix, OGMatrix> {
 
   private LAPACK _lapack = new LAPACK();
 
