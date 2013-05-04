@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.temporal.ChronoUnit;
 
-import com.opengamma.analytics.math.ParallelArrayBinarySort;
 import com.opengamma.analytics.math.curve.NodalObjectsCurve;
 import com.opengamma.engine.value.ValueSpecification;
+import com.opengamma.util.ParallelArrayBinarySort;
 import com.opengamma.util.time.Tenor;
 
 /**
@@ -28,14 +28,14 @@ import com.opengamma.util.time.Tenor;
     super(NodalObjectsCurve.class);
     addFormatter(new Formatter<NodalObjectsCurve>(Format.EXPANDED) {
       @Override
-      Object format(NodalObjectsCurve value, ValueSpecification valueSpec) {
+      Object format(NodalObjectsCurve value, ValueSpecification valueSpec, Object inlineKey) {
         return formatExpanded(value);
       }
     });
   }
 
   @Override
-  public List<Double[]> formatCell(NodalObjectsCurve value, ValueSpecification valueSpec) {
+  public List<Double[]> formatCell(NodalObjectsCurve value, ValueSpecification valueSpec, Object inlineKey) {
     if (value.size() != 0 && (value.getXData()[0] instanceof Tenor) && (value.getYData()[0] instanceof Double)) {
       final Tenor[] tenors = (Tenor[]) value.getXData();
       final Object[] ys = value.getYData();

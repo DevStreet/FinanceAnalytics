@@ -13,9 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -39,6 +36,7 @@ import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.id.UniqueId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.tuple.Pair;
+import com.opengamma.util.tuple.Triple;
 
 /**
  * The structure of the grid that displays portfolio data and analytics. Contains the column definitions and
@@ -46,15 +44,13 @@ import com.opengamma.util.tuple.Pair;
  */
 public class PortfolioGridStructure extends MainGridStructure {
 
-  private static final Logger s_logger = LoggerFactory.getLogger(PortfolioGridStructure.class);
-
   /** The root node of the portfolio structure. */
   private final AnalyticsNode _rootNode;
   /** For mapping cells to values in the results. */
   private final ValueMappings _valueMappings;
   /** Definition of the view driving the grid. */
   private final ViewDefinition _viewDef;
-  /** Number of exploded child columns for each column whose values can be exploded. */
+  /** Meta data for exploded child columns, keyed by the specification of the parent column. */
   private final Map<ColumnSpecification, SortedSet<ColumnMeta>> _inlineColumnMeta;
   /** Rows in the grid. */
   private final List<PortfolioGridRow> _rows;
@@ -137,7 +133,7 @@ public class PortfolioGridStructure extends MainGridStructure {
     Map<ColumnSpecification, SortedSet<ColumnMeta>> inlineColumnMeta = Maps.newHashMap();
     for (GridColumn column : getColumnStructure().getColumns()) {
       ColumnSpecification colSpec = column.getSpecification();
-      if (Inliner.isDisplayableInline(column.getType(), column.getSpecification())) {
+      if (Inliner.isDisplayableInline(column.getUnderlyingType(), column.getSpecification())) {
         // ordered set of the union of the column metadata for the whole set. need this to figure out how many unique
         // columns are required
         SortedSet<ColumnMeta> allColumnMeta = Sets.newTreeSet();
@@ -155,6 +151,7 @@ public class PortfolioGridStructure extends MainGridStructure {
         }
       }
     }
+    // TODO implement equals() and always return a new instance? conceptually a bit neater but less efficient
     if (!inlineColumnMeta.equals(_inlineColumnMeta)) {
       List<GridColumnGroup> analyticsColumns = buildAnalyticsColumns(_viewDef, getTargetLookup(), inlineColumnMeta);
       return new PortfolioGridStructure(_rows,
@@ -172,9 +169,6 @@ public class PortfolioGridStructure extends MainGridStructure {
 
   /* package */ static GridColumnGroup buildFixedColumns(List<PortfolioGridRow> rows) {
     GridColumn labelColumn = new GridColumn("Name", "", null, new PortfolioLabelRenderer(rows));
-    // TODO make the quantity column optional until it's replaced with a function
-    //GridColumn quantityColumn = new GridColumn("Quantity", "", BigDecimal.class, new QuantityRenderer(rows), null);
-    //return new GridColumnGroup("fixed", ImmutableList.of(labelColumn, quantityColumn), false);
     return new GridColumnGroup("fixed", ImmutableList.of(labelColumn), false);
   }
 
@@ -186,21 +180,28 @@ public class PortfolioGridStructure extends MainGridStructure {
    * @param viewDef The view definition
    * @return Columns for displaying calculated analytics data, one group per calculation configuration
    */
-  /* package */
-  static List<GridColumnGroup> buildAnalyticsColumns(ViewDefinition viewDef,
-                                                     TargetLookup targetLookup,
-                                                     Map<ColumnSpecification, SortedSet<ColumnMeta>> inlineColumnMeta) {
+  /* package */ static List<GridColumnGroup> buildAnalyticsColumns(ViewDefinition viewDef,
+                                                                   TargetLookup targetLookup,
+                                                                   Map<ColumnSpecification, SortedSet<ColumnMeta>> inlineColumnMeta) {
     List<GridColumnGroup> columnGroups = Lists.newArrayList();
-    Set<ColumnSpecification> columnSpecs = Sets.newHashSet();
+    Set<Triple<String, String, ValueProperties>> columnSpecs = Sets.newHashSet();
     for (ViewCalculationConfiguration calcConfig : viewDef.getAllCalculationConfigurations()) {
+      List<ColumnSpecification> allSpecs = Lists.newArrayList();
+      for (ViewCalculationConfiguration.Column column : calcConfig.getColumns()) {
+        allSpecs.add(new ColumnSpecification(calcConfig.getName(),
+                                             column.getValueName(),
+                                             column.getProperties(),
+                                             column.getHeader()));
+      }
+      for (Pair<String, ValueProperties> output : calcConfig.getAllPortfolioRequirements()) {
+        allSpecs.add(new ColumnSpecification(calcConfig.getName(), output.getFirst(), output.getSecond()));
+      }
       List<GridColumn> columns = Lists.newArrayList();
-      for (Pair<String, ValueProperties> portfolioOutput : calcConfig.getAllPortfolioRequirements()) {
-        String valueName = portfolioOutput.getFirst();
-        Class<?> columnType = ValueTypes.getTypeForValueName(valueName);
-        ValueProperties constraints = portfolioOutput.getSecond();
-        ColumnSpecification columnSpec = new ColumnSpecification(calcConfig.getName(), valueName, constraints);
-        // ensure columnSpec isn't a duplicate
-        if (columnSpecs.add(columnSpec)) {
+      for (ColumnSpecification columnSpec : allSpecs) {
+        Class<?> columnType = ValueTypes.getTypeForValueName(columnSpec.getValueName());
+        // ensure column isn't a duplicate. can't use a set of col specs because we need to treat columns as duplicates
+        // even if they have different headers
+        if (columnSpecs.add(Triple.of(columnSpec.getCalcConfigName(), columnSpec.getValueName(), columnSpec.getValueProperties()))) {
           SortedSet<ColumnMeta> meta = inlineColumnMeta.get(columnSpec);
           if (meta == null) { // column can't be inlined
             columns.add(GridColumn.forSpec(columnSpec, columnType, targetLookup));
@@ -209,11 +210,17 @@ public class PortfolioGridStructure extends MainGridStructure {
             for (ColumnMeta columnMeta : meta) {
               String header;
               if (inlineIndex++ == 0) {
-                header = columnSpec.getValueName() + " / " + columnMeta.getHeader();
+                header = columnSpec.getHeader() + " / " + columnMeta.getHeader();
               } else {
                 header = columnMeta.getHeader();
               }
-              columns.add(GridColumn.forSpec(header, columnSpec, columnMeta.getColumnType(), targetLookup, columnMeta.getKey(), inlineIndex));
+              columns.add(GridColumn.forSpec(header,
+                                             columnSpec,
+                                             columnMeta.getType(),
+                                             columnMeta.getUnderlyingType(),
+                                             targetLookup,
+                                             columnMeta.getKey(),
+                                             inlineIndex));
             }
           }
         }

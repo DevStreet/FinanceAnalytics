@@ -9,7 +9,7 @@ $.register_module({
         var common = og.api.common, api = og.api.rest;
         return { // all requests that begin with /marketdatasnapshots
             root: 'marketdatasnapshots',
-            get: api.default_get.partial([], null),
+            get: api.simple_get,
             put: common.not_available_put,
             del: common.not_available_del
         };

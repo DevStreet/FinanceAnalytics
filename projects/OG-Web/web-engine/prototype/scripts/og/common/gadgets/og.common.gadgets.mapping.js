@@ -75,14 +75,13 @@ $.register_module({
                 MATRIX_2D               : [0, 1, 6],
                 OTC_TRADE               : [5],
                 POSITION                : [5],
-                STRING                  : [8, 6],
+                STRING                  : [0, 8, 6],
                 SURFACE_DATA            : [2, 1, 0, 6],
                 UNPLOTTABLE_SURFACE_DATA: [1, 6, 0],
                 TENOR                   : [0, 6],
                 TIME_SERIES             : [4, 1, 7, 6, 0],
                 UNKNOWN                 : [0, 6],
-                VECTOR                  : [0, 1, 6],
-                HISTOGRAM               : [5, 1, 6, 0]
+                VECTOR                  : [0, 1, 6]
             }
         };
     }
