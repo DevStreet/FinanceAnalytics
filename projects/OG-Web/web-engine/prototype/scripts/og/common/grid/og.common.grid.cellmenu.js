@@ -120,6 +120,7 @@ $.register_module({
             new constructor(cellmenu.grid);
             og.analytics.resize({
                 selector: unique,
+                offset: {top: 1},
                 tmpl: '<div class="OG-analytics-resize og-resizer og-inplace-resizer" title="Drag to resize me" />',
                 mouseup_handler: function (right, bottom) {
                     var newWidth = Math.max(480,($(document).outerWidth() - right) - inner.offset().left),
@@ -140,7 +141,8 @@ $.register_module({
             if (cellmenu.menu && cellmenu.menu.length) {
                 cellmenu.menu
                     .appendTo($('body'))
-                    .css({top: current.top, left: current.right - width + cellmenu.grid.offset.left}).show();
+                    .css({top: current.top, left: current.right - width + cellmenu.grid.elements.parent.offset().left})
+                    .show();
             }
 
         };
