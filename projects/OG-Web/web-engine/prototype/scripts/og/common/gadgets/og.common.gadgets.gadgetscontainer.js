@@ -119,7 +119,7 @@ $.register_module({
                             if (!!$this.attr('style')) $this.find('.OG-gadget-tabs-label')
                                 .attr('title', $this.text().replace(/\s+/g , ' ').trim());
                         });
-                    }
+                    };
                     // implement drag
                     $tabs.each(function (i) {
                         $(this).draggable({
@@ -134,6 +134,7 @@ $.register_module({
                             source: pane
                         });
                     });
+                    container.focus();
                 };
                 if (id === null) $header.html(tabs_template({'tabs': [{'name': 'empty'}]})); // empty tabs
                 else {
@@ -201,8 +202,7 @@ $.register_module({
                 if (!data) return container; // no gadgets for this container
                 if (!selector) throw new TypeError('GadgetsContainer has not been initialized');
                 new_gadgets = data.map(function (obj, idx) {
-                    var id, gadget_class = 'OG-gadget-' + (id = counter++), gadget,
-                        options = JSON.parse(JSON.stringify(obj.options)), // make a copy
+                    var id, gadget_class = 'OG-gadget-' + (id = counter++), gadget, options = Object.clone(obj.options),
                         constructor = obj.gadget.split('.').reduce(function (acc, val) {return acc[val];}, window),
                         type = obj.gadget.replace(/^[a-z0-9.-_]+\.([a-z0-9.-_]+?)$/, '$1').toLowerCase();
                     $(panel_container).append('<div class="' + gadget_class + '" />').find('.' + gadget_class).css({
@@ -253,6 +253,23 @@ $.register_module({
                 if (show) (strong ? $html.addClass('strong') : $html.removeClass('strong')).show();
                 else clearTimeout(highlight_timer), highlight_timer = setTimeout(function () {$html.hide();}, 250);
             };
+            /**
+             * Add og-focus class to last clicked container tab and remove from all other gadget container instances
+             */
+            container.focus = function () {
+                var $box, $tab, cont, options, containers = og.analytics.containers, grid = og.analytics.grid;
+                // Highlight gadgetcontainer and tab
+                for (cont in containers) {
+                    $tab = $(selector_prefix + cont + ' .og-active');
+                    $box = $(selector_prefix + cont + ' .OG-gadget-container');
+                    if (cont === pane) $tab.addClass('og-focus'), $box.addClass('og-focus');
+                    else $tab.removeClass('og-focus'), $box.removeClass('og-focus');
+                };
+                // Highlight grid cell
+                options = Object
+                    .clone(container.gadgets().filter(function (val) {return !!val.active})[0].config.options);
+                containers.fire('cellhighlight', options.source, options.row, options.col);
+            };
             container.init = function (data) {
                 var toggle_dropbox = function () {
                         var $db = $('.og-drop').length, $dbs_span = $('.OG-dropbox span');
@@ -283,6 +300,7 @@ $.register_module({
                                 update_tabs(id || null);
                                 if (id) gadgets[index].gadget.resize();
                             }
+                            if (!$(this).hasClass('og-focus')) container.focus();
                         });
                     if (!data) update_tabs(null); else container.add(data);
                     // implement drop

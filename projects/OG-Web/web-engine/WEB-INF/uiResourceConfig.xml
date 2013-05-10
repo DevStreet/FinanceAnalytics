@@ -218,6 +218,7 @@
     <fragment>/scripts/lib/js.ext.array.prototype.pluck.js</fragment>
     <fragment>/scripts/lib/js.ext.string.prototype.lang.js</fragment>
     <fragment>/scripts/lib/js.ext.string.prototype.trim.js</fragment>
+    <fragment>/scripts/lib/js.ext.object.clone.js</fragment>
     <fragment>/scripts/lib/js.ext.object.create.js</fragment>
     <fragment>/scripts/lib/js.ext.object.equals.js</fragment>
     <fragment>/scripts/lib/js.ext.object.keys.js</fragment>
@@ -362,13 +363,15 @@
     <fragment>/scripts/og/common/search_results/og.common.search.filter.js</fragment>
     <fragment>/scripts/og/common/search_results/og.common.search_results.core.js</fragment>
     <fragment>/scripts/og/common/og.common.tooltip.js</fragment>
+    <fragment>/scripts/og/common/og.common.timeseries_menu.js</fragment>
+    <fragment>/scripts/og/common/og.common.timeseries_data.js</fragment>
+    <fragment>/scripts/og/common/og.common.timeseries.js</fragment>
   </bundle>
   <bundle id="gadgets.js">
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.manager.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.trades.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.positions.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.expanded_positions.js</fragment>
-    <fragment>/scripts/og/common/gadgets/og.common.gadgets.timeseries_plot.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.timeseries.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.histogram.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.histogram_plot.js</fragment>
@@ -418,10 +421,10 @@
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.swapsecurity.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.equityvarianceswapsecurity.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.swaptionsecurity.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.fxbarrierdivsecurity.js</fragment>
+    <fragment>/scripts/og/blotter/forms/og.blotter.forms.fxbarrieroptionsecurity.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.fxforwardsecurity.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.fxdivsecurity.js</fragment>
-    <fragment>/scripts/og/blotter/forms/og.blotter.forms.nondeliverablefxdivsecurity.js</fragment>
+    <fragment>/scripts/og/blotter/forms/og.blotter.forms.fxoptionsecurity.js</fragment>
+    <fragment>/scripts/og/blotter/forms/og.blotter.forms.nondeliverablefxoptionsecurity.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.capfloorsecurity.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.capfloorcmsspreadsecurity.js</fragment>
     <fragment>/scripts/og/blotter/forms/og.blotter.forms.frasecurity.js</fragment>
