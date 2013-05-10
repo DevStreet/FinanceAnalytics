@@ -12,12 +12,12 @@ $.register_module({
             expand_class = 'og-expanded',
             panels = ['south', 'dock-north', 'dock-center', 'dock-south'],
             width,
-            mapping = og.common.gadgets.mapping;
+            mapping = og.common.gadgets.mapping, scroll_size = og.common.util.scrollbar_size;
         var hide_menu = function (grid, cell) {
             var depgraph = grid.source.depgraph, primitives = grid.source.type === 'primitives',
                 portfolio = !depgraph && !primitives, blotter = !!grid.source.blotter;
             if (!!cell.value.logLevel) return false;                                    // always show if log exists
-            if (cell.right > grid.elements.parent.width()) return true;                 // end of the cell not visible
+            if (cell.right > grid.elements.parent.width() - scroll_size) return true;   // end of the cell not visible
             if (blotter && cell.col) return true;                                       // all blotter cols except 1st
             if (cell.type === 'NODE') return true;                                      // is node
             if (!portfolio && cell.col === 0) return true;                              // 1st column of non-portfolio
@@ -103,7 +103,7 @@ $.register_module({
            og.common.gadgets.manager.clean();
         };
         constructor.prototype.create_inplace = function (unique) {
-            var cellmenu = this, panel = 'inplace', options, cell = cellmenu.current,
+            var cellmenu = this, panel = 'inplace', options, cell = cellmenu.current, inner_height, inner_width,
                 offset = cellmenu.inplace.$dom.cntr.offset(), inner = cellmenu.inplace.$dom.menu;
             cellmenu.destroy_frozen();
             cellmenu.frozen = true;
@@ -111,12 +111,14 @@ $.register_module({
             options = mapping.options(cell, cellmenu.grid, panel);
             cellmenu.container.add([options]);
             cellmenu.container.on('launch', og.analytics.url.launch);
-            inner.height(window.innerHeight/2.5);
-            inner.width(window.innerWidth/2.5)
-            if ((offset.top + inner.height()) > $(window).height())
-                inner.css({marginTop: -inner.outerHeight(true)-9});
-            if ((offset.left + inner.width()) > $(window).width())
-                inner.css({marginLeft: -inner.width() + width - cellmenu.menu.left} );
+            inner_height = $(window).height()/2.5;
+            inner_width = $(window).width()/2.5;
+            inner.height(inner_height);
+            inner.width(inner_width)
+            if ((offset.top + inner_height) > $(window).height())
+                inner.css({marginTop: - inner_height - 30});
+            if ((offset.left + inner_width) > $(window).width())
+                inner.css({marginLeft: - inner_width - (offset.left - $(window).width()) - 10} );
             new constructor(cellmenu.grid);
             og.analytics.resize({
                 selector: unique,
