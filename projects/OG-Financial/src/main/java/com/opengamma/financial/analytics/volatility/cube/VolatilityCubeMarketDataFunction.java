@@ -35,7 +35,6 @@ import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
-import com.opengamma.util.tuple.Pair;
 import com.opengamma.util.tuple.Triple;
 
 /**
