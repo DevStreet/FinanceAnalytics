@@ -56,6 +56,7 @@ public abstract class CreditDefaultSwapDefinition implements CreditInstrumentDef
   // TODO : Replace rec rate range arg checkers with .isInRangeInclusive
   // TODO : Add a CSA agreement?
   // TODO : Should we also include a CentralCounterParty object in order to track exchange traded contracts?
+  // TODO : Need to extract out the recovery rate input from this definition (since it is actually market data)
 
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -185,7 +186,7 @@ public abstract class CreditDefaultSwapDefinition implements CreditInstrumentDef
     // Check the temporal ordering of the input dates (these are the unadjusted dates entered by the user)
     ArgumentChecker.isTrue(!startDate.isAfter(effectiveDate), "Start date {} must be on or before effective date {}", startDate, effectiveDate);
     ArgumentChecker.isTrue(!startDate.isAfter(maturityDate), "Start date {} must be on or before maturity date {}", startDate, maturityDate);
-    ArgumentChecker.isTrue(!effectiveDate.isAfter(maturityDate), "Effective date {} must be on or before maturity date {}", effectiveDate, maturityDate);
+    //ArgumentChecker.isTrue(!effectiveDate.isAfter(maturityDate), "Effective date {} must be on or before maturity date {}", effectiveDate, maturityDate);
 
     ArgumentChecker.notNull(stubType, "Stub Type");
     ArgumentChecker.notNull(couponFrequency, "Coupon frequency");

@@ -21,13 +21,8 @@ $.register_module({
                 try {histogram.resize();}
                 catch (error) {}
             };
-            var prepare_data = function (data) {
-                stripped = data.timeseries.data.reduce(function (a, b){return a.concat(b[1]);}, []);
-                stripped.sort(function(a,b) {return (b -a)});
-                samples = stripped.length;
-            };
             var calc_vars = function () {
-                return false;
+              return false;
               //if (stripped[stripped.length - 1] > 0) return false;
               //var ceil = Math.ceil, sample99 = ceil(samples * 0.99) - 1, sample95 = ceil(samples * 0.95) - 1,
               //  range99 = stripped.slice(sample99), range95 = stripped.slice(sample95);
@@ -38,7 +33,7 @@ $.register_module({
               //  cvar95 : range95.reduce(function(a, b) { return a + b; }, 0) / range95.length
               //}
             }
-            var histogram_data = function (data) {
+            var histogram_data = function () {
                 var max_buckets = 50, min_buckets = 10,
                     bucket_calc = Math.ceil(Math.sqrt(samples));
                 buckets = bucket_calc < max_buckets ? bucket_calc : max_buckets;
@@ -65,7 +60,7 @@ $.register_module({
                 count[buckets - 1][1] = count[buckets - 1][1] + maxcount;
                 /* test to ensure no data is lost - sum of all items in buckets must match dataset length */
                 /*
-                if (count.map(function(v) { return v[1]; }).reduce(function(a,b) { return a + b; }) != length)
+                if (count.map(function(v) { return v[1]; }).reduce(function(a,b) { return a + b; }) != samples)
                     og.dev.warn('bucket totals to not match dataset length');
                 */
                 return {histogram_data: count, interval: interval};
@@ -86,21 +81,30 @@ $.register_module({
                 $.each(stripped, function(index, value){
                     diff +=  (value-mu)*(value-mu);
                 });
-                sigma = Math.sqrt(diff/(ssamples-1));
+                sigma = Math.sqrt(diff/(samples-1));
                 $.each(stripped, function(index, value){
                     norm.push([value, (normpdf(value, mu, sigma, constant))]);
                 });
                 return {norm_pdf_data:norm};
             };
+            var prepare_data = function (data) {
+                stripped = data.timeseries.data.reduce(function (a, b){return a.concat(b[1]);}, []);
+                stripped.sort(function(a, b) {return (b - a)});
+                samples = stripped.length;
+                return $.extend(true, {}, config, histogram_data()/*, normpdf_data()*/,
+                    {rebucket: bucket_data}, bucket_range(), {vars : calc_vars()}, {update : update});
+            };
+            var update = function () {
+                return prepare_data(gadget.data);
+            };
             gadget.dataman = new og.analytics.Cell({
                 source: config.source, row: config.row, col: config.col, format: 'EXPANDED'}, 'histogram')
                 .on('data', function (value) {
-                    var input, data = typeof value.v !== 'undefined' ? value.v : value;
-                    if (!histogram && data && (typeof data === 'object')) {
-                        prepare_data(data);
-                        input = $.extend(true, {}, config, histogram_data(data)/*, normpdf_data()*/,
-                            {callback: bucket_data}, bucket_range(), {vars : calc_vars()});
-                        histogram = new og.common.gadgets.HistogramPlot(input);
+                    gadget.data = typeof value.v !== 'undefined' ? value.v : value;
+                    if (!histogram && gadget.data && (typeof gadget.data === 'object')) {
+                        histogram = new og.common.gadgets.HistogramPlot(prepare_data(gadget.data));
+                    } else {
+                        histogram.display_refresh();
                     }
                 })
                 .on('fatal', function (message) {$selector.html(message);});
