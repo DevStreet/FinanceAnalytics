@@ -3,13 +3,7 @@
 ${ogStyle.print('og_all.css', 'all',false)}
 </head>
 <body>
-<div class="OG-Openfin">
-    <form>
-        <div class="og-back"></div>
-        <div class="og-forward"></div>
-        <input class="og-url" value="" type="text" />
-    </form>
-</div>
+<#include "modules/common/og.common.openfin.ftl">
 <div class="OG-js-loading" style="padding: 10px">Loading...</div>
 <div class="OG-layout-admin-container">
   <div class="ui-layout-center">
