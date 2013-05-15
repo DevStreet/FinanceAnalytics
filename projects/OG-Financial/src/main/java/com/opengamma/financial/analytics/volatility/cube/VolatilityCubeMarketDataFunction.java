@@ -33,6 +33,7 @@ import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
+import com.opengamma.lambdava.tuple.Pair;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.Triple;
@@ -241,13 +242,14 @@ public class VolatilityCubeMarketDataFunction extends AbstractFunction {
       //        }
       //      }
 
-      final VolatilityCubeData volatilityCubeData = new VolatilityCubeData();
-      volatilityCubeData.setDataPoints(dataPoints);
-      volatilityCubeData.setOtherData(otherData);
-      volatilityCubeData.setDataIds(dataIds);
-      volatilityCubeData.setRelativeStrikes(relativeStrikes);
-      volatilityCubeData.setATMStrikes(strikes);
-      return volatilityCubeData;
+      //      final VolatilityCubeData volatilityCubeData = new VolatilityCubeData();
+      //      volatilityCubeData.setDataPoints(dataPoints);
+      //      volatilityCubeData.setOtherData(otherData);
+      //      volatilityCubeData.setDataIds(dataIds);
+      //      volatilityCubeData.setRelativeStrikes(relativeStrikes);
+      //      volatilityCubeData.setATMStrikes(strikes);
+      //      return volatilityCubeData;
+      return null;
     }
 
   }

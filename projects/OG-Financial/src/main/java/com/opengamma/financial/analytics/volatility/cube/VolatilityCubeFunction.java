@@ -5,16 +5,13 @@
  */
 package com.opengamma.financial.analytics.volatility.cube;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.threeten.bp.Instant;
 
 import com.google.common.collect.Sets;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
-import com.opengamma.core.marketdatasnapshot.VolatilityPoint;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.ComputationTargetSpecification;
 import com.opengamma.engine.function.AbstractFunction;
@@ -29,10 +26,7 @@ import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
-import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.util.money.Currency;
-import com.opengamma.util.time.Tenor;
-import com.opengamma.lambdava.tuple.Pair;
 
 /**
  * 
@@ -88,16 +82,16 @@ public class VolatilityCubeFunction extends AbstractFunction {
       public Set<ComputedValue> execute(final FunctionExecutionContext executionContext, final FunctionInputs inputs,
           final ComputationTarget target, final Set<ValueRequirement> desiredValues) {
         final VolatilityCubeData data = (VolatilityCubeData) inputs.getValue(getMarketDataRequirement());
-        final VolatilityCubeData normalizedData = new VolatilityCubeData();
-        final Map<VolatilityPoint, Double> volatilityPoints = data.getDataPoints();
-        final Map<VolatilityPoint, Double> normalizedVolatilityPoints = new HashMap<VolatilityPoint, Double>();
-        final Map<VolatilityPoint, ExternalIdBundle> volatilityPointIds = data.getDataIds();
-        final Map<VolatilityPoint, ExternalIdBundle> normalizedVolatilityPointIds = new HashMap<VolatilityPoint, ExternalIdBundle>();
-        final Map<VolatilityPoint, Double> relativeStrikes = data.getRelativeStrikes();
-        final Map<VolatilityPoint, Double> normalizedRelativeStrikes = new HashMap<VolatilityPoint, Double>();
-        final Map<Pair<Tenor, Tenor>, Double> atmStrikes = data.getATMStrikes();
-        final Map<Pair<Tenor, Tenor>, Double> normalizedATMStrikes = new HashMap<Pair<Tenor, Tenor>, Double>();
-        final Map<Pair<Tenor, Tenor>, Double> normalizedATMVols = new HashMap<Pair<Tenor, Tenor>, Double>();
+        //        final VolatilityCubeData normalizedData = new VolatilityCubeData();
+        //        final Map<VolatilityPoint, Double> volatilityPoints = data.getDataPoints();
+        //        final Map<VolatilityPoint, Double> normalizedVolatilityPoints = new HashMap<VolatilityPoint, Double>();
+        //        final Map<VolatilityPoint, ExternalIdBundle> volatilityPointIds = data.getDataIds();
+        //        final Map<VolatilityPoint, ExternalIdBundle> normalizedVolatilityPointIds = new HashMap<VolatilityPoint, ExternalIdBundle>();
+        //        final Map<VolatilityPoint, Double> relativeStrikes = data.getRelativeStrikes();
+        //        final Map<VolatilityPoint, Double> normalizedRelativeStrikes = new HashMap<VolatilityPoint, Double>();
+        //        final Map<Pair<Tenor, Tenor>, Double> atmStrikes = data.getATMStrikes();
+        //        final Map<Pair<Tenor, Tenor>, Double> normalizedATMStrikes = new HashMap<Pair<Tenor, Tenor>, Double>();
+        //        final Map<Pair<Tenor, Tenor>, Double> normalizedATMVols = new HashMap<Pair<Tenor, Tenor>, Double>();
         //        for (final Map.Entry<VolatilityPoint, Double> entry : volatilityPoints.entrySet()) {
         //          final VolatilityPoint oldPoint = entry.getKey();
         //          final Tenor swapTenor = oldPoint.getSwapTenor();
@@ -126,13 +120,14 @@ public class VolatilityCubeFunction extends AbstractFunction {
         //            }
         //          }
         //        }
-        normalizedData.setDataPoints(normalizedVolatilityPoints);
-        normalizedData.setOtherData(data.getOtherData());
-        normalizedData.setATMStrikes(normalizedATMStrikes);
-        normalizedData.setATMVolatilities(normalizedATMVols);
-        normalizedData.setDataIds(normalizedVolatilityPointIds);
-        normalizedData.setRelativeStrikes(normalizedRelativeStrikes);
-        return Sets.newHashSet(new ComputedValue(_cubeResult, normalizedData));
+        //        normalizedData.setDataPoints(normalizedVolatilityPoints);
+        //        normalizedData.setOtherData(data.getOtherData());
+        //        normalizedData.setATMStrikes(normalizedATMStrikes);
+        //        normalizedData.setATMVolatilities(normalizedATMVols);
+        //        normalizedData.setDataIds(normalizedVolatilityPointIds);
+        //        normalizedData.setRelativeStrikes(normalizedRelativeStrikes);
+        //        return Sets.newHashSet(new ComputedValue(_cubeResult, normalizedData));
+        return null;
       }
     };
   }

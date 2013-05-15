@@ -18,12 +18,6 @@ import org.fudgemsg.types.IndicatorType;
 import com.opengamma.core.marketdatasnapshot.ValueSnapshot;
 import com.opengamma.core.marketdatasnapshot.VolatilityCubeSnapshot;
 import com.opengamma.core.marketdatasnapshot.VolatilityPoint;
-<<<<<<< HEAD
-=======
-import com.opengamma.util.time.Tenor;
-import com.opengamma.util.tuple.ObjectsPairFudgeBuilder;
-import com.opengamma.lambdava.tuple.Pair;
->>>>>>> develop
 
 /**
  * 

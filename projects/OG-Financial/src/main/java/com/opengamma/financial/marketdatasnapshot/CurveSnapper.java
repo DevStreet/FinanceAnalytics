@@ -5,37 +5,37 @@
  */
 package com.opengamma.financial.marketdatasnapshot;
 
-import com.opengamma.core.marketdatasnapshot.*;
+import com.opengamma.core.marketdatasnapshot.CurveKey;
+import com.opengamma.core.marketdatasnapshot.CurveSnapshot;
+import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.core.marketdatasnapshot.impl.ManageableCurveSnapshot;
 import com.opengamma.core.marketdatasnapshot.impl.ManageableUnstructuredMarketDataSnapshot;
-import com.opengamma.core.marketdatasnapshot.impl.ManageableYieldCurveSnapshot;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.engine.view.ViewComputationResultModel;
-import com.opengamma.util.money.Currency;
 
 /**
  * Snapshotter that captures {@code ValueRequirementNames.CURVE_MARKET_DATA}
  */
 public class CurveSnapper extends
-    StructuredSnapper<CurveKey, SnapshotDataBundle, CurveSnapshot> {
+StructuredSnapper<CurveKey, SnapshotDataBundle, CurveSnapshot> {
 
   public CurveSnapper() {
     super(ValueRequirementNames.CURVE_MARKET_DATA);
   }
 
   @Override
-  CurveKey getKey(ValueSpecification spec) {
+  CurveKey getKey(final ValueSpecification spec) {
     final String curve = getSingleProperty(spec, ValuePropertyNames.CURVE);
     return new CurveKey(curve);
   }
 
   @Override
-  CurveSnapshot buildSnapshot(ViewComputationResultModel resultModel, CurveKey key,
-      SnapshotDataBundle bundle) {
-    ManageableUnstructuredMarketDataSnapshot values = getUnstructured(bundle);
-      ManageableCurveSnapshot ret = new ManageableCurveSnapshot();
+  CurveSnapshot buildSnapshot(final ViewComputationResultModel resultModel, final CurveKey key,
+      final SnapshotDataBundle bundle) {
+    final ManageableUnstructuredMarketDataSnapshot values = getUnstructured(bundle);
+    final ManageableCurveSnapshot ret = new ManageableCurveSnapshot();
     ret.setValues(values);
     ret.setValuationTime(resultModel.getViewCycleExecutionOptions().getValuationTime());
     return ret;

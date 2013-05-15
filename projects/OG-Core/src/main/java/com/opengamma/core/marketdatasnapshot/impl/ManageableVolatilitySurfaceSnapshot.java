@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javassist.compiler.ast.Pair;
-
 import org.fudgemsg.FudgeField;
 import org.fudgemsg.FudgeMsg;
 import org.fudgemsg.MutableFudgeMsg;
@@ -21,6 +19,7 @@ import org.fudgemsg.types.IndicatorType;
 import com.google.common.collect.Maps;
 import com.opengamma.core.marketdatasnapshot.ValueSnapshot;
 import com.opengamma.core.marketdatasnapshot.VolatilitySurfaceSnapshot;
+import com.opengamma.lambdava.tuple.Pair;
 
 /**
  * 
@@ -36,7 +35,7 @@ public class ManageableVolatilitySurfaceSnapshot implements VolatilitySurfaceSna
    * Sets the values field.
    * @param values  the values
    */
-  public void setValues(Map<Pair<Object, Object>, ValueSnapshot> values) {
+  public void setValues(final Map<Pair<Object, Object>, ValueSnapshot> values) {
     _values = values;
   }
 
@@ -65,7 +64,7 @@ public class ManageableVolatilitySurfaceSnapshot implements VolatilitySurfaceSna
     FudgeSerializer.addClassHeader(ret, ManageableVolatilitySurfaceSnapshot.class);
     final MutableFudgeMsg valuesMsg = serializer.newMessage();
     if (_values != null) {
-      for (Entry<Pair<Object, Object>, ValueSnapshot> entry : _values.entrySet()) {
+      for (final Entry<Pair<Object, Object>, ValueSnapshot> entry : _values.entrySet()) {
         serializer.addToMessage(valuesMsg, null, 1, entry.getKey());
         if (entry.getValue() == null) {
           valuesMsg.add(2, IndicatorType.INSTANCE);

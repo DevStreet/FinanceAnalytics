@@ -19,7 +19,6 @@ import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.config.ConfigSource;
-import com.opengamma.core.marketdatasnapshot.VolatilityCubeData;
 import com.opengamma.core.marketdatasnapshot.VolatilityPoint;
 import com.opengamma.engine.ComputationTarget;
 import com.opengamma.engine.function.AbstractFunction;
@@ -126,16 +125,17 @@ public class RawSwaptionVolatilityCubeDataFunction extends AbstractFunction {
             }
           }
         }
-        final VolatilityCubeData volatilityCubeData = new VolatilityCubeData();
-        volatilityCubeData.setDataPoints(data);
-        volatilityCubeData.setDataIds(ids);
-        final ValueProperties properties = createValueProperties()
-            .with(ValuePropertyNames.CUBE, cubeName)
-            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_DEFINITION, definitionName)
-            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_SPECIFICATION, specificationName)
-            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_QUOTE_TYPE, specification.getCubeQuoteType())
-            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_UNITS, specification.getQuoteUnits()).get();
-        return Collections.singleton(new ComputedValue(new ValueSpecification(ValueRequirementNames.VOLATILITY_CUBE_MARKET_DATA, target.toSpecification(), properties), volatilityCubeData));
+        //        final VolatilityCubeData volatilityCubeData = new VolatilityCubeData();
+        //        volatilityCubeData.setDataPoints(data);
+        //        volatilityCubeData.setDataIds(ids);
+        //        final ValueProperties properties = createValueProperties()
+        //            .with(ValuePropertyNames.CUBE, cubeName)
+        //            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_DEFINITION, definitionName)
+        //            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_SPECIFICATION, specificationName)
+        //            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_QUOTE_TYPE, specification.getCubeQuoteType())
+        //            .with(SurfaceAndCubePropertyNames.PROPERTY_CUBE_UNITS, specification.getQuoteUnits()).get();
+        //        return Collections.singleton(new ComputedValue(new ValueSpecification(ValueRequirementNames.VOLATILITY_CUBE_MARKET_DATA, target.toSpecification(), properties), volatilityCubeData));
+        return null;
       }
 
       @Override
