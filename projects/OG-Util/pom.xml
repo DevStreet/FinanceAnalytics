@@ -29,7 +29,6 @@
     <dependency>
       <groupId>com.opengamma</groupId>
       <artifactId>lambdava</artifactId>
-      <version>0.1</version>
     </dependency>
 
     <dependency>
@@ -235,6 +234,11 @@
     <dependency>
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
     </dependency>
 
   </dependencies>
