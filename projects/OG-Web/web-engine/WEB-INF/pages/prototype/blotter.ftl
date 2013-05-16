@@ -1,13 +1,9 @@
 <#include "modules/common/og.common.header.ftl">
 <title>OpenGamma</title>
 ${ogStyle.print('og_all.css', 'all',false)}
-<div class="OG-Openfin">
-    <form>
-        <div class="og-back"></div>
-        <div class="og-forward"></div>
-        <input class="og-url" value="" type="text" />
-    </form>
-</div>
+<#if openfin == "openfin/1.4.0">
+  <#include "modules/common/og.common.openfin.ftl">
+</#if>
 <style type="text/css">
 .temp-ul li{padding-left:6px;}
 .temp-ul {padding:3px;}
