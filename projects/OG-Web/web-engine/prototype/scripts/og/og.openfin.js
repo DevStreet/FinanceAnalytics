@@ -12,20 +12,20 @@ $.register_module({
                     var container = $('.OG-Openfin'), url_bar = $('.og-url', container).val(window.location.href),
                         forward = $('.og-forward', container), back = $('.og-back');
                     forward.click(function (event) {
-                        window.history.go(1)
+                        window.history.forward();
                         url_bar.val(window.location.href);
                     });
                     back.click(function () {
-                        window.history.go(-1);
+                        window.history.back();
                         url_bar.val(window.location.href);
                     });
                     container.find('form').submit(function (event) { return false; });
-                    $('a[href]').live('click', function (e) { url_bar.val($(this)[0].href) });
+                    $('a[href]').live('click', function (e) { url_bar.val($(this)[0].href); });
                     $(window).on('hashchange', function () {
                         url_bar.val(window.location.href);
                     });
                 });
             })()
-        }
+        };
     }
 });
