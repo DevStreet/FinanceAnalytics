@@ -11,6 +11,7 @@ $.register_module({
                 $(document).ready(function () {
                     var container = $('.OG-Openfin'), url_bar = $('.og-url', container).val(window.location.href),
                         forward = $('.og-forward', container), back = $('.og-back');
+                    if (!container) return;
                     forward.click(function (event) {
                         window.history.forward();
                         url_bar.val(window.location.href);
