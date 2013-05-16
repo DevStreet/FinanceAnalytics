@@ -3,7 +3,10 @@
 ${ogStyle.print('og_all.css', 'all',false)}
 </head>
 <body>
-<#include "modules/common/og.common.openfin.ftl">
+<#if openfin == "openfin/1.4.0">
+  <#include "modules/common/og.common.openfin.ftl">
+</#if>
+</body>
 <div class="OG-js-loading" style="padding: 10px">Loading...</div>
 <div class="OG-layout-admin-container">
   <div class="ui-layout-center">
