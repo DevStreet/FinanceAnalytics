@@ -8,68 +8,45 @@ $.register_module({
     obj: function () {
         var module = this, data = {
                 // TODO AG: data structure is a WIP, heavy review needed.
-                cols: [{
-                    text: 'foo',
-                    id: 'c1'
-                }, {
-                    text: 'bar',
-                    id: 'c2'
-                }, {
-                    text: 'baz',
-                    id: 'c3'
-                }, {
-                    text: 'boo',
-                    id: 'c4'
-                }],
+                cols: [
+                    { id: 'c1', text: 'foo', type:'string'},
+                    { id: 'c2', text: 'bar', type:'string'},
+                    { id: 'c3', text: 'baz', type:'string'},
+                    { id: 'c4', text: 'boo', type:'string'}
+                ],
                 rows: [
                     {
                         id: 'c1',
-                        cells: [{
-                            type:'string',
-                            content: 'Foo Cell 1'
-                        },
-                        {
-                            type:'string',
-                            content: 'Foo Cell 2'
-                        }]
+                        cells: [
+                            {text: 'Foo Cell 1'},
+                            {text: 'Foo Cell 2'}
+                        ]
                     },
                     {
                         id: 'c2',
-                        cells: [{
-                            type:'string',
-                            content: 'Bar Cell 1'
-                        },
-                        {
-                            type:'string',
-                            content: 'Bar Cell 2'
-                        }]
+                        cells: [
+                            {text: 'Bar Cell 1' },
+                            {text: 'Bar Cell 2'}
+                        ]
                     },
                     {
                         id: 'c3',
-                        cells: [{
-                            type:'string',
-                            content: 'Baz Cell 1'
-                        },
-                        {
-                            type:'string',
-                            content: 'Baz Cell 2'
-                        }]
+                        cells: [
+                            {text: 'Baz Cell 1' },
+                            {text: 'Baz Cell 2'}
+                        ]
                     },
                     {
                         id: 'c4',
-                        cells: [{
-                            type:'string',
-                            content: 'Boo Cell 1'
-                        },
-                        {
-                            type:'string',
-                            content: 'Boo Cell 2'
-                        }]
+                        cells: [
+                            {text: 'Boo Cell 1' },
+                            {text: 'Boo Cell 2'}
+                        ]
                     }
                 ]
         };
         return function (config) {
-            // TODO AG: Implement stand alone component api
+
         };
     }
 });
