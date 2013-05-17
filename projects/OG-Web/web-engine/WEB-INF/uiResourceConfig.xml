@@ -382,6 +382,7 @@
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.securitiesidentifiers.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.gadgetscontainer.js</fragment>
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.mapping.js</fragment>
+    <fragment>/scripts/og/common/gadgets/og.common.gadgets.tabular.js</fragment>
     <fragment>/scripts/og/common/grid/og.common.grid.cellmenu.js</fragment>
     <fragment>/scripts/og/common/grid/og.common.grid.formatter.js</fragment>
     <fragment>/scripts/og/common/grid/og.common.grid.clipboard.js</fragment>
