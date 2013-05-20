@@ -7,11 +7,7 @@ $.register_module({
     dependencies: ['og.common.gadgets.mapping'],
     obj: function () {
         var module = this,
-            icons = '.og-num, .og-icon-new-window-2',
-            open_icon = '.og-small',
-            expand_class = 'og-expanded',
             panels = ['south', 'dock-north', 'dock-center', 'dock-south'],
-            width,
             mapping = og.common.gadgets.mapping, scroll_size = og.common.util.scrollbar_size;
         var hide_menu = function (grid, cell) {
             var depgraph = grid.source.depgraph, primitives = grid.source.type === 'primitives',
@@ -29,48 +25,20 @@ $.register_module({
         };
         var constructor = function (grid) {
             var cellmenu = this, depgraph = grid.source.depgraph, primitives = grid.source.type === 'primitives',
-                parent = grid.elements.parent, inplace_config, timer, singlepanel = og.analytics.containers.initialize;
+                parent = grid.elements.parent, inplace_config, timer;
             cellmenu.frozen = false;
             cellmenu.grid = grid;
-            width = singlepanel ? 20 : 34;
             cellmenu.busy = (function (busy) {
                 return function (value) {return busy = typeof value !== 'undefined' ? value : busy;};
             })(false);
             og.api.text({module: 'og.views.gadgets.grid.cell_options'}).pipe(function (template) {
-                template = (Handlebars.compile(template))({singlepanel:singlepanel ? true : false});
                 (cellmenu.menu = $(template)).hide()
-                .on('mouseleave', function () {
-                    clearTimeout(timer), cellmenu.menu.removeClass(expand_class), cellmenu.hide();
-                })
-                .on('mouseenter', open_icon, function () {
-                    clearTimeout(timer), timer = setTimeout(function () {cellmenu.menu.addClass(expand_class);}, 500);
-                })
-                .on('mouseenter', function () {$.data(cellmenu, 'hover', true);})
-                .on('click', open_icon, function () {
-                    cellmenu.destroy_frozen();
-                    cellmenu.menu.addClass(expand_class);
-                })
-                .on('mouseenter', icons, function () {
-                    var panel = panels[$(this).text() - 1];
-                    panels.forEach(function (val) {og.analytics.containers[val].highlight(true, val === panel);});
-                })
-                .on('mouseleave', icons, function () {
-                    panels.forEach(function (val) {og.analytics.containers[val].highlight(false);});
-                })
-                .on('click', icons, function () {
-                    var panel = panels[+$(this).text() - 1], cell = cellmenu.current,
-                        options = mapping.options(cell, grid, panel);
-                    cellmenu.destroy_frozen();
-                    cellmenu.hide();
-                    if (!panel) og.analytics.url.launch(options); 
-                    else og.analytics.url.add(panel, options);
-                });
                 grid.on('cellhoverin', function (cell) {
                     if (cellmenu.frozen || cellmenu.busy()) return;
-                    cellmenu.menu.removeClass(expand_class);
                     clearTimeout(timer);
                     cellmenu.current = cell;
-                    if (hide_menu(grid, cell)) cellmenu.hide(); else cellmenu.show();
+                    if (hide_menu(grid, cell)) cellmenu.hide();
+                    else cellmenu.show(grid.cell_coords(cell.row, cell.col));
                 })
                 .on('cellhoverout', function () {
                     clearTimeout(timer);
@@ -88,7 +56,7 @@ $.register_module({
                     cellmenu.container = new og.common.gadgets.GadgetsContainer('.OG-layout-analytics-', unique);
                     cellmenu.inplace.$dom.toggle.on('click', function () {
                         if (cellmenu.inplace.toggle_handler()) {
-                            cellmenu.create_inplace('.OG-layout-analytics-' + unique);
+                            cellmenu.create_inplace('.OG-layout-analytics-' + unique, grid);
                             cellmenu.inplace.$dom.menu.blurkill(cellmenu.destroy_frozen.bind(cellmenu));
                         }
                         else cellmenu.destroy_frozen();
@@ -102,27 +70,31 @@ $.register_module({
            $('.og-inplace-resizer').remove();
            og.common.gadgets.manager.clean();
         };
-        constructor.prototype.create_inplace = function (unique) {
+        constructor.prototype.create_inplace = function (selector, grid) {
             var cellmenu = this, panel = 'inplace', options, cell = cellmenu.current, inner_height, inner_width,
+                cell_coordinates = grid.cell_coords(cellmenu.current.row, cellmenu.current.col),
+                cell_width = cell_coordinates.right - cell_coordinates.left,
                 offset = cellmenu.inplace.$dom.cntr.offset(), inner = cellmenu.inplace.$dom.menu;
             cellmenu.destroy_frozen();
             cellmenu.frozen = true;
             cellmenu.menu.addClass('og-frozen');
             options = mapping.options(cell, cellmenu.grid, panel);
-            cellmenu.container.add([options]);
+            cellmenu.container.add([options], null, true);
             cellmenu.container.on('launch', og.analytics.url.launch);
-            inner_height = $(window).height()/2.5;
-            inner_width = $(window).width()/2.5;
+            inner_height = $(window).height() / 2.5;
+            inner_width = $(window).width() / 2.5;
             inner.height(inner_height);
-            inner.width(inner_width)
-            if ((offset.top + inner_height) > $(window).height())
-                inner.css({marginTop: - inner_height - 30});
-            if ((offset.left + inner_width) > $(window).width())
-                inner.css({marginLeft: - inner_width - (offset.left - $(window).width()) - 10} );
+            inner.width(inner_width);
+            if ((offset.top + inner_height + 10) > $(window).height()) {
+                cellmenu.menu.addClass('og-pop-up');
+                inner.css({marginTop: - inner_height + 1});
+            }
+            if ((offset.left - cell_width + inner_width) > $(window).width())
+                inner.css({marginLeft: - inner_width - (offset.left - $(window).width())});
             new constructor(cellmenu.grid);
             og.analytics.resize({
-                selector: unique,
-                offset: {top: 1},
+                selector: selector,
+                offset: {top: -25, left: -1},
                 tmpl: '<div class="OG-analytics-resize og-resizer og-inplace-resizer" title="Drag to resize me" />',
                 mouseup_handler: function (right, bottom) {
                     var newWidth = Math.max(480,($(document).outerWidth() - right) - inner.offset().left),
@@ -133,20 +105,21 @@ $.register_module({
             });
         };
         constructor.prototype.hide = function () {
-           var cellmenu = this;
-            if (cellmenu.menu && cellmenu.menu.length && !cellmenu.frozen) {
-                cellmenu.menu.hide();
-            }
+            var cellmenu = this;
+            if (cellmenu.menu && cellmenu.menu.length && !cellmenu.frozen) cellmenu.menu.hide();
         };
-        constructor.prototype.show = function () {
-            var cellmenu = this, current = this.current;
+        constructor.prototype.show = function (coordinates) {
+            var cellmenu = this, current = this.current, width = coordinates.right - coordinates.left,
+                gadget_type = mapping.type(cellmenu.current, 'inplace'),
+                $chevron = cellmenu.menu.find('.og-icon-down-chevron');
             if (cellmenu.menu && cellmenu.menu.length) {
-                cellmenu.menu
-                    .appendTo($('body'))
-                    .css({top: current.top, left: current.right - width + cellmenu.grid.elements.parent.offset().left})
-                    .show();
+                if (!mapping.is_complex(gadget_type)) $chevron.addClass('og-complex');
+                else $chevron.removeClass('og-complex');
+                cellmenu.menu.appendTo($('body'))
+                    .css({top: current.top, left: current.right + cellmenu.grid.elements.parent.offset().left}).show()
+                    .find('.OG-gadgets-container').css('margin-left', -width + 'px').end()
+                    .find('.og-cell-border').css({left: -width + 'px'}).show();
             }
-
         };
         return constructor;
     }
