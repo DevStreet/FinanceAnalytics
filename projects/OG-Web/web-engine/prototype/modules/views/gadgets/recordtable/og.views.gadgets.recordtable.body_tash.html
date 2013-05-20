@@ -1,0 +1,8 @@
+{{#each rows}}
+    <tr>
+        {{#each this.cells}}
+        <td class="{{this.id}}">{{this.text}}</td>
+        {{/each}}
+        <td class="action"></td>
+    </tr>
+{{/each}}
