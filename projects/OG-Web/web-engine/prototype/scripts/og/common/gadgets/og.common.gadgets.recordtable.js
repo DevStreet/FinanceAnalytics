@@ -62,19 +62,18 @@ $.register_module({
         var RecordTable = function (config) {
             if (!config) og.dev.warn('og.common.gadgets.RecordTable: Missing param [config] to constructor.');
 
-            var cols = config.data.cols, rows = config.data.rows, container = $(config.container),
-                headers, form;
+            var cols = config.data.cols, rows = config.data.rows, container = $(config.container), headers, form;
 
-            form = new og.common.util.ui.Form({ // TODO AG: Refactor
+            form = new og.common.util.ui.Form({
+                data: {},
                 module: 'og.views.gadgets.recordtable_tash',
-                selector: '.' + config.container
+                selector: '.' + config.container,
+                children: [
+                    new form.Block({module: 'og.views.gadgets.recordtable.header_tash'}),
+                    new form.Block({module: 'og.views.gadgets.recordtable.footer_tash'}),
+                    new form.Block({module: 'og.views.gadgets.recordtable.body_tash'})
+                ]
             });
-            form.children.push(
-                new form.Block({
-                    data: {},
-                    module: 'og.views.gadgets.recordtable.row_tash'
-                })
-            );
         };
 
         RecordTable.prototype = new Block();
