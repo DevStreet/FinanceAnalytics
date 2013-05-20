@@ -20,7 +20,7 @@ $.register_module({
             mock = {
                 container: '.OG-layout-admin-details-center .ui-layout-content',
                 data: { // TODO AG: data structure is a WIP, heavy review needed.
-                    cols: [
+                    headers: [
                         {id: 'c1', text: 'foo', type:'string'},
                         {id: 'c2', text: 'bar', type:'string'},
                         {id: 'c3', text: 'baz', type:'string'},
@@ -59,24 +59,25 @@ $.register_module({
                 }
             };
 
-        var RecordTable = function (config) {
-            if (!config) og.dev.warn('og.common.gadgets.RecordTable: Missing param [config] to constructor.');
+        var RecordTable = function (conf) {
+            // if (!config) og.dev.warn('og.common.gadgets.RecordTable: Missing param [config] to constructor.');
 
-            var cols = config.data.cols, rows = config.data.rows, container = $(config.container), headers, form;
+            var config = conf || mock, cols = config.data.cols, rows = config.data.rows,
+                container = $(config.container), headers, form;
 
             form = new og.common.util.ui.Form({
                 data: {},
-                module: 'og.views.gadgets.recordtable_tash',
-                selector: '.' + config.container,
-                children: [
-                    new form.Block({module: 'og.views.gadgets.recordtable.header_tash'}),
-                    new form.Block({module: 'og.views.gadgets.recordtable.footer_tash'}),
-                    new form.Block({module: 'og.views.gadgets.recordtable.body_tash'})
-                ]
+                module: 'og.views.gadgets.recordtable.recordtable_tash',
+                selector: '.' + config.container
             });
+            form.children.push(
+                new form.Block({module: 'og.views.gadgets.recordtable.header_tash', extras: config.headers}),
+                new form.Block({module: 'og.views.gadgets.recordtable.footer_tash'}),
+                new form.Block({module: 'og.views.gadgets.recordtable.body_tash'})
+            );
         };
 
-        RecordTable.prototype = new Block();
+        RecordTable.prototype = new og.common.util.ui.Block();
         return RecordTable;
     }
 });

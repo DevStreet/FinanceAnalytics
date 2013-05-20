@@ -41,6 +41,7 @@
   </bundle>
   <bundle id="gadgets.css">
     <fragment>/styles/common/gadgets/og.common.gadgets.OG-histogram.css</fragment>
+    <fragment>/styles/common/gadgets/og.common.gadgets.OG-recordtable.css</fragment>
   </bundle>
   <bundle id="common.util.css">
     <fragment>/styles/common/util/og.common.util.OG-clearFix.css</fragment>
@@ -492,6 +493,7 @@
     <fragment>/scripts/og/common/gadgets/og.common.gadgets.data.js</fragment>
     <fragment>/scripts/og/env/og.env.curve.js</fragment>
     <fragment>/scripts/og/env/og.env.data.js</fragment>
+    <fragment>/scripts/og/env/og.env.recordtable.js</fragment>
     <fragment>/scripts/og/env/og.env.surface.js</fragment>
     <fragment>/scripts/og/env/og.env.timeseries.js</fragment>
     <fragment>/scripts/og/env/og.env.timeseries_multiple.js</fragment>
