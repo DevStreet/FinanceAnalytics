@@ -21,3 +21,19 @@
     padding: 7px 10px;
     text-align: left;
 }
+
+.OG-gadget-recordtable .og-cell-action{
+    visibility: hidden;
+}
+.OG-gadget-recordtable .og-cell-data:hover .og-cell-action{
+    visibility: visible;
+    cursor: pointer;
+}
+
+.OG-gadget-recordtable .og-row-actions:hover{
+    cursor: pointer;
+}
+
+.OG-gadget-recordtable .og-actions .og-revert{
+    display: none;
+}

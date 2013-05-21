@@ -7,14 +7,19 @@ $.register_module({
     dependencies: ['og.common.gadgets.manager'],
     obj: function () {
         var module = this, actions = {
+                cell: [ {name: 'edit'} ],
                 row: [
                     {name: 'edit'},
                     {name: 'save'},
                     {name: 'delete'},
                     {name: 'revert'}
                 ],
-                cell: [ {name: 'edit'} ],
-                rows: [ {name: 'add'} ]
+                table: [ {name: 'add'} ]
+            },
+            field_types = {
+                'boolean': 'radio',
+                'array': 'select',
+                'string': 'text'
             };
 
         var RecordTable = function (config) {
@@ -30,7 +35,9 @@ $.register_module({
             form.children.push(
                 new form.Block({module: 'og.views.gadgets.recordtable.header_tash', extras: {headers: data.headers}}),
                 new form.Block({module: 'og.views.gadgets.recordtable.footer_tash'}),
-                new form.Block({module: 'og.views.gadgets.recordtable.body_tash', extras: {rows: data.rows}})
+                new form.Block({module: 'og.views.gadgets.recordtable.body_tash',
+                    extras: {rows: data.rows, actions: actions}
+                })
             );
             form.dom();
         };

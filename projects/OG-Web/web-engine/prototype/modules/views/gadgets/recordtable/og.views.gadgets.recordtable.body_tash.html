@@ -1,8 +1,17 @@
 {{#each rows}}
     <tr>
         {{#each this.cells}}
-        <td class="{{this.id}}">{{this.text}}</td>
+        <td class="og-cell-data og-{{this.id}}">
+            {{this.text}}
+            {{#each ../../actions.cell}}
+                <span class="og-cell-action og-{{this.name}}">{{this.name}}</span>
+            {{/each}}
+        </td>
         {{/each}}
-        <td class="action"></td>
+        <td class="og-actions">
+            {{#each ../actions.row}}
+                <span class="og-row-actions og-{{this.name}}">{{this.name}}</span>
+            {{/each}}
+        </td>
     </tr>
 {{/each}}
