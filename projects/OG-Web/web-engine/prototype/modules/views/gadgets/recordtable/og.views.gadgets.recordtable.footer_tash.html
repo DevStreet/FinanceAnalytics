@@ -1,7 +1,7 @@
 <tr>
-{{#each actions.table}}
-    <th colspan="{{../colspan}}" class="og-cell-action og-{{this.name}}">
+    {{#each actions.table}}
+    <th colspan="{{../colspan}}" data-action="{{this.name}}" class="og-cell-action og-{{this.name}}">
         <span>{{this.name}}</span>
     </th>
-{{/each}}
+    {{/each}}
 </tr>

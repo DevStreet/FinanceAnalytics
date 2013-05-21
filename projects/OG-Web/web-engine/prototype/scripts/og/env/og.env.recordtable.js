@@ -18,6 +18,7 @@ $.register_module({
                     ],
                     rows: [
                         {
+                            id: 'row-1',
                             cells: [
                                 {id:'col-1', text: 'String Cell 1'},
                                 {id:'col-2', text: 'Array Cell 1'},
@@ -26,6 +27,7 @@ $.register_module({
                             ]
                         },
                         {
+                            id: 'row-2',
                             cells: [
                                 {id:'col-1', text: 'String Cell 2'},
                                 {id:'col-2', text: 'Array Cell 2'},
