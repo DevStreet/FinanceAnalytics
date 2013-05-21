@@ -11,26 +11,26 @@ $.register_module({
                 container: selector,
                 data: { // TODO AG: data structure is a WIP, heavy review needed.
                     headers: [
-                        {id: 'col-1', text: 'foo', type:'string'},
-                        {id: 'col-2', text: 'bar', type:'string'},
-                        {id: 'col-3', text: 'baz', type:'string'},
-                        {id: 'col-4', text: 'boo', type:'string'}
+                        {id: 'col-1', text: 'String', data_type:'string'},
+                        {id: 'col-2', text: 'Array', data_type:'array'},
+                        {id: 'col-3', text: 'Boolean', data_type:'boolean'},
+                        {id: 'col-4', text: 'String', data_type:'string'}
                     ],
                     rows: [
                         {
                             cells: [
-                                {id:'col-1', text: 'Foo Cell 1'},
-                                {id:'col-2', text: 'Bar Cell 1'},
-                                {id:'col-3', text: 'Baz Cell 1'},
-                                {id:'col-4', text: 'Boo Cell 1'}
+                                {id:'col-1', text: 'String Cell 1'},
+                                {id:'col-2', text: 'Array Cell 1'},
+                                {id:'col-3', text: 'Boolean Cell 1'},
+                                {id:'col-4', text: 'String Cell 1'}
                             ]
                         },
                         {
                             cells: [
-                                {id:'col-1', text: 'Foo Cell 2'},
-                                {id:'col-2', text: 'Bar Cell 2'},
-                                {id:'col-3', text: 'Baz Cell 2'},
-                                {id:'col-4', text: 'Boo Cell 2'}
+                                {id:'col-1', text: 'String Cell 2'},
+                                {id:'col-2', text: 'Array Cell 2'},
+                                {id:'col-3', text: 'Boolean Cell 2'},
+                                {id:'col-4', text: 'String Cell 2'}
                             ]
                         }
                     ]

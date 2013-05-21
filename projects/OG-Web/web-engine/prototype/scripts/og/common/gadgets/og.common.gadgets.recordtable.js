@@ -33,9 +33,16 @@ $.register_module({
                 selector: '.' + config.container
             });
             form.children.push(
-                new form.Block({module: 'og.views.gadgets.recordtable.header_tash', extras: {headers: data.headers}}),
-                new form.Block({module: 'og.views.gadgets.recordtable.footer_tash'}),
-                new form.Block({module: 'og.views.gadgets.recordtable.body_tash',
+                new form.Block({
+                    module: 'og.views.gadgets.recordtable.header_tash',
+                    extras: {headers: data.headers}
+                }),
+                new form.Block({
+                    module: 'og.views.gadgets.recordtable.footer_tash',
+                    extras: {actions: actions, colspan: data.headers.length+1}
+                }),
+                new form.Block({
+                    module: 'og.views.gadgets.recordtable.body_tash',
                     extras: {rows: data.rows, actions: actions}
                 })
             );

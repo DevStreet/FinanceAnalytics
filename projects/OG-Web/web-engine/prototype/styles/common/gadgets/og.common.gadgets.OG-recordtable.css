@@ -17,12 +17,13 @@
     border: 1px solid #eee;
 }
 
-.OG-gadget-recordtable tbody td {
+.OG-gadget-recordtable tbody td,
+.OG-gadget-recordtable tfoot th {
     padding: 7px 10px;
     text-align: left;
 }
 
-.OG-gadget-recordtable .og-cell-action{
+.OG-gadget-recordtable .og-cell-data .og-cell-action{
     visibility: hidden;
 }
 .OG-gadget-recordtable .og-cell-data:hover .og-cell-action{
@@ -36,4 +37,8 @@
 
 .OG-gadget-recordtable .og-actions .og-revert{
     display: none;
+}
+
+.OG-gadget-recordtable tfoot th span:hover{
+    cursor: pointer;
 }
