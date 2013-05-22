@@ -79,17 +79,16 @@ $.register_module({
             };
 
             var edit_handler = function (elem) {
-                var id, tr;
-                if (!(tr = elem.parents('tr'), id = elem.data('id'))) return false;
-                create_edit_fields(id).html(function (html) {
-                    $('tr'+id).append(html);
+                var tr = elem.parents('tr'); if (!tr.length) return false;
+                create_edit_fields(tr.data('id')).html(function (html) {
+                    $('tr[data-id='+tr.data('id')+']', '#'+form.id).replaceWith(html);
                 });
             };
 
             var event_delegate = function (event) {
                 var $elem = $(event.srcElement || event.target);
                 if ($elem.data('action') === 'add') return add_handler();
-                if ($elem.data('action') === 'edit') return edit_handler();
+                if ($elem.data('action') === 'edit') return edit_handler($elem);
             };
 
             var load_handler = function () {};
