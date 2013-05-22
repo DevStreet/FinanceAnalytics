@@ -42,3 +42,7 @@
 .OG-gadget-recordtable tfoot th span:hover{
     cursor: pointer;
 }
+
+.OG-gadget-recordtable tr[data-state=edit] .og-edit{
+    display: none;
+}

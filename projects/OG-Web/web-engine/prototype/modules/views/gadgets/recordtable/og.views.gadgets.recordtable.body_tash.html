@@ -1,8 +1,8 @@
 {{#each rows}}
-    <tr>
+    <tr {{#if state}}data-state="{{this.state}}"{{/if}}>
         {{#each this.cells}}
         <td class="og-cell-data og-{{this.id}}">
-            {{this.text}}
+            {{{this.text}}}
             {{#each ../../actions.cell}}
                 <span data-action="{{this.name}}" class="og-cell-action og-{{this.name}}">
                     {{this.name}}

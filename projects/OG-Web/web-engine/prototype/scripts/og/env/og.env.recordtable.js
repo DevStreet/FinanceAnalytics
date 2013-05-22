@@ -20,19 +20,19 @@ $.register_module({
                         {
                             id: 'row-1',
                             cells: [
-                                {id:'col-1', text: 'String Cell 1'},
-                                {id:'col-2', text: 'Array Cell 1'},
-                                {id:'col-3', text: 'Boolean Cell 1'},
-                                {id:'col-4', text: 'String Cell 1'}
+                                {id:'col-1', text: 'String Cell'},
+                                {id:'col-2', text: 'Array Cell A'},
+                                {id:'col-3', text: 'Boolean Cell'},
+                                {id:'col-4', text: 'String Cell'}
                             ]
                         },
                         {
                             id: 'row-2',
                             cells: [
-                                {id:'col-1', text: 'String Cell 2'},
-                                {id:'col-2', text: 'Array Cell 2'},
-                                {id:'col-3', text: 'Boolean Cell 2'},
-                                {id:'col-4', text: 'String Cell 2'}
+                                {id:'col-1', text: 'String Cell'},
+                                {id:'col-2', text: 'Array Cell A'},
+                                {id:'col-3', text: 'Boolean Cell'},
+                                {id:'col-4', text: 'String Cell'}
                             ]
                         }
                     ]

@@ -10,7 +10,6 @@ $.register_module({
             if (!config) og.dev.warn('og.common.gadgets.RecordTable: Missing param [config] to constructor.');
 
             var form, data = config.data, headers = data.headers, rows = data.rows,
-                // TODO AG: use Object.clone on headers array and splice out unused props
                 data_types = headers.map(function (header) {return {id: header.id, data_type: header.data_type};}),
                 actions = {
                     cell: [ {name: 'edit'} ],
@@ -32,38 +31,58 @@ $.register_module({
                             };
                         })
                     };
-                });
+                }),
+                mock = {
+                    'string': {val: 'String Cell'},
+                    'number': {val: 'Number Cell'},
+                    'array': {opts: ['Array Cell A', 'Array Cell B']}
+                },
+                selectors = {
+                    table_rows: '.OG-gadget-recordtable tbody tr'
+                };
 
             var add_handler = function () {
+                var row_id = 'row-' + ($('.'+selectors.table_rows).length+1);
                 new form.Block({
-                    module: 'og.views.gadgets.recordtable.row_tash',
-                    extras: {'fields': field_types.map(create_field_type)}
+                    module: 'og.views.gadgets.recordtable.body_tash',
+                    generator: function (handler, template, data) {
+                        data.rows = [{
+                            id: row_id,
+                            cells: headers.map(function (entry) {
+                                return {
+                                    id: entry.id,
+                                    text: (Handlebars.compile(create_field_type({
+                                        type: entry.data_type,
+                                        id: row_id + ' ' + entry.id
+                                    })))(mock[entry.data_type])
+                                };
+                            }),
+                            state: 'edit'
+                        }];
+                        data.actions = actions;
+                        handler(template(data));
+                    }
                 }).html(function (html) {
                     $('.OG-gadget-recordtable tbody').append(html);
                 });
             };
 
             var create_field_type = function (field) {
-                var template = {};
                 switch (field.type) {
                     case 'string':
                     case 'number':
-                        template.html = '<input type="text" val="{{val}}" />';
-                        break;
+                        return '<input type="text" value="{{val}}" />';
                     case 'array':
-                        template.html = '<select>{{#each opts}}<option>{{this.val}}</option>{{/each}}</select>';
-                        break;
+                        return '<select>{{#each opts}}<option>{{this}}</option>{{/each}}</select>';
                     case 'boolean':
-                        template.html = '<input name="'+field.id+'" type="radio" val="true" /> '+
-                                        '<input name="'+field.id+'" type="radio" val="true" />';
-                        break;
+                        return '<input checked name="'+field.id+'" type="radio" value="true">true</input> '+
+                               '<input name="'+field.id+'" type="radio" value="false">false</input>';
                 }
-                return template;
             };
 
             var event_delegate = function (event) {
                 var $elem = $(event.srcElement || event.target);
-                if ($elem.attr('data-action') === 'add') return add_handler();
+                if ($elem.data('action') === 'add') return add_handler();
             };
 
             var load_handler = function () {};
@@ -88,7 +107,7 @@ $.register_module({
                 })
             );
             form.on('form:load', load_handler);
-            form.on('click', '.OG-gadget-recordtable', event_delegate);
+            form.on('click', '.og-cell-action', event_delegate);
             form.dom();
         };
 
