@@ -1,20 +1,16 @@
 {{#each rows}}
-    <tr {{#if state}}data-state="{{this.state}}"{{/if}}>
+    <tr {{#if state}}data-state="{{this.state}}"{{/if}} data-id="{{this.id}}">
         {{#each this.cells}}
-        <td class="og-cell-data og-{{this.id}}">
-            {{{this.text}}}
+        <td data-id="{{this.id}}" class="og-cell-data">
+            {{{this.val}}}
             {{#each ../../actions.cell}}
-                <span data-action="{{this.name}}" class="og-cell-action og-{{this.name}}">
-                    {{this.name}}
-                </span>
+            <span data-action="{{this.val}}" class="og-cell-action">{{this.val}}</span>
             {{/each}}
         </td>
         {{/each}}
         <td class="og-actions">
             {{#each ../actions.row}}
-                <span data-action="{{this.name}}" class="og-row-actions og-{{this.name}}">
-                    {{this.name}}
-                </span>
+            <span data-action="{{this.val}}" class="og-row-actions">{{this.val}}</span>
             {{/each}}
         </td>
     </tr>

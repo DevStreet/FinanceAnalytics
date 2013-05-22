@@ -11,28 +11,28 @@ $.register_module({
                 container: selector,
                 data: { // TODO AG: data structure is a WIP, heavy review needed.
                     headers: [
-                        {id: 'col-1', text: 'String', data_type:'string'},
-                        {id: 'col-2', text: 'Array', data_type:'array'},
-                        {id: 'col-3', text: 'Boolean', data_type:'boolean'},
-                        {id: 'col-4', text: 'String', data_type:'string'}
+                        {id: 'col-1', val: 'String', data_type: 'string'},
+                        {id: 'col-2', val: 'Array', data_type: 'array'},
+                        {id: 'col-3', val: 'Boolean', data_type: 'boolean'},
+                        {id: 'col-4', val: 'String', data_type: 'string'}
                     ],
                     rows: [
                         {
                             id: 'row-1',
                             cells: [
-                                {id:'col-1', text: 'String Cell'},
-                                {id:'col-2', text: 'Array Cell A'},
-                                {id:'col-3', text: 'Boolean Cell'},
-                                {id:'col-4', text: 'String Cell'}
+                                {id:'col-1', val: 'Cell'},
+                                {id:'col-2', val: 'A'},
+                                {id:'col-3', val: true},
+                                {id:'col-4', val: 'Cell'}
                             ]
                         },
                         {
                             id: 'row-2',
                             cells: [
-                                {id:'col-1', text: 'String Cell'},
-                                {id:'col-2', text: 'Array Cell A'},
-                                {id:'col-3', text: 'Boolean Cell'},
-                                {id:'col-4', text: 'String Cell'}
+                                {id:'col-1', val: 'Cell'},
+                                {id:'col-2', val: 'B'},
+                                {id:'col-3', val: true},
+                                {id:'col-4', val: 'Cell'}
                             ]
                         }
                     ]

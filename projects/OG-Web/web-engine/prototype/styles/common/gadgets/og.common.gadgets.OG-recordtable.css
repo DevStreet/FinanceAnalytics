@@ -35,7 +35,7 @@
     cursor: pointer;
 }
 
-.OG-gadget-recordtable .og-actions .og-revert{
+.OG-gadget-recordtable .og-actions [data-action=revert]{
     display: none;
 }
 
@@ -43,6 +43,6 @@
     cursor: pointer;
 }
 
-.OG-gadget-recordtable tr[data-state=edit] .og-edit{
+.OG-gadget-recordtable tr[data-state=edit] [data-action=edit]{
     display: none;
 }

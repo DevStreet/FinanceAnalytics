@@ -9,17 +9,17 @@ $.register_module({
         var RecordTable = function (config) {
             if (!config) og.dev.warn('og.common.gadgets.RecordTable: Missing param [config] to constructor.');
 
-            var form, data = config.data, headers = data.headers, rows = data.rows,
+            var form, data = config.data, headers = data.headers, rows = data.rows, compile = Handlebars.compile,
                 data_types = headers.map(function (header) {return {id: header.id, data_type: header.data_type};}),
                 actions = {
-                    cell: [ {name: 'edit'} ],
+                    cell: [ {val: 'edit'} ],
                     row: [
-                        {name: 'edit'},
-                        {name: 'save'},
-                        {name: 'delete'},
-                        {name: 'revert'}
+                        {val: 'edit'},
+                        {val: 'save'},
+                        {val: 'delete'},
+                        {val: 'revert'}
                     ],
-                    table: [ {name: 'add'} ]
+                    table: [ {val: 'add'} ]
                 },
                 field_types = rows.map(function (row) {
                     return {
@@ -33,56 +33,63 @@ $.register_module({
                     };
                 }),
                 mock = {
-                    'string': {val: 'String Cell'},
-                    'number': {val: 'Number Cell'},
-                    'array': {opts: ['Array Cell A', 'Array Cell B']}
+                    'string': {val: 'Cell'},
+                    'number': {val: 10},
+                    'array': {opts: ['A', 'B']}
                 },
                 selectors = {
                     table_rows: '.OG-gadget-recordtable tbody tr'
                 };
 
             var add_handler = function () {
-                var row_id = 'row-' + ($('.'+selectors.table_rows).length+1);
-                new form.Block({
+                create_edit_fields('row-' + ($('.'+selectors.table_rows).length+1)).html(function (html) {
+                    $('.OG-gadget-recordtable tbody').append(html);
+                });
+            };
+
+            var create_edit_fields = function (id) {
+                return new form.Block({
                     module: 'og.views.gadgets.recordtable.body_tash',
                     generator: function (handler, template, data) {
+                        data.actions = actions;
                         data.rows = [{
-                            id: row_id,
-                            cells: headers.map(function (entry) {
+                            'id': id, 'state': 'edit',
+                            'cells': headers.map(function (entry) {
                                 return {
-                                    id: entry.id,
-                                    text: (Handlebars.compile(create_field_type({
-                                        type: entry.data_type,
-                                        id: row_id + ' ' + entry.id
+                                    'id': entry.id, 'val': (compile(create_field_type({
+                                        'type': entry.data_type, 'id': id+' '+entry.id
                                     })))(mock[entry.data_type])
                                 };
-                            }),
-                            state: 'edit'
+                            })
                         }];
-                        data.actions = actions;
                         handler(template(data));
                     }
-                }).html(function (html) {
-                    $('.OG-gadget-recordtable tbody').append(html);
                 });
             };
 
             var create_field_type = function (field) {
                 switch (field.type) {
                     case 'string':
-                    case 'number':
-                        return '<input type="text" value="{{val}}" />';
-                    case 'array':
-                        return '<select>{{#each opts}}<option>{{this}}</option>{{/each}}</select>';
+                    case 'number': return '<input type="text" value="{{val}}" />';
+                    case 'array': return '<select>{{#each opts}}<option>{{this}}</option>{{/each}}</select>';
                     case 'boolean':
-                        return '<input checked name="'+field.id+'" type="radio" value="true">true</input> '+
-                               '<input name="'+field.id+'" type="radio" value="false">false</input>';
+                        return '<label><input checked name="'+field.id+'" type="radio" value="true"/>true</label> '+
+                               '<label><input name="'+field.id+'" type="radio" value="false" />false</label>';
                 }
+            };
+
+            var edit_handler = function (elem) {
+                var id, tr;
+                if (!(tr = elem.parents('tr'), id = elem.data('id'))) return false;
+                create_edit_fields(id).html(function (html) {
+                    $('tr'+id).append(html);
+                });
             };
 
             var event_delegate = function (event) {
                 var $elem = $(event.srcElement || event.target);
                 if ($elem.data('action') === 'add') return add_handler();
+                if ($elem.data('action') === 'edit') return edit_handler();
             };
 
             var load_handler = function () {};
