@@ -751,7 +751,7 @@ public class IZY implements IZYAPIInterface {
 
   @Override
   public void vz_abs(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
-    check_complex_izy_cvcv(count, arg0, offsetarg0, out0, offsetout0);
+    check_complex_izy_cvrv(count, arg0, offsetarg0, out0, offsetout0);
     _localIZY.vz_abs(count, arg0, offsetarg0, out0, offsetout0);
   }
 
