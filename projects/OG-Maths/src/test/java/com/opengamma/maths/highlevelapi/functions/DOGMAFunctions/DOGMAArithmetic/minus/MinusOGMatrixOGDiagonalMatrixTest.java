@@ -34,7 +34,6 @@ public class MinusOGMatrixOGDiagonalMatrixTest {
 
   private static MinusOGMatrixOGDiagonalMatrix minus = new MinusOGMatrixOGDiagonalMatrix();
 
-
   @Test
   public static void scalarFullMinusDiag() {
     OGMatrix answer = new OGMatrix(new double[][] { {0.00, 10.00, 10.00 }, {10.00, -10.00, 10.00 }, {10.00, 10.00, -20.00 }, {10.00, 10.00, 10.00 } });
@@ -59,7 +58,7 @@ public class MinusOGMatrixOGDiagonalMatrixTest {
 
   @Test
   public static void FullMinusDiag() {
-    OGMatrix answer = new OGMatrix(new double[][] { {-9.00, 2.00, 3.00 }, {4.00, -15.00, 6.00 }, {7.00, 8.00, -21.00 }, {10.00, 11.00, 12.00 } });
+    OGMatrix answer = new OGMatrix(new double[][] { {-9., 2., 3. }, {4., -15., 6. }, {7., 8., -21. }, {10., 11., 12. } });
     assertTrue(answer.equals(minus.eval(F4x3, D4x3)));
   }
 }
