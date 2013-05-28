@@ -22,6 +22,7 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.financial.analytics.OpenGammaFunctionExclusions;
 import com.opengamma.financial.analytics.model.forex.ForexVisitors;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesFunctionUtils;
 import com.opengamma.financial.property.DefaultPropertyFunction;
 import com.opengamma.financial.security.FinancialSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
@@ -34,24 +35,27 @@ import com.opengamma.util.tuple.Pair;
  */
 public class FXForwardPnLDefaults extends DefaultPropertyFunction {
   private static final Logger s_logger = LoggerFactory.getLogger(FXForwardPnLDefaults.class);
-  private final String _samplingPeriod;
+  private final String _start;
+  private final String _end;
   private final String _scheduleCalculator;
   private final String _samplingFunction;
   private final Map<String, Pair<String, String>> _currencyCurveConfigAndDiscountingCurveNames;
 
-  public FXForwardPnLDefaults(final String samplingPeriod, final String scheduleCalculator, final String samplingFunction,
-      final String... currencyCurveConfigAndDiscountingCurveNames) {
+  public FXForwardPnLDefaults(final String start, final String end, final String scheduleCalculator,
+      final String samplingFunction, final String... currencyCurveConfigAndDiscountingCurveNames) {
     super(ComputationTargetType.POSITION, true);
-    ArgumentChecker.notNull(samplingPeriod, "sampling period");
+    ArgumentChecker.notNull(start, "start");
+    ArgumentChecker.notNull(end, "end");
     ArgumentChecker.notNull(scheduleCalculator, "schedule calculator");
     ArgumentChecker.notNull(samplingFunction, "sampling function");
-    _samplingPeriod = samplingPeriod;
+    _start = start;
+    _end = end;
     _scheduleCalculator = scheduleCalculator;
     _samplingFunction = samplingFunction;
     ArgumentChecker.notNull(currencyCurveConfigAndDiscountingCurveNames, "currency and curve config names");
     final int nPairs = currencyCurveConfigAndDiscountingCurveNames.length;
     ArgumentChecker.isTrue(nPairs % 3 == 0, "Must have one curve config and discounting curve name per currency");
-    _currencyCurveConfigAndDiscountingCurveNames = new HashMap<String, Pair<String, String>>();
+    _currencyCurveConfigAndDiscountingCurveNames = new HashMap<>();
     for (int i = 0; i < currencyCurveConfigAndDiscountingCurveNames.length; i += 3) {
       final Pair<String, String> pair = Pair.of(currencyCurveConfigAndDiscountingCurveNames[i + 1], currencyCurveConfigAndDiscountingCurveNames[i + 2]);
       _currencyCurveConfigAndDiscountingCurveNames.put(currencyCurveConfigAndDiscountingCurveNames[i], pair);
@@ -72,19 +76,25 @@ public class FXForwardPnLDefaults extends DefaultPropertyFunction {
 
   @Override
   protected void getDefaults(final PropertyDefaults defaults) {
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.PAY_CURVE);
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.RECEIVE_CURVE);
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.PAY_CURVE_CALCULATION_CONFIG);
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.RECEIVE_CURVE_CALCULATION_CONFIG);
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.SAMPLING_PERIOD);
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.SCHEDULE_CALCULATOR);
-    defaults.addValuePropertyName(ValueRequirementNames.PNL_SERIES, ValuePropertyNames.SAMPLING_FUNCTION);
+    for (final String requirementName : new String[] {ValueRequirementNames.PNL_SERIES, ValueRequirementNames.YIELD_CURVE_PNL_SERIES, ValueRequirementNames.YIELD_CURVE_HISTORICAL_TIME_SERIES}) {
+      defaults.addValuePropertyName(requirementName, ValuePropertyNames.PAY_CURVE);
+      defaults.addValuePropertyName(requirementName, ValuePropertyNames.RECEIVE_CURVE);
+      defaults.addValuePropertyName(requirementName, ValuePropertyNames.PAY_CURVE_CALCULATION_CONFIG);
+      defaults.addValuePropertyName(requirementName, ValuePropertyNames.RECEIVE_CURVE_CALCULATION_CONFIG);
+      defaults.addValuePropertyName(requirementName, HistoricalTimeSeriesFunctionUtils.START_DATE_PROPERTY);
+      defaults.addValuePropertyName(requirementName, HistoricalTimeSeriesFunctionUtils.END_DATE_PROPERTY);
+      defaults.addValuePropertyName(requirementName, ValuePropertyNames.SCHEDULE_CALCULATOR);
+      defaults.addValuePropertyName(requirementName, ValuePropertyNames.SAMPLING_FUNCTION);
+    }
   }
 
   @Override
   protected Set<String> getDefaultValue(final FunctionCompilationContext context, final ComputationTarget target, final ValueRequirement desiredValue, final String propertyName) {
-    if (ValuePropertyNames.SAMPLING_PERIOD.equals(propertyName)) {
-      return Collections.singleton(_samplingPeriod);
+    if (HistoricalTimeSeriesFunctionUtils.START_DATE_PROPERTY.equals(propertyName)) {
+      return Collections.singleton(_start);
+    }
+    if (HistoricalTimeSeriesFunctionUtils.END_DATE_PROPERTY.equals(propertyName)) {
+      return Collections.singleton(_end);
     }
     if (ValuePropertyNames.SCHEDULE_CALCULATOR.equals(propertyName)) {
       return Collections.singleton(_scheduleCalculator);

@@ -8,7 +8,7 @@ package com.opengamma.web.analytics.formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.engine.calcnode.MissingInput;
+import com.opengamma.engine.calcnode.MissingValue;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.util.ClassMap;
 import com.opengamma.web.analytics.ValueTypes;
@@ -51,12 +51,13 @@ public class ResultsFormatter {
     BigDecimalFormatter bigDecimalFormatter = new BigDecimalFormatter();
     DoubleFormatter doubleFormatter = new DoubleFormatter(bigDecimalFormatter);
     CurrencyAmountFormatter currencyAmountFormatter = new CurrencyAmountFormatter(bigDecimalFormatter);
-
     ZonedDateTimeFormatter zonedDateTimeFormatter = new ZonedDateTimeFormatter();
+    LocalDateDoubleTimeSeriesFormatter localDateDoubleTimeSeriesFormatter = new LocalDateDoubleTimeSeriesFormatter();
     addFormatters(doubleFormatter,
                   bigDecimalFormatter,
                   currencyAmountFormatter,
                   zonedDateTimeFormatter,
+                  localDateDoubleTimeSeriesFormatter,
                   new YieldCurveFormatter(),
                   new ISDADateCurveFormatter(),
                   new HazardRateCurveFormatter(),
@@ -68,16 +69,16 @@ public class ResultsFormatter {
                   new LocalDateLabelledMatrix1DFormatter(doubleFormatter),
                   new LabelledMatrix2DFormatter(),
                   new LabelledMatrix3DFormatter(),
+                  new TenorLabelledLocalDateDoubleTimeSeriesMatrix1DFormatter(localDateDoubleTimeSeriesFormatter),
                   new TenorFormatter(),
                   new MultipleCurrencyAmountFormatter(doubleFormatter),
-                  new MissingMarketDataSentinelFormatter(),
-                  new NotCalculatedSentinelFormatter(),
+                  new MissingInputFormatter(),
+                  new MissingOutputFormatter(),
                   new ForwardCurveFormatter(),
                   new BlackVolatilitySurfaceMoneynessFormatter(),
                   new LocalVolatilitySurfaceMoneynessFormatter(),
                   new BucketedGreekResultCollectionFormatter(),
                   new DoublesCurveFormatter(),
-                  new LocalDateDoubleTimeSeriesFormatter(),
                   new HistoricalTimeSeriesFormatter(),
                   new DoubleArrayFormatter(),
                   new DoubleObjectArrayFormatter(),
@@ -150,7 +151,7 @@ public class ResultsFormatter {
   }
 
   private static boolean isError(Object value) {
-    return value instanceof MissingInput;
+    return value instanceof MissingValue;
   }
 
   /**

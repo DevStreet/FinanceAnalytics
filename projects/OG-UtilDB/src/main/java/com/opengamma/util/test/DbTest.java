@@ -84,7 +84,7 @@ public abstract class DbTest implements TableCreationCallback {
           ArgumentChecker.notNull(_databaseType, "_databaseType");
           _dbtool = DbTestProperties.getDbTool(_databaseType);
           _dbtool.setJdbcUrl(getDbTool().getTestDatabaseUrl());
-          _dbtool.addDbScriptDirectory(DbScripts.getSqlScriptDir().getAbsolutePath());
+          _dbtool.addDbScriptDirectories(DbScripts.getSqlScriptDir());
         }
       }
     }
@@ -137,7 +137,7 @@ public abstract class DbTest implements TableCreationCallback {
   protected static Object[][] getParametersForSeparateMasters(int prevVersionCount) {
     String testDatabaseType = System.getProperty("test.database.type");
     Collection<String> databaseTypes;
-    if (testDatabaseType == null) {
+    if (testDatabaseType == null || testDatabaseType.trim().equalsIgnoreCase("all")) {
       databaseTypes = new ArrayList<>(s_dbDialects.keySet());
     } else {
       if (s_dbDialects.containsKey(testDatabaseType) == false) {
@@ -147,7 +147,7 @@ public abstract class DbTest implements TableCreationCallback {
     }
     ArrayList<Object[]> parameters = new ArrayList<Object[]>();
     for (String databaseType : databaseTypes) {
-      DbScripts scripts = DbScripts.of(Collections.singleton(DbScripts.getSqlScriptDir()), databaseType);
+      DbScripts scripts = DbScripts.of(DbScripts.getSqlScriptDir(), databaseType);
       Map<String, SortedMap<Integer, DbScriptPair>> scriptPairs = scripts.getScriptPairs();
       for (String schema : scriptPairs.keySet()) {
         Set<Integer> versions = scriptPairs.get(schema).keySet();

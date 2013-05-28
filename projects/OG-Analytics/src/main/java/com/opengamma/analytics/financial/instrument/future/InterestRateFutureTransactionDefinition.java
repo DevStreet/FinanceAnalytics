@@ -17,6 +17,7 @@ import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureSecurity;
 import com.opengamma.analytics.financial.interestrate.future.derivative.InterestRateFutureTransaction;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
+import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 
@@ -93,14 +94,16 @@ public class InterestRateFutureTransactionDefinition implements InstrumentDefini
    * @param notional Future notional.
    * @param paymentAccrualFactor Future payment accrual factor.
    * @param name The future name.
+   * @param calendar The holiday calendar for the ibor leg.
    * @return The interest rate futures.
    */
   public static InterestRateFutureTransactionDefinition fromFixingPeriodStartDate(final ZonedDateTime transactionDate, final double transactionPrice, final int quantity,
-      final ZonedDateTime fixingPeriodStartDate, final IborIndex iborIndex, final double notional, final double paymentAccrualFactor, final String name) {
+      final ZonedDateTime fixingPeriodStartDate, final IborIndex iborIndex, final double notional, final double paymentAccrualFactor, final String name,
+      final Calendar calendar) {
     ArgumentChecker.notNull(fixingPeriodStartDate, "Fixing period start date");
     ArgumentChecker.notNull(iborIndex, "Ibor index");
-    final ZonedDateTime lastTradingDate = ScheduleCalculator.getAdjustedDate(fixingPeriodStartDate, -iborIndex.getSpotLag(), iborIndex.getCalendar());
-    final ZonedDateTime fixingPeriodEndDate = ScheduleCalculator.getAdjustedDate(fixingPeriodStartDate, iborIndex);
+    final ZonedDateTime lastTradingDate = ScheduleCalculator.getAdjustedDate(fixingPeriodStartDate, -iborIndex.getSpotLag(), calendar);
+    final ZonedDateTime fixingPeriodEndDate = ScheduleCalculator.getAdjustedDate(fixingPeriodStartDate, iborIndex, calendar);
     return new InterestRateFutureTransactionDefinition(transactionDate, transactionPrice, quantity, lastTradingDate, fixingPeriodStartDate, fixingPeriodEndDate, iborIndex, notional,
         paymentAccrualFactor, name);
   }
@@ -120,21 +123,6 @@ public class InterestRateFutureTransactionDefinition implements InstrumentDefini
   public double getTransactionPrice() {
     return _transactionPrice;
   }
-
-  //  /**
-  //   * Constructor for Yield Curve fitting. Notional scaling for Jacobian conditioning; pricing to get spot traded trade to value to 0.
-  //   * @param notional Face value of the security. This doesn't include accrual factor.
-  //   * @param txnPrice Not scaled, eg 0.9875
-  //   * @return New InterestRate Future
-  //   */
-  //  public InterestRateFutureTransactionDefinition withNewNotionalAndTransactionPrice(final double notional, final double txnPrice) {
-  //    return new InterestRateFutureTransactionDefinition(getTransactionDate(), txnPrice, getLastTradingDate(), getIborIndex(), notional, getPaymentAccrualFactor(), getQuantity(), getName());
-  //  }
-
-  //  /** Scales notional to 1.0 in curve fitting to provide better conditioning of the Jacobian */
-  //  public void setUnitNotional() {
-  //    _notional = 1.0;
-  //  }
 
   /**
    * Gets the future last trading date.
@@ -265,7 +253,7 @@ public class InterestRateFutureTransactionDefinition implements InstrumentDefini
 
   @Override
   public String toString() {
-    String result = "Quantity: " + _quantity + " of " + _underlying.toString();
+    final String result = "Quantity: " + _quantity + " of " + _underlying.toString();
     return result;
   }
 
@@ -283,7 +271,7 @@ public class InterestRateFutureTransactionDefinition implements InstrumentDefini
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
@@ -293,7 +281,7 @@ public class InterestRateFutureTransactionDefinition implements InstrumentDefini
     if (getClass() != obj.getClass()) {
       return false;
     }
-    InterestRateFutureTransactionDefinition other = (InterestRateFutureTransactionDefinition) obj;
+    final InterestRateFutureTransactionDefinition other = (InterestRateFutureTransactionDefinition) obj;
     if (_quantity != other._quantity) {
       return false;
     }

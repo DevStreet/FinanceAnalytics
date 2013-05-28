@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.db.management.DbManagement;
 import com.opengamma.util.db.management.DbManagementUtils;
 
@@ -94,8 +95,8 @@ public class DbTool extends Task {
   public void initialize() {
     if (_dbServerHost == null) {
       // Parse the server host and catalog from a JDBC URL
+      // REVIEW jonathan 2013-05-14 -- should not be doing this (PLAT-2745)
       if (_jdbcUrl != null) {
-
         int lastSlash = _jdbcUrl.lastIndexOf('/');
         if (lastSlash == -1 || lastSlash == _jdbcUrl.length() - 1) {
           throw new OpenGammaRuntimeException("JDBC URL must contain a slash separating the server host and the database name");
@@ -278,6 +279,18 @@ public class DbTool extends Task {
       directory = getWorkingDirectory();
     }
     _dbScriptDirs.add(directory);
+  }
+
+  /**
+   * Adds a collection of directories to the set.
+   * 
+   * @param directories  the directories, not null
+   */
+  public void addDbScriptDirectories(Iterable<File> directories) {
+    ArgumentChecker.notNull(directories, "directories");
+    for (File dir : directories) {
+      _dbScriptDirs.add(dir.getAbsolutePath());
+    }
   }
 
   public void setCreateVersion(final String createVersion) {

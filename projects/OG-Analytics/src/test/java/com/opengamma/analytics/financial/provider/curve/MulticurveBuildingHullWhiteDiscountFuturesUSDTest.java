@@ -90,13 +90,17 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
   private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M", NYC);
   private static final IborIndex USDLIBOR3M = USD6MLIBOR3M.getIborIndex();
   private static final ZonedDateTime EDM3_START_PERIOD = DateUtils.getUTCDate(2013, 6, 19);
-  private static final InterestRateFutureSecurityDefinition EDM3_DEFINITION = InterestRateFutureSecurityDefinition.fromFixingPeriodStartDate(EDM3_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDM3");
+  private static final InterestRateFutureSecurityDefinition EDM3_DEFINITION = InterestRateFutureSecurityDefinition
+      .fromFixingPeriodStartDate(EDM3_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDM3", NYC);
   private static final ZonedDateTime EDU3_START_PERIOD = DateUtils.getUTCDate(2013, 9, 18);
-  private static final InterestRateFutureSecurityDefinition EDU3_DEFINITION = InterestRateFutureSecurityDefinition.fromFixingPeriodStartDate(EDU3_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDU3");
+  private static final InterestRateFutureSecurityDefinition EDU3_DEFINITION = InterestRateFutureSecurityDefinition
+      .fromFixingPeriodStartDate(EDU3_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDU3", NYC);
   private static final ZonedDateTime EDZ3_START_PERIOD = DateUtils.getUTCDate(2013, 12, 18);
-  private static final InterestRateFutureSecurityDefinition EDZ3_DEFINITION = InterestRateFutureSecurityDefinition.fromFixingPeriodStartDate(EDZ3_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDZ3");
+  private static final InterestRateFutureSecurityDefinition EDZ3_DEFINITION = InterestRateFutureSecurityDefinition
+      .fromFixingPeriodStartDate(EDZ3_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDZ3", NYC);
   private static final ZonedDateTime EDH4_START_PERIOD = DateUtils.getUTCDate(2014, 3, 19);
-  private static final InterestRateFutureSecurityDefinition EDH4_DEFINITION = InterestRateFutureSecurityDefinition.fromFixingPeriodStartDate(EDH4_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDH4");
+  private static final InterestRateFutureSecurityDefinition EDH4_DEFINITION = InterestRateFutureSecurityDefinition
+      .fromFixingPeriodStartDate(EDH4_START_PERIOD, USDLIBOR3M, NOTIONAL, 0.25, "EDH4", NYC);
   private static final Period CTPM3_TENOR = Period.ofYears(2);
   private static final double CTPM3_RATE = 0.0050;
   private static final SwapFuturesDeliverableSecurityDefinition CTPM3_DEFINITION = SwapFuturesDeliverableSecurityDefinition.from(EDM3_START_PERIOD, USD6MLIBOR3M, CTPM3_TENOR, NOTIONAL, CTPM3_RATE);
@@ -117,7 +121,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
   private static final GeneratorSwapFuturesDeliverable GENERATOR_CFPM3 = new GeneratorSwapFuturesDeliverable("CFPM3", CFPM3_DEFINITION);
   private static final GeneratorSwapFuturesDeliverable GENERATOR_CNPM3 = new GeneratorSwapFuturesDeliverable("CNPM3", CNPM3_DEFINITION);
   private static final GeneratorSwapFuturesDeliverable GENERATOR_CBPM3 = new GeneratorSwapFuturesDeliverable("CBPM3", CBPM3_DEFINITION);
-  private static final GeneratorDepositIbor GENERATOR_USDLIBOR3M = new GeneratorDepositIbor("GENERATOR_USDLIBOR3M", USDLIBOR3M);
+  private static final GeneratorDepositIbor GENERATOR_USDLIBOR3M = new GeneratorDepositIbor("GENERATOR_USDLIBOR3M", USDLIBOR3M, NYC);
 
   private static final ZonedDateTimeDoubleTimeSeries TS_EMPTY = ImmutableZonedDateTimeDoubleTimeSeries.ofEmptyUTC();
   private static final ZonedDateTimeDoubleTimeSeries TS_ON_EUR_WITH_TODAY = ImmutableZonedDateTimeDoubleTimeSeries.ofUTC(new ZonedDateTime[] {DateUtils.getUTCDate(2013, 4, 25),
@@ -192,9 +196,9 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
   private static final MulticurveProviderDiscount MULTICURVE_KNOWN_DATA = new MulticurveProviderDiscount(FX_MATRIX);
   private static final HullWhiteOneFactorProviderDiscount HW_KNOWN_DATA = new HullWhiteOneFactorProviderDiscount(MULTICURVE_KNOWN_DATA, MODEL_PARAMETERS, USD);
 
-  private static final LinkedHashMap<String, Currency> DSC_MAP = new LinkedHashMap<String, Currency>();
-  private static final LinkedHashMap<String, IndexON[]> FWD_ON_MAP = new LinkedHashMap<String, IndexON[]>();
-  private static final LinkedHashMap<String, IborIndex[]> FWD_IBOR_MAP = new LinkedHashMap<String, IborIndex[]>();
+  private static final LinkedHashMap<String, Currency> DSC_MAP = new LinkedHashMap<>();
+  private static final LinkedHashMap<String, IndexON[]> FWD_ON_MAP = new LinkedHashMap<>();
+  private static final LinkedHashMap<String, IborIndex[]> FWD_IBOR_MAP = new LinkedHashMap<>();
 
   static {
     DEFINITIONS_DSC_USD = getDefinitions(DSC_USD_MARKET_QUOTES, DSC_USD_GENERATORS, DSC_USD_ATTR);
@@ -231,7 +235,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
     return definitions;
   }
 
-  private static List<Pair<HullWhiteOneFactorProviderDiscount, CurveBuildingBlockBundle>> CURVES_PAR_SPREAD_MQ_WITHOUT_TODAY_BLOCK = new ArrayList<Pair<HullWhiteOneFactorProviderDiscount, CurveBuildingBlockBundle>>();
+  private static List<Pair<HullWhiteOneFactorProviderDiscount, CurveBuildingBlockBundle>> CURVES_PAR_SPREAD_MQ_WITHOUT_TODAY_BLOCK = new ArrayList<>();
 
   // Calculator
   private static final PresentValueHullWhiteCalculator PVHWC = PresentValueHullWhiteCalculator.getInstance();
@@ -259,7 +263,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
     }
   }
 
-  @Test(enabled = true)
+  @Test(enabled = false)
   public void performance() {
     long startTime, endTime;
     final int nbTest = 100;
@@ -269,7 +273,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
       makeCurvesFromDefinitions(DEFINITIONS_UNITS[0], GENERATORS_UNITS[0], NAMES_UNITS[0], HW_KNOWN_DATA, PSMQHWC, PSMQCSHWC, false);
     }
     endTime = System.currentTimeMillis();
-    System.out.println(nbTest + " curve construction / 2 units: " + (endTime - startTime) + " ms");
+    System.out.println("MulticurveBuildingHullWhiteDiscountFuturesUSDTest:" + nbTest + " curve construction / 2 units: " + (endTime - startTime) + " ms");
     // Performance note: Curve construction 2 units: 06-Nov-12: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 810 ms for 100 sets.
 
     startTime = System.currentTimeMillis();
@@ -277,7 +281,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
       makeCurvesFromDefinitions(DEFINITIONS_UNITS[1], GENERATORS_UNITS[1], NAMES_UNITS[1], HW_KNOWN_DATA, PSMQHWC, PSMQCSHWC, false);
     }
     endTime = System.currentTimeMillis();
-    System.out.println(nbTest + " curve construction / 1 unit: " + (endTime - startTime) + " ms");
+    System.out.println("MulticurveBuildingHullWhiteDiscountFuturesUSDTest:" + nbTest + " curve construction / 1 unit: " + (endTime - startTime) + " ms");
     // Performance note: Curve construction 1 unit: 06-Nov-12: On Mac Pro 3.2 GHz Quad-Core Intel Xeon: 920 ms for 100 sets.
 
   }

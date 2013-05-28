@@ -63,7 +63,7 @@ public class ConventionBuildersTest extends AnalyticsTestBase {
   public void testDepositConvention() {
     final DepositConvention convention = new DepositConvention("EUR Deposit", ExternalIdBundle.of(InMemoryConventionBundleMaster.simpleNameSecurityId("EUR Deposit")),
         DayCountFactory.INSTANCE.getDayCount("Act/365"), BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following"), 2, true,
-        Currency.EUR, ExternalId.of("Test", "EU"));
+        Currency.EUR, ExternalId.of("Test", "EU"), Tenor.ONE_DAY);
     convention.setUniqueId(UniqueId.of("Test", "1234"));
     assertEquals(convention, cycleObject(DepositConvention.class, convention));
   }
@@ -88,7 +88,7 @@ public class ConventionBuildersTest extends AnalyticsTestBase {
   public void testIborIndexConvention() {
     final IborIndexConvention convention = new IborIndexConvention("EUR Deposit", ExternalIdBundle.of(InMemoryConventionBundleMaster.simpleNameSecurityId("EUR Deposit")),
         DayCountFactory.INSTANCE.getDayCount("Act/365"), BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following"), 2, true,
-        Currency.EUR, LocalTime.of(11, 0), ExternalId.of("Test", "EU"), ExternalId.of("Test", "EU"), "Page");
+        Currency.EUR, LocalTime.of(11, 0), ExternalId.of("Test", "EU"), ExternalId.of("Test", "EU"), "Page", Tenor.THREE_MONTHS);
     convention.setUniqueId(UniqueId.of("Test", "1234567"));
     assertEquals(convention, cycleObject(IborIndexConvention.class, convention));
   }
@@ -104,7 +104,7 @@ public class ConventionBuildersTest extends AnalyticsTestBase {
   @Test
   public void testOISLegConvention() {
     final OISLegConvention convention = new OISLegConvention("EUR OIS", ExternalIdBundle.of(InMemoryConventionBundleMaster.simpleNameSecurityId("EUR OIS")),
-        ExternalId.of("Test", "EONIA"), Tenor.SIX_MONTHS, 0);
+        ExternalId.of("Test", "EONIA"), Tenor.SIX_MONTHS, 0, 1, BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following"), true);
     convention.setUniqueId(UniqueId.of("Test", "123"));
     assertEquals(convention, cycleObject(OISLegConvention.class, convention));
   }
@@ -149,4 +149,5 @@ public class ConventionBuildersTest extends AnalyticsTestBase {
     convention.setUniqueId(UniqueId.of("Test", "12345"));
     assertEquals(convention, cycleObject(VanillaIborLegConvention.class, convention));
   }
+
 }
