@@ -198,13 +198,13 @@ public class DOMGArdivideTest {
   @Test
   public void testDouble3x5ArdividedoubleTest() {
     OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, 10.e0);
-    assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
+    assertTrue(DOGMA.full(tmp).equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test
   public void testDouble3x5ArdivideintTest() {
     OGArray<? extends Number> tmp = DOGMA.rdivide(OGD3x5A, 10);
-    assertTrue(tmp.equals(OGD3x5ArdivOGD1x1));
+    assertTrue(DOGMA.full(tmp).equals(OGD3x5ArdivOGD1x1));
   }
 
   @Test

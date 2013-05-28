@@ -170,25 +170,25 @@ public class DOGMAtimesTest {
   @Test
   public void testDouble3x5AtimesdoubleTest() {
     OGArray<? extends Number> tmp = DOGMA.times(OGD3x5A, 10.e0);
-    assertTrue(tmp.equals(OGD3x5timesOGD1x1));
+    assertTrue(OGD3x5timesOGD1x1.equals(DOGMA.full(tmp)));
   }
 
   @Test
   public void testDouble3x5AtimesintTest() {
     OGArray<? extends Number> tmp = DOGMA.times(OGD3x5A, 10);
-    assertTrue(tmp.equals(OGD3x5timesOGD1x1));
+    assertTrue(OGD3x5timesOGD1x1.equals(DOGMA.full(tmp)));
   }
 
   @Test
   public void testdoubletimesDouble3x5ATest() {
     OGArray<? extends Number> tmp = DOGMA.times(10.e0, OGD3x5A);
-    assertTrue(tmp.equals(OGD3x5timesOGD1x1));
+    assertTrue(OGD3x5timesOGD1x1.equals(DOGMA.full(tmp)));
   }
 
   @Test
   public void testinttimesDouble3x5ATest() {
     OGArray<? extends Number> tmp = DOGMA.times(10, OGD3x5A);
-    assertTrue(tmp.equals(OGD3x5timesOGD1x1));
+    assertTrue(OGD3x5timesOGD1x1.equals(DOGMA.full(tmp)));
   }
 
   // OGSparseArray operate on natives
