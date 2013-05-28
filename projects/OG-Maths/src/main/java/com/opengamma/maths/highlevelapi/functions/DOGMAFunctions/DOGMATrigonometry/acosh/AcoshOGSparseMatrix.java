@@ -27,10 +27,14 @@ public class AcoshOGSparseMatrix implements Acosh<OGArray<? extends Number>, OGS
     double[] tmp;
     // check bounds
     boolean complex = false;
-    for (int i = 0; i < n; i++) {
-      if (data[i] < 1) {
-        complex = true;
-        break;
+    if (n != array1.getNumberOfColumns() * array1.getNumberOfRows()) { // must be a zero in there
+      complex = true;
+    } else { // full but sparse, see if any < 1
+      for (int i = 0; i < n; i++) {
+        if (data[i] < 1) {
+          complex = true;
+          break;
+        }
       }
     }
     OGArray<? extends Number> retarr;
@@ -38,15 +42,10 @@ public class AcoshOGSparseMatrix implements Acosh<OGArray<? extends Number>, OGS
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
       EasyIZY.vz_acosh(tmp, tmp);
       retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.i_times_half_pi());
-    } else {
+    } else { // we have a full sparse matrix with all values > 1
       tmp = new double[n];
       EasyIZY.vd_acosh(data, tmp);
-      if (n == array1.getNumberOfNonZeroElements()) { // sparse, but fully populated
-        retarr = SparseMemoryManipulation.createFullSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, 0);
-      } else {
-        tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(tmp);
-        retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.i_times_half_pi());
-      }
+      retarr = SparseMemoryManipulation.createFullSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, 0);
     }
     return retarr;
   }
