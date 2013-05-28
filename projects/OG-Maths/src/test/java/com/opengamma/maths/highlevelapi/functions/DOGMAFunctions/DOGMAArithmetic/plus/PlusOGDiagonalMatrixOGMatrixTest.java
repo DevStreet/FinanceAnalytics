@@ -5,8 +5,9 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.plus;
 
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
+
+import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
@@ -32,50 +33,50 @@ public class PlusOGDiagonalMatrixOGMatrixTest {
 
   private static PlusOGDiagonalMatrixOGMatrix plus = new PlusOGDiagonalMatrixOGMatrix();
   private static MinusOGDiagonalMatrixOGMatrix minus = new MinusOGDiagonalMatrixOGMatrix();
-  
+
   @Test
-  public static void scalarFullPlusDiag() {
+  public static void scalarDiagPlusFull() {
     OGMatrix answer = new OGMatrix(new double[][] { {20.00, 10.00, 10.00 }, {10.00, 30.00, 10.00 }, {10.00, 10.00, 40.00 }, {10.00, 10.00, 10.00 } });
     assertTrue(answer.equals(plus.eval(D4x3, F1x1)));
   }
 
   @Test
-  public static void scalarFullMinusDiag() {
-    OGMatrix answer = new OGMatrix(new double[][] { {0.00, 10.00, 10.00 }, {10.00, -10.00, 10.00 }, {10.00, 10.00, -20.00 }, {10.00, 10.00, 10.00 } });
-    assertTrue(answer.equals(minus.eval(D4x3,F1x1)));
+  public static void scalarDiagMinusFull() {
+    OGMatrix answer = new OGMatrix(new double[][] { {0., -10., -10. }, {-10., 10., -10. }, {-10., -10., 20. }, {-10., -10., -10. }});
+    assertTrue(answer.fuzzyequals(minus.eval(D4x3, F1x1),1e-15));
   }
 
   @Test
-  public static void FullPlusScalarDiag() {
+  public static void ScalarDiagPlusFull() {
     OGMatrix answer = new OGMatrix(new double[][] { {11.00, 12.00, 13.00 }, {14.00, 15.00, 16.00 }, {17.00, 18.00, 19.00 }, {20.00, 21.00, 22.00 } });
-    assertTrue(answer.equals(plus.eval(D1x1,F4x3)));
+    assertTrue(answer.equals(plus.eval(D1x1, F4x3)));
   }
 
   @Test
-  public static void FullMinusScalarDiag() {
-    OGMatrix answer = new OGMatrix(new double[][] { {-9.00, -8.00, -7.00 }, {-6.00, -5.00, -4.00 }, {-3.00, -2.00, -1.00 }, {0.00, 1.00, 2.00 } });
-    assertTrue(answer.equals(minus.eval(D1x1,F4x3)));
+  public static void ScalarDiagMinusFull() {
+    OGMatrix answer = new OGMatrix(new double[][] { {9., 8., 7. }, {6., 5., 4. }, {3., 2., 1. }, {0., -1., -2. }});
+    assertTrue(answer.fuzzyequals(minus.eval(D1x1, F4x3),1e-15));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public static void BadCommuteRows() {
-    plus.eval(new OGDiagonalMatrix(_datadiag, 3, 3),F4x3);
+    plus.eval(new OGDiagonalMatrix(_datadiag, 3, 3), F4x3);
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
   public static void BadCommuteCols() {
-    plus.eval(new OGDiagonalMatrix(_datadiag, 4, 23),F4x3);
+    plus.eval(new OGDiagonalMatrix(_datadiag, 4, 23), F4x3);
   }
 
   @Test
   public static void FullPlusDiag() {
     OGMatrix answer = new OGMatrix(new double[][] { {11.00, 2.00, 3.00 }, {4.00, 25.00, 6.00 }, {7.00, 8.00, 39.00 }, {10.00, 11.00, 12.00 } });
-    assertTrue(answer.equals(plus.eval(D4x3,F4x3)));
+    assertTrue(answer.equals(plus.eval(D4x3, F4x3)));
   }
 
   @Test
   public static void FullMinusDiag() {
-    OGMatrix answer = new OGMatrix(new double[][] { {-9.00, 2.00, 3.00 }, {4.00, -15.00, 6.00 }, {7.00, 8.00, -21.00 }, {10.00, 11.00, 12.00 } });
-    assertTrue(answer.equals(minus.eval(D4x3,F4x3)));
+    OGMatrix answer = new OGMatrix(new double[][] { {9., -2., -3. }, {-4., 15., -6. }, {-7., -8., 21. }, {-10., -11., -12. } });
+    assertTrue(answer.equals(minus.eval(D4x3, F4x3)));
   }
 }
