@@ -28,26 +28,40 @@ public class SvdSimpleTest {
   double[][] data1 = new double[][] { {1., 2., 3. }, {4., 5., 6. }, {7., 8., 9. }, {10., 11., 12. } };
   OGComplexMatrix A_complex_matrix = new OGComplexMatrix(data0, data1);
 
+  boolean debugMessages = false;
+
   @Test
   public void svdDOGMATest() {
-    System.out.println("Real Test");
+    if (debugMessages) {
+      System.out.println("Real Test");
+    }
     List<OGArray<? extends Number>> result = DOGMA.svd(A_real_matrix, SVDCompute.USV);
-    DOGMA.disp(result.get(0));
-    DOGMA.disp(result.get(1));
-    DOGMA.disp(result.get(2));
+    if (debugMessages) {
+      DOGMA.disp(result.get(0));
+      DOGMA.disp(result.get(1));
+      DOGMA.disp(result.get(2));
+    }
     OGArray<? extends Number> tmp = DOGMA.mtimes(DOGMA.mtimes(result.get(0), result.get(1)), DOGMA.transpose(result.get(2)));
-    DOGMA.disp(tmp);
+    if (debugMessages) {
+      DOGMA.disp(tmp);
+    }
   }
 
   @Test
   public void svdComplexDOGMATest() {
-    System.out.println("Complex Test");
+    if (debugMessages) {
+      System.out.println("Complex Test");
+    }
     List<OGArray<? extends Number>> result = DOGMA.svd(A_complex_matrix, SVDCompute.USV);
-    DOGMA.disp(result.get(0));
-    DOGMA.disp(result.get(1));
-    DOGMA.disp(result.get(2));
+    if (debugMessages) {
+      DOGMA.disp(result.get(0));
+      DOGMA.disp(result.get(1));
+      DOGMA.disp(result.get(2));
+    }
     OGArray<? extends Number> tmp = DOGMA.mtimes(DOGMA.mtimes(result.get(0), result.get(1)), DOGMA.transpose(result.get(2)));
-    DOGMA.disp(tmp);
+    if (debugMessages) {
+      DOGMA.disp(tmp);
+    }
   }
 
 }

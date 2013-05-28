@@ -16,6 +16,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.lapack.oglapack.general.typ
 /**
  * TODO: remove this comment: Currently being debugged!
  */
+@Test(enabled = false)
 public class SingularValueDecompositionTest {
   
   double [][] _Athinmat = {{1,2,3},{4,5,6},{7,8,9},{10,11,12}};
@@ -28,7 +29,7 @@ public class SingularValueDecompositionTest {
   DenseMatrix _DMAthinmat = new DenseMatrix(_Athinmat);
   DenseMatrix _DMAlargerthinmat = new DenseMatrix(_Alargerthinmat);
   
-  @Test
+  @Test(enabled = false)
   public void svdTestRowVect(){
     SingularValueDecompositionFullUSV tmp = DGESVD.full(_DMArowvector);
     System.out.println("U="+Arrays.toString(tmp.getMatrixU()));
@@ -37,7 +38,7 @@ public class SingularValueDecompositionTest {
     printToMatrix(tmp.getMatrixV(), 5, 5);  
   }
 
-  @Test
+  @Test(enabled = false)
   public void svdTestColVect(){
     SingularValueDecompositionFullUSV tmp = DGESVD.full(_DMAcolvector);
     System.out.println("U="+Arrays.toString(tmp.getMatrixU()));
