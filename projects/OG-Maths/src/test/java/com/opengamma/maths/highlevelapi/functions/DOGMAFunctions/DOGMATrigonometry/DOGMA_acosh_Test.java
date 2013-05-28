@@ -40,10 +40,10 @@ public class DOGMA_acosh_Test {
     double[][] data = new double[][] { {0, 2, 3 }, {0, 5, 0 }, {6, 0, 0 } };
     OGArray<? extends Number> foo, bar, baz;
     foo = new OGSparseMatrix(data);
-    bar = DOGMA.full(DOGMA.acosh(foo));
+    bar = DOGMA.acosh(foo);
     foo = new OGMatrix(data);
-    baz = DOGMA.full(DOGMA.acosh(foo));
-    assertTrue(baz.fuzzyequals(bar, 10*D1MACH.four()));
+    baz = DOGMA.acosh(foo);
+    assertTrue(DOGMA.full(baz).fuzzyequals(DOGMA.full(bar), 10*D1MACH.four()));
   }
 
   @Test
