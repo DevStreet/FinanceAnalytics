@@ -193,10 +193,12 @@ public class MATSharedData {
       _str2 = str2;
     }
 
+    @SuppressWarnings("unused")
     public String getStr1() {
       return _str1;
     }
 
+    @SuppressWarnings("unused")
     public String getStr2() {
       return _str2;
     }

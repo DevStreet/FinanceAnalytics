@@ -45,12 +45,45 @@ public class ReadMAT {
       long sbyte = tag.getStartByte();
       long ebyte = tag.getEndByte();
       fp.seek(sbyte);
+      @SuppressWarnings("unused")
       byte[] buf = new byte[(int) (ebyte - sbyte + 1)];
       MATTagType tagType = tag.getTagType();
       MATDataType dataType = tag.getDataType();
       if (tagType == MATTagType.standardData) {
         switch (dataType) {
           case miDOUBLE:
+            break;
+          case SPECIALSMALL:
+            break;
+          case miCOMPRESSED:
+            break;
+          case miINT16:
+            break;
+          case miINT32:
+            break;
+          case miINT64:
+            break;
+          case miINT8:
+            break;
+          case miMATRIX:
+            break;
+          case miSINGLE:
+            break;
+          case miUINT16:
+            break;
+          case miUINT32:
+            break;
+          case miUINT64:
+            break;
+          case miUINT8:
+            break;
+          case miUTF16:
+            break;
+          case miUTF32:
+            break;
+          case miUTF8:
+            break;
+          default:
             break;
         }
       }
