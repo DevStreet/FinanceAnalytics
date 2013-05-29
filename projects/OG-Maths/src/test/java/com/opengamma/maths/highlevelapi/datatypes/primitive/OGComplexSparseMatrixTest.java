@@ -15,11 +15,10 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGComplexSparseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
- * 
+ * Tests the complex sparse matrix class
  */
 public class OGComplexSparseMatrixTest {
   double[][] realData = { {1, 2, 0, 0 }, {5, 0, 7, 0 }, {0, 10, 11, 0 }, {0, 0, 15, 0 } };
