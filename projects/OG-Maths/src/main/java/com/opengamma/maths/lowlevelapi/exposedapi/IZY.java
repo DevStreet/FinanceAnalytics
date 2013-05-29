@@ -59,6 +59,8 @@ public class IZY implements IZYAPIInterface {
       _localIZY = new IZYNativeBacked();
     }
   }
+
+  //CSOFF
   
   /**
    * Checks the args to real domain izy calls of form f(vector,vector), before staging a call to the referenced izy implementation
