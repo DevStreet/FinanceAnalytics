@@ -17,10 +17,11 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
- * 
+ * Quick eyeballable to look at which methods have been scraped from the code 
  */
 public class MethodScraperTest {
 
+  @SuppressWarnings({"static-access", "unused" })
   @Test
   public void filterTest() {
     MethodScraperForInfixOperators filter = new MethodScraperForInfixOperators();

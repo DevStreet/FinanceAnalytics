@@ -39,6 +39,7 @@ public class DOGMAUnaryOps {
   private static RunUnaryFunctionChain s_runner = new RunUnaryFunctionChain();
   static {
     // hacky approx costs of evaluation
+    //CSOFF
     final double[][] FunctionEvalCosts = new double[][] {//
     {1 },//
         {1 },//
@@ -50,8 +51,9 @@ public class DOGMAUnaryOps {
         {5 },//
         {10 },//
         {20 } };
+    //CSON
     OGMatrix functionEvalCostsMatrix = new OGMatrix(FunctionEvalCosts);
-    OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDict = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>();
+    OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDict = new OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>>(); //CSIGNORE
     UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>[] sinFunctionTable = MethodScraperForUnaryFunctions.availableMethodsForUnaryFunctions(operatorDict.getOperationsMap(),
         Sin.class);
 
