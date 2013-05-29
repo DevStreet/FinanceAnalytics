@@ -8,6 +8,7 @@
 
   <dependencies>
     <dependency name="og-util" rev="latest.integration" />
+    <dependency name="og-maths" rev="latest.integration" />
 
     <dependency org="cern" name="colt" rev="1.2.0" />
     <dependency org="edu.emory.mathcs" name="jtransforms" rev="2.3" />
