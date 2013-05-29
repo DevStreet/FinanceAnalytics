@@ -5,8 +5,8 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConvergence;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * DGAMLM(X) provides the ability to calculate the minimum and maximum legal bounds for x in dgamma(x).
@@ -17,7 +17,7 @@ public class DGAMLM {
 
   public static void dgamlm(double[] xmin, double[] xmax) {
     double alnbig, alnsml, xln, xold;
-    alnsml = Math.log(D1MACH.one());
+    alnsml = Math.log(D1mach.one());
     xmin[0] = -alnsml;
     int i;
     for (i = 0; i < 10; i++) {
@@ -33,7 +33,7 @@ public class DGAMLM {
     }
     xmin[0] = -xmin[0] + 0.01d;
 
-    alnbig = Math.log(D1MACH.two());
+    alnbig = Math.log(D1mach.two());
     xmax[0] = alnbig;
     for (i = 0; i < 10; i++) {
       xold = xmax[0];

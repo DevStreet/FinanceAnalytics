@@ -8,10 +8,10 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
 import com.opengamma.maths.lowlevelapi.functions.MathE;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Computes the base 'e' (natural) logarithm of the true complete Gamma function at the absolute value of position 'x'
@@ -28,9 +28,9 @@ public class DLNGAM {
 
   private static double s_xmax, s_dxrel;
   static {
-    double temp = 1.d / Math.log(D1MACH.two());
-    s_xmax = temp * D1MACH.two();
-    s_dxrel = Math.sqrt(D1MACH.four());
+    double temp = 1.d / Math.log(D1mach.two());
+    s_xmax = temp * D1mach.two();
+    s_dxrel = Math.sqrt(D1mach.four());
   }
 
   /**

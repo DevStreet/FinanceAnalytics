@@ -9,13 +9,13 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -32,7 +32,7 @@ public class DOGMA_asinh_Test {
     bar = DOGMA.full(DOGMA.asinh(foo));
     foo = new OGComplexMatrix(data, data);
     baz = DOGMA.full(DOGMA.asinh(foo));
-    assertTrue(baz.fuzzyequals(bar, 10*D1MACH.four()));
+    assertTrue(baz.fuzzyequals(bar, 10*D1mach.four()));
   }
 
   @Test
@@ -43,7 +43,7 @@ public class DOGMA_asinh_Test {
     bar = DOGMA.full(DOGMA.asinh(foo));
     foo = new OGMatrix(data);
     baz = DOGMA.full(DOGMA.asinh(foo));
-    assertTrue(baz.fuzzyequals(bar, 10*D1MACH.four()));
+    assertTrue(baz.fuzzyequals(bar, 10*D1mach.four()));
   }
   
 }

@@ -129,7 +129,7 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
         iwork = new int[rows1];
         _lapack.dtrcon('1', UPLO, DIAG, rows1, data1, rows1, rcond, work, iwork, info);
 
-        if (rcond[0] + 1 != 1) { // rcond ~< D1MACH(4)
+        if (rcond[0] + 1 != 1) { // rcond ~< D1mach(4)
           _lapack.dtrtrs(UPLO, 'N', DIAG, rows1, cols2, data1, rows1, data2, rows2, info);
           if (info[0] == 0) { // triangular solve was ok
             if (_debug) {

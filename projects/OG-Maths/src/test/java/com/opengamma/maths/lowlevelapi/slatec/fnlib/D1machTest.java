@@ -5,16 +5,16 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
- * Tests double precision machine constants found in D1MACH
+ * Tests double precision machine constants found in D1mach
  */
-public class D1MACHTest {
+public class D1machTest {
 
   @Test
   public void d1machTestone() {

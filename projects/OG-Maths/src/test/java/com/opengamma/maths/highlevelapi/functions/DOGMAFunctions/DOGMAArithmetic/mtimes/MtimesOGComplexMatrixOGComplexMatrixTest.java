@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -39,7 +39,7 @@ public class MtimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][] { {-19., -38., -57. }, {-76., -95., -114. }, {-133., -152., -171. }, {-190., -209., -228. } };
     ip = new double[][] { {12., 24., 36. }, {48., 60., 72. }, {84., 96., 108. }, {120., 132., 144. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(mtimes.eval(Single, A), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(Single, A), 10 * D1mach.four()));
   }
 
   @Test
@@ -47,7 +47,7 @@ public class MtimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][] { {-19., -38., -57. }, {-76., -95., -114. }, {-133., -152., -171. }, {-190., -209., -228. } };
     ip = new double[][] { {12., 24., 36. }, {48., 60., 72. }, {84., 96., 108. }, {120., 132., 144. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(mtimes.eval(A, Single), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(A, Single), 10 * D1mach.four()));
   }
 
   @Test
@@ -55,7 +55,7 @@ public class MtimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][] { {-138.5999999999999943 }, {-316.7999999999999545 }, {-495.0000000000000000 }, {-673.2000000000000455 } };
     ip = new double[][] { {28.0000000000000000 }, {64.0000000000000000 }, {100.0000000000000000 }, {136.0000000000000000 } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(mtimes.eval(A, V), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(A, V), 10 * D1mach.four()));
   }
 
   @Test
@@ -63,7 +63,7 @@ public class MtimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][]  {{  -1643.4000000000000909,  -1861.2000000000000455,  -2079.0000000000000000}};
     ip = new double[][] {{    332.0000000000000000,    376.0000000000000000,    420.0000000000000000}};
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(mtimes.eval(H, A), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(H, A), 10 * D1mach.four()));
   }
 
   @Test
@@ -73,7 +73,7 @@ public class MtimesOGComplexMatrixOGComplexMatrixTest {
         {-673.2000000000000455, -1653.2999999999999545, -2633.4000000000000909, -3613.5000000000000000 } };
     ip = new double[][] { {28., 64., 100., 136. }, {64., 154., 244., 334. }, {100., 244., 388., 532. }, {136., 334., 532., 730. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(mtimes.eval(A, C), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(A, C), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

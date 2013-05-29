@@ -8,8 +8,8 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Computes the complex tangent of a double precision complex number
@@ -18,7 +18,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
  */
 public class ZTAN {
 
-  private static final double s_sqeps = Math.sqrt(D1MACH.four());
+  private static final double s_sqeps = Math.sqrt(D1mach.four());
   private static Logger s_log = LoggerFactory.getLogger(ZTAN.class);
 
   public static double[] ztan(double[] z) {

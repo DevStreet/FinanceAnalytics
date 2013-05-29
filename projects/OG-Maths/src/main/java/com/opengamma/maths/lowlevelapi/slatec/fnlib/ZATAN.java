@@ -8,10 +8,10 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.MathsConstants;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.lowlevelapi.complexbuiltins.ComplexArithmetic;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * ZATAN(Z) computes the complex trigonometric arc tangent of the argument.
@@ -26,11 +26,11 @@ public class ZATAN {
   private static final double s_halfPi = MathsConstants.halfpi;
   // NTERMS = LOG(EPS)/LOG(RBND) WHERE RBND = 0.1
   // -0.4343 is a magic number from 4 byte real precision complex, should still work.
-  // -0.4343 * Math.log(D1MACH.three()) ~= log(eps)/log(0.1) but saves calling log twice
-  private static final int NTERMS = (int) (-0.4343 * Math.log(D1MACH.three()) + 1.0);
-  private static final double SQEPS = Math.sqrt(D1MACH.four());
-  private static final double RMIN = Math.sqrt(3.0d * D1MACH.three());
-  private static final double RMAX = 1.0 / D1MACH.three();
+  // -0.4343 * Math.log(D1mach.three()) ~= log(eps)/log(0.1) but saves calling log twice
+  private static final int NTERMS = (int) (-0.4343 * Math.log(D1mach.three()) + 1.0);
+  private static final double SQEPS = Math.sqrt(D1mach.four());
+  private static final double RMIN = Math.sqrt(3.0d * D1mach.three());
+  private static final double RMAX = 1.0 / D1mach.three();
 
   public static double[] zatan(final double[] z) {
     double r = ZABS.zabs(z[0], z[1]);

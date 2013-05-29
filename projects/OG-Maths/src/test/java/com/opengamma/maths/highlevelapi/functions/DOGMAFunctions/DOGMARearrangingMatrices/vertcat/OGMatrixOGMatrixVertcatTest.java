@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -35,14 +35,14 @@ public class OGMatrixOGMatrixVertcatTest {
   @Test
   public void vertcatTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {1., 2., 3. }, {4., 5., 6. }, {7., 8., 9. }, {10., 11., 12. }, {1., 2., 3. }, {4., 5., 6. }, {7., 8., 9. } });
-    assertTrue(answer.fuzzyequals(vertcat.eval(Amatrix, Bmatrix), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(vertcat.eval(Amatrix, Bmatrix), 10 * D1mach.four()));
   }
 
   @Test
   public void vertcatVectorTest() {
     vertcat.eval(Amatrix, Hmatrix);
     OGMatrix answer = new OGMatrix(new double[][] { {1., 2., 3. }, {4., 5., 6. }, {7., 8., 9. }, {10., 11., 12. }, {1., 2., 3. } });
-    assertTrue(answer.fuzzyequals(vertcat.eval(Amatrix, Hmatrix), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(vertcat.eval(Amatrix, Hmatrix), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

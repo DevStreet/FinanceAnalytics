@@ -9,11 +9,11 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.MathsConstants;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests ZATAN
@@ -178,15 +178,15 @@ public class ZATANTest {
         // try seeing if they are the same, if they aren't then try again seeing if they are out by pi
 
         try {
-          assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 100 * D1MACH.four());
+          assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 100 * D1mach.four());
         } catch (AssertionError e) {
-          assertTrue(MathsConstants.pi - (ans.getReal() > tabans.getReal() ? ans.getReal() - tabans.getReal() : tabans.getReal() - ans.getReal()) < 100 * D1MACH.four());
+          assertTrue(MathsConstants.pi - (ans.getReal() > tabans.getReal() ? ans.getReal() - tabans.getReal() : tabans.getReal() - ans.getReal()) < 100 * D1mach.four());
         }
 
         try {
-          assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 100 * D1MACH.four());
+          assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 100 * D1mach.four());
         } catch (AssertionError e) {
-          assertTrue(MathsConstants.pi - (ans.getImag() > tabans.getImag() ? ans.getImag() - tabans.getImag() : tabans.getImag() - ans.getImag()) < 100 * D1MACH.four());
+          assertTrue(MathsConstants.pi - (ans.getImag() > tabans.getImag() ? ans.getImag() - tabans.getImag() : tabans.getImag() - ans.getImag()) < 100 * D1mach.four());
         }
       }
     }
@@ -204,40 +204,40 @@ public class ZATANTest {
 
   @Test
   public void argIsPlusMinusIBranchCoverage() {
-    ZATAN.zatan(new double[] {D1MACH.four(), 1 });
+    ZATAN.zatan(new double[] {D1mach.four(), 1 });
   }
   
   
   @Test
   public void angleIsTiny() {
-    ZATAN.zatan(new double[] {0, 1 + D1MACH.four() });
+    ZATAN.zatan(new double[] {0, 1 + D1mach.four() });
   }
 
   @Test
   public void branchOne() {
     double[] tmp = ZATAN.zatan(new double[] {0.05, 0.05 });
-    assertTrue(Math.abs(tmp[0] - 0.0500830824439626) < 100 * D1MACH.four());
-    assertTrue(Math.abs(tmp[1] - 0.0499164175629818) < 100 * D1MACH.four());
+    assertTrue(Math.abs(tmp[0] - 0.0500830824439626) < 100 * D1mach.four());
+    assertTrue(Math.abs(tmp[1] - 0.0499164175629818) < 100 * D1mach.four());
   }
 
   @Test
   public void branchOneEscape1() {
     double[] tmp = ZATAN.zatan(new double[] {1e-9, 1e-9 });
-    assertTrue(Math.abs(tmp[0] - 1e-9) < 100 * D1MACH.four());
-    assertTrue(Math.abs(tmp[1] - 1e-9) < 100 * D1MACH.four());
+    assertTrue(Math.abs(tmp[0] - 1e-9) < 100 * D1mach.four());
+    assertTrue(Math.abs(tmp[1] - 1e-9) < 100 * D1mach.four());
   }
   
   @Test
   public void branchTwoEscape1() {
     double[] tmp = ZATAN.zatan(new double[] {1e16, 1e16 });
-    assertTrue(Math.abs(tmp[0] - MathsConstants.halfpi) < 100 * D1MACH.four());
-    assertTrue(Math.abs(tmp[1] - 0) < 100 * D1MACH.four());
+    assertTrue(Math.abs(tmp[0] - MathsConstants.halfpi) < 100 * D1mach.four());
+    assertTrue(Math.abs(tmp[1] - 0) < 100 * D1mach.four());
   }
   
   @Test
   public void branchTwoEscape2() {
     double[] tmp = ZATAN.zatan(new double[] {-1e16, 1e16 });
-    assertTrue(Math.abs(tmp[0] - -MathsConstants.halfpi) < 100 * D1MACH.four());
-    assertTrue(Math.abs(tmp[1] - 0) < 100 * D1MACH.four());
+    assertTrue(Math.abs(tmp[0] - -MathsConstants.halfpi) < 100 * D1mach.four());
+    assertTrue(Math.abs(tmp[1] - 0) < 100 * D1mach.four());
   }
 }

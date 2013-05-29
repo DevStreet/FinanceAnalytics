@@ -9,11 +9,11 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.MathsConstants;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests complex square root
@@ -205,8 +205,8 @@ public class ZTANTest {
       for (int j = 0; j < cols; j++) {
         ans = new ComplexType(ZTAN.ztan(new double[] {c.getEntry(i, j).getReal(), c.getEntry(i, j).getImag() }));
         tabans = new ComplexType(answerReal[i][j], answerImag[i][j]);
-        assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 100 * D1MACH.four());
-        assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 100 * D1MACH.four());
+        assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 100 * D1mach.four());
+        assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 100 * D1mach.four());
       }
     }
   }
@@ -221,11 +221,11 @@ public class ZTANTest {
   //TODO: this branch needs sharpening
   @Test
   public void fpbranchWarn() {
-    double real = MathsConstants.halfpi - 100 * D1MACH.four();
+    double real = MathsConstants.halfpi - 100 * D1mach.four();
     double imag = 1e-4;
     ComplexType ans = new ComplexType(ZTAN.ztan(new double[] {real, imag }));
     ComplexType tabans = new ComplexType(new double[] { 2.226569275824151e-06,  1.000000003333333e+04});
-    assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 100 * D1MACH.four());
+    assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 100 * D1mach.four());
     assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 1e-4); // this value is really FP wobble dependent
   }
 }

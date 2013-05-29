@@ -9,11 +9,11 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -37,21 +37,21 @@ public class RdivideOGSparseMatrixOGMatrixTest {
     OGMatrix answer = new OGMatrix(new double[][] { {10.0000000000000000, Double.POSITIVE_INFINITY, 3.3333333333333335 }, {Double.POSITIVE_INFINITY, 2.0000000000000000, Double.POSITIVE_INFINITY },
         {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 1.1111111111111112 }, {1.0000000000000000, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY } });
     ;
-    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(SingleSparse, AFull)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(SingleSparse, AFull)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixRdivideScalarTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {0.1000000000000000, 0.0000000000000000, 0.3000000000000000 }, {0.0000000000000000, 0.5000000000000000, 0.0000000000000000 },
         {0.0000000000000000, 0.0000000000000000, 0.9000000000000000 }, {1.0000000000000000, 0.0000000000000000, 0.0000000000000000 } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(ASparse, SingleFull)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(ASparse, SingleFull)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixRdivideMatrixTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {Double.POSITIVE_INFINITY, 0.0000000000000000, Double.POSITIVE_INFINITY }, {Double.NaN, Double.POSITIVE_INFINITY, 0.0000000000000000 },
         {0.0000000000000000, Double.NaN, Double.POSITIVE_INFINITY }, {10.0000000000000000, Double.NaN, 0.0000000000000000 } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(ASparse, CFull)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(ASparse, CFull)), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

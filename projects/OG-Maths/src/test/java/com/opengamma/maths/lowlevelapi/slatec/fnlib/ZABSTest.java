@@ -9,8 +9,8 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests complex abs()
@@ -137,7 +137,7 @@ public class ZABSTest {
       for (int j = 0; j < cols; j++) {
         ans = (ZABS.zabs(c.getEntry(i, j).getReal(), c.getEntry(i, j).getImag()));
         tabans = answerReal[i][j];
-        assertTrue(Math.abs(ans - tabans) < 10 * D1MACH.four());
+        assertTrue(Math.abs(ans - tabans) < 10 * D1mach.four());
       }
     }
   }

@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests complex cos
@@ -203,8 +203,8 @@ public class ZACOSTest {
       for (int j = 0; j < cols; j++) {
         ans = new ComplexType(ZACOS.zacos(new double[] {c.getEntry(i, j).getReal(), c.getEntry(i, j).getImag() }));
         tabans = new ComplexType(answerReal[i][j], answerImag[i][j]);
-        assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 1000 * D1MACH.four());
-        assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 1000 * D1MACH.four());
+        assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 1000 * D1mach.four());
+        assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 1000 * D1mach.four());
       }
     }
   }

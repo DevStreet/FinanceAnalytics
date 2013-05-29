@@ -9,10 +9,10 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -38,13 +38,13 @@ public class MinusOGDiagonalMatrixOGMatrixTest {
   @Test
   public static void DiagMinusScalarFull() {
     OGMatrix answer = new OGMatrix(new double[][] { {0., -10., -10. }, {-10., 10., -10. }, {-10., -10., 20. }, {-10., -10., -10. } });
-    assertTrue(answer.fuzzyequals(minus.eval(D4x3, F1x1),10*D1MACH.four()));
+    assertTrue(answer.fuzzyequals(minus.eval(D4x3, F1x1),10*D1mach.four()));
   }
 
   @Test
   public static void scalarDiagMinusFull() {
     OGMatrix answer = new OGMatrix(new double[][] { {9., 8., 7. }, {6., 5., 4. }, {3., 2., 1. }, {0., -1., -2. } });
-    assertTrue(answer.fuzzyequals(minus.eval(D1x1, F4x3),10*D1MACH.four()));
+    assertTrue(answer.fuzzyequals(minus.eval(D1x1, F4x3),10*D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

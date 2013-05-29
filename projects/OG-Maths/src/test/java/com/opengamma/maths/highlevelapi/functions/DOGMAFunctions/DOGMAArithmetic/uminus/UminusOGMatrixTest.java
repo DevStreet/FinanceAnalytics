@@ -9,8 +9,8 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -29,7 +29,7 @@ public class UminusOGMatrixTest {
 
   @Test
   public void negationTest() {
-    assertTrue(dataNeg.fuzzyequals(m.eval(data), 10 * D1MACH.four()));
+    assertTrue(dataNeg.fuzzyequals(m.eval(data), 10 * D1mach.four()));
   }
 
 }

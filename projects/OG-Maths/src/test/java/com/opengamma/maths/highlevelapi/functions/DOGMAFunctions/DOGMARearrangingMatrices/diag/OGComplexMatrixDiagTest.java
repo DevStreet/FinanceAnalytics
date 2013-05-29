@@ -9,10 +9,10 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -44,7 +44,7 @@ public class OGComplexMatrixDiagTest {
     ip = new double[][] { {1. }, {5. }, {9. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
     OGArray<? extends Number> tmp = diag.eval(Amatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
@@ -53,21 +53,21 @@ public class OGComplexMatrixDiagTest {
     ip = new double[][] { {1.0 }, {6.0 }, {11.0 } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
     OGArray<? extends Number> tmp = diag.eval(Bmatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
   public void vvectordiagTest() {
     OGComplexDiagonalMatrix answer = new OGComplexDiagonalMatrix(new double[] {1, 2, 3 }, new double[] {10, 20, 30 });
     OGArray<? extends Number> tmp = diag.eval(Vmatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
   public void hvectordiagTest() {
     OGComplexDiagonalMatrix answer = new OGComplexDiagonalMatrix(new double[] {1, 2, 3 }, new double[] {10, 20, 30 });
     OGArray<? extends Number> tmp = diag.eval(Hmatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
 }

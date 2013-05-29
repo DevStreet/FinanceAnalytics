@@ -9,11 +9,11 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -35,13 +35,13 @@ public class PlusOGSparseMatrixOGSparseMatrixTest {
   @Test
   public static void ScalarPlusSparse() {
     OGMatrix answer = new OGMatrix(new double[][] { {11., 10., 13. }, {10., 15., 10. }, {10., 10., 19. }, {20., 10., 10. } });
-    assertTrue(answer.fuzzyequals(plus.eval(F1x1Scale2, F4x3Scale1), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(plus.eval(F1x1Scale2, F4x3Scale1), 10 * D1mach.four()));
   }
 
   @Test
   public static void SparsePlusScalar() {
     OGMatrix answer = new OGMatrix(new double[][] { {11., 10., 13. }, {10., 15., 10. }, {10., 10., 19. }, {20., 10., 10. } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(plus.eval(F4x3Scale1, F1x1Scale2)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(plus.eval(F4x3Scale1, F1x1Scale2)), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)
@@ -57,7 +57,7 @@ public class PlusOGSparseMatrixOGSparseMatrixTest {
   @Test
   public static void FullPlusFull() {
     OGMatrix answer = new OGMatrix(new double[][] { {1., 50., 3. }, {0., 5., 90. }, {100., 0., 9. }, {20., 0., 30. } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(plus.eval(F4x3Scale1, F4x3Scale2)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(plus.eval(F4x3Scale1, F4x3Scale2)), 10 * D1mach.four()));
   }
 
 }

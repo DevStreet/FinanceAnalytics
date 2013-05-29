@@ -9,11 +9,11 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -35,20 +35,20 @@ public class RdivideOGSparseMatrixOGSparseMatrixTest {
   @Test
   public void ScalarRdivideMatrixTest() {
     OGMatrix answer = B1;
-    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(Single, A)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(Single, A)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixRdivideScalarTest() {
     OGMatrix answer = B2;
-    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(A, Single)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(A, Single)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixRdivideMatrixTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {Double.POSITIVE_INFINITY, 0.0000000000000000, Double.POSITIVE_INFINITY }, {Double.NaN, Double.POSITIVE_INFINITY, 0.0000000000000000 },
         {0.0000000000000000, Double.NaN, Double.POSITIVE_INFINITY }, {10.0000000000000000, Double.NaN, 0.0000000000000000 } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(A, C)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(rdivide.eval(A, C)), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

@@ -8,10 +8,10 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
 import com.opengamma.maths.lowlevelapi.functions.MathE;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Computes the true complete Gamma function at position 'x'
@@ -73,13 +73,13 @@ public class DGAMMA {
   private static int s_ngam;
   private static double s_xmin, s_xmax, s_dxrel;
   static {
-    s_ngam = INITDS.initds(s_gamcs, 42, 0.1 * D1MACH.three());
+    s_ngam = INITDS.initds(s_gamcs, 42, 0.1 * D1mach.three());
     double[] tmp1 = new double[1];
     double[] tmp2 = new double[1];
     DGAMLM.dgamlm(tmp1, tmp2);
     s_xmin = tmp1[0];
     s_xmax = tmp2[0];
-    s_dxrel = Math.sqrt(D1MACH.four());
+    s_dxrel = Math.sqrt(D1mach.four());
   }
 
   public static double dgamma(double x) {

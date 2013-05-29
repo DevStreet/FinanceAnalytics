@@ -7,7 +7,7 @@ package com.opengamma.maths.lowlevelapi.functions.utilities;
 
 import org.apache.commons.lang.Validate;
 
-import com.opengamma.analytics.math.MathException;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 
 /**
  * Finds the indexes of values that satisfy a given condition.
@@ -109,7 +109,7 @@ public class Find {
         }
         break;
       default:
-        throw new MathException("Impossible condition in Find.");
+        throw new MathsExceptionGeneric("Impossible condition in Find.");
     }
     int[] ret = new int[count];
     System.arraycopy(tmp, 0, ret, 0, count);
@@ -181,7 +181,7 @@ public class Find {
         }
         break;
       default:
-        throw new MathException("Impossible condition in Find.");
+        throw new MathsExceptionGeneric("Impossible condition in Find.");
     }
     int[] ret = new int[count];
     System.arraycopy(tmp, 0, ret, 0, count);
@@ -328,7 +328,7 @@ public class Find {
         }
         break;
       default:
-        throw new MathException("Impossible condition in Find.");
+        throw new MathsExceptionGeneric("Impossible condition in Find.");
     }
     int[] ret = new int[count];
     System.arraycopy(tmp, 0, ret, 0, count);
@@ -400,7 +400,7 @@ public class Find {
         }
         break;
       default:
-        throw new MathException("Impossible condition in Find.");
+        throw new MathsExceptionGeneric("Impossible condition in Find.");
     }
     int[] ret = new int[count];
     System.arraycopy(tmp, 0, ret, 0, count);
@@ -440,7 +440,7 @@ public class Find {
         }
         break;
       default:
-        throw new MathException("Impossible condition in Find.");
+        throw new MathsExceptionGeneric("Impossible condition in Find.");
     }
     int[] ret = new int[count];
     System.arraycopy(tmp, 0, ret, 0, count);

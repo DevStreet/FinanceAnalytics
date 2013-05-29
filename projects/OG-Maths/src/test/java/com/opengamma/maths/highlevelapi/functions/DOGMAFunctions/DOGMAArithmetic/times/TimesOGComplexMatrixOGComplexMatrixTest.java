@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -37,7 +37,7 @@ public class TimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][] { {-19., -38., -57. }, {-76., -95., -114. }, {-133., -152., -171. }, {-190., -209., -228. } };
     ip = new double[][] { {12., 24., 36. }, {48., 60., 72. }, {84., 96., 108. }, {120., 132., 144. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(times.eval(Single, A), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(times.eval(Single, A), 10 * D1mach.four()));
   }
 
   @Test
@@ -45,7 +45,7 @@ public class TimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][] { {-19., -38., -57. }, {-76., -95., -114. }, {-133., -152., -171. }, {-190., -209., -228. } };
     ip = new double[][] { {12., 24., 36. }, {48., 60., 72. }, {84., 96., 108. }, {120., 132., 144. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(times.eval(A, Single), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(times.eval(A, Single), 10 * D1mach.four()));
   }
 
   @Test
@@ -53,7 +53,7 @@ public class TimesOGComplexMatrixOGComplexMatrixTest {
     rp = new double[][] { {-9.9, -39.6, -89.1 }, {-158.4, -247.5, -356.4 }, {-485.1, -633.6, -801.9 }, {-990., -1197.9, -1425.6 } };
     ip = new double[][] { {2., 8., 18. }, {32., 50., 72. }, {98., 128., 162. }, {200., 242., 288. } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(times.eval(A, B), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(times.eval(A, B), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

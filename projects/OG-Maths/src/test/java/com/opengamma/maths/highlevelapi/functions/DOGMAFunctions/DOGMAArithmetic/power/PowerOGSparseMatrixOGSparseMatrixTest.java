@@ -9,11 +9,11 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -35,25 +35,25 @@ public class PowerOGSparseMatrixOGSparseMatrixTest {
   @Test
   public void ScalarPowerMatrixTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {10., 1., 1000. }, {1., 100000., 1. }, {1., 1., 1000000000. }, {10000000000., 1., 1. } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(Single, A)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(Single, A)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixPowerScalarTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {1., 0., 59049. }, {0., 9765625., 0. }, {0., 0., 3486784401. }, {10000000000., 0., 0. } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(A, Single)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(A, Single)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixPowerMatrixTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {1., 0., 1. }, {1., 1., 0. }, {0., 1., 1. }, {10., 1., 0. } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(A, C)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(A, C)), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixPowerMatrixMoreBranchesTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {1., 1., 1. }, {1., 1., 1. }, {Double.POSITIVE_INFINITY, 1., 1. }, {0.1000000000000000, 1., Double.POSITIVE_INFINITY } });
-    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(A, D)), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(DOGMA.full(power.eval(A, D)), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

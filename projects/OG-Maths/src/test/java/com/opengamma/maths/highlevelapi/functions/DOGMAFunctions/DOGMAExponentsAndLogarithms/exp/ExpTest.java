@@ -9,13 +9,13 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -50,16 +50,16 @@ public class ExpTest {
   public void testReal() {
     OGArray<? extends Number> tmp1 = ExpOGMatrix.eval(ogmatrix);
     OGArray<? extends Number> tmp2 = ExpOGSparseMatrix.eval(ogsparsematrix);
-    assertTrue(tmp1.fuzzyequals(DOGMA.full(tmp2), 10 * D1MACH.four()));
-    assertTrue(realAnswer.fuzzyequals(DOGMA.full(tmp2), 10 * D1MACH.four()));
+    assertTrue(tmp1.fuzzyequals(DOGMA.full(tmp2), 10 * D1mach.four()));
+    assertTrue(realAnswer.fuzzyequals(DOGMA.full(tmp2), 10 * D1mach.four()));
   };
 
   @Test
   public void testComplex() {
     OGArray<? extends Number> tmp1 = ExpOGComplexMatrix.eval(ogcomplexmatrix);
     OGArray<? extends Number> tmp2 = ExpOGComplexSparseMatrix.eval(ogcomplexsparsematrix);
-    assertTrue(tmp1.fuzzyequals(DOGMA.full(tmp2), 10 * D1MACH.four()));
-    assertTrue(complexAnswer.fuzzyequals(DOGMA.full(tmp2), 10 * D1MACH.four()));
+    assertTrue(tmp1.fuzzyequals(DOGMA.full(tmp2), 10 * D1mach.four()));
+    assertTrue(complexAnswer.fuzzyequals(DOGMA.full(tmp2), 10 * D1mach.four()));
   };
 
 }

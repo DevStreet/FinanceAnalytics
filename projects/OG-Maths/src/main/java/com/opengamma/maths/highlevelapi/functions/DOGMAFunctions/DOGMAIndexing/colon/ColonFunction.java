@@ -5,13 +5,13 @@
  */
 package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.colon;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
 import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Colon;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * For generating vector data
@@ -42,7 +42,7 @@ public class ColonFunction {
       throw new MathsExceptionIllegalArgument("Cannot construct vector starting at " + lv + " with steps of " + sv + " to " + hv);
     }
 
-    int nvals = (int) ((5 * D1MACH.four() + Math.abs(hv - lv)) / Math.abs(sv));
+    int nvals = (int) ((5 * D1mach.four() + Math.abs(hv - lv)) / Math.abs(sv));
     double[] tmp = new double[nvals + 1];
     tmp[0] = low.doubleValue();
     for (int i = 1; i <= nvals; i++) {

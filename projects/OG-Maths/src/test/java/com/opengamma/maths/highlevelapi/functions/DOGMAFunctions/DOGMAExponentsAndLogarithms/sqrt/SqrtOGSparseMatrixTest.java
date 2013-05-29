@@ -9,10 +9,10 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -36,7 +36,7 @@ public class SqrtOGSparseMatrixTest {
   public void testAllReal() {
     OGSparseMatrix answer = new OGSparseMatrix(new double[][] { {1., 0., 1.7320508075688772 }, {0., 2.2360679774997898, 0. }, {0., 0., 3. }, {3.1622776601683795, 0., 0. } });
     OGArray<? extends Number> tmp = sqrt.eval(realMatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
@@ -45,7 +45,7 @@ public class SqrtOGSparseMatrixTest {
     ip = new double[][] { {2.2360679774997898, 0., 1.7320508075688772 }, {0., 1., 0. }, {0., 0., 0. }, {0., 0., 0. } };
     OGComplexSparseMatrix answer = new OGComplexSparseMatrix(rp, ip);
     OGArray<? extends Number> tmp = sqrt.eval(someComplexMatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
@@ -54,6 +54,6 @@ public class SqrtOGSparseMatrixTest {
     ip = new double[][] { {1., 0., 1.7320508075688772 }, {0., 2.2360679774997898, 0. }, {0., 0., 3. }, {3.1622776601683795, 0., 0. } };
     OGComplexSparseMatrix answer = new OGComplexSparseMatrix(rp, ip);
     OGArray<? extends Number> tmp = sqrt.eval(allComplexMatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 }

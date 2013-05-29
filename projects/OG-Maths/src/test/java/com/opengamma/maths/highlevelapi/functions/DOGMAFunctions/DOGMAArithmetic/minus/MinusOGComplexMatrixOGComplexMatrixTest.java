@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -59,7 +59,7 @@ public class MinusOGComplexMatrixOGComplexMatrixTest {
   public static void FullMinusFull() {
     OGComplexMatrix answer = new OGComplexMatrix(new double[][] { {-9., -18., -27. }, {-36., -45., -54. }, {-63., -72., -81. }, {-90., -99., -108. } }, new double[][] { {-18., -27., -36. },
         {-45., -54., -63. }, {-72., -81., -90. }, {-99., -108., -117. } });
-    assertTrue(answer.fuzzyequals(minus.eval(F4x3Scale1, F4x3Scale2), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(minus.eval(F4x3Scale1, F4x3Scale2), 10 * D1mach.four()));
   }
 
 }

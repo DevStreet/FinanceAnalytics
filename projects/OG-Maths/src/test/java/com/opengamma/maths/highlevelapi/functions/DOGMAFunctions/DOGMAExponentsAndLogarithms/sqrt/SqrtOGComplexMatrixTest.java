@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -45,7 +45,7 @@ public class SqrtOGComplexMatrixTest {
         {1.7797349430160412, 1.9026166845816204, 2.0180297394994953 }, {2.1271901209248893, 2.2310158205661588, 2.3302200266654078 } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
     OGArray<? extends Number> tmp = sqrt.eval(Amatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
 }

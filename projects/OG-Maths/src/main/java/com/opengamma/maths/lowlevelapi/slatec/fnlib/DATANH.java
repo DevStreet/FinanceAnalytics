@@ -8,8 +8,8 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Computes the inverse hyperbolic tangent at position 'x'
@@ -55,9 +55,9 @@ public class DATANH {
   private static double s_sqeps, s_dxrel;
 
   static {
-    s_nterms = INITDS.initds(s_atnhcs, 27, 0.1d * D1MACH.three());
-    s_sqeps = Math.sqrt(3.d * D1MACH.three());
-    s_dxrel = Math.sqrt(D1MACH.four());
+    s_nterms = INITDS.initds(s_atnhcs, 27, 0.1d * D1mach.three());
+    s_sqeps = Math.sqrt(3.d * D1mach.three());
+    s_dxrel = Math.sqrt(D1mach.four());
   }
 
   public static double datanh(final double x) {

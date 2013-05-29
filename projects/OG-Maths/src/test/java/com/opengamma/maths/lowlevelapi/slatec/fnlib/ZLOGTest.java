@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests complex square root
@@ -216,8 +216,8 @@ public class ZLOGTest {
           assertTrue(Double.isInfinite(ans.getImag()));
           assertTrue(Math.copySign(1, tabans.getImag()) == Math.copySign(1, ans.getImag()));
         } else {
-          assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 10 * D1MACH.four());
-          assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 10 * D1MACH.four());
+          assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 10 * D1mach.four());
+          assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 10 * D1mach.four());
         }
       }
     }

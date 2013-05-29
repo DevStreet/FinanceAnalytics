@@ -12,7 +12,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/usr/local/lib/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="/OG-Analytics"/>
 	<classpathentry kind="lib" path="/usr/local/lib">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/usr/local/lib"/>

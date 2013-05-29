@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -39,7 +39,7 @@ public class PowerOGComplexMatrixOGComplexMatrixTest {
     ip = new double[][] { {0.4178160376465139, 0.0671619471330996, -0.0648412730832937 }, {-0.0225812545759001, 0.0081083861106520, 0.0053912691600894 },
         {-0.0006012401879276, -0.0010726279704341, -0.0000635773490347 }, {0.0001839580849995, 0.0000410797975467, -0.0000266985495977 } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(power.eval(Single, A), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(power.eval(Single, A), 10 * D1mach.four()));
   }
 
   @Test
@@ -49,7 +49,7 @@ public class PowerOGComplexMatrixOGComplexMatrixTest {
     ip = new double[][] { {0.0022435608389809, -0.0463910079516964, -0.0033214737258765 }, {0.1448403219065644, 0.3051646106246708, 0.3910035349722569 },
         {0.3531442577167155, 0.1779647011082333, -0.1226516908969175 }, {-0.5213234214534311, -0.9829562501353317, -1.4701887318769953 } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(power.eval(A, Single), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(power.eval(A, Single), 10 * D1mach.four()));
   }
 
   @Test
@@ -59,7 +59,7 @@ public class PowerOGComplexMatrixOGComplexMatrixTest {
     ip = new double[][] { {0.1834472539948915, 0.0011972064861044, -0.0317781549643589 }, {0.0041129203595968, 0.0045069828054794, 0.0005820644297196 },
         {-0.0003801549217325, -0.0002561080017431, -0.0000876641329671 }, {-0.0000177996200170, 0.0000004782679236, 0.0000027326767557 } };
     OGComplexMatrix answer = new OGComplexMatrix(rp, ip);
-    assertTrue(answer.fuzzyequals(power.eval(B, A), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(power.eval(B, A), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

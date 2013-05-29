@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests complex inverse sin()
@@ -203,8 +203,8 @@ public class ZASINTest {
       for (int j = 0; j < cols; j++) {
         ans = new ComplexType(ZASIN.zasin(new double[] {c.getEntry(i, j).getReal(), c.getEntry(i, j).getImag() }));
         tabans = new ComplexType(answerReal[i][j], answerImag[i][j]);
-        assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 1000 * D1MACH.four());
-        assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 1000 * D1MACH.four());
+        assertTrue(Math.abs(ans.getReal() - tabans.getReal()) < 1000 * D1mach.four());
+        assertTrue(Math.abs(ans.getImag() - tabans.getImag()) < 1000 * D1mach.four());
       }
     }
   }
@@ -217,13 +217,13 @@ public class ZASINTest {
     input = new double[] {0.05, 0.05 };
     expectedAns = new double[] {0.049958239863297, 0.050041572638602 };
     ans = ZASIN.zasin(input);
-    assertTrue(Math.abs(ans[0] - expectedAns[0]) < 1000 * D1MACH.four());
-    assertTrue(Math.abs(ans[1] - expectedAns[1]) < 1000 * D1MACH.four());
+    assertTrue(Math.abs(ans[0] - expectedAns[0]) < 1000 * D1mach.four());
+    assertTrue(Math.abs(ans[1] - expectedAns[1]) < 1000 * D1mach.four());
 
     expectedAns = new double[] {0.090121944559072, 0.000100407476928 };
     input = new double[] {0.09, 0.0001 };
     ans = ZASIN.zasin(input);
-    assertTrue(Math.abs(ans[0] - expectedAns[0]) < 1000 * D1MACH.four());
-    assertTrue(Math.abs(ans[1] - expectedAns[1]) < 1000 * D1MACH.four());
+    assertTrue(Math.abs(ans[0] - expectedAns[0]) < 1000 * D1mach.four());
+    assertTrue(Math.abs(ans[1] - expectedAns[1]) < 1000 * D1mach.four());
   }
 }

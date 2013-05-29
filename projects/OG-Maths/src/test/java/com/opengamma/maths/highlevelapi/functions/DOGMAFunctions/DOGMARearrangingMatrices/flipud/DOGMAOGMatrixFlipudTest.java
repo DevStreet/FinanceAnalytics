@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -34,21 +34,21 @@ public class DOGMAOGMatrixFlipudTest {
   public void matrixflipudTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {10., 11., 12. }, {7., 8., 9. }, {4., 5., 6. }, {1., 2., 3. } });
     OGArray<? extends Number> tmp = flipud.eval(Amatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
   public void vvectorflipudTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {3. }, {2. }, {1. } });
     OGArray<? extends Number> tmp = flipud.eval(Vmatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
   @Test
   public void hvectorflipudTest() {
     OGMatrix answer = Hmatrix;
     OGArray<? extends Number> tmp = flipud.eval(Hmatrix);
-    assertTrue(answer.fuzzyequals(tmp, 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(tmp, 10 * D1mach.four()));
   }
 
 }

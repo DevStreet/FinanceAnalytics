@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Computes the inverse hyperbolic sine at position 'x'
@@ -62,8 +62,8 @@ public class DASINH {
   private static double s_sqeps, s_xmax;
 
   static {
-    s_nterms = INITDS.initds(s_asnhcs, 39, 0.1d * D1MACH.three());
-    s_sqeps = Math.sqrt(D1MACH.three());
+    s_nterms = INITDS.initds(s_asnhcs, 39, 0.1d * D1mach.three());
+    s_sqeps = Math.sqrt(D1mach.three());
     s_xmax = 1.d / s_sqeps;
   }
 

@@ -9,8 +9,8 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -36,16 +36,16 @@ public class OGMatrixIsSymmetricTest {
 
   @Test
   public void symmetricMatrixTrueTest() {
-    assertTrue(sym.eval(symmetrixMatrix).fuzzyequals(True, 10 * D1MACH.four()));
+    assertTrue(sym.eval(symmetrixMatrix).fuzzyequals(True, 10 * D1mach.four()));
   }
 
   @Test
   public void symmetricMatrixFalseTest() {
-    assertTrue(sym.eval(asymmetrixMatrix).fuzzyequals(False, 10 * D1MACH.four()));
+    assertTrue(sym.eval(asymmetrixMatrix).fuzzyequals(False, 10 * D1mach.four()));
   }
 
   @Test
   public void notSquareMatrixFalseTest() {
-    assertTrue(sym.eval(notSquare).fuzzyequals(False, 10 * D1MACH.four()));
+    assertTrue(sym.eval(notSquare).fuzzyequals(False, 10 * D1mach.four()));
   }
 }

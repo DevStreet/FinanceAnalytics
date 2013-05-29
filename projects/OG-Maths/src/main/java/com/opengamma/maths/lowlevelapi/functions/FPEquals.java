@@ -10,7 +10,7 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Checks floating point arrays are equal within some tolerance.
@@ -19,7 +19,7 @@ public class FPEquals {
 
   private static Logger s_log = LoggerFactory.getLogger(FPEquals.class);
 
-  private static double s_defaulttol = 100 * D1MACH.four();
+  private static double s_defaulttol = 100 * D1mach.four();
 
   public static boolean equals(double[] a, double[] b) {
     return Arrays.equals(a, b);
@@ -58,9 +58,9 @@ public class FPEquals {
     double tolerance;
     for (int i = 0; i < count; i++) {
       if (b[i + offsetb] == 0) {
-        tolerance = 10 * D1MACH.four();
+        tolerance = 10 * D1mach.four();
       } else {
-        tolerance = Math.ulp(b[i + offsetb]) > D1MACH.four() ? 100 * Math.ulp(b[i + offsetb]) : 10 * D1MACH.four();
+        tolerance = Math.ulp(b[i + offsetb]) > D1mach.four() ? 100 * Math.ulp(b[i + offsetb]) : 10 * D1mach.four();
       }
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
         s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);

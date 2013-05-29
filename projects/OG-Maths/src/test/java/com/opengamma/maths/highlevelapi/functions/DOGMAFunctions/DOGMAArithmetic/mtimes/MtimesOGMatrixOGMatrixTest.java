@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -30,19 +30,19 @@ public class MtimesOGMatrixOGMatrixTest {
   @Test
   public void ScalarMtimesMatrixTest() {
     OGMatrix answer = B;
-    assertTrue(answer.fuzzyequals(mtimes.eval(Single, A), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(Single, A), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixMtimesScalarTest() {
     OGMatrix answer = B;
-    assertTrue(answer.fuzzyequals(mtimes.eval(A, Single), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(A, Single), 10 * D1mach.four()));
   }
 
   @Test
   public void MatrixMtimesMatrixTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {14., 32., 50., 68. }, {32., 77., 122., 167. }, {50., 122., 194., 266. }, {68., 167., 266., 365. } });
-    assertTrue(answer.fuzzyequals(mtimes.eval(A, C), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(mtimes.eval(A, C), 10 * D1mach.four()));
   }
   
   @Test(expectedExceptions=MathsExceptionNonConformance.class)

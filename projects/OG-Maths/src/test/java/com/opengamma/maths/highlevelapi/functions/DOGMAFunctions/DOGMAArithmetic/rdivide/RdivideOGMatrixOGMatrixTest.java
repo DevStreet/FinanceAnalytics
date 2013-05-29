@@ -9,9 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -32,20 +32,20 @@ public class RdivideOGMatrixOGMatrixTest {
   @Test
   public void ScalarRdivideMatrixTest() {
     OGMatrix answer = B1;
-    assertTrue(answer.fuzzyequals(rdivide.eval(Single, A), 100 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(rdivide.eval(Single, A), 100 * D1mach.four()));
   }
 
   @Test
   public void MatrixRdivideScalarTest() {
     OGMatrix answer = B2;
-    assertTrue(answer.fuzzyequals(rdivide.eval(A, Single), 100 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(rdivide.eval(A, Single), 100 * D1mach.four()));
   }
 
   @Test
   public void MatrixRdivideMatrixTest() {
     OGMatrix answer = new OGMatrix(new double[][] { {0.1000000000000000, 0.4000000000000000, 0.8999999999999999 }, {1.6000000000000001, 2.5000000000000000, 3.5999999999999996 },
         {4.8999999999999995, 6.4000000000000004, 8.0999999999999996 }, {10.0000000000000000, 12.0999999999999996, 14.3999999999999986 } });
-    assertTrue(answer.fuzzyequals(rdivide.eval(A, B1), 10 * D1MACH.four()));
+    assertTrue(answer.fuzzyequals(rdivide.eval(A, B1), 10 * D1mach.four()));
   }
 
   @Test(expectedExceptions = MathsExceptionNonConformance.class)

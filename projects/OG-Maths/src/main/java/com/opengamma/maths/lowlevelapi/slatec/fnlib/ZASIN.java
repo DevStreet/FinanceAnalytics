@@ -5,9 +5,9 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.MathsConstants;
 import com.opengamma.maths.lowlevelapi.complexbuiltins.ComplexArithmetic;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * ZASIN(Z) computes the trigonometric inverse sine of the complex argument.
@@ -16,8 +16,8 @@ import com.opengamma.maths.lowlevelapi.complexbuiltins.ComplexArithmetic;
  * Major difference is that this is in double precision arithmetic
  */
 public class ZASIN {
-  private static int s_nterms = (int) (-0.4343 * Math.log(D1MACH.three()));
-  private static double s_rmin = Math.sqrt(6. * D1MACH.three());
+  private static int s_nterms = (int) (-0.4343 * Math.log(D1mach.three()));
+  private static double s_rmin = Math.sqrt(6. * D1mach.three());
 
   public static double[] zasin(double[] zinp) {
     double[] z = new double[] {zinp[0], zinp[1] };

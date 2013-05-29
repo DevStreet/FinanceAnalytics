@@ -8,10 +8,10 @@ package com.opengamma.maths.lowlevelapi.complexbuiltins;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.analytics.math.statistics.distribution.fnlib.D1MACH;
 import com.opengamma.maths.commonapi.MathsConstants;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.lowlevelapi.functions.MathBits;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZABS;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZACOS;
 import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZASIN;
@@ -24,7 +24,7 @@ import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZTAN;
  * There is no safety, the onus is on the user to ensure inputs are correctly handled (typical uses are for inlined calls)
  */
 public class ComplexArithmetic {
-  private static final double s_sqeps = Math.sqrt(D1MACH.four());
+  private static final double s_sqeps = Math.sqrt(D1mach.four());
   private static Logger s_log = LoggerFactory.getLogger(ComplexArithmetic.class);
 
   /**
