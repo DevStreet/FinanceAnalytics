@@ -30,6 +30,7 @@ public class DumpResultsHashMapToFile {
       try {
         fp = new FileWriter("results" + File.separatorChar + filenameRoot + keys + ".txt");
       } catch (IOException e) {
+        format.close();
         throw new MathsExceptionGeneric("Dump file requested cannot be opened");
       }
       BufferedWriter outstream = new BufferedWriter(fp);
@@ -51,13 +52,21 @@ public class DumpResultsHashMapToFile {
         format.format("%d", dataL[dataL.length - 1]);
         outstream.write(sb.toString());
       } catch (IOException e) {
+        format.close();
+        try {
+          outstream.close();
+        } catch (IOException ex) {
+          throw new MathsExceptionGeneric("Dump file write failed on outstream close");
+        }
         throw new MathsExceptionGeneric("Dump file write failed on times");
       }
       try {
         outstream.close();
       } catch (IOException e) {
+        format.close();
         throw new MathsExceptionGeneric("Dump file failed to close");
       }
+      format.close();
     }
 
   }
