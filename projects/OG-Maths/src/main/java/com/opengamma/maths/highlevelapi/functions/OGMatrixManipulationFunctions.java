@@ -5,10 +5,6 @@
  */
 package com.opengamma.maths.highlevelapi.functions;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.lowlevelapi.functions.utilities.Min;
-import com.opengamma.maths.lowlevelapi.functions.utilities.Reverse;
 
 /**
  * This wraps all the functions for the high level API such that they are just exposed as is.
