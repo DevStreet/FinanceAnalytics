@@ -22,12 +22,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.opengamma</groupId>
-      <artifactId>og-analytics</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <scope>provided</scope>
