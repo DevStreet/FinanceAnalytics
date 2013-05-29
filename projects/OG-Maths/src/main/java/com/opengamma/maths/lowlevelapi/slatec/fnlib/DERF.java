@@ -14,6 +14,7 @@ import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
  * See http://www.netlib.org/slatec/fnlib/derf.f
  */
 public class DERF {
+  //CSOFF
   static final double[] ERFCS = {
       -0.49046121234691808039984544033376e-1,
       -0.14226120510371364237824741899631e+0,
@@ -37,7 +38,8 @@ public class DERF {
       -0.10788925177498064213333333333333e-29,
       +0.12811883993017002666666666666666e-31
   };
-
+  //CSON
+  
   static final double SQRTPI = 1.77245385090551602729816748334115;
   private static double s_xbig;
   private static double s_sqeps;
