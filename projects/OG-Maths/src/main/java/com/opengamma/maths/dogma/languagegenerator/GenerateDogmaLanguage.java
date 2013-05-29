@@ -11,13 +11,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * 
+ * Generates the DOGMA language (or some variant of it)
  */
 public class GenerateDogmaLanguage {
 
   /**
-   * Generates the DOGMA Language based on what's available from a scan of the ClassPath
-   * @param args not needed
+   * Generates the DOGMA Language based on what's available from a scan of the ClassPath.
+   * @param args not needed.
    */
   public static void main(String[] args) {
     System.out.println("DOGMA Language Generator Running\n");

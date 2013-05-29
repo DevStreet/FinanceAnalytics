@@ -16,13 +16,10 @@ import com.opengamma.maths.dogma.engine.language.ArbitraryFunction;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
 import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
-import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
-import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulatorLibrary;
 import com.opengamma.maths.dogma.languagegenerator.generators.ArbitraryFunctionGenerator;
 import com.opengamma.maths.dogma.languagegenerator.generators.InfixOperatorGenerator;
 import com.opengamma.maths.dogma.languagegenerator.generators.UnaryFunctionGenerator;
 import com.opengamma.maths.dogma.languagegenerator.generators.VoidUnaryFunctionGenerator;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 
 /**
  * Generates the monolithic class representation of the DOGMA language code  
@@ -144,6 +141,7 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     tmp.append(" * Provides the DOGMA Language\n");
     tmp.append(" */\n");
     tmp.append("public class DogmaLanguage {\n");
+    tmp.append("//CSOFF\n");
     return tmp.toString();
   }
 
@@ -225,7 +223,7 @@ public class DogmaLanguageCodeGeneratorMonolithic {
     //    tmp.append(" = new OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>>();\n");
 
     tmp.append(s_indent +
-        "OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = OperatorDictionaryPopulatorLibrary.getInfixOperatorDictionary();\n");
+        "OperatorDictionaryPopulator<InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictInfix = OperatorDictionaryPopulatorLibrary.getInfixOperatorDictionary();\n"); //CSIGNORE
     tmp.append(s_indent +
         "OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? extends Number>>> operatorDictUnary = OperatorDictionaryPopulatorLibrary.getUnaryOperatorDictionary();\n");
     tmp.append(s_indent + "" +

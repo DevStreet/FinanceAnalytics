@@ -19,6 +19,7 @@ public class InfixOperatorGenerator implements DogmaLangTokenToCodeGenerator {
   InfixOperatorGenerator() {
   }
 
+  @SuppressWarnings("unused")
   private static Logger s_log = LoggerFactory.getLogger(InfixOperatorGenerator.class);
 
   private static InfixOperatorGenerator s_instance = new InfixOperatorGenerator();

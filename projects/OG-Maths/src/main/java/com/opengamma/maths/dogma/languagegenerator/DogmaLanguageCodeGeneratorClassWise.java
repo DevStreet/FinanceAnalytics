@@ -119,6 +119,7 @@ public class DogmaLanguageCodeGeneratorClassWise {
     tmp.append(" * Provides the DOGMA Language\n");
     tmp.append(" */\n");
     tmp.append("public class DOGMA {\n");
+    tmp.append("//CSOFF \n");    
     return tmp.toString();
   }
 
@@ -128,6 +129,7 @@ public class DogmaLanguageCodeGeneratorClassWise {
     return tmp.toString();
   }
 
+  @SuppressWarnings("unused")
   private static String dogmastart() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("if(s_verbose){\n");
@@ -137,6 +139,7 @@ public class DogmaLanguageCodeGeneratorClassWise {
     return tmp.toString();
   }
 
+  @SuppressWarnings("unused")
   private static String dogmafinished() {
     StringBuffer tmp = new StringBuffer();
     tmp.append("if(s_verbose){\n");
@@ -146,3 +149,4 @@ public class DogmaLanguageCodeGeneratorClassWise {
   }
 
 }
+

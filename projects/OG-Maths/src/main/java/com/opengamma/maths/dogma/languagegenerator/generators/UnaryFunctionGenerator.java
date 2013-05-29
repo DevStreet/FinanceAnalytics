@@ -5,14 +5,12 @@
  */
 package com.opengamma.maths.dogma.languagegenerator.generators;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
 import com.opengamma.maths.dogma.languagegenerator.DogmaLangTokenToCodeGenerator;
 import com.opengamma.maths.dogma.languagegenerator.FullToken;
 import com.opengamma.maths.dogma.languagegenerator.docs.Doc;
@@ -20,12 +18,13 @@ import com.opengamma.maths.dogma.languagegenerator.docs.DocFormatter;
 import com.opengamma.maths.dogma.languagegenerator.docs.DocsDictionaryPopulator;
 
 /**
- * 
+ * Generates unary function code
  */
 public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
   UnaryFunctionGenerator() {
   }
 
+  @SuppressWarnings("unused")
   private static Logger s_log = LoggerFactory.getLogger(UnaryFunctionGenerator.class);
 
   private static UnaryFunctionGenerator s_instance = new UnaryFunctionGenerator();
@@ -38,6 +37,7 @@ public class UnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
   private static String s_indent = "  ";
 
   private static DocsDictionaryPopulator<Doc> s_docsDict = new DocsDictionaryPopulator<Doc>();
+  @SuppressWarnings("unused")
   private static Map<Class<?>, Set<Doc>> s_classToDocsMap = s_docsDict.getOperationsMap();
 
   @Override

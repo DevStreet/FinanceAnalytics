@@ -21,7 +21,7 @@ import com.opengamma.maths.dogma.languagegenerator.FullToken;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArrayInterface;
 
 /**
- *
+ * Generates "arbitrary" function code
  */
 // TODO: This needs a refactor, too much repetition and unnecessary repeated reflection
 public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator {

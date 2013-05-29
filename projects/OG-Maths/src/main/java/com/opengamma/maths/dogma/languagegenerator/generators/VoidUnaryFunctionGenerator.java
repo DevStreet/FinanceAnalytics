@@ -18,12 +18,13 @@ import com.opengamma.maths.dogma.languagegenerator.docs.DocFormatter;
 import com.opengamma.maths.dogma.languagegenerator.docs.DocsDictionaryPopulator;
 
 /**
- * 
+ *  Generates void unary function code
  */
 public class VoidUnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator {
   VoidUnaryFunctionGenerator() {
   }
 
+  @SuppressWarnings("unused")
   private static Logger s_log = LoggerFactory.getLogger(VoidUnaryFunctionGenerator.class);
 
   private static VoidUnaryFunctionGenerator s_instance = new VoidUnaryFunctionGenerator();
@@ -36,6 +37,7 @@ public class VoidUnaryFunctionGenerator implements DogmaLangTokenToCodeGenerator
   private static String s_indent = "  ";
 
   private static DocsDictionaryPopulator<Doc> s_docsDict = new DocsDictionaryPopulator<Doc>();
+  @SuppressWarnings("unused")
   private static Map<Class<?>, Set<Doc>> s_classToDocsMap = s_docsDict.getOperationsMap();
 
   @Override
