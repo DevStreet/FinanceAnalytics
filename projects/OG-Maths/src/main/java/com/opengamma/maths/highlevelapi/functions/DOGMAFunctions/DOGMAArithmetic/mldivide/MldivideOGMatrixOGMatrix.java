@@ -27,12 +27,11 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
 
   private static Logger s_log = LoggerFactory.getLogger(MldivideOGMatrixOGMatrix.class);
 
-  private boolean _debug = false;
+  private boolean _debug;
 
   // Attempts to solve AX=B for matrices A,X,B
   @Override
   public OGMatrix eval(OGMatrix array1, OGMatrix array2) {
-    // Catch null
     Catchers.catchNullFromArgList(array1, 1);
     Catchers.catchNullFromArgList(array2, 2);
     int len1, len2;
@@ -85,7 +84,6 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
     Catchers.catchBadCommute(rows1, "rows array1", rows2, "rows array2");
 
     // Do the alg above: 
-
     // LAPACK info
     int[] info = new int[1];
     // is it square?
@@ -308,7 +306,6 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
     int[] rank = new int[1];
 
     // internal calls in svd to ilaenv() to get parameters for svd call seems broken in netlib jars, will need to patch the byte code or override
-
     lwork = -1;
     _lapack.dgelsd(rows1, cols1, cols2, data1, Math.max(1, rows1), data2, Math.max(1, Math.max(rows1, cols1)), s, moorePenroseRcond, rank, dummywork, lwork, dummyiwork, info);
     lwork = (int) dummywork[0];
@@ -329,7 +326,6 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
         s_log.warn("260. SVD success");
       }
     }
-
     if (_debug) {
       s_log.warn("270. SVD returning");
     }
@@ -381,7 +377,7 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
     if (data[0] != 1) {
       diag = 'N';
     }
-    rowloop:
+    rowloop: //CSIGNORE
     for (int i = 1; i < cols; i++) {
       ir = i * rows;
       if (data[ir + i] != 1) {  // check if diag == 1
