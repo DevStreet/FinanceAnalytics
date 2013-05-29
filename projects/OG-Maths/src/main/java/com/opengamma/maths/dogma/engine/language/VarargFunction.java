@@ -17,5 +17,6 @@ public interface VarargFunction<R extends OGArray<? extends Number>, S extends O
    * @param arrays first
     * @return ret
    */
+  @SuppressWarnings("unchecked")
   R eval(S... arrays);
 }

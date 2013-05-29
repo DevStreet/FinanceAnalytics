@@ -8,7 +8,7 @@ package com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary;
 import com.opengamma.maths.dogma.engine.language.ArbitraryFunction;
 
 /**
- * @param <R> ret
+ * Hook for size()
  */
 public interface Size extends ArbitraryFunction {
 
