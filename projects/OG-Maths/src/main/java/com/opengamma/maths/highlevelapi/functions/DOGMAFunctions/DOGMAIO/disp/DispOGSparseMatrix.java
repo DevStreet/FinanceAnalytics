@@ -42,7 +42,7 @@ public class DispOGSparseMatrix implements Disp<OGSparseMatrix> {
         sb.append("\n");
       }
     }
-
+    formatter.close();
     System.out.println(sb.toString());
 
   }

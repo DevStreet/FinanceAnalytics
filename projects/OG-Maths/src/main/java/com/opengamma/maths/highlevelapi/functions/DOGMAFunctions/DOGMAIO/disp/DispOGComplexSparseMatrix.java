@@ -51,7 +51,7 @@ public class DispOGComplexSparseMatrix implements Disp<OGComplexSparseMatrix> {
         sb.append("\n");
       }
     }
-
+    formatter.close();
     System.out.println(sb.toString());
 
   }

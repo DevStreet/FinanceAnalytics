@@ -54,6 +54,7 @@ public class DispOGComplexDiagonalMatrix implements Disp<OGComplexDiagonalMatrix
       }
       sb.append("\n");
     }
+    formatter.close();
     System.out.println(sb.toString());
   }
 
