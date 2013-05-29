@@ -37,7 +37,7 @@ public class LogOGSparseMatrix implements Log<OGArray<? extends Number>, OGSpars
     if (complex) {
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
       EasyIZY.vz_ln(tmp, tmp);
-      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf());
+      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf_plus_zero_i());
     } else {
       tmp = new double[n];
       EasyIZY.vd_ln(data, tmp);
@@ -45,7 +45,7 @@ public class LogOGSparseMatrix implements Log<OGArray<? extends Number>, OGSpars
         retarr = SparseMemoryManipulation.createFullSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, Double.NEGATIVE_INFINITY);
       } else {
         tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(tmp);
-        retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf());
+        retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf_plus_zero_i());
       }
     }
     return retarr;

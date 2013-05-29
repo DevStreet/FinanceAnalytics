@@ -37,12 +37,12 @@ public class AtanhOGSparseMatrix implements Atanh<OGArray<? extends Number>, OGS
     if (complex) {
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
       EasyIZY.vz_atanh(tmp, tmp);
-      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.i_times_half_pi());
+      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.zero_plus_i_times_half_pi());
     } else {
       tmp = new double[n];
       EasyIZY.vd_atanh(data, tmp);
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(tmp);
-      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.i_times_half_pi());
+      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.zero_plus_i_times_half_pi());
     }
     return retarr;
   }

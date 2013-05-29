@@ -23,6 +23,6 @@ public class AcosOGComplexSparseMatrix implements Acos<OGComplexSparseMatrix, OG
     int n = array1.getData().length;
     double[] tmp = new double[n];
     EasyIZY.vz_acos(array1.getData(), tmp);
-    return SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.half_pi());
+    return SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.half_pi_plus_zero_i());
   }
 }

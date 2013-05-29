@@ -24,7 +24,7 @@ public class AcoshOGComplexSparseMatrix implements Acosh<OGArray<? extends Numbe
     double[] data = array1.getData();
     double[] tmp = new double[data.length];
     EasyIZY.vz_acosh(data, tmp);
-    return SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.i_times_half_pi());
+    return SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.zero_plus_i_times_half_pi());
 
   }
 }

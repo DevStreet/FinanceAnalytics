@@ -38,7 +38,7 @@ public class AcosOGSparseMatrix implements Acos<OGArray<? extends Number>, OGSpa
     if (complex) {
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
       EasyIZY.vz_acos(tmp, tmp);
-      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.half_pi());
+      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.half_pi_plus_zero_i());
     } else {
       tmp = new double[n];
       EasyIZY.vd_acos(data, tmp);

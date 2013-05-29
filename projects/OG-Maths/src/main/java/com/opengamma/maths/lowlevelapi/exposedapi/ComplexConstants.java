@@ -29,17 +29,17 @@ public class ComplexConstants {
   /**
    * The value 0+(pi/2)*i
    */
-  private final static double[] s_i_times_half_pi = new double[] {0, MathsConstants.halfpi };
+  private static final double[] s_i_times_half_pi = new double[] {0.e0, MathsConstants.halfpi }; //CSIGNORE
 
   /**
    * The value pi/2+0*i
    */
-  private final static double[] s_half_pi = new double[] {MathsConstants.halfpi, 0 };
+  private static final double[] s_half_pi = new double[] {MathsConstants.halfpi, 0.e0 }; //CSIGNORE
 
   /**
    * The value -Inf + 0i
    */
-  private final static double[] s_neg_inf = new double[] {Double.NEGATIVE_INFINITY, 0.e0 };
+  private static final double[] s_neg_inf = new double[] {Double.NEGATIVE_INFINITY, 0.e0 }; //CSIGNORE
   
   
   /**
@@ -70,7 +70,7 @@ public class ComplexConstants {
    * The value 0+(pi/2)*i
    * @return 0+(pi/2)*i
    */
-  public static double[] i_times_half_pi() {
+  public static double[] zero_plus_i_times_half_pi() { //CSIGNORE
     return s_i_times_half_pi;
   }
 
@@ -78,7 +78,7 @@ public class ComplexConstants {
    * The value (pi/2)+0*i
    * @return (pi/2)+0*i
    */
-  public static double[] half_pi() {
+  public static double[] half_pi_plus_zero_i() { //CSIGNORE
     return s_half_pi;
   }
 
@@ -86,7 +86,7 @@ public class ComplexConstants {
    * The value -Inf+0*i
    * @return -Inf+0*i
    */
-  public static double[] negative_inf() {
+  public static double[] negative_inf_plus_zero_i() { //CSIGNORE
     return s_neg_inf;
   }
   

@@ -24,7 +24,7 @@ public class LogOGComplexSparseMatrix implements Log<OGArray<? extends Number>, 
     double[] data = array1.getData();
     double[] tmp = new double[data.length];
     EasyIZY.vz_ln(data, tmp);
-    return SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf());
+    return SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.negative_inf_plus_zero_i());
 
   }
 }

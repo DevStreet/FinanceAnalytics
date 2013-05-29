@@ -41,7 +41,7 @@ public class AcoshOGSparseMatrix implements Acosh<OGArray<? extends Number>, OGS
     if (complex) {
       tmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(data);
       EasyIZY.vz_acosh(tmp, tmp);
-      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.i_times_half_pi());
+      retarr = SparseMemoryManipulation.createFullComplexSparseMatrixWithNewFillValueInANDNewValuesBasedOnStructureOf(array1, tmp, ComplexConstants.zero_plus_i_times_half_pi());
     } else { // we have a full sparse matrix with all values > 1
       tmp = new double[n];
       EasyIZY.vd_acosh(data, tmp);
