@@ -9,8 +9,6 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
-
 /**
  *
  */
@@ -37,16 +35,6 @@ public void testContructFromArrayOfArraysWithBADCOLDimension() {
 @Test
 public void testContructFromArrayOfArraysNODimension() {
   new SparseMatrix(_sparsedata);
-}
-
-@Test
-public void testContructFromDoubleMatrix2DWithDimension() {
-  new SparseMatrix(new DoubleMatrix2D(_sparsedata), 10, 8);
-}
-
-@Test
-public void testContructFromDoubleMatrix2DNODimension() {
-  new SparseMatrix(new DoubleMatrix2D(_sparsedata));
 }
 
 @Test

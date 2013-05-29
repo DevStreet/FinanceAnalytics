@@ -5,9 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.datatypes.primitive;
 
-import org.apache.commons.lang.NotImplementedException;
-
-import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 
 /**
  * SparseMatrix is a class to wrap the underlying sparse storage types.
@@ -49,7 +47,7 @@ public class SparseMatrix implements MatrixPrimitive {
    */
   public SparseMatrix(double[][] indata, int m, int n, majorness t) {
     if (MatrixPrimitiveUtils.isRagged(indata)) {
-      throw new NotImplementedException("Construction from a ragged array of arrays is not implemented");
+      throw new MathsExceptionIllegalArgument("Construction from a ragged array of arrays is not implemented");
     }
 
     // test sanity of requested data lengths
@@ -109,26 +107,6 @@ public class SparseMatrix implements MatrixPrimitive {
   }
 
   /**
-   * Constructs a sparse matrix from the DoubleMatrix2D type
-   * @param indata is a DoubleMatrix2D containing data to be turned into a sparse matrix representation
-   * @param m is the number of rows in the matrix (use if there are empty rows in indata and a matrix of a specific size is needed for conformance)
-   * @param n is the number of columns in the matrix (use if there are empty columns in indata and a matrix of a specific size is needed for conformance)
-   */
-  public SparseMatrix(DoubleMatrix2D indata, int m, int n) {
-    this(indata.toArray(), m, n);
-  }
-
-  /**
-   * Constructs a sparse matrix from the DoubleMatrix2D type
-   * @param indata is a DoubleMatrix2D containing data to be turned into a sparse matrix representation
-   * The constructor assumes that the matrix dimensions can be derived from the dimensions of the DoubleMatrix2D passed in (i.e. no empty rows and columns)
-   * If for reasons of conformability a matrix of a specific dimension is needed then use the alternative constructor that allows this feature.
-   */
-  public SparseMatrix(DoubleMatrix2D indata) {
-    this(indata.toArray(), indata.getNumberOfRows(), indata.getNumberOfColumns());
-  }
-
-  /**
    * Constructs a sparse matrix from double array of arrays data
    * @param indata is an array of arrays containing data to be turned into a sparse matrix representation
    * @param m is the number of rows in the matrix (use if there are empty rows in indata and a matrix of a specific size is needed for conformance)
@@ -151,28 +129,6 @@ public class SparseMatrix implements MatrixPrimitive {
    */
   public SparseMatrix(double[][] indata, majorness t) {
     this(indata, indata.length, indata[0].length, t);
-  }
-
-  /**
-   * Constructs a sparse matrix from the DoubleMatrix2D type
-   * @param indata is a DoubleMatrix2D containing data to be turned into a sparse matrix representation
-   * @param m is the number of rows in the matrix (use if there are empty rows in indata and a matrix of a specific size is needed for conformance)
-   * @param n is the number of columns in the matrix (use if there are empty columns in indata and a matrix of a specific size is needed for conformance)
-   * @param t is an enumerated of type majorness, takes values "column" and "row" depending on anticipated access pattern.
-   */
-  public SparseMatrix(DoubleMatrix2D indata, int m, int n, majorness t) {
-    this(indata.toArray(), m, n, t);
-  }
-
-  /**
-   * Constructs a sparse matrix from the DoubleMatrix2D type
-   * @param indata is a DoubleMatrix2D containing data to be turned into a sparse matrix representation
-   * The constructor assumes that the matrix dimensions can be derived from the dimensions of the DoubleMatrix2D passed in (i.e. no empty rows and columns)
-   * If for reasons of conformability a matrix of a specific dimension is needed then use the alternative constructor that allows this feature.
-   * @param t is an enumerated of type majorness, takes values "column" and "row" depending on anticipated access pattern.
-   */
-  public SparseMatrix(DoubleMatrix2D indata, majorness t) {
-    this(indata.toArray(), indata.getNumberOfRows(), indata.getNumberOfColumns(), t);
   }
 
   /**
@@ -273,13 +229,6 @@ public class SparseMatrix implements MatrixPrimitive {
   @Override
   public String toString() {
     return _type.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public boolean equals(SparseMatrix obj) {
-    return _type.equals(obj);
   }
 
   /**
