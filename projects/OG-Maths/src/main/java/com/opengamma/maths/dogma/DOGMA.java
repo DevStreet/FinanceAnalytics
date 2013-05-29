@@ -3427,6 +3427,22 @@ public class DOGMA {
     return     com.opengamma.maths.dogma.autogen.DOGMASize.size(arg0);
   };
 
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASort.sort(arg0, arg1);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, int arg2, java.lang.String arg3) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASort.sort(arg0, arg1, arg2, arg3);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, int arg2) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASort.sort(arg0, arg1, arg2);
+  };
+
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, java.lang.String arg2) {
+    return     com.opengamma.maths.dogma.autogen.DOGMASort.sort(arg0, arg1, arg2);
+  };
+
 
 
 /**
@@ -4099,6 +4115,150 @@ public class DOGMA {
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAVander.vander(arg0);
   };
+
+
+/**
+ * DOGMA Function: Vertcat
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> vertcat(OGArray<? extends Number> arg0, OGArray<? extends Number> arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAVertcat.vertcat(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Vertcat
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> vertcat(Number arg0, OGArray<? extends Number> arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAVertcat.vertcat(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Vertcat
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static OGArray<? extends Number> vertcat(OGArray<? extends Number> arg0, Number arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAVertcat.vertcat(arg0, arg1);
+  }
+
+
+/**
+ * DOGMA Function: Vertcat
+ * <p>
+ * Short Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Full Description:
+ * <p>
+ * Docs Missing - No description given
+ * <p>
+ * Example Code:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ * <p>
+ * Example Output:
+ * <pre>
+ * {@code 
+ * Docs Missing - No description given
+ * }
+ * </pre>
+ *
+ * @param arg0  Docs Missing - No description given
+ * @param arg1  Docs Missing - No description given
+ * 
+ * @return Docs Missing - No description given
+ */
+
+  public static Number vertcat(Number arg0, Number arg1) {
+    return com.opengamma.maths.dogma.autogen.DOGMAVertcat.vertcat(arg0, arg1);
+  }
 
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix wilkinson(int arg0) {
     return     com.opengamma.maths.dogma.autogen.DOGMAWilkinson.wilkinson(arg0);

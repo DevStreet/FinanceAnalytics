@@ -15,6 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 /**
  * 
  */
+@Test(enabled=false)
 public class DOGMAUnaryFunctionsTest {
 
   @Test
