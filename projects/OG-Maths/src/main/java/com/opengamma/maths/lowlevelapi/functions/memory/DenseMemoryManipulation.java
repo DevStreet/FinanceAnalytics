@@ -6,7 +6,7 @@
 package com.opengamma.maths.lowlevelapi.functions.memory;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
+import com.opengamma.maths.lowlevelapi.functions.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
