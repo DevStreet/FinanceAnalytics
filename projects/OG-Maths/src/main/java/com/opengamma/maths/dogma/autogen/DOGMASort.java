@@ -38,7 +38,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Size;
+import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Sort;
 /**
  * Suppression against unused code, typically imports, this is due to autogeneration and it being easier to include all at little extra cost.
  */
@@ -46,23 +46,23 @@ import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.Size;
 /**
  * Provides the DOGMA Language
  */
-public class DOGMASize {
-  private static DOGMASize s_instance;
-  DOGMASize() {
+public class DOGMASort {
+  private static DOGMASort s_instance;
+  DOGMASort() {
   }
-  public static DOGMASize getInstance() {
+  public static DOGMASort getInstance() {
     return s_instance;
   }
-  private static Logger s_log = LoggerFactory.getLogger(Size.class);
+  private static Logger s_log = LoggerFactory.getLogger(Sort.class);
   // switch for chatty start up
   private static boolean s_verbose;
-  public DOGMASize(boolean verbose) {
+  public DOGMASort(boolean verbose) {
     s_verbose = verbose;
   };
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMADimensions.length.SizeFunction s_sizefunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMADimensions.length.SizeFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortOGMatrix s_sortogmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortOGMatrix();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//
@@ -94,11 +94,17 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = OperatorDictionaryPopulatorLibrary.getVoidUnaryOperatorDictionary();
 
 }
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number> size(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0){
-    return   s_sizefunction.size( arg0);
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1){
+    return   s_sortogmatrix.sort( arg0,  arg1);
   };
-  public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number> size(java.lang.Number arg0){
-    return   s_sizefunction.size( arg0);
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, Integer arg2, java.lang.String arg3){
+    return   s_sortogmatrix.sort( arg0,  arg1,  arg2,  arg3);
+  };
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, Integer arg2){
+    return   s_sortogmatrix.sort( arg0,  arg1,  arg2);
+  };
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, java.lang.String arg2){
+    return   s_sortogmatrix.sort( arg0,  arg1,  arg2);
   };
 
 }
