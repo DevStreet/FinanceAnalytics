@@ -3,7 +3,7 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.datatypes.primitive;
+package com.opengamma.maths.lowlevelapi.functions;
 
 import static org.testng.AssertJUnit.assertNotNull;
 
