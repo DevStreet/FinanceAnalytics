@@ -7,7 +7,6 @@ package com.opengamma.maths.dogma.engine.operationstack;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
