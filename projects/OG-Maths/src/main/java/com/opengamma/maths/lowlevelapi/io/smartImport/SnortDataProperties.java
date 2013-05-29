@@ -8,7 +8,7 @@ package com.opengamma.maths.lowlevelapi.io.smartImport;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
+import com.opengamma.maths.lowlevelapi.functions.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**

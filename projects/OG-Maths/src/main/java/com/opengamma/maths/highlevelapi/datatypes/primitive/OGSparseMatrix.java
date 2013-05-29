@@ -8,7 +8,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.lowlevelapi.datatypes.primitive.MatrixPrimitiveUtils;
+import com.opengamma.maths.lowlevelapi.functions.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
