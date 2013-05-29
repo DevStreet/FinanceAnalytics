@@ -193,7 +193,8 @@ public class Dblat1 {
     int[] ns = new int[] {0, 1, 2, 4 };
     double[] sx = new double[7], sy = new double[7];
     double[] stx = new double[7], sty = new double[7];
-    int knfortran = 0;
+    @SuppressWarnings("unused")
+    int knfortran = 0; 
     for (int ki = 0; ki < 4; ki++) {
       _incx = incxs[ki];
       _incy = incys[ki];
@@ -267,6 +268,7 @@ public class Dblat1 {
     int[] incys = {1, -2, 1, -2 };
     int[] ns = {0, 1, 2, 4 };
     int[][] lens = { {1, 1 }, {1, 1 }, {2, 3 }, {4, 7 } };
+    @SuppressWarnings("unused")
     int n, lenx, leny, ksize;
 
     double[][][] dt9x = { { {0.6e0, 0.6e0, 0.6e0, 0.6e0 }, {0.78e0, 0.78e0, 0.78e0, 0.78e0 }, {0.78e0, 0.66e0, -0.06e0, 0.78e0 }, {0.78e0, 0.96e0, 0.9e0, 0.78e0 } },
