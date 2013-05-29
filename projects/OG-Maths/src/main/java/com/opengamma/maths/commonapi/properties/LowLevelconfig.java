@@ -202,6 +202,7 @@ public class LowLevelconfig {
     for (Entry<String, String> entry : s_properties.entrySet()) {
       strbool.format("%-35.30s: %s\n", entry.getKey(), entry.getValue());
     }
+    strbool.close();
     return sb.toString();
   }
 
