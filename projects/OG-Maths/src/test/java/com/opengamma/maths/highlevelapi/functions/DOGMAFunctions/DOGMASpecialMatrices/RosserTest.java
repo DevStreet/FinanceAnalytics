@@ -11,7 +11,7 @@ import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the Rosser matrix generator
@@ -25,7 +25,7 @@ public class RosserTest {
   public static void testRosser() {
     final int n = 8;
     OGMatrix tmp = RosserFunction.rosser();
-    assertArrayEquals(tmp.getData(), s_theRosserData, D1MACH.four());
+    assertArrayEquals(tmp.getData(), s_theRosserData, D1mach.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
   }

@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the Wilkinson matrix generator
@@ -41,7 +41,7 @@ public class WilkinsonTest {
   public static void simple1x1Test() {
     final int n = 1;
     OGMatrix tmp = WilkinsonFunction.wilkinson(n);
-    assertArrayEquals(tmp.getData(), wilk1, 10 * D1MACH.four());
+    assertArrayEquals(tmp.getData(), wilk1, 10 * D1mach.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
   }
@@ -50,7 +50,7 @@ public class WilkinsonTest {
   public static void simple4x4Test() {
     final int n = 4;
     OGMatrix tmp = WilkinsonFunction.wilkinson(n);
-    assertArrayEquals(tmp.getData(), wilk4, 10 * D1MACH.four());
+    assertArrayEquals(tmp.getData(), wilk4, 10 * D1mach.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
   }
@@ -59,7 +59,7 @@ public class WilkinsonTest {
   public static void simple9x9Test() {
     final int n = 9;
     OGMatrix tmp = WilkinsonFunction.wilkinson(n);
-    assertArrayEquals(tmp.getData(), wilk9, 10 * D1MACH.four());
+    assertArrayEquals(tmp.getData(), wilk9, 10 * D1mach.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
   }
@@ -68,7 +68,7 @@ public class WilkinsonTest {
   public static void simple10x10Test() {
     final int n = 10;
     OGMatrix tmp = WilkinsonFunction.wilkinson(n);
-    assertArrayEquals(tmp.getData(), wilk10, 10 * D1MACH.four());
+    assertArrayEquals(tmp.getData(), wilk10, 10 * D1mach.four());
     assertTrue(tmp.getNumberOfColumns() == n);
     assertTrue(tmp.getNumberOfRows() == n);
   }

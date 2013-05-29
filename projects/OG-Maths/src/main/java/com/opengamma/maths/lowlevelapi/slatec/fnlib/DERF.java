@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * DERF(X) provides the ability to calculate the error function at position 'x'. 
@@ -43,9 +43,9 @@ public class DERF {
   private static double s_sqeps;
   private static int s_nterf;
   static {
-    s_nterf = INITDS.initds(ERFCS, 21, 0.1 * D1MACH.three());
-    s_xbig = Math.sqrt(-Math.log(SQRTPI * D1MACH.three()));
-    s_sqeps = Math.sqrt(2.0d * D1MACH.three());
+    s_nterf = INITDS.initds(ERFCS, 21, 0.1 * D1mach.three());
+    s_xbig = Math.sqrt(-Math.log(SQRTPI * D1mach.three()));
+    s_sqeps = Math.sqrt(2.0d * D1mach.three());
   }
 
   /**

@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the OGPermutation Array class
@@ -262,7 +262,7 @@ public class OGPermutationMatrixTest {
     OGPermutationMatrix D = new OGPermutationMatrix(data);
     OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
     OGMatrix expected = new OGMatrix(new double[] {1,0,0,0,1,0 }, 3, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
   
   // test equals obj points to obj

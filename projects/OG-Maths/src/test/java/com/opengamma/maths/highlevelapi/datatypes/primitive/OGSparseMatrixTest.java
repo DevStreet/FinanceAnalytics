@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the OGDoubleArray Class
@@ -242,7 +242,7 @@ public class OGSparseMatrixTest {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGSparseMatrix expected = new OGSparseMatrix(new double[][] {{3, 0, 4, 0 } });
     OGArray<? extends Number> row = D.getRow(1);
-    assertTrue(row.fuzzyequals(expected, 10 * D1MACH.four()));
+    assertTrue(row.fuzzyequals(expected, 10 * D1mach.four()));
   }
 
   // test get rows
@@ -415,7 +415,7 @@ public class OGSparseMatrixTest {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGArray<? extends Number> answer = D.get(new int[] {3, 1, 2 }, new int[] {2, 0 });
     OGSparseMatrix expected = new OGSparseMatrix(new double[][] { {7, 0 }, {4, 3 }, {6, 0 } });
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   // test get No elements
@@ -505,21 +505,21 @@ public class OGSparseMatrixTest {
   @Test
   public void testFuzzyEqualsObjeqObj() {
     OGSparseMatrix D = new OGSparseMatrix(data);
-    assertTrue(D.fuzzyequals(D, 10 * D1MACH.four()));
+    assertTrue(D.fuzzyequals(D, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj not = null
   @Test
   public void testFuzzyEqualsObjNull() {
     OGSparseMatrix D = new OGSparseMatrix(data);
-    assertFalse(D.fuzzyequals(null, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(null, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class different
   @Test
   public void testFuzzyEqualsObjDifferentClass() {
     OGSparseMatrix D = new OGSparseMatrix(data);
-    assertFalse(D.fuzzyequals(new Double(1.), 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(new Double(1.), 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, diff cols
@@ -527,7 +527,7 @@ public class OGSparseMatrixTest {
   public void testFuzzyEqualsObjDifferentCols() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGSparseMatrix Diff = new OGSparseMatrix(new double[][] {{7 } });
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, same cols diff rows
@@ -535,7 +535,7 @@ public class OGSparseMatrixTest {
   public void testFuzzyEqualsObjDifferentRows() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGSparseMatrix Diff = new OGSparseMatrix(new double[][] {{1, 2, 3, 4 } });
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, same cols same rows different data
@@ -543,7 +543,7 @@ public class OGSparseMatrixTest {
   public void testFuzzyEqualsObjDifferentData() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGSparseMatrix Diff = new OGSparseMatrix(new double[][] { {999, 2, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } });
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test equals obj class ok, same cols same rows different col ptr
@@ -551,7 +551,7 @@ public class OGSparseMatrixTest {
   public void testFuzzyEqualsObjDifferentColPtr() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGSparseMatrix Diff = new OGSparseMatrix(new double[][] { {1, 0, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } });
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test equals obj class ok, same cols same rows same data, should bork on column ptr
@@ -559,15 +559,15 @@ public class OGSparseMatrixTest {
   public void testFuzzyEqualsObjDifferentRowIdx() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     OGSparseMatrix Diff = new OGSparseMatrix(new double[][] { {1, 2, 0, 0 }, {3, 0, 4, 0 }, {5, 0, 6, 0 }, {0, 0, 7, 0 } });
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, same cols same rows same data
   @Test
   public void testFuzzyEqualsObjStructurallyIdentical() {
     OGSparseMatrix D = new OGSparseMatrix(data);
-    OGSparseMatrix Same = new OGSparseMatrix(new double[][] { {1 + 9 * D1MACH.four(), 2, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } });
-    assertTrue(D.fuzzyequals(Same, 10 * D1MACH.four()));
+    OGSparseMatrix Same = new OGSparseMatrix(new double[][] { {1 + 9 * D1mach.four(), 2, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } });
+    assertTrue(D.fuzzyequals(Same, 10 * D1mach.four()));
   }
 
   // test hash code

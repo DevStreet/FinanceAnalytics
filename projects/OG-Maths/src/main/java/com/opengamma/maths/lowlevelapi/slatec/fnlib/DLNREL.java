@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Provides ln(1+X) accurate in the sense of relative error.
@@ -66,8 +66,8 @@ public class DLNREL {
     s_dALNRCS[40] = +.17578597841760239233269760000000e-29;
     s_dALNRCS[41] = -.33410026677731010351377066666666e-30;
     s_dALNRCS[42] = +.63533936180236187354180266666666e-31;
-    s_dNLNREL = INITDS.initds(s_dALNRCS, 43, 0.1d * (float) (D1MACH.three()));
-    s_dXMIN = -1.0d + Math.sqrt(D1MACH.four());
+    s_dNLNREL = INITDS.initds(s_dALNRCS, 43, 0.1d * (float) (D1mach.three()));
+    s_dXMIN = -1.0d + Math.sqrt(D1mach.four());
     s_log = LoggerFactory.getLogger(DLNREL.class);
   }
 

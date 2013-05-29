@@ -12,7 +12,7 @@ import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.HilbFunction;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the Hilbert matrix formation
@@ -33,7 +33,7 @@ public class HilbTest {
   @Test
   public void hilbSimpleTest() {
     OGMatrix tmp = HilbFunction.hilb(10);
-    assertArrayEquals(tmp.getData(),hilb10x10,10*D1MACH.four());
+    assertArrayEquals(tmp.getData(),hilb10x10,10*D1mach.four());
     assertTrue(tmp.getNumberOfColumns()==10);
     assertTrue(tmp.getNumberOfRows()==10);
   }
@@ -41,7 +41,7 @@ public class HilbTest {
   @Test
   public void hilbSimple1x1Test() {
     OGMatrix tmp = HilbFunction.hilb(1);
-    assertArrayEquals(tmp.getData(),new double[] {1},10*D1MACH.four());
+    assertArrayEquals(tmp.getData(),new double[] {1},10*D1mach.four());
   }  
   
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)

@@ -13,7 +13,7 @@ import static org.testng.Assert.assertFalse;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the OGIndexArray Class
@@ -357,7 +357,7 @@ public class OGIndexMatrixTest {
     OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
     OGIndexMatrix expected = new OGIndexMatrix(new int[] {5, 8, 11, 6, 9, 12 }, 3, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   @Test
@@ -365,7 +365,7 @@ public class OGIndexMatrixTest {
     OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {2, 0 });
     OGIndexMatrix expected = new OGIndexMatrix(new int[] {6, 9, 12, 4, 7, 10 }, 3, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   @Test
@@ -373,7 +373,7 @@ public class OGIndexMatrixTest {
     OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {0, 3, 2 }, new int[] {2, 0 });
     OGIndexMatrix expected = new OGIndexMatrix(new int[] {3, 12, 9, 1, 10, 7 }, 3, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   // test get No elements

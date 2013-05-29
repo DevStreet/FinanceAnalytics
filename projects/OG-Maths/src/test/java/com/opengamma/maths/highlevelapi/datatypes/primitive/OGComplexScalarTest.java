@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the real scalar class
@@ -225,7 +225,7 @@ public class OGComplexScalarTest {
     OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
     OGArray<? extends Number> answer = D.get(new int[] {0 }, new int[] {0 });
     OGComplexScalar expected = new OGComplexScalar(1.2, 3.4);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   @Test
@@ -233,7 +233,7 @@ public class OGComplexScalarTest {
     OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
     OGArray<? extends Number> answer = D.get(new int[] {0, 0, 0, 0 }, new int[] {0 });
     OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 4, 1);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   @Test
@@ -241,7 +241,7 @@ public class OGComplexScalarTest {
     OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
     OGArray<? extends Number> answer = D.get(new int[] {0 }, new int[] {0, 0, 0, 0 });
     OGComplexMatrix expected = new OGComplexMatrix(new double[] {1.2, 3.4, 1.2, 3.4, 1.2, 3.4, 1.2, 3.4 }, 1, 4);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   // test get entry ok

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Provides the log Gamma correction factor so that
@@ -38,9 +38,9 @@ public class D9LGMC {
     s_dALGMCS[12] = +.1025680058010470912000000000000e-27;
     s_dALGMCS[13] = -.3401102254316748799999999999999e-29;
     s_dALGMCS[14] = +.1276642195630062933333333333333e-30;
-    s_dNALGM = INITDS.initds(s_dALGMCS, 15, (float) D1MACH.three());
-    s_dXBIG = 1.d / Math.sqrt(D1MACH.three());
-    s_dXMAX = Math.exp(Math.min(Math.log(D1MACH.two() / 12.d), -Math.log(12.d * D1MACH.one())));
+    s_dNALGM = INITDS.initds(s_dALGMCS, 15, (float) D1mach.three());
+    s_dXBIG = 1.d / Math.sqrt(D1mach.three());
+    s_dXMAX = Math.exp(Math.min(Math.log(D1mach.two() / 12.d), -Math.log(12.d * D1mach.one())));
     s_log = LoggerFactory.getLogger(D9LGMC.class);
   }
 

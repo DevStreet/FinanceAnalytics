@@ -9,7 +9,7 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 
 /**
@@ -91,7 +91,7 @@ public class DERFTest {
     // -1
     assertTrue(Math.abs(DERF.derf(-1) + .842700792949715d) < 1e-15);
     // 0.5(Machine precision/machine radix)
-    assertTrue(Math.abs(DERF.derf(D1MACH.three() / 2) - 6.26376265908397e-17) < 1e-16);
+    assertTrue(Math.abs(DERF.derf(D1mach.three() / 2) - 6.26376265908397e-17) < 1e-16);
   }
 
 }

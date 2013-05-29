@@ -6,7 +6,7 @@
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionUnderflow;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * DERFC(X) provides the ability to calculate the complementary error function at position 'x'. 
@@ -164,14 +164,14 @@ public class DERFC {
   private static double s_xmax;
   private static double s_sqeps;
   static {
-    s_eta = 0.1 * D1MACH.three(); // slight variation from F77 SLATEC, comparing using doubles opposed to floats
+    s_eta = 0.1 * D1mach.three(); // slight variation from F77 SLATEC, comparing using doubles opposed to floats
     s_nterf = INITDS.initds(s_erfcs, 21, s_eta);
     s_nterfc = INITDS.initds(s_erfccs, 59, s_eta);
     s_nterc2 = INITDS.initds(s_erc2cs, 49, s_eta);
-    s_xsml = -Math.sqrt(-Math.log(SQRTPI * D1MACH.three()));
-    s_txmax = Math.sqrt(-Math.log(SQRTPI * D1MACH.one()));
+    s_xsml = -Math.sqrt(-Math.log(SQRTPI * D1mach.three()));
+    s_txmax = Math.sqrt(-Math.log(SQRTPI * D1mach.one()));
     s_xmax = s_txmax - 0.5d * Math.log(s_txmax) / s_txmax - 0.01d;
-    s_sqeps = Math.sqrt(2d * D1MACH.three());
+    s_sqeps = Math.sqrt(2d * D1mach.three());
   }
 
   /**

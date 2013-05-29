@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Compute the double precision binomial coefficient for integer arguments N and M. 
@@ -24,8 +24,8 @@ public class DBINOM {
   private static double s_dSQ2PIL = 0.91893853320467274178032973640562e0;
   private static double s_dBILNMX, s_dFINTMX;
   static {
-    s_dBILNMX = Math.log(D1MACH.two() - 0.0001e0);
-    s_dFINTMX = 0.9e0 / D1MACH.three();
+    s_dBILNMX = Math.log(D1mach.two() - 0.0001e0);
+    s_dFINTMX = 0.9e0 / D1mach.three();
     s_log = LoggerFactory.getLogger(DBINOM.class);
   }
 

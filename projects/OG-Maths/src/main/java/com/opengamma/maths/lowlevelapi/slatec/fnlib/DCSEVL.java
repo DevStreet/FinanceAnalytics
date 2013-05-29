@@ -6,7 +6,7 @@
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Computes the n-term Chebychev series at point 'x'
@@ -20,7 +20,7 @@ public class DCSEVL {
    */
   private static double s_onepl;
   static {
-    s_onepl = 1.0 + D1MACH.four();
+    s_onepl = 1.0 + D1mach.four();
   }
 
   /**

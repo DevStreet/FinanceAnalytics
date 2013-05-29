@@ -13,7 +13,7 @@ import static org.testng.Assert.assertFalse;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the {@link OGDiagonalMatrix} Class
@@ -264,7 +264,7 @@ public class OGDiagonalMatrixTest {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {1, 2, 3 }, new int[] {1, 2 });
     OGDiagonalMatrix expected = new OGDiagonalMatrix(new double[] {2, 3 }, 3, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   @Test
@@ -272,7 +272,7 @@ public class OGDiagonalMatrixTest {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {3 }, new int[] {1, 2 });
     OGMatrix expected = new OGMatrix(new double[] {0, 0 }, 1, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
   @Test
@@ -280,7 +280,7 @@ public class OGDiagonalMatrixTest {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {2, 0, 3 }, new int[] {2, 0 });
     OGMatrix expected = new OGMatrix(new double[] {3.0, 0.0, 0.0, 0.0, 1.0, 0.0}, 3, 2);
-    assertTrue(expected.fuzzyequals(answer, 10 * D1MACH.four()));
+    assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
 
@@ -389,21 +389,21 @@ public class OGDiagonalMatrixTest {
   @Test
   public void testFuzzyEqualsObjeqObj() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    assertTrue(D.fuzzyequals(D, 10 * D1MACH.four()));
+    assertTrue(D.fuzzyequals(D, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj not = null
   @Test
   public void testFuzzyEqualsObjNull() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    assertFalse(D.fuzzyequals(null, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(null, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class different
   @Test
   public void testFuzzyEqualsObjDifferentClass() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    assertFalse(D.fuzzyequals(new Double(1.), 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(new Double(1.), 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, diff cols
@@ -411,7 +411,7 @@ public class OGDiagonalMatrixTest {
   public void testFuzzyEqualsObjDifferentCols() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGDiagonalMatrix Diff = new OGDiagonalMatrix(7);
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, same cols diff rows
@@ -419,7 +419,7 @@ public class OGDiagonalMatrixTest {
   public void testFuzzyEqualsObjDifferentRows() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGDiagonalMatrix Diff = new OGDiagonalMatrix(new double[] {1, 2, 3 }, 4, 13);
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, same cols same rows different data
@@ -427,15 +427,15 @@ public class OGDiagonalMatrixTest {
   public void testFuzzyEqualsObjDifferentData() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGDiagonalMatrix Diff = new OGDiagonalMatrix(new double[] {999.00, 2.00, 3.00 }, 4, 3);
-    assertFalse(D.fuzzyequals(Diff, 10 * D1MACH.four()));
+    assertFalse(D.fuzzyequals(Diff, 10 * D1mach.four()));
   }
 
   // test fuzzy equals obj class ok, same cols same rows same data
   @Test
   public void testFuzzyEqualsObjStructurallyIdentical() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    OGDiagonalMatrix Same = new OGDiagonalMatrix(new double[] {1.00 + 9 * D1MACH.four(), 2.00, 3.00 }, 4, 3);
-    assertTrue(D.fuzzyequals(Same, 10 * D1MACH.four()));
+    OGDiagonalMatrix Same = new OGDiagonalMatrix(new double[] {1.00 + 9 * D1mach.four(), 2.00, 3.00 }, 4, 3);
+    assertTrue(D.fuzzyequals(Same, 10 * D1mach.four()));
   }
 
   // test hash code

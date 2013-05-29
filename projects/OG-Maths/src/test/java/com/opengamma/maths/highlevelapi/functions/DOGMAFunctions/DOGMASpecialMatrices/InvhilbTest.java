@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.ogblas.auxiliary.D1MACH;
+import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the Inverse Hilbert matrix formation
@@ -50,19 +50,19 @@ public class InvhilbTest {
   @Test
   public void simple2x2Test() {
     OGMatrix tmp = InvhilbFunction.invhilb(2);
-    assertArrayEquals(tmp.getData(),invhilb2x2,10*D1MACH.four());
+    assertArrayEquals(tmp.getData(),invhilb2x2,10*D1mach.four());
   }
 
   @Test
   public void simple10x10Test() {
     OGMatrix tmp = InvhilbFunction.invhilb(10);
-    assertArrayEquals(tmp.getData(),invhilb10x10,10*D1MACH.four());
+    assertArrayEquals(tmp.getData(),invhilb10x10,10*D1mach.four());
   }  
   
   @Test
   public void hilbSimple1x1Test() {
     OGMatrix tmp = InvhilbFunction.invhilb(1);
-    assertArrayEquals(tmp.getData(),new double[] {1},10*D1MACH.four());
+    assertArrayEquals(tmp.getData(),new double[] {1},10*D1mach.four());
   }  
   
     
