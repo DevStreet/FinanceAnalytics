@@ -9,8 +9,9 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.nativewrappers.OGIZYRawWrapper;
 
 /**
- * 
+ * Native backed IZY
  */
+//CSOFF // to match C
 public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface {
   @Override
   public void vd_acos(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {

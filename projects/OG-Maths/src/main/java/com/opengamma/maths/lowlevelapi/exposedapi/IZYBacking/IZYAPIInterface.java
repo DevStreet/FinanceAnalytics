@@ -22,6 +22,7 @@ package com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking;
  * double[] foo = {rX, iX, rY, iY}
  * The reason for this packing is down to internal representation of complex data structures in native libraries.
  */
+//CSOFF // to match C
 public interface IZYAPIInterface {
 
   /**

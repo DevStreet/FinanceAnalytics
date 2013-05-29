@@ -13,6 +13,7 @@ import com.opengamma.maths.lowlevelapi.functions.MathE;
 /**
  * Implements the izy interface in java, best effort impl only.
  */
+//CSOFF // to match C
 public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIInterface {
 
   private static SLATEC s_slatec = new SLATEC(SLATEC.backing.OGjava);
