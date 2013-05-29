@@ -27,6 +27,7 @@ public class EasyIZY {
 
   private static final int[] s_zero = PointerConstants.zero();
 
+  //CSOFF
   public static void vd_acos(double[] arg0, double[] out0) {
     Catchers.catchCondition(arg0.length != out0.length, "Input vector is not the same length as output vector");
     int[] count = new int[] {arg0.length };
