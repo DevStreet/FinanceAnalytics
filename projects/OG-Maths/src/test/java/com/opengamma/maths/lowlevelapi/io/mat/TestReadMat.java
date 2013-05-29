@@ -6,7 +6,6 @@
 package com.opengamma.maths.lowlevelapi.io.mat;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.testng.annotations.Test;
 

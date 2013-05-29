@@ -5,14 +5,14 @@
  */
 package com.opengamma.maths.lowlevelapi.linearalgebra.blase;
 
+import static org.testng.Assert.assertTrue;
+
 import java.util.Arrays;
 
 import org.testng.annotations.Test;
-import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 
 /**
  * tests the dense data converters for BLAS/LAPACK storage schemes "Packed" and "Banded"
