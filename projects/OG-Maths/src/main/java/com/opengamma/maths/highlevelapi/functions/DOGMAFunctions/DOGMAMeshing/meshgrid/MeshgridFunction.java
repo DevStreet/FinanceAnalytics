@@ -58,10 +58,12 @@ public class MeshgridFunction {
     int colsArr1 = array1.getNumberOfColumns();
     int rowsArr2 = array2.getNumberOfRows();
     int colsArr2 = array2.getNumberOfColumns();
-    if (rowsArr1 != 1 || colsArr1 != 1) {
+    if (!(rowsArr1 == 1 || colsArr1 == 1)) {
+      System.out.println(rowsArr1 + " " + colsArr1);
+      System.out.println(rowsArr2 + " " + colsArr2);
       throw new MathsExceptionIllegalArgument("The input matrix array1 must have at least one dimension of value 1 (i.e. it's a vector)");
     }
-    if (rowsArr2 != 1 || colsArr2 != 1) {
+    if (!(rowsArr2 == 1 || colsArr2 == 1)) {
       throw new MathsExceptionIllegalArgument("The input matrix array2 must have at least one dimension of value 1 (i.e. it's a vector)");
     }
 
@@ -86,7 +88,7 @@ public class MeshgridFunction {
 
     double[] tmp2 = new double[m * n];
     for (int i = 0; i < n; i++) {
-      System.arraycopy(data2, 0, tmp2, i * m, n);
+      System.arraycopy(data2, 0, tmp2, i * m, m);
     }
 
     ArrayList<OGArray<? extends Number>> ret = new ArrayList<OGArray<? extends Number>>(2);

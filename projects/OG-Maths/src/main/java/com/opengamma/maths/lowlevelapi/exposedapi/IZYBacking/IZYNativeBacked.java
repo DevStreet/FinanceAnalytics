@@ -260,8 +260,7 @@ public class IZYNativeBacked extends IZYAbstractSuper implements IZYAPIInterface
 
   @Override
   public void vd_cdfnorm(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
-    throw new MathsExceptionNotImplemented("cdfnorm is not implemented");
-    //    OGIZYRawWrapper.vd_cdfnorm(count, arg0, offsetarg0, out0, offsetout0);
+    OGIZYRawWrapper.vd_cdfnorm(count, arg0, offsetarg0, out0, offsetout0);
   }
 
   @Override
