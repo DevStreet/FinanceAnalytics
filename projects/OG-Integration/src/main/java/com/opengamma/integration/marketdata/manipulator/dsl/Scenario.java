@@ -30,6 +30,9 @@ import com.opengamma.util.ArgumentChecker;
  */
 public class Scenario {
 
+  /** Manipulators keyed by the selectors for the items they apply to. */
+  private final ListMultimap<DistinctMarketDataSelector, StructureManipulator<?>> _manipulations = ArrayListMultimap.create();
+
   /** This scenario's name. */
   private final String _name;
   /** Calc configs to which this scenario will be applied, null will match any config. */
@@ -42,6 +45,7 @@ public class Scenario {
   /**
    * Creates a new scenario with a calcuation configuration name of "Default", valuation time of {@code Instant.now()}
    * and resolver version correction of {@link VersionCorrection#LATEST}.
+   * @param name The scenario name, not null
    */
   public Scenario(String name) {
     ArgumentChecker.notEmpty(name, "name"); // should this be allowed to be null? should there be a no-arg constructor?
@@ -60,11 +64,6 @@ public class Scenario {
     _valuationTime = valuationTime;
     _resolverVersionCorrection = resolverVersionCorrection;
   }
-
-  /**
-   * Manipulators keyed by the selectors for the items they apply to.
-   */
-  private final ListMultimap<DistinctMarketDataSelector, StructureManipulator<?>> _manipulations = ArrayListMultimap.create();
 
   /**
    * @return A object for specifying which curves should be transformed
@@ -92,7 +91,7 @@ public class Scenario {
    * @param configNames The calculation configuration name
    * @return The modified scenario
    */
-  public Scenario calculationConfigs(String... configNames) {
+  public Scenario calculationConfigurations(String... configNames) {
     ArgumentChecker.notEmpty(configNames, "configName");
     _calcConfigNames = ImmutableSet.copyOf(configNames);
     return this;
@@ -130,7 +129,7 @@ public class Scenario {
       DistinctMarketDataSelector selector = entry.getKey();
       // ListMultimap always has Lists as entries even if the signature doesn't say so
       List<StructureManipulator<?>> manipulators = (List<StructureManipulator<?>>) entry.getValue();
-      CompositeStructureManipulator compositeManipulator = new CompositeStructureManipulator(manipulators);
+      CompositeStructureManipulator compositeManipulator = new CompositeStructureManipulator(Object.class, manipulators);
       SimpleFunctionParameters functionParameters = new SimpleFunctionParameters();
       functionParameters.setValue(StructureManipulationFunction.EXPECTED_PARAMETER_NAME, compositeManipulator);
       params.put(selector, functionParameters);
@@ -154,7 +153,21 @@ public class Scenario {
     return _calcConfigNames;
   }
 
-  /* package */ String getName() {
+  /**
+   * @return The scenario name, not null
+   */
+  public String getName() {
     return _name;
+  }
+
+  @Override
+  public String toString() {
+    return "Scenario [" +
+        "_name='" + _name + "'" +
+        ", _calcConfigNames=" + _calcConfigNames +
+        ", _valuationTime=" + _valuationTime +
+        ", _resolverVersionCorrection=" + _resolverVersionCorrection +
+        ", _manipulations=" + _manipulations +
+        "]";
   }
 }
