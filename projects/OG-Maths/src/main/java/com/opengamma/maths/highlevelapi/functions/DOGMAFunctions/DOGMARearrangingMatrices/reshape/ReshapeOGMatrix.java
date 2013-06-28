@@ -29,15 +29,7 @@ public final class ReshapeOGMatrix implements Reshape<OGMatrix> {
           newCols);
     }
     double[] data = array1.getData();
-    int ptr = 0;
-    double[][] newData = new double[newRows][newCols];
-    for (int i = 0; i < newRows; i++) {
-      for (int j = 0; j < newCols; j++) {
-        newData[i][j] = data[ptr];
-        ptr++;
-      }
-    }
-    return new OGMatrix(newData);
+    return new OGMatrix(data, newRows, newCols);
   }
 
 }
