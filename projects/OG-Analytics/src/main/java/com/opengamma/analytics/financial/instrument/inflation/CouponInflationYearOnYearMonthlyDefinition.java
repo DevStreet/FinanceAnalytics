@@ -71,8 +71,8 @@ public class CouponInflationYearOnYearMonthlyDefinition extends CouponInflationD
     super(currency, paymentDate, accrualStartDate, accrualEndDate, paymentYearFraction, notional, priceIndex);
     ArgumentChecker.notNull(referenceStartDate, "Reference start date");
     ArgumentChecker.notNull(referenceEndDate, "Reference end date");
-    this._referenceStartDate = referenceStartDate;
-    this._referenceEndDate = referenceEndDate;
+    _referenceStartDate = referenceStartDate;
+    _referenceEndDate = referenceEndDate;
     _payNotional = payNotional;
     _conventionalMonthLag = conventionalMonthLag;
     _monthLag = conventionalMonthLag;
@@ -243,29 +243,39 @@ public class CouponInflationYearOnYearMonthlyDefinition extends CouponInflationD
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (!super.equals(obj))
+    }
+    if (!super.equals(obj)) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     CouponInflationYearOnYearMonthlyDefinition other = (CouponInflationYearOnYearMonthlyDefinition) obj;
-    if (_conventionalMonthLag != other._conventionalMonthLag)
+    if (_conventionalMonthLag != other._conventionalMonthLag) {
       return false;
-    if (_monthLag != other._monthLag)
+    }
+    if (_monthLag != other._monthLag) {
       return false;
-    if (_payNotional != other._payNotional)
+    }
+    if (_payNotional != other._payNotional) {
       return false;
+    }
     if (_referenceEndDate == null) {
-      if (other._referenceEndDate != null)
+      if (other._referenceEndDate != null) {
         return false;
-    } else if (!_referenceEndDate.equals(other._referenceEndDate))
+      }
+    } else if (!_referenceEndDate.equals(other._referenceEndDate)) {
       return false;
+    }
     if (_referenceStartDate == null) {
-      if (other._referenceStartDate != null)
+      if (other._referenceStartDate != null) {
         return false;
-    } else if (!_referenceStartDate.equals(other._referenceStartDate))
+      }
+    } else if (!_referenceStartDate.equals(other._referenceStartDate)) {
       return false;
+    }
     return true;
   }
 

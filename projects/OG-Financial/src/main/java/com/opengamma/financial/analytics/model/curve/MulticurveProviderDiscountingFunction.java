@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.financial.analytics.model.curve;
@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.threeten.bp.Clock;
@@ -28,6 +29,7 @@ import com.google.common.collect.Iterables;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorCurveYieldInterpolated;
 import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorYDCurve;
+import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -58,6 +60,7 @@ import com.opengamma.engine.value.ValueRequirement;
 import com.opengamma.engine.value.ValueRequirementNames;
 import com.opengamma.engine.value.ValueSpecification;
 import com.opengamma.financial.OpenGammaCompilationContext;
+import com.opengamma.financial.analytics.conversion.CurveNodeConverter;
 import com.opengamma.financial.analytics.curve.ConfigDBCurveConstructionConfigurationSource;
 import com.opengamma.financial.analytics.curve.CurveConstructionConfiguration;
 import com.opengamma.financial.analytics.curve.CurveConstructionConfigurationSource;
@@ -70,6 +73,7 @@ import com.opengamma.financial.analytics.curve.CurveUtils;
 import com.opengamma.financial.analytics.curve.DiscountingCurveTypeConfiguration;
 import com.opengamma.financial.analytics.curve.InterpolatedCurveDefinition;
 import com.opengamma.financial.analytics.ircurve.strips.CurveNodeWithIdentifier;
+import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
 import com.opengamma.financial.convention.ConventionSource;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
@@ -78,7 +82,7 @@ import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.Pair;
 
 /**
- * 
+ *
  */
 public class MulticurveProviderDiscountingFunction extends AbstractFunction {
   private static final String CALCULATION_METHOD = "Discounting"; //TODO move me
@@ -92,7 +96,6 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
     _configurationName = configurationName;
   }
 
-  //TODO need to deal with exogenous curves
   @Override
   public CompiledFunctionDefinition compile(final FunctionCompilationContext context, final Instant atInstant) {
     final ZonedDateTime atZDT = ZonedDateTime.ofInstant(atInstant, ZoneOffset.UTC);
@@ -105,6 +108,21 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
     if (curveConstructionConfiguration == null) {
       throw new OpenGammaRuntimeException("Could not get curve construction configuration called " + _configurationName);
     }
+    final Set<ValueRequirement> exogenousRequirements = new HashSet<>();
+    if (curveConstructionConfiguration.getExogenousConfigurations() != null) {
+      final List<String> exogenousConfigurations = curveConstructionConfiguration.getExogenousConfigurations();
+      for (final String name : exogenousConfigurations) {
+        //TODO deal with arbitrary depth
+        final ValueProperties properties = ValueProperties.builder()
+            .with(CURVE_CALCULATION_METHOD, CALCULATION_METHOD)
+            .with(CURVE_CONSTRUCTION_CONFIG, name)
+            .with(PROPERTY_ROOT_FINDER_ABSOLUTE_TOLERANCE, "0.0001")
+            .with(PROPERTY_ROOT_FINDER_RELATIVE_TOLERANCE, "0.0001")
+            .with(PROPERTY_ROOT_FINDER_MAX_ITERATIONS, "1000")
+          .get();
+        exogenousRequirements.add(new ValueRequirement(ValueRequirementNames.CURVE_BUNDLE, ComputationTargetSpecification.NULL, properties));
+      }
+    }
     final String[] curveNames = CurveUtils.getCurveNamesForConstructionConfiguration(curveConstructionConfiguration);
     final ConventionSource conventionSource = OpenGammaCompilationContext.getConventionSource(context);
     final HolidaySource holidaySource = OpenGammaCompilationContext.getHolidaySource(context);
@@ -115,6 +133,12 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
       @Override
       public Set<ComputedValue> execute(final FunctionExecutionContext executionContext, final FunctionInputs inputs, final ComputationTarget target,
           final Set<ValueRequirement> desiredValues) throws AsynchronousExecution {
+        MulticurveProviderDiscount knownData;
+        if (exogenousRequirements.isEmpty()) {
+          knownData = new MulticurveProviderDiscount();
+        } else {
+          knownData = (MulticurveProviderDiscount) inputs.getValue(ValueRequirementNames.CURVE_BUNDLE);
+        }
         final Clock snapshotClock = executionContext.getValuationClock();
         final ZonedDateTime now = ZonedDateTime.now(snapshotClock);
         ValueProperties bundleProperties = null;
@@ -134,8 +158,9 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
         final double absoluteTolerance = Double.parseDouble(Iterables.getOnlyElement(bundleProperties.getValues(PROPERTY_ROOT_FINDER_ABSOLUTE_TOLERANCE)));
         final double relativeTolerance = Double.parseDouble(Iterables.getOnlyElement(bundleProperties.getValues(PROPERTY_ROOT_FINDER_RELATIVE_TOLERANCE)));
         final int maxIterations = Integer.parseInt(Iterables.getOnlyElement(bundleProperties.getValues(PROPERTY_ROOT_FINDER_MAX_ITERATIONS)));
+        final FXMatrix fxMatrix = (FXMatrix) inputs.getValue(ValueRequirementNames.FX_MATRIX);
         final MulticurveDiscountBuildingRepository builder = new MulticurveDiscountBuildingRepository(absoluteTolerance, relativeTolerance, maxIterations);
-        final Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> pair = getCurves(curveConstructionConfiguration, inputs, now, builder);
+        final Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> pair = getCurves(curveConstructionConfiguration, inputs, now, builder, knownData, fxMatrix);
         final ValueSpecification bundleSpec = new ValueSpecification(ValueRequirementNames.CURVE_BUNDLE, ComputationTargetSpecification.NULL, bundleProperties);
         final Set<ComputedValue> result = new HashSet<>();
         result.add(new ComputedValue(bundleSpec, pair.getFirst()));
@@ -190,6 +215,12 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
           requirements.add(new ValueRequirement(ValueRequirementNames.CURVE_MARKET_DATA, ComputationTargetSpecification.NULL, properties));
           requirements.add(new ValueRequirement(ValueRequirementNames.CURVE_SPECIFICATION, ComputationTargetSpecification.NULL, properties));
         }
+        final ValueProperties properties = ValueProperties.builder()
+            .with(CURVE_CONSTRUCTION_CONFIG, _configurationName)
+            .get();
+        requirements.add(new ValueRequirement(ValueRequirementNames.CURVE_INSTRUMENT_CONVERSION_HISTORICAL_TIME_SERIES, ComputationTargetSpecification.NULL, properties));
+        requirements.add(new ValueRequirement(ValueRequirementNames.FX_MATRIX, ComputationTargetSpecification.NULL, properties));
+        requirements.addAll(exogenousRequirements);
         return requirements;
       }
 
@@ -218,19 +249,25 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
 
       @SuppressWarnings("synthetic-access")
       private Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> getCurves(final CurveConstructionConfiguration constructionConfiguration,
-          final FunctionInputs inputs, final ZonedDateTime now, final MulticurveDiscountBuildingRepository builder) {
+          final FunctionInputs inputs, final ZonedDateTime now, final MulticurveDiscountBuildingRepository builder, final MulticurveProviderDiscount knownData,
+          final FXMatrix fxMatrix) {
+        final ValueProperties curveConstructionProperties = ValueProperties.builder()
+            .with(CURVE_CONSTRUCTION_CONFIG, constructionConfiguration.getName())
+            .get();
+        final HistoricalTimeSeriesBundle timeSeries =
+            (HistoricalTimeSeriesBundle) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_INSTRUMENT_CONVERSION_HISTORICAL_TIME_SERIES,
+                ComputationTargetSpecification.NULL, curveConstructionProperties));
         final int nGroups = constructionConfiguration.getCurveGroups().size();
         final InstrumentDerivative[][][] definitions = new InstrumentDerivative[nGroups][][];
         final GeneratorYDCurve[][] curveGenerators = new GeneratorYDCurve[nGroups][];
         final String[][] curves = new String[nGroups][];
         final double[][] parameterGuess = new double[nGroups][];
-        final MulticurveProviderDiscount knownData = new MulticurveProviderDiscount(); //TODO handle exogenous curves
         final LinkedHashMap<String, Currency> discountingMap = new LinkedHashMap<>();
         final LinkedHashMap<String, IborIndex[]> forwardIborMap = new LinkedHashMap<>();
         final LinkedHashMap<String, IndexON[]> forwardONMap = new LinkedHashMap<>();
         //TODO comparator to sort groups by order
-        int i = 0;
-        for (final CurveGroupConfiguration group : constructionConfiguration.getCurveGroups()) {
+        int i = 0; // Implementation Note: loop on the groups
+        for (final CurveGroupConfiguration group : constructionConfiguration.getCurveGroups()) { // Group - start
           int j = 0;
           final int nCurves = group.getCurveTypes().size();
           definitions[i] = new InstrumentDerivative[nCurves][];
@@ -238,31 +275,22 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
           curves[i] = new String[nCurves];
           parameterGuess[i] = new double[nCurves];
           final DoubleArrayList parameterGuessForCurves = new DoubleArrayList();
-          for (final CurveTypeConfiguration type : group.getCurveTypes()) {
+          for (final CurveTypeConfiguration type : group.getCurveTypes()) { // Type - start
             final String curveName = type.getName();
             final ValueProperties properties = ValueProperties.builder().with(CURVE, curveName).get();
-            final Object snapshotObject = inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_MARKET_DATA, ComputationTargetSpecification.NULL, properties));
-            if (snapshotObject == null) {
-              throw new OpenGammaRuntimeException("Could not get market data for " + curveName);
-            }
-            final Object specificationObject = inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_SPECIFICATION, ComputationTargetSpecification.NULL, properties));
-            if (specificationObject == null) {
-              throw new OpenGammaRuntimeException("Could not get curve specification for " + curveName);
-            }
-            final Object definitionObject = inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_DEFINITION, ComputationTargetSpecification.NULL, properties));
-            if (definitionObject == null) {
-              throw new OpenGammaRuntimeException("Could not get curve definition for " + curveName);
-            }
-            final CurveSpecification specification = (CurveSpecification) specificationObject;
-            final CurveDefinition definition = (CurveDefinition) definitionObject;
-            final SnapshotDataBundle snapshot = (SnapshotDataBundle) snapshotObject;
+            final CurveSpecification specification =
+                (CurveSpecification) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_SPECIFICATION, ComputationTargetSpecification.NULL, properties));
+            final CurveDefinition definition =
+                (CurveDefinition) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_DEFINITION, ComputationTargetSpecification.NULL, properties));
+            final SnapshotDataBundle snapshot =
+                (SnapshotDataBundle) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_MARKET_DATA, ComputationTargetSpecification.NULL, properties));
             final int nNodes = specification.getNodes().size();
             final InstrumentDerivative[] derivativesForCurve = new InstrumentDerivative[nNodes];
             final double[] marketDataForCurve = new double[nNodes];
             int k = 0;
             final Set<IborIndex> uniqueIborIndices = new HashSet<>();
             final Set<IndexON> uniqueOvernightIndices = new HashSet<>();
-            for (final CurveNodeWithIdentifier node : specification.getNodes()) {
+            for (final CurveNodeWithIdentifier node : specification.getNodes()) { // Node points - start
               final Double marketData = snapshot.getDataPoint(node.getIdentifier());
               if (marketData == null) {
                 throw new OpenGammaRuntimeException("Could not get market data for " + node.getIdentifier());
@@ -272,8 +300,8 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
               final InstrumentDefinition<?> definitionForNode = curveNodeToDefinitionConverter.getDefinitionForNode(node.getCurveNode(), node.getIdentifier(), now, snapshot);
               uniqueIborIndices.addAll(definitionForNode.accept(IborIndexVisitor.getInstance()));
               uniqueOvernightIndices.addAll(definitionForNode.accept(OvernightIndexVisitor.getInstance()));
-              derivativesForCurve[k++] = definitionForNode.toDerivative(now, new String[] {"", ""});
-            }
+              derivativesForCurve[k++] = CurveNodeConverter.getDerivative(node, definitionForNode, now, timeSeries);
+            } // Node points - end
             definitions[i][j] = derivativesForCurve;
             curveGenerators[i][j] = getGenerator(definition);
             curves[i][j] = curveName;
@@ -286,9 +314,9 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
               discountingMap.put(curveName, Currency.of(((DiscountingCurveTypeConfiguration) type).getCode()));
             }
             j++;
-          }
+          } // type - end
           i++;
-        }
+        } // Group - end
         return builder.makeCurvesFromDerivatives(definitions, curveGenerators, curves, parameterGuess, knownData, discountingMap, forwardIborMap, forwardONMap, PSMQC, PSMQCSC);
       }
 
@@ -305,6 +333,5 @@ public class MulticurveProviderDiscountingFunction extends AbstractFunction {
       }
     };
   }
-
 
 }

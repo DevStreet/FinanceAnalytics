@@ -20,6 +20,7 @@ $.register_module({
             CONS = 'constraints',               WITH = 'with',
             WTHO = 'without',                   INDX = '<INDEX>',
             ORDS = 'columns',                   EMPT = '<EMPTY>',
+            SCEN = 'scenarioId',
             type_map = [
                 ['0',                                                                           Form.type.STR],
                 [[SETS, 'name'].join('.'),                                                      Form.type.STR],
@@ -31,6 +32,8 @@ $.register_module({
                 [[SETS, INDX, DEFP, WTHO, '*'].join('.'),                                       Form.type.STR],
                 // </constraints>
                 [[SETS, INDX, 'name'].join('.'),                                                Form.type.STR],
+                [[SETS, INDX, SCEN].join('.'),                                                  Form.type.STR],
+               /* [[SETS, SCEN].join('.'),                                                        Form.type.STR],*/
                 // <constraints>
                 [[SETS, INDX, COLS, INDX, REQS, INDX, CONS, WITH, '*'].join('.'),               Form.type.IND],
                 [[SETS, INDX, COLS, INDX, REQS, INDX, CONS, WITH, '*', 'optional'].join('.'),   Form.type.IND],
@@ -54,7 +57,7 @@ $.register_module({
                 // <new column order stuff>
                 [[SETS, INDX, ORDS, EMPT, INDX, 'header'].join('.'),                            Form.type.STR],
                 [[SETS, INDX, ORDS, EMPT, INDX, 'valueName'].join('.'),                         Form.type.STR],
-                    // <constraints>
+                // <constraints>
                 [[SETS, INDX, ORDS, EMPT, INDX, CONS, WITH, '*'].join('.'),                     Form.type.IND],
                 [[SETS, INDX, ORDS, EMPT, INDX, CONS, WITH, '*', 'optional'].join('.'),         Form.type.IND],
                 [[SETS, INDX, ORDS, EMPT, INDX, CONS, WITH, '*', '*'].join('.'),                Form.type.STR],
@@ -93,7 +96,6 @@ $.register_module({
                 resource_id = config.data.template_data.object_id,
                 save_new_handler = config.save_new_handler, save_handler = config.save_handler, prefix = 'viewdef',
                 master = config.data.template_data.configJSON.data,
-                column_set_tabs,
                 config_type = config.type,
                 form = new Form({
                     module: 'og.views.forms.view-definition_tash',
@@ -423,6 +425,9 @@ $.register_module({
                             extras: {name: [SETS, set_idx, 'name'].join('.'), value: set.name},
                             children: [
                                 col_tabs, col_vals, spec_vals, // additional values
+                                new blocks.Scenario({ // scenario
+                                	form: form, data: set[SCEN], index: [SETS, set_idx, SCEN].join('.')
+                                }),
                                 new blocks.Constraints({ // default properties
                                     form: form, data: set[DEFP], index: [SETS, set_idx, DEFP].join('.')
                                 }),
@@ -437,7 +442,7 @@ $.register_module({
                         }).on('click', set_id + ' .og-js-colset-nav', function (event) {
                             var $target = $(event.target),
                                 $tab = $target.is(this.selector) ? $target : $target.parents(this.selector + ':first'),
-                                navs = ['og-js-col-vals', 'og-js-specs', 'og-js-def-prop', 'og-js-rule-trans'],
+                                navs = ['og-js-col-vals', 'og-js-specs', 'og-js-scenario', 'og-js-def-prop', 'og-js-rule-trans'],
                                 show = navs[$(this.selector).index($tab)];
                             $tab.addClass('og-active').siblings().removeClass('og-active');
                             navs.forEach(function (cl) {$(set_id + ' .' + cl)[cl === show ? 'show' : 'hide']();});
