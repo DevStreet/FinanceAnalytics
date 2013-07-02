@@ -343,6 +343,7 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     return retarr;
   }
 
+    
   /**
    * Returns the backing data
    * @return the backing data

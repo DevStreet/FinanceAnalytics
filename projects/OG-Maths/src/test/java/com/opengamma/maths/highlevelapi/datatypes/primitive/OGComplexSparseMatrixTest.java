@@ -860,4 +860,42 @@ public class OGComplexSparseMatrixTest {
     assertTrue(D.fuzzyequals(Same, 10 * D1mach.four()));
   }
 
+  @Test
+  public void parserLinearModeTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    OGComplexMatrix expected;
+    double[][] re = new double[][] {{5., 0., 0., 2. } };
+    double[][] im = new double[][] {{0., 90., 0., 20. } };
+
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get("1:4"), 10 * D1mach.four()));
+
+    re = new double[][] {{1., 5., 0., 0., 2., 0., 10., 0., 0., 7., 11., 15., 0., 0., 0., 0. } };
+    im = new double[][] {{10., 0., 90., 0., 20., 60., 100., 0., 30., 70., 0., 0., 0., 0., 120., 160. } };
+
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get(":"), 10 * D1mach.four()));
+  }
+
+  @Test
+  public void parser2DModeTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    OGComplexSparseMatrix expected;
+    double[][] re, im;
+    
+    re = new double[][] {{      5.0000000000000000,      0.0000000000000000,      7.0000000000000000,      0.0000000000000000},{      0.0000000000000000,     10.0000000000000000,     11.0000000000000000,      0.0000000000000000},{      0.0000000000000000,      0.0000000000000000,     15.0000000000000000,      0.0000000000000000}};
+    im = new double[][] {{      0.0000000000000000,     60.0000000000000000,     70.0000000000000000,      0.0000000000000000},{     90.0000000000000000,    100.0000000000000000,      0.0000000000000000,    120.0000000000000000},{      0.0000000000000000,      0.0000000000000000,      0.0000000000000000,    160.0000000000000000}};
+
+    expected = new OGComplexSparseMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get("1:3,:"), 10 * D1mach.four()));
+
+    re = new double[][] {{      2.0000000000000000,      0.0000000000000000},{      0.0000000000000000,      7.0000000000000000},{     10.0000000000000000,     11.0000000000000000},{      0.0000000000000000,     15.0000000000000000}};
+    im = new double[][] {{     20.0000000000000000,     30.0000000000000000},{     60.0000000000000000,     70.0000000000000000},{    100.0000000000000000,      0.0000000000000000},{      0.0000000000000000,      0.0000000000000000}};
+    expected = new OGComplexSparseMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get(":,1:2"), 10 * D1mach.four()));
+
+    expected = new OGComplexSparseMatrix(realData, imagData);
+    assertTrue(expected.fuzzyequals(D.get(":,:"), 10 * D1mach.four()));
+  }
+
 }

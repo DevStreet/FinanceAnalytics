@@ -511,4 +511,33 @@ public class OGMatrixTest {
     D.toString();
   }
 
+  @Test
+  public void parserLinearModeTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGMatrix expected;
+    double[][] re = new double[][] {{4., 7., 10. } };
+    expected = new OGMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get("1:3"), 10 * D1mach.four()));
+
+    expected = new OGMatrix(data4x3unwound, 1, 12);
+    assertTrue(expected.fuzzyequals(D.get(":"), 10 * D1mach.four()));
+  }
+
+  @Test
+  public void parser2DModeTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    OGMatrix expected;
+    double[][] re = new double[][] { {4., 5., 6. }, {7., 8., 9. }, {10., 11., 12. } };
+    expected = new OGMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get("1:3,:"), 10 * D1mach.four()));
+
+    re = new double[][] { {2., 3. }, {5., 6. }, {8., 9. }, {11., 12. } };
+
+    expected = new OGMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get(":,1:2"), 10 * D1mach.four()));
+
+    expected = new OGMatrix(data4x3unwound, 4, 3);
+    assertTrue(expected.fuzzyequals(D.get(":,:"), 10 * D1mach.four()));
+  }
+
 }

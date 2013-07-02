@@ -9,10 +9,12 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Max;
 
 /**
  * OGComplex Array type (essentially an interleaved OGDoubleArray, byte aligned contiguous malloc of backing data required and assumed
@@ -390,6 +392,29 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
   public double[] getData() {
     return _data;
   }
+  
+  @Override
+  public OGArray<? extends Number> get(int[] linear) {
+    Catchers.catchNull(linear);
+    int max = Max.value(linear);
+    double[] tmp;
+    int len;
+    if (max >= _rows * _columns) {
+      throw new MathsExceptionOutOfBounds("Index requested exceeds data length.");
+    } else {
+      len = linear.length;
+      tmp = new double[2 * len];
+      int ptr = 0;
+      int twoIdx;
+      for (int i = 0; i < len; i++) {
+        twoIdx = 2 * linear[i];
+        tmp[ptr] = _data[twoIdx];
+        tmp[ptr + 1] = _data[twoIdx + 1];
+        ptr += 2;
+      }
+    }
+    return new OGComplexMatrix(tmp, 1, len);
+  }
 
   /**
    * Decide if this {@link OGMatrix} is equal to another {@link OGMatrix} with the addition of some numerical tolerance for floating point comparison
@@ -473,5 +498,6 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     }
     return true;
   }
+
 
 }

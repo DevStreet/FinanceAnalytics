@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
@@ -139,7 +140,7 @@ public class OGMatrix extends OGArray<Double> {
     boolean seq = true;
     for (int i = 0; i < nindex; i++) {
       index = indexes[i];
-      if (index < 0 || index >= _columns) {
+      if (index < 0 || index >= _rows) {
         throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
       }
       if (i > 0) {
@@ -273,6 +274,23 @@ public class OGMatrix extends OGArray<Double> {
       }
     }
     return new OGMatrix(tmp, nrows, ncols);
+  }
+
+  public OGArray<? extends Number> get(int[] indicies) {
+    Catchers.catchNull(indicies);
+    int len = indicies.length;
+    int maxIdx = _data.length;
+    double[] tmp = new double[len];
+    int locidx;
+    for (int i = 0; i < len; i++) {
+      locidx = indicies[i];
+      if (locidx < 0 || locidx > maxIdx) {
+        throw new MathsExceptionOutOfBounds("Invalid index :" + indicies[i]);
+      } else {
+        tmp[i] = _data[locidx];
+      }
+    }
+    return new OGMatrix(tmp, 1, len);
   }
 
   /**
