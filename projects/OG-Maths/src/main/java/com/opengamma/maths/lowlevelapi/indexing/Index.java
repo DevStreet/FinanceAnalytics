@@ -8,7 +8,7 @@ package com.opengamma.maths.lowlevelapi.indexing;
 /**
  * General index
  */
-public abstract class Index {
+public abstract class Index implements IndexElement {
 
 
 }

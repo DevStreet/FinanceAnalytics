@@ -5,6 +5,9 @@
  */
 package com.opengamma.maths.lowlevelapi.indexing;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+
+
 /**
  * Linear index representation
  */
@@ -71,11 +74,50 @@ public class LinearIndex implements IndexItem {
 
   private void checkRangeIsValid(int a, int b, int c) {
     if (a < 0 || c < 0) {
-      throw new RuntimeException("Indices cannot be negative");
+      throw new MathsExceptionIllegalArgument("Indices cannot be negative");
     }
     if (a < c && b < 1) {
-      throw new RuntimeException("Index representation is empty. Tried to construct index as: \"" + a + ":" + b + ":" + c + "\"");
+      throw new MathsExceptionIllegalArgument("Index representation is empty. Tried to construct index as: \"" + a + ":" + b + ":" + c + "\"");
     }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + _high;
+    result = prime * result + _low;
+    result = prime * result + _step;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    LinearIndex other = (LinearIndex) obj;
+    if (_high != other._high) {
+      return false;
+    }
+    if (_low != other._low) {
+      return false;
+    }
+    if (_step != other._step) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int[] linearise(int leadingDimension) {
+    return this.expand().getValues();
   }
 
 }
