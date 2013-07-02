@@ -25,6 +25,7 @@ public class ColonIndexTest {
   public void testLinearise() {
     int n = 10;
     int[] idx = ColonIndex.getInstance().linearise(n);
+    assertTrue(idx.length == n);
     for (int i = 0; i < n; i++) {
       assertTrue(idx[i] == i);
     }

@@ -7,7 +7,6 @@ package com.opengamma.maths.lowlevelapi.indexing;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 
-
 /**
  * Linear index representation
  */
@@ -15,6 +14,12 @@ public class LinearIndex implements IndexItem {
 
   private int _low, _step, _high;
 
+  /**
+   * Linear index from low:high inclusive at a given step
+   * @param low low value
+   * @param step the step
+   * @param high high value
+   */
   public LinearIndex(int low, int step, int high) {
     checkRangeIsValid(low, step, high);
     _low = low;
@@ -22,6 +27,11 @@ public class LinearIndex implements IndexItem {
     _high = high;
   }
 
+  /**
+   * Linear index from low:high inclusive
+   * @param low low value
+   * @param high high value
+   */
   public LinearIndex(int low, int high) {
     this(low, 1, high);
   }

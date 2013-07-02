@@ -24,9 +24,9 @@ public class ColonIndex implements IndexItem {
 
   @Override
   public int[] linearise(int leadingDimension) {
-    return new LinearIndex(0, leadingDimension).expand().getValues();
+    return new LinearIndex(0, leadingDimension - 1).expand().getValues();
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
