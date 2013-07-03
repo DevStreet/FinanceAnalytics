@@ -95,9 +95,12 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(OGMatrix arg0, Integer arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
     return   s_vanderfunction.vander( arg0,  arg1);
   };
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix vander(OGMatrix arg0){
+Catchers.catchNull(arg0);
     return   s_vanderfunction.vander( arg0);
   };
 

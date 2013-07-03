@@ -95,9 +95,12 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix zeros(Integer arg0){
+Catchers.catchNull(arg0);
     return   s_zerosfunction.zeros( arg0);
   };
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix zeros(Integer arg0, Integer arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
     return   s_zerosfunction.zeros( arg0,  arg1);
   };
 

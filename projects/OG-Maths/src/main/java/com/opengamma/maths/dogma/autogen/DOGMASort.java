@@ -95,15 +95,27 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
     return   s_sortogmatrix.sort( arg0,  arg1);
   };
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, Integer arg2, java.lang.String arg3){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
+Catchers.catchNull(arg2);
+Catchers.catchNull(arg3);
     return   s_sortogmatrix.sort( arg0,  arg1,  arg2,  arg3);
   };
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, Integer arg2){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
+Catchers.catchNull(arg2);
     return   s_sortogmatrix.sort( arg0,  arg1,  arg2);
   };
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> sort(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.sort.SortCompute arg1, java.lang.String arg2){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
+Catchers.catchNull(arg2);
     return   s_sortogmatrix.sort( arg0,  arg1,  arg2);
   };
 

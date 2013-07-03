@@ -80,6 +80,7 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
       String returnTypeString;
       while (mit.hasNext()) {
         StringBuffer argbuf = new StringBuffer(), argnamesbuf = new StringBuffer();
+        StringBuffer nullcheckbuf = new StringBuffer();
         next = mit.next();
         parameterTypes = next.getParameterTypes();
         returnType = next.getReturnType();
@@ -97,13 +98,16 @@ public class ArbitraryFunctionGenerator implements DogmaLangTokenToCodeGenerator
             //            argbuf.append(parameterTypes[i].getSimpleName() + " arg" + i + ", ");
             argbuf.append(superizeIfaceType(parameterTypes[i]) + " arg" + i + ", ");
             argnamesbuf.append(" arg" + i + ", ");
+            nullcheckbuf.append("Catchers.catchNull(arg" + i + ");\n");
           }
           //          argbuf.append(parameterTypes[plen - 1].getSimpleName() + " arg" + (plen - 1));
           argbuf.append(superizeIfaceType(parameterTypes[plen - 1]) + " arg" + (plen - 1));
           argnamesbuf.append(" arg" + (plen - 1));
+          nullcheckbuf.append("Catchers.catchNull(arg" + (plen - 1) + ");\n");
         }
         tmp.append(argbuf);
         tmp.append("){\n");
+        tmp.append(nullcheckbuf);
         if (!returnType.getSimpleName().equalsIgnoreCase("void")) {
           tmp.append(s_indent + s_indent + "return ");
         }

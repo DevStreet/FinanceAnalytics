@@ -95,6 +95,8 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> eig(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.eig.EIGCompute arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
     return   s_eigogmatrix.eig( arg0,  arg1);
   };
 

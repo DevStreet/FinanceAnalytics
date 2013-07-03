@@ -95,9 +95,12 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0){
+Catchers.catchNull(arg0);
     return   s_meshgridfunction.meshgrid( arg0);
   };
   public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> meshgrid(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0, com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
     return   s_meshgridfunction.meshgrid( arg0,  arg1);
   };
 

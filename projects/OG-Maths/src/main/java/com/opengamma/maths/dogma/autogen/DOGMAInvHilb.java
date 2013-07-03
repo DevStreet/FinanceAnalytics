@@ -95,6 +95,7 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix invhilb(Integer arg0){
+Catchers.catchNull(arg0);
     return   s_invhilbfunction.invhilb( arg0);
   };
 

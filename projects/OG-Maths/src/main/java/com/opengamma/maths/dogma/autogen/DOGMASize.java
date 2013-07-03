@@ -95,9 +95,11 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number> size(com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray arg0){
+Catchers.catchNull(arg0);
     return   s_sizefunction.size( arg0);
   };
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number> size(java.lang.Number arg0){
+Catchers.catchNull(arg0);
     return   s_sizefunction.size( arg0);
   };
 

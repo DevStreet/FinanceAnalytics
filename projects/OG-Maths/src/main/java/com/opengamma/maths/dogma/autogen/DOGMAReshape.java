@@ -95,6 +95,9 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix reshape(OGMatrix arg0, Integer arg1, Integer arg2){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
+Catchers.catchNull(arg2);
     return   s_reshapeogmatrix.reshape( arg0,  arg1,  arg2);
   };
 

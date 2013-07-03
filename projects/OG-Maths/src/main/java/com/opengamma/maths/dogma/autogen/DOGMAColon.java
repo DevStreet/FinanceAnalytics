@@ -95,9 +95,14 @@ OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operat
 
 }
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(java.lang.Number arg0, java.lang.Number arg1, java.lang.Number arg2){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
+Catchers.catchNull(arg2);
     return   s_colonfunction.colon( arg0,  arg1,  arg2);
   };
   public static com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix colon(java.lang.Number arg0, java.lang.Number arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
     return   s_colonfunction.colon( arg0,  arg1);
   };
 
