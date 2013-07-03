@@ -8,11 +8,11 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 import java.util.Arrays;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Mldivide;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mldivide.MldivideOGMatrixOGMatrixHelper.TriangularStruct;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
@@ -24,8 +24,8 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatrix, OGMatrix> {
 
   private LAPACK _lapack = new LAPACK();
-
-  private static Logger s_log = LoggerFactory.getLogger(MldivideOGMatrixOGMatrix.class);
+  private MldivideOGMatrixOGMatrixHelper _helper = new MldivideOGMatrixOGMatrixHelper();
+  private Logger _log = MldivideOGMatrixOGMatrixHelper.getLogger();
 
   private boolean _debug;
 
@@ -89,21 +89,21 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
     // is it square?
     if (rows1 == cols1) {
       if (_debug) {
-        s_log.warn("10. Matrix is square");
+        _log.warn("10. Matrix is square");
       }
 
       // is the array1 triangular or permuted triangular
-      TriangularStruct tstruct = isTriangular(data1, rows1, cols1);
+      TriangularStruct tstruct = _helper.isTriangular(data1, rows1, cols1);
       char UPLO = tstruct._flagUPLO; //CSIGNORE
       char DIAG = tstruct._flagDIAG; //CSIGNORE
       if (UPLO != 'N') { // i.e. this is some breed of triangular
         if (_debug) {
-          s_log.warn("20. Matrix is " + (UPLO == 'U' ? "upper" : "lower") + " triangular, " + (DIAG == 'N' ? "non-unit" : "unit") + " diagonal.");
+          _log.warn("20. Matrix is " + (UPLO == 'U' ? "upper" : "lower") + " triangular, " + (DIAG == 'N' ? "non-unit" : "unit") + " diagonal.");
         }
         char DATA_PERMUTATION = tstruct._flagPerm; // CSIGNORE
         if (DATA_PERMUTATION != 'N') { // we have a permutation of the data, rewrite
           if (_debug) {
-            s_log.warn("25. Matrix is " + (DATA_PERMUTATION == 'R' ? "row" : "column") + " permuted triangular.");
+            _log.warn("25. Matrix is " + (DATA_PERMUTATION == 'R' ? "row" : "column") + " permuted triangular.");
           }
           permuteV = tstruct._perm; // the permutation
           if (DATA_PERMUTATION == 'R') {
@@ -133,25 +133,25 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
           _lapack.dtrtrs(UPLO, 'N', DIAG, rows1, cols2, data1, rows1, data2, rows2, info);
           if (info[0] == 0) { // triangular solve was ok
             if (_debug) {
-              s_log.warn("30. Triangular solve success, returning");
+              _log.warn("30. Triangular solve success, returning");
             }
             return new OGMatrix(data2, rows2, cols2);
           } else {
             if (_debug) {
-              s_log.warn("40. Triangular solve fail. Mark as singular.");
+              _log.warn("40. Triangular solve fail. Mark as singular.");
             }
             singular = true;
           }
         } else {
           if (_debug) {
-            s_log.warn("43. Triangular condition was computed as too bad to attempt solve.");
+            _log.warn("43. Triangular condition was computed as too bad to attempt solve.");
           }
           singular = true;
         }
 
         if (DATA_PERMUTATION != 'N') { // reset permutation, just a pointer switch, not doing so might influence results from iterative llsq solvers
           if (_debug) {
-            s_log.warn("45. Resetting permutation.");
+            _log.warn("45. Resetting permutation.");
           }
           data1 = triPtr1;
           data2 = triPtr2;
@@ -162,49 +162,49 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
 
       if (!jmp) { // if it's triangular and it failed, then it's singular and a condition number is already computed and this can be jumped!
         if (_debug) {
-          s_log.warn("50. Not triangular");
+          _log.warn("50. Not triangular");
         }
         // see if it's Hermitian (symmetric in the real case)
-        if (isSymmetric(data1, rows1, cols1)) {
+        if (_helper.isSymmetric(data1, rows1, cols1)) {
           if (_debug) {
-            s_log.warn("60. Is Hermitian");
+            _log.warn("60. Is Hermitian");
           }
           // cholesky decompose, shove in lower triangle
           _lapack.dpotrf('L', rows1, data1, rows1, info);
           if (info[0] == 0) { // Cholesky factorisation was ok, matrix is s.p.d. Factorisation is in the lower triangle, back solve based on this
             if (_debug) {
-              s_log.warn("70. Cholesky success.  Computing condition based on cholesky factorisation");
+              _log.warn("70. Cholesky success.  Computing condition based on cholesky factorisation");
             }
             work = new double[3 * rows1];
             iwork = new int[rows1];
             anorm = _lapack.dlansy('1', 'L', rows1, array1.getData(), rows1, work);
             _lapack.dpocon('L', rows1, data1, rows1, anorm, rcond, work, iwork, info);
             if (_debug) {
-              s_log.warn("80. Cholesky condition estimate. " + rcond[0]);
+              _log.warn("80. Cholesky condition estimate. " + rcond[0]);
             }
             if (1 + rcond[0] != 1) {
               if (_debug) {
-                s_log.warn("90. Cholesky condition acceptable. Backsolve and return.");
+                _log.warn("90. Cholesky condition acceptable. Backsolve and return.");
               }
               _lapack.dpotrs('L', rows1, cols2, data1, rows1, data2, rows2, info);
               // info[0] will be zero. Any -ve info[0] will be handled by XERBLA
               return new OGMatrix(data2, rows2, cols2);
             } else {
               if (_debug) {
-                s_log.warn("100. Cholesky condition bad. Mark as singular.");
+                _log.warn("100. Cholesky condition bad. Mark as singular.");
               }
               singular = true;
             }
           } else { // factorisation failed
             if (_debug) {
-              s_log.warn("110. Cholesky factorisation failed. Matrix is not s.p.d.");
+              _log.warn("110. Cholesky factorisation failed. Matrix is not s.p.d.");
             }
           } // end factorisation info==0 
         } // end symmetric condition
 
         if (!singular) {
           if (_debug) {
-            s_log.warn("120. Non-symmetric OR not s.p.d.");
+            _log.warn("120. Non-symmetric OR not s.p.d.");
           }
           //  we're here as matrix isn't s.p.d. as Cholesky failed. Get new copy of matrix
           System.arraycopy(array1.getData(), 0, data1, 0, array1.getData().length);
@@ -213,12 +213,12 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
           int[] ipiv = new int[rows1];
           // decompose
           if (_debug) {
-            s_log.warn("130. LUP attempted");
+            _log.warn("130. LUP attempted");
           }
           _lapack.dgetrf(rows1, cols1, data1, rows1, ipiv, info);
           if (info[0] == 0) {
             if (_debug) {
-              s_log.warn("140. LUP success. Computing condition based on LUP factorisation.");
+              _log.warn("140. LUP success. Computing condition based on LUP factorisation.");
             }
             iwork = new int[rows1];
             work = new double[4 * rows1];
@@ -230,18 +230,18 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
               // back solve dgetrs()
               _lapack.dgetrs('N', cols1, cols2, data1, cols1, ipiv, data2, cols1, info);
               if (_debug) {
-                s_log.warn("150. LUP returning");
+                _log.warn("150. LUP returning");
               }
               return new OGMatrix(data2, rows2, cols2);
             } else { // condition bad, mark as singular
               if (_debug) {
-                s_log.warn("160. LUP failed, condition too high");
+                _log.warn("160. LUP failed, condition too high");
               }
               singular = true;
             }
           } else {
             if (_debug) {
-              s_log.warn("170. LUP factorisation failed. Mark as singular.");
+              _log.warn("170. LUP factorisation failed. Mark as singular.");
             }
             singular = true;
           }
@@ -251,13 +251,13 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
 
     // branch on rcond if computed, if cond is sky high then rcond is near zero, we use 1 here so cutoff is near 1e-16
     if (singular) {
-      s_log.warn("Square matrix is singular to machine precision. RCOND estimate = " + rcond[0]);
+      _log.warn("Square matrix is singular to machine precision. RCOND estimate = " + rcond[0]);
       if (_debug) {
-        s_log.warn("190. Square matrix is singular.");
+        _log.warn("190. Square matrix is singular.");
       }
       if ((rcond[0] + 1) == 1) {
         if (_debug) {
-          s_log.warn("200. Condition of square matrix is too bad for QR least squares.");
+          _log.warn("200. Condition of square matrix is too bad for QR least squares.");
         }
         attemptQR = false;
       }
@@ -267,7 +267,7 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
 
     if (attemptQR) {
       if (_debug) {
-        s_log.warn("210. Attempting QR solve.");
+        _log.warn("210. Attempting QR solve.");
       }
       lwork = -1;
       _lapack.dgels('N', rows1, cols1, cols2, data1, rows1, data2, rows2, dummywork, lwork, info);
@@ -276,15 +276,15 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
       _lapack.dgels('N', rows1, cols1, cols2, data1, rows1, data2, rows2, work, lwork, info);
       if (info[0] > 0) {
         if (_debug) {
-          s_log.warn("220. QR solve failed");
+          _log.warn("220. QR solve failed");
         }
-        s_log.warn("Matrix of coefficients does not have full rank. Rank is " + info[0] + ".");
+        _log.warn("Matrix of coefficients does not have full rank. Rank is " + info[0] + ".");
         // take a copy of the original data as it will have been destroyed above
         System.arraycopy(array1.getData(), 0, data1, 0, array1.getData().length);
         System.arraycopy(array2.getData(), 0, data2, 0, array2.getData().length);        
       } else {
         if (_debug) {
-          s_log.warn("230. QR solve success, returning");
+          _log.warn("230. QR solve success, returning");
         }
         // 1:cols1 from each column of data2 needs to be returned 
         double[] ref = data2;
@@ -297,7 +297,7 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
     }
 
     if (_debug) {
-      s_log.warn("240. Attempting SVD");
+      _log.warn("240. Attempting SVD");
     }
 
     // so we attempt a general least squares solve
@@ -318,163 +318,17 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
     // handle fail on info
     if (info[0] != 0) {
       if (_debug) {
-        s_log.warn("250. SVD failed");
+        _log.warn("250. SVD failed");
       }
-      s_log.warn("SVD Failed to converege. " + info[0] + " out of " + Math.max(rows1, cols1) + " off diagonals failed to converge to zero. RCOND = " + rcond[0]);
+      _log.warn("SVD Failed to converege. " + info[0] + " out of " + Math.max(rows1, cols1) + " off diagonals failed to converge to zero. RCOND = " + rcond[0]);
     } else {
       if (_debug) {
-        s_log.warn("260. SVD success");
+        _log.warn("260. SVD success");
       }
     }
     if (_debug) {
-      s_log.warn("270. SVD returning");
+      _log.warn("270. SVD returning");
     }
     return new OGMatrix(Arrays.copyOf(data2, cols1 * cols2), cols1, cols2);
-  }
-
-  private boolean isSymmetric(double[] data, int rows, int cols) {
-    int ir;
-    for (int i = 0; i < cols; i++) {
-      ir = i * rows;
-      for (int j = 0; j < rows; j++) {
-        if (data[ir + j] != data[j * rows + i]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  private TriangularStruct isTriangular(double[] data, int rows, int cols) {
-    char[] lapackVals;
-
-    // See if it's lower triangular
-    lapackVals = checkIfLowerTriangular(data, rows, cols);
-    if (lapackVals[0] != 'N') {
-      return new TriangularStruct(lapackVals[0], lapackVals[1], 'N', null);
-    }
-
-    // See if it's Upper or permuted upper
-    PermStruct permStruct = checkIfUpperTriangularPermuteRows(data, rows, cols);
-    if (permStruct._flagPerm == 'R') {
-      return new TriangularStruct('U', permStruct);
-    }
-
-    // DEFAULT, not triangular in any way
-    return new TriangularStruct('N', 'N', 'N', null);
-
-  }
-
-  //TODO: combine these two methods into a single sweep and include TODO from above regarding efficient permutations.
-  /*
-   * Checks if a matrix is lower triangular 
-   */
-  private char[] checkIfLowerTriangular(double[] data, int rows, int cols) {
-    // check lower
-    int ir;
-    char tri = 'L';
-    char diag = 'U';
-    if (data[0] != 1) {
-      diag = 'N';
-    }
-    rowloop: //CSIGNORE
-    for (int i = 1; i < cols; i++) {
-      ir = i * rows;
-      if (data[ir + i] != 1) {  // check if diag == 1
-        diag = 'N';
-      }
-      for (int j = 0; j < i; j++) { // check if upper triangle is empty
-        if (data[ir + j] != 0) {
-          tri = 'N';
-          break rowloop;
-        }
-      }
-    }
-    return new char[] {tri, diag };
-  }
-
-  /*
-   * Checks if a square matrix contains an upper triangular matrix or row permutation of 
-   */
-  private PermStruct checkIfUpperTriangularPermuteRows(double[] data, int rows, int cols) {
-    int[] rowStarts = new int[rows];
-    boolean[] rowTag = new boolean[rows];
-    char diag = 'U';
-    boolean upperTriangleIfValidIspermuted = false;
-    boolean validPermutation = true;
-    Arrays.fill(rowStarts, -1); // -1 is our flag
-    // Check if its lower, walk rows to look for when number appears in [0...0, Number....]
-    for (int i = 0; i < cols; i++) {
-      for (int j = 0; j < rows; j++) {
-        if (rowStarts[j] == -1 && data[i * rows + j] != 0) {
-          if (data[i * rows + j] != 1) {
-            diag = 'N'; // not unit diagonal
-          }
-          rowStarts[j] = i;
-        }
-      }
-    }
-    // Check to see if the matrix is a permutation of an upper triangle
-    // Do this by checking that the claimed start of rows cover all columns
-    // first set flags, then check flags, complete set needed to assess whether the perm is present
-    for (int i = 0; i < rows; i++) {
-      if (!rowTag[rowStarts[i]]) {
-        rowTag[rowStarts[i]] = true;
-      }
-      if (!upperTriangleIfValidIspermuted && rowStarts[i] != i) {
-        upperTriangleIfValidIspermuted = true;
-      }
-    }
-    for (int i = 0; i < rows; i++) {
-      if (!rowTag[i]) {
-        validPermutation = false;
-        break;
-      }
-    }
-    if (!validPermutation) {
-      return new PermStruct('N', 'N', null);
-    } else {
-      // permutation is valid, update struct. foo(rowStarts) = 1: length(rowStarts) gives direct perm
-      return new PermStruct('R', diag, rowStarts);
-    }
-
-  }
-
-  ///////////// Auxiliary structs
-  // Really just want structs, here. Use public and avoid function calls
-
-  // This holds the return struct from deciding if a matrix is a permutation of triangular 
-  private class PermStruct {
-    public char _flagPerm; // CSIGNORE
-    public char _flagDiag; // CSIGNORE
-    public int[] _perm; // CSIGNORE
-
-    public PermStruct(char flagPerm, char flagDiag, int[] perm) {
-      _flagPerm = flagPerm;
-      _flagDiag = flagDiag;
-      _perm = perm;
-    };
-  }
-
-  // This holds the return struct from deciding if a matrix is in some way triangular
-  private class TriangularStruct {
-    public char _flagUPLO; // CSIGNORE
-    public char _flagDIAG; // CSIGNORE
-    public char _flagPerm; // CSIGNORE
-    public int[] _perm; // CSIGNORE
-
-    public TriangularStruct(char flagUPLO, char flagDIAG, char flagPERM, int[] perm) {
-      _flagUPLO = flagUPLO;
-      _flagDIAG = flagDIAG;
-      _flagPerm = flagPERM;
-      _perm = perm;
-    };
-
-    public TriangularStruct(char flagUPLO, PermStruct p) {
-      _flagUPLO = flagUPLO;
-      _flagDIAG = p._flagDiag;
-      _flagPerm = p._flagPerm;
-      _perm = p._perm;
-    };
   }
 }
