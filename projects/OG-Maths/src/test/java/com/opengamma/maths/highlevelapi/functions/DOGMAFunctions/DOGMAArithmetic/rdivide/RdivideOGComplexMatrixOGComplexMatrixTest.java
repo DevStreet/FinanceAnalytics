@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests full rdivide full
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class RdivideOGComplexMatrixOGComplexMatrixTest {
 
   RdivideOGComplexMatrixOGComplexMatrix rdivide = new RdivideOGComplexMatrixOGComplexMatrix();

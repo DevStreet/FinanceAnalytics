@@ -19,7 +19,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests Diag on OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class OGSparseMatrixDiagTest {
 
   double[][] A = new double[][] { {1., 0., 3. }, {0., 5., 0. }, {0., 0., 9. }, {10., 0., 0. } };

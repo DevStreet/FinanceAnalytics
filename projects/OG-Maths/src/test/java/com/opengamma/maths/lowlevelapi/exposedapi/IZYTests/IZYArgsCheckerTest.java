@@ -27,7 +27,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Args Checker Test for IZY
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class IZYArgsCheckerTest {
 
   Logger s_log = LoggerFactory.getLogger(IZYArgsCheckerTest.class);

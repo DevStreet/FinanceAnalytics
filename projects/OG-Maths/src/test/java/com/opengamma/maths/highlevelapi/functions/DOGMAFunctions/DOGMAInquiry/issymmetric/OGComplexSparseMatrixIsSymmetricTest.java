@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests issymmetric on OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class OGComplexSparseMatrixIsSymmetricTest {
 
   OGMatrix True = new OGMatrix(1);

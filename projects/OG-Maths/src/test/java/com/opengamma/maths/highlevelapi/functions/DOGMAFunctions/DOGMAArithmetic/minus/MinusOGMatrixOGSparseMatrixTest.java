@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Test minus on OGMatrix/OGMatrix combo
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class MinusOGMatrixOGSparseMatrixTest {
   static double[] _data4x3Scale1 = new double[] {1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12 };
   static double[][] _data4x3Scale2 = new double[][] { {0., 50., 0. }, {0., 0., 90. }, {100., 0., 0. }, {10., 0., 30. } };

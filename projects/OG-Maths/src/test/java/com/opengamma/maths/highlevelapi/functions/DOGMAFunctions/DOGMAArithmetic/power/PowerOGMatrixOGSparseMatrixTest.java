@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Test power on OGMatrix/OGMatrix combo
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class PowerOGMatrixOGSparseMatrixTest {
   OGSparseMatrix SingleSparse = new OGSparseMatrix(new double[][] {{2 } });
   OGMatrix SingleFull = new OGMatrix(new double[][] {{2 } });

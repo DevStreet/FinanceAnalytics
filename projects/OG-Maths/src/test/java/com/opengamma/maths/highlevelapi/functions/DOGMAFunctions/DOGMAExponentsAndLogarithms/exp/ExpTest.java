@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Test exp
  */
-@Test(groups=TestGroup.UNIT)
+@Test
 public class ExpTest {
 
   ExpOGMatrix ExpOGMatrix = new ExpOGMatrix();

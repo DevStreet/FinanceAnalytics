@@ -18,7 +18,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests adding/subtracting Diagonal and Full Arrays 
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class MinusOGDiagonalMatrixOGMatrixTest {
 
   static double[] _data4x3 = new double[] {1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12 };

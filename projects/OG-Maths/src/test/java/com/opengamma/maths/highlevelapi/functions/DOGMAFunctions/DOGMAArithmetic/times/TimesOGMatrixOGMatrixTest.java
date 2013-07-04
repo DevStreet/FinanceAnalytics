@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests times OGMatrix OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class TimesOGMatrixOGMatrixTest {
 
   TimesOGMatrixOGMatrix mtimes = new TimesOGMatrixOGMatrix();

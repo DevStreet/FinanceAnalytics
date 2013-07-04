@@ -19,7 +19,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests Power sparse sparse
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class PowerOGSparseMatrixOGSparseMatrixTest {
 
   PowerOGSparseMatrixOGSparseMatrix power = new PowerOGSparseMatrixOGSparseMatrix();

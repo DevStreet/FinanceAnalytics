@@ -19,7 +19,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests full mtimes full/sparse
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class TimesOGSparseMatrixOGMatrixTest {
 
   TimesOGSparseMatrixOGMatrix mtimes = new TimesOGSparseMatrixOGMatrix();

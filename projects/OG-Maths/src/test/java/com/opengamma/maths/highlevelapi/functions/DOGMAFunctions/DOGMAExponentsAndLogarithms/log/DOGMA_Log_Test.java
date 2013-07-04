@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests log
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMA_Log_Test {
    
   @Test

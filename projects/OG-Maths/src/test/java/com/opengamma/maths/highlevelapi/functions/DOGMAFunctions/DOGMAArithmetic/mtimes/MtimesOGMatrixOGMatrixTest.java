@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests full mtimes full
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class MtimesOGMatrixOGMatrixTest {
 
   MtimesOGMatrixOGMatrix mtimes = new MtimesOGMatrixOGMatrix();

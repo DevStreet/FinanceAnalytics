@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests complex full Power full
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class PowerOGComplexMatrixOGComplexMatrixTest {
 
   PowerOGComplexMatrixOGComplexMatrix power = new PowerOGComplexMatrixOGComplexMatrix();

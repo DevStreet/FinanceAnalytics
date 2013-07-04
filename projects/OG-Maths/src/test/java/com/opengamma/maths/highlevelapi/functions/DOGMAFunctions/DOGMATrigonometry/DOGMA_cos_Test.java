@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests cos
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMA_cos_Test {
 
   @Test

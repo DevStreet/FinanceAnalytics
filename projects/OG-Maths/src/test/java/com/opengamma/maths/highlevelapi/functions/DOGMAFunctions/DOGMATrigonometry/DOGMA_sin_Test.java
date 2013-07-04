@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests sin
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMA_sin_Test {
 
   @Test

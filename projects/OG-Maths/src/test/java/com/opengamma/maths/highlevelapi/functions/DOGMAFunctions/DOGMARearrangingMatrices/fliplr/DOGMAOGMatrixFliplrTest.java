@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests fliplr on OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMAOGMatrixFliplrTest {
 
   double[][] A = new double[][] { {1., 2., 3. }, {4., 5., 6. }, {7., 8., 9. }, {10., 11., 12. } };

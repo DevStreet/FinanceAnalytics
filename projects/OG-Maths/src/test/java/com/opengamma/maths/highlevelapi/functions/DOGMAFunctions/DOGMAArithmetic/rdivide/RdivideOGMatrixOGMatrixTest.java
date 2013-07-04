@@ -17,7 +17,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests Rdivide OGMatrix OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class RdivideOGMatrixOGMatrixTest {
 
   RdivideOGMatrixOGMatrix rdivide = new RdivideOGMatrixOGMatrix();

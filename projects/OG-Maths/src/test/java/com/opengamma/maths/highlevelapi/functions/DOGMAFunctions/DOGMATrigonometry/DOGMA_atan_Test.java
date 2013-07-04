@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests atan
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMA_atan_Test {
 
   @Test

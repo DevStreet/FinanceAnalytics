@@ -19,7 +19,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests full rdivide full/sparse
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class RdivideOGSparseMatrixOGMatrixTest {
 
   RdivideOGSparseMatrixOGMatrix rdivide = new RdivideOGSparseMatrixOGMatrix();

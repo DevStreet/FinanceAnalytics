@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Tests cosh
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMA_cosh_Test {
 
   @Test

@@ -19,7 +19,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * Test for mldivide()
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class MldivideOGMatrixOGMatrixTest {
   boolean debugStatements = false; // eyeballable output switch
 

@@ -18,7 +18,7 @@ import com.opengamma.util.test.TestGroup;
 /**
  * tests sqrt of an OGMatrix 
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class SqrtOGMatrixTest {
 
   SqrtOGMatrix sqrt = new SqrtOGMatrix();
