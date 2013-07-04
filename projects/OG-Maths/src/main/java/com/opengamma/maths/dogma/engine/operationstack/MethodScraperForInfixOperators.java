@@ -22,7 +22,6 @@ import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.util.tuple.Pair;
 
 /**
  * Filters and processes way to convert from one type to another
@@ -124,17 +123,17 @@ public class MethodScraperForInfixOperators {
       for (int j = 0; j < n; j++) {
         if (functionTable[i][j] != null) {
           availabilityAndCostMatrix[i][j] = functionTableEvalCost.getEntry(i, j);
-          functionArgPairings.add(Pair.of(Integer.valueOf(i), Integer.valueOf(j)));
+          functionArgPairings.add(new MethodScraperForInfixOperators().new Pair<Integer, Integer>(Integer.valueOf(i), Integer.valueOf(j)));
         }
       }
     }
 
-//    System.out.println(functionArgPairings.toString());
-//    Iterator<Pair<Integer, Integer>> itp = functionArgPairings.iterator();
-//    while (itp.hasNext()) { // walk list of
-//      Pair<Integer, Integer> next = itp.next();
-//      System.out.println("Combo [" + MatrixTypeToIndexMap.getClassFromIndex(next.getFirst()).getSimpleName() + "," + MatrixTypeToIndexMap.getClassFromIndex(next.getSecond()).getSimpleName() + "]");
-//    }
+    //    System.out.println(functionArgPairings.toString());
+    //    Iterator<Pair<Integer, Integer>> itp = functionArgPairings.iterator();
+    //    while (itp.hasNext()) { // walk list of
+    //      Pair<Integer, Integer> next = itp.next();
+    //      System.out.println("Combo [" + MatrixTypeToIndexMap.getClassFromIndex(next.getFirst()).getSimpleName() + "," + MatrixTypeToIndexMap.getClassFromIndex(next.getSecond()).getSimpleName() + "]");
+    //    }
 
     //    OGMatrix implexists = new OGMatrix(availabilityAndCostMatrix);
     //    System.out.println("Available Functions exist for pairings" + implexists.toString());
@@ -159,36 +158,36 @@ public class MethodScraperForInfixOperators {
             next = it.next();
             typeArg1 = next.getFirst();
             typeArg2 = next.getSecond();
-//            System.out.println("Trying to get from " + MatrixTypeToIndexMap.getClassFromIndex(i).getSimpleName() + " to " + MatrixTypeToIndexMap.getClassFromIndex(typeArg1).getSimpleName());
-//            System.out.println("Trying to get from " + MatrixTypeToIndexMap.getClassFromIndex(j).getSimpleName() + " to " + MatrixTypeToIndexMap.getClassFromIndex(typeArg2).getSimpleName());
+            //            System.out.println("Trying to get from " + MatrixTypeToIndexMap.getClassFromIndex(i).getSimpleName() + " to " + MatrixTypeToIndexMap.getClassFromIndex(typeArg1).getSimpleName());
+            //            System.out.println("Trying to get from " + MatrixTypeToIndexMap.getClassFromIndex(j).getSimpleName() + " to " + MatrixTypeToIndexMap.getClassFromIndex(typeArg2).getSimpleName());
             // it's possible to convert, we use the pointers opposed to the weights matrix because the matrix might lie whereas at least if there is a pointer a method exists
             if (s_conversionFunctions[i][typeArg1] != null && s_conversionFunctions[j][typeArg2] != null) {
-//              System.out.println("..... Conversion can be done.  Converting the first via " + s_conversionFunctions[i][typeArg1].getClass().getSimpleName() + ", Converting the second via " +
-//                  s_conversionFunctions[j][typeArg2].getClass().getSimpleName());
+              //              System.out.println("..... Conversion can be done.  Converting the first via " + s_conversionFunctions[i][typeArg1].getClass().getSimpleName() + ", Converting the second via " +
+              //                  s_conversionFunctions[j][typeArg2].getClass().getSimpleName());
               cost = availabilityAndCostMatrix[i][j] + conversionTableEvalCost.getEntry(i, typeArg1) + conversionTableEvalCost.getEntry(j, typeArg2);
               if (cost < mincost) {
                 mincost = cost;
-                bestPair = Pair.of(next.getFirst(), next.getSecond());
+                bestPair = new MethodScraperForInfixOperators().new Pair<Integer, Integer>(next.getFirst(), next.getSecond());
               }
-//            } else { // for debug
-//              System.out.print("..... Conversion cannot be done\n");
+              //            } else { // for debug
+              //              System.out.print("..... Conversion cannot be done\n");
             }
           }
-//          System.out.println("Finished testing pairs");
+          //          System.out.println("Finished testing pairs");
           if (bestPair != null) {
             // create InfixOpChain based on best found, they are lists opposed to class pointers because at some point we might want to be able to run chains of conversions
-//            InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>> clazz = functionTable[bestPair.getFirst()][bestPair.getSecond()];
-            InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>> clazz = functionTable[bestPair.getFirst()][bestPair.getSecond()];            
+            //            InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>> clazz = functionTable[bestPair.getFirst()][bestPair.getSecond()];
+            InfixOperator<OGArray<? extends Number>, OGArray<? extends Number>, OGArray<? extends Number>> clazz = functionTable[bestPair.getFirst()][bestPair.getSecond()];
             List<Converter<? super OGArray<? extends Number>>> chain1 = new ArrayList<Converter<? super OGArray<? extends Number>>>();
             List<Converter<? super OGArray<? extends Number>>> chain2 = new ArrayList<Converter<? super OGArray<? extends Number>>>();
             chain1.add((Converter<? super OGArray<? extends Number>>) s_conversionFunctions[i][bestPair.getFirst()]);
             chain2.add((Converter<? super OGArray<? extends Number>>) s_conversionFunctions[j][bestPair.getSecond()]);
-//            System.out.println("ADDING: " + clazz.getClass().getSimpleName() + ". Converting the first via " + s_conversionFunctions[i][bestPair.getFirst()].getClass().getSimpleName() +
-//                " and the second via " + s_conversionFunctions[j][bestPair.getSecond()].getClass().getSimpleName());
+            //            System.out.println("ADDING: " + clazz.getClass().getSimpleName() + ". Converting the first via " + s_conversionFunctions[i][bestPair.getFirst()].getClass().getSimpleName() +
+            //                " and the second via " + s_conversionFunctions[j][bestPair.getSecond()].getClass().getSimpleName());
             ret[i][j] = new InfixOpChain(chain1, chain2, clazz);
           }
           // else we leave it as null and the chain runner will bork if the operation is attempted
-//          System.out.println("\n");
+          //          System.out.println("\n");
         }
       }
     }
@@ -232,5 +231,45 @@ public class MethodScraperForInfixOperators {
       }
     }
     return sb.toString();
+  }
+
+  private final class Pair<A, B> {
+
+    /** The first element. */
+    public final A _first; // CSIGNORE
+    /** The second element. */
+    public final B _second; // CSIGNORE
+
+    /**
+     * Creates a pair inferring the types.
+     * 
+     * @param <A> the first element type
+     * @param <B> the second element type
+     * @param first  the first element, may be null
+     * @param second  the second element, may be null
+     * @return a pair formed from the two parameters, not null
+     */
+    public Pair<A, B> of(A first, B second) {
+      return new Pair(first, second);
+    }
+
+    /**
+     * Constructs a pair.
+     * 
+     * @param first  the first element, may be null
+     * @param second  the second element, may be null
+     */
+    public Pair(A first, B second) {
+      this._first = first;
+      this._second = second;
+    }
+
+    public A getFirst() {
+      return _first;
+    }
+
+    public B getSecond() {
+      return _second;
+    }
   }
 }
