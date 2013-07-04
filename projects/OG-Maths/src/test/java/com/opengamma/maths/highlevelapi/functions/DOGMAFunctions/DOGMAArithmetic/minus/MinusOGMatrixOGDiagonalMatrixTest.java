@@ -12,7 +12,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.minus.MinusOGMatrixOGDiagonalMatrix;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Tests subtracting Full Arrays and Diagonal Arrays in that order 
