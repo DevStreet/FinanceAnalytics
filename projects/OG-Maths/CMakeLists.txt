@@ -25,7 +25,7 @@ include(UseJava)
 # build types for it in CMake as far as I am aware.
 set(CMAKE_Java_COMPILE_FLAGS "${CMAKE_Java_COMPILE_FLAGS} -g")
 
-set(CMAKE_JAVA_INCLUDE_PATH /home/graham/.ivy2/cache/org.slf4j/slf4j/jars/slf4j-api-1.7.5.jar /home/graham/.ivy2/cache/org.testng/testng/jars/testng-6.3.1.jar /home/graham/.ivy2/cache/org.apache.commons/commons-lang/jars/commons-lang-2.6.jar /home/graham/src/OG-MathsWrappers-0.0.1.jar)
+set(CMAKE_JAVA_INCLUDE_PATH /home/graham/.ivy2/cache/org.slf4j/slf4j/jars/slf4j-api-1.7.5.jar /home/graham/.ivy2/cache/org.testng/testng/jars/testng-6.3.1.jar /home/graham/src/OG-MathsWrappers-0.0.1.jar /home/graham/.ivy2/cache/org.fudgemsg/fudge-java/jars/fudge-java-0.3.9.8.jar)
 
 add_subdirectory(src)
 
