@@ -8,7 +8,6 @@ package com.opengamma.maths.lowlevelapi.exposedapi;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKAPIInterface;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKAbstractSuper;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKNativeBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKNetlibBacked;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKOGJavaBacked;
 
 /**
@@ -46,8 +45,6 @@ public class LAPACK implements LAPACKAPIInterface {
       _localLAPACK = new LAPACKOGJavaBacked();
     } else if (backedby == backing.OGnative) {
       _localLAPACK = new LAPACKNativeBacked();
-    } else if (backedby == backing.Netlib) {
-      _localLAPACK = new LAPACKNetlibBacked();
     }
 
   }
