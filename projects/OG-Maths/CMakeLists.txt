@@ -6,7 +6,7 @@
 
 cmake_minimum_required (VERSION 2.8.6)
 
-project (OG-MathsWrappers)
+project (OG-Maths)
 
 set(OG-Maths_VERSION_MAJOR 0)
 set(OG-Maths_VERSION_MINOR 0)
