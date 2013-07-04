@@ -16,12 +16,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatri
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Tests atan
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class DOGMA_atan_Test {
 
   @Test

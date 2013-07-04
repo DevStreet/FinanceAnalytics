@@ -12,12 +12,12 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * tests full mtimes full
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class TimesOGComplexMatrixOGComplexMatrixTest {
 
   TimesOGComplexMatrixOGComplexMatrix times = new TimesOGComplexMatrixOGComplexMatrix();

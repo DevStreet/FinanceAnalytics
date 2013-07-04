@@ -17,12 +17,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.eig.EIGCompute;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Simple eig() test
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class EigSimpleTest {
 
   private static double[][] s_data = new double[][] { {1, 2, 3 }, {4, 5, 6 }, {7, 8, 9 } };

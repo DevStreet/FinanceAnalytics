@@ -14,12 +14,12 @@ import com.opengamma.maths.dogma.DOGMA;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Test minus on OGSparseMatrix/OGSparseMatrix combo
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class MinusOGSparseMatrixOGSparseMatrixTest {
   static double[][] _data4x3Scale1 = new double[][] { {1., 0., 3. }, {0., 5., 0. }, {0., 0., 9. }, {10., 0., 0. } };
   static double[][] _data4x3Scale2 = new double[][] { {0., 50., 0. }, {0., 0., 90. }, {100., 0., 0. }, {10., 0., 30. } };

@@ -12,12 +12,12 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Tests Rdivide OGMatrix OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class RdivideOGMatrixOGMatrixTest {
 
   RdivideOGMatrixOGMatrix rdivide = new RdivideOGMatrixOGMatrix();

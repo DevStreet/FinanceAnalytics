@@ -14,12 +14,12 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * tests Diag on OGMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class OGSparseMatrixDiagTest {
 
   double[][] A = new double[][] { {1., 0., 3. }, {0., 5., 0. }, {0., 0., 9. }, {10., 0., 0. } };

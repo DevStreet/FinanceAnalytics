@@ -22,12 +22,12 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.lowlevelapi.exposedapi.IZY;
 import com.opengamma.maths.lowlevelapi.exposedapi.IZY.backing;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Args Checker Test for IZY
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class IZYArgsCheckerTest {
 
   Logger s_log = LoggerFactory.getLogger(IZYArgsCheckerTest.class);

@@ -12,12 +12,12 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * tests issymmetric on OGSparseMatrix
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class OGSparseMatrixIsSymmetricTest {
 
   OGMatrix True = new OGMatrix(1);

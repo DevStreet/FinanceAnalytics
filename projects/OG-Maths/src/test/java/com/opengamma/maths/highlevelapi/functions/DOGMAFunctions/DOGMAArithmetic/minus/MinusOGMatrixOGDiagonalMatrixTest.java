@@ -12,12 +12,12 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.minus.MinusOGMatrixOGDiagonalMatrix;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Tests subtracting Full Arrays and Diagonal Arrays in that order 
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class MinusOGMatrixOGDiagonalMatrixTest {
 
   static double[] _data4x3 = new double[] {1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12 };

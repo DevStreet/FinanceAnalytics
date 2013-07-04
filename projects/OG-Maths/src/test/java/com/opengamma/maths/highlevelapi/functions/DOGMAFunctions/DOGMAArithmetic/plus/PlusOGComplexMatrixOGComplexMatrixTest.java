@@ -12,12 +12,12 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
-import com.opengamma.util.test.TestGroup;
+
 
 /**
  * Test plus on OGComplexMatrix/OGComplexMatrix combo
  */
-@Test(groups = TestGroup.UNIT)
+@Test
 public class PlusOGComplexMatrixOGComplexMatrixTest {
   static double[] _data4x3Scale1 = new double[] {1, 2, 4, 5, 7, 8, 10, 11, 2, 3, 5, 6, 8, 9, 11, 12, 3, 4, 6, 7, 9, 10, 12, 13 };
   static double[] _data4x3Scale2 = new double[] {10.00, 20.00, 40.00, 50.00, 70.00, 80.00, 100.00, 110.00, 20.00, 30.00, 50.00, 60.00, 80.00, 90.00, 110.00, 120.00, 30.00, 40.00, 60.00, 70.00, 90.00,
