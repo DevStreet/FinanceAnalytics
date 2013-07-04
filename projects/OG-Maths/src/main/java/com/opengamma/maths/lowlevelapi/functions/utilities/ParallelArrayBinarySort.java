@@ -11,7 +11,7 @@ import org.apache.commons.lang.Validate;
  * Performs sorting. This is not "parallel" in the sense of threads,
  * but parallel in the sense that two arrays are sorted in parallel.
  */
-class ParallelArrayBinarySort {
+public class ParallelArrayBinarySort {
   // copy of class in OG-Analytics
 
   /**

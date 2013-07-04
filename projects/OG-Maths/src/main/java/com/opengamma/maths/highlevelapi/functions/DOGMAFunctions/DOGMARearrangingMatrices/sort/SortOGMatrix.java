@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opengamma.util.ParallelArrayBinarySort;
+import com.opengamma.maths.lowlevelapi.functions.utilities.ParallelArrayBinarySort;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
