@@ -5,6 +5,9 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.utilities;
 
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+
 /**
  * Validates truth or non-null property of paramters.
  */
