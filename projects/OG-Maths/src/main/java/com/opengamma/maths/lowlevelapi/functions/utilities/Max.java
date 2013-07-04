@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.utilities;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Finds information about the maximum value within a vector of primitives.

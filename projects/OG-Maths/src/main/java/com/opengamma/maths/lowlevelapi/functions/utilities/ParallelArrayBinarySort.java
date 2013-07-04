@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.utilities;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Performs sorting. This is not "parallel" in the sense of threads,

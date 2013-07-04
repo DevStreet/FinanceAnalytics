@@ -7,7 +7,7 @@ package com.opengamma.maths.lowlevelapi.functions.utilities;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Reverses Vectors

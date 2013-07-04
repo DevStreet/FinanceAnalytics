@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.utilities;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Computes the sum of a vector.

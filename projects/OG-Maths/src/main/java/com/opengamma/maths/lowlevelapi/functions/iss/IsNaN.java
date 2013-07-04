@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.iss;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Tries to detect NaNs, where they are, and provides some potentially useful tools to do things like mask off NaNs.
