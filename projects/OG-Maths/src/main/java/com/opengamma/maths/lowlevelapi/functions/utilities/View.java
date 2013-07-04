@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.utilities;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Sets a view on a set of data. Basically the supplied indexes are looked up within the data

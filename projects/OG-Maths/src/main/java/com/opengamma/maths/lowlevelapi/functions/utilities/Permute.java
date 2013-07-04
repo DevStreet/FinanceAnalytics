@@ -7,7 +7,7 @@ package com.opengamma.maths.lowlevelapi.functions.utilities;
 
 import static org.testng.AssertJUnit.assertTrue;
 
-import org.apache.commons.lang.Validate;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 /**
  * Applies a permutation to a given vector
