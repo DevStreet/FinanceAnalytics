@@ -5,9 +5,10 @@
  */
 package com.opengamma.maths.lowlevelapi.functions;
 
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.Assert.assertNotNull;
 
-import org.apache.commons.lang.NotImplementedException;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 
 /**
  *
@@ -45,7 +46,7 @@ public class MatrixPrimitiveUtils {
     }
     return false;
   }
-  
+
   /**
    * Tests if an array is ragged
    * @param aMatrix an array of arrays
@@ -117,7 +118,6 @@ public class MatrixPrimitiveUtils {
     }
     return els;
   }
-
 
   /**
    * Counts number of *true* nonzero elements in a vector
@@ -215,9 +215,9 @@ public class MatrixPrimitiveUtils {
    * @param aMatrix which is the array of arrays to be manipulated
    * @return a double array of arrays with the lower triangle set to zero
    */
-  public static double[][] removeLowerTriangle(double[][] aMatrix) throws  IllegalArgumentException, NotImplementedException {
+  public static double[][] removeLowerTriangle(double[][] aMatrix) {
     if (isRagged(aMatrix)) {
-      throw new NotImplementedException("Construction from ragged array is not implemented");
+      throw new MathsExceptionNotImplemented("Construction from ragged array is not implemented");
     }
     if (!isSquare(aMatrix)) {
       throw new IllegalArgumentException("Matrix is not square so removing lower triangle isn't clear cut enough to be implemented");
@@ -234,15 +234,14 @@ public class MatrixPrimitiveUtils {
     return tmp;
   }
 
-/**
- * Boolean on whether a matrix is upper triangular
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return boolean, true if matrix is Upper Triangular, false if matrix is not.
- * @throws IllegalArgumentException
- */
-  public static boolean isUpperTriangular(double[][] aMatrix) throws  IllegalArgumentException {
+  /**
+   * Boolean on whether a matrix is upper triangular
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return boolean, true if matrix is Upper Triangular, false if matrix is not.
+   */
+  public static boolean isUpperTriangular(double[][] aMatrix) {
     if (!isSquare(aMatrix)) {
-      throw new IllegalArgumentException("Matrix is not square so the notion of Upper Triangular isn't clear cut enough to be implemented");
+      throw new MathsExceptionIllegalArgument("Matrix is not square so the notion of Upper Triangular isn't clear cut enough to be implemented");
     }
     int rows = aMatrix.length;
 
@@ -256,29 +255,27 @@ public class MatrixPrimitiveUtils {
     return true;
   }
 
-/**
- * Checks if a matrix is upper triangular and returns the matrix if true, throws and exception otherwise.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return the matrix referred to in the argument if the check passes
- */
+  /**
+   * Checks if a matrix is upper triangular and returns the matrix if true, throws and exception otherwise.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return the matrix referred to in the argument if the check passes
+   */
   public static double[][] checkIsUpperTriangular(double[][] aMatrix) {
     if (MatrixPrimitiveUtils.isUpperTriangular(aMatrix)) {
       return aMatrix;
     } else {
-      throw new IllegalArgumentException("Upper triangular matrix called on data that isn't upper triangular!");
+      throw new MathsExceptionIllegalArgument("Upper triangular matrix called on data that isn't upper triangular!");
     }
   }
 
-
-/**
- * Boolean on whether a matrix is lower triangular
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return boolean, true if matrix is Lower Triangular, false if matrix is not.
- * @throws IllegalArgumentException
- */
-  public static boolean isLowerTriangular(double[][] aMatrix) throws  IllegalArgumentException {
+  /**
+   * Boolean on whether a matrix is lower triangular
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return boolean, true if matrix is Lower Triangular, false if matrix is not.
+   */
+  public static boolean isLowerTriangular(double[][] aMatrix) {
     if (!isSquare(aMatrix)) {
-      throw new IllegalArgumentException("Matrix is not square so the notion of Lower Triangular isn't clear cut enough to be implemented");
+      throw new MathsExceptionIllegalArgument("Matrix is not square so the notion of Lower Triangular isn't clear cut enough to be implemented");
     }
     int rows = aMatrix.length;
 
@@ -292,29 +289,27 @@ public class MatrixPrimitiveUtils {
     return true;
   }
 
-/**
- * Checks if a matrix is lower triangular and returns the matrix if true, throws and exception otherwise.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return the matrix referred to in the argument if the check passes
- */
+  /**
+   * Checks if a matrix is lower triangular and returns the matrix if true, throws and exception otherwise.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return the matrix referred to in the argument if the check passes
+   */
   public static double[][] checkIsLowerTriangular(double[][] aMatrix) {
     if (MatrixPrimitiveUtils.isLowerTriangular(aMatrix)) {
       return aMatrix;
     } else {
-      throw new IllegalArgumentException("Lower triangular matrix called on data that isn't lower triangular!");
+      throw new MathsExceptionIllegalArgument("Lower triangular matrix called on data that isn't lower triangular!");
     }
   }
 
-
-/**
- * Boolean on whether a matrix is upper Hessenberg
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return boolean, true if matrix is upper Hessenberg, false if matrix is not.
- * @throws IllegalArgumentException
- */
-  public static boolean isUpperHessenberg(double[][] aMatrix) throws  IllegalArgumentException {
+  /**
+   * Boolean on whether a matrix is upper Hessenberg
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return boolean, true if matrix is upper Hessenberg, false if matrix is not.
+   */
+  public static boolean isUpperHessenberg(double[][] aMatrix) throws IllegalArgumentException {
     if (!isSquare(aMatrix)) {
-      throw new IllegalArgumentException("Matrix is not square so the notion of Upper Hessenberg isn't clear cut enough to be implemented");
+      throw new MathsExceptionIllegalArgument("Matrix is not square so the notion of Upper Hessenberg isn't clear cut enough to be implemented");
     }
     int rows = aMatrix.length;
 
@@ -328,29 +323,27 @@ public class MatrixPrimitiveUtils {
     return true;
   }
 
-/**
- * Checks if a matrix is upper triangular and returns the matrix if true, throws and exception otherwise.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return the matrix referred to in the argument if the check passes
- */
+  /**
+   * Checks if a matrix is upper triangular and returns the matrix if true, throws and exception otherwise.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return the matrix referred to in the argument if the check passes
+   */
   public static double[][] checkIsUpperHessenberg(double[][] aMatrix) {
     if (MatrixPrimitiveUtils.isUpperHessenberg(aMatrix)) {
       return aMatrix;
     } else {
-      throw new IllegalArgumentException("Upper Hessenberg matrix called on data that isn't upper Hessenberg!");
+      throw new MathsExceptionIllegalArgument("Upper Hessenberg matrix called on data that isn't upper Hessenberg!");
     }
   }
 
-
-/**
- * Boolean on whether a matrix is lower Hessenberg.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return boolean, true if matrix is Lower Hessenberg, false if matrix is not.
- * @throws IllegalArgumentException
- */
-  public static boolean isLowerHessenberg(double[][] aMatrix) throws  IllegalArgumentException {
+  /**
+   * Boolean on whether a matrix is lower Hessenberg.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return boolean, true if matrix is Lower Hessenberg, false if matrix is not.
+   */
+  public static boolean isLowerHessenberg(double[][] aMatrix) throws IllegalArgumentException {
     if (!isSquare(aMatrix)) {
-      throw new IllegalArgumentException("Matrix is not square so the notion of Lower Hessenberg isn't clear cut enough to be implemented");
+      throw new MathsExceptionIllegalArgument("Matrix is not square so the notion of Lower Hessenberg isn't clear cut enough to be implemented");
     }
     int rows = aMatrix.length;
 
@@ -364,43 +357,40 @@ public class MatrixPrimitiveUtils {
     return true;
   }
 
-/**
- * Checks if a matrix is lower Hessenberg and returns the matrix if true, throws and exception otherwise.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return the matrix referred to in the argument if the check passes
- */
+  /**
+   * Checks if a matrix is lower Hessenberg and returns the matrix if true, throws and exception otherwise.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return the matrix referred to in the argument if the check passes
+   */
   public static double[][] checkIsLowerHessenberg(double[][] aMatrix) {
     if (MatrixPrimitiveUtils.isLowerHessenberg(aMatrix)) {
       return aMatrix;
     } else {
-      throw new IllegalArgumentException("Lower Hessenberg matrix called on data that isn't lower Hessenberg!");
+      throw new MathsExceptionIllegalArgument("Lower Hessenberg matrix called on data that isn't lower Hessenberg!");
     }
   }
 
-
-
-/**
- * Checks if a matrix is tri-diagonal and returns the matrix if true, throws and exception otherwise.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return the matrix referred to in the argument if the check passes
- */
+  /**
+   * Checks if a matrix is tri-diagonal and returns the matrix if true, throws and exception otherwise.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return the matrix referred to in the argument if the check passes
+   */
   public static double[][] checkIsTriDiag(double[][] aMatrix) {
     if (MatrixPrimitiveUtils.isTriDiag(aMatrix)) {
       return aMatrix;
     } else {
-      throw new IllegalArgumentException("TriDiag matrix called on data that isn't Tri-Diagonal!");
+      throw new MathsExceptionIllegalArgument("TriDiag matrix called on data that isn't Tri-Diagonal!");
     }
   }
 
-/**
- * Boolean on whether a matrix is tri-Diagonal.
- * @param aMatrix an array of arrays representation of the matrix to be tested.
- * @return boolean, true if matrix is tri-Diagonal, false if matrix is not.
- * @throws IllegalArgumentException
- */
+  /**
+   * Boolean on whether a matrix is tri-Diagonal.
+   * @param aMatrix an array of arrays representation of the matrix to be tested.
+   * @return boolean, true if matrix is tri-Diagonal, false if matrix is not.
+   */
   public static boolean isTriDiag(double[][] aMatrix) throws IllegalArgumentException {
     if (!isSquare(aMatrix)) {
-      throw new IllegalArgumentException("Matrix is not square so the notion of Tri-Diagonal isn't clear cut enough to be implemented");
+      throw new MathsExceptionIllegalArgument("Matrix is not square so the notion of Tri-Diagonal isn't clear cut enough to be implemented");
     }
     final int rows = aMatrix.length;
 
@@ -437,7 +427,6 @@ public class MatrixPrimitiveUtils {
     return true;
   }
 
-
   /**
    * Checks if a matrix is N-diagonal and returns the matrix if true, throws and exception otherwise.
    * @param aMatrix an array of arrays representation of the matrix to be tested.
@@ -448,7 +437,7 @@ public class MatrixPrimitiveUtils {
     if (MatrixPrimitiveUtils.isNDiag(aMatrix, n)) {
       return aMatrix;
     } else {
-      throw new IllegalArgumentException("N-Diag matrix called on data that isn't N-Diagonal!");
+      throw new MathsExceptionIllegalArgument("N-Diag matrix called on data that isn't N-Diagonal!");
     }
   }
 
@@ -457,18 +446,17 @@ public class MatrixPrimitiveUtils {
    * @param aMatrix an array of arrays representation of the matrix to be tested.
    * @param n the bandwidth
    * @return boolean, true if matrix is N-Diagonal, false if matrix is not.
-   * @throws IllegalArgumentException
    */
-  public static boolean isNDiag(double[][] aMatrix, int n) throws IllegalArgumentException, NotImplementedException {
+  public static boolean isNDiag(double[][] aMatrix, int n) {
     assertNotNull(aMatrix);
     if (isEven(n) || n < 1) {
-      throw new IllegalArgumentException("Matrix bandwidth must be odd (as in an odd number of bands) AND positive");
+      throw new MathsExceptionIllegalArgument("Matrix bandwidth must be odd (as in an odd number of bands) AND positive");
     }
     if (!isSquare(aMatrix)) {
       throw new IllegalArgumentException("Matrix is not square so the notion of N-Diagonal isn't clear cut enough to be implemented");
     }
     if (n > aMatrix.length || n == 0) {
-      throw new IllegalArgumentException("Impossible bandwidth suggested: bandwidth = " + n);
+      throw new MathsExceptionIllegalArgument("Impossible bandwidth suggested: bandwidth = " + n);
     }
 
     final int rows = aMatrix.length;
