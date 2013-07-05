@@ -7,7 +7,7 @@ set(JARNAME Test-${PROJECT_NAME}-${OG-Maths_VERSION})
 set(OGMATHSJARNAME ${PROJECT_NAME}-${OG-Maths_VERSION})
 
 set(OGMATHSJAR ${JARDIR}/${OGMATHSJARNAME}.jar)
-set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_JAVA_INDCLUDE_PATH} /home/graham/.ivy2/cache/org.testng/testng/jars/testng-6.3.1.jar ${OGMATHSJAR})
+set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_JAVA_INCLUDE_PATH} /home/graham/.ivy2/cache/org.testng/testng/jars/testng-6.3.1.jar ${OGMATHSJAR})
 
 file(GLOB_RECURSE JAR_SOURCES *.java)
 
