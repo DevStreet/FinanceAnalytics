@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions;
 
-import org.testng.annotations.DataProvider;
+//import org.testng.annotations.DataProvider;
 
 /**
  * 
@@ -254,7 +254,7 @@ public class MathBits {
     return Double.longBitsToDouble(s_positiveQuietNaN);
   }
 
-  @DataProvider(name = "mathBits")
+  //@DataProvider(name = "mathBits")
   public Object[][] mathBitsDataProvider() {
     Object[][] tmp = new Object[20][1];
     tmp[0][0] = getPlusOne();
