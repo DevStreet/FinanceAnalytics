@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.testng.annotations.Test;
-
 import com.opengamma.maths.dogma.engine.language.Function;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 
@@ -39,7 +37,7 @@ public class DogmaLanguageMethodParser {
   }
 
   // this is a bit of a kludge, and by bit I mean a lot
-  private static void parseFunctions() {
+  public static void parseFunctions() {
     Map<Class<?>, Set<Function>> opsmap = s_infixops.getOperationsMap();
 //    System.out.println(opsmap.toString());
     Set<Class<?>> keyset = opsmap.keySet();
@@ -57,11 +55,6 @@ public class DogmaLanguageMethodParser {
   @Override
   public String toString() {
     return s_infixops.getOperationsMap().keySet().toString();
-  }
-
-  @Test
-  public void aTest() {
-    parseFunctions();
   }
 
 }
