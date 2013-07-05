@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions;
 
-import static org.testng.Assert.assertNotNull;
+import com.opengamma.maths.lowlevelapi.functions.utilities.Validate;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
@@ -448,7 +448,7 @@ public class MatrixPrimitiveUtils {
    * @return boolean, true if matrix is N-Diagonal, false if matrix is not.
    */
   public static boolean isNDiag(double[][] aMatrix, int n) {
-    assertNotNull(aMatrix);
+    Validate.notNull(aMatrix);
     if (isEven(n) || n < 1) {
       throw new MathsExceptionIllegalArgument("Matrix bandwidth must be odd (as in an odd number of bands) AND positive");
     }
