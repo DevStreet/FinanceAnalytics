@@ -9,8 +9,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
@@ -29,8 +27,6 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @Test
 public class IZYArgsCheckerTest {
-
-  Logger s_log = LoggerFactory.getLogger(IZYArgsCheckerTest.class);
 
   static IZY izy = new IZY(backing.Referencejava); // java one is fine, nothing is really "run"
 
@@ -152,11 +148,11 @@ public class IZYArgsCheckerTest {
 
     public test_harness(String methname, Class<?>[] argList) {
       methodName = methname;
-      s_log.info("Attempting to test " + methname);
+      System.out.println("Attempting to test " + methname);
       try {
         _method_to_test = izy.getClass().getMethod(methname, argList);
       } catch (NoSuchMethodException | SecurityException ex) {
-        s_log.warn("Failed to get pointer to method: " + methname);
+        System.err.println("Failed to get pointer to method: " + methname);
         ex.printStackTrace();
       }
     }
