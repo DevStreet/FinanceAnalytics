@@ -32,6 +32,8 @@ set(CMAKE_JAVA_INCLUDE_PATH /home/graham/.ivy2/cache/org.slf4j/slf4j/jars/slf4j-
 
 add_subdirectory(src)
 
+file(COPY config/OG-Maths.properties DESTINATION ${CMAKE_BINARY_DIR}/config)
+
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
 message("
