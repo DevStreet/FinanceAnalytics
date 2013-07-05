@@ -7,6 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import static org.testng.Assert.assertTrue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
@@ -20,6 +22,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
  * Tests the times() function in DOGMA
  */
 public class DOGMAtimesTest {
+  Logger foo = LoggerFactory.getLogger(getClass());
 
   // OGDoubles
   OGMatrix OGD1x1 = new OGMatrix(new double[][] {{10 } });
