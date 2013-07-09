@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
@@ -100,6 +101,11 @@ public class OGIndexMatrix extends OGArray<Integer> {
       throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
     }
     return _data[indices[1] * _rows + indices[0]];
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int rowidx, int colidx, Number num) {
+    throw new MathsExceptionNotImplemented("setEntry not implemented for OGIndexMatrix");
   }
 
   public OGIndexMatrix getFullRow(int index) {

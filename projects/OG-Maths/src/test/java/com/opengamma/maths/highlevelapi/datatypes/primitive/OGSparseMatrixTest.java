@@ -14,10 +14,14 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.CopyOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse.SparseOGMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
- * Tests the OGDoubleArray Class
+ * Tests the OGSparseMatrix Class
  */
 public class OGSparseMatrixTest {
 
@@ -198,6 +202,122 @@ public class OGSparseMatrixTest {
         assertTrue(D.getEntry(i, j) == data[i][j]);
       }
     }
+  }
+
+  // test get entry linear index
+  @Test
+  public void testGetEntryOKLinearIndicesTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    int ptr = 0;
+    for (int j = 0; j < D.getNumberOfColumns(); j++) {
+      for (int i = 0; i < D.getNumberOfRows(); i++) {
+        assertTrue(D.getEntry(ptr) == data[i][j]); // col major access
+        ptr++;
+      }
+    }
+  }
+
+  // test set entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadRowIndicesTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.setEntry(23, 1, 1);
+  }
+
+  // test set entry bad col index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadColumnIndicesTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.setEntry(1, 23, 1);
+  }
+
+  // test set null Number
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testSetEntryNullNumberTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    D.setEntry(1, 1, null);
+  }
+
+  // test set entry ok
+  @Test
+  public void testSetEntryOKIndiciesTest() {
+    double[][] data = new double[][] { {0, 0, 0, 61 }, {0, 85, 0, 0 }, {71, 22, 86, 9 }, {91, 78, 0, 0 }, {0, 29, 0, 52 }, {0, 54, 0, 0 } };
+    double[][] datacmp = new double[][] { {0, 0, 0, 61 }, {0, 85, 0, 0 }, {71, 22, 86, 9 }, {91, 78, 0, 0 }, {0, 29, 0, 52 }, {0, 54, 0, 0 } };
+    OGMatrix compareM = new OGMatrix(datacmp);
+    OGArray<? extends Number> answer;
+    FullOGSparseMatrix full = new FullOGSparseMatrix();
+    SparseOGMatrix sparseCreator = new SparseOGMatrix();
+    CopyOGMatrix copy = new CopyOGMatrix();
+    OGSparseMatrix expected = null;
+    int rows = data.length;
+    int cols = data[0].length;
+    double val = 1337;
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        OGSparseMatrix D = new OGSparseMatrix(data);
+        OGMatrix tmp = copy.eval(compareM);
+        tmp.setEntry(i, j, val);
+        expected = sparseCreator.eval(tmp);
+        answer = D.setEntry(i, j, val);
+        assertTrue(full.eval(expected).fuzzyequals(full.eval((OGSparseMatrix) answer), 1e-14));
+        assertTrue(answer.getEntry(i, j).doubleValue() == val);
+      }
+    }
+
+    OGSparseMatrix setToLeet = new OGSparseMatrix(data);
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        setToLeet.setEntry(i, j, val);
+      }
+    }
+
+    // make sure the underlying data is now all val
+    double[] dataFinal = setToLeet.getData();
+    for (int i = 0; i < dataFinal.length; i++) {
+      assertTrue(dataFinal[i] == val);
+    }
+  }
+
+  // test type promotion
+  @Test
+  public void testSetEntryTypePromotionTest() {
+    double[][] data = new double[][] { {0, 0, 0, 61 }, {0, 85, 0, 0 }, {71, 22, 86, 9 }, {91, 78, 0, 0 }, {0, 29, 0, 52 }, {0, 54, 0, 0 } };
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    Number val = new ComplexType(13, 37);
+
+    // set in a location where an entry already exists
+    OGArray<? extends Number> answer = D.setEntry(2, 2, val);
+
+    // make original is unchanged
+    assertTrue(D.fuzzyequals(new OGSparseMatrix(data), 1e-14));
+
+    // make sure promotion has occurred
+    assertTrue(answer instanceof OGComplexSparseMatrix);
+
+    // make sure data is ok
+    double[][] re = new double[][] { {0, 0, 0, 61 }, {0, 85, 0, 0 }, {71, 22, 13, 9 }, {91, 78, 0, 0 }, {0, 29, 0, 52 }, {0, 54, 0, 0 } };
+    double[][] im = new double[][] { {0, 0, 0, 0 }, {0, 0, 0, 0 }, {0, 0, 37, 0 }, {0, 0, 0, 0 }, {0, 0, 0, 0 }, {0, 0, 0, 0 } };
+
+    OGComplexSparseMatrix cmplx = new OGComplexSparseMatrix(re, im);
+    assertTrue(answer.fuzzyequals(cmplx, 1e-14));
+
+    // set in a location where an entry doean't exist
+    answer = D.setEntry(4, 2, val);
+
+    // make original is unchanged
+    assertTrue(D.fuzzyequals(new OGSparseMatrix(data), 1e-14));
+
+    // make sure promotion has occurred
+    assertTrue(answer instanceof OGComplexSparseMatrix);
+
+    // make sure data is ok
+    re = new double[][] { {0, 0, 0, 61 }, {0, 85, 0, 0 }, {71, 22, 86, 9 }, {91, 78, 0, 0 }, {0, 29, 13, 52 }, {0, 54, 0, 0 } };
+    im = new double[][] { {0, 0, 0, 0 }, {0, 0, 0, 0 }, {0, 0, 0, 0 }, {0, 0, 0, 0 }, {0, 0, 37, 0 }, {0, 0, 0, 0 } };
+
+    cmplx = new OGComplexSparseMatrix(re, im);
+    assertTrue(answer.fuzzyequals(cmplx, 1e-14));
+
   }
 
   // test get full row neg index
@@ -582,6 +702,40 @@ public class OGSparseMatrixTest {
   public void testToStringTest() {
     OGSparseMatrix D = new OGSparseMatrix(data);
     D.toString();
+  }
+
+  @Test
+  public void parserLinearModeTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    OGMatrix expected;
+    double[][] re = new double[][] {{3., 0., 0., 2. } };
+
+    expected = new OGMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get("1:4"), 10 * D1mach.four()));
+
+    re = new double[][] {{1., 3., 0., 0., 2., 0., 5., 0., 0., 4., 6., 7., 0., 0., 0., 0. } };
+
+    expected = new OGMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get(":"), 10 * D1mach.four()));
+  }
+
+  @Test
+  public void parser2DModeTest() {
+    OGSparseMatrix D = new OGSparseMatrix(data);
+    OGSparseMatrix expected;
+    double[][] re;
+    re = new double[][] { {3, 0, 4, 0 }, {0, 5, 6, 0 },
+        {0, 0, 7, 0 } };
+    expected = new OGSparseMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get("1:3,:"), 10 * D1mach.four()));
+
+    re = new double[][] { {2., 0. }, {0., 4. }, {5., 6. }, {0., 7. } };
+
+    expected = new OGSparseMatrix(re);
+    assertTrue(expected.fuzzyequals(D.get(":,1:2"), 10 * D1mach.four()));
+
+    expected = new OGSparseMatrix(data);
+    assertTrue(expected.fuzzyequals(D.get(":,:"), 10 * D1mach.four()));
   }
 
 }

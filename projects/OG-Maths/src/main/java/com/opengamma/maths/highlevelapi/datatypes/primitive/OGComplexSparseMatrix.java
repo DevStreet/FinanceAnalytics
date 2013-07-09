@@ -692,6 +692,70 @@ public class OGComplexSparseMatrix extends OGArray<ComplexType> {
   }
 
   @Override
+  public OGArray<? extends Number> setEntry(int rowidx, int colidx, Number num) {
+    Catchers.catchNull(num);
+    super.entryValidator(rowidx, colidx);
+    double rp, ip;
+
+    if (num instanceof ComplexType) {
+      rp = ((ComplexType) num).getReal();
+      ip = ((ComplexType) num).getImag();
+    } else {
+      rp = num.doubleValue();
+      ip = 0.;
+    }
+
+    for (int i = _colPtr[colidx]; i < _colPtr[colidx + 1]; i++) { // loops through elements of correct column
+      // looks for row index
+      if (_rowIdx[i] == rowidx) {
+        _values[2 * i] = rp;
+        _values[2 * i + 1] = ip;
+        return this;
+      }
+    }
+    // need the jiggle the arrays about
+    // create new data
+    int[] rowIdxtmp = new int[_rowIdx.length + 1];
+    double[] valuestmp = new double[_values.length + 2];
+    int[] colPtrtmp = DenseMemoryManipulation.memcpy(_colPtr);
+    // copy row references up to column that needs an insert
+    System.arraycopy(_rowIdx, 0, rowIdxtmp, 0, _colPtr[colidx]);
+    // copy in values up to 2x colptr
+    System.arraycopy(_values, 0, valuestmp, 0, 2 * _colPtr[colidx]);
+
+    // looks for row index in column
+    int rowoffset = 0;
+    boolean writeLocFound = false;
+    for (int i = _colPtr[colidx]; i < _colPtr[colidx + 1]; i++) { // loops through elements of correct column
+      // write in row and value as they are ok still
+      valuestmp[2 * i] = _values[2 * i];
+      valuestmp[2 * i + 1] = _values[2 * i + 1];
+      rowIdxtmp[i] = _rowIdx[i];
+      if (!writeLocFound && _rowIdx[i] > rowidx) {
+        // insert at _rowIdx[i]
+        valuestmp[2 * i] = rp;
+        valuestmp[2 * i + 1] = ip;
+        rowIdxtmp[i] = rowidx;
+        rowoffset = i;
+        writeLocFound = true;
+      }
+    }
+    if (!writeLocFound) { // data is at the end of column of nonzero data
+      rowoffset = _colPtr[colidx + 1];
+      valuestmp[2 * rowoffset] = rp;
+      valuestmp[2 * rowoffset + 1] = ip;
+      rowIdxtmp[rowoffset] = rowidx;
+    }
+
+    System.arraycopy(_rowIdx, rowoffset, rowIdxtmp, rowoffset + 1, _rowIdx.length - rowoffset);
+    System.arraycopy(_values, 2 * rowoffset, valuestmp, 2 * (rowoffset + 1), 2 * (_rowIdx.length - rowoffset));
+    for (int i = colidx + 1; i < _colPtr.length; i++) { // shift the col pointers along one
+      colPtrtmp[i]++;
+    }
+    return new OGComplexSparseMatrix(colPtrtmp, rowIdxtmp, valuestmp, _rows, _cols);
+  }
+
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     Formatter formatter = new Formatter(sb);

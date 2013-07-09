@@ -147,16 +147,22 @@ public class OGComplexScalar extends OGArray<Number> {
 
   @Override
   public ComplexType getEntry(int... indices) {
-    if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGComplexScalar only has 2 indicies, more than 2 were given");
-    }
-    if (indices[0] != 0) {
-      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + 1 + " rows");
-    }
-    if (indices[1] != 0) {
-      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + 1 + " columns");
-    }
+    super.entryValidator(indices);
     return new ComplexType(_data);
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, column);
+    if (value instanceof ComplexType) {
+      _data[0] = ((ComplexType) value).getReal();
+      _data[1] = ((ComplexType) value).getImag();
+      return this;
+    } else {
+      return new OGRealScalar(value.doubleValue());
+    }
+
   }
 
   @Override

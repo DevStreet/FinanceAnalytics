@@ -15,6 +15,9 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.CopyOGComplexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse.SparseOGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
@@ -455,6 +458,98 @@ public class OGComplexSparseMatrixTest {
     D.getEntry(1, -1);
   }
 
+  // test set entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadRowIndicesTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.setEntry(23, 1, 1);
+  }
+
+  // test set entry bad col index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadColumnIndicesTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.setEntry(1, 23, 1);
+  }
+
+  // test set null Number
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testSetEntryNullNumberTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    D.setEntry(1, 1, null);
+  }
+
+  // test set entry ok
+  @Test
+  public void testSetEntryOKIndiciesTest() {
+    OGComplexMatrix compareM = new OGComplexMatrix(realData, imagData);
+    OGArray<? extends Number> answer;
+    FullOGComplexSparseMatrix full = new FullOGComplexSparseMatrix();
+    SparseOGComplexMatrix sparseCreator = new SparseOGComplexMatrix();
+    CopyOGComplexMatrix copy = new CopyOGComplexMatrix();
+    OGComplexSparseMatrix expected = null;
+    int rows = realData.length;
+    int cols = realData[0].length;
+    Number val = 1337;
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+        OGComplexMatrix tmp = copy.eval(compareM);
+        tmp.setEntry(i, j, val);
+        expected = sparseCreator.eval(tmp);
+        answer = D.setEntry(i, j, val);
+        assertTrue(full.eval(expected).fuzzyequals(full.eval((OGComplexSparseMatrix) answer), 1e-14));
+        assertTrue(((ComplexType) answer.getEntry(i, j)).getReal() == val.doubleValue());
+        assertTrue(((ComplexType) answer.getEntry(i, j)).getImag() == 0);
+      }
+    }
+
+    OGComplexSparseMatrix setToLeet = new OGComplexSparseMatrix(realData, imagData);
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        setToLeet.setEntry(i, j, val);
+      }
+    }
+
+    // make sure the underlying data is now all val
+    double[] dataFinal = setToLeet.getData();
+    for (int i = 0; i < dataFinal.length; i += 2) {
+      assertTrue(dataFinal[i] == val.doubleValue());
+      assertTrue(dataFinal[i + 1] == 0);
+    }
+
+    compareM = new OGComplexMatrix(realData, imagData);
+    val = new ComplexType(13, 37);
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+        OGComplexMatrix tmp = copy.eval(compareM);
+        tmp.setEntry(i, j, val);
+        expected = sparseCreator.eval(tmp);
+        answer = D.setEntry(i, j, val);
+        assertTrue(full.eval(expected).fuzzyequals(full.eval((OGComplexSparseMatrix) answer), 1e-14));
+        assertTrue(((ComplexType) answer.getEntry(i, j)).getReal() == ((ComplexType) val).getReal());
+        assertTrue(((ComplexType) answer.getEntry(i, j)).getImag() == ((ComplexType) val).getImag());
+      }
+    }
+
+    setToLeet = new OGComplexSparseMatrix(realData, imagData);
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        setToLeet.setEntry(i, j, val);
+      }
+    }
+
+    // make sure the underlying data is now all val
+    dataFinal = setToLeet.getData();
+    for (int i = 0; i < dataFinal.length; i += 2) {
+      assertTrue(dataFinal[i] == ((ComplexType) val).getReal());
+      assertTrue(dataFinal[i + 1] == ((ComplexType) val).getImag());
+    }
+  }
+
   // test get full row
   @Test
   public void testGetFullRow() {
@@ -858,6 +953,47 @@ public class OGComplexSparseMatrixTest {
     OGComplexSparseMatrix D = new OGComplexSparseMatrix(dataForEqualsTests);
     OGComplexSparseMatrix Same = new OGComplexSparseMatrix(new double[][] { {1 + 9 * D1mach.four(), 2, 0, 0 }, {3, 0, 4, 0 }, {0, 5, 6, 0 }, {0, 0, 7, 0 } });
     assertTrue(D.fuzzyequals(Same, 10 * D1mach.four()));
+  }
+
+  @Test
+  public void parserLinearModeTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    OGComplexMatrix expected;
+    double[][] re = new double[][] {{5., 0., 0., 2. } };
+    double[][] im = new double[][] {{0., 90., 0., 20. } };
+
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get("1:4"), 10 * D1mach.four()));
+
+    re = new double[][] {{1., 5., 0., 0., 2., 0., 10., 0., 0., 7., 11., 15., 0., 0., 0., 0. } };
+    im = new double[][] {{10., 0., 90., 0., 20., 60., 100., 0., 30., 70., 0., 0., 0., 0., 120., 160. } };
+
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get(":"), 10 * D1mach.four()));
+  }
+
+  @Test
+  public void parser2DModeTest() {
+    OGComplexSparseMatrix D = new OGComplexSparseMatrix(realData, imagData);
+    OGComplexSparseMatrix expected;
+    double[][] re, im;
+
+    re = new double[][] { {5.0000000000000000, 0.0000000000000000, 7.0000000000000000, 0.0000000000000000 }, {0.0000000000000000, 10.0000000000000000, 11.0000000000000000, 0.0000000000000000 },
+        {0.0000000000000000, 0.0000000000000000, 15.0000000000000000, 0.0000000000000000 } };
+    im = new double[][] { {0.0000000000000000, 60.0000000000000000, 70.0000000000000000, 0.0000000000000000 }, {90.0000000000000000, 100.0000000000000000, 0.0000000000000000, 120.0000000000000000 },
+        {0.0000000000000000, 0.0000000000000000, 0.0000000000000000, 160.0000000000000000 } };
+
+    expected = new OGComplexSparseMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get("1:3,:"), 10 * D1mach.four()));
+
+    re = new double[][] { {2.0000000000000000, 0.0000000000000000 }, {0.0000000000000000, 7.0000000000000000 }, {10.0000000000000000, 11.0000000000000000 }, {0.0000000000000000, 15.0000000000000000 } };
+    im = new double[][] { {20.0000000000000000, 30.0000000000000000 }, {60.0000000000000000, 70.0000000000000000 }, {100.0000000000000000, 0.0000000000000000 },
+        {0.0000000000000000, 0.0000000000000000 } };
+    expected = new OGComplexSparseMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get(":,1:2"), 10 * D1mach.four()));
+
+    expected = new OGComplexSparseMatrix(realData, imagData);
+    assertTrue(expected.fuzzyequals(D.get(":,:"), 10 * D1mach.four()));
   }
 
 }

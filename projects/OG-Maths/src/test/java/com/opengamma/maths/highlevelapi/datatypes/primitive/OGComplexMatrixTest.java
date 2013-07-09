@@ -234,6 +234,40 @@ public class OGComplexMatrixTest {
     assertTrue(D.getNumberOfColumns() == 3);
   }
 
+  //sending in bad rows double[] double[] constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrDoublePtrConstructorBadRowsDataTest() {
+    new OGComplexMatrix(realdata4x3unwound, imagdata4x3unwound, -1, 3);
+  }
+
+  //sending in bad rows double[] double[] constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrDoublePtrConstructorBadColsDataTest() {
+    new OGComplexMatrix(realdata4x3unwound, imagdata4x3unwound, 3, -1);
+  }
+
+  //sending in bad data count double[] double[] constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrDoublePtrConstructorDataCountDataTest() {
+    new OGComplexMatrix(realdata4x3unwound, imagdata4x3unwound, 3, 17);
+  }
+
+  //sending in bad data lengths double[] double[] constructor
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testDoublePtrDoublePtrConstructorBadDataLengthTest() {
+    new OGComplexMatrix(realdata4x3unwound, new double[4], 3, 17);
+  }
+
+  //sending in ok double[] double[] constructor
+  @Test
+  public void testDoublePtrDoublePtrConstructorRealDataOKTest() {
+    OGComplexMatrix D = new OGComplexMatrix(realdata4x3unwound, imagdata4x3unwound, 4, 3);
+    assertTrue(D.getClass() == OGComplexMatrix.class);
+    assertTrue(Arrays.equals(D.getData(), DenseMemoryManipulation.convertTwoSinglePointersToInterleavedSinglePointer(realdata4x3unwound, imagdata4x3unwound)));
+    assertTrue(D.getNumberOfRows() == 4);
+    assertTrue(D.getNumberOfColumns() == 3);
+  }
+
   @Test
   // sending in single double for a 1x1 element array
   public void testDoubleConstructorInternalDataTest() {
@@ -313,6 +347,79 @@ public class OGComplexMatrixTest {
     }
   }
 
+  // test get entry ok
+  @Test
+  public void testGetEntryOKLinearIndicesTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    for (int j = 0; j < D.getNumberOfColumns(); j++) {
+      for (int i = 0; i < D.getNumberOfRows(); i++) {
+        assertTrue(D.getEntry(i + j * D.getNumberOfRows()).getReal() == realdata4x3[i][j]);
+        assertTrue(D.getEntry(i + j * D.getNumberOfRows()).getImag() == imagdata4x3[i][j]);
+      }
+    }
+  }
+
+  // test set entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadRowIndicesTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.setEntry(23, 1, 1);
+  }
+
+  // test set entry bad col index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadColumnIndicesTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.setEntry(1, 23, 1);
+  }
+
+  // test set null Number
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testSetEntryNullNumberTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    D.setEntry(1, 1, null);
+  }
+
+  // test set entry ok
+  @Test
+  public void testSetEntryOKIndicesTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    Number val = new ComplexType(13, 37);
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        Number tmp = D.setEntry(i, j, val).getEntry(i, j);
+        assertTrue(((ComplexType) tmp).getReal() == ((ComplexType) val).getReal());
+        assertTrue(((ComplexType) tmp).getImag() == ((ComplexType) val).getImag());
+      }
+    }
+    // make sure the underlying data is now all val
+    double[] dataFinal = D.getData();
+    for (int i = 0; i < dataFinal.length; i += 2) {
+      assertTrue(dataFinal[i] == ((ComplexType) val).getReal());
+      assertTrue(dataFinal[i + 1] == ((ComplexType) val).getImag());
+    }
+  }
+
+  // test real value assigned ok
+  @Test
+  public void testSetEntryRealNumberAssignmentTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    Number val = 1337;
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        Number tmp = D.setEntry(i, j, val).getEntry(i, j);
+        assertTrue(((ComplexType) tmp).getReal() == val.doubleValue());
+        assertTrue(((ComplexType) tmp).getImag() == 0.d);
+      }
+    }
+    // make sure the underlying data is now all val
+    double[] dataFinal = D.getData();
+    for (int i = 0; i < dataFinal.length; i += 2) {
+      assertTrue(dataFinal[i] == val.doubleValue());
+      assertTrue(dataFinal[i + 1] == 0d);
+    }
+  }
+
   // test get full row neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetFullRowNegIndexTest() {
@@ -339,21 +446,21 @@ public class OGComplexMatrixTest {
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowNegIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    D.getFullRow(-1);
+    D.getRow(-1);
   }
 
   // test get full row bad index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetRowBadIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    D.getFullRow(23);
+    D.getRow(23);
   }
 
   // test get full row ok
   @Test
   public void testGetRowOkIndexTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
-    OGComplexMatrix row = D.getFullRow(2);
+    OGComplexMatrix row = D.getRow(2);
     assertTrue(row.equals(getRow));
   }
 
@@ -543,7 +650,7 @@ public class OGComplexMatrixTest {
   public void testGetRandomRowsRandomColsTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {0, 3, 2 }, new int[] {2, 0 });
-    OGComplexMatrix expected = new OGComplexMatrix(new double[] {3,30,12,120,9,90,1,10,10,100,7,70}, 3, 2);
+    OGComplexMatrix expected = new OGComplexMatrix(new double[] {3, 30, 12, 120, 9, 90, 1, 10, 10, 100, 7, 70 }, 3, 2);
     assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
   }
 
@@ -683,6 +790,39 @@ public class OGComplexMatrixTest {
   public void testToStringTest() {
     OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
     D.toString();
+  }
+
+  @Test
+  public void parserLinearModeTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGComplexMatrix expected;
+    double[][] re = new double[][] {{4., 7., 10. } };
+    double[][] im = new double[][] {{40., 70., 100. } };
+
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get("1:3"), 10 * D1mach.four()));
+
+    expected = new OGComplexMatrix(interleaved4x3, 1, 12);
+    assertTrue(expected.fuzzyequals(D.get(":"), 10 * D1mach.four()));
+  }
+
+  @Test
+  public void parser2DModeTest() {
+    OGComplexMatrix D = new OGComplexMatrix(interleaved4x3, 4, 3);
+    OGComplexMatrix expected;
+    double[][] re = new double[][] { {4., 5., 6. }, {7., 8., 9. }, {10., 11., 12. } };
+    double[][] im = new double[][] { {40., 50., 60. }, {70., 80., 90. }, {100., 110., 120. } };
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get("1:3,:"), 10 * D1mach.four()));
+
+    re = new double[][] { {2., 3. }, {5., 6. }, {8., 9. }, {11., 12. } };
+    im = new double[][] { {20., 30. }, {50., 60. }, {80., 90. }, {110., 120. } };
+    expected = new OGComplexMatrix(re, im);
+    assertTrue(expected.fuzzyequals(D.get(":,1:2"), 10 * D1mach.four()));
+
+    expected = new OGComplexMatrix(interleaved4x3, 4, 3);
+    assertTrue(expected.fuzzyequals(D.get(":,:"), 10 * D1mach.four()));
+
   }
 
 }

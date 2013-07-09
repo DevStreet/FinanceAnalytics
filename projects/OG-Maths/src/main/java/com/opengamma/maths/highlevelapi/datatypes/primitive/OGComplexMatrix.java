@@ -89,7 +89,7 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
   }
 
   /**
-   * Takes a column major double[] and turns it into an OGComplexArray
+   * Takes two separate column major double[] one for real part, one for imag part, and turns it into an OGComplexArray
    * @param realData the real components of the backing data
    * @param imagData the imaginary components of the backing data 
    * @param rows number of rows
@@ -181,17 +181,29 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
 
   @Override
   public ComplexType getEntry(int... indices) {
-    if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
+    super.entryValidator(indices);
+    int jmp;
+    if (indices.length == 1) {
+      jmp = 2 * (indices[0]);
+    } else { // 2d mode
+      jmp = 2 * (indices[1] * _rows + indices[0]);
     }
-    if (indices[0] >= _rows) {
-      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
-    }
-    if (indices[1] >= _columns) {
-      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
-    }
-    final int jmp = 2 * (indices[1] * _rows + indices[0]);
     return new ComplexType(_data[jmp], _data[jmp + 1]);
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, column);
+    int idx = 2 * (column * _rows + row);
+    if (value instanceof ComplexType) {
+      _data[idx] = ((ComplexType) value).getReal();
+      _data[idx + 1] = ((ComplexType) value).getImag();
+    } else {
+      _data[idx] = value.doubleValue();
+      _data[idx + 1] = 0.;
+    }
+    return this;
   }
 
   public OGComplexMatrix getFullRow(int index) {

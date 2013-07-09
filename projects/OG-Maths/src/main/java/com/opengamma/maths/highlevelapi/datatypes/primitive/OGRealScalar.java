@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -49,16 +50,20 @@ public class OGRealScalar extends OGArray<Number> {
 
   @Override
   public Number getEntry(int... indices) {
-    if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGRealScalar only has 2 indicies, more than 2 were given");
-    }
-    if (indices[0] != 0) {
-      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + 1 + " rows");
-    }
-    if (indices[1] != 0) {
-      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + 1 + " columns");
-    }
+    super.entryValidator(indices);
     return _data[0];
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, column);
+    if (value instanceof ComplexType) {
+      return new OGComplexScalar(((ComplexType) value).getReal(), ((ComplexType) value).getImag());
+    } else {
+      _data[0] = value.doubleValue();
+      return this;
+    }
   }
 
   @Override
