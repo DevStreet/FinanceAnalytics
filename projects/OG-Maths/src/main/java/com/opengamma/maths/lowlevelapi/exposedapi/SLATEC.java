@@ -8,47 +8,31 @@ package com.opengamma.maths.lowlevelapi.exposedapi;
 import com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking.SLATECAPIInterface;
 import com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking.SLATECAbstractSuper;
 import com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking.SLATECNativeBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking.SLATECOGJavaBacked;
 
 /**
  * Provides a unified interface to SLATEC
  */
-public class SLATEC implements SLATECAPIInterface {
+public final class SLATEC implements SLATECAPIInterface {
+
+  private static class SLATECRef {
+    public static final SLATEC s_instance = new SLATEC();
+  }
+
+  public static SLATEC getInstance() {
+    return SLATECRef.s_instance;
+  }
 
   private SLATECAbstractSuper _localSLATEC;
 
-  /**
-   * Backing type
-   */
-  public enum backing {
-    /**
-     * OG Java backed SLATEC
-     */
-    OGjava,
-    /**
-     * OG Native backed SLATEC
-     */
-    OGnative
-  }
-
-  public SLATEC() {
+  private SLATEC() {
     _localSLATEC = new SLATECNativeBacked();
-  }
-
-  public SLATEC(backing backedby) {
-    if (backedby == backing.OGjava) {
-      _localSLATEC = new SLATECOGJavaBacked();
-    } else if (backedby == backing.OGnative) {
-      _localSLATEC = new SLATECNativeBacked();
-    }
-
   }
 
   @Override
   public double derf(double x) {
     return _localSLATEC.derf(x);
-  }  
-  
+  }
+
   @Override
   public double derfc(double x) {
     return _localSLATEC.derfc(x);
@@ -58,12 +42,12 @@ public class SLATEC implements SLATECAPIInterface {
   public double dgamma(double x) {
     return _localSLATEC.dgamma(x);
   }
-  
+
   @Override
   public double dlngam(double x) {
     return _localSLATEC.dlngam(x);
   }
-  
+
   @Override
   public double dacosh(double x) {
     return _localSLATEC.dacosh(x);
@@ -78,7 +62,7 @@ public class SLATEC implements SLATECAPIInterface {
   public double datanh(double x) {
     return _localSLATEC.datanh(x);
   }
-  
+
   @Override
   public double zabs(double zr, double zi) {
     return _localSLATEC.zabs(zr, zi);
@@ -93,6 +77,5 @@ public class SLATEC implements SLATECAPIInterface {
   public double[] zatan(double[] z) {
     return _localSLATEC.zatan(z);
   }
-
 
 }

@@ -22,14 +22,12 @@ import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
  */
 public class ZATAN2 {
 
-  private static SLATEC s_slatec = new SLATEC();
-
   public static double[] zatan2(double[] csn, double[] ccs) {
     double[] zatan2;
-    if (s_slatec.zabs(ccs[0], ccs[1]) != 0.d) {
+    if (SLATEC.getInstance().zabs(ccs[0], ccs[1]) != 0.d) {
       double[] tmp = new double[2];
       tmp = ComplexArithmetic.cdivide(csn, ccs);
-      zatan2 = s_slatec.zatan(tmp);
+      zatan2 = SLATEC.getInstance().zatan(tmp);
 
       if (ccs[0] < 0) {
         zatan2[0] += MathsConstants.pi;
@@ -38,7 +36,7 @@ public class ZATAN2 {
         zatan2[0] -= 2 * MathsConstants.pi;
       }
     } else {
-      if (s_slatec.zabs(csn[0], csn[1]) == 0d) {
+      if (SLATEC.getInstance().zabs(csn[0], csn[1]) == 0d) {
         throw new MathsExceptionIllegalArgument("SLATEC: ZATAN2 called with both arguments numerically zero");
       }
       zatan2 = new double[2];

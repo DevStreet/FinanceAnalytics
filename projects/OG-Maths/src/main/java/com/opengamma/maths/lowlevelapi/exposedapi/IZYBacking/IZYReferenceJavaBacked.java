@@ -16,7 +16,7 @@ import com.opengamma.maths.lowlevelapi.functions.MathE;
 //CSOFF // to match C
 public class IZYReferenceJavaBacked extends IZYAbstractSuper implements IZYAPIInterface {
 
-  private static SLATEC s_slatec = new SLATEC(SLATEC.backing.OGjava);
+  private static SLATEC s_slatec = SLATEC.getInstance();
 
   @Override
   public void vd_acos(int[] count, double[] arg0, int[] offsetarg0, double[] out0, int[] offsetout0) {
