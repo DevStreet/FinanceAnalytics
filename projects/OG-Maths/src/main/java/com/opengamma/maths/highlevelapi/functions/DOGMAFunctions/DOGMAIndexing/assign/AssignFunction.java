@@ -65,8 +65,8 @@ public class AssignFunction {
       int rowidxlen = rowidx.length;
       int colidxlen = colidx.length;
       int ptr = 0;
-      for (int i = 0; i < rowidxlen; i++) {
-        for (int j = 0; j < colidxlen; j++) {
+      for (int j = 0; j < colidxlen; j++) {
+        for (int i = 0; i < rowidxlen; i++) {
           ret = ret.setEntry(rowidx[i], colidx[j], assignFrom.getEntry(ptr++));
         }
       }
@@ -118,8 +118,8 @@ public class AssignFunction {
   }
 
   private int[][] process2DIndex(OneDIndex rows, OneDIndex cols, int rowDim, int colDim) {
-    int[] colIndiciesPrimitive = process1Dindex(rows, rowDim);
-    int[] rowIndiciesPrimitive = process1Dindex(cols, colDim);
+    int[] rowIndiciesPrimitive = process1Dindex(rows, rowDim);
+    int[] colIndiciesPrimitive = process1Dindex(cols, colDim);
     return new int[][] {rowIndiciesPrimitive, colIndiciesPrimitive };
   }
 

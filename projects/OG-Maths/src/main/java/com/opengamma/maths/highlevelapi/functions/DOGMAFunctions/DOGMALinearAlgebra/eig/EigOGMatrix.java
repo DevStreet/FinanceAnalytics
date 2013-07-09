@@ -30,7 +30,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 public final class EigOGMatrix {
   private static Logger s_log = LoggerFactory.getLogger(EigOGMatrix.class);
 
-  private LAPACK _localLAPACK = new LAPACK();
+  private LAPACK _localLAPACK = LAPACK.getInstance();
 
   @DOGMAMethodLiteral
   public List<OGArray<? extends Number>> eig(OGMatrix array1, EIGCompute these) {

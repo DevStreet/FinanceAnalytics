@@ -23,7 +23,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 @DOGMAMethodHook(provides = SVD.class)
 public final class SvdOGMatrix {
 
-  private LAPACK _localLAPACK = new LAPACK();
+  private LAPACK _localLAPACK = LAPACK.getInstance();
   private TransposeOGMatrix _transpose = new TransposeOGMatrix();
 
   @DOGMAMethodLiteral

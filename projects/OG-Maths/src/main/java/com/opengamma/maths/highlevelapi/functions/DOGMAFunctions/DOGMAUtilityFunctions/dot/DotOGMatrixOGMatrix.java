@@ -17,7 +17,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 @DOGMAMethodHook(provides = Dot.class)
 public final class DotOGMatrixOGMatrix implements Dot<OGMatrix, OGMatrix, OGMatrix> {
 
-  private BLAS _localblas = new BLAS();
+  private BLAS _localblas = BLAS.getInstance();
 
   @Override
   public OGMatrix eval(OGMatrix array1, OGMatrix array2) {

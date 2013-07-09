@@ -19,7 +19,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.BLAS;
  */
 public class Dblat1 {
 
-  private BLAS _blas = new BLAS();
+  private BLAS _blas = BLAS.getInstance();
 
   // equiv of common block
   private int _icase, _n, _incx, _incy, _mode;

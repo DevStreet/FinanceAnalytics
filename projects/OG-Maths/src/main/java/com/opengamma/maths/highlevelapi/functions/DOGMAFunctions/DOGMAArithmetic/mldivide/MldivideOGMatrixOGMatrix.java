@@ -23,7 +23,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 @DOGMAMethodHook(provides = Mldivide.class)
 public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatrix, OGMatrix> {
 
-  private LAPACK _lapack = new LAPACK();
+  private LAPACK _lapack = LAPACK.getInstance();
   private MldivideOGMatrixOGMatrixHelper _helper = new MldivideOGMatrixOGMatrixHelper();
   private Logger _log = MldivideOGMatrixOGMatrixHelper.getLogger();
 
@@ -281,7 +281,7 @@ public final class MldivideOGMatrixOGMatrix implements Mldivide<OGMatrix, OGMatr
         _log.warn("Matrix of coefficients does not have full rank. Rank is " + info[0] + ".");
         // take a copy of the original data as it will have been destroyed above
         System.arraycopy(array1.getData(), 0, data1, 0, array1.getData().length);
-        System.arraycopy(array2.getData(), 0, data2, 0, array2.getData().length);        
+        System.arraycopy(array2.getData(), 0, data2, 0, array2.getData().length);
       } else {
         if (_debug) {
           _log.warn("230. QR solve success, returning");

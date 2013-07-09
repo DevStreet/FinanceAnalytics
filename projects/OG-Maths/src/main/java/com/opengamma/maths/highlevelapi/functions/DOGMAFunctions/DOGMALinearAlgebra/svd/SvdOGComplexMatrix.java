@@ -24,7 +24,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 @DOGMAMethodHook(provides = SVD.class)
 public final class SvdOGComplexMatrix {
 
-  private LAPACK _localLAPACK = new LAPACK();
+  private LAPACK _localLAPACK = LAPACK.getInstance();
   private CtransposeOGComplexMatrix _cmplxtranspose = new CtransposeOGComplexMatrix();
 
   @DOGMAMethodLiteral

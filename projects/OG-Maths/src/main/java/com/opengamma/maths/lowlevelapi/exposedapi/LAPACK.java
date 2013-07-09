@@ -8,48 +8,24 @@ package com.opengamma.maths.lowlevelapi.exposedapi;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKAPIInterface;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKAbstractSuper;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKNativeBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKNetlibBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.LAPACKBacking.LAPACKOGJavaBacked;
 
 /**
  * Provides a unified interface to SLATEC
  */
-public class LAPACK implements LAPACKAPIInterface {
+public final class LAPACK implements LAPACKAPIInterface {
+
+  private static class LAPACKRef {
+    public static final LAPACK s_instance = new LAPACK();
+  }
+
+  public static LAPACK getInstance() {
+    return LAPACKRef.s_instance;
+  }
 
   private LAPACKAbstractSuper _localLAPACK;
 
-  /**
-   * Backing type
-   */
-  public enum backing {
-    /**
-     * OG Java backed LAPACK
-     */
-    OGjava,
-    /**
-     * OG Native backed LAPACK
-     */
-    OGnative,
-    /**
-     * Netlib f2j backed LAPACK
-     */
-    Netlib
-  }
-
-  // for now plumb in netlib
-  public LAPACK() {
+  private LAPACK() {
     _localLAPACK = new LAPACKNativeBacked();
-  }
-
-  public LAPACK(backing backedby) {
-    if (backedby == backing.OGjava) {
-      _localLAPACK = new LAPACKOGJavaBacked();
-    } else if (backedby == backing.OGnative) {
-      _localLAPACK = new LAPACKNativeBacked();
-    } else if (backedby == backing.Netlib) {
-      _localLAPACK = new LAPACKNetlibBacked();
-    }
-
   }
 
   @Override

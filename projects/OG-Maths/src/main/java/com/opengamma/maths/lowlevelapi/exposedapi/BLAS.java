@@ -8,54 +8,24 @@ package com.opengamma.maths.lowlevelapi.exposedapi;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAPIInterface;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASAbstractSuper;
 import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASNativeBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASNetlibBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASOGJavaBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.BLASBacking.BLASReferenceJavaBacked;
 
 /**
  * Provides a unified interface to BLASs
  */
-public class BLAS implements BLASAPIInterface {
+public final class BLAS implements BLASAPIInterface {
+
+  private static class BLASRef {
+    public static final BLAS s_instance = new BLAS();
+  }
+
+  public static BLAS getInstance() {
+    return BLASRef.s_instance;
+  }
 
   private BLASAbstractSuper _localBLAS;
 
-  /**
-   * Backing type
-   */
-  public enum backing {
-    /**
-     * Reference Java backed BLAS
-     */
-    Referencejava,
-    /**
-     * OG Java backed BLAS
-     */
-    OGjava,
-    /**
-     * OG Native backed BLAS
-     */
-    OGnative,
-    /**
-     * Netlib f2j backed BLAS
-     */
-    Netlib
-  }
-
-  public BLAS() {
+  private BLAS() {
     _localBLAS = new BLASNativeBacked();
-  }
-
-  public BLAS(backing backedby) {
-    if (backedby == backing.Referencejava) {
-      _localBLAS = new BLASReferenceJavaBacked();
-    } else if (backedby == backing.OGjava) {
-      _localBLAS = new BLASOGJavaBacked();
-    } else if (backedby == backing.OGnative) {
-      _localBLAS = new BLASNativeBacked();
-    } else if (backedby == backing.Netlib) {
-      _localBLAS = new BLASNetlibBacked();
-    }
-
   }
 
   @Override
@@ -186,28 +156,28 @@ public class BLAS implements BLASAPIInterface {
   @Override
   public void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda) {
     _localBLAS.dger(m, n, alpha, x, incx, y, incy, aMatrix, lda);
-  }  
+  }
 
   @Override
   public void dsyr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix, int lda) {
     _localBLAS.dsyr(uplo, n, alpha, x, incx, aMatrix, lda);
-  }  
+  }
 
   @Override
   public void dspr(char uplo, int n, double alpha, double[] x, int incx, double[] aMatrix) {
     _localBLAS.dspr(uplo, n, alpha, x, incx, aMatrix);
-  }  
-  
+  }
+
   @Override
   public void dsyr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix, int lda) {
     _localBLAS.dsyr2(uplo, n, alpha, x, incx, y, incy, aMatrix, lda);
   }
-  
+
   @Override
   public void dspr2(char uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] aMatrix) {
     _localBLAS.dspr2(uplo, n, alpha, x, incx, y, incy, aMatrix);
-  }    
-  
+  }
+
   @Override
   public void dgemm(char transa, char transb, int m, int n, int k, double alpha, double[] aMatrix, int lda, double[] bMatrix, int ldb, double beta, double[] cMatrix, int ldc) {
     _localBLAS.dgemm(transa, transb, m, n, k, alpha, aMatrix, lda, bMatrix, ldb, beta, cMatrix, ldc);

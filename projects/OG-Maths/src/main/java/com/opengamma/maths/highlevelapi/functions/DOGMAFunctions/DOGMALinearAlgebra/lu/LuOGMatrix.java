@@ -26,7 +26,7 @@ import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 public final class LuOGMatrix {
   private static Logger s_log = LoggerFactory.getLogger(LuOGMatrix.class);
 
-  private LAPACK _localLAPACK = new LAPACK();
+  private LAPACK _localLAPACK = LAPACK.getInstance();
 
   @DOGMAMethodLiteral
   public List<OGArray<? extends Number>> lu(OGMatrix array1, LUCompute these) {

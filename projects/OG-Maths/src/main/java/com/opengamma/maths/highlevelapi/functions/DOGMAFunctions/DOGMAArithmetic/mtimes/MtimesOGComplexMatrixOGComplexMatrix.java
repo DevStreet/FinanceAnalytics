@@ -18,7 +18,7 @@ import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
  */
 @DOGMAMethodHook(provides = Mtimes.class)
 public final class MtimesOGComplexMatrixOGComplexMatrix implements Mtimes<OGComplexMatrix, OGComplexMatrix, OGComplexMatrix> {
-  private BLAS _localblas = new BLAS();
+  private BLAS _localblas = BLAS.getInstance();
 
   @Override
   public OGComplexMatrix eval(OGComplexMatrix array1, OGComplexMatrix array2) {
