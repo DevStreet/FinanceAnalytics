@@ -8,6 +8,7 @@ package com.opengamma.maths.highlevelapi.datatypes.primitive;
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
@@ -201,6 +202,11 @@ public class OGPermutationMatrix extends OGArray<Integer> {
   }
 
   @Override
+  public OGArray<? extends Number> setEntry(int rowidx, int colidx, Number num) {
+    throw new MathsExceptionNotImplemented("setEntry not implemented for OGPermutationMatrix");
+  }
+  
+  @Override
   public String toString() {
     String str = "OGPermutationArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";
@@ -282,5 +288,6 @@ public class OGPermutationMatrix extends OGArray<Integer> {
     }
     return true;
   }
+
 
 }

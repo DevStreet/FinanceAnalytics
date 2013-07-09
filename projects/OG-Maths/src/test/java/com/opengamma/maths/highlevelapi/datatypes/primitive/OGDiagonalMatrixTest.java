@@ -13,6 +13,7 @@ import static org.testng.Assert.assertFalse;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
@@ -146,6 +147,127 @@ public class OGDiagonalMatrixTest {
     D.getEntry(1, 23);
   }
 
+  // test get entry ok
+  @Test
+  public void testGetEntryOKIndicesTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        assertTrue(D.getEntry(i, j) == data4x3full[i][j]);
+      }
+    }
+  }
+
+  // test set entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadRowIndicesTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.setEntry(23, 1, 1);
+  }
+
+  // test set entry bad col index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadColumnIndicesTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.setEntry(1, 23, 1);
+  }
+
+  // test set null Number
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testSetEntryNullNumberTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    D.setEntry(1, 1, null);
+  }
+
+  // test set entry ok
+  @Test
+  public void testSetEntryOnDiagIndicesTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    Number val = 1337;
+    for (int i = 0; i < D.getNumberOfColumns(); i++) {
+      assertTrue(D.setEntry(i, i, val).getEntry(i, i).doubleValue() == val.doubleValue());
+    }
+    // make sure the underlying data is now all val
+    double[] dataFinal = D.getData();
+    for (int i = 0; i < dataFinal.length; i++) {
+      assertTrue(dataFinal[i] == val.doubleValue());
+    }
+  }
+
+  @Test
+  public void testSetEntryOffDiagIndicesTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGDiagonalMatrix orig = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGMatrix expected;
+    double[] expectedData;
+    Number val = 1337;
+    OGArray<? extends Number> answer;
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        if (i != j) { // test off diags
+          expectedData = new double[4 * 3];
+          for (int k = 0; k < 3; k++) {
+            expectedData[k + k * 4] = k + 1;
+          }
+          expectedData[j * 4 + i] = val.doubleValue();
+          expected = new OGMatrix(expectedData, 4, 3);
+          D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+          answer = D.setEntry(i, j, val);
+          assertTrue(expected.fuzzyequals(answer, 1e-14));
+          // make original is unchanged
+          assertTrue(D.fuzzyequals(orig, 1e-14));
+        }
+      }
+    }
+  }
+
+  // test type promotion
+  @Test
+  public void testSetEntryOnDiagIndiciesTypePromotionTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    Number val = new ComplexType(13, 37);
+    OGArray<? extends Number> answer = D.setEntry(2, 2, val);
+
+    // make original is unchanged
+    assertTrue(D.fuzzyequals(new OGDiagonalMatrix(data4x3diagd, 4, 3), 1e-14));
+
+    // make sure promotion has occurred
+    assertTrue(answer instanceof OGComplexDiagonalMatrix);
+
+    // make sure data is ok
+    double[] cd = new double[] {1, 0, 2, 0, 13, 37 };
+    OGComplexDiagonalMatrix cmplx = new OGComplexDiagonalMatrix(cd, 4, 3);
+    assertTrue(answer.fuzzyequals(cmplx, 1e-14));
+  }
+
+  @Test
+  public void testSetEntryOffDiagIndicesTypePromotionTest() {
+    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGDiagonalMatrix orig = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+    OGComplexMatrix expected;
+    double[] expectedData;
+    Number val = new ComplexType(13, 37);
+    OGArray<? extends Number> answer;
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        if (i != j) { // test off diags
+          expectedData = new double[4 * 3 * 2];
+          for (int k = 0; k < 3; k++) {
+            expectedData[2 * (k + k * 4)] = k + 1;
+          }
+          expectedData[2 * (j * 4 + i)] = ((ComplexType) val).getReal();
+          expectedData[2 * (j * 4 + i) + 1] = ((ComplexType) val).getImag();
+          expected = new OGComplexMatrix(expectedData, 4, 3);
+          D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
+          answer = D.setEntry(i, j, val);
+          assertTrue(expected.fuzzyequals(answer, 1e-14));
+          // make original is unchanged
+          assertTrue(D.fuzzyequals(orig, 1e-14));
+        }
+      }
+    }
+  }
+
   // test get col neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColNegIndexTest() {
@@ -221,8 +343,7 @@ public class OGDiagonalMatrixTest {
     OGMatrix getRow = new OGMatrix(new double[] {0, 2, 0 }, 1, 3);
     assertTrue(row.equals(getRow));
   }
-  
-  
+
   @Test(expectedExceptions = MathsExceptionNullPointer.class)
   public void testGetNullRowsTest() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
@@ -279,20 +400,8 @@ public class OGDiagonalMatrixTest {
   public void testGetNonSeqTest() {
     OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
     OGArray<? extends Number> answer = D.get(new int[] {2, 0, 3 }, new int[] {2, 0 });
-    OGMatrix expected = new OGMatrix(new double[] {3.0, 0.0, 0.0, 0.0, 1.0, 0.0}, 3, 2);
+    OGMatrix expected = new OGMatrix(new double[] {3.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, 3, 2);
     assertTrue(expected.fuzzyequals(answer, 10 * D1mach.four()));
-  }
-
-
-  // test get entry ok
-  @Test
-  public void testGetEntryOKIndicesTest() {
-    OGDiagonalMatrix D = new OGDiagonalMatrix(data4x3diagd, 4, 3);
-    for (int i = 0; i < D.getNumberOfRows(); i++) {
-      for (int j = 0; j < D.getNumberOfColumns(); j++) {
-        assertTrue(D.getEntry(i, j) == data4x3full[i][j]);
-      }
-    }
   }
 
   // test get rows null index

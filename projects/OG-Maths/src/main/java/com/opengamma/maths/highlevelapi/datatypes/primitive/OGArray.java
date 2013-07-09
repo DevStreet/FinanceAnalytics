@@ -50,6 +50,38 @@ public abstract class OGArray<T extends Number> implements OGArrayInterface<T>, 
     return idx.accept(this);
   }
 
+  /**
+   * Use to validate a variadic index based referencing of data
+   * @param indices the index to lookup
+   */
+  public void entryValidator(int... indices) {
+    Catchers.catchNull(indices);
+    if (indices.length > 2) {
+      throw new MathsExceptionIllegalArgument("OGArray types only have 2 indicies, more than 2 were given");
+    }
+    if (indices.length == 1) { // 1D addressing mode
+      if (indices[0] < 0) {
+        throw new MathsExceptionIllegalArgument("Cannot have a negative index, was given:" + indices[0]);
+      }
+      if (indices[0] > getNumberOfColumns() * getNumberOfRows()) {
+        throw new MathsExceptionIllegalArgument("Index " + indices[0] + " requested for OGArray with only " + getData().length + " elements");
+      }
+    } else { // 2d mode
+      if (indices[0] < 0) {
+        throw new MathsExceptionIllegalArgument("Cannot have a negative row index, was given:" + indices[0]);
+      }
+      if (indices[1] < 0) {
+        throw new MathsExceptionIllegalArgument("Cannot have a negative column index, was given:" + indices[1]);
+      }
+      if (indices[0] > getNumberOfRows()) {
+        throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for OGArray with only " + 1 + " row");
+      }
+      if (indices[1] > getNumberOfColumns()) {
+        throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for OGArray with only " + 1 + " column");
+      }
+    }
+  }
+
   @Override
   public OGArray<? extends Number> get(OneDIndex idx) {
     // walk the elements in the index look up and hoik them out
@@ -164,7 +196,6 @@ public abstract class OGArray<T extends Number> implements OGArrayInterface<T>, 
     int len = linear.length;
     int idx;
     int rows = this.getNumberOfRows();
-    int cols = this.getNumberOfColumns();
     int colNum = 0;
     int rowNum = 0;
     OGArray<? extends Number> ret;
@@ -172,7 +203,7 @@ public abstract class OGArray<T extends Number> implements OGArrayInterface<T>, 
       ComplexType[][] tmp = new ComplexType[1][len];
       for (int i = 0; i < len; i++) {
         idx = linear[i];
-        colNum = idx / cols;
+        colNum = idx / rows;
         rowNum = idx - colNum * rows;
         tmp[0][i] = (ComplexType) getEntry(rowNum, colNum);
       }
@@ -181,7 +212,7 @@ public abstract class OGArray<T extends Number> implements OGArrayInterface<T>, 
       double[][] tmp = new double[1][len];
       for (int i = 0; i < len; i++) {
         idx = linear[i];
-        colNum = idx / cols;
+        colNum = idx / rows;
         rowNum = idx - colNum * rows;
         tmp[0][i] = (Double) getEntry(rowNum, colNum);
       }

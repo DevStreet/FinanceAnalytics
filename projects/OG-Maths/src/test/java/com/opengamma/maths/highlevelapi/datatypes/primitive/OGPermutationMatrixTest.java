@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
@@ -113,6 +114,12 @@ public class OGPermutationMatrixTest {
     }
   }
 
+  @Test(expectedExceptions = MathsExceptionNotImplemented.class)
+  public void testSetEntryTest() {
+    OGPermutationMatrix D = new OGPermutationMatrix(data);
+    D.setEntry(0, 0, null);
+  }
+  
   // test get col neg index
   @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
   public void testGetColNegIndexTest() {

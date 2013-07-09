@@ -251,6 +251,46 @@ public class OGComplexScalarTest {
     assertTrue(defaultVal.getEntry(0, 0).getImag() == 3.4d);
   }
 
+  // test set entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadRowIndicesTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.setEntry(23, 1, 1);
+  }
+
+  // test set entry bad col index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadColumnIndicesTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.setEntry(1, 23, 1);
+  }
+
+  // test set null Number
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testSetEntryNullNumberTest() {
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    D.setEntry(1, 1, null);
+  }
+
+  // test set entry ok
+  @Test
+  public void testSetEntryOKIndiciesTest() {
+    OGArray<? extends Number> answer;
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    answer = D.setEntry(1, 1, new ComplexType(12, 34));
+    assertTrue(answer.getData()[0] == 12 && answer.getData()[1] == 34);
+  }
+
+  // test type demotion
+  @Test
+  public void testSetEntryTypeDemotionTest() {
+    OGArray<? extends Number> answer;
+    OGComplexScalar D = new OGComplexScalar(1.2, 3.4);
+    answer = D.setEntry(1, 1, 1337); // set real, should remote to OGRealScalar
+    assertTrue(answer instanceof OGRealScalar);
+    assertTrue(answer.getData()[0] == 1337);
+  }
+
   // test equals obj points to obj
   @Test
   public void testEqualsObjeqObjTest() {

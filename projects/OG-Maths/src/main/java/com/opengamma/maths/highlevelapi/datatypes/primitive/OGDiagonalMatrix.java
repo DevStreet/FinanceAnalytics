@@ -9,7 +9,9 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
  * Holds a "diagonal" array
@@ -276,6 +278,51 @@ public class OGDiagonalMatrix extends OGArray<Double> {
       }
     }
     return true;
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int col, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, col);
+    if (row != col) { // setting an off diag
+      int scal;
+      boolean isComplex = false;
+      if (value instanceof ComplexType) {
+        isComplex = true;
+        scal = 2;
+      } else {
+        scal = 1;
+      }
+      double[] tmp = new double[scal * _rows * _columns];
+      int min = Math.min(_rows, _columns);
+      int max = Math.max(_rows, _columns);
+      int idx;
+      for (int i = 0; i < min; i++) { // unwind
+        idx = scal * (i * max + i);
+        tmp[idx] = _data[i];
+      }
+      // inject type in right place
+      if (isComplex) {
+        idx = scal * (col * _rows + row);
+        tmp[idx] = ((ComplexType) value).getReal();
+        tmp[idx + 1] = ((ComplexType) value).getImag();
+        return new OGComplexMatrix(tmp, _rows, _columns);
+      } else {
+        tmp[(col * _rows + row)] = value.doubleValue();
+        return new OGMatrix(tmp, _rows, _columns);
+      }
+    } else { // setting a diag value
+      if (value instanceof ComplexType) {
+        double[] complextmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(_data);
+        int idx = 2 * row;
+        complextmp[idx] = ((ComplexType) value).getReal();
+        complextmp[idx + 1] = ((ComplexType) value).getImag();
+        return new OGComplexDiagonalMatrix(complextmp, _rows, _columns);
+      } else {
+        _data[Math.min(row, col)] = value.doubleValue();
+        return this;
+      }
+    }
   }
 
   @Override

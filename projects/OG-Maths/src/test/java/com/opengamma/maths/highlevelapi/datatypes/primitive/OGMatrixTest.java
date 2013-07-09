@@ -13,6 +13,7 @@ import static org.testng.Assert.assertFalse;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
@@ -149,6 +150,74 @@ public class OGMatrixTest {
         assertTrue(D.getEntry(i, j) == data4x3[i][j]);
       }
     }
+  }
+
+  @Test
+  public void testGetEntryLinearIndicesTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    int ptr = 0;
+    for (int j = 0; j < D.getNumberOfColumns(); j++) {
+      for (int i = 0; i < D.getNumberOfRows(); i++) {
+        assertTrue(D.getEntry(ptr++) == data4x3[i][j]);
+      }
+    }
+  }
+
+  // test set entry bad row index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadRowIndicesTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.setEntry(23, 1, 1);
+  }
+
+  // test set entry bad col index
+  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  public void testSetEntryBadColumnIndicesTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.setEntry(1, 23, 1);
+  }
+
+  // test set null Number
+  @Test(expectedExceptions = MathsExceptionNullPointer.class)
+  public void testSetEntryNullNumberTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    D.setEntry(1, 1, null);
+  }
+
+  // test set entry ok
+  @Test
+  public void testSetEntryOKIndicesTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    Number val = 1337;
+    for (int i = 0; i < D.getNumberOfRows(); i++) {
+      for (int j = 0; j < D.getNumberOfColumns(); j++) {
+        assertTrue(D.setEntry(i, j, val).getEntry(i, j).doubleValue() == val.doubleValue());
+      }
+    }
+    // make sure the underlying data is now all val
+    double[] dataFinal = D.getData();
+    for (int i = 0; i < dataFinal.length; i++) {
+      assertTrue(dataFinal[i] == val.doubleValue());
+    }
+  }
+
+  // test type promotion
+  @Test
+  public void testSetEntryTypePromotionTest() {
+    OGMatrix D = new OGMatrix(data4x3unwound, 4, 3);
+    Number val = new ComplexType(13, 37);
+    OGArray<? extends Number> answer = D.setEntry(2, 2, val);
+
+    // make original is unchanged
+    assertTrue(D.fuzzyequals(new OGMatrix(data4x3unwound, 4, 3), 1e-14));
+
+    // make sure promotion has occurred
+    assertTrue(answer instanceof OGComplexMatrix);
+
+    // make sure data is ok
+    double[] cd = new double[] {1.00, 0, 4.00, 0, 7.00, 0, 10.00, 0, 2.00, 0, 5.00, 0, 8.00, 0, 11.00, 0, 3.00, 0, 6.00, 0, 13.00, 37, 12.00, 0 };
+    OGComplexMatrix cmplx = new OGComplexMatrix(cd, 4, 3);
+    assertTrue(answer.fuzzyequals(cmplx, 1e-14));
   }
 
   // test get full row neg index

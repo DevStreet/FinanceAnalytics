@@ -9,12 +9,10 @@ import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.MatrixPrimitiveUtils;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
-import com.opengamma.maths.lowlevelapi.functions.utilities.Max;
 
 /**
  * OGComplex Array type (essentially an interleaved OGDoubleArray, byte aligned contiguous malloc of backing data required and assumed
@@ -91,7 +89,7 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
   }
 
   /**
-   * Takes a column major double[] and turns it into an OGComplexArray
+   * Takes two separate column major double[] one for real part, one for imag part, and turns it into an OGComplexArray
    * @param realData the real components of the backing data
    * @param imagData the imaginary components of the backing data 
    * @param rows number of rows
@@ -183,17 +181,29 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
 
   @Override
   public ComplexType getEntry(int... indices) {
-    if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
+    super.entryValidator(indices);
+    int jmp;
+    if (indices.length == 1) {
+      jmp = 2 * (indices[0]);
+    } else { // 2d mode
+      jmp = 2 * (indices[1] * _rows + indices[0]);
     }
-    if (indices[0] >= _rows) {
-      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
-    }
-    if (indices[1] >= _columns) {
-      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
-    }
-    final int jmp = 2 * (indices[1] * _rows + indices[0]);
     return new ComplexType(_data[jmp], _data[jmp + 1]);
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, column);
+    int idx = 2 * (column * _rows + row);
+    if (value instanceof ComplexType) {
+      _data[idx] = ((ComplexType) value).getReal();
+      _data[idx + 1] = ((ComplexType) value).getImag();
+    } else {
+      _data[idx] = value.doubleValue();
+      _data[idx + 1] = 0.;
+    }
+    return this;
   }
 
   public OGComplexMatrix getFullRow(int index) {
@@ -392,29 +402,6 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
   public double[] getData() {
     return _data;
   }
-  
-  @Override
-  public OGArray<? extends Number> get(int[] linear) {
-    Catchers.catchNull(linear);
-    int max = Max.value(linear);
-    double[] tmp;
-    int len;
-    if (max >= _rows * _columns) {
-      throw new MathsExceptionOutOfBounds("Index requested exceeds data length.");
-    } else {
-      len = linear.length;
-      tmp = new double[2 * len];
-      int ptr = 0;
-      int twoIdx;
-      for (int i = 0; i < len; i++) {
-        twoIdx = 2 * linear[i];
-        tmp[ptr] = _data[twoIdx];
-        tmp[ptr + 1] = _data[twoIdx + 1];
-        ptr += 2;
-      }
-    }
-    return new OGComplexMatrix(tmp, 1, len);
-  }
 
   /**
    * Decide if this {@link OGMatrix} is equal to another {@link OGMatrix} with the addition of some numerical tolerance for floating point comparison
@@ -498,6 +485,5 @@ public class OGComplexMatrix extends OGArray<ComplexType> {
     }
     return true;
   }
-
 
 }

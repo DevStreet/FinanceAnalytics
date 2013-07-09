@@ -12,6 +12,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
@@ -209,6 +210,12 @@ public class OGIndexMatrixTest {
         assertTrue(D.getEntry(i, j) == data4x3[i][j]);
       }
     }
+  }
+  
+  @Test(expectedExceptions = MathsExceptionNotImplemented.class)
+  public void testSetEntryTest() {
+    OGIndexMatrix D = new OGIndexMatrix(data4x3unwound, 4, 3);
+    D.setEntry(0, 0, null);
   }
 
   // test get full row neg index

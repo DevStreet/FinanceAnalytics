@@ -10,6 +10,7 @@ import java.util.Arrays;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
+import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
@@ -97,16 +98,27 @@ public class OGMatrix extends OGArray<Double> {
 
   @Override
   public Double getEntry(int... indices) {
-    if (indices.length > 2) {
-      throw new MathsExceptionIllegalArgument("OGDoubleArray only has 2 indicies, more than 2 were given");
+    super.entryValidator(indices);
+    if (indices.length == 1) {
+      return _data[indices[0]];
+    } else { // 2d mode
+      return _data[indices[1] * _rows + indices[0]];
     }
-    if (indices[0] >= _rows) {
-      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
+  }
+
+  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, column);
+    if (value instanceof ComplexType) {
+      double[] complextmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(_data);
+      int idx = 2 * (column * _rows + row);
+      complextmp[idx] = ((ComplexType) value).getReal();
+      complextmp[idx + 1] = ((ComplexType) value).getImag();
+      return new OGComplexMatrix(complextmp, _rows, _columns);
+    } else {
+      _data[column * _rows + row] = value.doubleValue();
+      return this;
     }
-    if (indices[1] >= _columns) {
-      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
-    }
-    return _data[indices[1] * _rows + indices[0]];
   }
 
   public OGMatrix getFullRow(int index) {

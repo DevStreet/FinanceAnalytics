@@ -20,6 +20,8 @@ public interface OGArrayInterface<T extends Number> {
 
   T getEntry(int... indices);
 
+  OGArray<? extends Number> setEntry(int rowidx, int colidx, Number num);
+
   double[] getData();
 
   /**

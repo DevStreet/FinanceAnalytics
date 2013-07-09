@@ -343,7 +343,6 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
     return retarr;
   }
 
-    
   /**
    * Returns the backing data
    * @return the backing data
@@ -401,6 +400,51 @@ public class OGComplexDiagonalMatrix extends OGArray<ComplexType> {
       ret = new ComplexType(_data[twoup], _data[twoup + 1]);
     }
     return ret;
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int col, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, col);
+    if (row != col) { // setting an off diag
+      final int scal = 2;
+      boolean isComplex = false;
+      if (value instanceof ComplexType) {
+        isComplex = true;
+      }
+      double[] tmp = new double[scal * _rows * _columns];
+      int min = Math.min(_rows, _columns);
+      int max = Math.max(_rows, _columns);
+      int idx;
+      int ptr = 0;
+      for (int i = 0; i < min; i++) { // unwind
+        idx = scal * (i * max + i);
+        tmp[idx] = _data[ptr];
+        tmp[idx + 1] = _data[ptr + 1];
+        ptr += 2;
+      }
+      // inject type in right place
+      idx = scal * (col * _rows + row);
+      if (isComplex) {
+        tmp[idx] = ((ComplexType) value).getReal();
+        tmp[idx + 1] = ((ComplexType) value).getImag();
+        return new OGComplexMatrix(tmp, _rows, _columns);
+      } else {
+        tmp[idx] = value.doubleValue();
+        tmp[idx + 1] = 0.d;
+        return new OGComplexMatrix(tmp, _rows, _columns);
+      }
+    } else { // setting a diag value
+      if (value instanceof ComplexType) {
+        _data[2 * Math.min(row, col)] = ((ComplexType) value).getReal();
+        _data[2 * Math.min(row, col) + 1] = ((ComplexType) value).getImag();
+        return this;
+      } else {
+        _data[2 * Math.min(row, col)] = value.doubleValue();
+        _data[2 * Math.min(row, col) + 1] = 0.d;
+        return this;
+      }
+    }
   }
 
   @Override
