@@ -19,7 +19,7 @@ public class TestReadMat {
   public void TestReadMatFile() {
     //TODO: ask about an OG or at least sensible way of doing this
     String topPath = System.getProperty("user.dir");
-    String relPath = "/tests/unit/com/opengamma/maths/lowlevelapi/io/mat/";
+    String relPath = "/src/test/java/com/opengamma/maths/lowlevelapi/io/mat/";
     String filename = topPath + relPath + "A.mat";
     try {
       ReadMAT.read(filename);
@@ -32,7 +32,7 @@ public class TestReadMat {
   public void TestParseMatFile() {
     //TODO: ask about an OG or at least sensible way of doing this
     String topPath = System.getProperty("user.dir");
-    String relPath = "/tests/unit/com/opengamma/maths/lowlevelapi/io/mat/";
+    String relPath = "/src/test/java/com/opengamma/maths/lowlevelapi/io/mat/";
     String filename = topPath + relPath + "ABC.mat";
     MATFileStruct mfs = null;
     try {
@@ -41,7 +41,7 @@ public class TestReadMat {
       e.printStackTrace();
     }
 
-    System.out.println("\n\nStringified MFS\n" + mfs.toString());
+//    System.out.println("\n\nStringified MFS\n" + mfs.toString());
 
   }
 

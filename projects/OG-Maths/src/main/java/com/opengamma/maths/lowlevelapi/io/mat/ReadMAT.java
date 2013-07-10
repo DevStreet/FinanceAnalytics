@@ -155,8 +155,8 @@ public class ReadMAT {
     }
     int mDataType = getStandardTagDataType(fp, endian);
     int mNoBytes = getStandardTagNoBytes(fp, endian);
-    System.out.println("M-Data type is " + mDataType);
-    System.out.println("M-Data byte count is " + mNoBytes);
+//    System.out.println("M-Data type is " + mDataType);
+//    System.out.println("M-Data byte count is " + mNoBytes);
 
     // rewind to start of tag
     try {
@@ -243,11 +243,11 @@ public class ReadMAT {
 
     // inspect first 2 bytes to see if we are dealing with a "Small Data Element Format"
     if (rTAGDataTypeRaw[0] == 0x0 && rTAGDataTypeRaw[1] == 0x0) {
-      System.out.println("Small Data Element Format");
+//      System.out.println("Small Data Element Format");
       ret = MATTagType.smallData;
 
     } else {
-      System.out.println("Standard Format");
+//      System.out.println("Standard Format");
       ret = MATTagType.standardData;
     }
 

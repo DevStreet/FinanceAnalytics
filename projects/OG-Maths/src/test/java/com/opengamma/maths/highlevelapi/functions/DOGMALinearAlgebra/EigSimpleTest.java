@@ -34,7 +34,7 @@ public class EigSimpleTest {
   public void eigDOGMATest() {
     OGMatrix answer = new OGMatrix(new double[] {16.1168439698070394, -1.1168439698070438, -0.0000000000000003 }, 3, 1);
     OGArray<? extends Number> result = DOGMA.eig(A_real_matrix, EIGCompute.LAMBDA).get(0);
-    assertTrue(answer.fuzzyequals(result, 10 * D1mach.four()));
+    assertTrue(answer.fuzzyequals(result, 100 * D1mach.four()));
   }
 
   @Test
@@ -57,7 +57,7 @@ public class EigSimpleTest {
   public void eigComplexDOGMATest() {
     OGComplexMatrix answer = new OGComplexMatrix(new double[] {-0.6207512864450693, 1.7367967731711886, -0.6207512864450693, -1.7367967731711886, -11.7584974271098606, 0.0000000000000000 }, 3, 1);
     OGArray<? extends Number> result = DOGMA.eig(A_realMatrixWithComplexEigs, EIGCompute.LAMBDA).get(0);
-    assertTrue(answer.fuzzyequals(result, 10 * D1mach.four()));
+    assertTrue(answer.fuzzyequals(result, 100 * D1mach.four()));
   }
 
   @Test
