@@ -18,17 +18,8 @@ import com.opengamma.maths.lowlevelapi.functions.FPEquals;
  */
 @Test
 public class IzyBasicTest {
-  IzyBasicTest() {
-  };
 
-  private IZY _izy = new IZY(IZY.backing.OGnative);
-
-  /**
-   * Say which izy is going to be tested
-   */
-  public IzyBasicTest(IZY.backing back) {
-    _izy = new IZY(back);
-  }
+  private IZY _izy = IZY.getInstance();
 
   int[] zero = new int[] {0 };
 

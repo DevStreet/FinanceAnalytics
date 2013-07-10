@@ -12,52 +12,27 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking.IZYAPIInterface;
 import com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking.IZYAbstractSuper;
 import com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking.IZYNativeBacked;
-import com.opengamma.maths.lowlevelapi.exposedapi.IZYBacking.IZYReferenceJavaBacked;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**
  * Provides a unified interface to IZY
  */
-public class IZY implements IZYAPIInterface {
+public final class IZY implements IZYAPIInterface {
 
   private static Logger s_log = LoggerFactory.getLogger(IZY.class);
 
+  private static class IZYRef {
+    public static final IZY s_instance = new IZY();
+  }
+
+  public static IZY getInstance() {
+    return IZYRef.s_instance;
+  }
+
   private IZYAbstractSuper _localIZY;
 
-  private static IZY s_instance = new IZY();
-
-  /**
-   * Get the default IZY instance
-   * @return the default IZY instance
-   */
-  public static IZY getInstance() {
-    return s_instance;
-  }
-
-  /**
-   * Backing type
-   */
-  public enum backing {
-    /**
-     * Reference Java backed BLAS
-     */
-    Referencejava,
-    /**
-     * OG Native backed BLAS
-     */
-    OGnative,
-  }
-
-  public IZY() {
+  private IZY() {
     _localIZY = new IZYNativeBacked();
-  }
-
-  public IZY(backing backedby) {
-    if (backedby == backing.Referencejava) {
-      _localIZY = new IZYReferenceJavaBacked();
-    } else if (backedby == backing.OGnative) {
-      _localIZY = new IZYNativeBacked();
-    }
   }
 
   //CSOFF

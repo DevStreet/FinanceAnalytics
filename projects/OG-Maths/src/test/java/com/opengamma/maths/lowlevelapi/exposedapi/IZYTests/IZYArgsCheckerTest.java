@@ -20,7 +20,6 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.lowlevelapi.exposedapi.IZY;
-import com.opengamma.maths.lowlevelapi.exposedapi.IZY.backing;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.util.test.TestGroup;
 
@@ -32,7 +31,7 @@ public class IZYArgsCheckerTest {
 
   Logger s_log = LoggerFactory.getLogger(IZYArgsCheckerTest.class);
 
-  static IZY izy = new IZY(backing.Referencejava); // java one is fine, nothing is really "run"
+  static IZY izy = IZY.getInstance(); 
 
   // these are used to smell out the signatures of the types 
   static Class<?> intPtrClass;
