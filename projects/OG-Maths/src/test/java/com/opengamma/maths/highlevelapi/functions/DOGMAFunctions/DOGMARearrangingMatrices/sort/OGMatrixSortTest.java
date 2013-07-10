@@ -14,6 +14,8 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMARearrangingMatrices.sort.SortCompute;
+import com.opengamma.maths.highlevelapi.functions.DOGMARearrangingMatrices.sort.SortOGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**

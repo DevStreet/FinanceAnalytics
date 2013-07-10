@@ -62,7 +62,7 @@ public class DOGMAInvHilb {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.InvhilbFunction s_invhilbfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.InvhilbFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.InvhilbFunction s_invhilbfunction = new com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.InvhilbFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

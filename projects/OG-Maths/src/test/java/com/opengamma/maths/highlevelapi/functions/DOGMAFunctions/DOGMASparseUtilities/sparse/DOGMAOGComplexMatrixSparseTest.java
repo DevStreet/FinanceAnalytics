@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.sparse.SparseOGComplexMatrix;
 
 /**
  * tests complex matrix to complex sparse type

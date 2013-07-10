@@ -62,7 +62,7 @@ public class DOGMASize {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMADimensions.length.SizeFunction s_sizefunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMADimensions.length.SizeFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMADimensions.length.SizeFunction s_sizefunction = new com.opengamma.maths.highlevelapi.functions.DOGMADimensions.length.SizeFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

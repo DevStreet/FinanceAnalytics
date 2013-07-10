@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.WilkinsonFunction;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**

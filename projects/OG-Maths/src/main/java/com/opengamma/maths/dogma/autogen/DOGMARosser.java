@@ -62,7 +62,7 @@ public class DOGMARosser {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.RosserFunction s_rosserfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.RosserFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.RosserFunction s_rosserfunction = new com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.RosserFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

@@ -13,6 +13,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.mtimes.MtimesOGDiagonalMatrixOGMatrix;
 
 /**
  * tests diag mtimes full

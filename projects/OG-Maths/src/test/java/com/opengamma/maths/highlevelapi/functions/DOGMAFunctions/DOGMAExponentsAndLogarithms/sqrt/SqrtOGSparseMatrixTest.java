@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAExponentsAndLogarithms.sqrt.SqrtOGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 import com.opengamma.util.test.TestGroup;
 

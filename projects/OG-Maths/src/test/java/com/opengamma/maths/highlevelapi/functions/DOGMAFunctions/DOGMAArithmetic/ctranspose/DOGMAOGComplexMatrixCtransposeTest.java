@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.ctranspose.CtransposeOGComplexMatrix;
 
 
 /**

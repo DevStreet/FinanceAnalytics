@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMARearrangingMatrices.copy.CopyOGSparseMatrix;
 
 /**
  * test copy OGSparseMatrix

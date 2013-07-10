@@ -62,7 +62,7 @@ public class DOGMAZeros {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.ZerosFunction s_zerosfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.ZerosFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.ZerosFunction s_zerosfunction = new com.opengamma.maths.highlevelapi.functions.DOGMASpecialMatrices.ZerosFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

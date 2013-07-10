@@ -18,9 +18,9 @@ import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.CopyOGComplexMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGComplexSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse.SparseOGComplexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMARearrangingMatrices.copy.CopyOGComplexMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.full.FullOGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.sparse.SparseOGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**

@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAInquiry.issymmetric.IsSymmetricOGComplexSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 import com.opengamma.util.test.TestGroup;
 

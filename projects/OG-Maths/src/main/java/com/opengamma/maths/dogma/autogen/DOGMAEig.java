@@ -62,7 +62,7 @@ public class DOGMAEig {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.eig.EigOGMatrix s_eigogmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.eig.EigOGMatrix();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMALinearAlgebra.eig.EigOGMatrix s_eigogmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMALinearAlgebra.eig.EigOGMatrix();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//
@@ -94,7 +94,7 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = OperatorDictionaryPopulatorLibrary.getVoidUnaryOperatorDictionary();
 
 }
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.OGArray<? extends java.lang.Number>> eig(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.eig.EIGCompute arg1){
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.OGArray<? extends java.lang.Number>> eig(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMALinearAlgebra.eig.EIGCompute arg1){
 Catchers.catchNull(arg0);
 Catchers.catchNull(arg1);
     return   s_eigogmatrix.eig( arg0,  arg1);

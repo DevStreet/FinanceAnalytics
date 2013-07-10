@@ -62,7 +62,7 @@ public class DOGMAMeshgrid {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAMeshing.meshgrid.MeshgridFunction s_meshgridfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAMeshing.meshgrid.MeshgridFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMAMeshing.meshgrid.MeshgridFunction s_meshgridfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAMeshing.meshgrid.MeshgridFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

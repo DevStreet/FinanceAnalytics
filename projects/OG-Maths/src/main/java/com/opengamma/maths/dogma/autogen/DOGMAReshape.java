@@ -62,7 +62,7 @@ public class DOGMAReshape {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.reshape.ReshapeOGMatrix s_reshapeogmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.reshape.ReshapeOGMatrix();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMARearrangingMatrices.reshape.ReshapeOGMatrix s_reshapeogmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMARearrangingMatrices.reshape.ReshapeOGMatrix();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.ctranspose.CtransposeOGDiagonalMatrix;
 
 /**
  * Tests OGDiagonalArray conjugate transpose

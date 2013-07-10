@@ -12,7 +12,8 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.minus.MinusOGDiagonalMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.minus.MinusOGDiagonalMatrixOGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.plus.PlusOGDiagonalMatrixOGMatrix;
 
 /**
  * Tests adding/subtracting Diagonal and Full Arrays 

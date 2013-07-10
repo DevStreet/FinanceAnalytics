@@ -62,7 +62,7 @@ public class DOGMASelect {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.select.SelectFunction s_selectfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.select.SelectFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMAIndexing.select.SelectFunction s_selectfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAIndexing.select.SelectFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

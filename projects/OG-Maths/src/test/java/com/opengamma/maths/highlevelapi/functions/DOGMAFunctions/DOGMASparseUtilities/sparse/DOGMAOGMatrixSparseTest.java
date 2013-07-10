@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.sparse.SparseOGSparseMatrix;
 
 
 /**

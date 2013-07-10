@@ -62,7 +62,7 @@ public class DOGMAColon {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.colon.ColonFunction s_colonfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.colon.ColonFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMAIndexing.colon.ColonFunction s_colonfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAIndexing.colon.ColonFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

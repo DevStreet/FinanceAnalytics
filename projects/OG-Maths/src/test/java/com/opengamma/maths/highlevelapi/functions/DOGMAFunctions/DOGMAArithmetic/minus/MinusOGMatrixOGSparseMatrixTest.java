@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.minus.MinusOGMatrixOGSparseMatrix;
 import com.opengamma.util.test.TestGroup;
 
 /**

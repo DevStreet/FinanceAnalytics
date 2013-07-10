@@ -9,7 +9,7 @@ import com.opengamma.maths.dogma.engine.DOGMAConverterHook;
 import com.opengamma.maths.dogma.engine.converters.Converter;
 import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.full.FullOGSparseMatrix;
 
 /**
  * Converts from an OGSparseMatrix type to an OGMatrix type

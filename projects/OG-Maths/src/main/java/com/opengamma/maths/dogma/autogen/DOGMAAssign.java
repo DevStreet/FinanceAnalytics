@@ -62,7 +62,7 @@ public class DOGMAAssign {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.assign.AssignFunction s_assignfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIndexing.assign.AssignFunction();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMAIndexing.assign.AssignFunction s_assignfunction = new com.opengamma.maths.highlevelapi.functions.DOGMAIndexing.assign.AssignFunction();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//

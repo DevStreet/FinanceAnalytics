@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
-import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.minus.MinusOGMatrixOGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMAArithmetic.minus.MinusOGMatrixOGDiagonalMatrix;
 import com.opengamma.util.test.TestGroup;
 
 /**

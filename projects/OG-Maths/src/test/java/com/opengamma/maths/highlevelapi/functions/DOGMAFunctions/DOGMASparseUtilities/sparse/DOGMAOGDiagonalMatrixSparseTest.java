@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.sparse.SparseOGDiagonalMatrix;
 
 
 /**

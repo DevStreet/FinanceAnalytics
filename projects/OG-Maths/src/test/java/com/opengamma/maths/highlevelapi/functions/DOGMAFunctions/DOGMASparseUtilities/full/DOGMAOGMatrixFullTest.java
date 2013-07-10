@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.full.FullOGMatrix;
 
 /**
  * Tests full(OGDoubleArray) 

@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.OGPermutationMatrix;
+import com.opengamma.maths.highlevelapi.functions.DOGMASparseUtilities.full.FullOGPermutationMatrix;
 
 /**
  * tests full(permutation array) 
