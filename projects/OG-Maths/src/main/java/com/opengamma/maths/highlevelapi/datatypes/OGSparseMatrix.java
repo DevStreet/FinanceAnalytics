@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.datatypes.primitive;
+package com.opengamma.maths.highlevelapi.datatypes;
 
 import java.util.Arrays;
 

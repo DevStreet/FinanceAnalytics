@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.dogma.engine.matrixinfo;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 
 /**
  * Holder of a adjacency matrix to show what can be converted to what

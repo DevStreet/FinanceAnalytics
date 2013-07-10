@@ -11,7 +11,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.catchInf.CatchInf;
 import com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN.CatchNaN;
 

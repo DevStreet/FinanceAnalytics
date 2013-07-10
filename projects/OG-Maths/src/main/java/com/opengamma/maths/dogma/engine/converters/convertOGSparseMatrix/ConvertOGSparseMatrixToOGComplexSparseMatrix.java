@@ -7,9 +7,9 @@ package com.opengamma.maths.dogma.engine.converters.convertOGSparseMatrix;
 
 import com.opengamma.maths.dogma.engine.DOGMAConverterHook;
 import com.opengamma.maths.dogma.engine.converters.Converter;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**

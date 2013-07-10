@@ -6,7 +6,7 @@
 package com.opengamma.maths.dogma.engine.methodhookinstances.binary;
 
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 
 /**
  * @param <R> ret

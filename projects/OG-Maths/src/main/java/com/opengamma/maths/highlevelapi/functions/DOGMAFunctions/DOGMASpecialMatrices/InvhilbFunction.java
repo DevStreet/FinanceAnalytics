@@ -9,7 +9,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionOverflow;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
 import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.InvHilb;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 

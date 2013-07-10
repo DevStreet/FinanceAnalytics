@@ -11,10 +11,10 @@ import java.util.List;
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
 import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.SVD;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.ctranspose.CtransposeOGComplexMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 

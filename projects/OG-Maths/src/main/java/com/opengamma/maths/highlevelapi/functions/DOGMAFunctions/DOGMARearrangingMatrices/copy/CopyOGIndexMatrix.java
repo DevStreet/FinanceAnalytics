@@ -7,7 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangi
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Copy;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGIndexMatrix;
 
 /**
  * Copies OGIndexMatrix 

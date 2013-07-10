@@ -8,8 +8,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUti
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 
 
 /**

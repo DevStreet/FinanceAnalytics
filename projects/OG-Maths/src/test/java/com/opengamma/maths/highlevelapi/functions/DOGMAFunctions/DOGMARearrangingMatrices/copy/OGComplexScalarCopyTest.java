@@ -9,7 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexScalar;
 
 /**
  * test copy OGComplexScalar

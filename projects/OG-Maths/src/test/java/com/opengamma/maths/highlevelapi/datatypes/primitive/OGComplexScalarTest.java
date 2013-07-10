@@ -13,6 +13,10 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGRealScalar;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**

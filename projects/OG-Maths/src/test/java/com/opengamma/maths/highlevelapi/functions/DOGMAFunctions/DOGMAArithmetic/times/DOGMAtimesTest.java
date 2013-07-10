@@ -14,9 +14,9 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNonConformance;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.dogma.DOGMA;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 
 /**
  * Tests the times() function in DOGMA

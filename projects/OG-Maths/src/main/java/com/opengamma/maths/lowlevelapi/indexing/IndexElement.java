@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.indexing;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 
 /**
  * An element of an indexing operation

@@ -1,47 +1,58 @@
 /**
- * Copyright (C) 2011 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
  *
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.datatypes.primitive;
+package com.opengamma.maths.highlevelapi.datatypes;
 
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionOutOfBounds;
-import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
- * High level API.
- * Dense matrix backed array magic.
+ * The OGIndex class provides access to the typically understood notion of a matrix, i.e. A Fully populated array.
  */
-public class OGMatrix extends OGArray<Double> {
-
-  private double[] _data;
-  private int _columns;
+public class OGIndexMatrix extends OGArray<Integer> {
+  private int[] _data;
   private int _rows;
+  private int _columns;
 
   /**
-   * Takes a row major java double[][] and turns it into an OGDoubleArray
-   * @param dataIn a row major java double[][] 
+   * Constructors
    */
-  public OGMatrix(double[][] dataIn) {
-    Catchers.catchNullFromArgList(dataIn, 1);
-    _data = DenseMemoryManipulation.convertRowMajorDoublePointerToColumnMajorSinglePointer(dataIn);
-    _rows = dataIn.length;
-    _columns = dataIn[0].length;
+  // construct from array
+  /**
+   * Constructs from an array of arrays representation
+   * @param aMatrix is an n columns x m rows matrix stored as a row major array of arrays
+   */
+  public OGIndexMatrix(int[][] aMatrix) {
+    Catchers.catchNullFromArgList(aMatrix, 1);
+    _data = DenseMemoryManipulation.convertRowMajorIntPointerToColumnMajorSinglePointer(aMatrix);
+    _rows = aMatrix.length;
+    _columns = aMatrix[0].length;
   }
 
   /**
-   * Takes a column major double[] and turns it into an OGDoubleArray
+   * @param number the single number in this array
+   */
+  public OGIndexMatrix(int number) {
+    _columns = 1;
+    _rows = 1;
+    _data = new int[1];
+    _data[0] = number;
+  }
+
+  /**
+   * Takes a column major int[] and turns it into an OGIndexArray
    * @param dataIn the backing data
    * @param rows number of rows
    * @param columns number of columns
    */
-  public OGMatrix(double[] dataIn, int rows, int columns) {
+  public OGIndexMatrix(int[] dataIn, int rows, int columns) {
     if (dataIn == null) {
       throw new MathsExceptionNullPointer("dataIn is null");
     }
@@ -55,104 +66,80 @@ public class OGMatrix extends OGArray<Double> {
     if (len != dataIn.length) {
       throw new MathsExceptionIllegalArgument("Number of rows and columns specified does not commute with the quantity of data supplied");
     }
-    _data = new double[len];
+    _data = new int[len];
     System.arraycopy(dataIn, 0, _data, 0, len);
     _rows = rows;
     _columns = columns;
   }
 
-  /**
-   * @param number the single number in this array
+  /*
+   * Methods
    */
-  public OGMatrix(double number) {
-    _columns = 1;
-    _rows = 1;
-    _data = new double[1];
-    _data[0] = number;
+  /**
+   * Gets the number of elements in the matrix (full population assumed).
+   * @return the number of elements in the matrix
+   */
+  public int getNumberOfElements() {
+    return _data.length;
   }
 
   /**
-   * Takes a double[] and turns it into an OGMatrix as a single row
-   * @param dataIn the backing data
-   */
-  public OGMatrix(double[] dataIn) {
-    if (dataIn == null) {
-      throw new MathsExceptionNullPointer("dataIn is null");
+   * @param indices The index of the entry within the matrix to be returned.
+   * If a single index is given, it assumes ind2sub behaviour (index = i*rows+j) and returns that index
+   * If a pair of indices are given, it assumes standard lookup behaviour and returns the index at the given matrix "coordinate".
+   * @return the entry at index specified
+   *    */
+  @Override
+  public Integer getEntry(int... indices) {
+    if (indices.length != 2) {
+      throw new MathsExceptionIllegalArgument("OGIndexArray only has 2 indicies, more than 2 were given");
     }
-    int len = dataIn.length;
-    _data = new double[len];
-    System.arraycopy(dataIn, 0, _data, 0, len);
-    _rows = 1;
-    _columns = len;
+    if (indices[0] >= _rows) {
+      throw new MathsExceptionIllegalArgument("Row index" + indices[0] + " requested for matrix with only " + _rows + " rows");
+    }
+    if (indices[1] >= _columns) {
+      throw new MathsExceptionIllegalArgument("Columns index" + indices[1] + " requested for matrix with only " + _columns + " columns");
+    }
+    return _data[indices[1] * _rows + indices[0]];
   }
 
   @Override
-  public int getNumberOfRows() {
-    return _rows;
+  public OGArray<? extends Number> setEntry(int rowidx, int colidx, Number num) {
+    throw new MathsExceptionNotImplemented("setEntry not implemented for OGIndexMatrix");
   }
 
-  @Override
-  public int getNumberOfColumns() {
-    return _columns;
-  }
-
-  @Override
-  public Double getEntry(int... indices) {
-    super.entryValidator(indices);
-    if (indices.length == 1) {
-      return _data[indices[0]];
-    } else { // 2d mode
-      return _data[indices[1] * _rows + indices[0]];
-    }
-  }
-
-  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
-    Catchers.catchNull(value);
-    super.entryValidator(row, column);
-    if (value instanceof ComplexType) {
-      double[] complextmp = DenseMemoryManipulation.convertSinglePointerToZeroInterleavedSinglePointer(_data);
-      int idx = 2 * (column * _rows + row);
-      complextmp[idx] = ((ComplexType) value).getReal();
-      complextmp[idx + 1] = ((ComplexType) value).getImag();
-      return new OGComplexMatrix(complextmp, _rows, _columns);
-    } else {
-      _data[column * _rows + row] = value.doubleValue();
-      return this;
-    }
-  }
-
-  public OGMatrix getFullRow(int index) {
+  public OGIndexMatrix getFullRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_columns];
+    int[] tmp = new int[_columns];
     for (int i = 0; i < _columns; i++) {
       tmp[i] = _data[i * _rows + index];
     }
-    return new OGMatrix(tmp, 1, _columns);
+    return new OGIndexMatrix(tmp, 1, _columns);
   }
 
   @Override
-  public OGMatrix getRow(int index) {
+  public OGIndexMatrix getRow(int index) {
     if (index < 0 || index >= _rows) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_columns];
+    int[] tmp = new int[_columns];
     for (int i = 0; i < _columns; i++) {
       tmp[i] = _data[i * _rows + index];
     }
-    return new OGMatrix(tmp, 1, _columns);
+    return new OGIndexMatrix(tmp, 1, _columns);
   }
 
   @Override
-  public OGMatrix getRows(int... indexes) {
+  public OGIndexMatrix getRows(int... indexes) {
     Catchers.catchNullFromArgList(indexes, 1);
     final int nindex = indexes.length;
     int index;
     boolean seq = true;
     for (int i = 0; i < nindex; i++) {
       index = indexes[i];
-      if (index < 0 || index >= _rows) {
+      if (index < 0 || index >= _columns) {
         throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
       }
       if (i > 0) {
@@ -161,7 +148,7 @@ public class OGMatrix extends OGArray<Double> {
         }
       }
     }
-    double[] tmp = new double[nindex * _columns];
+    int[] tmp = new int[nindex * _columns];
     if (seq) {
       for (int i = 0; i < _columns; i++) {
         System.arraycopy(_data, i * _rows + indexes[0], tmp, i * nindex, nindex);
@@ -176,18 +163,18 @@ public class OGMatrix extends OGArray<Double> {
         }
       }
     }
-    return new OGMatrix(tmp, nindex, _columns);
+    return new OGIndexMatrix(tmp, nindex, _columns);
   }
 
-  public OGMatrix getFullColumn(int index) {
+  public OGIndexMatrix getFullColumn(int index) {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_rows];
+    int[] tmp = new int[_rows];
     for (int i = 0; i < _rows; i++) {
       tmp[i] = _data[i + index * _rows];
     }
-    return new OGMatrix(tmp, _rows, 1);
+    return new OGIndexMatrix(tmp, _rows, 1);
   }
 
   @Override
@@ -195,9 +182,9 @@ public class OGMatrix extends OGArray<Double> {
     if (index < 0 || index >= _columns) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    double[] tmp = new double[_rows];
+    int[] tmp = new int[_rows];
     System.arraycopy(_data, index * _rows, tmp, 0, _rows);
-    return new OGMatrix(tmp, _rows, 1);
+    return new OGIndexMatrix(tmp, _rows, 1);
   }
 
   @Override
@@ -217,7 +204,7 @@ public class OGMatrix extends OGArray<Double> {
         }
       }
     }
-    double[] tmp = new double[nindex * _rows];
+    int[] tmp = new int[nindex * _rows];
     if (seq) { // sequential indices requested, do single memcpy
       index = indexes[0];
       System.arraycopy(_data, index * _rows, tmp, 0, nindex * _rows);
@@ -227,7 +214,7 @@ public class OGMatrix extends OGArray<Double> {
         System.arraycopy(_data, index * _rows, tmp, i * _rows, _rows);
       }
     }
-    return new OGMatrix(tmp, _rows, nindex);
+    return new OGIndexMatrix(tmp, _rows, nindex);
   }
 
   @Override
@@ -262,7 +249,7 @@ public class OGMatrix extends OGArray<Double> {
       }
     }
 
-    double[] tmp = new double[nrows * ncols];
+    int[] tmp = new int[nrows * ncols];
     int idxi, idxj;
     if (seqCols && seqRows) { // sequential rows, with seq cols: straight memcpy loop
       int offset = columns[0] * _rows + rows[0];
@@ -285,81 +272,56 @@ public class OGMatrix extends OGArray<Double> {
         }
       }
     }
-    return new OGMatrix(tmp, nrows, ncols);
-  }
-
-  public OGArray<? extends Number> get(int[] indicies) {
-    Catchers.catchNull(indicies);
-    int len = indicies.length;
-    int maxIdx = _data.length;
-    double[] tmp = new double[len];
-    int locidx;
-    for (int i = 0; i < len; i++) {
-      locidx = indicies[i];
-      if (locidx < 0 || locidx > maxIdx) {
-        throw new MathsExceptionOutOfBounds("Invalid index :" + indicies[i]);
-      } else {
-        tmp[i] = _data[locidx];
-      }
-    }
-    return new OGMatrix(tmp, 1, len);
+    return new OGIndexMatrix(tmp, nrows, ncols);
   }
 
   /**
-   * Gets the number of elements in the matrix (full population assumed).
-   * @return the number of elements in the matrix
+   * Gets the number of rows
+   * @return _rows the number of rows
    */
-  public int getNumberOfElements() {
-    return _data.length;
+  public int getNumberOfRows() {
+    return _rows;
   }
 
   /**
-   * Returns the backing data
-   * @return the backing data
+   * Gets the number of columns
+   * @return _cols the number of columns
+   */
+  public int getNumberOfColumns() {
+    return _columns;
+  }
+
+  /**
+   * Gets the data
+   * @return _data the OGIndex data as double[]
    */
   public double[] getData() {
+    double[] tmp = new double[_data.length];
+    for (int i = 0; i < _data.length; i++) {
+      tmp[i] = _data[i];
+    }
+    return tmp;
+  }
+
+  /**
+   * Get as int data
+   * @return the data as int[]
+   */
+  public int[] getIntData() {
     return _data;
   }
 
   /**
-   * Decide if this {@link OGMatrix} is equal to another {@link OGMatrix} with the addition of some numerical tolerance for floating point comparison
-   * @param obj the {@link OGMatrix} against which a comparison is to be drawn
-   * @param tolerance the tolerance for double precision comparison of the data elements in the array
-   * @return true if they are considered equal in value, false otherwise
+   * ToString for pretty printing
+   * @return A string representation of the matrix
    */
-  public boolean fuzzyequals(Object obj, double tolerance) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    OGMatrix other = (OGMatrix) obj;
-    if (_columns != other._columns) {
-      return false;
-    }
-    if (_rows != other._rows) {
-      return false;
-    }
-    double[] objData = other.getData();
-    for (int i = 0; i < _data.length; i++) {
-      if (Math.abs(_data[i] - objData[i]) > tolerance) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   @Override
   public String toString() {
-    String str = "OGMatrix:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
+    String str = "OGIndexArray:" + "\ndata = " + Arrays.toString(_data) + "\nrows = " + _rows + "\ncols = " + _columns;
     str = str + "\n====Pretty Print====\n";
     for (int i = 0; i < _rows; i++) {
       for (int j = 0; j < _columns; j++) {
-        str += String.format("%24.18f ", _data[j * _rows + i]);
+        str += String.format("%24d ", _data[j * _rows + i]);
       }
       str += String.format("\n");
     }
@@ -376,6 +338,38 @@ public class OGMatrix extends OGArray<Double> {
     return result;
   }
 
+  /**
+   * Decide if this {@link OGIndexMatrix} is equal to another {@link OGIndexMatrix} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGIndexMatrix} against which a comparison is to be drawn
+   * @param tolerance the tolerance for double precision comparison of the data elements in the array
+   * @return true if they are considered equal in value, false otherwise
+   */
+  public boolean fuzzyequals(Object obj, double tolerance) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    OGIndexMatrix other = (OGIndexMatrix) obj;
+    if (_columns != other._columns) {
+      return false;
+    }
+    if (_rows != other._rows) {
+      return false;
+    }
+    double[] objData = other.getData();
+    for (int i = 0; i < _data.length; i++) {
+      if (Math.abs(_data[i] - objData[i]) > tolerance) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -387,7 +381,7 @@ public class OGMatrix extends OGArray<Double> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGMatrix other = (OGMatrix) obj;
+    OGIndexMatrix other = (OGIndexMatrix) obj;
     if (_columns != other._columns) {
       return false;
     }

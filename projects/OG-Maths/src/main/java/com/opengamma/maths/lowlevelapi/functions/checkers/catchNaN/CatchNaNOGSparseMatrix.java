@@ -6,7 +6,7 @@
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchNaN;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredNaN;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.iss.IsNaN;
 

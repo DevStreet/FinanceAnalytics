@@ -20,8 +20,8 @@ import com.opengamma.maths.dogma.engine.converters.ConversionPointers;
 import com.opengamma.maths.dogma.engine.converters.Converter;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.util.tuple.Pair;
 
 /**

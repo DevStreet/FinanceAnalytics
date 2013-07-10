@@ -9,8 +9,8 @@ import java.util.Arrays;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Sparse;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
 
 /**
  * Sparse's a OGComplexMatrix

@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.dogma.engine.converters;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 
 /**
  * Interface for OGArray type -> OGArray type converters

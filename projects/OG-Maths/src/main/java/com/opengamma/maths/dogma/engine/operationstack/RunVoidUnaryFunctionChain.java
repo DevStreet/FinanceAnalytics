@@ -10,7 +10,7 @@ import java.util.List;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.dogma.engine.converters.Converter;
 import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**

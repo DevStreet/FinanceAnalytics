@@ -14,6 +14,11 @@ import static org.testng.Assert.assertFalse;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**

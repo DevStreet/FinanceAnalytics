@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.dogma.engine.operationstack;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 
 /**
  * Interface to the static optimisation of the operation chain

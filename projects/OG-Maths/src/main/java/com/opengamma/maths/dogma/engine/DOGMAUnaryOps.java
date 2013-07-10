@@ -14,10 +14,10 @@ import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForUnaryFunc
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
 import com.opengamma.maths.dogma.engine.operationstack.RunUnaryFunctionChain;
 import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGRealScalar;
 
 /**
  * Maps unary functions to op chains

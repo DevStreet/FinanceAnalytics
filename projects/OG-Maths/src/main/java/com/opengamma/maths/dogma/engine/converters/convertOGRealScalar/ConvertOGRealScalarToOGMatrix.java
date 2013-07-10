@@ -7,9 +7,9 @@ package com.opengamma.maths.dogma.engine.converters.convertOGRealScalar;
 
 import com.opengamma.maths.dogma.engine.DOGMAConverterHook;
 import com.opengamma.maths.dogma.engine.converters.Converter;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGRealScalar;
 
 /**
  * 

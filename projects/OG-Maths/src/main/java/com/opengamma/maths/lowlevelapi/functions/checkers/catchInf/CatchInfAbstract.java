@@ -5,7 +5,7 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchInf;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 
 /**
  * Catches Infss

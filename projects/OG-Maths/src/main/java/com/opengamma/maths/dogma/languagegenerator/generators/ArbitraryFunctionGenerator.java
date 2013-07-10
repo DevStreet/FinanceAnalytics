@@ -18,7 +18,7 @@ import com.opengamma.maths.commonapi.exceptions.MathsExceptionGeneric;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
 import com.opengamma.maths.dogma.languagegenerator.DogmaLangTokenToCodeGenerator;
 import com.opengamma.maths.dogma.languagegenerator.FullToken;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArrayInterface;
+import com.opengamma.maths.highlevelapi.datatypes.OGArrayInterface;
 
 /**
  * Generates "arbitrary" function code

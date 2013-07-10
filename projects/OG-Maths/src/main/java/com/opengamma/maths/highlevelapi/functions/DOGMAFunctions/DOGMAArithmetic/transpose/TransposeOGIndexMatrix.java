@@ -7,7 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmeti
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Transpose;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGIndexMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**

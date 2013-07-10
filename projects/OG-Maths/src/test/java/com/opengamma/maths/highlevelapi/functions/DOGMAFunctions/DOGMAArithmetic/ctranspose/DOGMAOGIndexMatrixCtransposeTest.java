@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGIndexMatrix;
 
 /**
  * Tests OGIndexArray conjugate transpose

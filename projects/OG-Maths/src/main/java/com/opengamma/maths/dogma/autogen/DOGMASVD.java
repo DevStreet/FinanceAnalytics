@@ -25,17 +25,17 @@ import com.opengamma.maths.dogma.engine.operationstack.UnaryFunctionChain;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.dogma.engine.matrixinfo.ConversionCostAdjacencyMatrixStore;
 import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGRealScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGPermutationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.SVD;
@@ -62,8 +62,8 @@ public class DOGMASVD {
   private static RunInfixOpChain s_infixOpChainRunner = new RunInfixOpChain();
   private static RunUnaryFunctionChain s_unaryFunctionChainRunner = new RunUnaryFunctionChain();
   private static RunVoidUnaryFunctionChain s_voidUnaryFunctionChainRunner = new RunVoidUnaryFunctionChain();
-  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SvdOGComplexMatrix s_svdogcomplexmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SvdOGComplexMatrix();
   private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SvdOGMatrix s_svdogmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SvdOGMatrix();
+  private static com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SvdOGComplexMatrix s_svdogcomplexmatrix = new com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SvdOGComplexMatrix();
 static {
 final double[][] DefaultInfixFunctionEvalCosts = new double[][] {
 {1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00 },//
@@ -95,23 +95,23 @@ OperatorDictionaryPopulator<UnaryFunction<OGArray<? extends Number>, OGArray<? e
 OperatorDictionaryPopulator<VoidUnaryFunction<OGArray<? extends Number>>> operatorDictVoidUnary = OperatorDictionaryPopulatorLibrary.getVoidUnaryOperatorDictionary();
 
 }
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(OGComplexMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1){
-Catchers.catchNull(arg0);
-Catchers.catchNull(arg1);
-    return   s_svdogcomplexmatrix.svd( arg0,  arg1);
-  };
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(OGComplexMatrix arg0){
-Catchers.catchNull(arg0);
-    return   s_svdogcomplexmatrix.svd( arg0);
-  };
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1){
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.OGArray<? extends java.lang.Number>> svd(OGMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1){
 Catchers.catchNull(arg0);
 Catchers.catchNull(arg1);
     return   s_svdogmatrix.svd( arg0,  arg1);
   };
-  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray<? extends java.lang.Number>> svd(OGMatrix arg0){
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.OGArray<? extends java.lang.Number>> svd(OGMatrix arg0){
 Catchers.catchNull(arg0);
     return   s_svdogmatrix.svd( arg0);
+  };
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.OGArray<? extends java.lang.Number>> svd(OGComplexMatrix arg0, com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMALinearAlgebra.svd.SVDCompute arg1){
+Catchers.catchNull(arg0);
+Catchers.catchNull(arg1);
+    return   s_svdogcomplexmatrix.svd( arg0,  arg1);
+  };
+  public static java.util.List<com.opengamma.maths.highlevelapi.datatypes.OGArray<? extends java.lang.Number>> svd(OGComplexMatrix arg0){
+Catchers.catchNull(arg0);
+    return   s_svdogcomplexmatrix.svd( arg0);
   };
 
 }

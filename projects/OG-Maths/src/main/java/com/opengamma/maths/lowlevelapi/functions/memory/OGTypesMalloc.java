@@ -5,10 +5,10 @@
  */
 package com.opengamma.maths.lowlevelapi.functions.memory;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 
 /**
  * Hassle free dealing with mallocs

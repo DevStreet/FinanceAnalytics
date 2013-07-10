@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.datatypes.primitive;
+package com.opengamma.maths.highlevelapi.datatypes;
 
 import com.opengamma.maths.lowlevelapi.indexing.OneDIndex;
 import com.opengamma.maths.lowlevelapi.indexing.TwoDIndex;

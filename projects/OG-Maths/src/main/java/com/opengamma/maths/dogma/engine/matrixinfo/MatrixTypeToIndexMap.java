@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.Set;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionConfigProblem;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGPermutationMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGPermutationMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGRealScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 
 /**
  * Provides a map between Matrix Classes and their address in jump tables

@@ -9,7 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGIndexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGIndexMatrix;
 
 /**
  * test copy OGIndexMatrix

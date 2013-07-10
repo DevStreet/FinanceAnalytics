@@ -13,8 +13,8 @@ import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Plus;
 import com.opengamma.maths.dogma.engine.operationstack.InfixOpChain;
 import com.opengamma.maths.dogma.engine.operationstack.MethodScraperForInfixOperators;
 import com.opengamma.maths.dogma.engine.operationstack.OperatorDictionaryPopulator;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 
 /**
  * Quick eyeballable to look at which methods have been scraped from the code 

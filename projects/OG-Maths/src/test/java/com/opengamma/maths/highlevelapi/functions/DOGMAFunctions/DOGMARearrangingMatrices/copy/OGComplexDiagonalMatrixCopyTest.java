@@ -9,7 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexDiagonalMatrix;
 
 /**
  * test copy OGComplexDiagonalMatrix

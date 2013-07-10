@@ -8,7 +8,7 @@ package com.opengamma.maths.dogma.engine.operationstack;
 import com.opengamma.maths.dogma.engine.language.InfixOperator;
 import com.opengamma.maths.dogma.engine.language.UnaryFunction;
 import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
 
 /**
  * A container for the operator dictionaries 

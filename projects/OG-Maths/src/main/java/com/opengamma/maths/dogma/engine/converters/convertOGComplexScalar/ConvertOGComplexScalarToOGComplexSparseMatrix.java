@@ -8,9 +8,9 @@ package com.opengamma.maths.dogma.engine.converters.convertOGComplexScalar;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.dogma.engine.DOGMAConverterHook;
 import com.opengamma.maths.dogma.engine.converters.Converter;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexScalar;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexSparseMatrix;
 
 /**
  * 

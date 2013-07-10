@@ -7,8 +7,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMATrigonome
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Atanh;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGSparseMatrix;
 import com.opengamma.maths.lowlevelapi.exposedapi.ComplexConstants;
 import com.opengamma.maths.lowlevelapi.exposedapi.EasyIZY;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;

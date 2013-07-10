@@ -7,9 +7,9 @@ package com.opengamma.maths.dogma.engine.converters.convertOGComplexDiagonalMatr
 
 import com.opengamma.maths.dogma.engine.DOGMAConverterHook;
 import com.opengamma.maths.dogma.engine.converters.Converter;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexDiagonalMatrix;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexDiagonalMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGComplexMatrix;
 
 /**
  * 

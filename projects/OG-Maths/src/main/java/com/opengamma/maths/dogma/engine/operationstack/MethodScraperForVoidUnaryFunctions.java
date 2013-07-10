@@ -17,8 +17,8 @@ import com.opengamma.maths.dogma.engine.converters.ConversionPointers;
 import com.opengamma.maths.dogma.engine.converters.Converter;
 import com.opengamma.maths.dogma.engine.language.VoidUnaryFunction;
 import com.opengamma.maths.dogma.engine.matrixinfo.MatrixTypeToIndexMap;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGArray;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 
 /**
  * Filters and processes way to convert from one type to another

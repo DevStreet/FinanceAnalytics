@@ -3,31 +3,45 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.highlevelapi.datatypes.primitive;
+package com.opengamma.maths.highlevelapi.datatypes;
 
 import java.util.Arrays;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
 
 /**
  * Scalar real number
  */
-public class OGRealScalar extends OGArray<Number> {
+public class OGComplexScalar extends OGArray<Number> {
 
-  private double[] _data = new double[1];
+  private double[] _data = new double[2];
 
   /**
    * @param n a number
    */
-  public OGRealScalar(Number n) {
+  public OGComplexScalar(Number n) {
     Catchers.catchNullFromArgList(n, 1);
-    try {
-      _data[0] = n.doubleValue();
-    } catch (Exception e) {
-      throw new MathsExceptionIllegalArgument("Cannot construct real scalar from type that has no doublevalue");
+    // this is a touch horrible, should probably revisit complex types and try and work out a better way of handling whilst
+    // keeping in mind the native code data layouts, std::complex and _Complex etc. 
+    if (n.getClass() == ComplexType.class) {
+      ComplexType tmp = (ComplexType) n;
+      _data[0] = tmp.getReal();
+      _data[1] = tmp.getImag();
+    } else {
+      try {
+        _data[0] = n.doubleValue();
+      } catch (Exception e) {
+        throw new MathsExceptionIllegalArgument("Cannot construct complex scalar from type that has no doublevalue");
+      }
     }
+  }
+
+  public OGComplexScalar(double real, double imag) {
+    _data[0] = real;
+    _data[1] = imag;
   }
 
   /**
@@ -49,29 +63,11 @@ public class OGRealScalar extends OGArray<Number> {
   }
 
   @Override
-  public Number getEntry(int... indices) {
-    super.entryValidator(indices);
-    return _data[0];
-  }
-
-  @Override
-  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
-    Catchers.catchNull(value);
-    super.entryValidator(row, column);
-    if (value instanceof ComplexType) {
-      return new OGComplexScalar(((ComplexType) value).getReal(), ((ComplexType) value).getImag());
-    } else {
-      _data[0] = value.doubleValue();
-      return this;
-    }
-  }
-
-  @Override
   public OGArray<? extends Number> getColumn(int index) {
     if (index != 0) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    return new OGRealScalar(_data[0]);
+    return new OGComplexScalar(_data[0], _data[1]);
   }
 
   @Override
@@ -88,9 +84,9 @@ public class OGRealScalar extends OGArray<Number> {
     if (nindex == 1) {
       return getColumn(0);
     }
-    double[] tmp = new double[nindex];
-    Arrays.fill(tmp, _data[0]);
-    return new OGMatrix(tmp, 1, nindex);
+    double[] tmp = new double[2 * nindex];
+    DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
+    return new OGComplexMatrix(tmp, 1, nindex);
   }
 
   @Override
@@ -98,7 +94,7 @@ public class OGRealScalar extends OGArray<Number> {
     if (index != 0) {
       throw new MathsExceptionIllegalArgument("Invalid index. Value given was " + index);
     }
-    return new OGRealScalar(_data[0]);
+    return new OGComplexScalar(_data[0], _data[1]);
   }
 
   @Override
@@ -115,9 +111,9 @@ public class OGRealScalar extends OGArray<Number> {
     if (nindex == 1) {
       return getRow(0);
     }
-    double[] tmp = new double[nindex];
-    Arrays.fill(tmp, _data[0]);
-    return new OGMatrix(tmp, nindex, 1);
+    double[] tmp = new double[2 * nindex];
+    DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
+    return new OGComplexMatrix(tmp, nindex, 1);
   }
 
   @Override
@@ -140,13 +136,33 @@ public class OGRealScalar extends OGArray<Number> {
       }
     }
 
-    double[] tmp = new double[nrows * ncols];
-    Arrays.fill(tmp, _data[0]);
+    double[] tmp = new double[nrows * ncols * 2];
+    DenseMemoryManipulation.fillArrayWithInterleavedComplexValue(tmp, _data);
     if (nrows > 1 || ncols > 1) {
-      return new OGMatrix(tmp, nrows, ncols);
+      return new OGComplexMatrix(tmp, nrows, ncols);
     } else {
-      return new OGRealScalar(tmp[0]);
+      return new OGComplexScalar(tmp[0], tmp[1]);
     }
+  }
+
+  @Override
+  public ComplexType getEntry(int... indices) {
+    super.entryValidator(indices);
+    return new ComplexType(_data);
+  }
+
+  @Override
+  public OGArray<? extends Number> setEntry(int row, int column, Number value) {
+    Catchers.catchNull(value);
+    super.entryValidator(row, column);
+    if (value instanceof ComplexType) {
+      _data[0] = ((ComplexType) value).getReal();
+      _data[1] = ((ComplexType) value).getImag();
+      return this;
+    } else {
+      return new OGRealScalar(value.doubleValue());
+    }
+
   }
 
   @Override
@@ -158,8 +174,8 @@ public class OGRealScalar extends OGArray<Number> {
   }
 
   /**
-   * Decide if this {@link OGRealScalar} is equal to another {@link OGRealScalar} with the addition of some numerical tolerance for floating point comparison
-   * @param obj the {@link OGRealScalar} against which a comparison is to be drawn
+   * Decide if this {@link OGComplexScalar} is equal to another {@link OGComplexScalar} with the addition of some numerical tolerance for floating point comparison
+   * @param obj the {@link OGComplexScalar} against which a comparison is to be drawn
    * @param tolerance the tolerance for double precision comparison of the data elements in the array
    * @return true if they are considered equal in value, false otherwise
    */
@@ -173,7 +189,7 @@ public class OGRealScalar extends OGArray<Number> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGRealScalar other = (OGRealScalar) obj;
+    OGComplexScalar other = (OGComplexScalar) obj;
     double[] objData = other.getData();
     for (int i = 0; i < _data.length; i++) {
       if (Math.abs(_data[i] - objData[i]) > tolerance) {
@@ -194,7 +210,7 @@ public class OGRealScalar extends OGArray<Number> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    OGRealScalar other = (OGRealScalar) obj;
+    OGComplexScalar other = (OGComplexScalar) obj;
     if (!Arrays.equals(_data, other._data)) {
       return false;
     }
@@ -203,7 +219,7 @@ public class OGRealScalar extends OGArray<Number> {
 
   @Override
   public String toString() {
-    String str = "\nOGRealScalar: value = " + String.format("%24.18f\n", _data[0]);
+    String str = "\nOGComplexScalar: value = " + String.format("%24.18f " + (_data[1] >= 0 ? "+" : "-") + "%24.18fi, ", _data[0], Math.abs(_data[1]));
     return str;
   }
 

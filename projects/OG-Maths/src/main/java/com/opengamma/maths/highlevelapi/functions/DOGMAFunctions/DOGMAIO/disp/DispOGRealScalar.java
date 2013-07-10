@@ -7,7 +7,7 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAIO.disp;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unaryvoid.Disp;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGRealScalar;
+import com.opengamma.maths.highlevelapi.datatypes.OGRealScalar;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 
 /**

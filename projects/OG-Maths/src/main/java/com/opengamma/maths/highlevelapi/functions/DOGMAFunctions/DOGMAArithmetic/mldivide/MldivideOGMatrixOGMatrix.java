@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.infix.Mldivide;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMAArithmetic.mldivide.MldivideOGMatrixOGMatrixHelper.TriangularStruct;
 import com.opengamma.maths.lowlevelapi.exposedapi.LAPACK;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;

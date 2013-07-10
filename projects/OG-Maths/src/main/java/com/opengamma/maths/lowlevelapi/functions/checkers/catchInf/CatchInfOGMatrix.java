@@ -6,7 +6,7 @@
 package com.opengamma.maths.lowlevelapi.functions.checkers.catchInf;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionEncounteredInf;
-import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.highlevelapi.datatypes.OGMatrix;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 import com.opengamma.maths.lowlevelapi.functions.iss.IsInf;
 
