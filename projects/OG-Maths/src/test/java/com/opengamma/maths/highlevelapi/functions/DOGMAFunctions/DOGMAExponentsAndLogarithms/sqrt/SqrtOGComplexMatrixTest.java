@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGArray;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**

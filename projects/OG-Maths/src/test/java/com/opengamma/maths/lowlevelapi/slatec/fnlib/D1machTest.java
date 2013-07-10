@@ -9,7 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**
  * Tests double precision machine constants found in D1mach

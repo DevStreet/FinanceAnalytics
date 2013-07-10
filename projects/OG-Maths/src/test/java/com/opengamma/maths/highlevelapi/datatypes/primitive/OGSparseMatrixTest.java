@@ -18,7 +18,7 @@ import com.opengamma.maths.commonapi.numbers.ComplexType;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMARearrangingMatrices.copy.CopyOGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.full.FullOGSparseMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASparseUtilities.sparse.SparseOGMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**
  * Tests the OGSparseMatrix Class

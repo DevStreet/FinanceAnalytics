@@ -10,7 +10,7 @@ import static org.testng.AssertJUnit.assertTrue;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 
 /**

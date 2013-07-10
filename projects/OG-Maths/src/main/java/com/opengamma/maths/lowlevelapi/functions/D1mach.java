@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas;
+package com.opengamma.maths.lowlevelapi.functions;
 
 /**
  * Provides double precision machine constants

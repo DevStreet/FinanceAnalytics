@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.blase;
+package com.opengamma.maths.lowlevelapi.functions.memory;
 
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
 

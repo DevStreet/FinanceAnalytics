@@ -12,7 +12,7 @@ import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialMatrices.HilbFunction;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**
  * Tests the Hilbert matrix formation

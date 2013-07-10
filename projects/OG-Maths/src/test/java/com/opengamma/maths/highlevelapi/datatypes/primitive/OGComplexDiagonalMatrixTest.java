@@ -15,8 +15,8 @@ import org.testng.annotations.Test;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
 import com.opengamma.maths.commonapi.numbers.ComplexType;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 import com.opengamma.maths.lowlevelapi.functions.memory.DenseMemoryManipulation;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Tests the {@link OGComplexDiagonalMatrix} Class

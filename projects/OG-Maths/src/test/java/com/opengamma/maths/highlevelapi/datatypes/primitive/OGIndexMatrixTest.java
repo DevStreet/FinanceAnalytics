@@ -14,7 +14,7 @@ import static org.testng.Assert.assertFalse;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNotImplemented;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 
 /**
  * Tests the OGIndexArray Class

@@ -15,7 +15,7 @@ import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexSparseMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.lowlevelapi.functions.D1mach;
 import com.opengamma.util.test.TestGroup;
 
 /**

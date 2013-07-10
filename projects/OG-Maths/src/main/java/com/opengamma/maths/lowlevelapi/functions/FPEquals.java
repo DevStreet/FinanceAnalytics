@@ -10,7 +10,6 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
  * Checks floating point arrays are equal within some tolerance.

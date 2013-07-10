@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
 import com.opengamma.maths.commonapi.exceptions.MathsExceptionNullPointer;
+import com.opengamma.maths.lowlevelapi.functions.memory.DenseDataConverters;
 
 /**
  * tests the dense data converters for BLAS/LAPACK storage schemes "Packed" and "Banded"
