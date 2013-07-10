@@ -3,7 +3,7 @@
  * 
  * Please see distribution for license.
  */
-package com.opengamma.maths.lowlevelapi.linearalgebra.blase;
+package com.opengamma.maths.lowlevelapi.functions;
 
 import static org.testng.Assert.assertTrue;
 
