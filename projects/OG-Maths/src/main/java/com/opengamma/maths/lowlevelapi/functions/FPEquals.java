@@ -10,7 +10,6 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Checks floating point arrays are equal within some tolerance.
  */
@@ -24,13 +23,22 @@ public class FPEquals {
     return Arrays.equals(a, b);
   }
 
-  public static boolean fuzzyEquals(int count, double[] a, int offseta, double[] b, int offsetb, double tolerance) {
+  public static boolean fuzzyEquals(int count, double[] a, int offseta, double[] b, int offsetb, double tolerance, boolean signDiffOk) {
     for (int i = 0; i < count; i++) {
       if (Double.isNaN(a[i + offseta]) && !Double.isNaN(b[i + offsetb])) {
         return false;
       }
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
-        s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
+        if (signDiffOk) {
+          double diff = Math.abs(Math.abs(a[i + offseta]) - Math.abs(b[i + offsetb]));
+          if (diff > tolerance) {
+            s_log.warn("Sign invariant equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance + ". Difference was: " + diff);
+            return false;
+          } else {
+            return true;
+          }
+        }
+        s_log.warn("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
         return false;
       }
     }
@@ -38,7 +46,11 @@ public class FPEquals {
   }
 
   public static boolean fuzzyEquals(double[] a, double[] b, double tolerance) {
-    return fuzzyEquals(a.length, a, 0, b, 0, tolerance);
+    return fuzzyEquals(a.length, a, 0, b, 0, tolerance, false);
+  }
+
+  public static boolean fuzzyEquals(double[] a, double[] b, double tolerance, boolean signDiffOk) {
+    return fuzzyEquals(a.length, a, 0, b, 0, tolerance, signDiffOk);
   }
 
   public static boolean fuzzyEquals(double[] a, double[] b) {
@@ -53,7 +65,7 @@ public class FPEquals {
     return fuzzyEquals(new double[] {a }, new double[] {b }, s_defaulttol);
   }
 
-  public static boolean fuzzyEqualsDynamicTol(int count, double[] a, int offseta, double[] b, int offsetb) {
+  public static boolean fuzzyEqualsDynamicTol(int count, double[] a, int offseta, double[] b, int offsetb, boolean signDiffOk) {
     double tolerance;
     for (int i = 0; i < count; i++) {
       if (b[i + offsetb] == 0) {
@@ -62,7 +74,16 @@ public class FPEquals {
         tolerance = Math.ulp(b[i + offsetb]) > D1mach.four() ? 100 * Math.ulp(b[i + offsetb]) : 10 * D1mach.four();
       }
       if (Math.abs(a[i + offseta] - b[i + offsetb]) > tolerance) {
-        s_log.debug("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
+        if (signDiffOk) {
+          double diff = Math.abs(Math.abs(a[i + offseta]) - Math.abs(b[i + offsetb]));
+          if (diff > tolerance) {
+            s_log.warn("Sign invariant equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
+            return false;
+          } else {
+            return true;
+          }
+        }
+        s_log.warn("Equality test failed between " + a[i + offseta] + " and " + b[i + offsetb] + " with tolerance = " + tolerance);
         return false;
       }
     }
@@ -70,11 +91,15 @@ public class FPEquals {
   }
 
   public static boolean fuzzyEqualsDynamicTol(double[] a, double[] b) {
-    return fuzzyEqualsDynamicTol(a.length, a, 0, b, 0);
+    return fuzzyEqualsDynamicTol(a.length, a, 0, b, 0, false);
+  }
+
+  public static boolean fuzzyEqualsDynamicTol(double[] a, double[] b, boolean signDiffOk) {
+    return fuzzyEqualsDynamicTol(a.length, a, 0, b, 0, signDiffOk);
   }
 
   public static boolean fuzzyEqualsDynamicTol(double a, double b) {
-    return fuzzyEqualsDynamicTol(1, new double[] {a }, 0, new double[] {b }, 0);
+    return fuzzyEqualsDynamicTol(1, new double[] {a }, 0, new double[] {b }, 0, false);
   }
 
 }

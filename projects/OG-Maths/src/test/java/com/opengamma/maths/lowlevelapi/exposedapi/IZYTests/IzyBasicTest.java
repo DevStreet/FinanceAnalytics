@@ -1075,7 +1075,7 @@ public class IzyBasicTest {
         7.866481568871084e-01, -3.342308207562602e+00 };
     double[] y0 = new double[expected_data.length];
     _izy.vz_acos(new int[] {n_in }, in_data, zero, y0, zero);
-    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data));
+    assertTrue(FPEquals.fuzzyEquals(y0, expected_data, 1e-13));
 
   };
 
@@ -1977,7 +1977,7 @@ public class IzyBasicTest {
         3.342308207562602e+00, 7.866481568871084e-01 };
     double[] y0 = new double[expected_data.length];
     _izy.vz_acosh(new int[] {n_in }, in_data, zero, y0, zero);
-    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data));
+    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data, true));
 
   };
 
@@ -2370,7 +2370,7 @@ public class IzyBasicTest {
         1.528101194087726e+00, 4.951265574285911e-02, 1.527292458372589e+00 };
     double[] y0 = new double[expected_data.length];
     _izy.vz_atanh(new int[] {n_in }, in_data, zero, y0, zero);
-    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data));
+    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data, true));
 
   };
 
@@ -2551,7 +2551,7 @@ public class IzyBasicTest {
         -5.991431182979468e+03 };
     double[] y0 = new double[expected_data.length];
     _izy.vz_cosh(new int[] {n_in }, in_data, zero, y0, zero);
-    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data));
+    assertTrue(FPEquals.fuzzyEqualsDynamicTol(y0, expected_data, true));
 
   };
 
