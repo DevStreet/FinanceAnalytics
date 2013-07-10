@@ -13,6 +13,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hsqldb:hsqldb:2.2.9" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant:1.7.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-launcher:1.7.1" level="project" />
     <orderEntry type="module" module-name="OG-Core" />
     <orderEntry type="module" module-name="OG-Util" />
     <orderEntry type="module" module-name="OG-TimeSeries" />
@@ -74,6 +77,26 @@
     <orderEntry type="library" name="Maven: redis.clients:jedis:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.jruby:jruby-complete:1.7.3" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-core:1.17" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:3.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-http:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-external:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-servlet-webserver:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-http:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-framework:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-utils:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-lzma:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-rcm:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-portunif:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-http-servlet:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-grizzly:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.contribs:jersey-guice:1.17" level="project" />
+    <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.inject:guice:3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.inject.extensions:guice-servlet:3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-inmemory:1.17" level="project" />
     <orderEntry type="library" name="Maven: org.mindrot:jbcrypt:0.3m" level="project" />
     <orderEntry type="module" module-name="OG-UtilDB" />
     <orderEntry type="library" name="Maven: com.opengamma:elsql:0.7" level="project" />
@@ -92,7 +115,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant:1.7.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-launcher:1.7.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.testng:testng:6.3.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.beust:jcommander:1.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.0" level="project" />

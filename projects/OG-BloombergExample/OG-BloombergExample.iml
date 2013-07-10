@@ -40,6 +40,32 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-continuation:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlets:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-client:7.0.1.v20091125" level="project" />
+    <orderEntry type="library" name="Maven: org.mortbay.jetty:jsp-2.1-glassfish:9.1.1.B60.25.p2" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:core:3.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.mortbay.jetty:jsp-api-2.1-glassfish:9.1.1.B60.25.p2" level="project" />
+    <orderEntry type="library" name="Maven: ant:ant:1.6.5" level="project" />
+    <orderEntry type="library" name="Maven: org.cometd.java:cometd-java-server:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.cometd.java:cometd-api:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.yahoo.platform.yui:yuicompressor:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: rhino:js:1.6R7" level="project" />
+    <orderEntry type="library" name="Maven: com.opengamma.external.blpapi:blpapi:3.4.8.1" level="project" />
+    <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:1.8.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-pool:5.3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-jta_1.0.1B_spec:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:2.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.hsqldb:hsqldb:2.2.9" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xbean:xbean-spring:3.6" level="project" />
     <orderEntry type="module" module-name="OG-Component" />
     <orderEntry type="module" module-name="OG-Web" />
     <orderEntry type="module" module-name="OG-Financial" />
@@ -106,6 +132,26 @@
     <orderEntry type="library" name="Maven: redis.clients:jedis:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.jruby:jruby-complete:1.7.3" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-core:1.17" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:3.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-http:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-external:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-servlet-webserver:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-http:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-framework:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-utils:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-lzma:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-rcm:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-portunif:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.grizzly:grizzly-http-servlet:1.9.45" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-grizzly:1.17" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.contribs:jersey-guice:1.17" level="project" />
+    <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.inject:guice:3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.inject.extensions:guice-servlet:3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey.jersey-test-framework:jersey-test-framework-inmemory:1.17" level="project" />
     <orderEntry type="library" name="Maven: org.mindrot:jbcrypt:0.3m" level="project" />
     <orderEntry type="library" name="Maven: com.opengamma:og-region-data:1.0.0.v20110908a" level="project" />
     <orderEntry type="module" module-name="OG-Provider" />
@@ -174,7 +220,6 @@
     <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:2.1.5" level="project" />
     <orderEntry type="library" name="Maven: org.hsqldb:hsqldb:2.2.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xbean:xbean-spring:3.6" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.0" level="project" />
   </component>
 </module>
