@@ -151,7 +151,7 @@ public class MldivideOGMatrixOGMatrixTest {
     OGMatrix answer = mldivide.eval(A17, C2);
     OGMatrix expected = new OGMatrix(new double[][] { {0.0000000000000002, -29.9999999999998650 }, {0.0000000000000004, -57.8526315789472108 }, {-0.0000000000000004, 51.3052631578945864 },
         {0.0000000000000000, 0.9473684210526315 }, {0.2000000000000000, 1.6000000000000001 } });
-    assertTrue(answer.fuzzyequals(expected, 10 * D1mach.four()));
+    assertTrue(answer.fuzzyequals(expected, 100 * D1mach.four()));
     if (debugStatements) {
       System.out.println("A17" + A17.toString());
       System.out.println("C2" + C2.toString());
