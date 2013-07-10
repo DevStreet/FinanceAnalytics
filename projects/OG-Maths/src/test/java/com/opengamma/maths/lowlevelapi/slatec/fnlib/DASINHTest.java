@@ -9,6 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.FPEquals;
 
 /**
@@ -69,7 +70,7 @@ public class DASINHTest {
   public static void dasinhRangeTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DASINH.dasinh(input[i]);
+      ans = SLATEC.getInstance().dasinh(input[i]);
       assertTrue(FPEquals.fuzzyEquals(expected[i], ans));
     }
   }
@@ -78,7 +79,7 @@ public class DASINHTest {
   public static void dasinhSmallRangeTest() {
     double ans;
     for (int i = 0; i < smallInput.length; i++) {
-      ans = DASINH.dasinh(smallInput[i]);
+      ans = SLATEC.getInstance().dasinh(smallInput[i]);
       assertTrue(FPEquals.fuzzyEquals(smallExpected[i], ans));
     }
   }

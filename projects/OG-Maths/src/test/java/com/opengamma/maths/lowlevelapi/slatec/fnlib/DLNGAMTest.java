@@ -8,6 +8,7 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.FPEquals;
 
 /**
@@ -78,7 +79,7 @@ public class DLNGAMTest {
   public void dgamlnSmokeTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DLNGAM.dlngam(input[i]);
+      ans = SLATEC.getInstance().dlngam(input[i]);
       assertTrue(FPEquals.fuzzyEquals(expected[i], ans));
     }
   }

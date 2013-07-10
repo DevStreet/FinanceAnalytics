@@ -8,8 +8,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFu
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Erfc;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
 
 /**
  * Does erfc on OGDoubleArray
@@ -28,7 +28,7 @@ public final class ErfcOGMatrix implements Erfc<OGMatrix, OGMatrix> {
     //TODO: check what SLATEC impl does with NaN/Inf & deal with underflow issues, exception currently thrown
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = DERFC.derfc(dataArray1[i]);
+      tmp[i] = SLATEC.getInstance().derfc(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

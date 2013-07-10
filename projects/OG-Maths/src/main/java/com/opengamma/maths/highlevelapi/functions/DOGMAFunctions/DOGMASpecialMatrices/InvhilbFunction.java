@@ -10,8 +10,8 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.DOGMAMethodLiteral;
 import com.opengamma.maths.dogma.engine.methodhookinstances.arbitrary.InvHilb;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.DBINOM;
 
 /**
  * Generates inverse Hilbert matrices of order "n". 
@@ -42,7 +42,7 @@ public class InvhilbFunction {
     }
     // calculate the reduced binomial expansion based factors
     for (int i = 0; i < n; i++) {
-      factors[i] = (i + 1) * DBINOM.dbinom(i + n, i) * DBINOM.dbinom(n, i + 1);
+      factors[i] = (i + 1) * SLATEC.getInstance().dbinom(i + n, i) * SLATEC.getInstance().dbinom(n, i + 1);
       if (flip) {
         factors[i] = -factors[i];
         flip = false;

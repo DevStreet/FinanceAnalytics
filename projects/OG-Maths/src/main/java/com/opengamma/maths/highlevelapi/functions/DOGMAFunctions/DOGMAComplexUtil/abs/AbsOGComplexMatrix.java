@@ -9,8 +9,8 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Abs;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.ZABS;
 
 /**
  * does abs
@@ -41,7 +41,7 @@ public final class AbsOGComplexMatrix implements Abs<OGMatrix, OGComplexMatrix> 
       if (Double.isInfinite(imag) && Double.isInfinite(real)) {
         tmp[ptr] = Double.POSITIVE_INFINITY;
       } else {
-        tmp[ptr] = ZABS.zabs(real, imag);
+        tmp[ptr] = SLATEC.getInstance().zabs(real, imag);
       }
       ptr++;
     }

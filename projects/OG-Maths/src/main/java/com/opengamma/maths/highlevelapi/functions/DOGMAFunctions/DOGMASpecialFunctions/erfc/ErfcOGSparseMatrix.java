@@ -11,8 +11,8 @@ import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Erfc;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGSparseMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERFC;
 
 /**
  * Erfc on Sparse
@@ -35,7 +35,7 @@ public final class ErfcOGSparseMatrix implements Erfc<OGMatrix, OGSparseMatrix> 
 
     for (int ir = 0; ir < columnsArray1; ir++) {
       for (int i = colPtr[ir]; i < colPtr[ir + 1]; i++) { // loops through elements of correct column
-        tmp[rowIdx[i] + ir * rowsArray1] = DERFC.derfc(dataArray1[i]);
+        tmp[rowIdx[i] + ir * rowsArray1] = SLATEC.getInstance().derfc(dataArray1[i]);
       }
     }
 

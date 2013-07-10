@@ -5,11 +5,13 @@
  */
 package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import org.testng.annotations.Test;
+
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
+import com.opengamma.maths.nativewrappers.exceptions.OGNativeMathsWrapperInvalidArgumentException;
 
 /**
  * Tests D9LGMC from SLATEC
@@ -25,25 +27,25 @@ public class D9LGMCTest {
 
   private double fp_limit = D1mach.four();
 
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public void invalidInputTest() {
-    D9LGMC.d9lgmc(9);
+    SLATEC.getInstance().d9lgmc(9);
   }
 
   @Test
   public void okInputTest() {
-    D9LGMC.d9lgmc(10);
+    SLATEC.getInstance().d9lgmc(10);
   }
 
   @Test
   public void deliberateUnderflowTest() {
-    D9LGMC.d9lgmc(1e307);
+    SLATEC.getInstance().d9lgmc(1e307);
   }
 
   @Test
   public void numberRangeTest() {
     for (int i = 0; i < x.length; i++) {
-      assertTrue(Math.abs(D9LGMC.d9lgmc(x[i]) - answer[i]) < fp_limit);
+      assertTrue(Math.abs(SLATEC.getInstance().d9lgmc(x[i]) - answer[i]) < fp_limit);
     }
   }
 }

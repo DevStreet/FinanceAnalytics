@@ -9,7 +9,8 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
+import com.opengamma.maths.nativewrappers.exceptions.OGNativeMathsWrapperInvalidArgumentException;
 
 /**
  * Tests DBINOM
@@ -79,19 +80,19 @@ public class DBINOMTest {
   private final static int nlen = 10, scal = 10;
 
   
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public void invalidInputNltMTest() {
-    DBINOM.dbinom(1, 2);
+    SLATEC.getInstance().dbinom(1, 2);
   }  
 
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public void invalidInputBadNTest() {
-    DBINOM.dbinom(-1, 2);
+    SLATEC.getInstance().dbinom(-1, 2);
   }    
 
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public void invalidInputBadMTest() {
-    DBINOM.dbinom(2, -1);
+    SLATEC.getInstance().dbinom(2, -1);
   }      
   
   @Test
@@ -100,20 +101,20 @@ public class DBINOMTest {
     int ptr=0;
     for (int i = 1; i <= nlen * scal; i += scal) {
       for (int j = 1; j <= i; j++) {
-        exponent=Math.max(0,(int)Math.log10(DBINOM.dbinom(i, j)));
+        exponent=Math.max(0,(int)Math.log10(SLATEC.getInstance().dbinom(i, j)));
         if(exponent>14)
         {
           exponent-=2;
         }       
-        assertTrue(Math.abs(DBINOM.dbinom(i, j)-rangeTestAnswer[ptr])<=Math.pow(10,exponent));
+        assertTrue(Math.abs(SLATEC.getInstance().dbinom(i, j)-rangeTestAnswer[ptr])<=Math.pow(10,exponent));
         ptr++;
       }
     }
   }
 
-  @Test
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public void overflowTest() {
-    DBINOM.dbinom(1040, 500);
+    SLATEC.getInstance().dbinom(1040, 500);
   }
 
 }

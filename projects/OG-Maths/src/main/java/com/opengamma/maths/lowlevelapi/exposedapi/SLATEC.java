@@ -74,8 +74,18 @@ public final class SLATEC implements SLATECAPIInterface {
   }
 
   @Override
-  public double[] zatan(double[] z) {
-    return _localSLATEC.zatan(z);
+  public double dbinom(int n, int m) {
+    return _localSLATEC.dbinom(n, m);
+  }
+
+  @Override
+  public double d9lgmc(double x) {
+    return _localSLATEC.d9lgmc(x);
+  }
+
+  @Override
+  public double dcsevl(double x, double[] cs, int n) {
+    return _localSLATEC.dcsevl(x, cs, n);
   }
 
 }

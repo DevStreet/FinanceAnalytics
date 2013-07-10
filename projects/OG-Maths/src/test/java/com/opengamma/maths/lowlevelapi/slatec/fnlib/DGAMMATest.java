@@ -8,6 +8,7 @@ package com.opengamma.maths.lowlevelapi.slatec.fnlib;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.FPEquals;
 
 /**
@@ -67,7 +68,7 @@ public class DGAMMATest {
   public void gammaSmokeTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DGAMMA.dgamma(input[i]);
+      ans = SLATEC.getInstance().dgamma(input[i]);
       assertTrue(FPEquals.fuzzyEqualsDynamicTol(expected[i], ans));
     }
   }

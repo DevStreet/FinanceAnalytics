@@ -9,6 +9,7 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 
@@ -79,7 +80,7 @@ public class DERFTest {
   public void erfTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DERF.derf(input[i]);
+      ans = SLATEC.getInstance().derf(input[i]);
       assertTrue(Math.abs(answer[i] - ans) < 1e-14); // should get within this
     }
   }
@@ -87,11 +88,11 @@ public class DERFTest {
   @Test
   void erfEdgeCasesTest() {
     // 1
-    assertTrue(Math.abs(DERF.derf(1) - .842700792949715d) < 1e-15);
+    assertTrue(Math.abs(SLATEC.getInstance().derf(1) - .842700792949715d) < 1e-15);
     // -1
-    assertTrue(Math.abs(DERF.derf(-1) + .842700792949715d) < 1e-15);
+    assertTrue(Math.abs(SLATEC.getInstance().derf(-1) + .842700792949715d) < 1e-15);
     // 0.5(Machine precision/machine radix)
-    assertTrue(Math.abs(DERF.derf(D1mach.three() / 2) - 6.26376265908397e-17) < 1e-16);
+    assertTrue(Math.abs(SLATEC.getInstance().derf(D1mach.three() / 2) - 6.26376265908397e-17) < 1e-16);
   }
 
 }

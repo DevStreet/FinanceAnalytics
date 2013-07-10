@@ -9,6 +9,8 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
+
 
 /**
  * Tests DERFC
@@ -142,7 +144,7 @@ public class DERFCTest {
   public void erfcTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DERFC.derfc(input[i]);
+      ans = SLATEC.getInstance().derfc(input[i]);
       assertTrue((answer[i] - ans) < 1e-14); // should get within this
     }
   }

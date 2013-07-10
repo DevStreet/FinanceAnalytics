@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGComplexMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.linearalgebra.blas.referenceblas.D1mach;
 
 /**
@@ -135,7 +136,7 @@ public class ZABSTest {
     final int cols = c.getNumberOfColumns();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        ans = (ZABS.zabs(c.getEntry(i, j).getReal(), c.getEntry(i, j).getImag()));
+        ans = (SLATEC.getInstance().zabs(c.getEntry(i, j).getReal(), c.getEntry(i, j).getImag()));
         tabans = answerReal[i][j];
         assertTrue(Math.abs(ans - tabans) < 10 * D1mach.four());
       }

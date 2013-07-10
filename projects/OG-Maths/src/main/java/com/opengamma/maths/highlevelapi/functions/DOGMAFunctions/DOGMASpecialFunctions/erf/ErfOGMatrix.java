@@ -8,8 +8,8 @@ package com.opengamma.maths.highlevelapi.functions.DOGMAFunctions.DOGMASpecialFu
 import com.opengamma.maths.dogma.engine.DOGMAMethodHook;
 import com.opengamma.maths.dogma.engine.methodhookinstances.unary.Erf;
 import com.opengamma.maths.highlevelapi.datatypes.primitive.OGMatrix;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.checkers.Catchers;
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 
 /**
  * Does erf on OGDoubleArray
@@ -28,7 +28,7 @@ public final class ErfOGMatrix implements Erf<OGMatrix, OGMatrix> {
 
     double[] tmp = new double[n];
     for (int i = 0; i < n; i++) {
-      tmp[i] = DERF.derf(dataArray1[i]);
+      tmp[i] = SLATEC.getInstance().derf(dataArray1[i]);
     }
     return new OGMatrix(tmp, rowsArray1, columnsArray1);
   }

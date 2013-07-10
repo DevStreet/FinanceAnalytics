@@ -9,8 +9,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.FPEquals;
+import com.opengamma.maths.nativewrappers.exceptions.OGNativeMathsWrapperInvalidArgumentException;
 
 /**
  * Tests double acosh()
@@ -38,14 +39,14 @@ public class DACOSHTest {
   public static void dacoshRangeTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DACOSH.dacosh(input[i]);
+      ans = SLATEC.getInstance().dacosh(input[i]);
       assertTrue(FPEquals.fuzzyEquals(expected[i], ans));
     }
   }
 
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public static void dacoshIllegalArgTest() {
-    DACOSH.dacosh(0);
+    SLATEC.getInstance().dacosh(0);
   }
 
 }

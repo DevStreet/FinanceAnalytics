@@ -5,7 +5,6 @@
  */
 package com.opengamma.maths.lowlevelapi.exposedapi.SLATECBacking;
 
-import com.opengamma.maths.lowlevelapi.slatec.fnlib.DERF;
 
 /**
  * Required behaviours of the SLATEC interface, cut down version, may be expanded.
@@ -42,8 +41,7 @@ public interface SLATECAPIInterface {
    * @return the value of the absolute value of the base 'e' (natural) log of the complete Gamma function function at position 'x'
    */
   double dlngam(double x);
- 
-  
+
   /**
    * DACOSH(X) provides the ability to calculate the inverse hyperbolic cosine at position 'x'.
    * @param x the position at which to evaluate the inverse hyperbolic cosine.
@@ -57,14 +55,14 @@ public interface SLATECAPIInterface {
    * @return the value of the inverse hyperbolic sine at position 'x'
    */
   double dasinh(double x);
-  
+
   /**
    * DATANH(X) provides the ability to calculate the inverse hyperbolic tangent at position 'x'.
    * @param x the position at which to evaluate the inverse hyperbolic tangent.
    * @return the value of the inverse hyperbolic tangent at position 'x'
-   */  
+   */
   double datanh(double x);
-  
+
   /**
    * ZABS(X) Computes the absolute value or magnitude of a double precision complex number (stored as a two element double []).
    * @param zr the real part of the complex number of which the absolute value shall be computed
@@ -84,14 +82,30 @@ public interface SLATECAPIInterface {
   void zlog(double ar, double ai, double[] br, double[] bi, int[] ierr);
 
   /**
-   * Computes the complex trigonometric arc tangent of the argument.
-   * @param z a complex number where the real part is stored in z[0] and the imaginary in z[1]
-   * @return the arc tangent of z.
+   * Compute the binomial coefficient for arguments n and m as (N!)/((M!)(N-M)!)
+   * @param n the N
+   * @param m the M
+   * @return (N!)/((M!)(N-M)!)
    */
-  double[] zatan(final double[] z);
-  
-  
-  
-  
+  double dbinom(int n, int m);
+
+  /**
+   * Compute the log Gamma correction factor so that
+   * LOG(DGAMMA(X)) = LOG(SQRT(2*PI)) + (X-5.)*LOG(X) - X + D9LGMC(X)
+   * Description from http://www.netlib.org/slatec/fnlib/d9lgmc.f
+   * @param x the location to compute
+   * @return the value at x
+   */
+  double d9lgmc(double x);
+
+  /**
+   * Evaluate a N-term Chebyshev series
+   * @param x the location at which the series should be evaluated
+   * @param cs the array of terms in the series
+   * @param n length of cs
+   * @return the value of the series at x
+   */
+  double dcsevl(double x, double[] cs, int n);
+
   
 }

@@ -9,9 +9,10 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.maths.commonapi.exceptions.MathsExceptionIllegalArgument;
+import com.opengamma.maths.lowlevelapi.exposedapi.SLATEC;
 import com.opengamma.maths.lowlevelapi.functions.FPEquals;
 import com.opengamma.maths.lowlevelapi.functions.MathBits;
+import com.opengamma.maths.nativewrappers.exceptions.OGNativeMathsWrapperInvalidArgumentException;
 
 /**
  * Tests double atanh()
@@ -55,24 +56,24 @@ public class DATANHTest {
   public static void datanhRangeTest() {
     double ans;
     for (int i = 0; i < input.length; i++) {
-      ans = DATANH.datanh(input[i]);
+      ans = SLATEC.getInstance().datanh(input[i]);
       assertTrue(FPEquals.fuzzyEquals(expected[i], ans));
     }
   }
 
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public static void datanhIllegalArgPosTest() {
-    DATANH.datanh(1.1);
+    SLATEC.getInstance().datanh(1.1);
   }
 
-  @Test(expectedExceptions = MathsExceptionIllegalArgument.class)
+  @Test(expectedExceptions = OGNativeMathsWrapperInvalidArgumentException.class)
   public static void datanhIllegalArgNegTest() {
-    DATANH.datanh(-1.1);
+    SLATEC.getInstance().datanh(-1.1);
   }
 
   @Test
   public static void invokePrecisionWarningTest() {
-    DATANH.datanh(MathBits.getLargestPositiveNormalMoreNegativeThanOne());
+    SLATEC.getInstance().datanh(MathBits.getLargestPositiveNormalMoreNegativeThanOne());
   }
 
 }
