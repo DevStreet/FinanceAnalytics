@@ -127,7 +127,7 @@
           <argLine>-Xmx${junit.maxheap}</argLine>
           <systemPropertyVariables>
             <logback.configurationFile>${junit.logback}</logback.configurationFile>
-            <test.database.type>hsqldb</test.database.type>
+            <test.database.type>all</test.database.type>
           </systemPropertyVariables>
           <parallel>${tests.testng.parallel}</parallel>
           <threadCount>${tests.testng.threads}</threadCount>
