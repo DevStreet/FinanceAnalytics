@@ -1,24 +1,9 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.master.user;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.joda.beans.BeanBuilder;
-import org.joda.beans.BeanDefinition;
-import org.joda.beans.JodaBeanUtils;
-import org.joda.beans.MetaProperty;
-import org.joda.beans.Property;
-import org.joda.beans.PropertyDefinition;
-import org.joda.beans.impl.direct.DirectBeanBuilder;
-import org.joda.beans.impl.direct.DirectMetaProperty;
-import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
@@ -31,10 +16,24 @@ import com.opengamma.master.AbstractSearchRequest;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.PublicSPI;
 import com.opengamma.util.RegexUtils;
+import org.joda.beans.BeanBuilder;
+import org.joda.beans.BeanDefinition;
+import org.joda.beans.JodaBeanUtils;
+import org.joda.beans.MetaProperty;
+import org.joda.beans.Property;
+import org.joda.beans.PropertyDefinition;
+import org.joda.beans.impl.direct.DirectBeanBuilder;
+import org.joda.beans.impl.direct.DirectMetaProperty;
+import org.joda.beans.impl.direct.DirectMetaPropertyMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Request for searching for users. 
- * <p>
+ * Request for searching for users.
+ * <p/>
  * Documents will be returned that match the search criteria.
  * This class provides the ability to page the results and to search
  * as at a specific version and correction instant.
@@ -72,10 +71,10 @@ public class UserSearchRequest extends AbstractSearchRequest {
   @PropertyDefinition
   private String _externalIdScheme;
   /**
-   * The user id to search for, wildcards allowed, null to not match on name.
+   * The username to search for, wildcards allowed, null to not match on name.
    */
   @PropertyDefinition
-  private String _userId;
+  private String _username;
   /**
    * The display user name to search for, wildcards allowed, null to not match on name.
    */
@@ -96,6 +95,29 @@ public class UserSearchRequest extends AbstractSearchRequest {
    */
   @PropertyDefinition(validate = "notNull")
   private UserSearchSortOrder _sortOrder = UserSearchSortOrder.OBJECT_ID_ASC;
+  /**
+   * The object identifier of user's role.
+   */
+  @PropertyDefinition
+  private ObjectId _roleObjectId;
+
+  /**
+   * The external identifier of a resource to match, null to not match on resource identifier.
+   */
+  @PropertyDefinition
+  private ExternalId _resourceExternalId;
+
+  /**
+   * The access type for a resource, null to not match on resource access type.
+   */
+  @PropertyDefinition
+  private String _resourceAccess;
+
+  /**
+   * The type for a resource, null to not match on resource access type.
+   */
+  @PropertyDefinition
+  private String _resourceType;
 
   /**
    * Creates an instance.
@@ -105,8 +127,8 @@ public class UserSearchRequest extends AbstractSearchRequest {
 
   /**
    * Creates an instance using a single search identifier.
-   * 
-   * @param userId  the external user identifier to search for, not null
+   *
+   * @param userId the external user identifier to search for, not null
    */
   public UserSearchRequest(ExternalId userId) {
     addExternalId(userId);
@@ -114,18 +136,19 @@ public class UserSearchRequest extends AbstractSearchRequest {
 
   /**
    * Creates an instance using a bundle of identifiers.
-   * 
-   * @param userIdBundle  the external user identifiers to search for, not null
+   *
+   * @param userIdBundle the external user identifiers to search for, not null
    */
   public UserSearchRequest(ExternalIdBundle userIdBundle) {
     addExternalIds(userIdBundle);
   }
 
   //-------------------------------------------------------------------------
+
   /**
    * Adds a single user object identifier to the set.
-   * 
-   * @param userId  the user object identifier to add, not null
+   *
+   * @param userId the user object identifier to add, not null
    */
   public void addObjectId(ObjectIdentifiable userId) {
     ArgumentChecker.notNull(userId, "userId");
@@ -138,8 +161,8 @@ public class UserSearchRequest extends AbstractSearchRequest {
   /**
    * Sets the set of user object identifiers, null to not limit by user object identifiers.
    * Note that an empty collection will return no securities.
-   * 
-   * @param userIds  the new user identifiers, null clears the user id search
+   *
+   * @param userIds the new user identifiers, null clears the user id search
    */
   public void setObjectIds(Iterable<? extends ObjectIdentifiable> userIds) {
     if (userIds == null) {
@@ -153,12 +176,13 @@ public class UserSearchRequest extends AbstractSearchRequest {
   }
 
   //-------------------------------------------------------------------------
+
   /**
    * Adds a single external user identifier to the collection to search for.
-   * Unless customized, the search will match 
+   * Unless customized, the search will match
    * {@link ExternalIdSearchType#ANY any} of the identifiers.
-   * 
-   * @param externalUserId  the external user identifier to add, not null
+   *
+   * @param externalUserId the external user identifier to add, not null
    */
   public void addExternalId(ExternalId externalUserId) {
     ArgumentChecker.notNull(externalUserId, "externalUserId");
@@ -167,10 +191,10 @@ public class UserSearchRequest extends AbstractSearchRequest {
 
   /**
    * Adds a collection of external user identifiers to the collection to search for.
-   * Unless customized, the search will match 
+   * Unless customized, the search will match
    * {@link ExternalIdSearchType#ANY any} of the identifiers.
-   * 
-   * @param externalUserIds  the external user identifiers to add, not null
+   *
+   * @param externalUserIds the external user identifiers to add, not null
    */
   public void addExternalIds(ExternalId... externalUserIds) {
     ArgumentChecker.notNull(externalUserIds, "externalUserIds");
@@ -183,10 +207,10 @@ public class UserSearchRequest extends AbstractSearchRequest {
 
   /**
    * Adds a collection of external user identifiers to the collection to search for.
-   * Unless customized, the search will match 
+   * Unless customized, the search will match
    * {@link ExternalIdSearchType#ANY any} of the identifiers.
-   * 
-   * @param externalUserIds  the user key identifiers to add, not null
+   *
+   * @param externalUserIds the user key identifiers to add, not null
    */
   public void addExternalIds(Iterable<ExternalId> externalUserIds) {
     ArgumentChecker.notNull(externalUserIds, "externalUserIds");
@@ -202,7 +226,7 @@ public class UserSearchRequest extends AbstractSearchRequest {
   public boolean matches(AbstractDocument obj) {
     if (obj instanceof UserDocument == false) {
       return false;
-    }    
+    }
     UserDocument document = (UserDocument) obj;
     ManageableOGUser user = document.getUser();
     if (getObjectIds() != null && getObjectIds().contains(document.getObjectId()) == false) {
@@ -211,7 +235,7 @@ public class UserSearchRequest extends AbstractSearchRequest {
     if (getExternalIdSearch() != null && getExternalIdSearch().matches(user.getExternalIdBundle()) == false) {
       return false;
     }
-    if (getUserId() != null && RegexUtils.wildcardMatch(getUserId(), user.getUserId()) == false) {
+    if (getUsername() != null && RegexUtils.wildcardMatch(getUsername(), user.getUserId()) == false) {
       return false;
     }
     if (getName() != null && RegexUtils.wildcardMatch(getName(), user.getName()) == false) {
@@ -238,6 +262,18 @@ public class UserSearchRequest extends AbstractSearchRequest {
       }
     }
     return true;
+  }
+
+  public static UserSearchRequest byRoleOid(ObjectId objectId) {
+    UserSearchRequest usr = new UserSearchRequest();
+    usr.setRoleObjectId(objectId);
+    return usr;
+  }
+
+  public static UserSearchRequest byUserId(String username) {
+    UserSearchRequest usr = new UserSearchRequest();
+    usr.setUsername(username);
+    return usr;
   }
 
   //------------------------- AUTOGENERATED START -------------------------
@@ -269,8 +305,8 @@ public class UserSearchRequest extends AbstractSearchRequest {
         return getExternalIdValue();
       case -267027573:  // externalIdScheme
         return getExternalIdScheme();
-      case -836030906:  // userId
-        return getUserId();
+      case -265713450:  // username
+        return getUsername();
       case 3373707:  // name
         return getName();
       case -2077180903:  // timeZone
@@ -279,6 +315,14 @@ public class UserSearchRequest extends AbstractSearchRequest {
         return getEmailAddress();
       case -26774448:  // sortOrder
         return getSortOrder();
+      case -1820334256:  // roleObjectId
+        return getRoleObjectId();
+      case -523629324:  // resourceExternalId
+        return getResourceExternalId();
+      case -571694318:  // resourceAccess
+        return getResourceAccess();
+      case -384364440:  // resourceType
+        return getResourceType();
     }
     return super.propertyGet(propertyName, quiet);
   }
@@ -299,8 +343,8 @@ public class UserSearchRequest extends AbstractSearchRequest {
       case -267027573:  // externalIdScheme
         setExternalIdScheme((String) newValue);
         return;
-      case -836030906:  // userId
-        setUserId((String) newValue);
+      case -265713450:  // username
+        setUsername((String) newValue);
         return;
       case 3373707:  // name
         setName((String) newValue);
@@ -313,6 +357,18 @@ public class UserSearchRequest extends AbstractSearchRequest {
         return;
       case -26774448:  // sortOrder
         setSortOrder((UserSearchSortOrder) newValue);
+        return;
+      case -1820334256:  // roleObjectId
+        setRoleObjectId((ObjectId) newValue);
+        return;
+      case -523629324:  // resourceExternalId
+        setResourceExternalId((ExternalId) newValue);
+        return;
+      case -571694318:  // resourceAccess
+        setResourceAccess((String) newValue);
+        return;
+      case -384364440:  // resourceType
+        setResourceType((String) newValue);
         return;
     }
     super.propertySet(propertyName, newValue, quiet);
@@ -335,11 +391,15 @@ public class UserSearchRequest extends AbstractSearchRequest {
           JodaBeanUtils.equal(getExternalIdSearch(), other.getExternalIdSearch()) &&
           JodaBeanUtils.equal(getExternalIdValue(), other.getExternalIdValue()) &&
           JodaBeanUtils.equal(getExternalIdScheme(), other.getExternalIdScheme()) &&
-          JodaBeanUtils.equal(getUserId(), other.getUserId()) &&
+          JodaBeanUtils.equal(getUsername(), other.getUsername()) &&
           JodaBeanUtils.equal(getName(), other.getName()) &&
           JodaBeanUtils.equal(getTimeZone(), other.getTimeZone()) &&
           JodaBeanUtils.equal(getEmailAddress(), other.getEmailAddress()) &&
           JodaBeanUtils.equal(getSortOrder(), other.getSortOrder()) &&
+          JodaBeanUtils.equal(getRoleObjectId(), other.getRoleObjectId()) &&
+          JodaBeanUtils.equal(getResourceExternalId(), other.getResourceExternalId()) &&
+          JodaBeanUtils.equal(getResourceAccess(), other.getResourceAccess()) &&
+          JodaBeanUtils.equal(getResourceType(), other.getResourceType()) &&
           super.equals(obj);
     }
     return false;
@@ -352,11 +412,15 @@ public class UserSearchRequest extends AbstractSearchRequest {
     hash += hash * 31 + JodaBeanUtils.hashCode(getExternalIdSearch());
     hash += hash * 31 + JodaBeanUtils.hashCode(getExternalIdValue());
     hash += hash * 31 + JodaBeanUtils.hashCode(getExternalIdScheme());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getUserId());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getUsername());
     hash += hash * 31 + JodaBeanUtils.hashCode(getName());
     hash += hash * 31 + JodaBeanUtils.hashCode(getTimeZone());
     hash += hash * 31 + JodaBeanUtils.hashCode(getEmailAddress());
     hash += hash * 31 + JodaBeanUtils.hashCode(getSortOrder());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getRoleObjectId());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getResourceExternalId());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getResourceAccess());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getResourceType());
     return hash ^ super.hashCode();
   }
 
@@ -474,27 +538,27 @@ public class UserSearchRequest extends AbstractSearchRequest {
 
   //-----------------------------------------------------------------------
   /**
-   * Gets the user id to search for, wildcards allowed, null to not match on name.
+   * Gets the username to search for, wildcards allowed, null to not match on name.
    * @return the value of the property
    */
-  public String getUserId() {
-    return _userId;
+  public String getUsername() {
+    return _username;
   }
 
   /**
-   * Sets the user id to search for, wildcards allowed, null to not match on name.
-   * @param userId  the new value of the property
+   * Sets the username to search for, wildcards allowed, null to not match on name.
+   * @param username  the new value of the property
    */
-  public void setUserId(String userId) {
-    this._userId = userId;
+  public void setUsername(String username) {
+    this._username = username;
   }
 
   /**
-   * Gets the the {@code userId} property.
+   * Gets the the {@code username} property.
    * @return the property, not null
    */
-  public final Property<String> userId() {
-    return metaBean().userId().createProperty(this);
+  public final Property<String> username() {
+    return metaBean().username().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
@@ -600,6 +664,106 @@ public class UserSearchRequest extends AbstractSearchRequest {
 
   //-----------------------------------------------------------------------
   /**
+   * Gets the object identifier of user's role.
+   * @return the value of the property
+   */
+  public ObjectId getRoleObjectId() {
+    return _roleObjectId;
+  }
+
+  /**
+   * Sets the object identifier of user's role.
+   * @param roleObjectId  the new value of the property
+   */
+  public void setRoleObjectId(ObjectId roleObjectId) {
+    this._roleObjectId = roleObjectId;
+  }
+
+  /**
+   * Gets the the {@code roleObjectId} property.
+   * @return the property, not null
+   */
+  public final Property<ObjectId> roleObjectId() {
+    return metaBean().roleObjectId().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the external identifier of a resource to match, null to not match on resource identifier.
+   * @return the value of the property
+   */
+  public ExternalId getResourceExternalId() {
+    return _resourceExternalId;
+  }
+
+  /**
+   * Sets the external identifier of a resource to match, null to not match on resource identifier.
+   * @param resourceExternalId  the new value of the property
+   */
+  public void setResourceExternalId(ExternalId resourceExternalId) {
+    this._resourceExternalId = resourceExternalId;
+  }
+
+  /**
+   * Gets the the {@code resourceExternalId} property.
+   * @return the property, not null
+   */
+  public final Property<ExternalId> resourceExternalId() {
+    return metaBean().resourceExternalId().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the access type for a resource, null to not match on resource access type.
+   * @return the value of the property
+   */
+  public String getResourceAccess() {
+    return _resourceAccess;
+  }
+
+  /**
+   * Sets the access type for a resource, null to not match on resource access type.
+   * @param resourceAccess  the new value of the property
+   */
+  public void setResourceAccess(String resourceAccess) {
+    this._resourceAccess = resourceAccess;
+  }
+
+  /**
+   * Gets the the {@code resourceAccess} property.
+   * @return the property, not null
+   */
+  public final Property<String> resourceAccess() {
+    return metaBean().resourceAccess().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the type for a resource, null to not match on resource access type.
+   * @return the value of the property
+   */
+  public String getResourceType() {
+    return _resourceType;
+  }
+
+  /**
+   * Sets the type for a resource, null to not match on resource access type.
+   * @param resourceType  the new value of the property
+   */
+  public void setResourceType(String resourceType) {
+    this._resourceType = resourceType;
+  }
+
+  /**
+   * Gets the the {@code resourceType} property.
+   * @return the property, not null
+   */
+  public final Property<String> resourceType() {
+    return metaBean().resourceType().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * The meta-bean for {@code UserSearchRequest}.
    */
   public static class Meta extends AbstractSearchRequest.Meta {
@@ -630,10 +794,10 @@ public class UserSearchRequest extends AbstractSearchRequest {
     private final MetaProperty<String> _externalIdScheme = DirectMetaProperty.ofReadWrite(
         this, "externalIdScheme", UserSearchRequest.class, String.class);
     /**
-     * The meta-property for the {@code userId} property.
+     * The meta-property for the {@code username} property.
      */
-    private final MetaProperty<String> _userId = DirectMetaProperty.ofReadWrite(
-        this, "userId", UserSearchRequest.class, String.class);
+    private final MetaProperty<String> _username = DirectMetaProperty.ofReadWrite(
+        this, "username", UserSearchRequest.class, String.class);
     /**
      * The meta-property for the {@code name} property.
      */
@@ -655,6 +819,26 @@ public class UserSearchRequest extends AbstractSearchRequest {
     private final MetaProperty<UserSearchSortOrder> _sortOrder = DirectMetaProperty.ofReadWrite(
         this, "sortOrder", UserSearchRequest.class, UserSearchSortOrder.class);
     /**
+     * The meta-property for the {@code roleObjectId} property.
+     */
+    private final MetaProperty<ObjectId> _roleObjectId = DirectMetaProperty.ofReadWrite(
+        this, "roleObjectId", UserSearchRequest.class, ObjectId.class);
+    /**
+     * The meta-property for the {@code resourceExternalId} property.
+     */
+    private final MetaProperty<ExternalId> _resourceExternalId = DirectMetaProperty.ofReadWrite(
+        this, "resourceExternalId", UserSearchRequest.class, ExternalId.class);
+    /**
+     * The meta-property for the {@code resourceAccess} property.
+     */
+    private final MetaProperty<String> _resourceAccess = DirectMetaProperty.ofReadWrite(
+        this, "resourceAccess", UserSearchRequest.class, String.class);
+    /**
+     * The meta-property for the {@code resourceType} property.
+     */
+    private final MetaProperty<String> _resourceType = DirectMetaProperty.ofReadWrite(
+        this, "resourceType", UserSearchRequest.class, String.class);
+    /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
@@ -663,11 +847,15 @@ public class UserSearchRequest extends AbstractSearchRequest {
         "externalIdSearch",
         "externalIdValue",
         "externalIdScheme",
-        "userId",
+        "username",
         "name",
         "timeZone",
         "emailAddress",
-        "sortOrder");
+        "sortOrder",
+        "roleObjectId",
+        "resourceExternalId",
+        "resourceAccess",
+        "resourceType");
 
     /**
      * Restricted constructor.
@@ -686,8 +874,8 @@ public class UserSearchRequest extends AbstractSearchRequest {
           return _externalIdValue;
         case -267027573:  // externalIdScheme
           return _externalIdScheme;
-        case -836030906:  // userId
-          return _userId;
+        case -265713450:  // username
+          return _username;
         case 3373707:  // name
           return _name;
         case -2077180903:  // timeZone
@@ -696,6 +884,14 @@ public class UserSearchRequest extends AbstractSearchRequest {
           return _emailAddress;
         case -26774448:  // sortOrder
           return _sortOrder;
+        case -1820334256:  // roleObjectId
+          return _roleObjectId;
+        case -523629324:  // resourceExternalId
+          return _resourceExternalId;
+        case -571694318:  // resourceAccess
+          return _resourceAccess;
+        case -384364440:  // resourceType
+          return _resourceType;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -749,11 +945,11 @@ public class UserSearchRequest extends AbstractSearchRequest {
     }
 
     /**
-     * The meta-property for the {@code userId} property.
+     * The meta-property for the {@code username} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<String> userId() {
-      return _userId;
+    public final MetaProperty<String> username() {
+      return _username;
     }
 
     /**
@@ -786,6 +982,38 @@ public class UserSearchRequest extends AbstractSearchRequest {
      */
     public final MetaProperty<UserSearchSortOrder> sortOrder() {
       return _sortOrder;
+    }
+
+    /**
+     * The meta-property for the {@code roleObjectId} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<ObjectId> roleObjectId() {
+      return _roleObjectId;
+    }
+
+    /**
+     * The meta-property for the {@code resourceExternalId} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<ExternalId> resourceExternalId() {
+      return _resourceExternalId;
+    }
+
+    /**
+     * The meta-property for the {@code resourceAccess} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<String> resourceAccess() {
+      return _resourceAccess;
+    }
+
+    /**
+     * The meta-property for the {@code resourceType} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<String> resourceType() {
+      return _resourceType;
     }
 
   }

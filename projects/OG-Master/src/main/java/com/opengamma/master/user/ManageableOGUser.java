@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.master.user;
@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import com.opengamma.id.ObjectId;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -22,7 +23,6 @@ import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import org.threeten.bp.ZoneId;
 
-import com.google.common.collect.Sets;
 import com.opengamma.core.user.OGUser;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
@@ -63,15 +63,10 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
   private String _userId;
   /**
    * The hashed version of the user password, null if no password.
+   * The hash is brut-force safe thanks to bcrypt thus no need for salt (it uses salt internally)
    */
   @PropertyDefinition
   private String _passwordHash;
-  /**
-   * The entitlements for the user.
-   * This is a set of entitlements that the user has, which enables access restriction.
-   */
-  @PropertyDefinition(validate = "notNull")
-  private final Set<String> _entitlements = Sets.newHashSet();
   /**
    * The display user name, used to identify the user in a GUI.
    */
@@ -96,7 +91,7 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
 
   /**
    * Creates a user, setting the user id.
-   * 
+   *
    * @param userId  the user id, not null
    */
   public ManageableOGUser(String userId) {
@@ -105,7 +100,7 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
 
   /**
    * Clones the user, returning an independent copy.
-   * 
+   *
    * @return the clone, not null
    */
   public ManageableOGUser clone() {
@@ -114,7 +109,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
     cloned._externalIdBundle = _externalIdBundle;
     cloned._userId = _userId;
     cloned._passwordHash = _passwordHash;
-    cloned._entitlements.addAll(_entitlements);
     cloned._name = _name;
     cloned._timeZone = _timeZone;
     cloned._emailAddress = _emailAddress;
@@ -124,7 +118,7 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
   //-------------------------------------------------------------------------
   /**
    * Adds an external identifier to the bundle representing this user.
-   * 
+   *
    * @param userId  the identifier to add, not null
    */
   public void addExternalId(ExternalId userId) {
@@ -160,8 +154,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
         return getUserId();
       case 566700617:  // passwordHash
         return getPasswordHash();
-      case -1704576794:  // entitlements
-        return getEntitlements();
       case 3373707:  // name
         return getName();
       case -2077180903:  // timeZone
@@ -172,7 +164,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
     return super.propertyGet(propertyName, quiet);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected void propertySet(String propertyName, Object newValue, boolean quiet) {
     switch (propertyName.hashCode()) {
@@ -187,9 +178,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
         return;
       case 566700617:  // passwordHash
         setPasswordHash((String) newValue);
-        return;
-      case -1704576794:  // entitlements
-        setEntitlements((Set<String>) newValue);
         return;
       case 3373707:  // name
         setName((String) newValue);
@@ -208,7 +196,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
   protected void validate() {
     JodaBeanUtils.notNull(_externalIdBundle, "externalIdBundle");
     JodaBeanUtils.notNull(_userId, "userId");
-    JodaBeanUtils.notNull(_entitlements, "entitlements");
     JodaBeanUtils.notNull(_timeZone, "timeZone");
     super.validate();
   }
@@ -224,7 +211,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
           JodaBeanUtils.equal(getExternalIdBundle(), other.getExternalIdBundle()) &&
           JodaBeanUtils.equal(getUserId(), other.getUserId()) &&
           JodaBeanUtils.equal(getPasswordHash(), other.getPasswordHash()) &&
-          JodaBeanUtils.equal(getEntitlements(), other.getEntitlements()) &&
           JodaBeanUtils.equal(getName(), other.getName()) &&
           JodaBeanUtils.equal(getTimeZone(), other.getTimeZone()) &&
           JodaBeanUtils.equal(getEmailAddress(), other.getEmailAddress());
@@ -239,7 +225,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
     hash += hash * 31 + JodaBeanUtils.hashCode(getExternalIdBundle());
     hash += hash * 31 + JodaBeanUtils.hashCode(getUserId());
     hash += hash * 31 + JodaBeanUtils.hashCode(getPasswordHash());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getEntitlements());
     hash += hash * 31 + JodaBeanUtils.hashCode(getName());
     hash += hash * 31 + JodaBeanUtils.hashCode(getTimeZone());
     hash += hash * 31 + JodaBeanUtils.hashCode(getEmailAddress());
@@ -335,6 +320,7 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
   //-----------------------------------------------------------------------
   /**
    * Gets the hashed version of the user password, null if no password.
+   * The hash is brut-force safe thanks to bcrypt thus no need for salt (it uses salt internally)
    * @return the value of the property
    */
   public String getPasswordHash() {
@@ -343,6 +329,7 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
 
   /**
    * Sets the hashed version of the user password, null if no password.
+   * The hash is brut-force safe thanks to bcrypt thus no need for salt (it uses salt internally)
    * @param passwordHash  the new value of the property
    */
   public void setPasswordHash(String passwordHash) {
@@ -351,39 +338,11 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
 
   /**
    * Gets the the {@code passwordHash} property.
+   * The hash is brut-force safe thanks to bcrypt thus no need for salt (it uses salt internally)
    * @return the property, not null
    */
   public final Property<String> passwordHash() {
     return metaBean().passwordHash().createProperty(this);
-  }
-
-  //-----------------------------------------------------------------------
-  /**
-   * Gets the entitlements for the user.
-   * This is a set of entitlements that the user has, which enables access restriction.
-   * @return the value of the property, not null
-   */
-  public Set<String> getEntitlements() {
-    return _entitlements;
-  }
-
-  /**
-   * Sets the entitlements for the user.
-   * This is a set of entitlements that the user has, which enables access restriction.
-   * @param entitlements  the new value of the property
-   */
-  public void setEntitlements(Set<String> entitlements) {
-    this._entitlements.clear();
-    this._entitlements.addAll(entitlements);
-  }
-
-  /**
-   * Gets the the {@code entitlements} property.
-   * This is a set of entitlements that the user has, which enables access restriction.
-   * @return the property, not null
-   */
-  public final Property<Set<String>> entitlements() {
-    return metaBean().entitlements().createProperty(this);
   }
 
   //-----------------------------------------------------------------------
@@ -493,12 +452,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
     private final MetaProperty<String> _passwordHash = DirectMetaProperty.ofReadWrite(
         this, "passwordHash", ManageableOGUser.class, String.class);
     /**
-     * The meta-property for the {@code entitlements} property.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes" })
-    private final MetaProperty<Set<String>> _entitlements = DirectMetaProperty.ofReadWrite(
-        this, "entitlements", ManageableOGUser.class, (Class) Set.class);
-    /**
      * The meta-property for the {@code name} property.
      */
     private final MetaProperty<String> _name = DirectMetaProperty.ofReadWrite(
@@ -522,7 +475,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
         "externalIdBundle",
         "userId",
         "passwordHash",
-        "entitlements",
         "name",
         "timeZone",
         "emailAddress");
@@ -544,8 +496,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
           return _userId;
         case 566700617:  // passwordHash
           return _passwordHash;
-        case -1704576794:  // entitlements
-          return _entitlements;
         case 3373707:  // name
           return _name;
         case -2077180903:  // timeZone
@@ -602,14 +552,6 @@ public class ManageableOGUser extends DirectBean implements OGUser, Serializable
      */
     public final MetaProperty<String> passwordHash() {
       return _passwordHash;
-    }
-
-    /**
-     * The meta-property for the {@code entitlements} property.
-     * @return the meta-property, not null
-     */
-    public final MetaProperty<Set<String>> entitlements() {
-      return _entitlements;
     }
 
     /**
