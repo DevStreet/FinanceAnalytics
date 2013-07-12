@@ -8,6 +8,7 @@ common/deploy.properties
 /projects/*
 !/projects/OG-Parent
 !/projects/OG-Analytics
+!/projects/OG-Auth
 !/projects/OG-Bloomberg
 !/projects/OG-Component
 !/projects/OG-Core

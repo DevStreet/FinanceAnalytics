@@ -508,6 +508,7 @@
     <mkdir dir="${docs.dir}/javadoc-all" />
     <mkdir dir="${docs.dir}/temp-src" />
     <copy toDir="${docs.dir}/temp-src">
+      <fileset dir="${projects.dir}/OG-Auth/src/main/java" includes="**/*.java **/package.html"/>
       <fileset dir="${projects.dir}/OG-Analytics/src/main/java" includes="**/*.java **/package.html"/>
       <fileset dir="${projects.dir}/OG-Bloomberg/src/main/java" includes="**/*.java **/package.html"/>
       <fileset dir="${projects.dir}/OG-BloombergExample/src/main/java" includes="**/*.java **/package.html"/>
