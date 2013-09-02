@@ -21,6 +21,7 @@ import com.opengamma.analytics.financial.interestrate.CompoundingType;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
 import com.opengamma.util.time.Tenor;
+import org.joda.beans.Bean;
 
 /**
  * Conventions for a compounding ibor swap leg.
@@ -95,74 +96,6 @@ public class CompoundingIborLegConvention extends Convention {
   @Override
   public CompoundingIborLegConvention.Meta metaBean() {
     return CompoundingIborLegConvention.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -1542426233:  // iborIndexConvention
-        return getIborIndexConvention();
-      case -507548582:  // paymentTenor
-        return getPaymentTenor();
-      case -1936397775:  // compoundingType
-        return getCompoundingType();
-      case 348962765:  // isExchangeNotional
-        return isIsExchangeNotional();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -1542426233:  // iborIndexConvention
-        setIborIndexConvention((ExternalId) newValue);
-        return;
-      case -507548582:  // paymentTenor
-        setPaymentTenor((Tenor) newValue);
-        return;
-      case -1936397775:  // compoundingType
-        setCompoundingType((CompoundingType) newValue);
-        return;
-      case 348962765:  // isExchangeNotional
-        setIsExchangeNotional((Boolean) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_iborIndexConvention, "iborIndexConvention");
-    JodaBeanUtils.notNull(_paymentTenor, "paymentTenor");
-    JodaBeanUtils.notNull(_compoundingType, "compoundingType");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      CompoundingIborLegConvention other = (CompoundingIborLegConvention) obj;
-      return JodaBeanUtils.equal(getIborIndexConvention(), other.getIborIndexConvention()) &&
-          JodaBeanUtils.equal(getPaymentTenor(), other.getPaymentTenor()) &&
-          JodaBeanUtils.equal(getCompoundingType(), other.getCompoundingType()) &&
-          JodaBeanUtils.equal(isIsExchangeNotional(), other.isIsExchangeNotional()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getIborIndexConvention());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getPaymentTenor());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getCompoundingType());
-    hash += hash * 31 + JodaBeanUtils.hashCode(isIsExchangeNotional());
-    return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
@@ -266,6 +199,60 @@ public class CompoundingIborLegConvention extends Convention {
    */
   public final Property<Boolean> isExchangeNotional() {
     return metaBean().isExchangeNotional().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public CompoundingIborLegConvention clone() {
+    return (CompoundingIborLegConvention) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      CompoundingIborLegConvention other = (CompoundingIborLegConvention) obj;
+      return JodaBeanUtils.equal(getIborIndexConvention(), other.getIborIndexConvention()) &&
+          JodaBeanUtils.equal(getPaymentTenor(), other.getPaymentTenor()) &&
+          JodaBeanUtils.equal(getCompoundingType(), other.getCompoundingType()) &&
+          (isIsExchangeNotional() == other.isIsExchangeNotional()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getIborIndexConvention());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getPaymentTenor());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getCompoundingType());
+    hash += hash * 31 + JodaBeanUtils.hashCode(isIsExchangeNotional());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(160);
+    buf.append("CompoundingIborLegConvention{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("iborIndexConvention").append('=').append(getIborIndexConvention()).append(',').append(' ');
+    buf.append("paymentTenor").append('=').append(getPaymentTenor()).append(',').append(' ');
+    buf.append("compoundingType").append('=').append(getCompoundingType()).append(',').append(' ');
+    buf.append("isExchangeNotional").append('=').append(isIsExchangeNotional()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -375,6 +362,49 @@ public class CompoundingIborLegConvention extends Convention {
      */
     public final MetaProperty<Boolean> isExchangeNotional() {
       return _isExchangeNotional;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -1542426233:  // iborIndexConvention
+          return ((CompoundingIborLegConvention) bean).getIborIndexConvention();
+        case -507548582:  // paymentTenor
+          return ((CompoundingIborLegConvention) bean).getPaymentTenor();
+        case -1936397775:  // compoundingType
+          return ((CompoundingIborLegConvention) bean).getCompoundingType();
+        case 348962765:  // isExchangeNotional
+          return ((CompoundingIborLegConvention) bean).isIsExchangeNotional();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -1542426233:  // iborIndexConvention
+          ((CompoundingIborLegConvention) bean).setIborIndexConvention((ExternalId) newValue);
+          return;
+        case -507548582:  // paymentTenor
+          ((CompoundingIborLegConvention) bean).setPaymentTenor((Tenor) newValue);
+          return;
+        case -1936397775:  // compoundingType
+          ((CompoundingIborLegConvention) bean).setCompoundingType((CompoundingType) newValue);
+          return;
+        case 348962765:  // isExchangeNotional
+          ((CompoundingIborLegConvention) bean).setIsExchangeNotional((Boolean) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._iborIndexConvention, "iborIndexConvention");
+      JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._paymentTenor, "paymentTenor");
+      JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._compoundingType, "compoundingType");
+      super.validate(bean);
     }
 
   }

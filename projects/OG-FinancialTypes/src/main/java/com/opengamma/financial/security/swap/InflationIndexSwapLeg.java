@@ -7,6 +7,7 @@ package com.opengamma.financial.security.swap;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -109,73 +110,6 @@ public class InflationIndexSwapLeg extends InflationLeg {
     return InflationIndexSwapLeg.Meta.INSTANCE;
   }
 
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 1943291277:  // indexId
-        return getIndexId();
-      case -1695868826:  // quotationLag
-        return getQuotationLag();
-      case -395555690:  // conventionalLag
-        return getConventionalLag();
-      case 374385573:  // interpolationMethod
-        return getInterpolationMethod();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 1943291277:  // indexId
-        setIndexId((ExternalId) newValue);
-        return;
-      case -1695868826:  // quotationLag
-        setQuotationLag((Integer) newValue);
-        return;
-      case -395555690:  // conventionalLag
-        setConventionalLag((Integer) newValue);
-        return;
-      case 374385573:  // interpolationMethod
-        setInterpolationMethod((InterpolationMethod) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_indexId, "indexId");
-    JodaBeanUtils.notNull(_interpolationMethod, "interpolationMethod");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      InflationIndexSwapLeg other = (InflationIndexSwapLeg) obj;
-      return JodaBeanUtils.equal(getIndexId(), other.getIndexId()) &&
-          JodaBeanUtils.equal(getQuotationLag(), other.getQuotationLag()) &&
-          JodaBeanUtils.equal(getConventionalLag(), other.getConventionalLag()) &&
-          JodaBeanUtils.equal(getInterpolationMethod(), other.getInterpolationMethod()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getIndexId());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getQuotationLag());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getConventionalLag());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getInterpolationMethod());
-    return hash ^ super.hashCode();
-  }
-
   //-----------------------------------------------------------------------
   /**
    * Gets the external id of the index.
@@ -276,6 +210,60 @@ public class InflationIndexSwapLeg extends InflationLeg {
    */
   public final Property<InterpolationMethod> interpolationMethod() {
     return metaBean().interpolationMethod().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public InflationIndexSwapLeg clone() {
+    return (InflationIndexSwapLeg) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      InflationIndexSwapLeg other = (InflationIndexSwapLeg) obj;
+      return JodaBeanUtils.equal(getIndexId(), other.getIndexId()) &&
+          (getQuotationLag() == other.getQuotationLag()) &&
+          (getConventionalLag() == other.getConventionalLag()) &&
+          JodaBeanUtils.equal(getInterpolationMethod(), other.getInterpolationMethod()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getIndexId());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getQuotationLag());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getConventionalLag());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getInterpolationMethod());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(160);
+    buf.append("InflationIndexSwapLeg{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("indexId").append('=').append(getIndexId()).append(',').append(' ');
+    buf.append("quotationLag").append('=').append(getQuotationLag()).append(',').append(' ');
+    buf.append("conventionalLag").append('=').append(getConventionalLag()).append(',').append(' ');
+    buf.append("interpolationMethod").append('=').append(getInterpolationMethod()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -385,6 +373,48 @@ public class InflationIndexSwapLeg extends InflationLeg {
      */
     public final MetaProperty<InterpolationMethod> interpolationMethod() {
       return _interpolationMethod;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 1943291277:  // indexId
+          return ((InflationIndexSwapLeg) bean).getIndexId();
+        case -1695868826:  // quotationLag
+          return ((InflationIndexSwapLeg) bean).getQuotationLag();
+        case -395555690:  // conventionalLag
+          return ((InflationIndexSwapLeg) bean).getConventionalLag();
+        case 374385573:  // interpolationMethod
+          return ((InflationIndexSwapLeg) bean).getInterpolationMethod();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 1943291277:  // indexId
+          ((InflationIndexSwapLeg) bean).setIndexId((ExternalId) newValue);
+          return;
+        case -1695868826:  // quotationLag
+          ((InflationIndexSwapLeg) bean).setQuotationLag((Integer) newValue);
+          return;
+        case -395555690:  // conventionalLag
+          ((InflationIndexSwapLeg) bean).setConventionalLag((Integer) newValue);
+          return;
+        case 374385573:  // interpolationMethod
+          ((InflationIndexSwapLeg) bean).setInterpolationMethod((InterpolationMethod) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((InflationIndexSwapLeg) bean)._indexId, "indexId");
+      JodaBeanUtils.notNull(((InflationIndexSwapLeg) bean)._interpolationMethod, "interpolationMethod");
+      super.validate(bean);
     }
 
   }

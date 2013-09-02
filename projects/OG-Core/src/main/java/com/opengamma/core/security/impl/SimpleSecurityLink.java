@@ -7,6 +7,7 @@ package com.opengamma.core.security.impl;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -223,45 +224,6 @@ public class SimpleSecurityLink extends AbstractLink<Security>
     return SimpleSecurityLink.Meta.INSTANCE;
   }
 
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -880905839:  // target
-        return getTarget();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -880905839:  // target
-        setTarget((Security) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      SimpleSecurityLink other = (SimpleSecurityLink) obj;
-      return JodaBeanUtils.equal(getTarget(), other.getTarget()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getTarget());
-    return hash ^ super.hashCode();
-  }
-
   //-----------------------------------------------------------------------
   /**
    * Gets the target security.
@@ -285,6 +247,51 @@ public class SimpleSecurityLink extends AbstractLink<Security>
    */
   public final Property<Security> target() {
     return metaBean().target().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public SimpleSecurityLink clone() {
+    return (SimpleSecurityLink) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      SimpleSecurityLink other = (SimpleSecurityLink) obj;
+      return JodaBeanUtils.equal(getTarget(), other.getTarget()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getTarget());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(64);
+    buf.append("SimpleSecurityLink{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("target").append('=').append(getTarget()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -346,6 +353,26 @@ public class SimpleSecurityLink extends AbstractLink<Security>
      */
     public final MetaProperty<Security> target() {
       return _target;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -880905839:  // target
+          return ((SimpleSecurityLink) bean).getTarget();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -880905839:  // target
+          ((SimpleSecurityLink) bean).setTarget((Security) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
     }
 
   }

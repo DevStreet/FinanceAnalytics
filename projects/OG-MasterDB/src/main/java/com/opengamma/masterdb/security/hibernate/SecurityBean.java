@@ -17,6 +17,7 @@ import org.joda.beans.impl.direct.DirectBean;
 import org.joda.beans.impl.direct.DirectMetaBean;
 import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
+import org.joda.beans.Bean;
 
 /**
  * Hibernate bean for a security.
@@ -52,51 +53,6 @@ public abstract class SecurityBean extends DirectBean {
   @Override
   public SecurityBean.Meta metaBean() {
     return SecurityBean.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 3355:  // id
-        return getId();
-      case 1574023291:  // securityId
-        return getSecurityId();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 3355:  // id
-        setId((Long) newValue);
-        return;
-      case 1574023291:  // securityId
-        setSecurityId((Long) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      SecurityBean other = (SecurityBean) obj;
-      return JodaBeanUtils.equal(getId(), other.getId()) &&
-          JodaBeanUtils.equal(getSecurityId(), other.getSecurityId());
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = getClass().hashCode();
-    hash += hash * 31 + JodaBeanUtils.hashCode(getId());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getSecurityId());
-    return hash;
   }
 
   //-----------------------------------------------------------------------
@@ -147,6 +103,61 @@ public abstract class SecurityBean extends DirectBean {
    */
   public final Property<Long> securityId() {
     return metaBean().securityId().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public SecurityBean clone() {
+    BeanBuilder<? extends SecurityBean> builder = metaBean().builder();
+    for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
+      if (mp.readWrite().isWritable()) {
+        Object value = mp.get(this);
+        if (value instanceof Bean) {
+          value = ((Bean) value).clone();
+        }
+        builder.set(mp.name(), value);
+      }
+    }
+    return builder.build();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      SecurityBean other = (SecurityBean) obj;
+      return JodaBeanUtils.equal(getId(), other.getId()) &&
+          JodaBeanUtils.equal(getSecurityId(), other.getSecurityId());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = getClass().hashCode();
+    hash += hash * 31 + JodaBeanUtils.hashCode(getId());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getSecurityId());
+    return hash;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(96);
+    buf.append("SecurityBean{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  protected void toString(StringBuilder buf) {
+    buf.append("id").append('=').append(getId()).append(',').append(' ');
+    buf.append("securityId").append('=').append(getSecurityId()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -224,6 +235,31 @@ public abstract class SecurityBean extends DirectBean {
      */
     public final MetaProperty<Long> securityId() {
       return _securityId;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 3355:  // id
+          return ((SecurityBean) bean).getId();
+        case 1574023291:  // securityId
+          return ((SecurityBean) bean).getSecurityId();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 3355:  // id
+          ((SecurityBean) bean).setId((Long) newValue);
+          return;
+        case 1574023291:  // securityId
+          ((SecurityBean) bean).setSecurityId((Long) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
     }
 
   }

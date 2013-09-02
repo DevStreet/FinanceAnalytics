@@ -18,6 +18,7 @@ import com.opengamma.bbg.component.AbstractBloombergLiveDataServerComponentFacto
 import com.opengamma.livedata.entitlement.LiveDataEntitlementChecker;
 import com.opengamma.livedata.entitlement.PermissiveLiveDataEntitlementChecker;
 import com.opengamma.livedata.resolver.DistributionSpecificationResolver;
+import org.joda.beans.Bean;
 
 /**
  * Component factory for Bloomberg live market data for the purpose of evaluation.
@@ -49,14 +50,10 @@ public class ExampleLiveDataServerComponentFactory extends AbstractBloombergLive
     return ExampleLiveDataServerComponentFactory.Meta.INSTANCE;
   }
 
+  //-----------------------------------------------------------------------
   @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    super.propertySet(propertyName, newValue, quiet);
+  public ExampleLiveDataServerComponentFactory clone() {
+    return (ExampleLiveDataServerComponentFactory) super.clone();
   }
 
   @Override
@@ -74,6 +71,24 @@ public class ExampleLiveDataServerComponentFactory extends AbstractBloombergLive
   public int hashCode() {
     int hash = 7;
     return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(32);
+    buf.append("ExampleLiveDataServerComponentFactory{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
   }
 
   //-----------------------------------------------------------------------

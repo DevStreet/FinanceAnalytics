@@ -7,6 +7,7 @@ package com.opengamma.financial.security.cds;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -112,75 +113,6 @@ public abstract class CreditDefaultSwapSecurity extends AbstractCreditDefaultSwa
   @Override
   public CreditDefaultSwapSecurity.Meta metaBean() {
     return CreditDefaultSwapSecurity.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 2002873877:  // recoveryRate
-        return getRecoveryRate();
-      case 1737168171:  // debtSeniority
-        return getDebtSeniority();
-      case -1774904020:  // restructuringClause
-        return getRestructuringClause();
-      case -690339025:  // regionId
-        return getRegionId();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 2002873877:  // recoveryRate
-        setRecoveryRate((Double) newValue);
-        return;
-      case 1737168171:  // debtSeniority
-        setDebtSeniority((DebtSeniority) newValue);
-        return;
-      case -1774904020:  // restructuringClause
-        setRestructuringClause((RestructuringClause) newValue);
-        return;
-      case -690339025:  // regionId
-        setRegionId((ExternalId) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_recoveryRate, "recoveryRate");
-    JodaBeanUtils.notNull(_debtSeniority, "debtSeniority");
-    JodaBeanUtils.notNull(_restructuringClause, "restructuringClause");
-    JodaBeanUtils.notNull(_regionId, "regionId");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      CreditDefaultSwapSecurity other = (CreditDefaultSwapSecurity) obj;
-      return JodaBeanUtils.equal(getRecoveryRate(), other.getRecoveryRate()) &&
-          JodaBeanUtils.equal(getDebtSeniority(), other.getDebtSeniority()) &&
-          JodaBeanUtils.equal(getRestructuringClause(), other.getRestructuringClause()) &&
-          JodaBeanUtils.equal(getRegionId(), other.getRegionId()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getRecoveryRate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getDebtSeniority());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getRestructuringClause());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getRegionId());
-    return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
@@ -291,6 +223,55 @@ public abstract class CreditDefaultSwapSecurity extends AbstractCreditDefaultSwa
   }
 
   //-----------------------------------------------------------------------
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      CreditDefaultSwapSecurity other = (CreditDefaultSwapSecurity) obj;
+      return JodaBeanUtils.equal(getRecoveryRate(), other.getRecoveryRate()) &&
+          JodaBeanUtils.equal(getDebtSeniority(), other.getDebtSeniority()) &&
+          JodaBeanUtils.equal(getRestructuringClause(), other.getRestructuringClause()) &&
+          JodaBeanUtils.equal(getRegionId(), other.getRegionId()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getRecoveryRate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getDebtSeniority());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getRestructuringClause());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getRegionId());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(160);
+    buf.append("CreditDefaultSwapSecurity{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("recoveryRate").append('=').append(getRecoveryRate()).append(',').append(' ');
+    buf.append("debtSeniority").append('=').append(getDebtSeniority()).append(',').append(' ');
+    buf.append("restructuringClause").append('=').append(getRestructuringClause()).append(',').append(' ');
+    buf.append("regionId").append('=').append(getRegionId()).append(',').append(' ');
+  }
+
+  //-----------------------------------------------------------------------
   /**
    * The meta-bean for {@code CreditDefaultSwapSecurity}.
    */
@@ -397,6 +378,50 @@ public abstract class CreditDefaultSwapSecurity extends AbstractCreditDefaultSwa
      */
     public final MetaProperty<ExternalId> regionId() {
       return _regionId;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 2002873877:  // recoveryRate
+          return ((CreditDefaultSwapSecurity) bean).getRecoveryRate();
+        case 1737168171:  // debtSeniority
+          return ((CreditDefaultSwapSecurity) bean).getDebtSeniority();
+        case -1774904020:  // restructuringClause
+          return ((CreditDefaultSwapSecurity) bean).getRestructuringClause();
+        case -690339025:  // regionId
+          return ((CreditDefaultSwapSecurity) bean).getRegionId();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 2002873877:  // recoveryRate
+          ((CreditDefaultSwapSecurity) bean).setRecoveryRate((Double) newValue);
+          return;
+        case 1737168171:  // debtSeniority
+          ((CreditDefaultSwapSecurity) bean).setDebtSeniority((DebtSeniority) newValue);
+          return;
+        case -1774904020:  // restructuringClause
+          ((CreditDefaultSwapSecurity) bean).setRestructuringClause((RestructuringClause) newValue);
+          return;
+        case -690339025:  // regionId
+          ((CreditDefaultSwapSecurity) bean).setRegionId((ExternalId) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((CreditDefaultSwapSecurity) bean)._recoveryRate, "recoveryRate");
+      JodaBeanUtils.notNull(((CreditDefaultSwapSecurity) bean)._debtSeniority, "debtSeniority");
+      JodaBeanUtils.notNull(((CreditDefaultSwapSecurity) bean)._restructuringClause, "restructuringClause");
+      JodaBeanUtils.notNull(((CreditDefaultSwapSecurity) bean)._regionId, "regionId");
+      super.validate(bean);
     }
 
   }

@@ -5,7 +5,6 @@
  */
 package com.opengamma.web.analytics.rest;
 
-import java.net.URI;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 

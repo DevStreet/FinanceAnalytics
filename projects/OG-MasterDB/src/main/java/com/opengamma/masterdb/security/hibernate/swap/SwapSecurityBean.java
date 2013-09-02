@@ -21,6 +21,7 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.masterdb.security.hibernate.SecurityBean;
 import com.opengamma.masterdb.security.hibernate.ZonedDateTimeBean;
+import org.joda.beans.Bean;
 
 /**
  * A Hibernate bean representation of {@link SwapSecurity}.
@@ -62,94 +63,6 @@ public class SwapSecurityBean extends SecurityBean {
   @Override
   public SwapSecurityBean.Meta metaBean() {
     return SwapSecurityBean.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -318434451:  // swapType
-        return getSwapType();
-      case 752419634:  // tradeDate
-        return getTradeDate();
-      case -930389515:  // effectiveDate
-        return getEffectiveDate();
-      case -414641441:  // maturityDate
-        return getMaturityDate();
-      case -414907925:  // forwardStartDate
-        return getForwardStartDate();
-      case -1651301782:  // counterparty
-        return getCounterparty();
-      case -995239866:  // payLeg
-        return getPayLeg();
-      case 209233963:  // receiveLeg
-        return getReceiveLeg();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -318434451:  // swapType
-        setSwapType((SwapType) newValue);
-        return;
-      case 752419634:  // tradeDate
-        setTradeDate((ZonedDateTimeBean) newValue);
-        return;
-      case -930389515:  // effectiveDate
-        setEffectiveDate((ZonedDateTimeBean) newValue);
-        return;
-      case -414641441:  // maturityDate
-        setMaturityDate((ZonedDateTimeBean) newValue);
-        return;
-      case -414907925:  // forwardStartDate
-        setForwardStartDate((ZonedDateTimeBean) newValue);
-        return;
-      case -1651301782:  // counterparty
-        setCounterparty((String) newValue);
-        return;
-      case -995239866:  // payLeg
-        setPayLeg((SwapLegBean) newValue);
-        return;
-      case 209233963:  // receiveLeg
-        setReceiveLeg((SwapLegBean) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      SwapSecurityBean other = (SwapSecurityBean) obj;
-      return JodaBeanUtils.equal(getSwapType(), other.getSwapType()) &&
-          JodaBeanUtils.equal(getTradeDate(), other.getTradeDate()) &&
-          JodaBeanUtils.equal(getEffectiveDate(), other.getEffectiveDate()) &&
-          JodaBeanUtils.equal(getMaturityDate(), other.getMaturityDate()) &&
-          JodaBeanUtils.equal(getForwardStartDate(), other.getForwardStartDate()) &&
-          JodaBeanUtils.equal(getCounterparty(), other.getCounterparty()) &&
-          JodaBeanUtils.equal(getPayLeg(), other.getPayLeg()) &&
-          JodaBeanUtils.equal(getReceiveLeg(), other.getReceiveLeg()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getSwapType());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getTradeDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getEffectiveDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getMaturityDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getForwardStartDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getCounterparty());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getPayLeg());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getReceiveLeg());
-    return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
@@ -353,6 +266,72 @@ public class SwapSecurityBean extends SecurityBean {
   }
 
   //-----------------------------------------------------------------------
+  @Override
+  public SwapSecurityBean clone() {
+    return (SwapSecurityBean) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      SwapSecurityBean other = (SwapSecurityBean) obj;
+      return JodaBeanUtils.equal(getSwapType(), other.getSwapType()) &&
+          JodaBeanUtils.equal(getTradeDate(), other.getTradeDate()) &&
+          JodaBeanUtils.equal(getEffectiveDate(), other.getEffectiveDate()) &&
+          JodaBeanUtils.equal(getMaturityDate(), other.getMaturityDate()) &&
+          JodaBeanUtils.equal(getForwardStartDate(), other.getForwardStartDate()) &&
+          JodaBeanUtils.equal(getCounterparty(), other.getCounterparty()) &&
+          JodaBeanUtils.equal(getPayLeg(), other.getPayLeg()) &&
+          JodaBeanUtils.equal(getReceiveLeg(), other.getReceiveLeg()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getSwapType());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getTradeDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getEffectiveDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getMaturityDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getForwardStartDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getCounterparty());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getPayLeg());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getReceiveLeg());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(288);
+    buf.append("SwapSecurityBean{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("swapType").append('=').append(getSwapType()).append(',').append(' ');
+    buf.append("tradeDate").append('=').append(getTradeDate()).append(',').append(' ');
+    buf.append("effectiveDate").append('=').append(getEffectiveDate()).append(',').append(' ');
+    buf.append("maturityDate").append('=').append(getMaturityDate()).append(',').append(' ');
+    buf.append("forwardStartDate").append('=').append(getForwardStartDate()).append(',').append(' ');
+    buf.append("counterparty").append('=').append(getCounterparty()).append(',').append(' ');
+    buf.append("payLeg").append('=').append(getPayLeg()).append(',').append(' ');
+    buf.append("receiveLeg").append('=').append(getReceiveLeg()).append(',').append(' ');
+  }
+
+  //-----------------------------------------------------------------------
   /**
    * The meta-bean for {@code SwapSecurityBean}.
    */
@@ -523,6 +502,61 @@ public class SwapSecurityBean extends SecurityBean {
      */
     public final MetaProperty<SwapLegBean> receiveLeg() {
       return _receiveLeg;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -318434451:  // swapType
+          return ((SwapSecurityBean) bean).getSwapType();
+        case 752419634:  // tradeDate
+          return ((SwapSecurityBean) bean).getTradeDate();
+        case -930389515:  // effectiveDate
+          return ((SwapSecurityBean) bean).getEffectiveDate();
+        case -414641441:  // maturityDate
+          return ((SwapSecurityBean) bean).getMaturityDate();
+        case -414907925:  // forwardStartDate
+          return ((SwapSecurityBean) bean).getForwardStartDate();
+        case -1651301782:  // counterparty
+          return ((SwapSecurityBean) bean).getCounterparty();
+        case -995239866:  // payLeg
+          return ((SwapSecurityBean) bean).getPayLeg();
+        case 209233963:  // receiveLeg
+          return ((SwapSecurityBean) bean).getReceiveLeg();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -318434451:  // swapType
+          ((SwapSecurityBean) bean).setSwapType((SwapType) newValue);
+          return;
+        case 752419634:  // tradeDate
+          ((SwapSecurityBean) bean).setTradeDate((ZonedDateTimeBean) newValue);
+          return;
+        case -930389515:  // effectiveDate
+          ((SwapSecurityBean) bean).setEffectiveDate((ZonedDateTimeBean) newValue);
+          return;
+        case -414641441:  // maturityDate
+          ((SwapSecurityBean) bean).setMaturityDate((ZonedDateTimeBean) newValue);
+          return;
+        case -414907925:  // forwardStartDate
+          ((SwapSecurityBean) bean).setForwardStartDate((ZonedDateTimeBean) newValue);
+          return;
+        case -1651301782:  // counterparty
+          ((SwapSecurityBean) bean).setCounterparty((String) newValue);
+          return;
+        case -995239866:  // payLeg
+          ((SwapSecurityBean) bean).setPayLeg((SwapLegBean) newValue);
+          return;
+        case 209233963:  // receiveLeg
+          ((SwapSecurityBean) bean).setReceiveLeg((SwapLegBean) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
     }
 
   }
