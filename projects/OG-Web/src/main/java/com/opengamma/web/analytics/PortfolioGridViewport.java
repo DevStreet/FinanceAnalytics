@@ -16,6 +16,9 @@ import com.opengamma.engine.view.cycle.ViewCycle;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.tuple.Pair;
 
+/**
+ * The grid viewport.
+ */
 public class PortfolioGridViewport extends MainGridViewport {
 
   /** The node structure. */

@@ -58,7 +58,7 @@ import com.opengamma.web.analytics.formatting.TypeFormatter;
   private final UniqueId _viewDefinitionId;
 
   private PortfolioAnalyticsGrid _portfolioGrid;
-  private MainAnalyticsGrid _primitivesGrid;
+  private MainAnalyticsGrid<?> _primitivesGrid;
   private CompiledViewDefinition _compiledViewDefinition;
   private CompiledViewDefinition _pendingStructureChange;
   private Portfolio _pendingPortfolio;
@@ -195,7 +195,7 @@ import com.opengamma.web.analytics.formatting.TypeFormatter;
     return updatedIds;
   }
 
-  private MainAnalyticsGrid getGrid(GridType gridType) {
+  private MainAnalyticsGrid<?> getGrid(GridType gridType) {
     switch (gridType) {
       case PORTFOLIO:
         return _portfolioGrid;

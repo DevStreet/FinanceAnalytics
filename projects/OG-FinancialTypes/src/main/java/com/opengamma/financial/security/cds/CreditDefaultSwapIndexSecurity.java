@@ -34,6 +34,9 @@ import com.opengamma.id.ExternalId;
 @BeanDefinition
 public class CreditDefaultSwapIndexSecurity extends AbstractCreditDefaultSwapSecurity {
 
+  /** Serialization version */
+  private static final long serialVersionUID = 1L;
+
   /**
    * The security type
    */
@@ -72,7 +75,7 @@ public class CreditDefaultSwapIndexSecurity extends AbstractCreditDefaultSwapSec
   }
 
 
-  public CreditDefaultSwapIndexSecurity(boolean buy,
+  public CreditDefaultSwapIndexSecurity(boolean buy,  // CSIGNORE: number of parameters is appropriate here
                                         ExternalId protectionBuyer,
                                         ExternalId protectionSeller,
                                         ExternalId underlyingIndex,

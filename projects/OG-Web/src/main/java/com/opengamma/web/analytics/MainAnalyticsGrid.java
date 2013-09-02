@@ -181,7 +181,7 @@ import com.opengamma.util.tuple.Pair;
     return getDependencyGraph(graphId).createViewport(viewportId, callbackId, structureCallbackId, viewportDefinition, cache);
   }
 
-   @Override
+  @Override
   abstract T createViewport(ViewportDefinition viewportDefinition, String callbackId, String structureCallbackId, ResultsCache cache);
 
   /**
