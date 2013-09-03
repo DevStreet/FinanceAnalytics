@@ -179,7 +179,7 @@ public class ExecutionLogWithContext extends DirectBean {
   public ExecutionLogWithContext clone() {
     BeanBuilder<? extends ExecutionLogWithContext> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

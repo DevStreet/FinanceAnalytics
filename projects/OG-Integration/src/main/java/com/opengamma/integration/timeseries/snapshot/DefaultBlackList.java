@@ -111,7 +111,7 @@ public class DefaultBlackList extends DirectBean implements BlackList {
   public DefaultBlackList clone() {
     BeanBuilder<? extends DefaultBlackList> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

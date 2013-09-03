@@ -275,7 +275,7 @@ public class SimpleSecurity extends DirectBean
   public SimpleSecurity clone() {
     BeanBuilder<? extends SimpleSecurity> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

@@ -168,7 +168,7 @@ public class TargetProperty extends DirectBean {
   public TargetProperty clone() {
     BeanBuilder<? extends TargetProperty> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

@@ -236,7 +236,7 @@ public class SimpleExchange extends DirectBean
   public SimpleExchange clone() {
     BeanBuilder<? extends SimpleExchange> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

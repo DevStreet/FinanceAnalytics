@@ -376,7 +376,7 @@ public class RestComponents extends DirectBean {
   public RestComponents clone() {
     BeanBuilder<? extends RestComponents> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

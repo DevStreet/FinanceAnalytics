@@ -314,7 +314,7 @@ public class ManageableHistoricalTimeSeriesInfo extends DirectBean
   public ManageableHistoricalTimeSeriesInfo clone() {
     BeanBuilder<? extends ManageableHistoricalTimeSeriesInfo> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

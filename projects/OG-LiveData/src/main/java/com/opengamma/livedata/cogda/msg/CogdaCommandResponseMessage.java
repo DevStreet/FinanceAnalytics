@@ -146,7 +146,7 @@ public abstract class CogdaCommandResponseMessage extends DirectBean {
   public CogdaCommandResponseMessage clone() {
     BeanBuilder<? extends CogdaCommandResponseMessage> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

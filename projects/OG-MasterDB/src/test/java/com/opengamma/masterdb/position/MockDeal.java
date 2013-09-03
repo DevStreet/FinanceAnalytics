@@ -118,9 +118,9 @@ import org.joda.beans.Bean;
   //-----------------------------------------------------------------------
   @Override
   public MockDeal clone() {
-    BeanBuilder<? extends MockDeal> builder = MockDeal.Meta.INSTANCE.builder();
-    for (MetaProperty<?> mp : MockDeal.Meta.INSTANCE.metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+    BeanBuilder<? extends MockDeal> builder = metaBean().builder();
+    for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

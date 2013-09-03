@@ -559,7 +559,7 @@ public class ResultModelDefinition extends DirectBean implements Serializable {
   public ResultModelDefinition clone() {
     BeanBuilder<? extends ResultModelDefinition> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

@@ -598,7 +598,7 @@ public class RiskRun extends DirectBean implements ObjectIdentifiable {
   public RiskRun clone() {
     BeanBuilder<? extends RiskRun> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

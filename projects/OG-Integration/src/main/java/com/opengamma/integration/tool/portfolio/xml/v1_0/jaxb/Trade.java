@@ -295,7 +295,7 @@ public abstract class Trade extends DirectBean {
   public Trade clone() {
     BeanBuilder<? extends Trade> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

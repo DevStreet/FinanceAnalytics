@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  * 
  * @param <T> the bean type
  */
-public final class DirectBeanFudgeBuilder<T extends Bean> implements FudgeBuilder<T> {
+public final class JodaBeanFudgeBuilder<T extends Bean> implements FudgeBuilder<T> {
 
   /**
    * The meta bean for this instance.
@@ -48,7 +48,7 @@ public final class DirectBeanFudgeBuilder<T extends Bean> implements FudgeBuilde
    * @param cls  the class to get the builder for, not null
    * @return the bean builder, not null
    */
-  public static <R extends Bean> DirectBeanFudgeBuilder<R> of(final Class<R> cls) {
+  public static <R extends Bean> JodaBeanFudgeBuilder<R> of(final Class<R> cls) {
     MetaBean meta;
     try {
       meta = (MetaBean) cls.getMethod("meta").invoke(null);
@@ -57,14 +57,14 @@ public final class DirectBeanFudgeBuilder<T extends Bean> implements FudgeBuilde
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
-    return new DirectBeanFudgeBuilder<R>(meta);
+    return new JodaBeanFudgeBuilder<R>(meta);
   }
 
   /**
    * Constructor.
    * @param metaBean  the meta-bean, not null
    */
-  public DirectBeanFudgeBuilder(MetaBean metaBean) {
+  public JodaBeanFudgeBuilder(MetaBean metaBean) {
     _metaBean = metaBean;
   }
 
@@ -76,7 +76,7 @@ public final class DirectBeanFudgeBuilder<T extends Bean> implements FudgeBuilde
     try {
       MutableFudgeMsg msg = serializer.newMessage();
       for (MetaProperty<?> prop : bean.metaBean().metaPropertyIterable()) {
-        if (prop.readWrite().isReadable()) {
+        if (prop.style().isReadable() && prop.style().isBuildable()) {
           Object obj = prop.get(bean);
           if (obj instanceof List<?>) {
             MutableFudgeMsg subMsg = buildMessageCollection(serializer, prop, bean.getClass(), (List<?>) obj);
@@ -142,39 +142,39 @@ public final class DirectBeanFudgeBuilder<T extends Bean> implements FudgeBuilde
   public T buildObject(FudgeDeserializer deserializer, FudgeMsg msg) {
     try {
       BeanBuilder<T> builder = (BeanBuilder<T>) _metaBean.builder();
-      for (MetaProperty<?> mp : _metaBean.metaPropertyIterable()) {
-        if (mp.readWrite().isWritable()) {
-          final FudgeField field = msg.getByName(mp.name());
+      for (MetaProperty<?> prop : _metaBean.metaPropertyIterable()) {
+        if (prop.style().isReadable() && prop.style().isBuildable()) {
+          final FudgeField field = msg.getByName(prop.name());
           if (field != null) {
             Object value = null;
-            if (List.class.isAssignableFrom(mp.propertyType())) {
+            if (List.class.isAssignableFrom(prop.propertyType())) {
               value = field.getValue();
               if (value instanceof FudgeMsg) {
-                value = buildObjectList(deserializer, mp, _metaBean.beanType(), (FudgeMsg) value);
+                value = buildObjectList(deserializer, prop, _metaBean.beanType(), (FudgeMsg) value);
               }
-            } else if (Set.class.isAssignableFrom(mp.propertyType())) {
+            } else if (Set.class.isAssignableFrom(prop.propertyType())) {
               value = field.getValue();
               if (value instanceof FudgeMsg) {
-                value = buildObjectSet(deserializer, mp, _metaBean.beanType(), (FudgeMsg) value);
+                value = buildObjectSet(deserializer, prop, _metaBean.beanType(), (FudgeMsg) value);
               }
-            } else if (Map.class.isAssignableFrom(mp.propertyType())) {
+            } else if (Map.class.isAssignableFrom(prop.propertyType())) {
               value = field.getValue();
               if (value instanceof FudgeMsg) {
-                value = buildObjectMap(deserializer, mp, _metaBean.beanType(), (FudgeMsg) value);
+                value = buildObjectMap(deserializer, prop, _metaBean.beanType(), (FudgeMsg) value);
               }
             }
             if (value == null) {
               try {
-                value = deserializer.fieldValueToObject(mp.propertyType(), field);
+                value = deserializer.fieldValueToObject(prop.propertyType(), field);
               } catch (IllegalArgumentException ex) {
                 if (field.getValue() instanceof String == false) {
                   throw ex;
                 }
-                value = JodaBeanUtils.stringConverter().convertFromString(mp.propertyType(), (String) field.getValue());
+                value = JodaBeanUtils.stringConverter().convertFromString(prop.propertyType(), (String) field.getValue());
               }
             }
-            if (value != null || mp.propertyType().isPrimitive() == false) {
-              builder.set(mp.name(), value);
+            if (value != null || prop.propertyType().isPrimitive() == false) {
+              builder.set(prop.name(), value);
             }
           }
         }

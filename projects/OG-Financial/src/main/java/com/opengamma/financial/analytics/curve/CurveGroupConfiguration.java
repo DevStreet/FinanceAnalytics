@@ -137,7 +137,7 @@ public class CurveGroupConfiguration extends DirectBean implements Serializable 
   public CurveGroupConfiguration clone() {
     BeanBuilder<? extends CurveGroupConfiguration> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

@@ -206,7 +206,7 @@ public class HistoricalTimeSeriesInfoDocument extends AbstractDocument {
     /**
      * The meta-property for the {@code uniqueId} property.
      */
-    private final MetaProperty<UniqueId> _uniqueId = DirectMetaProperty.ofReadOnly(
+    private final MetaProperty<UniqueId> _uniqueId = DirectMetaProperty.ofDerived(
         this, "uniqueId", HistoricalTimeSeriesInfoDocument.class, UniqueId.class);
     /**
      * The meta-properties.

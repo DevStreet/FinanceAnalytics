@@ -494,12 +494,12 @@ public final class ExternalIdSearch implements ImmutableBean, Iterable<ExternalI
      * The meta-property for the {@code externalIds} property.
      */
     @SuppressWarnings({"unchecked", "rawtypes" })
-    private final MetaProperty<ImmutableSet<ExternalId>> _externalIds = DirectMetaProperty.ofReadOnly(
+    private final MetaProperty<ImmutableSet<ExternalId>> _externalIds = DirectMetaProperty.ofImmutable(
         this, "externalIds", ExternalIdSearch.class, (Class) ImmutableSet.class);
     /**
      * The meta-property for the {@code searchType} property.
      */
-    private final MetaProperty<ExternalIdSearchType> _searchType = DirectMetaProperty.ofReadOnly(
+    private final MetaProperty<ExternalIdSearchType> _searchType = DirectMetaProperty.ofImmutable(
         this, "searchType", ExternalIdSearch.class, ExternalIdSearchType.class);
     /**
      * The meta-properties.
@@ -613,7 +613,7 @@ public final class ExternalIdSearch implements ImmutableBean, Iterable<ExternalI
     public Builder set(String propertyName, Object newValue) {
       switch (propertyName.hashCode()) {
         case -1153096979:  // externalIds
-          this._externalIds = (ImmutableSet<ExternalId>) newValue;
+          this._externalIds = (Set<ExternalId>) newValue;
           break;
         case -710454014:  // searchType
           this._searchType = (ExternalIdSearchType) newValue;

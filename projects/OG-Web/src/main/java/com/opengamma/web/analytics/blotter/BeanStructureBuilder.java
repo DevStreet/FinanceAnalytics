@@ -15,7 +15,6 @@ import org.joda.beans.JodaBeanUtils;
 import org.joda.beans.MetaBean;
 import org.joda.beans.MetaProperty;
 import org.joda.beans.PropertyDefinition;
-import org.joda.beans.PropertyReadWrite;
 import org.joda.convert.StringConvert;
 import org.threeten.bp.ZonedDateTime;
 
@@ -196,7 +195,7 @@ import com.opengamma.util.OpenGammaClock;
                                                     PropertyType propertyType) {
     Map<String, Object> result = Maps.newHashMap();
     // TODO this is *really* dirty and not supposed to be anything else. fix or remove
-    boolean readOnly = property.readWrite() == PropertyReadWrite.READ_ONLY || property.name().equals("uniqueId");
+    boolean readOnly = property.style().isWritable() == false || property.name().equals("uniqueId");
 
     // TODO this is obviously a poor choice of names
     result.put("type", propertyType.name().toLowerCase());

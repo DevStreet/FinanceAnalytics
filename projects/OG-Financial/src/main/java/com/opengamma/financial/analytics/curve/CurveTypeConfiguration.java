@@ -57,7 +57,7 @@ public abstract class CurveTypeConfiguration extends DirectBean implements Seria
   public CurveTypeConfiguration clone() {
     BeanBuilder<? extends CurveTypeConfiguration> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

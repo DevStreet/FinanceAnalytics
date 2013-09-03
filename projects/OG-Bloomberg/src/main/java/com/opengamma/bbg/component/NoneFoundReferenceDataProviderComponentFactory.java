@@ -92,7 +92,7 @@ public class NoneFoundReferenceDataProviderComponentFactory extends DirectBean i
   public NoneFoundReferenceDataProviderComponentFactory clone() {
     BeanBuilder<? extends NoneFoundReferenceDataProviderComponentFactory> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

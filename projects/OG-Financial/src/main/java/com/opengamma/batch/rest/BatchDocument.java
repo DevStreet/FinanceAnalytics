@@ -500,7 +500,7 @@ public class BatchDocument extends DirectBean {
   public BatchDocument clone() {
     BeanBuilder<? extends BatchDocument> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();

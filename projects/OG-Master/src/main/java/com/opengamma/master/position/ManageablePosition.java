@@ -519,7 +519,7 @@ public class ManageablePosition extends DirectBean
   public ManageablePosition clone() {
     BeanBuilder<? extends ManageablePosition> builder = metaBean().builder();
     for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
-      if (mp.readWrite().isWritable()) {
+      if (mp.style().isBuildable()) {
         Object value = mp.get(this);
         if (value instanceof Bean) {
           value = ((Bean) value).clone();
@@ -629,7 +629,7 @@ public class ManageablePosition extends DirectBean
     /**
      * The meta-property for the {@code name} property.
      */
-    private final MetaProperty<String> _name = DirectMetaProperty.ofReadOnly(
+    private final MetaProperty<String> _name = DirectMetaProperty.ofDerived(
         this, "name", ManageablePosition.class, String.class);
     /**
      * The meta-properties.
