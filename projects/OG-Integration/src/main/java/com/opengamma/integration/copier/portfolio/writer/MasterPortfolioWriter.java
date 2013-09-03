@@ -338,7 +338,7 @@ public class MasterPortfolioWriter implements PortfolioWriter {
     ArgumentChecker.notNull(security, "security");
     
     SecuritySearchRequest searchReq = new SecuritySearchRequest();
-    ExternalIdSearch idSearch = new ExternalIdSearch(security.getExternalIdBundle());  // match any one of the IDs
+    ExternalIdSearch idSearch = ExternalIdSearch.of(security.getExternalIdBundle());  // match any one of the IDs
     searchReq.setVersionCorrection(VersionCorrection.ofVersionAsOf(Instant.now())); // valid now
     searchReq.setExternalIdSearch(idSearch);
     searchReq.setFullDetail(true);
