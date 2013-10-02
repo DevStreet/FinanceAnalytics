@@ -15,12 +15,36 @@ Configuration compatibility
   server-side components, has been removed. Any instances of this can be safely deleted from component configuration
   .ini files.
 
+
 Database compatibility
 - No upgrade required
+
 
 API compatibility
 - The legacy analytics web UI has been retired. The dependency on the CometD long-polling library, and the custom
   RESTful end-points that it used, have been removed.
+
+- ExternalIdSearch is now immutable
+Change constructor to of() factory
+
+- FXForwardCurveDefinition is now immutable
+Change constructor to of() factory
+Change getTenors() to getTenorsArray()
+
+- FuturePriceCurveDefinition is now immutable
+Change constructor to of() factory
+Handle change of return type from array to list
+
+- ValueSnapshot is now immutable
+Change constructor to of() factory
+Any use of set method will require creating new instance
+
+- HistoricalTimeSeriesRating is now immutable
+Change constructor to of() factory
+
+- HistoricalTimeSeriesRatingRule is now immutable
+Change constructor to of() factory
+
 
 Analytics compatibility
 - No expected differences
