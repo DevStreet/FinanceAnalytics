@@ -103,6 +103,7 @@
   </bean>
 
   <bean id="viewResultListenerFactory" class="com.opengamma.masterdb.batch.BatchDbViewResultListenerFactory">
+    <property name="batchRunMaster" ref="sharedBatchMaster" />
   </bean>
   
   <bean id="viewProcessWorkerFactory" class="com.opengamma.engine.view.worker.StaticSequencePartitioningViewProcessWorkerFactory">
@@ -179,6 +180,9 @@
               <value>UserCurves</value>
             </set>
           </constructor-arg>
+        </bean>
+        <bean class="com.opengamma.financial.view.ConfigDocumentWatchSetProvider">
+          <constructor-arg ref="combinedConfigSource" />
         </bean>
       </set>
     </property>

@@ -16,8 +16,6 @@ public class CreditBootstrapFailTest extends ISDABaseTest {
   private static final LocalDate CASH_SETTLE_DATE = addWorkDays(TRADE_DATE, 3, DEFAULT_CALENDAR); // AKA valuation date
   private static final LocalDate STARTDATE = LocalDate.of(2012, Month.DECEMBER, 20);//last IMM date before TRADE_DATE;
 
-  private static final double COUPON = 100;
-
   //yield curve
   private static final LocalDate SPOT_DATE = LocalDate.of(2013, Month.APRIL, 12);
   private static final String[] YIELD_CURVE_POINTS = new String[] {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "12Y", "15Y", "20Y", "30Y" };
@@ -35,14 +33,11 @@ public class CreditBootstrapFailTest extends ISDABaseTest {
   public void test() {
     final ISDACompliantCreditCurveBuilder creditCurveBuilder = new FastCreditCurveBuilder(true, ArbitrageHandling.ZeroHazardRate);
 
-    final double coupon = COUPON * ONE_BP;
-    // final double scale = NOTIONAL * ONE_BP;
-
     final int m = PILLAR_DATES.length;
 
     final CDSAnalytic[] curveCDSs = new CDSAnalytic[m];
     for (int i = 0; i < m; i++) {
-      curveCDSs[i] = new CDSAnalytic(TRADE_DATE, EFFECTIVE_DATE, CASH_SETTLE_DATE, STARTDATE, PILLAR_DATES[i], PAY_ACC_ON_DEFAULT, TENOR, STUB, PROCTECTION_START, RECOVERY_RATE);
+      curveCDSs[i] = new CDSAnalytic(TRADE_DATE, EFFECTIVE_DATE, CASH_SETTLE_DATE, STARTDATE, PILLAR_DATES[i], PAY_ACC_ON_DEFAULT, PAYMENT_INTERVAL, STUB, PROCTECTION_START, RECOVERY_RATE);
     }
     final ISDACompliantCreditCurve creditCurve = creditCurveBuilder.calibrateCreditCurve(curveCDSs, PAR_SPREADS, YIELD_CURVE);
 

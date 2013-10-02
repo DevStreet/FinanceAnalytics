@@ -12,11 +12,12 @@ public class EuropeanVanillaOptionFunctionProvider extends OptionFunctionProvide
 
   /**
    * @param strike Strike price
+   * @param timeToExpiry Time to expiry
    * @param steps Number of steps
    * @param isCall True if call, false if put
    */
-  public EuropeanVanillaOptionFunctionProvider(final double strike, final int steps, final boolean isCall) {
-    super(strike, steps, isCall);
+  public EuropeanVanillaOptionFunctionProvider(final double strike, final double timeToExpiry, final int steps, final boolean isCall) {
+    super(strike, timeToExpiry, steps, isCall);
   }
 
   @Override
@@ -28,21 +29,43 @@ public class EuropeanVanillaOptionFunctionProvider extends OptionFunctionProvide
     final double[] values = new double[nStepsP];
     double priceTmp = assetPrice;
     for (int i = 0; i < nStepsP; ++i) {
-      values[i] = Math.max(sign * (priceTmp - strike), 0);
+      values[i] = Math.max(sign * (priceTmp - strike), 0.);
       priceTmp *= upOverDown;
     }
     return values;
   }
 
   @Override
-  public double[] getNextOptionValues(final double discount, final double upProbability, final double downProbability, final double[] values, final double baseAssetPrice, final double sumCashDiv,
-      final double downFactor, final double upOverDown, final int steps) {
-    final int nStepsP = steps + 1;
+  public double[] getPayoffAtExpiryTrinomial(final double assetPrice, final double middleOverDown) {
+    final double strike = getStrike();
+    final int nNodes = 2 * getNumberOfSteps() + 1;
+    final double sign = getSign();
 
-    final double[] res = new double[nStepsP];
-    for (int j = 0; j < nStepsP; ++j) {
-      res[j] = discount * (upProbability * values[j + 1] + downProbability * values[j]);
+    final double[] values = new double[nNodes];
+    double priceTmp = assetPrice;
+    for (int i = 0; i < nNodes; ++i) {
+      values[i] = Math.max(sign * (priceTmp - strike), 0.);
+      priceTmp *= middleOverDown;
     }
-    return res;
+    return values;
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof EuropeanVanillaOptionFunctionProvider)) {
+      return false;
+    }
+    return super.equals(obj);
   }
 }

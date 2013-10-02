@@ -49,6 +49,7 @@ import com.opengamma.financial.analytics.conversion.CashSecurityConverter;
 import com.opengamma.financial.analytics.conversion.DeliverableSwapFutureSecurityConverter;
 import com.opengamma.financial.analytics.conversion.FRASecurityConverter;
 import com.opengamma.financial.analytics.conversion.FXForwardSecurityConverter;
+import com.opengamma.financial.analytics.conversion.FederalFundsFutureTradeConverter;
 import com.opengamma.financial.analytics.conversion.FixedIncomeConverterDataProvider;
 import com.opengamma.financial.analytics.conversion.FutureTradeConverter;
 import com.opengamma.financial.analytics.conversion.NonDeliverableFXForwardSecurityConverter;
@@ -58,6 +59,7 @@ import com.opengamma.financial.analytics.curve.ConfigDBCurveConstructionConfigur
 import com.opengamma.financial.analytics.curve.CurveConstructionConfiguration;
 import com.opengamma.financial.analytics.curve.CurveUtils;
 import com.opengamma.financial.analytics.curve.exposure.ConfigDBInstrumentExposuresProvider;
+import com.opengamma.financial.analytics.curve.exposure.ExposureFunctions;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesFunctionUtils;
 import com.opengamma.financial.convention.ConventionBundleSource;
@@ -73,6 +75,7 @@ import com.opengamma.financial.security.future.InterestRateFutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
 import com.opengamma.financial.security.fx.NonDeliverableFXForwardSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
+import com.opengamma.financial.view.ConfigDocumentWatchSetProvider;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesResolver;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.async.AsynchronousExecution;
@@ -94,6 +97,11 @@ public abstract class MultiCurvePricingFunction extends AbstractFunction {
     _valueRequirements = valueRequirements;
   }
 
+  @Override
+  public void init(final FunctionCompilationContext context) {
+    ConfigDocumentWatchSetProvider.reinitOnChanges(context, null, ExposureFunctions.class);
+  }
+
   /**
    * Constructs an object capable of converting from {@link ComputationTarget} to {@link InstrumentDefinition}.
    * @param context The compilation context, not null
@@ -107,10 +115,11 @@ public abstract class MultiCurvePricingFunction extends AbstractFunction {
     final ConventionSource conventionSource = OpenGammaCompilationContext.getConventionSource(context);
     final CashSecurityConverter cashConverter = new CashSecurityConverter(holidaySource, regionSource);
     final FRASecurityConverter fraConverter = new FRASecurityConverter(holidaySource, regionSource, conventionSource);
-    final SwapSecurityConverter swapConverter = new SwapSecurityConverter(holidaySource, conventionSource, regionSource, false);
+    final SwapSecurityConverter swapConverter = new SwapSecurityConverter(holidaySource, conventionSource, regionSource);
     final FXForwardSecurityConverter fxForwardSecurityConverter = new FXForwardSecurityConverter();
     final NonDeliverableFXForwardSecurityConverter nonDeliverableFXForwardSecurityConverter = new NonDeliverableFXForwardSecurityConverter();
     final DeliverableSwapFutureSecurityConverter dsfConverter = new DeliverableSwapFutureSecurityConverter(securitySource, swapConverter);
+    final FederalFundsFutureTradeConverter federalFundsFutureTradeConverter = new FederalFundsFutureTradeConverter(holidaySource, conventionSource, regionSource);
     final FinancialSecurityVisitor<InstrumentDefinition<?>> securityConverter = FinancialSecurityVisitorAdapter.<InstrumentDefinition<?>>builder()
         .cashSecurityVisitor(cashConverter)
         .deliverableSwapFutureSecurityVisitor(dsfConverter)
@@ -121,7 +130,7 @@ public abstract class MultiCurvePricingFunction extends AbstractFunction {
         .create();
     final FutureTradeConverter futureTradeConverter = new FutureTradeConverter(securitySource, holidaySource, conventionSource, conventionBundleSource,
         regionSource);
-    return new TradeConverter(futureTradeConverter, securityConverter);
+    return new TradeConverter(futureTradeConverter, federalFundsFutureTradeConverter, securityConverter);
   }
 
   /**
@@ -196,7 +205,7 @@ public abstract class MultiCurvePricingFunction extends AbstractFunction {
 
     @Override
     public Set<ValueSpecification> getResults(final FunctionCompilationContext context, final ComputationTarget target) {
-      final ValueProperties properties = getResultProperties(target).get();
+      final ValueProperties properties = getResultProperties(context, target).get();
       final Set<ValueSpecification> results = new HashSet<>();
       for (final String valueRequirement : _valueRequirements) {
         results.add(new ValueSpecification(valueRequirement, target.toSpecification(), properties));
@@ -244,7 +253,7 @@ public abstract class MultiCurvePricingFunction extends AbstractFunction {
         requirements.addAll(timeSeriesRequirements);
         return requirements;
       } catch (final Exception e) {
-        s_logger.error(e.getMessage());
+        s_logger.error(e.getMessage(), e);
         return null;
       }
     }
@@ -328,10 +337,11 @@ public abstract class MultiCurvePricingFunction extends AbstractFunction {
 
     /**
      * Gets the properties for the results given a target.
+     * @param context The compilation context, not null
      * @param target The target, not null
      * @return The result properties
      */
-    protected abstract ValueProperties.Builder getResultProperties(ComputationTarget target);
+    protected abstract ValueProperties.Builder getResultProperties(FunctionCompilationContext context, ComputationTarget target);
 
     /**
      * Checks that all constraints have values.

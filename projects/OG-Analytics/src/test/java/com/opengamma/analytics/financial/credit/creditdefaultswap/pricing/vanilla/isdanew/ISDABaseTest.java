@@ -18,7 +18,6 @@ public class ISDABaseTest {
   protected static final AnalyticCDSPricer PRICER = new AnalyticCDSPricer();
   protected static final AnalyticCDSPricer PRICER_CORRECT = new AnalyticCDSPricer(true);
   protected static final ISDACompliantCreditCurveBuilder CREDIT_CURVE_BUILDER = new FastCreditCurveBuilder();
-  protected static final ISDACompliantYieldCurveBuild YIELD_CURVE_BUILDER = new ISDACompliantYieldCurveBuild();
   protected static final SpreadSensitivityCalculator CS01_CAL = new SpreadSensitivityCalculator();
 
   protected static final double ONE_PC = 1e-2;
@@ -31,13 +30,14 @@ public class ISDABaseTest {
   protected static final DayCount ACT365 = DayCountFactory.INSTANCE.getDayCount("ACT/365");
   protected static final DayCount ACT360 = DayCountFactory.INSTANCE.getDayCount("ACT/360");
   protected static final DayCount D30360 = DayCountFactory.INSTANCE.getDayCount("30/360");
+  protected static final DayCount ACT_ACT_ISDA = DayCountFactory.INSTANCE.getDayCount("Actual/Actual ISDA");
 
   protected static final BusinessDayConvention FOLLOWING = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Following");
   protected static final BusinessDayConvention MOD_FOLLOWING = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
 
   //standard CDS settings 
   protected static final boolean PAY_ACC_ON_DEFAULT = true;
-  protected static final Period TENOR = Period.ofMonths(3);
+  protected static final Period PAYMENT_INTERVAL = Period.ofMonths(3);
   protected static final StubType STUB = StubType.FRONTSHORT;
   protected static final boolean PROCTECTION_START = true;
   protected static final double RECOVERY_RATE = 0.4;
@@ -71,7 +71,7 @@ public class ISDABaseTest {
         throw new IllegalArgumentException("cannot parse " + temp);
       }
     }
-    return YIELD_CURVE_BUILDER.build(today, spotDate, types, tenors, rates, moneyMarketDCC, swapDCC, swapInterval, curveDCC, MOD_FOLLOWING);
+    return ISDACompliantYieldCurveBuild.build(today, spotDate, types, tenors, rates, moneyMarketDCC, swapDCC, swapInterval, curveDCC, MOD_FOLLOWING);
 
   }
 

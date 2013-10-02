@@ -105,8 +105,16 @@ public class FXMatrixFunction extends AbstractFunction {
     /** The set of relevant currencies */
     private final Set<Currency> _currencies;
 
+    /**
+     * @param earliestInvocation The earliest time that this function is valid, not null
+     * @param latestInvocation The latest time that this function is valid, not null
+     * @param spec The result specification for the FX matrix, not null
+     * @param currencies The currencies contained in the matrix, not null
+     */
     public MyCompiledFunction(final ZonedDateTime earliestInvocation, final ZonedDateTime latestInvocation, final ValueSpecification spec, final Set<Currency> currencies) {
       super(earliestInvocation, latestInvocation);
+      ArgumentChecker.notNull(spec, "specification");
+      ArgumentChecker.notNull(currencies, "currencies");
       _spec = spec;
       _currencies = currencies;
     }
@@ -126,7 +134,7 @@ public class FXMatrixFunction extends AbstractFunction {
         if (pairs.getCurrencyPair(initialCurrency, otherCurrency).getBase().equals(initialCurrency)) {
           final double spotRate = (Double) inputs.getValue(new ValueRequirement(ValueRequirementNames.SPOT_RATE,
               CurrencyPair.TYPE.specification(CurrencyPair.of(otherCurrency, initialCurrency))));
-          matrix.addCurrency(initialCurrency, otherCurrency, spotRate);
+          matrix.addCurrency(otherCurrency, initialCurrency, spotRate);
         } else {
           final double spotRate = (Double) inputs.getValue(new ValueRequirement(ValueRequirementNames.SPOT_RATE,
               CurrencyPair.TYPE.specification(CurrencyPair.of(otherCurrency, initialCurrency))));

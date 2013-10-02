@@ -44,10 +44,15 @@ import com.opengamma.analytics.financial.interestrate.inflation.derivative.Coupo
 import com.opengamma.analytics.financial.interestrate.inflation.derivative.CouponInflationZeroCouponMonthlyGearing;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponCMS;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixedAccruedCompounding;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixedCompounding;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIbor;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborCompounding;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborCompoundingSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponIborSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponON;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponONCompounded;
+import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponONSpread;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.PaymentFixed;
 import com.opengamma.analytics.financial.interestrate.swap.derivative.Swap;
@@ -133,6 +138,16 @@ public class LastTimeCalculator extends InstrumentDerivativeVisitorAdapter<Objec
   }
 
   @Override
+  public Double visitCouponIborCompounding(final CouponIborCompounding payment) {
+    return Math.max(payment.getFixingPeriodEndTimes()[payment.getFixingPeriodEndTimes().length - 1], payment.getPaymentTime());
+  }
+
+  @Override
+  public Double visitCouponIborCompoundingSpread(final CouponIborCompoundingSpread payment) {
+    return Math.max(payment.getFixingPeriodEndTimes()[payment.getFixingPeriodEndTimes().length - 1], payment.getPaymentTime());
+  }
+
+  @Override
   public Double visitGenericAnnuity(final Annuity<? extends Payment> annuity) {
     return annuity.getNthPayment(annuity.getNumberOfPayments() - 1).accept(this);
   }
@@ -160,6 +175,16 @@ public class LastTimeCalculator extends InstrumentDerivativeVisitorAdapter<Objec
   }
 
   @Override
+  public Double visitCouponFixedAccruedCompounding(final CouponFixedAccruedCompounding payment) {
+    return payment.getPaymentTime();
+  }
+
+  @Override
+  public Double visitCouponONCompounded(final CouponONCompounded payment) {
+    return payment.getPaymentTime();
+  }
+
+  @Override
   public Double visitSwaptionCashFixedIbor(final SwaptionCashFixedIbor swaption) {
     return visitSwap(swaption.getUnderlyingSwap());
   }
@@ -173,6 +198,11 @@ public class LastTimeCalculator extends InstrumentDerivativeVisitorAdapter<Objec
 
   @Override
   public Double visitCouponOIS(final CouponON payment) {
+    return payment.getPaymentTime();
+  }
+
+  @Override
+  public Double visitCouponONSpread(final CouponONSpread payment) {
     return payment.getPaymentTime();
   }
 

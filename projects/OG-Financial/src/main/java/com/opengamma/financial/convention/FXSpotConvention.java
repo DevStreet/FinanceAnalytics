@@ -7,6 +7,7 @@ package com.opengamma.financial.convention;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -38,7 +39,7 @@ public class FXSpotConvention extends Convention {
   /**
    * The settlement region.
    */
-  @PropertyDefinition(validate = "notNull")
+  @PropertyDefinition
   private ExternalId _settlementRegion;
 
   /**
@@ -51,7 +52,7 @@ public class FXSpotConvention extends Convention {
    * @param name The convention name, not null
    * @param externalIdBundle The external identifiers for this convention, not null
    * @param settlementDays The number of settlement days
-   * @param settlementRegion The settlement region, not null
+   * @param settlementRegion The settlement region, can be null
    */
   public FXSpotConvention(final String name, final ExternalIdBundle externalIdBundle, final int settlementDays, final ExternalId settlementRegion) {
     super(name, externalIdBundle);
@@ -76,58 +77,6 @@ public class FXSpotConvention extends Convention {
   @Override
   public FXSpotConvention.Meta metaBean() {
     return FXSpotConvention.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -295948000:  // settlementDays
-        return getSettlementDays();
-      case -534226563:  // settlementRegion
-        return getSettlementRegion();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -295948000:  // settlementDays
-        setSettlementDays((Integer) newValue);
-        return;
-      case -534226563:  // settlementRegion
-        setSettlementRegion((ExternalId) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_settlementRegion, "settlementRegion");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      FXSpotConvention other = (FXSpotConvention) obj;
-      return JodaBeanUtils.equal(getSettlementDays(), other.getSettlementDays()) &&
-          JodaBeanUtils.equal(getSettlementRegion(), other.getSettlementRegion()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getSettlementDays());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getSettlementRegion());
-    return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
@@ -158,7 +107,7 @@ public class FXSpotConvention extends Convention {
   //-----------------------------------------------------------------------
   /**
    * Gets the settlement region.
-   * @return the value of the property, not null
+   * @return the value of the property
    */
   public ExternalId getSettlementRegion() {
     return _settlementRegion;
@@ -166,10 +115,9 @@ public class FXSpotConvention extends Convention {
 
   /**
    * Sets the settlement region.
-   * @param settlementRegion  the new value of the property, not null
+   * @param settlementRegion  the new value of the property
    */
   public void setSettlementRegion(ExternalId settlementRegion) {
-    JodaBeanUtils.notNull(settlementRegion, "settlementRegion");
     this._settlementRegion = settlementRegion;
   }
 
@@ -179,6 +127,54 @@ public class FXSpotConvention extends Convention {
    */
   public final Property<ExternalId> settlementRegion() {
     return metaBean().settlementRegion().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public FXSpotConvention clone() {
+    return (FXSpotConvention) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      FXSpotConvention other = (FXSpotConvention) obj;
+      return (getSettlementDays() == other.getSettlementDays()) &&
+          JodaBeanUtils.equal(getSettlementRegion(), other.getSettlementRegion()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getSettlementDays());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getSettlementRegion());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(96);
+    buf.append("FXSpotConvention{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("settlementDays").append('=').append(getSettlementDays()).append(',').append(' ');
+    buf.append("settlementRegion").append('=').append(getSettlementRegion()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -256,6 +252,31 @@ public class FXSpotConvention extends Convention {
      */
     public final MetaProperty<ExternalId> settlementRegion() {
       return _settlementRegion;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -295948000:  // settlementDays
+          return ((FXSpotConvention) bean).getSettlementDays();
+        case -534226563:  // settlementRegion
+          return ((FXSpotConvention) bean).getSettlementRegion();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -295948000:  // settlementDays
+          ((FXSpotConvention) bean).setSettlementDays((Integer) newValue);
+          return;
+        case -534226563:  // settlementRegion
+          ((FXSpotConvention) bean).setSettlementRegion((ExternalId) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
     }
 
   }

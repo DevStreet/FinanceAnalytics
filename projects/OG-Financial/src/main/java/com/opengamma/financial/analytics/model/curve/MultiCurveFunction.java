@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDate;
 import org.threeten.bp.LocalTime;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
@@ -63,9 +64,11 @@ import com.opengamma.financial.analytics.curve.CurveConstructionConfiguration;
 import com.opengamma.financial.analytics.curve.CurveConstructionConfigurationSource;
 import com.opengamma.financial.analytics.curve.CurveDefinition;
 import com.opengamma.financial.analytics.curve.CurveUtils;
+import com.opengamma.financial.analytics.curve.InterpolatedCurveDefinition;
 import com.opengamma.financial.analytics.ircurve.strips.CurveNodeVisitor;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
 import com.opengamma.financial.convention.ConventionSource;
+import com.opengamma.financial.view.ConfigDocumentWatchSetProvider;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.VersionCorrection;
 import com.opengamma.util.ArgumentChecker;
@@ -82,8 +85,6 @@ import com.opengamma.util.tuple.Pair;
  * @param <W> The type of the sensitivity results
  */
 public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U, V, W> extends AbstractFunction {
-  /** The curve node converter */
-  private static final CurveNodeConverter CURVE_NODE_CONVERTER = new CurveNodeConverter();
   /** The curve configuration name */
   private final String _configurationName;
   /** The maturity calculator */
@@ -95,6 +96,13 @@ public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U
   public MultiCurveFunction(final String configurationName) {
     ArgumentChecker.notNull(configurationName, "configuration name");
     _configurationName = configurationName;
+  }
+
+  @Override
+  public void init(final FunctionCompilationContext context) {
+    ConfigDocumentWatchSetProvider.reinitOnChanges(context, this, CurveConstructionConfiguration.class);
+    ConfigDocumentWatchSetProvider.reinitOnChanges(context, null, CurveDefinition.class);
+    ConfigDocumentWatchSetProvider.reinitOnChanges(context, null, InterpolatedCurveDefinition.class);
   }
 
   @Override
@@ -153,18 +161,21 @@ public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U
     /**
      * @param earliestInvocation The earliest time this metadata and invoker are valid, null to indicate no lower validity bound
      * @param latestInvocation The latest time this metadata and invoker are valid, null to indicate no upper validity bound
-     * @param curveNames The curve names
-     * @param curveRequirement The curve value requirement produced by this function
-     * @param exogenousRequirements The exogenous requirements
+     * @param curveNames The curve names, not null
+     * @param curveRequirement The curve value requirement produced by this function, not null
+     * @param exogenousRequirements The exogenous requirements, not null
      */
     protected CurveCompiledFunctionDefinition(final ZonedDateTime earliestInvocation, final ZonedDateTime latestInvocation, final String[] curveNames,
         final String curveRequirement, final Set<ValueRequirement> exogenousRequirements) {
       super(earliestInvocation, latestInvocation);
+      ArgumentChecker.notNull(curveNames, "curve names");
+      ArgumentChecker.notNull(curveRequirement, "curve requirement");
+      ArgumentChecker.notNull(exogenousRequirements, "exogenous requirements");
       _curveNames = curveNames;
       _curveRequirement = curveRequirement;
       _exogenousRequirements = exogenousRequirements;
       _results = new HashSet<>();
-      final ValueProperties properties = getBundleProperties();
+      final ValueProperties properties = getBundleProperties(_curveNames);
       for (final String curveName : _curveNames) {
         final ValueProperties curveProperties = getCurveProperties(curveName);
         _results.add(new ValueSpecification(curveRequirement, ComputationTargetSpecification.NULL, curveProperties));
@@ -302,9 +313,10 @@ public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U
     /**
      * Gets the generator for a curve definition
      * @param definition The curve definition
+     * @param valuationDate The valuation date
      * @return The generator
      */
-    protected abstract V getGenerator(CurveDefinition definition);
+    protected abstract V getGenerator(CurveDefinition definition, LocalDate valuationDate);
 
     /**
      * @param conventionSource The convention source
@@ -343,11 +355,13 @@ public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U
         ValueProperties bundleProperties, Pair<T, CurveBuildingBlockBundle> pair);
 
     /**
-     * Gets the curve node converter.
-     * @return The curve node converter
+     * Gets the curve node converter used to convert a node into an InstrumentDerivative.
+     * @param conventionSource the convention source, not null
+     * @return The curve node converter used to convert a node into an InstrumentDerivative.
      */
-    protected CurveNodeConverter getCurveNodeConverter() {
-      return CURVE_NODE_CONVERTER;
+    protected CurveNodeConverter getCurveNodeConverter(final ConventionSource conventionSource) {
+      ArgumentChecker.notNull(conventionSource, "convention source");
+      return new CurveNodeConverter(conventionSource);
     }
 
     /**
@@ -377,9 +391,10 @@ public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U
 
     /**
      * Gets the result properties for a curve bundle
+     * @param curveNames All of the curves produced by this function
      * @return The result properties
      */
-    protected ValueProperties getBundleProperties() {
+    protected ValueProperties getBundleProperties(final String[] curveNames) {
       return createValueProperties()
           .with(CURVE_CALCULATION_METHOD, ROOT_FINDING)
           .with(PROPERTY_CURVE_TYPE, getCurveTypeProperty())
@@ -387,6 +402,7 @@ public abstract class MultiCurveFunction<T extends ParameterProviderInterface, U
           .withAny(PROPERTY_ROOT_FINDER_ABSOLUTE_TOLERANCE)
           .withAny(PROPERTY_ROOT_FINDER_RELATIVE_TOLERANCE)
           .withAny(PROPERTY_ROOT_FINDER_MAX_ITERATIONS)
+          .with(CURVE, curveNames)
           .get();
     }
 

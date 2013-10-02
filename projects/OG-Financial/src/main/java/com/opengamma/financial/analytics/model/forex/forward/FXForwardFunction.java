@@ -54,6 +54,7 @@ import com.opengamma.util.money.Currency;
  */
 @Deprecated
 public abstract class FXForwardFunction extends AbstractFunction.NonCompiledInvoker {
+  /** The logger */
   private static final Logger s_logger = LoggerFactory.getLogger(FXForwardFunction.class);
   /**
    * @deprecated Deprecated value property name - has been moved to {@link ValuePropertyNames#PAY_CURVE_CALCULATION_CONFIG}
@@ -65,7 +66,7 @@ public abstract class FXForwardFunction extends AbstractFunction.NonCompiledInvo
    */
   @Deprecated
   public static final String RECEIVE_CURVE_CALC_CONFIG = ValuePropertyNames.RECEIVE_CURVE_CALCULATION_CONFIG;
-
+  /** The computation target types for this function */
   private static final ComputationTargetType TYPE = FinancialSecurityTypes.FX_FORWARD_SECURITY.or(FinancialSecurityTypes.NON_DELIVERABLE_FX_FORWARD_SECURITY);
 
   /** The value requirement produced by this function */
@@ -177,7 +178,7 @@ public abstract class FXForwardFunction extends AbstractFunction.NonCompiledInvo
     final ValueRequirement receiveFundingCurve = YieldCurveFunctionUtils.getCurveRequirementForFXForward(ComputationTargetSpecification.of(receiveCurrency),
         receiveCurveName, receiveCurveCalculationConfig, false);
     final ValueRequirement pairQuoteRequirement = new ValueRequirement(ValueRequirementNames.CURRENCY_PAIRS, ComputationTargetSpecification.NULL);
-    return Sets.newHashSet(payFundingCurve, receiveFundingCurve, pairQuoteRequirement);
+    return Sets.newHashSet(pairQuoteRequirement, payFundingCurve, receiveFundingCurve);
   }
 
   @Override
@@ -203,7 +204,9 @@ public abstract class FXForwardFunction extends AbstractFunction.NonCompiledInvo
         }
       }
     }
-    assert currencyPairConfigName != null;
+    if (currencyPairConfigName == null || payCurveName == null || receiveCurveName == null) {
+      return null;
+    }
     final CurrencyPairs baseQuotePairs = OpenGammaCompilationContext.getCurrencyPairsSource(context).getCurrencyPairs(currencyPairConfigName);
     final FinancialSecurity security = (FinancialSecurity) target.getSecurity();
     final Currency payCurrency = security.accept(ForexVisitors.getPayCurrencyVisitor());

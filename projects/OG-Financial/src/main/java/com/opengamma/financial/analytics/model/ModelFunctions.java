@@ -58,7 +58,7 @@ public class ModelFunctions extends AbstractFunctionConfigurationBean {
 
   @Override
   protected void addAllConfigurations(final List<FunctionConfiguration> functions) {
-    // Nothing in this package, just the sub-packages
+    functions.add(functionConfiguration(MarginPriceFunction.class));
   }
 
   protected FunctionConfigurationSource bondFunctionConfiguration() {
@@ -88,7 +88,7 @@ public class ModelFunctions extends AbstractFunctionConfigurationBean {
   /**
    * Adds deprecated interest rate instrument functions.
    * @return A configuration source containing the deprecated interest rate instrument functions
-   * @deprecated The current versions of these functions are added in {@link #multiCurvePricingFunctionConfiguration()}
+   * @deprecated The current versions of these functions are added in {@link #discountingFunctionConfiguration}
    */
   @Deprecated
   protected FunctionConfigurationSource fixedIncomeFunctionConfiguration() {
@@ -154,6 +154,10 @@ public class ModelFunctions extends AbstractFunctionConfigurationBean {
     return FutureOptionFunctions.instance();
   }
 
+  /**
+   * Adds horizon functions.
+   * @return A configuration source containing horizon functions.
+   */
   protected FunctionConfigurationSource horizonFunctionConfiguration() {
     return HorizonFunctions.instance();
   }

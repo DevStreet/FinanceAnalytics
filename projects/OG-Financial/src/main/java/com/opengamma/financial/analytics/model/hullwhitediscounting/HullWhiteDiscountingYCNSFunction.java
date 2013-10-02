@@ -12,7 +12,6 @@ import static com.opengamma.engine.value.ValueRequirementNames.CURVE_DEFINITION;
 import static com.opengamma.engine.value.ValueRequirementNames.YIELD_CURVE_NODE_SENSITIVITIES;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.HULL_WHITE_DISCOUNTING;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.PROPERTY_CURVE_TYPE;
-import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.PROPERTY_HULL_WHITE_CURRENCY;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.PROPERTY_HULL_WHITE_PARAMETERS;
 
 import java.util.Collections;
@@ -107,14 +106,9 @@ public class HullWhiteDiscountingYCNSFunction extends HullWhiteDiscountingFuncti
         if (hullWhiteParameters == null || hullWhiteParameters.size() != 1) {
           return null;
         }
-        final Set<String> hullWhiteCurrencies = constraints.getValues(PROPERTY_HULL_WHITE_CURRENCY);
-        if (hullWhiteCurrencies == null || hullWhiteCurrencies.size() != 1) {
-          return null;
-        }
         final ValueProperties properties = ValueProperties
             .with(PROPERTY_CURVE_TYPE, HULL_WHITE_DISCOUNTING)
             .with(PROPERTY_HULL_WHITE_PARAMETERS, hullWhiteParameters)
-            .with(PROPERTY_HULL_WHITE_CURRENCY, hullWhiteCurrencies)
             .with(CURVE_EXPOSURES, curveExposureConfigs)
             .get();
         final ValueProperties curveProperties = ValueProperties
@@ -135,8 +129,8 @@ public class HullWhiteDiscountingYCNSFunction extends HullWhiteDiscountingFuncti
       }
 
       @Override
-      protected ValueProperties.Builder getResultProperties(final ComputationTarget target) {
-        final ValueProperties.Builder properties = super.getResultProperties(target);
+      protected ValueProperties.Builder getResultProperties(final FunctionCompilationContext compilationContext, final ComputationTarget target) {
+        final ValueProperties.Builder properties = super.getResultProperties(compilationContext, target);
         return properties.withAny(CURVE);
       }
 

@@ -47,8 +47,9 @@ import com.opengamma.financial.analytics.model.cds.ISDAFunctionConstants;
 import com.opengamma.financial.convention.Convention;
 import com.opengamma.financial.convention.ConventionSource;
 import com.opengamma.financial.convention.DepositConvention;
-import com.opengamma.financial.convention.OISLegConvention;
+import com.opengamma.financial.convention.IborIndexConvention;
 import com.opengamma.financial.convention.SwapFixedLegConvention;
+import com.opengamma.financial.convention.VanillaIborLegConvention;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCountFactory;
 import com.opengamma.id.ExternalId;
@@ -61,13 +62,16 @@ import com.opengamma.util.async.AsynchronousExecution;
 // non compiled for now to allow dynamic config db lookup
 public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvoker {
 
-  // ISDA fixes yield curve daycout to Act/365
+  /** ISDA fixes yield curve daycout to Act/365 */
   private static final DayCount ACT_365 = DayCountFactory.INSTANCE.getDayCount("ACT/365");
-  private static final ISDACompliantYieldCurveBuild BUILDER = new ISDACompliantYieldCurveBuild();
 
   /** the curve configuration name */
-  private String _curveName;
+  private final String _curveName;
 
+  /**
+   * The name of the curve produced by this function.
+   * @param curveName The curve name, not null
+   */
   public ISDACompliantCurveFunction(final String curveName) {
     ArgumentChecker.notNull(curveName, "curve name");
     _curveName = curveName;
@@ -88,8 +92,9 @@ public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvo
         : now.toLocalDate();
 
     DepositConvention cashConvention = null;
-    OISLegConvention floatLegConvention = null;
+    VanillaIborLegConvention floatLegConvention = null;
     SwapFixedLegConvention fixLegConvention = null;
+    IborIndexConvention liborConvention = null;
 
     final int nNodes = specification.getNodes().size();
     final double[] marketDataForCurve = new double[nNodes];
@@ -115,11 +120,17 @@ public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvo
         instruments[k] = ISDAInstrumentTypes.Swap;
         final ExternalId payConventionId = ((SwapNode) node.getCurveNode()).getPayLegConvention();
         final Convention payConvention = conventionSource.getConvention(payConventionId);
+        if (payConvention == null) {
+          throw new OpenGammaRuntimeException("Convention '" + payConventionId + "' not found");
+        }
         final ExternalId receiveConventionId = ((SwapNode) node.getCurveNode()).getReceiveLegConvention();
         final Convention receiveConvention = conventionSource.getConvention(receiveConventionId);
-        if (payConvention instanceof OISLegConvention) {  // float leg
+        if (receiveConvention == null) {
+          throw new OpenGammaRuntimeException("Convention '" + receiveConventionId + "' not found");
+        }
+        if (payConvention instanceof VanillaIborLegConvention) {  // float leg
           if (floatLegConvention == null) {
-            floatLegConvention = (OISLegConvention) payConvention;
+            floatLegConvention = (VanillaIborLegConvention) payConvention;
           } else if (!floatLegConvention.getExternalIdBundle().contains(payConventionId)) {
             throw new OpenGammaRuntimeException("Got 2 types of float leg convention: " + payConvention.getExternalIdBundle() + " " + payConventionId);
           }
@@ -132,9 +143,9 @@ public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvo
         } else {
           throw new OpenGammaRuntimeException("Unexpected swap convention type: " + payConvention);
         }
-        if (receiveConvention instanceof OISLegConvention) {  // float leg
+        if (receiveConvention instanceof VanillaIborLegConvention) {  // float leg
           if (floatLegConvention == null) {
-            floatLegConvention = (OISLegConvention) receiveConvention;
+            floatLegConvention = (VanillaIborLegConvention) receiveConvention;
           } else if (!floatLegConvention.getExternalIdBundle().contains(receiveConventionId)) {
             throw new OpenGammaRuntimeException("Got 2 types of float leg convention: " + receiveConvention.getExternalIdBundle() + " " + receiveConventionId);
           }
@@ -145,7 +156,7 @@ public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvo
             throw new OpenGammaRuntimeException("Got 2 types of fixed leg convention: " + receiveConvention.getExternalIdBundle() + " " + receiveConventionId);
           }
         } else {
-          throw new OpenGammaRuntimeException("Unexpected swap convention type: " + payConvention);
+          throw new OpenGammaRuntimeException("Unexpected swap convention type: " + receiveConvention);
         }
       } else {
         throw new OpenGammaRuntimeException("Can't handle node type " + node.getCurveNode().getClass().getSimpleName() + " at node " + node);
@@ -156,12 +167,13 @@ public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvo
     ArgumentChecker.notNull(cashConvention, "Cash convention");
     ArgumentChecker.notNull(floatLegConvention, "Floating leg convention");
     ArgumentChecker.notNull(fixLegConvention, "Fixed leg convention");
+    liborConvention = conventionSource.getConvention(IborIndexConvention.class, floatLegConvention.getIborIndexConvention());
+    ArgumentChecker.notNull(liborConvention, floatLegConvention.getIborIndexConvention().toString());
 
-    final ISDACompliantYieldCurve yieldCurve = BUILDER.build(now.toLocalDate(), spotDate, instruments, tenors, marketDataForCurve, cashConvention.getDayCount(),
-        fixLegConvention.getDayCount(), fixLegConvention.getPaymentTenor().getPeriod(), ACT_365, floatLegConvention.getBusinessDayConvention());
+    final ISDACompliantYieldCurve yieldCurve = ISDACompliantYieldCurveBuild.build(spotDate, spotDate, instruments, tenors, marketDataForCurve, cashConvention.getDayCount(),
+        fixLegConvention.getDayCount(), fixLegConvention.getPaymentTenor().getPeriod(), ACT_365, liborConvention.getBusinessDayConvention());
 
     final ValueProperties properties = desiredValue.getConstraints().copy()
-        //.withoutAny(ISDAFunctionConstants.ISDA_CURVE_DATE)
         .with(ISDAFunctionConstants.ISDA_CURVE_DATE, spotDate.toString())
         .get();
 
@@ -196,24 +208,7 @@ public class ISDACompliantCurveFunction extends AbstractFunction.NonCompiledInvo
     requirements.add(new ValueRequirement(CURVE_DEFINITION, ComputationTargetSpecification.NULL, properties));
     requirements.add(new ValueRequirement(CURVE_MARKET_DATA, ComputationTargetSpecification.NULL, properties));
     requirements.add(new ValueRequirement(CURVE_SPECIFICATION, ComputationTargetSpecification.NULL, properties));
-    // Exogenous needed?
-    //final ValueProperties properties = ValueProperties.builder()
-    //    .with(CURVE_CONSTRUCTION_CONFIG, _configurationName)
-    //    .get();
-    //requirements.add(new ValueRequirement(CURVE_INSTRUMENT_CONVERSION_HISTORICAL_TIME_SERIES, ComputationTargetSpecification.NULL, properties));
-    //requirements.add(new ValueRequirement(FX_MATRIX, ComputationTargetSpecification.NULL, properties));
-    //requirements.addAll(_exogenousRequirements);
     return requirements;
   }
-
-  //@Override
-  //public boolean canHandleMissingInputs() {
-  //  return true;
-  //}
-  //
-  //@Override
-  //public boolean canHandleMissingRequirements() {
-  //  return true;
-  //}
 
 }

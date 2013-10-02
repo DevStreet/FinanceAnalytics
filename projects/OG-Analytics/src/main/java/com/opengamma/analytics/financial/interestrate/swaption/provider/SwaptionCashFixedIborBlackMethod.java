@@ -11,10 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.opengamma.analytics.financial.interestrate.PresentValueBlackSwaptionSensitivity;
-import com.opengamma.analytics.financial.interestrate.swap.method.SwapFixedCouponDiscountingMethod;
+import com.opengamma.analytics.financial.interestrate.swap.provider.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionCashFixedIbor;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackPriceFunction;
+import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
 import com.opengamma.analytics.financial.provider.calculator.discounting.ParRateCurveSensitivityDiscountingCalculator;
 import com.opengamma.analytics.financial.provider.calculator.discounting.ParRateDiscountingCalculator;
 import com.opengamma.analytics.financial.provider.description.interestrate.BlackSwaptionFlatProviderInterface;
@@ -71,7 +72,6 @@ public final class SwaptionCashFixedIborBlackMethod {
   public MultipleCurrencyAmount presentValue(final SwaptionCashFixedIbor swaption, final BlackSwaptionFlatProviderInterface curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    ArgumentChecker.isTrue(curveBlack.getBlackParameters().getGeneratorSwap().getCurrency().equals(swaption.getCurrency()), "Black data currency should be equal to swaption currency");
     final double tenor = swaption.getMaturityTime();
     final double forward = swaption.getUnderlyingSwap().accept(PRDC, curveBlack.getMulticurveProvider());
     final double pvbp = METHOD_SWAP.getAnnuityCash(swaption.getUnderlyingSwap(), forward);
@@ -108,7 +108,6 @@ public final class SwaptionCashFixedIborBlackMethod {
   public MultipleCurrencyMulticurveSensitivity presentValueCurveSensitivity(final SwaptionCashFixedIbor swaption, final BlackSwaptionFlatProviderInterface curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    ArgumentChecker.isTrue(curveBlack.getBlackParameters().getGeneratorSwap().getCurrency().equals(swaption.getCurrency()), "Black data currency should be equal to swaption currency");
     final double tenor = swaption.getMaturityTime();
     final double forward = swaption.getUnderlyingSwap().accept(PRDC, curveBlack.getMulticurveProvider());
     // Derivative of the forward with respect to the rates.
@@ -133,6 +132,38 @@ public final class SwaptionCashFixedIborBlackMethod {
   }
 
   /**
+   * Computes the 2nd order sensitivity of the present value to rates of a cash-settled European swaption in the Black model.
+   * @param swaption The swaption.
+   * @param curveBlack The curves with Black volatility data.
+   * @return The present value curve sensitivity.
+   */
+  public MultipleCurrencyMulticurveSensitivity presentValueSecondOrderCurveSensitivity(final SwaptionCashFixedIbor swaption, final BlackSwaptionFlatProviderInterface curveBlack) {
+    ArgumentChecker.notNull(swaption, "Swaption");
+    ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
+    final double tenor = swaption.getMaturityTime();
+    final double forward = swaption.getUnderlyingSwap().accept(PRDC, curveBlack.getMulticurveProvider());
+    // Derivative of the forward with respect to the rates.
+    final MulticurveSensitivity forwardDr = swaption.getUnderlyingSwap().accept(PRCS, curveBlack.getMulticurveProvider());
+    final double pvbp = METHOD_SWAP.getAnnuityCash(swaption.getUnderlyingSwap(), forward);
+    // Derivative of the cash annuity with respect to the forward.
+    final double pvbpDf = METHOD_SWAP.getAnnuityCashDerivative(swaption.getUnderlyingSwap(), forward);
+    final double pvbpDff = METHOD_SWAP.getAnnuityCashSecondDerivative(swaption.getUnderlyingSwap(), forward);
+    // Implementation note: strictly speaking, the strike equivalent is curve dependent; that dependency is ignored.
+    final double volatility = curveBlack.getBlackParameters().getVolatility(swaption.getTimeToExpiry(), tenor);
+    final double discountFactorSettle = curveBlack.getMulticurveProvider().getDiscountFactor(swaption.getCurrency(), swaption.getSettlementTime());
+
+    final double price = BlackFormulaRepository.price(forward, swaption.getStrike(), volatility, swaption.getTimeToExpiry(), swaption.isCall());
+    final double delta = BlackFormulaRepository.delta(forward, swaption.getStrike(), volatility, swaption.getTimeToExpiry(), swaption.isCall());
+    final double gamma = BlackFormulaRepository.gamma(forward, swaption.getStrike(), volatility, swaption.getTimeToExpiry());
+
+    MulticurveSensitivity result = forwardDr.multipliedBy(discountFactorSettle * (pvbpDff * price + 2. * pvbpDf * delta + pvbp * gamma));
+    if (!swaption.isLong()) {
+      result = result.multipliedBy(-1);
+    }
+    return MultipleCurrencyMulticurveSensitivity.of(swaption.getCurrency(), result);
+  }
+
+  /**
    * Computes the present value sensitivity to the Black volatility (also called vega) of a cash-settled European swaption in the Black swaption model.
    * @param swaption The swaption.
    * @param curveBlack The curves with Black volatility data.
@@ -141,7 +172,6 @@ public final class SwaptionCashFixedIborBlackMethod {
   public PresentValueBlackSwaptionSensitivity presentValueBlackSensitivity(final SwaptionCashFixedIbor swaption, final BlackSwaptionFlatProviderInterface curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    ArgumentChecker.isTrue(curveBlack.getBlackParameters().getGeneratorSwap().getCurrency().equals(swaption.getCurrency()), "Black data currency should be equal to swaption currency");
     final double forward = swaption.getUnderlyingSwap().accept(PRDC, curveBlack.getMulticurveProvider());
     final double pvbp = METHOD_SWAP.getAnnuityCash(swaption.getUnderlyingSwap(), forward);
     final double discountFactorSettle = curveBlack.getMulticurveProvider().getDiscountFactor(swaption.getCurrency(), swaption.getSettlementTime());

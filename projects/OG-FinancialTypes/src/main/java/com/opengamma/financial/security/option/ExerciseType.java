@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -33,14 +34,20 @@ public abstract class ExerciseType extends DirectBean implements Serializable {
   /**
    * Cache of known types.
    */
-  private static final ConcurrentMap<String, ExerciseType> CACHE = new ConcurrentHashMap<>(8, 0.75f, 1);
-  static {
-    register(new AmericanExerciseType());
-    register(new AsianExerciseType());
-    register(new BermudanExerciseType());
-    register(new EuropeanExerciseType());
-  }
+  private static volatile ConcurrentMap<String, ExerciseType> s_cache;
 
+  private static void registerKnownTypes() {
+    synchronized (ExerciseType.class) {
+      if (s_cache == null) {
+        s_cache = new ConcurrentHashMap<>(8, 0.75f, 1);
+        register(new AmericanExerciseType());
+        register(new AsianExerciseType());
+        register(new BermudanExerciseType());
+        register(new EuropeanExerciseType());
+      }
+    }
+  }
+  
   /**
    * Gets an exercise type by name.
    * 
@@ -50,7 +57,9 @@ public abstract class ExerciseType extends DirectBean implements Serializable {
   @FromString
   public static ExerciseType of(String name) {
     ArgumentChecker.notNull(name, "name");
-    ExerciseType type = CACHE.get(name);
+   
+    registerKnownTypes();
+    ExerciseType type = s_cache.get(name);
     if (type == null) {
       throw new IllegalArgumentException("Unknown ExerciseType: " + name);
     }
@@ -64,8 +73,11 @@ public abstract class ExerciseType extends DirectBean implements Serializable {
    */
   public static void register(ExerciseType type) {
     ArgumentChecker.notNull(type, "type");
-    CACHE.putIfAbsent(type.getName(), type);
+    
+    registerKnownTypes();
+    s_cache.putIfAbsent(type.getName(), type);
   }
+  
 
   //-------------------------------------------------------------------------
   /**
@@ -112,14 +124,20 @@ public abstract class ExerciseType extends DirectBean implements Serializable {
     return ExerciseType.Meta.INSTANCE;
   }
 
+  //-----------------------------------------------------------------------
   @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    super.propertySet(propertyName, newValue, quiet);
+  public ExerciseType clone() {
+    BeanBuilder<? extends ExerciseType> builder = metaBean().builder();
+    for (MetaProperty<?> mp : metaBean().metaPropertyIterable()) {
+      if (mp.style().isBuildable()) {
+        Object value = mp.get(this);
+        if (value instanceof Bean) {
+          value = ((Bean) value).clone();
+        }
+        builder.set(mp.name(), value);
+      }
+    }
+    return builder.build();
   }
 
   @Override
@@ -137,6 +155,22 @@ public abstract class ExerciseType extends DirectBean implements Serializable {
   public int hashCode() {
     int hash = getClass().hashCode();
     return hash;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(32);
+    buf.append("ExerciseType{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  protected void toString(StringBuilder buf) {
   }
 
   //-----------------------------------------------------------------------

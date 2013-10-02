@@ -7,6 +7,7 @@ package com.opengamma.financial.security.swap;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -56,6 +57,16 @@ public class SwapSecurity extends FinancialSecurity {
   @PropertyDefinition(validate = "notNull")
   private String _counterparty;
   /**
+   * Whether the initial notional is exchanged.
+   */
+  @PropertyDefinition
+  private boolean _exchangeInitialNotional;
+  /**
+   * Whether the final notional is exchanged.
+   */
+  @PropertyDefinition
+  private boolean _exchangeFinalNotional;
+  /**
    * The pay leg.
    */
   @PropertyDefinition(validate = "notNull")
@@ -86,6 +97,8 @@ public class SwapSecurity extends FinancialSecurity {
     setCounterparty(counterparty);
     setPayLeg(payLeg);
     setReceiveLeg(receiveLeg);
+    setExchangeInitialNotional(false);
+    setExchangeFinalNotional(false);
   }
 
   /**
@@ -114,6 +127,8 @@ public class SwapSecurity extends FinancialSecurity {
     setCounterparty(counterparty);
     setPayLeg(payLeg);
     setReceiveLeg(receiveLeg);
+    setExchangeInitialNotional(false);
+    setExchangeFinalNotional(false);
   }
 
   //-------------------------------------------------------------------------
@@ -139,91 +154,6 @@ public class SwapSecurity extends FinancialSecurity {
   @Override
   public SwapSecurity.Meta metaBean() {
     return SwapSecurity.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 752419634:  // tradeDate
-        return getTradeDate();
-      case -930389515:  // effectiveDate
-        return getEffectiveDate();
-      case -414641441:  // maturityDate
-        return getMaturityDate();
-      case -1651301782:  // counterparty
-        return getCounterparty();
-      case -995239866:  // payLeg
-        return getPayLeg();
-      case 209233963:  // receiveLeg
-        return getReceiveLeg();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 752419634:  // tradeDate
-        setTradeDate((ZonedDateTime) newValue);
-        return;
-      case -930389515:  // effectiveDate
-        setEffectiveDate((ZonedDateTime) newValue);
-        return;
-      case -414641441:  // maturityDate
-        setMaturityDate((ZonedDateTime) newValue);
-        return;
-      case -1651301782:  // counterparty
-        setCounterparty((String) newValue);
-        return;
-      case -995239866:  // payLeg
-        setPayLeg((SwapLeg) newValue);
-        return;
-      case 209233963:  // receiveLeg
-        setReceiveLeg((SwapLeg) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_tradeDate, "tradeDate");
-    JodaBeanUtils.notNull(_effectiveDate, "effectiveDate");
-    JodaBeanUtils.notNull(_maturityDate, "maturityDate");
-    JodaBeanUtils.notNull(_counterparty, "counterparty");
-    JodaBeanUtils.notNull(_payLeg, "payLeg");
-    JodaBeanUtils.notNull(_receiveLeg, "receiveLeg");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      SwapSecurity other = (SwapSecurity) obj;
-      return JodaBeanUtils.equal(getTradeDate(), other.getTradeDate()) &&
-          JodaBeanUtils.equal(getEffectiveDate(), other.getEffectiveDate()) &&
-          JodaBeanUtils.equal(getMaturityDate(), other.getMaturityDate()) &&
-          JodaBeanUtils.equal(getCounterparty(), other.getCounterparty()) &&
-          JodaBeanUtils.equal(getPayLeg(), other.getPayLeg()) &&
-          JodaBeanUtils.equal(getReceiveLeg(), other.getReceiveLeg()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getTradeDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getEffectiveDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getMaturityDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getCounterparty());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getPayLeg());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getReceiveLeg());
-    return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
@@ -332,6 +262,56 @@ public class SwapSecurity extends FinancialSecurity {
 
   //-----------------------------------------------------------------------
   /**
+   * Gets whether the initial notional is exchanged.
+   * @return the value of the property
+   */
+  public boolean isExchangeInitialNotional() {
+    return _exchangeInitialNotional;
+  }
+
+  /**
+   * Sets whether the initial notional is exchanged.
+   * @param exchangeInitialNotional  the new value of the property
+   */
+  public void setExchangeInitialNotional(boolean exchangeInitialNotional) {
+    this._exchangeInitialNotional = exchangeInitialNotional;
+  }
+
+  /**
+   * Gets the the {@code exchangeInitialNotional} property.
+   * @return the property, not null
+   */
+  public final Property<Boolean> exchangeInitialNotional() {
+    return metaBean().exchangeInitialNotional().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
+   * Gets whether the final notional is exchanged.
+   * @return the value of the property
+   */
+  public boolean isExchangeFinalNotional() {
+    return _exchangeFinalNotional;
+  }
+
+  /**
+   * Sets whether the final notional is exchanged.
+   * @param exchangeFinalNotional  the new value of the property
+   */
+  public void setExchangeFinalNotional(boolean exchangeFinalNotional) {
+    this._exchangeFinalNotional = exchangeFinalNotional;
+  }
+
+  /**
+   * Gets the the {@code exchangeFinalNotional} property.
+   * @return the property, not null
+   */
+  public final Property<Boolean> exchangeFinalNotional() {
+    return metaBean().exchangeFinalNotional().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * Gets the pay leg.
    * @return the value of the property, not null
    */
@@ -383,6 +363,72 @@ public class SwapSecurity extends FinancialSecurity {
   }
 
   //-----------------------------------------------------------------------
+  @Override
+  public SwapSecurity clone() {
+    return (SwapSecurity) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      SwapSecurity other = (SwapSecurity) obj;
+      return JodaBeanUtils.equal(getTradeDate(), other.getTradeDate()) &&
+          JodaBeanUtils.equal(getEffectiveDate(), other.getEffectiveDate()) &&
+          JodaBeanUtils.equal(getMaturityDate(), other.getMaturityDate()) &&
+          JodaBeanUtils.equal(getCounterparty(), other.getCounterparty()) &&
+          (isExchangeInitialNotional() == other.isExchangeInitialNotional()) &&
+          (isExchangeFinalNotional() == other.isExchangeFinalNotional()) &&
+          JodaBeanUtils.equal(getPayLeg(), other.getPayLeg()) &&
+          JodaBeanUtils.equal(getReceiveLeg(), other.getReceiveLeg()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getTradeDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getEffectiveDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getMaturityDate());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getCounterparty());
+    hash += hash * 31 + JodaBeanUtils.hashCode(isExchangeInitialNotional());
+    hash += hash * 31 + JodaBeanUtils.hashCode(isExchangeFinalNotional());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getPayLeg());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getReceiveLeg());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(288);
+    buf.append("SwapSecurity{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("tradeDate").append('=').append(getTradeDate()).append(',').append(' ');
+    buf.append("effectiveDate").append('=').append(getEffectiveDate()).append(',').append(' ');
+    buf.append("maturityDate").append('=').append(getMaturityDate()).append(',').append(' ');
+    buf.append("counterparty").append('=').append(getCounterparty()).append(',').append(' ');
+    buf.append("exchangeInitialNotional").append('=').append(isExchangeInitialNotional()).append(',').append(' ');
+    buf.append("exchangeFinalNotional").append('=').append(isExchangeFinalNotional()).append(',').append(' ');
+    buf.append("payLeg").append('=').append(getPayLeg()).append(',').append(' ');
+    buf.append("receiveLeg").append('=').append(getReceiveLeg()).append(',').append(' ');
+  }
+
+  //-----------------------------------------------------------------------
   /**
    * The meta-bean for {@code SwapSecurity}.
    */
@@ -413,6 +459,16 @@ public class SwapSecurity extends FinancialSecurity {
     private final MetaProperty<String> _counterparty = DirectMetaProperty.ofReadWrite(
         this, "counterparty", SwapSecurity.class, String.class);
     /**
+     * The meta-property for the {@code exchangeInitialNotional} property.
+     */
+    private final MetaProperty<Boolean> _exchangeInitialNotional = DirectMetaProperty.ofReadWrite(
+        this, "exchangeInitialNotional", SwapSecurity.class, Boolean.TYPE);
+    /**
+     * The meta-property for the {@code exchangeFinalNotional} property.
+     */
+    private final MetaProperty<Boolean> _exchangeFinalNotional = DirectMetaProperty.ofReadWrite(
+        this, "exchangeFinalNotional", SwapSecurity.class, Boolean.TYPE);
+    /**
      * The meta-property for the {@code payLeg} property.
      */
     private final MetaProperty<SwapLeg> _payLeg = DirectMetaProperty.ofReadWrite(
@@ -431,6 +487,8 @@ public class SwapSecurity extends FinancialSecurity {
         "effectiveDate",
         "maturityDate",
         "counterparty",
+        "exchangeInitialNotional",
+        "exchangeFinalNotional",
         "payLeg",
         "receiveLeg");
 
@@ -451,6 +509,10 @@ public class SwapSecurity extends FinancialSecurity {
           return _maturityDate;
         case -1651301782:  // counterparty
           return _counterparty;
+        case -1304307199:  // exchangeInitialNotional
+          return _exchangeInitialNotional;
+        case -1976228493:  // exchangeFinalNotional
+          return _exchangeFinalNotional;
         case -995239866:  // payLeg
           return _payLeg;
         case 209233963:  // receiveLeg
@@ -508,6 +570,22 @@ public class SwapSecurity extends FinancialSecurity {
     }
 
     /**
+     * The meta-property for the {@code exchangeInitialNotional} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<Boolean> exchangeInitialNotional() {
+      return _exchangeInitialNotional;
+    }
+
+    /**
+     * The meta-property for the {@code exchangeFinalNotional} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<Boolean> exchangeFinalNotional() {
+      return _exchangeFinalNotional;
+    }
+
+    /**
      * The meta-property for the {@code payLeg} property.
      * @return the meta-property, not null
      */
@@ -521,6 +599,72 @@ public class SwapSecurity extends FinancialSecurity {
      */
     public final MetaProperty<SwapLeg> receiveLeg() {
       return _receiveLeg;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 752419634:  // tradeDate
+          return ((SwapSecurity) bean).getTradeDate();
+        case -930389515:  // effectiveDate
+          return ((SwapSecurity) bean).getEffectiveDate();
+        case -414641441:  // maturityDate
+          return ((SwapSecurity) bean).getMaturityDate();
+        case -1651301782:  // counterparty
+          return ((SwapSecurity) bean).getCounterparty();
+        case -1304307199:  // exchangeInitialNotional
+          return ((SwapSecurity) bean).isExchangeInitialNotional();
+        case -1976228493:  // exchangeFinalNotional
+          return ((SwapSecurity) bean).isExchangeFinalNotional();
+        case -995239866:  // payLeg
+          return ((SwapSecurity) bean).getPayLeg();
+        case 209233963:  // receiveLeg
+          return ((SwapSecurity) bean).getReceiveLeg();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 752419634:  // tradeDate
+          ((SwapSecurity) bean).setTradeDate((ZonedDateTime) newValue);
+          return;
+        case -930389515:  // effectiveDate
+          ((SwapSecurity) bean).setEffectiveDate((ZonedDateTime) newValue);
+          return;
+        case -414641441:  // maturityDate
+          ((SwapSecurity) bean).setMaturityDate((ZonedDateTime) newValue);
+          return;
+        case -1651301782:  // counterparty
+          ((SwapSecurity) bean).setCounterparty((String) newValue);
+          return;
+        case -1304307199:  // exchangeInitialNotional
+          ((SwapSecurity) bean).setExchangeInitialNotional((Boolean) newValue);
+          return;
+        case -1976228493:  // exchangeFinalNotional
+          ((SwapSecurity) bean).setExchangeFinalNotional((Boolean) newValue);
+          return;
+        case -995239866:  // payLeg
+          ((SwapSecurity) bean).setPayLeg((SwapLeg) newValue);
+          return;
+        case 209233963:  // receiveLeg
+          ((SwapSecurity) bean).setReceiveLeg((SwapLeg) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((SwapSecurity) bean)._tradeDate, "tradeDate");
+      JodaBeanUtils.notNull(((SwapSecurity) bean)._effectiveDate, "effectiveDate");
+      JodaBeanUtils.notNull(((SwapSecurity) bean)._maturityDate, "maturityDate");
+      JodaBeanUtils.notNull(((SwapSecurity) bean)._counterparty, "counterparty");
+      JodaBeanUtils.notNull(((SwapSecurity) bean)._payLeg, "payLeg");
+      JodaBeanUtils.notNull(((SwapSecurity) bean)._receiveLeg, "receiveLeg");
+      super.validate(bean);
     }
 
   }

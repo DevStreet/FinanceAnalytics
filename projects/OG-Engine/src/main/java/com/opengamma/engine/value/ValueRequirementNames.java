@@ -5,10 +5,10 @@
  */
 package com.opengamma.engine.value;
 
+import com.opengamma.core.position.Position;
 import com.opengamma.core.value.MarketDataRequirementNames;
 import com.opengamma.engine.function.FunctionDefinition;
 import com.opengamma.engine.function.TargetSourcingFunction;
-import com.opengamma.core.position.Position;
 
 /**
  * Standard names used to refer to particular computed values.
@@ -89,6 +89,11 @@ public final class ValueRequirementNames {
    * The market price of the underlying security in a compound security, such as an option
    */
   public static final String UNDERLYING_MARKET_PRICE = "Underlying Market Price";
+  /**
+   * For margined securities, the reference or margin price. This will either be the security's close price or,
+   * on the transaction date itself, the traded price 
+   */
+  public static final String MARGIN_PRICE = "Margin Price";
   /**
    * The historical time series of a quantity.
    */
@@ -192,6 +197,14 @@ public final class ValueRequirementNames {
    * The bundle of time series objects needed to convert instruments on a curve to their OG-Analytics derivative form.
    */
   public static final String CURVE_INSTRUMENT_CONVERSION_HISTORICAL_TIME_SERIES = "Curve Instrument Conversion Historical Time Series";
+  /**
+   * The bundle of time series objects needed to convert instruments on a yield curve to their OG-Analytics derivative form.
+   */
+  public static final String YIELD_CURVE_CONVERSION_HISTORICAL_TIME_SERIES = "Yield Curve Conversion Series";
+  /**
+   * A series of yield curves calculated using historical data
+   */
+  public static final String YIELD_CURVE_SERIES = "Yield Curve Series";
   /** 
    * The FX matrix associated with a bundle of curves.
    */
@@ -401,6 +414,12 @@ public final class ValueRequirementNames {
    */
   public static final String VOLATILITY_CUBE_FITTED_POINTS = "VolatilityCubeFittedPoints";
 
+  ///// Volatility adjustments
+  /**
+   * The shifts to apply to a log-normal volatility surface
+   */
+  public static final String LOGNORMAL_SURFACE_SHIFTS = "LognormalSurfaceShifts";
+  
   ///// Pricing
 
   /**
@@ -527,6 +546,10 @@ public final class ValueRequirementNames {
    */
   public static final String PAR_RATE = "Par Rate";
   /**
+   * The spread that must be added to the market quote of an instrument to produce a present value of zero
+   */
+  public static final String PAR_SPREAD = "Par Spread";
+  /**
    * Sensitivity of par rate to a 1bp shift in the yield curve.
    */
   public static final String PAR_RATE_PARALLEL_CURVE_SHIFT = "Par Rate Parallel Shift Sensitivity";
@@ -558,7 +581,18 @@ public final class ValueRequirementNames {
    * Fair value for an option position (used for options - equal to the FAIR_VALUE multiplied by the number of trades and the point value).
    */
   public static final String VALUE_FAIR_VALUE = "ValueFairValue";
-
+  /**
+   * The convexity adjustment - the difference between the price and the par rate of an instrument
+   */
+  public static final String CONVEXITY_ADJUSTMENT = "Convexity Adjustment";
+  /**
+   * The net amount of an inflation coupon at the start of a month with respect to the reference index.
+   */
+  public static final String INFLATION_NET_AMOUNT = "Inflation Net Amount";
+  /**
+   * The market quoted value of an instrument (e.g. 0.99 for a Eurodollar future)
+   */
+  public static final String MARKET_QUOTE = "Market Quote";
   ///// Greeks
 
   /**
@@ -779,7 +813,7 @@ public final class ValueRequirementNames {
   public static final String VALUE_CARRY_RHO = "ValueCarryRho";
   /**
    * ValueDelta represents the cash value of the position or, the value of money one would make if the underlying increased in price by 100%.<p>
-   * {@link Delta} = dV/dS.  ValueDelta is defined as S(t) * dV/dS. <p>
+   * {@link #DELTA} = dV/dS.  ValueDelta is defined as S(t) * dV/dS. <p>
    * Observe: PNL = dV/dS * (change in S) = S(t) * dV/dS * (S(T) - S(t)) / S(t), thus S(t)* dV/dS (ValueDelta) would be the PNL if 1.0 = (S(T) - S(t)) / S(t) => S(T) = 2*S(t), 
    * i.e. if the underlying doubled (increased by 100%). It thus gives a measure of the sensitivity as a relative measure.
    */

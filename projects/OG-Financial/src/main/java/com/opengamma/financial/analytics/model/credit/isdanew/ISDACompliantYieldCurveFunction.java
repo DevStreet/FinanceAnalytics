@@ -8,11 +8,6 @@ package com.opengamma.financial.analytics.model.credit.isdanew;
 import java.util.Collections;
 import java.util.Set;
 
-import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.isdanew.ISDACompliantYieldCurve;
-import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.isdanew.ISDACompliantYieldCurveBuild;
-import com.opengamma.analytics.financial.credit.isdayieldcurve.ISDAInstrumentTypes;
-import com.opengamma.financial.convention.businessday.BusinessDayConvention;
-import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.LocalTime;
@@ -25,6 +20,9 @@ import org.threeten.bp.format.DateTimeFormatterBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
+import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.isdanew.ISDACompliantYieldCurve;
+import com.opengamma.analytics.financial.credit.creditdefaultswap.pricing.vanilla.isdanew.ISDACompliantYieldCurveBuild;
+import com.opengamma.analytics.financial.credit.isdayieldcurve.ISDAInstrumentTypes;
 import com.opengamma.core.config.ConfigSource;
 import com.opengamma.core.marketdatasnapshot.SnapshotDataBundle;
 import com.opengamma.engine.ComputationTarget;
@@ -52,9 +50,13 @@ import com.opengamma.financial.analytics.ircurve.InterpolatedYieldCurveSpecifica
 import com.opengamma.financial.analytics.ircurve.YieldCurveDefinition;
 import com.opengamma.financial.analytics.model.cds.ISDAFunctionConstants;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
+import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.financial.convention.businessday.BusinessDayConventionFactory;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCountFactory;
+import com.opengamma.financial.convention.frequency.PeriodFrequency;
 import com.opengamma.financial.security.cash.CashSecurity;
+import com.opengamma.financial.security.swap.FixedInterestRateLeg;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.util.async.AsynchronousExecution;
 import com.opengamma.util.money.Currency;
@@ -63,7 +65,6 @@ import com.opengamma.util.money.Currency;
  * Function to return a @{code ISDACompliantYieldCurve}
  */
 public class ISDACompliantYieldCurveFunction extends AbstractFunction {
-  private static final Period swapIvl = Period.ofMonths(6); //FIXME: hardcoded
   private static final BusinessDayConvention badDayConv = BusinessDayConventionFactory.INSTANCE.getBusinessDayConvention("Modified Following");
   private static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
   private static final DayCount ACT_365 = DayCountFactory.INSTANCE.getDayCount("ACT/365");
@@ -79,7 +80,6 @@ public class ISDACompliantYieldCurveFunction extends AbstractFunction {
     final ZonedDateTime atZDT = ZonedDateTime.ofInstant(atInstant, ZoneOffset.UTC);
     final ConfigSource configSource = OpenGammaCompilationContext.getConfigSource(compilationContext);
     final InterpolatedYieldCurveSpecificationBuilder curveSpecBuilder = new ConfigDBInterpolatedYieldCurveSpecificationBuilder(configSource);
-    final ISDACompliantYieldCurveBuild builder = new ISDACompliantYieldCurveBuild();
     return new AbstractInvokingCompiledFunction(atZDT.with(LocalTime.MIDNIGHT), atZDT.plusDays(1).with(LocalTime.MIDNIGHT).minusNanos(1000000)) {
 
       @SuppressWarnings("synthetic-access")
@@ -113,6 +113,7 @@ public class ISDACompliantYieldCurveFunction extends AbstractFunction {
         final Period[] tenors = new Period[specificationWithSecurities.getStrips().size()];
         final double[] values = new double[specificationWithSecurities.getStrips().size()];
 
+        Period swapIvl = null;
         int i = 0;
         for (final FixedIncomeStripWithSecurity strip : specificationWithSecurities.getStrips()) {
           final String securityType = strip.getSecurity().getSecurityType();
@@ -123,14 +124,20 @@ public class ISDACompliantYieldCurveFunction extends AbstractFunction {
           if (rate == null) {
             throw new OpenGammaRuntimeException("Could not get rate for " + strip);
           }
-          final ISDAInstrumentTypes instrumentType = CashSecurity.SECURITY_TYPE.equals(strip.getSecurity().getSecurityType()) ? ISDAInstrumentTypes.MoneyMarket : ISDAInstrumentTypes.Swap;
-          instruments[i] = instrumentType;
+          if (CashSecurity.SECURITY_TYPE.equals(strip.getSecurity().getSecurityType())) {
+            instruments[i] = ISDAInstrumentTypes.MoneyMarket;
+          } else if (SwapSecurity.SECURITY_TYPE.equals(strip.getSecurity().getSecurityType())) {
+            instruments[i] = ISDAInstrumentTypes.Swap;
+            swapIvl = getFixedLegPaymentTenor((SwapSecurity) strip.getSecurity());
+          } else {
+            throw new OpenGammaRuntimeException("Unexpected curve instument type, can only handle cash and swaps, got: " + strip.getSecurity());
+          }
           tenors[i] = strip.getTenor().getPeriod();
           values[i] = rate;
           i++;
         }
 
-        final ISDACompliantYieldCurve yieldCurve = builder.build(valuationDate.toLocalDate(), spotDate, instruments, tenors, values, MONEY_MARKET_DCC, SWAP_DCC, swapIvl, CURVE_DCC, badDayConv);
+        final ISDACompliantYieldCurve yieldCurve = ISDACompliantYieldCurveBuild.build(valuationDate.toLocalDate(), spotDate, instruments, tenors, values, MONEY_MARKET_DCC, SWAP_DCC, swapIvl, CURVE_DCC, badDayConv);
 
         final ValueProperties properties = createValueProperties()
             .with(ValuePropertyNames.CURVE, curveName)
@@ -140,6 +147,19 @@ public class ISDACompliantYieldCurveFunction extends AbstractFunction {
             .with(ValuePropertyNames.CURVE_CALCULATION_METHOD, ISDAFunctionConstants.ISDA_METHOD_NAME).get();
         final ValueSpecification spec = new ValueSpecification(ValueRequirementNames.YIELD_CURVE, target.toSpecification(), properties);
         return Collections.singleton(new ComputedValue(spec, yieldCurve));
+      }
+
+      private Period getFixedLegPaymentTenor(final SwapSecurity swap) {
+        if (swap.getReceiveLeg() instanceof FixedInterestRateLeg) {
+          FixedInterestRateLeg fixLeg = (FixedInterestRateLeg) swap.getReceiveLeg();
+          return PeriodFrequency.convertToPeriodFrequency(fixLeg.getFrequency()).getPeriod();
+        } else if (swap.getPayLeg() instanceof FixedInterestRateLeg) {
+          FixedInterestRateLeg fixLeg = (FixedInterestRateLeg) swap.getPayLeg();
+          return PeriodFrequency.convertToPeriodFrequency(fixLeg.getFrequency()).getPeriod();
+        } else {
+          throw new OpenGammaRuntimeException("Got a swap without a fixed leg " + swap);
+        }
+
       }
 
       @Override

@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.analytics.financial.interestrate;
@@ -13,9 +13,12 @@ import com.opengamma.analytics.financial.model.option.definition.YieldCurveWithB
 import com.opengamma.util.ArgumentChecker;
 
 /**
- * InstrumentDerivativeVisitor that calculates {@link ValueRequirementNames#DELTA}, the delta of the Security, not the Position. <p>
+ * InstrumentDerivativeVisitor that calculates delta, the first derivative of the price with respect to the price of the underlying future.
+ * <p>
  * See also {@link PresentValueBlackDeltaForTransactionCalculator}
+ * @deprecated {@link YieldCurveBundle} is deprecated
  */
+@Deprecated
 public class PresentValueBlackDeltaForSecurityCalculator extends InstrumentDerivativeVisitorAdapter<YieldCurveBundle, Double> {
   private static final PresentValueBlackDeltaForSecurityCalculator INSTANCE = new PresentValueBlackDeltaForSecurityCalculator();
   private static final BondFutureOptionPremiumSecurityBlackSurfaceMethod PREMIUM_BOND_FUTURE_OPTION = BondFutureOptionPremiumSecurityBlackSurfaceMethod.getInstance();
@@ -33,7 +36,7 @@ public class PresentValueBlackDeltaForSecurityCalculator extends InstrumentDeriv
     final double unitNotional = security.getUnderlyingFuture().getNotional();
     return delta * unitNotional;
   }
-  
+
   @Override
   public Double visitInterestRateFutureOptionMarginSecurity(final InterestRateFutureOptionMarginSecurity security, final YieldCurveBundle curves) {
     ArgumentChecker.notNull(security, "security");
@@ -42,5 +45,5 @@ public class PresentValueBlackDeltaForSecurityCalculator extends InstrumentDeriv
     final double delta = IR_FUTURE_OPTION.optionPriceDelta(security, (YieldCurveWithBlackCubeBundle) curves);
     return delta;
   }
-  
+
 }

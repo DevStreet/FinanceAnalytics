@@ -9,7 +9,6 @@ import static com.opengamma.engine.value.ValuePropertyNames.CURVE;
 import static com.opengamma.engine.value.ValuePropertyNames.CURVE_CONSTRUCTION_CONFIG;
 import static com.opengamma.engine.value.ValueRequirementNames.YIELD_CURVE;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.DISCOUNTING;
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.OpenGammaRuntimeException;
@@ -32,6 +32,8 @@ import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisito
 import com.opengamma.analytics.financial.provider.calculator.issuer.ParSpreadMarketQuoteCurveSensitivityIssuerDiscountingCalculator;
 import com.opengamma.analytics.financial.provider.calculator.issuer.ParSpreadMarketQuoteIssuerDiscountingCalculator;
 import com.opengamma.analytics.financial.provider.curve.CurveBuildingBlockBundle;
+import com.opengamma.analytics.financial.provider.curve.MultiCurveBundle;
+import com.opengamma.analytics.financial.provider.curve.SingleCurveBundle;
 import com.opengamma.analytics.financial.provider.curve.issuer.IssuerDiscountBuildingRepository;
 import com.opengamma.analytics.financial.provider.description.inflation.InflationProviderDiscount;
 import com.opengamma.analytics.financial.provider.description.interestrate.IssuerProviderDiscount;
@@ -75,6 +77,7 @@ import com.opengamma.financial.convention.ConventionSource;
 import com.opengamma.financial.convention.IborIndexConvention;
 import com.opengamma.financial.convention.OvernightIndexConvention;
 import com.opengamma.id.ExternalId;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.Pair;
 
@@ -105,16 +108,24 @@ public class IssuerProviderDiscountingFunction extends
    * Compiled function implementation.
    */
   protected class MyCompiledFunctionDefinition extends CurveCompiledFunctionDefinition {
-    private final Set<ValueRequirement> _exogenousRequirements;
+    /** The curve construction configuration */
     private final CurveConstructionConfiguration _curveConstructionConfiguration;
 
+    /**
+     * @param earliestInvokation The earliest time for which this function is valid, null if there is no bound
+     * @param latestInvokation The latest time for which this function is valid, null if there is no bound
+     * @param curveNames The names of the curves produced by this function, not null
+     * @param exogenousRequirements The exogenous requirements, not null
+     * @param curveConstructionConfiguration The curve construction configuration, not null
+     */
     protected MyCompiledFunctionDefinition(final ZonedDateTime earliestInvokation, final ZonedDateTime latestInvokation, final String[] curveNames,
         final Set<ValueRequirement> exogenousRequirements, final CurveConstructionConfiguration curveConstructionConfiguration) {
       super(earliestInvokation, latestInvokation, curveNames, ValueRequirementNames.YIELD_CURVE, exogenousRequirements);
+      ArgumentChecker.notNull(curveConstructionConfiguration, "curve construction configuration");
       _curveConstructionConfiguration = curveConstructionConfiguration;
-      _exogenousRequirements = exogenousRequirements;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Pair<IssuerProviderInterface, CurveBuildingBlockBundle> getCurves(final FunctionInputs inputs, final ZonedDateTime now, final IssuerDiscountBuildingRepository builder,
         final IssuerProviderInterface knownData, final ConventionSource conventionSource, final HolidaySource holidaySource, final RegionSource regionSource) {
@@ -125,10 +136,7 @@ public class IssuerProviderDiscountingFunction extends
           (HistoricalTimeSeriesBundle) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_INSTRUMENT_CONVERSION_HISTORICAL_TIME_SERIES,
               ComputationTargetSpecification.NULL, curveConstructionProperties));
       final int nGroups = _curveConstructionConfiguration.getCurveGroups().size();
-      final InstrumentDerivative[][][] definitions = new InstrumentDerivative[nGroups][][];
-      final GeneratorYDCurve[][] curveGenerators = new GeneratorYDCurve[nGroups][];
-      final String[][] curves = new String[nGroups][];
-      final double[][] parameterGuess = new double[nGroups][];
+      final MultiCurveBundle<GeneratorYDCurve>[] curveBundles = new MultiCurveBundle[nGroups];
       final LinkedHashMap<String, Currency> discountingMap = new LinkedHashMap<>();
       final LinkedHashMap<String, IborIndex[]> forwardIborMap = new LinkedHashMap<>();
       final LinkedHashMap<String, IndexON[]> forwardONMap = new LinkedHashMap<>();
@@ -138,11 +146,7 @@ public class IssuerProviderDiscountingFunction extends
       for (final CurveGroupConfiguration group : _curveConstructionConfiguration.getCurveGroups()) { // Group - start
         int j = 0;
         final int nCurves = group.getTypesForCurves().size();
-        definitions[i] = new InstrumentDerivative[nCurves][];
-        curveGenerators[i] = new GeneratorYDCurve[nCurves];
-        curves[i] = new String[nCurves];
-        parameterGuess[i] = new double[nCurves];
-        final DoubleArrayList parameterGuessForCurves = new DoubleArrayList();
+        final SingleCurveBundle<GeneratorYDCurve>[] singleCurves = new SingleCurveBundle[nCurves];
         for (final Map.Entry<String, List<CurveTypeConfiguration>> entry : group.getTypesForCurves().entrySet()) {
           final List<IborIndex> iborIndex = new ArrayList<>();
           final List<IndexON> overnightIndex = new ArrayList<>();
@@ -156,18 +160,17 @@ public class IssuerProviderDiscountingFunction extends
               (SnapshotDataBundle) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_MARKET_DATA, ComputationTargetSpecification.NULL, properties));
           final int nNodes = specification.getNodes().size();
           final InstrumentDerivative[] derivativesForCurve = new InstrumentDerivative[nNodes];
-          final double[] marketDataForCurve = new double[nNodes]; // FIXME: Where is this used?
+          final double[] parameterGuessForCurves = new double[nNodes];
           int k = 0;
           for (final CurveNodeWithIdentifier node : specification.getNodes()) { // Node points - start
             final Double marketData = snapshot.getDataPoint(node.getIdentifier());
             if (marketData == null) {
               throw new OpenGammaRuntimeException("Could not get market data for " + node.getIdentifier());
             }
-            marketDataForCurve[k] = marketData;
-            parameterGuessForCurves.add(0.02); // For FX forward, the FX rate is not a good initial guess. // TODO: change this // marketData
+            parameterGuessForCurves[k] = 0.02; // For FX forward, the FX rate is not a good initial guess. // TODO: change this // marketData
             final InstrumentDefinition<?> definitionForNode = node.getCurveNode().accept(getCurveNodeConverter(conventionSource, holidaySource, regionSource,
                 snapshot, node.getIdentifier(), timeSeries, now));
-            derivativesForCurve[k++] = getCurveNodeConverter().getDerivative(node, definitionForNode, now, timeSeries);
+            derivativesForCurve[k++] = getCurveNodeConverter(conventionSource).getDerivative(node, definitionForNode, now, timeSeries);
           } // Node points - end
           for (final CurveTypeConfiguration type : entry.getValue()) { // Type - start
             if (type instanceof DiscountingCurveTypeConfiguration) {
@@ -210,17 +213,15 @@ public class IssuerProviderDiscountingFunction extends
           if (!overnightIndex.isEmpty()) {
             forwardONMap.put(curveName, overnightIndex.toArray(new IndexON[overnightIndex.size()]));
           }
-          definitions[i][j] = derivativesForCurve;
-          curveGenerators[i][j] = getGenerator(definition);
-          curves[i][j] = curveName;
-          parameterGuess[i] = parameterGuessForCurves.toDoubleArray();
-          j++;
+          final GeneratorYDCurve generator = getGenerator(definition, now.toLocalDate());
+          singleCurves[j++] = new SingleCurveBundle<>(curveName, derivativesForCurve, generator.initialGuess(parameterGuessForCurves), generator);
         }
-        i++;
+        final MultiCurveBundle<GeneratorYDCurve> groupBundle = new MultiCurveBundle<>(singleCurves);
+        curveBundles[i++] = groupBundle;
       } // Group - end
       //TODO this is only in here because the code in analytics doesn't use generics properly
-      final Pair<IssuerProviderDiscount, CurveBuildingBlockBundle> temp = builder.makeCurvesFromDerivatives(definitions, curveGenerators, curves,
-          parameterGuess, (IssuerProviderDiscount) knownData, discountingMap, forwardIborMap, forwardONMap, issuerMap, getCalculator(), getSensitivityCalculator());
+      final Pair<IssuerProviderDiscount, CurveBuildingBlockBundle> temp = builder.makeCurvesFromDerivatives(curveBundles,
+          (IssuerProviderDiscount) knownData, discountingMap, forwardIborMap, forwardONMap, issuerMap, getCalculator(), getSensitivityCalculator());
       final Pair<IssuerProviderInterface, CurveBuildingBlockBundle> result = Pair.of((IssuerProviderInterface) temp.getFirst(), temp.getSecond());
       return result;
     }
@@ -245,7 +246,7 @@ public class IssuerProviderDiscountingFunction extends
       final FXMatrix fxMatrix = (FXMatrix) inputs.getValue(ValueRequirementNames.FX_MATRIX);
       //TODO requires that the discounting curves are supplied externally
       IssuerProviderDiscount knownData;
-      if (_exogenousRequirements.isEmpty()) {
+      if (getExogenousRequirements().isEmpty()) {
         knownData = new IssuerProviderDiscount(fxMatrix);
       } else {
         knownData = new IssuerProviderDiscount((MulticurveProviderDiscount) inputs.getValue(ValueRequirementNames.CURVE_BUNDLE));
@@ -260,7 +261,7 @@ public class IssuerProviderDiscountingFunction extends
     }
 
     @Override
-    protected GeneratorYDCurve getGenerator(final CurveDefinition definition) {
+    protected GeneratorYDCurve getGenerator(final CurveDefinition definition, final LocalDate valuationDate) {
       if (definition instanceof InterpolatedCurveDefinition) {
         final InterpolatedCurveDefinition interpolatedDefinition = (InterpolatedCurveDefinition) definition;
         final String interpolatorName = interpolatedDefinition.getInterpolatorName();

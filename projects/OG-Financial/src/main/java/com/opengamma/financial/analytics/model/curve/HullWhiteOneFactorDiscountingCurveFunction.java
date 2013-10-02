@@ -11,7 +11,6 @@ import static com.opengamma.engine.value.ValueRequirementNames.YIELD_CURVE;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.HULL_WHITE_DISCOUNTING;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.PROPERTY_HULL_WHITE_CURRENCY;
 import static com.opengamma.financial.analytics.model.curve.CurveCalculationPropertyNamesAndValues.PROPERTY_HULL_WHITE_PARAMETERS;
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,8 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZonedDateTime;
 
+import com.google.common.collect.Iterables;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorCurveYieldInterpolated;
 import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorYDCurve;
@@ -35,6 +36,8 @@ import com.opengamma.analytics.financial.model.interestrate.definition.HullWhite
 import com.opengamma.analytics.financial.provider.calculator.hullwhite.ParSpreadMarketQuoteCurveSensitivityHullWhiteCalculator;
 import com.opengamma.analytics.financial.provider.calculator.hullwhite.ParSpreadMarketQuoteHullWhiteCalculator;
 import com.opengamma.analytics.financial.provider.curve.CurveBuildingBlockBundle;
+import com.opengamma.analytics.financial.provider.curve.MultiCurveBundle;
+import com.opengamma.analytics.financial.provider.curve.SingleCurveBundle;
 import com.opengamma.analytics.financial.provider.curve.hullwhite.HullWhiteProviderDiscountBuildingRepository;
 import com.opengamma.analytics.financial.provider.description.interestrate.HullWhiteOneFactorProviderDiscount;
 import com.opengamma.analytics.financial.provider.description.interestrate.HullWhiteOneFactorProviderInterface;
@@ -73,6 +76,7 @@ import com.opengamma.financial.analytics.curve.RateFutureNodeConverter;
 import com.opengamma.financial.analytics.curve.SwapNodeConverter;
 import com.opengamma.financial.analytics.ircurve.strips.CurveNodeVisitor;
 import com.opengamma.financial.analytics.ircurve.strips.CurveNodeWithIdentifier;
+import com.opengamma.financial.analytics.ircurve.strips.DeliverableSwapFutureNode;
 import com.opengamma.financial.analytics.ircurve.strips.RateFutureNode;
 import com.opengamma.financial.analytics.timeseries.HistoricalTimeSeriesBundle;
 import com.opengamma.financial.convention.Convention;
@@ -80,6 +84,7 @@ import com.opengamma.financial.convention.ConventionSource;
 import com.opengamma.financial.convention.IborIndexConvention;
 import com.opengamma.financial.convention.OvernightIndexConvention;
 import com.opengamma.id.ExternalId;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.Pair;
 
@@ -110,14 +115,21 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
    * Compiled function implementation.
    */
   protected class MyCompiledFunctionDefinition extends CurveCompiledFunctionDefinition {
-    private final Set<ValueRequirement> _exogenousRequirements;
+    /** The curve construction configuration */
     private final CurveConstructionConfiguration _curveConstructionConfiguration;
 
+    /**
+     * @param earliestInvokation The earliest time for which this function is valid, null if there is no bound
+     * @param latestInvokation The latest time for which this function is valid, null if there is no bound
+     * @param curveNames The names of the curves produced by this function, not null
+     * @param exogenousRequirements The exogenous requirements, not null
+     * @param curveConstructionConfiguration The curve construction configuration, not null
+     */
     protected MyCompiledFunctionDefinition(final ZonedDateTime earliestInvokation, final ZonedDateTime latestInvokation, final String[] curveNames,
         final Set<ValueRequirement> exogenousRequirements, final CurveConstructionConfiguration curveConstructionConfiguration) {
       super(earliestInvokation, latestInvokation, curveNames, ValueRequirementNames.YIELD_CURVE, exogenousRequirements);
+      ArgumentChecker.notNull(curveConstructionConfiguration, "curve construction configuration");
       _curveConstructionConfiguration = curveConstructionConfiguration;
-      _exogenousRequirements = exogenousRequirements;
     }
 
     @Override
@@ -132,10 +144,8 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
           (HistoricalTimeSeriesBundle) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_INSTRUMENT_CONVERSION_HISTORICAL_TIME_SERIES,
               ComputationTargetSpecification.NULL, curveConstructionProperties));
       final int nGroups = _curveConstructionConfiguration.getCurveGroups().size();
-      final InstrumentDerivative[][][] definitions = new InstrumentDerivative[nGroups][][];
-      final GeneratorYDCurve[][] curveGenerators = new GeneratorYDCurve[nGroups][];
-      final String[][] curves = new String[nGroups][];
-      final double[][] parameterGuess = new double[nGroups][];
+      @SuppressWarnings("unchecked")
+      final MultiCurveBundle<GeneratorYDCurve>[] curveBundles = new MultiCurveBundle[nGroups];
       final LinkedHashMap<String, Currency> discountingMap = new LinkedHashMap<>();
       final LinkedHashMap<String, IborIndex[]> forwardIborMap = new LinkedHashMap<>();
       final LinkedHashMap<String, IndexON[]> forwardONMap = new LinkedHashMap<>();
@@ -144,11 +154,8 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
       for (final CurveGroupConfiguration group : _curveConstructionConfiguration.getCurveGroups()) { // Group - start
         int j = 0;
         final int nCurves = group.getTypesForCurves().size();
-        definitions[i] = new InstrumentDerivative[nCurves][];
-        curveGenerators[i] = new GeneratorYDCurve[nCurves];
-        curves[i] = new String[nCurves];
-        parameterGuess[i] = new double[nCurves];
-        final DoubleArrayList parameterGuessForCurves = new DoubleArrayList();
+        @SuppressWarnings("unchecked")
+        final SingleCurveBundle<GeneratorYDCurve>[] singleCurves = new SingleCurveBundle[nCurves];
         for (final Map.Entry<String, List<CurveTypeConfiguration>> entry : group.getTypesForCurves().entrySet()) {
           final List<IborIndex> iborIndex = new ArrayList<>();
           final List<IndexON> overnightIndex = new ArrayList<>();
@@ -162,23 +169,25 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
               (SnapshotDataBundle) inputs.getValue(new ValueRequirement(ValueRequirementNames.CURVE_MARKET_DATA, ComputationTargetSpecification.NULL, properties));
           final int nNodes = specification.getNodes().size();
           final InstrumentDerivative[] derivativesForCurve = new InstrumentDerivative[nNodes];
-          final double[] marketDataForCurve = new double[nNodes];
+          final double[] parameterGuessForCurves = new double[nNodes];
           int k = 0;
           for (final CurveNodeWithIdentifier node : specification.getNodes()) { // Node points - start
             Double marketData = snapshot.getDataPoint(node.getIdentifier());
             if (marketData == null) {
               marketData = 0.99;
-//              throw new OpenGammaRuntimeException("Could not get market data for " + node.getIdentifier());
             }
-            marketDataForCurve[k] = marketData;
             if (node.getCurveNode() instanceof RateFutureNode) {
-              parameterGuessForCurves.add(1 - marketData);
+              parameterGuessForCurves[k] = (1 - marketData);
             } else {
-              parameterGuessForCurves.add(marketData);
+              if (node.getCurveNode() instanceof DeliverableSwapFutureNode) {
+                parameterGuessForCurves[k] = 0.01d; // Implementation note: The relation between price, coupon and rate is complex. There is no good initial guess.
+              } else {
+                parameterGuessForCurves[k] = marketData;
+              }
             }
             final InstrumentDefinition<?> definitionForNode = node.getCurveNode().accept(getCurveNodeConverter(conventionSource, holidaySource, regionSource, snapshot,
                 node.getIdentifier(), timeSeries, now));
-            derivativesForCurve[k++] = getCurveNodeConverter().getDerivative(node, definitionForNode, now, timeSeries);
+            derivativesForCurve[k++] = getCurveNodeConverter(conventionSource).getDerivative(node, definitionForNode, now, timeSeries);
           } // Node points - end
           for (final CurveTypeConfiguration type : entry.getValue()) { // Type - start
             if (type instanceof DiscountingCurveTypeConfiguration) {
@@ -224,16 +233,14 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
           if (!overnightIndex.isEmpty()) {
             forwardONMap.put(curveName, overnightIndex.toArray(new IndexON[overnightIndex.size()]));
           }
-          definitions[i][j] = derivativesForCurve;
-          curveGenerators[i][j] = getGenerator(definition);
-          curves[i][j] = curveName;
-          parameterGuess[i] = parameterGuessForCurves.toDoubleArray();
-          j++;
+          final GeneratorYDCurve generator = getGenerator(definition, now.toLocalDate());
+          singleCurves[j++] = new SingleCurveBundle<>(curveName, derivativesForCurve, generator.initialGuess(parameterGuessForCurves), generator);
         }
-        i++;
+        final MultiCurveBundle<GeneratorYDCurve> groupBundle = new MultiCurveBundle<>(singleCurves);
+        curveBundles[i++] = groupBundle;
       } // Group - end
       //TODO this is only in here because the code in analytics doesn't use generics properly
-      final Pair<HullWhiteOneFactorProviderDiscount, CurveBuildingBlockBundle> temp = builder.makeCurvesFromDerivatives(definitions, curveGenerators, curves, parameterGuess,
+      final Pair<HullWhiteOneFactorProviderDiscount, CurveBuildingBlockBundle> temp = builder.makeCurvesFromDerivatives(curveBundles,
           (HullWhiteOneFactorProviderDiscount) knownData, discountingMap, forwardIborMap, forwardONMap, getCalculator(), getSensitivityCalculator());
       final Pair<HullWhiteOneFactorProviderInterface, CurveBuildingBlockBundle> result = Pair.of((HullWhiteOneFactorProviderInterface) temp.getFirst(), temp.getSecond());
       return result;
@@ -254,11 +261,12 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
       if (hwCurrencies == null || hwCurrencies.size() != 1) {
         return null;
       }
+      final Currency hwCurrency = Currency.of(Iterables.getOnlyElement(hwCurrencies));
       final ValueProperties hwProperties = ValueProperties.builder()
           .with(PROPERTY_HULL_WHITE_PARAMETERS, hwPropertyNames)
           .with(PROPERTY_HULL_WHITE_CURRENCY, hwCurrencies)
           .get();
-      requirements.add(new ValueRequirement(ValueRequirementNames.HULL_WHITE_ONE_FACTOR_PARAMETERS, ComputationTargetSpecification.NULL, hwProperties));
+      requirements.add(new ValueRequirement(ValueRequirementNames.HULL_WHITE_ONE_FACTOR_PARAMETERS, ComputationTargetSpecification.of(hwCurrency), hwProperties));
       return requirements;
     }
 
@@ -286,8 +294,8 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
     }
 
     @Override
-    protected ValueProperties getBundleProperties() {
-      return super.getBundleProperties().copy()
+    protected ValueProperties getBundleProperties(final String[] curveNames) {
+      return super.getBundleProperties(curveNames).copy()
           .withAny(PROPERTY_HULL_WHITE_PARAMETERS)
           .withAny(PROPERTY_HULL_WHITE_CURRENCY)
           .get();
@@ -296,6 +304,9 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
     @Override
     protected HullWhiteOneFactorProviderInterface getKnownData(final FunctionInputs inputs) {
       final HullWhiteOneFactorPiecewiseConstantParameters modelParameters = (HullWhiteOneFactorPiecewiseConstantParameters) inputs.getValue(ValueRequirementNames.HULL_WHITE_ONE_FACTOR_PARAMETERS);
+      if (modelParameters == null) {
+        throw new OpenGammaRuntimeException("Could not get the Hull-White model parameters");
+      }
       Currency currency = null;
       for (final ComputedValue input : inputs.getAllValues()) {
         if (input.getSpecification().getValueName().equals(ValueRequirementNames.HULL_WHITE_ONE_FACTOR_PARAMETERS)) {
@@ -308,7 +319,7 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
       }
       final FXMatrix fxMatrix = (FXMatrix) inputs.getValue(ValueRequirementNames.FX_MATRIX);
       HullWhiteOneFactorProviderDiscount knownData;
-      if (_exogenousRequirements.isEmpty()) {
+      if (getExogenousRequirements().isEmpty()) {
         knownData = new HullWhiteOneFactorProviderDiscount(new MulticurveProviderDiscount(fxMatrix), modelParameters, currency);
       } else {
         final Object curveBundle = inputs.getValue(ValueRequirementNames.CURVE_BUNDLE);
@@ -326,7 +337,7 @@ public class HullWhiteOneFactorDiscountingCurveFunction extends
     }
 
     @Override
-    protected GeneratorYDCurve getGenerator(final CurveDefinition definition) {
+    protected GeneratorYDCurve getGenerator(final CurveDefinition definition, final LocalDate valuationDate) {
       if (definition instanceof InterpolatedCurveDefinition) {
         final InterpolatedCurveDefinition interpolatedDefinition = (InterpolatedCurveDefinition) definition;
         final String interpolatorName = interpolatedDefinition.getInterpolatorName();

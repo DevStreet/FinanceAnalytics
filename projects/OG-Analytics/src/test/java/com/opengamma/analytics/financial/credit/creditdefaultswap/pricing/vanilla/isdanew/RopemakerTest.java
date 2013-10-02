@@ -35,10 +35,62 @@ public class RopemakerTest extends ISDABaseTest {
 
   private static final double NOTIONAL = 1e6;
   private static final double COUPON = 0.01;
-  private static final double RECOVERY = 0.25;
+  private static final double RECOVERY = 0.40;
   private static final Period NON_IMM_TENOR = Period.ofMonths(6);
   private static final CDSAnalyticFactory IMM_CDS_FACTORY = new CDSAnalyticFactory(RECOVERY);
   private static final CDSAnalyticFactory NON_IMM_CDS_FACTORY = IMM_CDS_FACTORY.with(NON_IMM_TENOR);
+
+  @Test(enabled = false)
+  public void gbpTest() {
+    final LocalDate tradeDate = LocalDate.of(2013, Month.SEPTEMBER, 5);
+    final CDSAnalytic cds = IMM_CDS_FACTORY.makeIMMCDS(tradeDate, Period.ofYears(10));
+    final LocalDate spotDate = addWorkDays(tradeDate.minusDays(1), 1, DEFAULT_CALENDAR);
+    final String[] yieldCurvePoints = new String[] {"1M", "2M", "3M", "6M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "12Y", "15Y", "20Y", "25Y", "30Y" };
+    final String[] yieldCurveInstruments = new String[] {"M", "M", "M", "M", "M", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S" };
+    //final String[] yieldCurveInstruments = new String[] {"M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M" };
+    final double[] rates = new double[] {0.004919, 0.005006, 0.00515, 0.005906, 0.008813, 0.0088, 0.01195, 0.01534, 0.01836, 0.02096, 0.02322, 0.02514, 0.02673, 0.02802, 0.02997, 0.0318, 0.03331,
+      0.03383, 0.034 };
+    final ISDACompliantYieldCurve yieldCurve = makeYieldCurve(tradeDate, spotDate, yieldCurvePoints, yieldCurveInstruments, rates, ACT_ACT_ISDA, ACT_ACT_ISDA, Period.ofMonths(6));
+    final double tradelevel = 130.5 * ONE_BP;
+    System.out.println("Accrued days: " + cds.getAccuredDays());
+
+    final double cs01 = NOTIONAL * ONE_BP * CS01_CAL.parallelCS01(cds, new QuotedSpread(COUPON, tradelevel), yieldCurve, ONE_BP);
+    System.out.println("CS01: " + cs01);
+
+    final int day = 5;
+    final Month month = Month.SEPTEMBER;
+    for (int i = 0; i < 10; i++) {
+      final int year = 2014 + i;
+      final LocalDate mat = LocalDate.of(year, month, day);
+      final double t = ACT365.getDayCountFraction(tradeDate, mat);
+      final double df = yieldCurve.getDiscountFactor(t);
+      System.out.println(mat + "\t" + t + "\t" + df);
+    }
+
+  }
+
+  @Test(enabled = false)
+  public void aegonTest() {
+    final String name = "aegon";
+
+    final LocalDate tradeDate = LocalDate.of(2013, Month.SEPTEMBER, 2);
+    final LocalDate firstMaturity = getNextIMMDate(tradeDate);
+    final LocalDate[] maturities = getIMMDateSet(firstMaturity, 41);
+
+    final double[] spreads = new double[] {0.003372, 0.003751, 0.004117, 0.004892, 0.00557, 0.006765, 0.007629, 0.008325, 0.008907, 0.009919, 0.010759, 0.011492, 0.012135, 0.012951, 0.013681,
+      0.014336, 0.014927, 0.015745, 0.016472, 0.017147, 0.017754, 0.018181, 0.018569, 0.018953, 0.019306, 0.019671, 0.02001, 0.020339, 0.020647, 0.020829, 0.021013, 0.021182, 0.021351, 0.021499,
+      0.021649, 0.021786, 0.022041, 0.022181, 0.022328, 0.02246, 0.022601 };
+
+    //yield curve
+    final LocalDate spotDate = addWorkDays(tradeDate.minusDays(1), 3, DEFAULT_CALENDAR);
+    final String[] yieldCurvePoints = new String[] {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "12Y", "15Y", "20Y", "30Y" };
+    final String[] yieldCurveInstruments = new String[] {"M", "M", "M", "M", "M", "M", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S" };
+    final double[] rates = new double[] {0.00129, 0.00175, 0.00224, 0.00343, 0.0045, 0.00545, 0.00628, 0.00862, 0.01121, 0.01365, 0.01576, 0.01758, 0.01917, 0.0206, 0.02188, 0.02395, 0.02595, 0.0271,
+      0.0271 };
+    final ISDACompliantYieldCurve yieldCurve = makeYieldCurve(tradeDate, spotDate, yieldCurvePoints, yieldCurveInstruments, rates, ACT360, D30360, Period.ofYears(1));
+
+    runGrid(name, tradeDate, maturities, spreads, yieldCurve);
+  }
 
   @Test(enabled = false)
   public void russiaTest() {
@@ -137,20 +189,20 @@ public class RopemakerTest extends ISDABaseTest {
     final LocalDate[] pillarDates = getIMMDateSet(nextIMM, PILLARS);
 
     final double[] pillarSpreads = getSpreadsAtDates(maturities, spreads, pillarDates);
-    final CDSAnalytic[] pillarCDSs_nonIMM = NON_IMM_CDS_FACTORY.makeCDS(tradeDate, startDate, pillarDates); //TODO check this start date
+    final CDSAnalytic[] pillarCDSsNonIMM = NON_IMM_CDS_FACTORY.makeCDS(tradeDate, startDate, pillarDates); //TODO check this start date
     final LocalDate[] bucketDates = getIMMDateSet(nextIMM, BUCKETS);
-    final CDSAnalytic[] bucketCDSs_IMM = IMM_CDS_FACTORY.makeCDS(tradeDate, startDate, bucketDates);
-    final CDSAnalytic[] bucketCDSs_nonIMM = NON_IMM_CDS_FACTORY.makeCDS(tradeDate, startDate, bucketDates);
+    final CDSAnalytic[] bucketCDSsIMM = IMM_CDS_FACTORY.makeCDS(tradeDate, startDate, bucketDates);
+    final CDSAnalytic[] bucketCDSsNonIMM = NON_IMM_CDS_FACTORY.makeCDS(tradeDate, startDate, bucketDates);
 
     final double[] puf = new double[nMat];
     final double[] upfrontAmount = new double[nMat];
     final double[] parellelCS01 = new double[nMat];
     final double[][] bucketedCS01 = new double[nMat][];
 
-    final int accDays = pillarCDSs_nonIMM[0].getAccuredDays();
+    final int accDays = pillarCDSsNonIMM[0].getAccuredDays();
     for (int i = 0; i < nMat; i++) {
       if (isIMMDate(maturities[i])) {
-        final CDSAnalytic pricingCDS = new CDSAnalytic(tradeDate, stepinDate, cashSettleDate, startDate, maturities[i], PAY_ACC_ON_DEFAULT, TENOR, STUB, PROCTECTION_START, RECOVERY);
+        final CDSAnalytic pricingCDS = new CDSAnalytic(tradeDate, stepinDate, cashSettleDate, startDate, maturities[i], PAY_ACC_ON_DEFAULT, PAYMENT_INTERVAL, STUB, PROCTECTION_START, RECOVERY);
         final QuotedSpread quote = new QuotedSpread(COUPON, spreads[i]);
         puf[i] = PUF_CONVERTER.toPointsUpFront(pricingCDS, quote, yieldCurve).getPointsUpFront();
         upfrontAmount[i] = (puf[i] - pricingCDS.getAccruedPremium(COUPON)) * NOTIONAL;
@@ -158,14 +210,14 @@ public class RopemakerTest extends ISDABaseTest {
         //a flat (constant) hazard rate does not give a completely flat spread term structure 
         //TODO repeat calculation (already done fro PUF) and parallelCS01
         final ISDACompliantCreditCurve creditCurve = CREDIT_CURVE_BUILDER.calibrateCreditCurve(pricingCDS, quote.getQuotedSpread(), yieldCurve);
-        bucketedCS01[i] = CS01_CAL.bucketedCS01FromCreditCurve(pricingCDS, COUPON, bucketCDSs_IMM, yieldCurve, creditCurve, ONE_BP);
+        bucketedCS01[i] = CS01_CAL.bucketedCS01FromCreditCurve(pricingCDS, COUPON, bucketCDSsIMM, yieldCurve, creditCurve, ONE_BP);
       } else {
         final CDSAnalytic pricingCDS = new CDSAnalytic(tradeDate, stepinDate, cashSettleDate, startDate, maturities[i], PAY_ACC_ON_DEFAULT, NON_IMM_TENOR, STUB, PROCTECTION_START, RECOVERY);
-        final ISDACompliantCreditCurve creditCurve = CREDIT_CURVE_BUILDER.calibrateCreditCurve(pillarCDSs_nonIMM, pillarSpreads, yieldCurve);
+        final ISDACompliantCreditCurve creditCurve = CREDIT_CURVE_BUILDER.calibrateCreditCurve(pillarCDSsNonIMM, pillarSpreads, yieldCurve);
         puf[i] = PRICER.pv(pricingCDS, yieldCurve, creditCurve, spreads[i]);
         upfrontAmount[i] = (puf[i] - pricingCDS.getAccruedPremium(spreads[i])) * NOTIONAL;
-        parellelCS01[i] = CS01_CAL.parallelCS01FromParSpreads(pricingCDS, spreads[i], yieldCurve, pillarCDSs_nonIMM, pillarSpreads, ONE_BP, BumpType.ADDITIVE);
-        bucketedCS01[i] = CS01_CAL.bucketedCS01FromCreditCurve(pricingCDS, spreads[i], bucketCDSs_nonIMM, yieldCurve, creditCurve, ONE_BP);
+        parellelCS01[i] = CS01_CAL.parallelCS01FromParSpreads(pricingCDS, spreads[i], yieldCurve, pillarCDSsNonIMM, pillarSpreads, ONE_BP, BumpType.ADDITIVE);
+        bucketedCS01[i] = CS01_CAL.bucketedCS01FromCreditCurve(pricingCDS, spreads[i], bucketCDSsNonIMM, yieldCurve, creditCurve, ONE_BP);
       }
     }
 

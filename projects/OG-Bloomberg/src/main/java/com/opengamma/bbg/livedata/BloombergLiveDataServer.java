@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.sf.ehcache.CacheManager;
+
 import org.fudgemsg.FudgeMsg;
 import org.fudgemsg.mapping.FudgeSerializer;
 import org.slf4j.Logger;
@@ -39,8 +41,6 @@ import com.opengamma.livedata.server.AbstractEventDispatcher;
 import com.opengamma.transport.FudgeMessageSender;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
-
-import net.sf.ehcache.CacheManager;
 
 /**
  * A Bloomberg Live Data Server. 
@@ -155,7 +155,7 @@ public class BloombergLiveDataServer extends AbstractBloombergLiveDataServer {
     
     SubscriptionList sl = new SubscriptionList();
     for (String bbgUniqueId : bbgUniqueIds) {
-      String securityDes = "/buid/" + bbgUniqueId;
+      String securityDes = getBloombergSubscriptionPathPrefix() + bbgUniqueId;
       Subscription subscription = new Subscription(securityDes, BloombergDataUtils.STANDARD_FIELDS_LIST);
       sl.add(subscription);
       returnValue.put(bbgUniqueId, subscription);

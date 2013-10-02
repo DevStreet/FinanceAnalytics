@@ -7,6 +7,7 @@ package com.opengamma.financial.security.cds;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -35,7 +36,7 @@ import com.opengamma.id.ExternalId;
 public class LegacyVanillaCDSSecurity extends LegacyCDSSecurity {
 
   /** Serialization version. */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2L;
 
   /**
    * The security type
@@ -55,11 +56,11 @@ public class LegacyVanillaCDSSecurity extends LegacyCDSSecurity {
       final DebtSeniority debtSeniority, final RestructuringClause restructuringClause, final ExternalId regionId, final ZonedDateTime startDate,
       final ZonedDateTime effectiveDate, final ZonedDateTime maturityDate, final StubType stubType, final Frequency couponFrequency, final DayCount dayCount,
       final BusinessDayConvention businessDayConvention, final boolean immAdjustMaturityDate, final boolean adjustEffectiveDate,
-      final boolean adjustMaturityDate, final InterestRateNotional notional, final double recoveryRate, final boolean includeAccruedPremium,
+      final boolean adjustMaturityDate, final InterestRateNotional notional, final boolean includeAccruedPremium,
       final boolean protectionStart, final double parSpread) {
     super(isBuy, protectionSeller, protectionBuyer, referenceEntity, debtSeniority, restructuringClause, regionId, startDate,
         effectiveDate, maturityDate, stubType, couponFrequency, dayCount, businessDayConvention, immAdjustMaturityDate, adjustEffectiveDate,
-        adjustMaturityDate, notional, recoveryRate, includeAccruedPremium, protectionStart, SECURITY_TYPE);
+        adjustMaturityDate, notional, includeAccruedPremium, protectionStart, SECURITY_TYPE);
     setParSpread(parSpread);
   }
 
@@ -86,51 +87,6 @@ public class LegacyVanillaCDSSecurity extends LegacyCDSSecurity {
     return LegacyVanillaCDSSecurity.Meta.INSTANCE;
   }
 
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 1556795764:  // parSpread
-        return getParSpread();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 1556795764:  // parSpread
-        setParSpread((Double) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_parSpread, "parSpread");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      LegacyVanillaCDSSecurity other = (LegacyVanillaCDSSecurity) obj;
-      return JodaBeanUtils.equal(getParSpread(), other.getParSpread()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getParSpread());
-    return hash ^ super.hashCode();
-  }
-
   //-----------------------------------------------------------------------
   /**
    * Gets the par spread.
@@ -155,6 +111,51 @@ public class LegacyVanillaCDSSecurity extends LegacyCDSSecurity {
    */
   public final Property<Double> parSpread() {
     return metaBean().parSpread().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public LegacyVanillaCDSSecurity clone() {
+    return (LegacyVanillaCDSSecurity) super.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      LegacyVanillaCDSSecurity other = (LegacyVanillaCDSSecurity) obj;
+      return JodaBeanUtils.equal(getParSpread(), other.getParSpread()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getParSpread());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(64);
+    buf.append("LegacyVanillaCDSSecurity{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("parSpread").append('=').append(getParSpread()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -216,6 +217,32 @@ public class LegacyVanillaCDSSecurity extends LegacyCDSSecurity {
      */
     public final MetaProperty<Double> parSpread() {
       return _parSpread;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 1556795764:  // parSpread
+          return ((LegacyVanillaCDSSecurity) bean).getParSpread();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 1556795764:  // parSpread
+          ((LegacyVanillaCDSSecurity) bean).setParSpread((Double) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((LegacyVanillaCDSSecurity) bean)._parSpread, "parSpread");
+      super.validate(bean);
     }
 
   }

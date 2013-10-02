@@ -8,12 +8,11 @@ package com.opengamma.financial.analytics.model.sabr;
 import static com.opengamma.engine.value.ValueRequirementNames.BLOCK_CURVE_SENSITIVITIES;
 import static com.opengamma.financial.analytics.model.sabr.SABRPropertyValues.NO_EXTRAPOLATION;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.threeten.bp.Instant;
 
-import com.google.common.collect.Iterables;
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisitor;
@@ -66,13 +65,16 @@ public class NoExtrapolationSABRDiscountingBCSFunction extends SABRDiscountingFu
       protected Set<ComputedValue> getValues(final FunctionExecutionContext executionContext, final FunctionInputs inputs,
           final ComputationTarget target, final Set<ValueRequirement> desiredValues, final InstrumentDerivative derivative,
           final FXMatrix fxMatrix) {
-        final ValueRequirement desiredValue = Iterables.getOnlyElement(desiredValues);
+        final Set<ComputedValue> result = new HashSet<>();
         final DayCount dayCount = DayCountFactory.INSTANCE.getDayCount("Act/360"); //TODO
         final SABRSwaptionProvider sabrData = getSABRSurfaces(executionContext, inputs, target, fxMatrix, dayCount);
         final CurveBuildingBlockBundle blocks = getMergedCurveBuildingBlocks(inputs);
         final MultipleCurrencyParameterSensitivity sensitivities = CALCULATOR.fromInstrument(derivative, sabrData, blocks);
-        final ValueSpecification spec = new ValueSpecification(BLOCK_CURVE_SENSITIVITIES, target.toSpecification(), desiredValue.getConstraints().copy().get());
-        return Collections.singleton(new ComputedValue(spec, sensitivities));
+        for (final ValueRequirement desiredValue : desiredValues) {
+          final ValueSpecification spec = new ValueSpecification(BLOCK_CURVE_SENSITIVITIES, target.toSpecification(), desiredValue.getConstraints().copy().get());
+          result.add(new ComputedValue(spec, sensitivities));
+        }
+        return result;
       }
 
       @Override

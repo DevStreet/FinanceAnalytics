@@ -7,6 +7,7 @@ package com.opengamma.financial.security.cds;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -33,7 +34,7 @@ import com.opengamma.id.ExternalId;
 public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
 
   /** Serialization version */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2L;
 
   /**
    * The quoted spread.
@@ -55,7 +56,7 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
       final DebtSeniority debtSeniority, final RestructuringClause restructuringClause, final ExternalId regionId, final ZonedDateTime startDate,
       final ZonedDateTime effectiveDate, final ZonedDateTime maturityDate, final StubType stubType, final Frequency couponFrequency, final DayCount dayCount,
       final BusinessDayConvention businessDayConvention, final boolean immAdjustMaturityDate, final boolean adjustEffectiveDate,
-      final boolean adjustMaturityDate, final InterestRateNotional notional, final double recoveryRate, final boolean includeAccruedPremium,
+      final boolean adjustMaturityDate, final InterestRateNotional notional, final boolean includeAccruedPremium,
       final boolean protectionStart, final double quotedSpread, final InterestRateNotional upfrontAmount, final String securityType) {
 
     super(isBuy,
@@ -76,7 +77,6 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
           adjustEffectiveDate,
           adjustMaturityDate,
           notional,
-          recoveryRate,
           includeAccruedPremium,
           protectionStart,
           securityType);
@@ -84,7 +84,7 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
     setUpfrontAmount(upfrontAmount);
   }
 
-  protected StandardCDSSecurity(boolean isBuy,
+  protected StandardCDSSecurity(boolean isBuy,  // CSIGNORE: number of parameters is appropriate here
                                 ExternalId protectionSeller,
                                 ExternalId protectionBuyer,
                                 ExternalId referenceEntity,
@@ -102,7 +102,6 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
                                 boolean adjustEffectiveDate,
                                 boolean adjustMaturityDate,
                                 InterestRateNotional notional,
-                                double recoveryRate,
                                 boolean includeAccruedPremium,
                                 boolean protectionStart,
                                 String securityType,
@@ -126,7 +125,6 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
           adjustEffectiveDate,
           adjustMaturityDate,
           notional,
-          recoveryRate,
           includeAccruedPremium,
           protectionStart,
           securityType);
@@ -151,59 +149,6 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
   @Override
   public StandardCDSSecurity.Meta metaBean() {
     return StandardCDSSecurity.Meta.INSTANCE;
-  }
-
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -963526405:  // quotedSpread
-        return getQuotedSpread();
-      case -716346778:  // upfrontAmount
-        return getUpfrontAmount();
-    }
-    return super.propertyGet(propertyName, quiet);
-  }
-
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case -963526405:  // quotedSpread
-        setQuotedSpread((Double) newValue);
-        return;
-      case -716346778:  // upfrontAmount
-        setUpfrontAmount((InterestRateNotional) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
-  }
-
-  @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_quotedSpread, "quotedSpread");
-    JodaBeanUtils.notNull(_upfrontAmount, "upfrontAmount");
-    super.validate();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (obj != null && obj.getClass() == this.getClass()) {
-      StandardCDSSecurity other = (StandardCDSSecurity) obj;
-      return JodaBeanUtils.equal(getQuotedSpread(), other.getQuotedSpread()) &&
-          JodaBeanUtils.equal(getUpfrontAmount(), other.getUpfrontAmount()) &&
-          super.equals(obj);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(getQuotedSpread());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getUpfrontAmount());
-    return hash ^ super.hashCode();
   }
 
   //-----------------------------------------------------------------------
@@ -256,6 +201,49 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
    */
   public final Property<InterestRateNotional> upfrontAmount() {
     return metaBean().upfrontAmount().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj != null && obj.getClass() == this.getClass()) {
+      StandardCDSSecurity other = (StandardCDSSecurity) obj;
+      return JodaBeanUtils.equal(getQuotedSpread(), other.getQuotedSpread()) &&
+          JodaBeanUtils.equal(getUpfrontAmount(), other.getUpfrontAmount()) &&
+          super.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash += hash * 31 + JodaBeanUtils.hashCode(getQuotedSpread());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getUpfrontAmount());
+    return hash ^ super.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(96);
+    buf.append("StandardCDSSecurity{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
+  }
+
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("quotedSpread").append('=').append(getQuotedSpread()).append(',').append(' ');
+    buf.append("upfrontAmount").append('=').append(getUpfrontAmount()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -333,6 +321,38 @@ public abstract class StandardCDSSecurity extends CreditDefaultSwapSecurity {
      */
     public final MetaProperty<InterestRateNotional> upfrontAmount() {
       return _upfrontAmount;
+    }
+
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -963526405:  // quotedSpread
+          return ((StandardCDSSecurity) bean).getQuotedSpread();
+        case -716346778:  // upfrontAmount
+          return ((StandardCDSSecurity) bean).getUpfrontAmount();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case -963526405:  // quotedSpread
+          ((StandardCDSSecurity) bean).setQuotedSpread((Double) newValue);
+          return;
+        case -716346778:  // upfrontAmount
+          ((StandardCDSSecurity) bean).setUpfrontAmount((InterestRateNotional) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((StandardCDSSecurity) bean)._quotedSpread, "quotedSpread");
+      JodaBeanUtils.notNull(((StandardCDSSecurity) bean)._upfrontAmount, "upfrontAmount");
+      super.validate(bean);
     }
 
   }

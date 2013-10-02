@@ -19,7 +19,7 @@ import com.opengamma.util.ArgumentChecker;
  * (operation on the continuously-compounded zero-coupon rates)  produced by the array of generators.
  * The generated curve is a {@link YieldAndDiscountAddZeroSpreadCurve}.
  */
-@Deprecated
+@SuppressWarnings("deprecation")
 public class GeneratorCurveAddYield extends GeneratorYDCurve {
 
   /**
@@ -70,6 +70,11 @@ public class GeneratorCurveAddYield extends GeneratorYDCurve {
     return new YieldAndDiscountAddZeroSpreadCurve(name, _substract, underlyingCurves);
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated {@link YieldCurveBundle} is deprecated.
+   */
+  @Deprecated
   @Override
   public YieldAndDiscountCurve generateCurve(final String name, final YieldCurveBundle bundle, final double[] parameters) {
     return generateCurve(name, parameters);

@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
- * 
+ *
  * Please see distribution for license.
  */
 package com.opengamma.analytics.financial.interestrate.payments.derivative;
@@ -13,8 +13,8 @@ import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 
 /**
- *  Class describing a OIS-like floating coupon. 
- * 
+ *  Class describing a OIS-like floating coupon.
+ *
  */
 public class CouponONCompounded extends Coupon {
 
@@ -23,7 +23,7 @@ public class CouponONCompounded extends Coupon {
    */
   private final IndexON _index;
   /**
-   * The fixing period start time (in years). The fixing period does take into account the already fixed period, 
+   * The fixing period start time (in years). The fixing period does take into account the already fixed period,
    * i.e. the fixing period start time is the first date for which the coupon is not fixed yet.
    */
   private final double[] _fixingPeriodStartTimes;
@@ -51,7 +51,7 @@ public class CouponONCompounded extends Coupon {
   private final String _forwardCurveName;
 
   /**
-   * Constructor of a generic coupon from details.
+   * Constructor of a generic coupon from details. Deprecated version using the funding curve name.
    * @param currency The payment currency.
    * @param paymentTime Time (in years) up to the payment.
    * @param fundingCurveName Name of the funding curve.
@@ -82,7 +82,7 @@ public class CouponONCompounded extends Coupon {
   }
 
   /**
-   * Constructor of a generic coupon from details.
+   * Constructor of a generic coupon from details. Same as the previous constructor but not using the funding curve name.
    * @param currency The payment currency.
    * @param paymentTime Time (in years) up to the payment.
    * @param paymentYearFraction The year fraction (or accrual factor) for the coupon payment.
@@ -98,7 +98,7 @@ public class CouponONCompounded extends Coupon {
       final double[] fixingPeriodStartTimes, final double[] fixingPeriodEndTimes, final double[] fixingPeriodAccrualFactors, final double[] fixingPeriodAccrualFactorsActAct,
       final double notionalAccrued) {
     super(currency, paymentTime, paymentYearFraction, notional);
-    ArgumentChecker.notNull(index, "Coupon OIS: index");
+    ArgumentChecker.notNull(index, "Coupon ON conpounded : index");
     _index = index;
     _fixingPeriodStartTimes = fixingPeriodStartTimes;
     _fixingPeriodEndTimes = fixingPeriodEndTimes;
@@ -164,6 +164,7 @@ public class CouponONCompounded extends Coupon {
     return _forwardCurveName;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public CouponONCompounded withNotional(final double notional) {
     return new CouponONCompounded(getCurrency(), getPaymentTime(), getFundingCurveName(), getPaymentYearFraction(), notional, _index, _fixingPeriodStartTimes, _fixingPeriodEndTimes,
@@ -198,6 +199,9 @@ public class CouponONCompounded extends Coupon {
     result = prime * result + Arrays.hashCode(_fixingPeriodStartTimes);
     result = prime * result + ((_forwardCurveName == null) ? 0 : _forwardCurveName.hashCode());
     result = prime * result + ((_index == null) ? 0 : _index.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(_notionalAccrued);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
 
@@ -237,6 +241,9 @@ public class CouponONCompounded extends Coupon {
         return false;
       }
     } else if (!_index.equals(other._index)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(_notionalAccrued) != Double.doubleToLongBits(other._notionalAccrued)) {
       return false;
     }
     return true;

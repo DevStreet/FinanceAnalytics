@@ -7,6 +7,7 @@ package com.opengamma.financial.security.swap;
 
 import java.util.Map;
 
+import org.joda.beans.Bean;
 import org.joda.beans.BeanBuilder;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.JodaBeanUtils;
@@ -37,16 +38,10 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
   public static final String SECURITY_TYPE = "YEAR_ON_YEAR_INFLATION_SWAP";
 
   /**
-   * Is the notional exchanged.
-   */
-  @PropertyDefinition
-  private boolean _exchangeNotional;
-
-  /**
-   * The tenor of the swap.
+   * The maturity tenor of the swap.
    */
   @PropertyDefinition(validate = "notNull")
-  private Tenor _tenor;
+  private Tenor _maturityTenor;
 
   /**
    * For the builder
@@ -62,14 +57,16 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
    * @param counterparty The counterparty, not null
    * @param payLeg The pay leg, not null
    * @param receiveLeg The receive leg, not null
-   * @param exchangeNotional True if the notional is exchanged
+   * @param exchangeInitialNotional Whether the initial notional is exchanged
+   * @param exchangeFinalNotional Whether the final notional is exchanged
    * @param tenor The tenor, not null
    */
   public YearOnYearInflationSwapSecurity(final ZonedDateTime tradeDate, final ZonedDateTime effectiveDate, final ZonedDateTime maturityDate,
-      final String counterparty, final SwapLeg payLeg, final SwapLeg receiveLeg, final boolean exchangeNotional, final Tenor tenor) {
+      final String counterparty, final SwapLeg payLeg, final SwapLeg receiveLeg, boolean exchangeInitialNotional, boolean exchangeFinalNotional, final Tenor tenor) {
     super(SECURITY_TYPE, tradeDate, effectiveDate, maturityDate, counterparty, payLeg, receiveLeg);
-    setExchangeNotional(exchangeNotional);
-    setTenor(tenor);
+    setExchangeInitialNotional(exchangeInitialNotional);
+    setExchangeFinalNotional(exchangeFinalNotional);
+    setMaturityTenor(tenor);
   }
 
   @Override
@@ -97,34 +94,36 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
     return YearOnYearInflationSwapSecurity.Meta.INSTANCE;
   }
 
-  @Override
-  protected Object propertyGet(String propertyName, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 1793327747:  // exchangeNotional
-        return isExchangeNotional();
-      case 110246592:  // tenor
-        return getTenor();
-    }
-    return super.propertyGet(propertyName, quiet);
+  //-----------------------------------------------------------------------
+  /**
+   * Gets the maturity tenor of the swap.
+   * @return the value of the property, not null
+   */
+  public Tenor getMaturityTenor() {
+    return _maturityTenor;
   }
 
-  @Override
-  protected void propertySet(String propertyName, Object newValue, boolean quiet) {
-    switch (propertyName.hashCode()) {
-      case 1793327747:  // exchangeNotional
-        setExchangeNotional((Boolean) newValue);
-        return;
-      case 110246592:  // tenor
-        setTenor((Tenor) newValue);
-        return;
-    }
-    super.propertySet(propertyName, newValue, quiet);
+  /**
+   * Sets the maturity tenor of the swap.
+   * @param maturityTenor  the new value of the property, not null
+   */
+  public void setMaturityTenor(Tenor maturityTenor) {
+    JodaBeanUtils.notNull(maturityTenor, "maturityTenor");
+    this._maturityTenor = maturityTenor;
   }
 
+  /**
+   * Gets the the {@code maturityTenor} property.
+   * @return the property, not null
+   */
+  public final Property<Tenor> maturityTenor() {
+    return metaBean().maturityTenor().createProperty(this);
+  }
+
+  //-----------------------------------------------------------------------
   @Override
-  protected void validate() {
-    JodaBeanUtils.notNull(_tenor, "tenor");
-    super.validate();
+  public YearOnYearInflationSwapSecurity clone() {
+    return (YearOnYearInflationSwapSecurity) super.clone();
   }
 
   @Override
@@ -134,8 +133,7 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
     }
     if (obj != null && obj.getClass() == this.getClass()) {
       YearOnYearInflationSwapSecurity other = (YearOnYearInflationSwapSecurity) obj;
-      return JodaBeanUtils.equal(isExchangeNotional(), other.isExchangeNotional()) &&
-          JodaBeanUtils.equal(getTenor(), other.getTenor()) &&
+      return JodaBeanUtils.equal(getMaturityTenor(), other.getMaturityTenor()) &&
           super.equals(obj);
     }
     return false;
@@ -144,60 +142,27 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash += hash * 31 + JodaBeanUtils.hashCode(isExchangeNotional());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getTenor());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getMaturityTenor());
     return hash ^ super.hashCode();
   }
 
-  //-----------------------------------------------------------------------
-  /**
-   * Gets is the notional exchanged.
-   * @return the value of the property
-   */
-  public boolean isExchangeNotional() {
-    return _exchangeNotional;
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder(64);
+    buf.append("YearOnYearInflationSwapSecurity{");
+    int len = buf.length();
+    toString(buf);
+    if (buf.length() > len) {
+      buf.setLength(buf.length() - 2);
+    }
+    buf.append('}');
+    return buf.toString();
   }
 
-  /**
-   * Sets is the notional exchanged.
-   * @param exchangeNotional  the new value of the property
-   */
-  public void setExchangeNotional(boolean exchangeNotional) {
-    this._exchangeNotional = exchangeNotional;
-  }
-
-  /**
-   * Gets the the {@code exchangeNotional} property.
-   * @return the property, not null
-   */
-  public final Property<Boolean> exchangeNotional() {
-    return metaBean().exchangeNotional().createProperty(this);
-  }
-
-  //-----------------------------------------------------------------------
-  /**
-   * Gets the tenor of the swap.
-   * @return the value of the property, not null
-   */
-  public Tenor getTenor() {
-    return _tenor;
-  }
-
-  /**
-   * Sets the tenor of the swap.
-   * @param tenor  the new value of the property, not null
-   */
-  public void setTenor(Tenor tenor) {
-    JodaBeanUtils.notNull(tenor, "tenor");
-    this._tenor = tenor;
-  }
-
-  /**
-   * Gets the the {@code tenor} property.
-   * @return the property, not null
-   */
-  public final Property<Tenor> tenor() {
-    return metaBean().tenor().createProperty(this);
+  @Override
+  protected void toString(StringBuilder buf) {
+    super.toString(buf);
+    buf.append("maturityTenor").append('=').append(getMaturityTenor()).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -211,22 +176,16 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
     static final Meta INSTANCE = new Meta();
 
     /**
-     * The meta-property for the {@code exchangeNotional} property.
+     * The meta-property for the {@code maturityTenor} property.
      */
-    private final MetaProperty<Boolean> _exchangeNotional = DirectMetaProperty.ofReadWrite(
-        this, "exchangeNotional", YearOnYearInflationSwapSecurity.class, Boolean.TYPE);
-    /**
-     * The meta-property for the {@code tenor} property.
-     */
-    private final MetaProperty<Tenor> _tenor = DirectMetaProperty.ofReadWrite(
-        this, "tenor", YearOnYearInflationSwapSecurity.class, Tenor.class);
+    private final MetaProperty<Tenor> _maturityTenor = DirectMetaProperty.ofReadWrite(
+        this, "maturityTenor", YearOnYearInflationSwapSecurity.class, Tenor.class);
     /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
         this, (DirectMetaPropertyMap) super.metaPropertyMap(),
-        "exchangeNotional",
-        "tenor");
+        "maturityTenor");
 
     /**
      * Restricted constructor.
@@ -237,10 +196,8 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
     @Override
     protected MetaProperty<?> metaPropertyGet(String propertyName) {
       switch (propertyName.hashCode()) {
-        case 1793327747:  // exchangeNotional
-          return _exchangeNotional;
-        case 110246592:  // tenor
-          return _tenor;
+        case 45907375:  // maturityTenor
+          return _maturityTenor;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -262,19 +219,37 @@ public class YearOnYearInflationSwapSecurity extends SwapSecurity {
 
     //-----------------------------------------------------------------------
     /**
-     * The meta-property for the {@code exchangeNotional} property.
+     * The meta-property for the {@code maturityTenor} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<Boolean> exchangeNotional() {
-      return _exchangeNotional;
+    public final MetaProperty<Tenor> maturityTenor() {
+      return _maturityTenor;
     }
 
-    /**
-     * The meta-property for the {@code tenor} property.
-     * @return the meta-property, not null
-     */
-    public final MetaProperty<Tenor> tenor() {
-      return _tenor;
+    //-----------------------------------------------------------------------
+    @Override
+    protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 45907375:  // maturityTenor
+          return ((YearOnYearInflationSwapSecurity) bean).getMaturityTenor();
+      }
+      return super.propertyGet(bean, propertyName, quiet);
+    }
+
+    @Override
+    protected void propertySet(Bean bean, String propertyName, Object newValue, boolean quiet) {
+      switch (propertyName.hashCode()) {
+        case 45907375:  // maturityTenor
+          ((YearOnYearInflationSwapSecurity) bean).setMaturityTenor((Tenor) newValue);
+          return;
+      }
+      super.propertySet(bean, propertyName, newValue, quiet);
+    }
+
+    @Override
+    protected void validate(Bean bean) {
+      JodaBeanUtils.notNull(((YearOnYearInflationSwapSecurity) bean)._maturityTenor, "maturityTenor");
+      super.validate(bean);
     }
 
   }

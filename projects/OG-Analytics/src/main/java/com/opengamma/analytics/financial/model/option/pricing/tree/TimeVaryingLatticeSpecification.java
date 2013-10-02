@@ -15,8 +15,6 @@ import com.opengamma.analytics.math.statistics.descriptive.MeanCalculator;
  */
 public class TimeVaryingLatticeSpecification extends LatticeSpecification {
 
-  private static final Function1D<double[], Double> CALCULATOR = new MeanCalculator();
-
   @Override
   public double[] getParameters(final double spot, final double strike, final double timeToExpiry, final double volatility, final double interestRate, final int nSteps, final double dt) {
     throw new NotImplementedException();
@@ -40,6 +38,26 @@ public class TimeVaryingLatticeSpecification extends LatticeSpecification {
     return res;
   }
 
+  /**
+   * Parameters for trinomial tree
+   * @param vol Volatility
+   * @param nu Computed by getShiftedDrift method
+   * @param dt Time step
+   * @param spaceStep Homogeneous space step
+   * @return {(up probability), (middle probability), (down probability)}
+   */
+  public double[] getParametersTrinomial(final double vol, final double nu, final double dt, final double spaceStep) {
+    final double nudt = nu * dt;
+    final double dx = vol * Math.sqrt(3. * dt);
+
+    final double part = (vol * vol * dt + nudt * nudt) / dx / dx;
+    final double upProbability = 0.5 * (part + nudt / dx);
+    final double middleProbability = 1. - part;
+    final double downProbability = 0.5 * (part - nudt / dx);
+
+    return new double[] {upProbability, middleProbability, downProbability };
+  }
+
   @Override
   public double getTheta(final double spot, final double volatility, final double interestRate, final double dividend, final double dt, final double[] greeksTmp) {
     return 0.5 * (greeksTmp[3] - greeksTmp[0]) / dt;
@@ -54,21 +72,6 @@ public class TimeVaryingLatticeSpecification extends LatticeSpecification {
    */
   public double getTheta(final double dt0, final double dt1, final double[] greeksTmp) {
     return (greeksTmp[3] - greeksTmp[0]) / (dt0 + dt1);
-  }
-
-  /**
-   * @param volatility Volatility
-   * @param interestRate Interest rate
-   * @return (interest rate) - 0.5 * volatility * volatility for all layers 
-   */
-  public double[] getShiftedDrift(final double[] volatility, final double[] interestRate) {
-    final int nSteps = volatility.length;
-    final double[] res = new double[nSteps];
-
-    for (int i = 0; i < nSteps; ++i) {
-      res[i] = interestRate[i] - 0.5 * volatility[i] * volatility[i];
-    }
-    return res;
   }
 
   /**
@@ -95,10 +98,25 @@ public class TimeVaryingLatticeSpecification extends LatticeSpecification {
    * @return space step 
    */
   public double getSpaceStep(final double timeToExpiry, final double[] volatility, final int nSteps, final double[] nu) {
-    final double meanNu = CALCULATOR.evaluate(nu);
-    final double meanVol = CALCULATOR.evaluate(volatility);
+    final Function1D<double[], Double> calculator = new MeanCalculator();
+    final double meanNu = calculator.evaluate(nu);
+    final double meanVol = calculator.evaluate(volatility);
     final double dt = timeToExpiry / nSteps;
 
     return Math.sqrt(meanVol * meanVol * dt + meanNu * meanNu * dt * dt);
+  }
+
+  /**
+   * @param volatility Volatility
+   * @param nu Computed by getShiftedDrift method
+   * @param dt time step
+   * @return space step 
+   */
+  public double getSpaceStepTrinomial(final double[] volatility, final double[] nu, final double dt) {
+    final Function1D<double[], Double> calculator = new MeanCalculator();
+    final double meanNu = calculator.evaluate(nu);
+    final double meanVol = calculator.evaluate(volatility);
+
+    return Math.sqrt(3. * meanVol * meanVol * dt + meanNu * meanNu * dt * dt);
   }
 }

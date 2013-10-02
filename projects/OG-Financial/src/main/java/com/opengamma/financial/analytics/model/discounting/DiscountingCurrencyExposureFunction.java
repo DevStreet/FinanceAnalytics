@@ -58,7 +58,10 @@ public class DiscountingCurrencyExposureFunction extends DiscountingFunction {
       public boolean canApplyTo(final FunctionCompilationContext compilationContext, final ComputationTarget target) {
         final Security security = target.getTrade().getSecurity();
         if (security instanceof SwapSecurity) {
-          return InterestRateInstrumentType.getInstrumentTypeFromSecurity((SwapSecurity) security) == InterestRateInstrumentType.SWAP_CROSS_CURRENCY;
+          if (InterestRateInstrumentType.isFixedIncomeInstrumentType((SwapSecurity) security)) {
+            return InterestRateInstrumentType.getInstrumentTypeFromSecurity((SwapSecurity) security) == InterestRateInstrumentType.SWAP_CROSS_CURRENCY;
+          }
+          return false;
         }
         return security instanceof FXForwardSecurity ||
             security instanceof NonDeliverableFXForwardSecurity;
