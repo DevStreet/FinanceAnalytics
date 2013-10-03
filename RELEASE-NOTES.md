@@ -11,13 +11,43 @@ To 2.2.0-M1
 -----------
 
 Configuration compatibility
-- No changes required
+- [PLAT-4782] The legacy analytics web UI has been retired. WebsiteAnalyticsComponentFactory, which used to construct
+  its server-side components, has been removed. Any instances of this can be safely deleted from component
+  configuration .ini files.
+
 
 Database compatibility
 - No upgrade required
 
+
 API compatibility
-- No significant changes
+- [PLAT-4782] The legacy analytics web UI has been retired. The dependency on the CometD long-polling library, and the
+  custom RESTful end-points that it used, have been removed.
+
+- ExternalIdSearch is now immutable
+Change constructor to of() factory
+
+- FXForwardCurveDefinition is now immutable
+Change constructor to of() factory
+Change getTenors() to getTenorsArray()
+
+- FuturePriceCurveDefinition is now immutable
+Change constructor to of() factory
+Handle change of return type from array to list
+
+- ValueSnapshot is now a bean
+Change constructor to of() factory
+The set method has been retained for ease of upgrade
+
+- HistoricalTimeSeriesRating is now immutable
+Change constructor to of() factory
+
+- HistoricalTimeSeriesRatingRule is now immutable
+Change constructor to of() factory
+
+- ScenarioDslParameters and ScenarioDslScript are now immutable
+Change constructor to of() factory
+
 
 Analytics compatibility
 - No expected differences

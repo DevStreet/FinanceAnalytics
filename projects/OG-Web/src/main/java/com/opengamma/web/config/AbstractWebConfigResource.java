@@ -28,7 +28,9 @@ import org.fudgemsg.wire.FudgeMsgReader;
 import org.fudgemsg.wire.FudgeMsgWriter;
 import org.fudgemsg.wire.xml.FudgeXMLStreamReader;
 import org.fudgemsg.wire.xml.FudgeXMLStreamWriter;
+import org.joda.beans.Bean;
 import org.joda.beans.impl.flexi.FlexiBean;
+import org.joda.beans.ser.JodaBeanSer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,20 +168,27 @@ public abstract class AbstractWebConfigResource extends AbstractPerRequestWebRes
   protected WebConfigData data() {
     return _data;
   }
-  
+
   /**
-   * Utility method to convert XML to configuration object
-   * @param xml the configuration xml
+   * Utility method to convert XML to configuration object.
+   * 
+   * @param <T> the type to parse to
+   * @param xml  the configuration xml, not null
+   * @param type  the type to parse to, not null
    * @return the configuration object
    */
-  protected Object parseXML(String xml) {
-    final CharArrayReader car = new CharArrayReader(xml.toCharArray());
-    @SuppressWarnings("resource")
-    final FudgeMsgReader fmr = new FudgeMsgReader(new FudgeXMLStreamReader(getFudgeContext(), car));
-    final FudgeMsg message = fmr.nextMessage();
-    return getFudgeContext().fromFudgeMsg(message);
+  protected <T> T parseXML(String xml, Class<T> type) {
+    if (xml.contains("<fudgeEnvelope")) {
+      final CharArrayReader car = new CharArrayReader(xml.toCharArray());
+      @SuppressWarnings("resource")
+      final FudgeMsgReader fmr = new FudgeMsgReader(new FudgeXMLStreamReader(getFudgeContext(), car));
+      final FudgeMsg message = fmr.nextMessage();
+      return getFudgeContext().fromFudgeMsg(type, message);
+    } else {
+      return JodaBeanSer.PRETTY.xmlReader().read(xml, type);
+    }
   }
-    
+
   /**
    * Converts JSON to configuration object
    * 
@@ -195,6 +204,18 @@ public abstract class AbstractWebConfigResource extends AbstractPerRequestWebRes
     
     return new FudgeDeserializer(getFudgeContext()).fudgeMsgToObject(fudgeMsg);
     
+  }
+
+  protected String createBeanXML(ConfigDocument doc) {
+    Object object = doc.getConfig().getValue();
+    if (object instanceof Bean) {
+      try {
+        return JodaBeanSer.PRETTY.xmlWriter().write((Bean) object, false);
+      } catch (RuntimeException ex) {
+        return createXML(doc);
+      }
+    }
+    return createXML(doc);
   }
 
   protected String createXML(ConfigDocument doc) {
