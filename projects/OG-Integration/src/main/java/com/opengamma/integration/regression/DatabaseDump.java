@@ -11,6 +11,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.saxon.event.StreamWriterToReceiver;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.Serializer.Property;
+
 import org.fudgemsg.FudgeContext;
 import org.fudgemsg.MutableFudgeMsg;
 import org.fudgemsg.mapping.FudgeSerializer;
@@ -19,6 +25,7 @@ import org.fudgemsg.wire.xml.FudgeXMLStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.opengamma.OpenGammaRuntimeException;
@@ -258,13 +265,21 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
   }
 
   private void writeToFudge(File outputDir, Object object, String fileName) throws IOException {
+    Processor p = new Processor(false);
     try (FileWriter writer = new FileWriter(new File(outputDir, fileName))) {
-      FudgeXMLStreamWriter streamWriter = new FudgeXMLStreamWriter(_ctx, writer);
+      Serializer serializer = p.newSerializer(writer);
+      serializer.setOutputProperty(Property.INDENT, "yes");
+      StreamWriterToReceiver xmlStreamWriter;
+      try {
+        xmlStreamWriter = serializer.getXMLStreamWriter();
+      } catch (SaxonApiException ex) {
+        throw Throwables.propagate(ex);
+      }
+      FudgeXMLStreamWriter streamWriter = new FudgeXMLStreamWriter(_ctx, xmlStreamWriter);
       FudgeMsgWriter fudgeMsgWriter = new FudgeMsgWriter(streamWriter);
       MutableFudgeMsg msg = _serializer.objectToFudgeMsg(object);
       FudgeSerializer.addClassHeader(msg, object.getClass());
       fudgeMsgWriter.writeMessage(msg);
-      writer.append("\n");
       s_logger.debug("Wrote object {}", object);
       fudgeMsgWriter.flush();
     }
