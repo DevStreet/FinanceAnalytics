@@ -9,29 +9,15 @@ import static com.google.common.collect.Iterators.filter;
 import static com.google.common.collect.Iterators.transform;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.sf.saxon.event.StreamWriterToReceiver;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.Serializer;
-import net.sf.saxon.s9api.Serializer.Property;
-
-import org.fudgemsg.FudgeContext;
-import org.fudgemsg.MutableFudgeMsg;
-import org.fudgemsg.mapping.FudgeSerializer;
-import org.fudgemsg.wire.FudgeMsgWriter;
-import org.fudgemsg.wire.xml.FudgeXMLStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.core.config.impl.ConfigItem;
 import com.opengamma.core.marketdatasnapshot.impl.ManageableMarketDataSnapshot;
 import com.opengamma.id.ObjectId;
@@ -83,7 +69,6 @@ import com.opengamma.master.security.SecurityMaster;
 import com.opengamma.master.security.SecuritySearchRequest;
 import com.opengamma.master.security.impl.SecuritySearchIterator;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 
 /**
  * Dumps all the data required to run views from the database into Fudge XML files.
@@ -93,7 +78,8 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
 
   private static final Logger s_logger = LoggerFactory.getLogger(DatabaseDump.class);
 
-  private final File _outputDir;
+  private final DatabaseDumpWriter _dumpWriter;
+  
   private final SecurityMaster _securityMaster;
   private final PositionMaster _positionMaster;
   private final PortfolioMaster _portfolioMaster;
@@ -107,13 +93,11 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
   private final MasterFilterManager _masterFilterManager;
   
   private final IdMappings _idMappings;
-  private final FudgeContext _ctx = new FudgeContext(OpenGammaFudgeContext.getInstance());
-  private final FudgeSerializer _serializer = new FudgeSerializer(OpenGammaFudgeContext.getInstance());
 
   private int _nextId;
 
 
-  DatabaseDump(String outputDir,
+  DatabaseDump(DatabaseDumpWriter dumpWriter,
       SecurityMaster securityMaster,
       PositionMaster positionMaster,
       PortfolioMaster portfolioMaster,
@@ -123,7 +107,7 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
       ExchangeMaster exchangeMaster,
       MarketDataSnapshotMaster snapshotMaster,
       OrganizationMaster organizationMaster) {
-    this(outputDir,
+    this(dumpWriter,
         securityMaster,
         positionMaster,
         portfolioMaster,
@@ -136,7 +120,7 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
         MasterFilterManager.alwaysTrue());
   }
   
-  DatabaseDump(String outputDir,
+  DatabaseDump(DatabaseDumpWriter dumpWriter,
       SecurityMaster securityMaster,
       PositionMaster positionMaster,
       PortfolioMaster portfolioMaster,
@@ -147,13 +131,14 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
       MarketDataSnapshotMaster snapshotMaster,
       OrganizationMaster organizationMaster,
       MasterFilterManager masterFilterManager) {
+    ArgumentChecker.notNull(dumpWriter, "dumpWriter");
     ArgumentChecker.notNull(securityMaster, "securityMaster");
-    ArgumentChecker.notNull(outputDir, "outputDir");
     ArgumentChecker.notNull(positionMaster, "positionMaster");
     ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
     ArgumentChecker.notNull(configMaster, "configMaster");
     ArgumentChecker.notNull(timeSeriesMaster, "timeSeriesMaster");
     ArgumentChecker.notNull(masterFilterManager, "masterFilterManager");
+    _dumpWriter = dumpWriter;
     _organizationMaster = organizationMaster;
     _snapshotMaster = snapshotMaster;
     _exchangeMaster = exchangeMaster;
@@ -165,7 +150,6 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
     _securityMaster = securityMaster;
     _masterFilterManager = masterFilterManager;
 
-    _outputDir = new File(outputDir);
 
     ConfigItem<IdMappings> mappingsConfigItem = RegressionUtils.loadIdMappings(_configMaster);
     if (mappingsConfigItem != null) {
@@ -174,14 +158,6 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
       _idMappings = new IdMappings();
     }
     _nextId = _idMappings.getMaxId() + 1;
-    if (!_outputDir.exists()) {
-      boolean success = _outputDir.mkdirs();
-      if (!success) {
-        throw new OpenGammaRuntimeException("Output directory " + outputDir + " couldn't be created");
-      }
-      s_logger.info("Created output directory {}", _outputDir.getAbsolutePath());
-    }
-    s_logger.info("Dumping database to {}", _outputDir.getAbsolutePath());
   }
 
   public static void main(String[] args) throws IOException {
@@ -193,7 +169,7 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
     String serverUrl = args[1];
     int exitCode = 0;
     try (RemoteServer server = RemoteServer.create(serverUrl)) {
-      DatabaseDump databaseDump = new DatabaseDump(dataDir,
+      DatabaseDump databaseDump = new DatabaseDump(DatabaseDumpWriter.createFileWriter(new File(dataDir)),
                                                    server.getSecurityMaster(),
                                                    server.getPositionMaster(),
                                                    server.getPortfolioMaster(),
@@ -211,7 +187,10 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
     System.exit(exitCode);
   }
 
+  
+  
   public void dumpDatabase() throws IOException {
+    
     Map<ObjectId, Integer> ids = Maps.newHashMap(_idMappings.getIds());
     ids.putAll(writeSecurities());
     ids.putAll(writePositions());
@@ -229,7 +208,7 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
       }
     }
     IdMappings idMappings = new IdMappings(ids, maxId);
-    writeToFudge(_outputDir, idMappings, RegressionUtils.ID_MAPPINGS_FILE);
+    _dumpWriter.writeToFudge(RegressionUtils.ID_MAPPINGS_FILE, idMappings);
   }
 
   private Map<ObjectId, Integer> writeSecurities() throws IOException {
@@ -289,16 +268,6 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
   private Map<ObjectId, Integer> writeToDirectory(Iterator<? extends UniqueIdentifiable> objects,
                                                   String outputSubDirName,
                                                   String prefix) throws IOException {
-    File outputDir = new File(_outputDir, outputSubDirName);
-    if (!outputDir.exists()) {
-      boolean success = outputDir.mkdir();
-      if (success) {
-        s_logger.debug("Created directory {}", outputDir);
-      } else {
-        throw new OpenGammaRuntimeException("Failed to create directory " + outputDir);
-      }
-    }
-    s_logger.info("Writing to {}", outputDir.getAbsolutePath());
     Map<ObjectId, Integer> ids = Maps.newHashMap();
     int count = 0;
     while (objects.hasNext()) {
@@ -313,34 +282,13 @@ import com.opengamma.util.fudgemsg.OpenGammaFudgeContext;
         id = previousId;
       }
       String fileName = prefix + id + ".xml";
-      writeToFudge(outputDir, object, fileName);
+      _dumpWriter.writeToFudge(outputSubDirName, fileName, object);
       count++;
     }
-    s_logger.info("Wrote {} objects to {}", count, outputDir.getAbsolutePath());
+    s_logger.info("Wrote {} objects to {}", count, outputSubDirName);
     return ids;
   }
 
-  private void writeToFudge(File outputDir, Object object, String fileName) throws IOException {
-    Processor p = new Processor(false);
-    try (FileWriter writer = new FileWriter(new File(outputDir, fileName))) {
-      Serializer serializer = p.newSerializer(writer);
-      serializer.setOutputProperty(Property.INDENT, "yes");
-      StreamWriterToReceiver xmlStreamWriter;
-      try {
-        xmlStreamWriter = serializer.getXMLStreamWriter();
-      } catch (SaxonApiException ex) {
-        throw Throwables.propagate(ex);
-      }
-      FudgeXMLStreamWriter streamWriter = new FudgeXMLStreamWriter(_ctx, xmlStreamWriter);
-      FudgeMsgWriter fudgeMsgWriter = new FudgeMsgWriter(streamWriter);
-      MutableFudgeMsg msg = _serializer.objectToFudgeMsg(object);
-      FudgeSerializer.addClassHeader(msg, object.getClass());
-      fudgeMsgWriter.writeMessage(msg);
-      s_logger.debug("Wrote object {}", object);
-      fudgeMsgWriter.flush();
-    }
-  }
-  
   private class SecurityTransformer implements Function<SecurityDocument, ManageableSecurity> {
     @Override
     public ManageableSecurity apply(SecurityDocument input) {
