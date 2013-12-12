@@ -127,29 +127,22 @@ public class DatabaseRestore {
       ExchangeMaster exchangeMaster,
       MarketDataSnapshotMaster snapshotMaster,
       OrganizationMaster organizationMaster) {
-    ArgumentChecker.notEmpty(dataDir, "dataDir");
-    ArgumentChecker.notNull(securityMaster, "securityMaster");
-    ArgumentChecker.notNull(positionMaster, "positionMaster");
-    ArgumentChecker.notNull(portfolioMaster, "portfolioMaster");
-    ArgumentChecker.notNull(configMaster, "configMaster");
-    ArgumentChecker.notNull(timeSeriesMaster, "timeSeriesMaster");
-    ArgumentChecker.notNull(holidayMaster, "holidayMaster");
-    ArgumentChecker.notNull(exchangeMaster, "exchangeMaster");
-    ArgumentChecker.notNull(snapshotMaster, "snapshotMaster");
-    ArgumentChecker.notNull(organizationMaster, "organizationMaster");
-    _securityMaster = securityMaster;
-    _positionMaster = positionMaster;
-    _portfolioMaster = portfolioMaster;
-    _configMaster = configMaster;
-    _timeSeriesMaster = timeSeriesMaster;
-    _holidayMaster = holidayMaster;
-    _exchangeMaster = exchangeMaster;
-    _snapshotMaster = snapshotMaster;
-    _organizationMaster = organizationMaster;
-    _dataDir = new File(dataDir);
-    // TODO check data dir is an existing directory
+    this(new File(dataDir),
+        securityMaster,
+        positionMaster,
+        portfolioMaster,
+        configMaster,
+        timeSeriesMaster,
+        holidayMaster,
+        exchangeMaster,
+        snapshotMaster,
+        organizationMaster);
   }
 
+  
+  
+  
+  
   public static void main(String[] args) throws IOException {
     if (args.length < 2) {
       System.err.println("arguments: dataDirectory serverUrl");
