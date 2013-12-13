@@ -7,7 +7,6 @@ package com.opengamma.integration.regression;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
@@ -51,7 +50,7 @@ public class GoldenCopyCreationTool extends AbstractTool<DataTrackingToolContext
     
     DataTrackingToolContext tc = getToolContext();
     
-    try (DatabaseDumpWriter writer = createDumpWriter()) {
+    try (DatabaseDumpWriter writer = createDumpWriter(regressionDirectory)) {
       GoldenCopyDumpCreator goldenCopyDumpCreator = new GoldenCopyDumpCreator(writer, 
           tc.getSecurityMaster(),
           tc.getPositionMaster(),
@@ -68,25 +67,15 @@ public class GoldenCopyCreationTool extends AbstractTool<DataTrackingToolContext
     }
   }
   
-  private DatabaseDumpWriter createDumpWriter() throws IOException {
-    CommandLine commandLine = getCommandLine();
-    String outputDirRootStr = commandLine.getOptionValue("db-dump-output-dir");
-    
-    File dumpDir = Paths.get(outputDirRootStr, GoldenCopyDumpCreator.DB_DUMP_SUBDIR).toFile();
-    
-    if (commandLine.hasOption("zipfile-name")) {
-      String zipfileName = commandLine.getOptionValue("zipfile-name");
-      return DatabaseDumpWriter.createZipWriter(dumpDir, zipfileName);
-    } else {
-      return DatabaseDumpWriter.createFileWriter(dumpDir);
-    }
+  private DatabaseDumpWriter createDumpWriter(String regressionDirectoryStr) throws IOException {
+    File regressionDirectory = new File(regressionDirectoryStr);
+    return DatabaseDumpWriter.createZipWriter(regressionDirectory, GoldenCopyDumpCreator.DB_DUMP_ZIP);
   }
 
   @Override
   protected Options createOptions(boolean mandatoryConfig) {
     Options options = super.createOptions(mandatoryConfig);
     options.addOption(createDbDumpOutputDirectory());
-    options.addOption(createZipfileNameOption());
     return options;
   }
 
@@ -101,14 +90,4 @@ public class GoldenCopyCreationTool extends AbstractTool<DataTrackingToolContext
         .create("o");
   }
   
-  @SuppressWarnings("static-access")
-  private static Option createZipfileNameOption() {
-    return OptionBuilder.isRequired(false)
-        .hasArg(true)
-        .withArgName("zipfile")
-        .withDescription("The zip file to write the dump to")
-        .withLongOpt("zipfile-name")
-        .create("z");
-  }
-
 }

@@ -38,7 +38,7 @@ class GoldenCopyDumpCreator {
   /**
    * The subdir in which the dump lives.
    */
-  public static final String DB_DUMP_SUBDIR = "dbdump";
+  public static final String DB_DUMP_ZIP = "dbdump.zip";
 
   
   private final DatabaseDumpWriter _databaseDumpWriter;
