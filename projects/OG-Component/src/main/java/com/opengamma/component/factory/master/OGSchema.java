@@ -133,17 +133,12 @@ public final class OGSchema {
       throw new OpenGammaRuntimeException("JDBC URL must contain '/' before the database name");
     }
 
-    // REVIEW jonathan 2013-05-14 -- should not be doing this (PLAT-2745)
-    int lastSlash = jdbcUrl.lastIndexOf('/');
-    if (lastSlash == -1 || lastSlash == jdbcUrl.length() - 1) {
-      throw new OpenGammaRuntimeException("JDBC URL must contain a slash separating the server host and the database name");
-    }
-    String dbServerHost = jdbcUrl.substring(0, lastSlash);
-    String catalog = jdbcUrl.substring(lastSlashIdx + 1);
     String user = dataSource.getUsername();
     String password = dataSource.getPassword();
-    dbManagement.initialise(dbServerHost, user, password);
-    
+    dbManagement.initialise(jdbcUrl, user, password);
+
+    String catalog = dbManagement.getCatalog();
+
     Integer expectedSchemaVersion = DbScriptUtils.getCurrentVersion(schemaName);
     if (expectedSchemaVersion == null) {
       throw new OpenGammaRuntimeException("Unable to find schema version information for " + schemaName + ". Database objects cannot be managed.");

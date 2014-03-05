@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.Oracle10gDialect;
@@ -81,7 +83,7 @@ public final class Oracle11gDbManagement extends AbstractDbManagement {
   //-------------------------------------------------------------------------
   @Override
   public String getCatalogToConnectTo(String catalog) {
-    return getDbHost();
+    return getJdbcUrl();
   }
 
   @Override
@@ -197,4 +199,9 @@ public final class Oracle11gDbManagement extends AbstractDbManagement {
     }
   }
 
+  @Override
+  public String getCatalog() {
+    // in oracle user is the catalog
+    return getUser();
+  }
 }

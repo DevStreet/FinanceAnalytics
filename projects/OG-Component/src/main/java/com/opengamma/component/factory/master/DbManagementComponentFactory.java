@@ -19,7 +19,6 @@ import org.joda.beans.impl.direct.DirectBeanBuilder;
 import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.component.ComponentInfo;
 import com.opengamma.component.ComponentRepository;
 import com.opengamma.component.factory.AbstractComponentFactory;
@@ -59,23 +58,8 @@ public class DbManagementComponentFactory extends AbstractComponentFactory {
   }
 
   protected DbManagement initDbManagement(ComponentRepository repo) {
-    // REVIEW jonathan 2012-10-12 -- should not be doing this (PLAT-2745)
-    String dbHost;
-    if (getJdbcUrl().startsWith("jdbc:sqlserver")) {
-      // [PLAT-2745] jdbc:sqlserver://mysvr:1433;integratedSecurity=true;/databaseName=mydb
-      dbHost = getJdbcUrl();
-    } else if (getJdbcUrl().startsWith("jdbc:oracle")) {
-      dbHost = getJdbcUrl();
-    } else {
-      int lastSlashIdx = getJdbcUrl().lastIndexOf("/");
-      if (lastSlashIdx == -1) {
-        throw new OpenGammaRuntimeException("JDBC URL must contain '/' before the database name");
-      }
-      dbHost = getJdbcUrl().substring(0, lastSlashIdx);
-    }
-
-    DbManagement dbManagement = DbManagementUtils.getDbManagement(dbHost);
-    dbManagement.initialise(dbHost, getUsername(), getPassword());
+    DbManagement dbManagement = DbManagementUtils.getDbManagement(getJdbcUrl());
+    dbManagement.initialise(getJdbcUrl(), getUsername(), getPassword());
     ComponentInfo info = new ComponentInfo(DbManagement.class, getClassifier());
     repo.registerComponent(info, dbManagement);
     return dbManagement;

@@ -7,6 +7,8 @@ package com.opengamma.util.db.management;
 
 import java.io.File;
 import java.sql.SQLInvalidAuthorizationSpecException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.dialect.Dialect;
@@ -191,8 +193,8 @@ public final class HSQLDbManagement extends AbstractDbManagement {
   }
 
   private File getFile() {
-    String dbHost = getDbHost().trim();
-    String filePart = dbHost.substring("jdbc:hsqldb:file:".length());
+    String jdbcUrl = getJdbcUrl().trim();
+    String filePart = jdbcUrl.substring("jdbc:hsqldb:file:".length());
     return new File(filePart);
   }
 
@@ -204,7 +206,7 @@ public final class HSQLDbManagement extends AbstractDbManagement {
 
     @Override
     public boolean catalogExists(String catalog) {
-      if (getDbHost().toLowerCase().indexOf("jdbc:hsqldb:file:") != 1) {
+      if (getJdbcUrl().toLowerCase().indexOf("jdbc:hsqldb:file:") != 1) {
         return true;
       }
       File catalogDir = new File(getFile(), catalog);
@@ -214,6 +216,20 @@ public final class HSQLDbManagement extends AbstractDbManagement {
     @Override
     public void create(String catalog) {
       return; // HSQLDB creates DB automatically on first connect
+    }
+  }
+
+  // HSQL jdbc format from http://hsqldb.org/doc/2.0/apidocs/org/hsqldb/jdbc/JDBCConnection.html
+  private static final Pattern EXTRACT_CATALOG_PATTERN = Pattern.compile("jdbc:hsqldb:(hsql|hsqls|http|https)://(\\w+)(:\\d+)?(/(\\w+))?(;.*)?", Pattern.CASE_INSENSITIVE);
+
+  @Override
+  public String getCatalog() {
+    String url = getJdbcUrl();
+    Matcher m = EXTRACT_CATALOG_PATTERN.matcher(url);
+    if (m.matches() && m.groupCount() >= 5) {
+      return m.group(5);
+    } else {
+      return null;
     }
   }
 

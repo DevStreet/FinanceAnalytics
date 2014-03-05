@@ -100,7 +100,7 @@ public class Oracle11gCatalogCreationStrategy implements CatalogCreationStrategy
 
   private String getCatalogToConnectTo() {
     if (_blankCatalog == null) {
-      return _dbManagement.getDbHost();
+      return _dbManagement.getJdbcUrl();
     } else {
       return _dbManagement.getCatalogToConnectTo(_blankCatalog);
     }

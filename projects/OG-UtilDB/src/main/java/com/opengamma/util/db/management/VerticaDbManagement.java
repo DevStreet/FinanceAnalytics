@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.PostgreSQLDialect;
@@ -72,7 +74,7 @@ public final class VerticaDbManagement extends AbstractDbManagement {
   //-------------------------------------------------------------------------
   @Override
   public String getCatalogToConnectTo(String catalog) {
-    return getDbHost();
+    return getJdbcUrl();
   }
 
   @Override
@@ -203,6 +205,20 @@ public final class VerticaDbManagement extends AbstractDbManagement {
     @Override
     public void create(String catalog) {
       return; // no possibility in Vertica to programmatically create databases. Instead schemas are encoded to contain database name as well.
+    }
+  }
+
+  // PostgreSQL jdbc format from http://jdbc.postgresql.org/documentation/80/connect.html
+  private static final Pattern EXTRACT_CATALOG_PATTERN = Pattern.compile("jdbc:vertica://(\\w+)(:\\d+)?(/(\\w+))?", Pattern.CASE_INSENSITIVE);
+
+  @Override
+  public String getCatalog() {
+    String url = getJdbcUrl();
+    Matcher m = EXTRACT_CATALOG_PATTERN.matcher(url);
+    if (m.matches() && m.groupCount() >= 4) {
+      return m.group(4);
+    } else {
+      return null;
     }
   }
 

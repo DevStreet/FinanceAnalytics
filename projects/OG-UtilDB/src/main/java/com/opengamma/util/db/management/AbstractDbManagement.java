@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Copyright (C) 2014 - present by OpenGamma Inc. and the OpenGamma group of companies
  *
  * Please see distribution for license.
  */
@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -39,11 +41,30 @@ public abstract class AbstractDbManagement implements DbManagement {
    * The schema version table suffix.
    */
   protected static final String SCHEMA_VERSION_TABLE_SUFFIX = "_schema_version";
-  
+
   /**
-   * The database server.
+   * Regexp patter for jdbc scheme extraction
    */
-  private String _dbServerHost;
+  private static final Pattern JDBC_SCHEME = Pattern.compile("^jdbc:(\\w+):.*", Pattern.CASE_INSENSITIVE);
+
+  /**
+   * Extracts jdbc scheme from jdbc url.
+   * @param jdbcUrl jdbc url
+   * @return jdbc scheme
+   */
+  public static String extractJdbcScheme(String jdbcUrl) {
+    Matcher m = JDBC_SCHEME.matcher(jdbcUrl);
+    if (m.matches()) {
+      return m.group(1);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * The jdbc url.
+   */
+  private String _jdbcUrl;
   /**
    * The user name.
    */
@@ -55,8 +76,8 @@ public abstract class AbstractDbManagement implements DbManagement {
 
   //-------------------------------------------------------------------------
   @Override
-  public void initialise(String dbServerHost, String user, String password) {
-    _dbServerHost = dbServerHost;
+  public void initialise(String jdbcUrl, String user, String password) {
+    _jdbcUrl = jdbcUrl;
     _user = user;
     _password = password;
     try {
@@ -86,15 +107,19 @@ public abstract class AbstractDbManagement implements DbManagement {
     // by default, do nothing
   }
 
-  public String getDbHost() {
-    return _dbServerHost;
+  public void setJdbcUrl(String jdbcUrl) {
+    _jdbcUrl = jdbcUrl;
   }
 
-  public String getUser() {
+  public String getJdbcUrl() {
+    return _jdbcUrl;
+  }
+
+  public synchronized String getUser() {
     return _user;
   }
 
-  public String getPassword() {
+  public synchronized String getPassword() {
     return _password;
   }
 
@@ -153,9 +178,9 @@ public abstract class AbstractDbManagement implements DbManagement {
       if (obj instanceof ColumnDefinition) {
         ColumnDefinition c = (ColumnDefinition) obj;
         return ObjectUtils.equals(getName(), c.getName())
-          && ObjectUtils.equals(getDataType(), c.getDataType())
-          && ObjectUtils.equals(getAllowsNull(), c.getAllowsNull())
-          && ObjectUtils.equals(getDefaultValue(), c.getDefaultValue());
+            && ObjectUtils.equals(getDataType(), c.getDataType())
+            && ObjectUtils.equals(getAllowsNull(), c.getAllowsNull())
+            && ObjectUtils.equals(getDefaultValue(), c.getDefaultValue());
       }
       return false;
     }
@@ -189,9 +214,9 @@ public abstract class AbstractDbManagement implements DbManagement {
   public abstract String getAllForeignKeyConstraintsSQL(String catalog, String schema);
 
   public abstract String getCreateSchemaSQL(String catalog, String schema);
-  
+
   public abstract String getSchemaVersionTable(String schemaGroupName);
-  
+
   public abstract String getSchemaVersionSQL(String catalog, String schemaGroupName);
 
   public abstract CatalogCreationStrategy getCatalogCreationStrategy();
@@ -208,7 +233,7 @@ public abstract class AbstractDbManagement implements DbManagement {
 
   @Override
   public String getCatalogToConnectTo(String catalog) {
-    return getDbHost() + "/" + catalog;
+    return getJdbcUrl() + "/" + catalog;
   }
 
   protected List<String> getAllTables(String catalog, String schema, Statement statement) throws SQLException {
@@ -544,7 +569,7 @@ public abstract class AbstractDbManagement implements DbManagement {
         try {
           statement.execute(sqlStatement);
         } catch (SQLException e) {
-          throw new OpenGammaRuntimeException("Failed to execute statement (" + getDbHost() + ") " + sqlStatement, e);
+          throw new OpenGammaRuntimeException("Failed to execute statement (" + getJdbcUrl() + ") " + sqlStatement, e);
         }
       }
       statement.close();
@@ -673,5 +698,5 @@ public abstract class AbstractDbManagement implements DbManagement {
       }
     }
   }
-  
+
 }

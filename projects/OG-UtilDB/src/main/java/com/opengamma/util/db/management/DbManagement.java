@@ -21,11 +21,11 @@ public interface DbManagement {
   /**
    * Initializes the database management API.
    * 
-   * @param dbServerHost  the database server, not null
+   * @param jdbcUrl  the jdbc url, not null
    * @param user  the user name
    * @param password  the password
    */
-  void initialise(String dbServerHost, String user, String password);
+  void initialise(String jdbcUrl, String user, String password);
 
   /**
    * Resets the database catalog.
@@ -169,4 +169,9 @@ public interface DbManagement {
    */
   String getCatalogToConnectTo(String catalog);
 
+  /**
+   * Extracts catalog from jdbc url
+   * @return catalog
+   */
+  String getCatalog();
 }

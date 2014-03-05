@@ -90,7 +90,7 @@ public class SQLCatalogCreationStrategy implements CatalogCreationStrategy {
 
   private String getCatalogToConnectTo() {
     if (_blankCatalog == null) {
-      return _dbManagement.getDbHost();
+      return _dbManagement.getJdbcUrl();
     } else {
       return _dbManagement.getCatalogToConnectTo(_blankCatalog);
     }
@@ -114,7 +114,7 @@ public class SQLCatalogCreationStrategy implements CatalogCreationStrategy {
       }
       conn.setAutoCommit(true);
   
-      String createCatalogSql = "CREATE DATABASE " + catalog;
+      String createCatalogSql = "CREATE DATABASE \"" + catalog + "\"";
       Statement statement = conn.createStatement();
       statement.executeUpdate(createCatalogSql);
       statement.close();

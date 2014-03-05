@@ -8,6 +8,8 @@ package com.opengamma.util.db.management;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.PostgreSQLDialect;
@@ -173,6 +175,20 @@ public final class PostgresDbManagement extends AbstractDbManagement {
       } catch (SQLException se) {
         throw new OpenGammaRuntimeException("Failed to drop the default schema", se);
       }
+    }
+  }
+
+  // PostgreSQL jdbc format from http://jdbc.postgresql.org/documentation/80/connect.html
+  private static final Pattern EXTRACT_CATALOG_PATTERN = Pattern.compile("jdbc:postgresql://(\\w+)(:\\d+)?(/(\\w+))?(\\?.*)?", Pattern.CASE_INSENSITIVE);
+
+  @Override
+  public String getCatalog() {
+    String url = getJdbcUrl();
+    Matcher m = EXTRACT_CATALOG_PATTERN.matcher(url);
+    if (m.matches() && m.groupCount() >= 4) {
+      return m.group(4);
+    } else {
+      return null;
     }
   }
 }

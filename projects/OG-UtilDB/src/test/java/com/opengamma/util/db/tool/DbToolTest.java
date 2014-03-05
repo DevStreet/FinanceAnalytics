@@ -83,8 +83,7 @@ public class DbToolTest {
   }
 
   private Connection getConnection() throws SQLException {
-    return DriverManager.getConnection(
-        _tool.getDbServerHost() + "/" + _tool.getTestCatalog(), _tool.getUser(), _tool.getPassword());
+    return DriverManager.getConnection(_tool.getJdbcUrl(), _tool.getUser(), _tool.getPassword());
   }
 
   private void createTestTable() throws SQLException {

@@ -5,6 +5,9 @@
  */
 package com.opengamma.util.db.management;
 
+import static com.opengamma.util.db.management.AbstractDbManagement.extractJdbcScheme;
+
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,14 +44,10 @@ public final class DbManagementUtils {
    */
   public static DbManagement getDbManagement(String jdbcUrl) {
     ArgumentChecker.notNull(jdbcUrl, "jdbcUrl");
-    String[] dbUrlParts = jdbcUrl.toLowerCase().split(":");
-    if (dbUrlParts.length < 2 || !"jdbc".equals(dbUrlParts[0])) {
-      throw new OpenGammaRuntimeException("Expected JDBC database URL, found '" + jdbcUrl + "'");
-    }
-    String jdbcVendorName = dbUrlParts[1];
-    DbManagement dbManagement = s_jdbcVendorMap.get(jdbcVendorName);
+    String jdbcScheme = extractJdbcScheme(jdbcUrl);
+    DbManagement dbManagement = s_jdbcVendorMap.get(jdbcScheme);
     if (dbManagement == null) {
-      throw new IllegalArgumentException("Unsupported JDBC vendor name '" + jdbcVendorName + "'");
+      throw new IllegalArgumentException("Unsupported JDBC vendor name '" + jdbcScheme + "'");
     }
     return dbManagement;
   }

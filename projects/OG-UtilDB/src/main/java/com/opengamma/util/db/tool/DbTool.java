@@ -5,6 +5,8 @@
  */
 package com.opengamma.util.db.tool;
 
+import static com.opengamma.util.db.management.AbstractDbManagement.extractJdbcScheme;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +74,7 @@ public class DbTool {
   // What to do it on - can change
   private DbManagement _dialect;
   private String _jdbcUrl;
-  private String _dbServerHost;
+  private String _jdbcScheme;
   private String _user;
   private String _password;
   private volatile DataSource _dataSource;
@@ -93,12 +95,12 @@ public class DbTool {
   /**
    * Creates an instance with a host, username and password.
    * 
-   * @param dbServerHost  the host
+   * @param jdbcUrl  the jdbc url
    * @param user  the user
    * @param password  the password
    */
-  public DbTool(String dbServerHost, String user, String password) {
-    setDbServerHost(dbServerHost);
+  public DbTool(String jdbcUrl, String user, String password) {
+    setJdbcUrl(jdbcUrl);
     setUser(user);
     setPassword(password);
   }
@@ -106,13 +108,13 @@ public class DbTool {
   /**
    * Creates an instance with a host, username, password and a pre-existing data source.
    * 
-   * @param dbServerHost  the host
+   * @param jdbcUrl the jdbc Url
    * @param user  the user
    * @param password  the password
    * @param dataSource  the pre-existing data source, may be null
    */
-  public DbTool(String dbServerHost, String user, String password, DataSource dataSource) {
-    setDbServerHost(dbServerHost);
+  public DbTool(String jdbcUrl, String user, String password, DataSource dataSource) {
+    setJdbcUrl(jdbcUrl);
     setUser(user);
     setPassword(password);
     _dataSource = dataSource;
@@ -123,28 +125,19 @@ public class DbTool {
    * Initializes the class.
    */
   public void initialize() {
-    if (_dbServerHost == null) {
-      // Parse the server host and catalog from a JDBC URL
-      // REVIEW jonathan 2013-05-14 -- should not be doing this (PLAT-2745)
+    if (_jdbcScheme == null) {
       if (_jdbcUrl != null) {
-        int lastSlash = _jdbcUrl.lastIndexOf('/');
-        if (lastSlash == -1 || lastSlash == _jdbcUrl.length() - 1) {
-          throw new OpenGammaRuntimeException("JDBC URL must contain a slash separating the server host and the database name");
-        }
-
-        _dbServerHost = _jdbcUrl.substring(0, lastSlash);
-        _catalog = _jdbcUrl.substring(lastSlash + 1);
-
+        _jdbcScheme = extractJdbcScheme(_jdbcUrl);
       } else {
         throw new OpenGammaRuntimeException("No DB server specified.");
       }
     }
-
-    if (_dbServerHost == null || _user == null || _password == null) {
-      throw new OpenGammaRuntimeException("Server/user/password not initialised");
+    if (_jdbcUrl == null || _user == null || _password == null) {
+      throw new OpenGammaRuntimeException("jdbcURL/user/password not initialised");
     }
-    _dialect = DbManagementUtils.getDbManagement(_dbServerHost);
-    _dialect.initialise(_dbServerHost, _user, _password);
+
+    _dialect = DbManagementUtils.getDbManagement(_jdbcUrl);
+    _dialect.initialise(_jdbcUrl, _user, _password);
   }
 
   //-------------------------------------------------------------------------
@@ -189,20 +182,12 @@ public class DbTool {
     _dialect.shutdown(catalog);
   }
 
-  public void setDbServerHost(String dbServerHost) {
-    _dbServerHost = dbServerHost;
-  }
-
   public void setUser(String user) {
     _user = user;
   }
 
   public void setPassword(String password) {
     _password = password;
-  }
-
-  public String getDbServerHost() {
-    return _dbServerHost;
   }
 
   public String getUser() {
@@ -432,8 +417,8 @@ public class DbTool {
         throw new IllegalArgumentException("There is no CREATE TABLE xxx ( after " + doNotClear);
       }
       String[] createTableSqls = sql.substring(
-        doNotClearIndex + doNotClear.length(),
-        createTableOpenParenthesis).split("\r\n|\r|\n| ");
+          doNotClearIndex + doNotClear.length(),
+          createTableOpenParenthesis).split("\r\n|\r|\n| ");
       List<String> filteredCreateTableSqls = new ArrayList<String>();
       for (String createTableSql : createTableSqls) {
         if (!createTableSql.isEmpty()) {
@@ -504,7 +489,7 @@ public class DbTool {
     // set the jdbcHost (normally the case) then the catalog is overridden
     // with one derived from the URL in initialize() called from here.
     // All very confusing...
-    
+
     if (!_createTestDb) {
       if (_catalog == null) {
         throw new OpenGammaRuntimeException("No database on the DB server specified.");
@@ -545,11 +530,11 @@ public class DbTool {
       for (String dbType : initDatabaseTypes(_testDbType)) {
         s_logger.debug("Creating " + dbType + " test database...");
 
-        String dbUrl = DbTest.getDbHost(dbType);
+        String dbUrl = DbTest.getDbJdbcUrl(dbType);
         String user = DbTest.getDbUsername(dbType);
         String password = DbTest.getDbPassword(dbType);
 
-        setDbServerHost(dbUrl);
+        setJdbcUrl(dbUrl);
         setUser(user);
         setPassword(password);
 
@@ -620,7 +605,7 @@ public class DbTool {
 
     DbTool tool = new DbTool();
     tool.setJdbcUrl(line.getOptionValue("jdbcUrl"));
-    tool.setDbServerHost(line.getOptionValue("server"));
+    tool.setJdbcUrl(line.getOptionValue("server"));
     tool.setUser(line.getOptionValue("user"));
     tool.setPassword(line.getOptionValue("password"));
     tool.setCatalog(line.getOptionValue("database"));
@@ -668,9 +653,9 @@ public class DbTool {
    * Callback invoked when tables are creates or upgraded.
    */
   public interface TableCreationCallback {
-    
+
     void tablesCreatedOrUpgraded(final int version, final DbSchemaGroupMetadata schemaGroupMetadata);
-    
+
   }
 
 }

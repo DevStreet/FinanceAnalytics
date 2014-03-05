@@ -9,6 +9,8 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.dialect.DerbyDialect;
 import org.hibernate.dialect.Dialect;
@@ -177,8 +179,8 @@ public final class DerbyDbManagement extends AbstractDbManagement {
   private class DerbyCatalogCreationStrategy implements CatalogCreationStrategy {
 
     private File getFile() {
-      String dbHost = getDbHost().trim();
-      String filePart = dbHost.substring("jdbc:derby:".length());
+      String jdbcUrl = getJdbcUrl().trim();
+      String filePart = jdbcUrl.substring("jdbc:derby:".length());
       return new File(filePart);
     }
 
@@ -198,6 +200,20 @@ public final class DerbyDbManagement extends AbstractDbManagement {
           throw new OpenGammaRuntimeException("Cannot create Derby DB", e);
         }
       }
+    }
+  }
+
+  // Derby jdbc format from https://db.apache.org/derby/docs/10.7/devguide/cdevdvlp17453.html
+  private static final Pattern EXTRACT_CATALOG_PATTERN = Pattern.compile("jdbc:derby:(\\w+:)?(\\w+)?", Pattern.CASE_INSENSITIVE);
+
+  @Override
+  public String getCatalog() {
+    String url = getJdbcUrl();
+    Matcher m = EXTRACT_CATALOG_PATTERN.matcher(url);
+    if (m.matches() && m.groupCount() >= 2) {
+      return m.group(2);
+    } else {
+      return null;
     }
   }
 

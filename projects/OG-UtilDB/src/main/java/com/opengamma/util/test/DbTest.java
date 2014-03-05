@@ -129,11 +129,11 @@ public final class DbTest {
    */
   public static DbTool createDbTool(String databaseConfigPrefix, DbConnector connector) {
     ArgumentChecker.notNull(databaseConfigPrefix, "databaseConfigPrefix");
-    String dbHost = getDbHost(databaseConfigPrefix);
+    String jdbcUrl = getDbJdbcUrl(databaseConfigPrefix);
     String user = getDbUsername(databaseConfigPrefix);
     String password = getDbPassword(databaseConfigPrefix);
     DataSource dataSource = (connector != null ? connector.getDataSource() : null);
-    DbTool dbTool = new DbTool(dbHost, user, password, dataSource);
+    DbTool dbTool = new DbTool(jdbcUrl, user, password, dataSource);
     dbTool.initialize();
     dbTool.setJdbcUrl(dbTool.getTestDatabaseUrl());
     return dbTool;
@@ -149,13 +149,13 @@ public final class DbTest {
     return DbDialectUtils.getSupportedDbDialect(dbType);
   }
 
-  public static String getDbHost(String databaseConfigPrefix) {
-    String dbHostProperty = databaseConfigPrefix + ".jdbc.url";
-    String dbHost = TestProperties.getTestProperties().getProperty(dbHostProperty);
-    if (dbHost == null) {
-      throw new OpenGammaRuntimeException("Property " + dbHostProperty + " not found");
+  public static String getDbJdbcUrl(String databaseConfigPrefix) {
+    String dbJdbcUrlProperty = databaseConfigPrefix + ".jdbc.url";
+    String dbJdbcUrl = TestProperties.getTestProperties().getProperty(dbJdbcUrlProperty);
+    if (dbJdbcUrl == null) {
+      throw new OpenGammaRuntimeException("Property " + dbJdbcUrlProperty + " not found");
     }
-    return dbHost;
+    return dbJdbcUrl;
   }
 
   public static String getDbUsername(String databaseConfigPrefix) {

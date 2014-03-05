@@ -5,12 +5,18 @@
  */
 package com.opengamma.util.db.management;
 
+import static com.google.common.collect.Maps.newHashMap;
+
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
@@ -29,7 +35,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
    * SQL to retrieve all the columns.
    */
   private static final String GET_ALL_COLUMNS_SQL =
-    "SELECT column_name AS name,data_type AS datatype,is_nullable AS allowsnull,column_default AS defaultvalue FROM information_schema.columns WHERE table_name='";
+      "SELECT column_name AS name,data_type AS datatype,is_nullable AS allowsnull,column_default AS defaultvalue FROM information_schema.columns WHERE table_name='";
   /**
    * The default schema.
    */
@@ -91,9 +97,9 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
   //-------------------------------------------------------------------------
   @Override
   public String getCatalogToConnectTo(String catalog) {
-    return getDbHost() + ";databasename=" + catalog;
+    return getJdbcUrl() + ";databasename=" + catalog;
   }
-  
+
   @Override
   public String getAllSchemasSQL(String catalog) {
     return "SELECT SCHEMA_NAME AS name FROM INFORMATION_SCHEMA.SCHEMATA";
@@ -105,7 +111,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
       schema = SQLSERVER2008_DEFAULT_SCHEMA;
     }
     String sql = "SELECT constraint_name AS name, table_name FROM information_schema.table_constraints WHERE " +
-      "constraint_catalog = '" + catalog + "' AND constraint_schema = '" + schema + "'" + " AND constraint_type = 'FOREIGN KEY'";
+        "constraint_catalog = '" + catalog + "' AND constraint_schema = '" + schema + "'" + " AND constraint_type = 'FOREIGN KEY'";
     return sql;
   }
 
@@ -114,8 +120,8 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
     if (schema == null) {
       schema = SQLSERVER2008_DEFAULT_SCHEMA;
     }
-    String sql = "SELECT table_name AS name FROM information_schema.tables WHERE table_name LIKE '%_seq' AND " + 
-      "table_catalog = '" + catalog + "'" + " AND table_schema = '" + schema + "' AND table_type = 'BASE TABLE'";
+    String sql = "SELECT table_name AS name FROM information_schema.tables WHERE table_name LIKE '%_seq' AND " +
+        "table_catalog = '" + catalog + "'" + " AND table_schema = '" + schema + "' AND table_type = 'BASE TABLE'";
     return sql;
   }
 
@@ -125,7 +131,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
       schema = SQLSERVER2008_DEFAULT_SCHEMA;
     }
     String sql = "SELECT table_name AS name FROM information_schema.tables WHERE NOT table_name LIKE '%_seq' AND " +
-      "table_catalog = '" + catalog + "'" + " AND table_schema = '" + schema + "' AND table_type = 'BASE TABLE'";
+        "table_catalog = '" + catalog + "'" + " AND table_schema = '" + schema + "' AND table_type = 'BASE TABLE'";
     return sql;
   }
 
@@ -135,7 +141,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
       schema = SQLSERVER2008_DEFAULT_SCHEMA;
     }
     String sql = "SELECT table_name AS name FROM information_schema.tables WHERE " +
-      "table_catalog = '" + catalog + "'" + " AND table_schema = '" + schema + "' AND table_type = 'VIEW'";
+        "table_catalog = '" + catalog + "'" + " AND table_schema = '" + schema + "' AND table_type = 'VIEW'";
     return sql;
   }
 
@@ -154,7 +160,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
   public String getCreateSchemaSQL(String catalog, String schema) {
     return "CREATE SCHEMA " + schema;
   }
-  
+
   @Override
   public String getSchemaVersionTable(String schemaGroupName) {
     return (schemaGroupName + SCHEMA_VERSION_TABLE_SUFFIX).toLowerCase();
@@ -168,32 +174,32 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
   @Override
   public CatalogCreationStrategy getCatalogCreationStrategy() {
     return new SQLCatalogCreationStrategy(
-        this, 
-        getUser(), 
-        getPassword(), 
-        "SELECT name FROM sys.databases WHERE name NOT IN ('master', 'model', 'msdb', 'tempdb')", 
+        this,
+        getUser(),
+        getPassword(),
+        "SELECT name FROM sys.databases WHERE name NOT IN ('master', 'model', 'msdb', 'tempdb')",
         null);
   }
-  
+
   @Override
   public void dropSchema(String catalog, String schema) {
     // Does not handle triggers or stored procedures yet
     ArrayList<String> script = new ArrayList<String>();
-    
+
     Connection conn = null;
     try {
       if (!getCatalogCreationStrategy().catalogExists(catalog)) {
         System.out.println("Catalog " + catalog + " does not exist");
         return; // nothing to drop
       }
-      
+
       conn = connect(catalog);
-      
+
       if (schema != null) {
-        Statement statement = conn.createStatement(); 
+        Statement statement = conn.createStatement();
         Collection<String> schemas = getAllSchemas(catalog, statement);
         statement.close();
-        
+
         if (!schemas.contains(schema)) {
           System.out.println("Schema " + schema + " does not exist");
           return; // nothing to drop
@@ -202,7 +208,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
 
       setActiveSchema(conn, schema);
       Statement statement = conn.createStatement();
-      
+
       // Drop constraints SQL
       if (getHibernateDialect().dropConstraints()) {
         for (Pair<String, String> constraint : getAllForeignKeyConstraints(catalog, schema, statement)) {
@@ -211,12 +217,12 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
           ForeignKey fk = new ForeignKey();
           fk.setName(name);
           fk.setTable(new Table(table));
-          
+
           String dropConstraintSql = fk.sqlDropString(getHibernateDialect(), null, schema);
           script.add(dropConstraintSql);
         }
       }
-      
+
       // Drop views SQL
       for (String name : getAllViews(catalog, schema, statement)) {
         Table table = new Table(name);
@@ -224,14 +230,14 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
         dropViewStr = dropViewStr.replaceAll("drop table", "drop view");
         script.add(dropViewStr);
       }
-      
+
       // Drop tables SQL
       for (String name : getAllTables(catalog, schema, statement)) {
         Table table = new Table(name);
         String dropTableStr = table.sqlDropString(getHibernateDialect(), null, schema);
         script.add(dropTableStr);
       }
-      
+
       // Now execute it all
       statement.close();
       statement = conn.createStatement();
@@ -239,10 +245,10 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
         //System.out.println("Executing \"" + sql + "\"");
         statement.executeUpdate(sql);
       }
-      
+
       statement.close();
       statement = conn.createStatement();
-      
+
       // Drop sequences SQL
       script.clear();
       for (String name : getAllSequences(catalog, schema, statement)) {
@@ -250,7 +256,7 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
         String dropTableStr = table.sqlDropString(getHibernateDialect(), null, schema);
         script.add(dropTableStr);
       }
-      
+
       //now execute drop sequence
       statement.close();
       statement = conn.createStatement();
@@ -258,9 +264,9 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
         //System.out.println("Executing \"" + sql + "\"");
         statement.executeUpdate(sql);
       }
-      
+
       statement.close();
-    
+
     } catch (SQLException e) {
       throw new OpenGammaRuntimeException("Failed to drop schema", e);
     } finally {
@@ -270,6 +276,20 @@ public final class SqlServer2008DbManagement extends AbstractDbManagement {
         }
       } catch (SQLException e) {
       }
+    }
+  }
+
+  // SQLServer jdbc format from http://technet.microsoft.com/en-us/library/ms378428.aspx   (jdbc:sqlserver://[serverName[\instanceName][:portNumber]][;property=value[;property=value]])
+  private static final Pattern EXTRACT_CATALOG_PATTERN = Pattern.compile("jdbc:sqlserver://(\\w+)(\\\\\\w+)?(:\\d+)?(;\\w+=\\w+)*?(;databaseName=(\\w+))", Pattern.CASE_INSENSITIVE);
+
+  @Override
+  public String getCatalog() {
+    String url = getJdbcUrl();
+    Matcher m = EXTRACT_CATALOG_PATTERN.matcher(url);
+    if (m.matches() && m.groupCount() >= 6) {
+      return m.group(6);
+    } else {
+      return null;
     }
   }
 
