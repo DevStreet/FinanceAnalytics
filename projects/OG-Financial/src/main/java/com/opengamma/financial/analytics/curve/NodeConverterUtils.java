@@ -237,23 +237,7 @@ public class NodeConverterUtils {
         if (isXCcy) {
           throw new NotImplementedException("Cross-currency ON Arithmetic Average leg not implemented.");
         }
-        final OvernightIndexConvention overnightIndexConvention;
-        final Security overnightIndexSec = securitySource.getSingle(convention.getOvernightIndexConvention().toBundle());
-        if (overnightIndexSec instanceof OvernightIndex) {
-          OvernightIndex overnightIndex = (OvernightIndex) overnightIndexSec; // implciit null check
-          overnightIndexConvention = conventionSource.getSingle(overnightIndex.getConventionId(), OvernightIndexConvention.class);
-          if (overnightIndexConvention == null) {
-            s_logger.error("Found index, but referred to convention {} not found", overnightIndex.getConventionId());
-            throw new OpenGammaRuntimeException("Found index, but referred to convention " + overnightIndex.getConventionId() + " was not found");
-          }
-        } else {
-          s_logger.warn("Could not find overnight index, falling back to look for convention {} directly for compatibility", convention.getOvernightIndexConvention());
-          overnightIndexConvention = conventionSource.getSingle(convention.getOvernightIndexConvention(), OvernightIndexConvention.class);          
-          if (overnightIndexConvention == null) {
-            s_logger.error("Convention {} not found", convention.getOvernightIndexConvention());
-            throw new OpenGammaRuntimeException("Found index, but referred to convention " + convention.getOvernightIndexConvention() + " was not found");
-          }
-        }
+        final OvernightIndexConvention overnightIndexConvention = ConventionUtils.of(securitySource, conventionSource).withOvernightIndexId(convention.getOvernightIndexConvention());
         final IndexON indexON = ConverterUtils.indexON(overnightIndexConvention.getName(), overnightIndexConvention);
         final Calendar calendar = CalendarUtils.getCalendar(regionSource, holidaySource, overnightIndexConvention.getRegionCalendar());
         final int spotLagLeg = convention.getSettlementDays();
@@ -282,26 +266,9 @@ public class NodeConverterUtils {
         if (isXCcy) {
           throw new NotImplementedException("Cross-currency Ibor compounded leg not implemented.");
         }
-        final Security iborIndexSec = securitySource.getSingle(convention.getIborIndexConvention().toBundle()); 
-        final IborIndexConvention iborIndexConvention;
-        final Tenor indexTenor;
-        if (iborIndexSec instanceof com.opengamma.financial.security.index.IborIndex) {
-          com.opengamma.financial.security.index.IborIndex iborIndex = (com.opengamma.financial.security.index.IborIndex) iborIndexSec; // implicit null check
-          iborIndexConvention = conventionSource.getSingle(iborIndex.getConventionId(), IborIndexConvention.class);
-          if (iborIndexConvention == null) {
-            s_logger.error("Found index, but couldn't find linked convention {}", iborIndex.getConventionId());
-            throw new OpenGammaRuntimeException("Found index, but couldn't find linked convention " + iborIndex.getConventionId());
-          }
-          indexTenor = iborIndex.getTenor();
-        } else {
-          s_logger.warn("Couldn't find index, falling back to looking for convention directly for compatibility");
-          iborIndexConvention = conventionSource.getSingle(convention.getIborIndexConvention(), IborIndexConvention.class);
-          if (iborIndexConvention == null) {
-            s_logger.error("Couldn't find IBOR index as direct convention either of id {}", convention.getIborIndexConvention());
-            throw new OpenGammaRuntimeException("Couldn't find IBOR index as direct convention of id " + convention.getIborIndexConvention());
-          }
-          indexTenor = convention.getCompositionTenor();
-        }
+        ObjectsPair<IborIndexConvention, Tenor> pair = ConventionUtils.of(securitySource, conventionSource).withIborIndexId(convention.getIborIndexConvention(), convention.getCompositionTenor());
+        final IborIndexConvention iborIndexConvention = pair.getFirst();
+        final Tenor indexTenor = pair.getSecond();
         final IborIndex index = ConverterUtils.indexIbor(iborIndexConvention.getName(), iborIndexConvention, indexTenor);
         final Calendar calendar = CalendarUtils.getCalendar(regionSource, holidaySource, iborIndexConvention.getRegionCalendar());
         final boolean eomLeg = convention.isIsEOM();
@@ -347,23 +314,7 @@ public class NodeConverterUtils {
         if (isXCcy) {
           throw new NotImplementedException("Cross-currency OIS leg not implemented.");
         }
-        final OvernightIndexConvention indexConvention;
-        final Security overnightIndexSec = securitySource.getSingle(convention.getOvernightIndexConvention().toBundle());
-        if (overnightIndexSec instanceof OvernightIndex) {
-          OvernightIndex overnightIndex = (OvernightIndex) overnightIndexSec; // implicit null check
-          indexConvention = conventionSource.getSingle(overnightIndex.getConventionId(), OvernightIndexConvention.class);
-          if (indexConvention == null) {
-            s_logger.error("Found index, but could not find linked convention {}", overnightIndex.getConventionId());
-            throw new OpenGammaRuntimeException("Found index, but could not find linked convention " + overnightIndex.getConventionId());
-          }
-        } else {
-          s_logger.warn("Couldn't find index {}, falling back to looking in convention source for compatibility", convention.getOvernightIndexConvention());
-          indexConvention = conventionSource.getSingle(convention.getOvernightIndexConvention(), OvernightIndexConvention.class);
-          if (indexConvention == null) {
-            s_logger.error("Could not find legacy overnight index convention {}", convention.getOvernightIndexConvention());
-            throw new OpenGammaRuntimeException("Could not find legacy overnight index convention " + convention.getOvernightIndexConvention());
-          }
-        }
+        final OvernightIndexConvention indexConvention = ConventionUtils.of(securitySource, conventionSource).withOvernightIndexId(convention.getOvernightIndexConvention());
         final IndexON indexON = ConverterUtils.indexON(indexConvention.getName(), indexConvention);
         final Calendar calendar = CalendarUtils.getCalendar(regionSource, holidaySource, indexConvention.getRegionCalendar());
         final int spotLagLeg = convention.getSettlementDays();
@@ -416,21 +367,9 @@ public class NodeConverterUtils {
       @Override
       public AnnuityDefinition<? extends PaymentDefinition> visitVanillaIborLegConvention(final VanillaIborLegConvention convention) {
         final Security sec = securitySource.getSingle(convention.getIborIndexConvention().toBundle()); 
-        final IborIndexConvention indexConvention;
-        final Tenor indexTenor;
-        if (sec instanceof com.opengamma.financial.security.index.IborIndex) {
-          final com.opengamma.financial.security.index.IborIndex indexSecurity = (com.opengamma.financial.security.index.IborIndex) sec;
-          indexConvention = conventionSource.getSingle(indexSecurity.getConventionId(), IborIndexConvention.class);
-          indexTenor = indexSecurity.getTenor();
-        } else { // compatibility code.
-          s_logger.warn("Trying to load index convention from ibor leg convention as convention because index was not available");
-          indexConvention = conventionSource.getSingle(convention.getIborIndexConvention(), IborIndexConvention.class);
-          s_logger.warn("Implying index tenor from reset tenor on VanillaIborLegConvention.  Point at index in sec master for more accurate value.");
-          indexTenor = convention.getResetTenor(); // old heuristic
-        }
-        if (indexConvention == null) {
-          throw new OpenGammaRuntimeException("Can't load IborIndexConvention " + convention.getIborIndexConvention());
-        }
+        ObjectsPair<IborIndexConvention, Tenor> pair = ConventionUtils.of(securitySource, conventionSource).withIborIndexId(convention.getIborIndexConvention(), convention.getResetTenor());
+        final IborIndexConvention indexConvention = pair.getFirst();
+        final Tenor indexTenor = pair.getSecond();
         final IborIndex index = ConverterUtils.indexIbor(indexConvention.getName(), indexConvention, indexTenor);
         final Calendar calendar = CalendarUtils.getCalendar(regionSource, holidaySource, indexConvention.getRegionCalendar());
         final boolean eomLeg = convention.isIsEOM();

@@ -145,7 +145,7 @@ public class RateFutureNodeConverter extends CurveNodeVisitorAdapter<InstrumentD
    */
   private InstrumentDefinition<?> getFederalFundsFuture(final RateFutureNode rateFuture, final FederalFundsFutureConvention futureConvention,
       final Double price) {
-    final String expiryCalculatorName = futureConvention.getExpiryConvention().getValue();
+   final String expiryCalculatorName = futureConvention.getExpiryConvention().getValue();
     final OvernightIndexConvention indexConvention = ConventionUtils.of(_securitySource, _conventionSource).withOvernightIndexId(futureConvention.getIndexConvention());
     final IndexON indexON = ConverterUtils.indexON(indexConvention.getName(), indexConvention);
     final double paymentAccrualFactor = 1 / 12.;

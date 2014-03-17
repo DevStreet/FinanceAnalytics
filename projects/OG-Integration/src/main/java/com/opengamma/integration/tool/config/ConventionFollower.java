@@ -135,87 +135,60 @@ public abstract class ConventionFollower<P, R> {
     throw new OpenGammaRuntimeException("Unhandled convention:" + c);
   }
 
-  public abstract R followVanillaIborLegRollDateConvention(VanillaIborLegRollDateConvention vanillaIborLegRollDateConvention, P parameter);
+  public abstract R followVanillaIborLegRollDateConvention(VanillaIborLegRollDateConvention convention, P parameter);
   
-
-  public abstract R followVanillaIborLegConvention(VanillaIborLegConvention vanillaIborLegConvention, P parameter);
+  public abstract R followVanillaIborLegConvention(VanillaIborLegConvention convention, P parameter);
   
-
-  public abstract R followSwapIndexConvention(SwapIndexConvention swapIndexConvention, P parameter);
+  public abstract R followSwapIndexConvention(SwapIndexConvention convention, P parameter);
   
-
-  public abstract R followSwapFixedLegConvention(SwapFixedLegConvention swapFixedLegConvention, P parameter);
+  public abstract R followSwapFixedLegConvention(SwapFixedLegConvention cnvention, P parameter);
   
-
-  public abstract R followSwapConvention(SwapConvention swapConvention, P parameter);
+  public abstract R followSwapConvention(SwapConvention convention, P parameter);
   
-
-  public abstract R followRollDateSwapConvention(RollDateSwapConvention rollDateSwapConvention, P parameter);
+  public abstract R followRollDateSwapConvention(RollDateSwapConvention convention, P parameter);
   
-
-  public abstract R followRollDateFRAConvention(RollDateFRAConvention rollDateFRAConvention, P parameter);
+  public abstract R followRollDateFRAConvention(RollDateFRAConvention convention, P parameter);
   
-
-  public abstract R followPriceIndexConvention(PriceIndexConvention priceIndexConvention, P parameter);
+  public abstract R followPriceIndexConvention(PriceIndexConvention convention, P parameter);
   
-
-  public abstract R followOvernightIndexConvention(OvernightIndexConvention overnightIndexConvention, P parameter);
+  public abstract R followOvernightIndexConvention(OvernightIndexConvention convention, P parameter);
   
-
-  public abstract R followONCompoundedLegRollRateConvention(ONCompoundedLegRollDateConvention onCompoundedLegRollDateConvention, P parameter);
+  public abstract R followONCompoundedLegRollRateConvention(ONCompoundedLegRollDateConvention convention, P parameter);
   
-
-  public abstract R followONArithmeticAverageLegConvention(ONArithmeticAverageLegConvention onArithmeticAverageLegConvention, P parameter);
+  public abstract R followONArithmeticAverageLegConvention(ONArithmeticAverageLegConvention convention, P parameter);
   
-
-  public abstract R followOISLegConvention(OISLegConvention oisLegConvention, P parameter);
+  public abstract R followOISLegConvention(OISLegConvention convention, P parameter);
   
-
-  public abstract R followMockConvention(MockConvention mockConvention, P parameter);
+  public abstract R followMockConvention(MockConvention convention, P parameter);
   
-
-  public abstract R followFloatingInterestRateSwapLegConvention(FloatingInterestRateSwapLegConvention floatingInterestRateSwapLegConvention, P parameter);
+  public abstract R followFloatingInterestRateSwapLegConvention(FloatingInterestRateSwapLegConvention convention, P parameter);
   
-
-  public abstract R followFixedInterestRateSwapLegConvention(FixedInterestRateSwapLegConvention fixedInterestRateSwapLegConvention, P parameter);
+  public abstract R followFixedInterestRateSwapLegConvention(FixedInterestRateSwapLegConvention convention, P parameter);
   
-
-  public abstract R followInflationLegConvention(InflationLegConvention inflationLegConvention, P parameter);
+  public abstract R followInflationLegConvention(InflationLegConvention convention, P parameter);
   
-
-  public abstract R followIborIndexConvention(IborIndexConvention iborIndexConvention, P parameter);
+  public abstract R followIborIndexConvention(IborIndexConvention convention, P parameter);
   
-
-  public abstract R followFXSpotConvention(FXSpotConvention fxSpotConvention, P parameter);
+  public abstract R followFXSpotConvention(FXSpotConvention convention, P parameter);
   
-
-  public abstract R followFXForwardAndSwapConvention(FXForwardAndSwapConvention fxForwardAndSwapConvention, P parameter);
+  public abstract R followFXForwardAndSwapConvention(FXForwardAndSwapConvention convention, P parameter);
   
-
-  public abstract R followFixedLegRollRateConvention(FixedLegRollDateConvention fixedLegRollDateConvention, P parameter);
+  public abstract R followFixedLegRollRateConvention(FixedLegRollDateConvention convention, P parameter);
   
-
-  public abstract R followOtherExchangeTradedFutureAndOptionConvention(ExchangeTradedFutureAndOptionConvention exchangeTradedFutureAndOptionConvention, P parameter);
+  public abstract R followOtherExchangeTradedFutureAndOptionConvention(ExchangeTradedFutureAndOptionConvention convention, P parameter);
   
-
-  public abstract R followInterestRateFutureConvention(InterestRateFutureConvention interestRateFutureConvention, P parameter);
+  public abstract R followInterestRateFutureConvention(InterestRateFutureConvention convention, P parameter);
   
-
-  public abstract R followFederalFundsFutureConvention(FederalFundsFutureConvention federalFundsFutureConvention, P parameter);
+  public abstract R followFederalFundsFutureConvention(FederalFundsFutureConvention convention, P parameter);
   
-
-  public abstract R followDeliverablePriceQuotedSwapFutureConvention(DeliverablePriceQuotedSwapFutureConvention deliverablePriceQuotedSwapFutureConvention, P parameter);
+  public abstract R followDeliverablePriceQuotedSwapFutureConvention(DeliverablePriceQuotedSwapFutureConvention convention, P parameter);
   
-
-  public abstract R followEquityConvention(EquityConvention equityConvention, P parameter);
+  public abstract R followEquityConvention(EquityConvention convention, P parameter);
   
-
-  public abstract R followDepositorConvention(DepositConvention depositConvention, P parameter);
+  public abstract R followDepositorConvention(DepositConvention convention, P parameter);
   
+  public abstract R followCompoundingIborLegConvention(CompoundingIborLegConvention convention, P parameter);  
 
-  public abstract R followCompoundingIborLegConvention(CompoundingIborLegConvention compoundingIborLegConvention, P parameter);
-  
-
-  public abstract R followCMSLegConvention(CMSLegConvention cmsLegConvention, P parameter);
+  public abstract R followCMSLegConvention(CMSLegConvention convention, P parameter);
 
 }
