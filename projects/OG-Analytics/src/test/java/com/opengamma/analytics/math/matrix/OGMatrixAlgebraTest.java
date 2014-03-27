@@ -15,8 +15,8 @@ import com.opengamma.analytics.math.statistics.distribution.ProbabilityDistribut
 
 import com.opengamma.analytics.util.AssertMatrix;
 
-import com.opengamma.longdog.exceptions.MathsExceptionNativeComputation;
-import com.opengamma.longdog.helpers.FuzzyEquals;
+import com.opengamma.maths.exceptions.MathsExceptionNativeComputation;
+import com.opengamma.maths.helpers.FuzzyEquals;
 
 import com.opengamma.util.test.TestGroup;
 
