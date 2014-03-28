@@ -18,6 +18,10 @@ import com.opengamma.analytics.util.AssertMatrix;
 import com.opengamma.maths.exceptions.MathsExceptionNativeComputation;
 import com.opengamma.maths.helpers.FuzzyEquals;
 
+
+import com.opengamma.maths.exceptions.MathsExceptionNativeComputation;
+import com.opengamma.maths.helpers.FuzzyEquals;
+
 import com.opengamma.util.test.TestGroup;
 
 /**
