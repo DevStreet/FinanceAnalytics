@@ -9,6 +9,12 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.math.linearalgebra.TridiagonalMatrix;
+import com.opengamma.maths.datacontainers.OGNumeric;
+import com.opengamma.maths.datacontainers.OGTerminal;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
+import com.opengamma.maths.materialisers.Materialisers;
+import com.opengamma.maths.nodes.MTIMES;
+import com.opengamma.maths.nodes.NORM2;
 
 /**
  * An absolutely minimal implementation of matrix algebra - only various multiplications covered. For more advanced stuff (e.g. calculating the inverse) use {@link ColtMatrixAlgebra} or
@@ -81,18 +87,18 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
   @Override
   public double getNorm2(final Matrix<?> m) {
     Validate.notNull(m, "m");
+    OGNumeric data = null;
     if (m instanceof DoubleMatrix1D) {
       final double[] a = ((DoubleMatrix1D) m).getData();
-      final int l = a.length;
-      double sum = 0.0;
-      for (int i = 0; i < l; i++) {
-        sum += a[i] * a[i];
-      }
-      return Math.sqrt(sum);
+      data = new OGRealDenseMatrix(a);
     } else if (m instanceof DoubleMatrix2D) {
-      throw new NotImplementedException();
+      final double[][] a = ((DoubleMatrix2D) m).getData();
+      data = new OGRealDenseMatrix(a);
+    } else {
+      throw new IllegalArgumentException("Found unknown matrix type");
     }
-    throw new IllegalArgumentException("Can only find norm2 of a DoubleMatrix1D; have " + m.getClass());
+    NORM2 norm = new NORM2(data);
+    return Materialisers.toDoubleArrayOfArrays(norm)[0][0];
   }
 
   /**
@@ -195,15 +201,35 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
       return multiply((TridiagonalMatrix) m1, (DoubleMatrix1D) m2);
     } else if (m1 instanceof DoubleMatrix1D && m2 instanceof TridiagonalMatrix) {
       return multiply((DoubleMatrix1D) m1, (TridiagonalMatrix) m2);
-    } else if (m1 instanceof DoubleMatrix2D && m2 instanceof DoubleMatrix2D) {
-      return multiply((DoubleMatrix2D) m1, (DoubleMatrix2D) m2);
-    } else if (m1 instanceof DoubleMatrix2D && m2 instanceof DoubleMatrix1D) {
-      return multiply((DoubleMatrix2D) m1, (DoubleMatrix1D) m2);
-    } else if (m1 instanceof DoubleMatrix1D && m2 instanceof DoubleMatrix2D) {
-      return multiply((DoubleMatrix1D) m1, (DoubleMatrix2D) m2);
+    } else {
+      MTIMES node;
+      OGRealDenseMatrix mat1 = null;
+      OGRealDenseMatrix mat2 = null;
+      // NOTE: DoubleMatrix1D has no notion of orientation it is chosen by context!
+      if (m1 instanceof DoubleMatrix2D && m2 instanceof DoubleMatrix2D) {
+        mat1 = new OGRealDenseMatrix(((DoubleMatrix2D) m1).asDoubleAoA());
+        mat2 = new OGRealDenseMatrix(((DoubleMatrix2D) m2).asDoubleAoA());
+        node = new MTIMES(mat1, mat2);
+        return new DoubleMatrix2D(Materialisers.toDoubleArrayOfArrays(node));
+      } else if (m1 instanceof DoubleMatrix2D && m2 instanceof DoubleMatrix1D) {
+        mat1 = new OGRealDenseMatrix(((DoubleMatrix2D) m1).asDoubleAoA());
+        mat2 = new OGRealDenseMatrix(((DoubleMatrix1D) m2).asDoubleAoA());
+        node = new MTIMES(mat1, mat2);
+        OGTerminal term = Materialisers.toOGTerminal(node);
+        return new DoubleMatrix1D(term.getData());
+      } else if (m1 instanceof DoubleMatrix1D && m2 instanceof DoubleMatrix2D) {
+        DoubleMatrix1D conc = (DoubleMatrix1D) m1;
+        mat1 = new OGRealDenseMatrix(conc.asDoubleArray(), 1, conc.getData().length);
+        mat2 = new OGRealDenseMatrix(((DoubleMatrix2D) m2).asDoubleAoA());
+        node = new MTIMES(mat1, mat2);
+        OGTerminal term = Materialisers.toOGTerminal(node);
+        return new DoubleMatrix1D(term.getData());
+      } else {
+        throw new IllegalArgumentException("Cannot compute due to lack of implementation for " + m1.getClass() + " and "
+            + m2.getClass());
+      }
     }
-    throw new IllegalArgumentException("Can only multiply two DoubleMatrix2D; a DoubleMatrix2D and a DoubleMatrix1D; or a DoubleMatrix1D and a DoubleMatrix2D. have " + m1.getClass() + " and "
-        + m2.getClass());
+
   }
 
   /**

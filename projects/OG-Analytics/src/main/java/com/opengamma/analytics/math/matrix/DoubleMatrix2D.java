@@ -5,6 +5,8 @@
  */
 package com.opengamma.analytics.math.matrix;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.util.ArgumentChecker;
@@ -13,7 +15,7 @@ import com.opengamma.util.ArgumentChecker;
  * A minimal implementation of a 2D matrix of doubles.
  *
  */
-public class DoubleMatrix2D implements Matrix<Double> {
+public class DoubleMatrix2D implements DoubleMatrix {
   private final double[][] _data;
   private final int _rows;
   private final int _columns;
@@ -236,5 +238,31 @@ public class DoubleMatrix2D implements Matrix<Double> {
       //  sb.append(d[d.length - 1] + ")\n");
     }
     return sb.toString();
+  }
+
+  @Override
+  public double[][] asDoubleAoA() {
+    double[][] tmp = new double[_rows][];
+    for (int i = 0; i < _rows; i++) {
+      tmp[i] = Arrays.copyOf(_data[i], _columns);
+    }
+    return tmp;
+  }
+
+  @Override
+  public double[] asDoubleArray() {
+    double[][] dat = this.getData();
+    int nrows = dat.length;
+    int ncols = dat[0].length;
+
+    double[] ret = new double[nrows * ncols];
+    int jmp = 0;
+    for (int i = 0; i < ncols; i++) {
+      for (int j = 0; j < nrows; j++) {
+        ret[jmp + j] = dat[j][i];
+      }
+      jmp += nrows;
+    }
+    return ret;
   }
 }
