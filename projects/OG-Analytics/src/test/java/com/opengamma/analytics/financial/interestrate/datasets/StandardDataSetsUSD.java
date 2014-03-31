@@ -20,14 +20,14 @@ import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorFRA;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborCompoundingIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
@@ -89,7 +89,7 @@ public class StandardDataSetsUSD {
   private static final GeneratorSwapFixedONMaster GENERATOR_OIS_MASTER = GeneratorSwapFixedONMaster.getInstance();
   private static final GeneratorSwapFixedIborMaster GENERATOR_IRS_MASTER = GeneratorSwapFixedIborMaster.getInstance();
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_USD = GENERATOR_OIS_MASTER.getGenerator("USD1YFEDFUND", NYC);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = GENERATOR_OIS_MASTER.getGenerator("USD1YFEDFUND", NYC);
   private static final IndexON USDFEDFUND = GENERATOR_OIS_USD.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_USD = new GeneratorDepositON("USD Deposit ON", USD, NYC, USDFEDFUND.getDayCount());
   private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_IRS_MASTER.getGenerator("USD6MLIBOR3M", NYC);
@@ -145,13 +145,13 @@ public class StandardDataSetsUSD {
     Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(6), Period.ofYears(7), Period.ofYears(8), Period.ofYears(9), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_1_USD_ATTR = new GeneratorAttributeIR[DSC_1_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_1_USD_ATTR = new GeneratorAttributeIROTC[DSC_1_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_1_USD_TENOR[loopins], Period.ofDays(0));
+      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_1_USD_TENOR[loopins], Period.ofDays(0));
     }
     for (int loopins = 2; loopins < DSC_1_USD_TENOR.length; loopins++) {
-      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_1_USD_TENOR[loopins]);
+      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_1_USD_TENOR[loopins]);
     }
   }
 
@@ -170,10 +170,10 @@ public class StandardDataSetsUSD {
     Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(7), Period.ofYears(10), Period.ofYears(12), Period.ofYears(15), Period.ofYears(20), Period.ofYears(25), Period.ofYears(30) };
-  private static final GeneratorAttributeIR[] FWD3_1_USD_ATTR = new GeneratorAttributeIR[FWD3_1_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD3_1_USD_ATTR = new GeneratorAttributeIROTC[FWD3_1_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_1_USD_TENOR.length; loopins++) {
-      FWD3_1_USD_ATTR[loopins] = new GeneratorAttributeIR(FWD3_1_USD_TENOR[loopins]);
+      FWD3_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_1_USD_TENOR[loopins]);
     }
   }
 
@@ -193,13 +193,13 @@ public class StandardDataSetsUSD {
     Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(6), Period.ofYears(7), Period.ofYears(8), Period.ofYears(9), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_2_USD_ATTR = new GeneratorAttributeIR[DSC_2_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_2_USD_ATTR = new GeneratorAttributeIROTC[DSC_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_2_USD_TENOR[loopins], Period.ofDays(0));
+      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_2_USD_TENOR[loopins], Period.ofDays(0));
     }
     for (int loopins = 2; loopins < DSC_2_USD_TENOR.length; loopins++) {
-      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_2_USD_TENOR[loopins]);
+      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_2_USD_TENOR[loopins]);
     }
   }
 
@@ -218,10 +218,10 @@ public class StandardDataSetsUSD {
     Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(7), Period.ofYears(10), Period.ofYears(12), Period.ofYears(15), Period.ofYears(20), Period.ofYears(25), Period.ofYears(30) };
-  private static final GeneratorAttributeIR[] FWD3_2_USD_ATTR = new GeneratorAttributeIR[FWD3_2_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD3_2_USD_ATTR = new GeneratorAttributeIROTC[FWD3_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_2_USD_TENOR.length; loopins++) {
-      FWD3_2_USD_ATTR[loopins] = new GeneratorAttributeIR(FWD3_2_USD_TENOR[loopins]);
+      FWD3_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_2_USD_TENOR[loopins]);
     }
   }
 
@@ -240,10 +240,10 @@ public class StandardDataSetsUSD {
     Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(7), Period.ofYears(10), Period.ofYears(12), Period.ofYears(15), Period.ofYears(20), Period.ofYears(25), Period.ofYears(30) };
-  private static final GeneratorAttributeIR[] FWD1_2_USD_ATTR = new GeneratorAttributeIR[FWD1_2_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD1_2_USD_ATTR = new GeneratorAttributeIROTC[FWD1_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD1_2_USD_TENOR.length; loopins++) {
-      FWD1_2_USD_ATTR[loopins] = new GeneratorAttributeIR(FWD1_2_USD_TENOR[loopins]);
+      FWD1_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD1_2_USD_TENOR[loopins]);
     }
   }
 
@@ -262,10 +262,10 @@ public class StandardDataSetsUSD {
     Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(7), Period.ofYears(10), Period.ofYears(12), Period.ofYears(15), Period.ofYears(20), Period.ofYears(25), Period.ofYears(30) };
-  private static final GeneratorAttributeIR[] FWD6_2_USD_ATTR = new GeneratorAttributeIR[FWD6_2_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD6_2_USD_ATTR = new GeneratorAttributeIROTC[FWD6_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD6_2_USD_TENOR.length; loopins++) {
-      FWD6_2_USD_ATTR[loopins] = new GeneratorAttributeIR(FWD6_2_USD_TENOR[loopins]);
+      FWD6_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD6_2_USD_TENOR[loopins]);
     }
   }
 

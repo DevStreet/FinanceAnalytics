@@ -28,6 +28,7 @@ import com.opengamma.timeseries.DoubleTimeSeries;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.time.DateUtils;
+import com.opengamma.util.time.Tenor;
 
 /**
  * Test.
@@ -71,7 +72,7 @@ public class GeneratorSwapFixedInflationTest {
   //  private static final DayCount ACT_ACT = DayCounts.ACT_ACT_ISDA;
   private static final DoubleTimeSeries<ZonedDateTime> HICPX_TS = MulticurveProviderDiscountDataSets.euroHICPXFrom2009();
 
-  public static final GeneratorAttributeIR ATTRIBUTE = new GeneratorAttributeIR(COUPON_TENOR);
+  public static final GeneratorAttributeIROTC ATTRIBUTE = new GeneratorAttributeIROTC(Tenor.of(COUPON_TENOR));
 
   private static final GeneratorSwapFixedInflationZeroCoupon GENERATOR_SWAP_INFLATION_LINEAR = new GeneratorSwapFixedInflationZeroCoupon("generator", PRICE_INDEX_EUR, BUSINESS_DAY, CALENDAR,
       EOM, MONTH_LAG, SPOT_LAG,

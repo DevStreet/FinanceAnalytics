@@ -17,7 +17,7 @@ import com.opengamma.util.ArgumentChecker;
 /**
  *  Generator (or template) for swap ON compounded.
  */
-public class GeneratorSwapFixedCompoundedONCompounded extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorSwapFixedCompoundedONCompounded extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The ON index of the floating leg.
@@ -227,12 +227,12 @@ public class GeneratorSwapFixedCompoundedONCompounded extends GeneratorInstrumen
    * The effective date is date+_spotLag. The end of fixing period is effective date+tenor.
    */
   @Override
-  public SwapFixedCompoundedONCompoundedDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public SwapFixedCompoundedONCompoundedDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
     ArgumentChecker.notNull(attribute, "Attributes");
     final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _spotLag, _calendar);
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartPeriod(), _businessDayConvention, _calendar, _endOfMonth);
-    return SwapFixedCompoundedONCompoundedDefinition.from(startDate, attribute.getEndPeriod(), notional, this, rate, true);
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartTenor(), _businessDayConvention, _calendar, _endOfMonth);
+    return SwapFixedCompoundedONCompoundedDefinition.from(startDate, attribute.getEndTenor().getPeriod(), notional, this, rate, true);
   }
 
 }

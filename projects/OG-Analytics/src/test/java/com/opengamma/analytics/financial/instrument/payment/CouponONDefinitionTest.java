@@ -14,7 +14,7 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
@@ -590,7 +590,7 @@ public class CouponONDefinitionTest {
   }
 
   private static final Calendar NYC = new MondayToFridayCalendar("NYC");
-  private static final GeneratorSwapFixedON USD_GENERATOR = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final GeneratorSwapFixedONCompounding USD_GENERATOR = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
   private static final IndexON USD_FEDFUND = USD_GENERATOR.getIndex();
 
   private static final ZonedDateTime USD_END_ACCRUAL_DATE = ScheduleCalculator.getAdjustedDate(START_ACCRUAL_DATE, CPN_TENOR, USD_GENERATOR.getBusinessDayConvention(), NYC,

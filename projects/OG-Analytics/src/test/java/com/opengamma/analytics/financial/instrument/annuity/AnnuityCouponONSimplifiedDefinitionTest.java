@@ -17,7 +17,7 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventions;
@@ -47,7 +47,7 @@ public class AnnuityCouponONSimplifiedDefinitionTest {
   private static final double NOTIONAL = 100000000;
   private static final IndexON INDEX = new IndexON("O/N", CCY, DAY_COUNT, 1);
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.FOLLOWING;
-  private static final GeneratorSwapFixedON GENERATOR = new GeneratorSwapFixedON("OIS", INDEX, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 1, CALENDAR);
+  private static final GeneratorSwapFixedONCompounding GENERATOR = new GeneratorSwapFixedONCompounding("OIS", INDEX, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 1, CALENDAR);
   private static final boolean IS_PAYER = true;
   private static final AnnuityCouponONSimplifiedDefinition DEFINITION = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, GENERATOR, IS_PAYER);
   private static final DoubleTimeSeries<ZonedDateTime> FIXING_TS;
@@ -156,7 +156,7 @@ public class AnnuityCouponONSimplifiedDefinitionTest {
     assertFalse(DEFINITION.equals(definition));
     definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL / 2, GENERATOR, IS_PAYER);
     assertFalse(DEFINITION.equals(definition));
-    definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, new GeneratorSwapFixedON("OIS", INDEX, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 0, CALENDAR),
+    definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, new GeneratorSwapFixedONCompounding("OIS", INDEX, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 0, CALENDAR),
         IS_PAYER);
     assertFalse(DEFINITION.equals(definition));
     definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, GENERATOR, !IS_PAYER);

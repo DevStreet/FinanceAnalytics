@@ -65,7 +65,8 @@ public class SwapFuturesPriceDeliverableSecurityDefinition extends FuturesSecuri
       final double notional, final double rate) {
     ArgumentChecker.notNull(effectiveDate, "Effective date");
     ArgumentChecker.notNull(generator, "Generator");
-    final ZonedDateTime lastTradingDate = ScheduleCalculator.getAdjustedDate(effectiveDate, -generator.getSpotLag(), generator.getCalendar());
+    final ZonedDateTime lastTradingDate = ScheduleCalculator.getAdjustedDate(effectiveDate, -generator.getFixedLegGenerator().getSpotLag(), 
+        generator.getIborLegGenerator().getFixingCalendar());
     final SwapFixedIborDefinition swap = SwapFixedIborDefinition.from(effectiveDate, tenor, generator, 1.0, rate, false);
     return new SwapFuturesPriceDeliverableSecurityDefinition(lastTradingDate, swap, notional);
   }

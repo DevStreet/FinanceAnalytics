@@ -24,6 +24,7 @@ import com.opengamma.financial.convention.daycount.DayCounts;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.time.DateUtils;
+import com.opengamma.util.time.Tenor;
 
 /**
  * Tests the constructor and method of GeneratorDeposit.
@@ -109,7 +110,7 @@ public class GeneratorDepositTest {
     final Period tenor = Period.ofMonths(6);
     final double rate = 0.01;
     final double notional = 12345;
-    final GeneratorAttributeIR attribute = new GeneratorAttributeIR(tenor);
+    final GeneratorAttributeIROTC attribute = new GeneratorAttributeIROTC(Tenor.of(tenor));
     final CashDefinition insGenerated = GENERATOR_DEPOSIT_USD.generateInstrument(referenceDate, rate, notional, attribute);
     final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(referenceDate, SETTLEMENT_DAYS, CALENDAR);
     final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, tenor, BUSINESS_DAY, CALENDAR, IS_EOM);

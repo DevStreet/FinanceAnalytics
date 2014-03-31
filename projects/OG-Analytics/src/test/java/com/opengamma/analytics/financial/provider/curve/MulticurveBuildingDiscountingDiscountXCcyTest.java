@@ -27,7 +27,7 @@ import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefi
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeFX;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorFRA;
@@ -35,7 +35,7 @@ import com.opengamma.analytics.financial.instrument.index.GeneratorForexSwap;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapXCcyIborIbor;
@@ -105,9 +105,9 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
-  private static final GeneratorSwapFixedON GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", TARGET);
-  private static final GeneratorSwapFixedON GENERATOR_OIS_JPY = GeneratorSwapFixedONMaster.getInstance().getGenerator("JPY1YTONAR", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_JPY = GeneratorSwapFixedONMaster.getInstance().getGenerator("JPY1YTONAR", TARGET);
   private static final IndexON INDEX_ON_EUR = GENERATOR_OIS_EUR.getIndex();
   private static final IndexON INDEX_ON_USD = GENERATOR_OIS_USD.getIndex();
   private static final IndexON INDEX_ON_JPY = GENERATOR_OIS_JPY.getIndex();
@@ -187,13 +187,13 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final Period[] DSC_USD_TENOR = new Period[] {Period.ofDays(0), Period.ofDays(1), Period.ofMonths(1), Period.ofMonths(2),
     Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_USD_ATTR = new GeneratorAttributeIR[DSC_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_USD_ATTR = new GeneratorAttributeIROTC[DSC_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins], Period.ZERO);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_USD_TENOR[loopins], Period.ZERO);
     }
     for (int loopins = 2; loopins < DSC_USD_TENOR.length; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins]);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_USD_TENOR[loopins]);
     }
   }
 
@@ -206,10 +206,10 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final Period[] FWD3_USD_TENOR = new Period[] {Period.ofMonths(0), Period.ofMonths(6), Period.ofYears(1), Period.ofYears(2),
     Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD3_USD_ATTR = new GeneratorAttributeIR[FWD3_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD3_USD_ATTR = new GeneratorAttributeIROTC[FWD3_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_USD_TENOR.length; loopins++) {
-      FWD3_USD_ATTR[loopins] = new GeneratorAttributeIR(FWD3_USD_TENOR[loopins]);
+      FWD3_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_USD_TENOR[loopins]);
     }
   }
 
@@ -226,7 +226,7 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final GeneratorAttribute[] DSC_EUR_ATTR = new GeneratorAttribute[DSC_EUR_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR[loopins], Period.ZERO);
+      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR[loopins], Period.ZERO);
     }
     for (int loopins = 2; loopins < DSC_EUR_TENOR.length; loopins++) {
       DSC_EUR_ATTR[loopins] = new GeneratorAttributeFX(DSC_EUR_TENOR[loopins], FX_MATRIX);
@@ -242,10 +242,10 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final Period[] FWD3_EUR_TENOR = new Period[] {Period.ofMonths(0), Period.ofMonths(6), Period.ofYears(1), Period.ofYears(2),
     Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD3_EUR_ATTR = new GeneratorAttributeIR[FWD3_EUR_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD3_EUR_ATTR = new GeneratorAttributeIROTC[FWD3_EUR_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_EUR_TENOR.length; loopins++) {
-      FWD3_EUR_ATTR[loopins] = new GeneratorAttributeIR(FWD3_EUR_TENOR[loopins]);
+      FWD3_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_EUR_TENOR[loopins]);
     }
   }
 
@@ -262,13 +262,13 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final GeneratorAttribute[] DSC_EUR_ATTR_2 = new GeneratorAttribute[DSC_EUR_TENOR_2.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_EUR_ATTR_2[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR_2[loopins], Period.ZERO);
+      DSC_EUR_ATTR_2[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR_2[loopins], Period.ZERO);
     }
     for (int loopins = 2; loopins < 8; loopins++) {
       DSC_EUR_ATTR_2[loopins] = new GeneratorAttributeFX(DSC_EUR_TENOR_2[loopins], FX_MATRIX);
     }
     for (int loopins = 8; loopins < DSC_EUR_TENOR_2.length; loopins++) {
-      DSC_EUR_ATTR_2[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR_2[loopins]);
+      DSC_EUR_ATTR_2[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR_2[loopins]);
     }
   }
 
@@ -284,7 +284,7 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final GeneratorAttribute[] FWD3_EUR_ATTR_2 = new GeneratorAttribute[FWD3_EUR_TENOR_2.length];
   static {
     for (int loopins = 0; loopins < 3; loopins++) {
-      FWD3_EUR_ATTR_2[loopins] = new GeneratorAttributeIR(FWD3_EUR_TENOR_2[loopins]);
+      FWD3_EUR_ATTR_2[loopins] = new GeneratorAttributeIROTC(FWD3_EUR_TENOR_2[loopins]);
     }
     for (int loopins = 3; loopins < FWD3_EUR_TENOR_2.length; loopins++) {
       FWD3_EUR_ATTR_2[loopins] = new GeneratorAttributeFX(FWD3_EUR_TENOR_2[loopins], FX_MATRIX);
@@ -304,13 +304,13 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final GeneratorAttribute[] DSC_EUR_ATTR_3 = new GeneratorAttribute[DSC_EUR_TENOR_3.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_EUR_ATTR_3[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR_3[loopins], Period.ZERO);
+      DSC_EUR_ATTR_3[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR_3[loopins], Period.ZERO);
     }
     for (int loopins = 2; loopins < 8; loopins++) {
       DSC_EUR_ATTR_3[loopins] = new GeneratorAttributeFX(DSC_EUR_TENOR_3[loopins], FX_MATRIX);
     }
     for (int loopins = 8; loopins < DSC_EUR_TENOR_3.length - 1; loopins++) {
-      DSC_EUR_ATTR_3[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR_3[loopins]);
+      DSC_EUR_ATTR_3[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR_3[loopins]);
     }
     DSC_EUR_ATTR_3[DSC_EUR_TENOR_3.length - 1] = new GeneratorAttributeFX(DSC_EUR_TENOR_3[DSC_EUR_TENOR_3.length - 1], FX_MATRIX);
   }
@@ -327,12 +327,12 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final GeneratorAttribute[] FWD3_EUR_ATTR_3 = new GeneratorAttribute[FWD3_EUR_TENOR_3.length];
   static {
     for (int loopins = 0; loopins < 3; loopins++) {
-      FWD3_EUR_ATTR_3[loopins] = new GeneratorAttributeIR(FWD3_EUR_TENOR_3[loopins]);
+      FWD3_EUR_ATTR_3[loopins] = new GeneratorAttributeIROTC(FWD3_EUR_TENOR_3[loopins]);
     }
     for (int loopins = 3; loopins < FWD3_EUR_TENOR_3.length - 1; loopins++) {
       FWD3_EUR_ATTR_3[loopins] = new GeneratorAttributeFX(FWD3_EUR_TENOR_3[loopins], FX_MATRIX);
     }
-    FWD3_EUR_ATTR_3[FWD3_EUR_TENOR_3.length - 1] = new GeneratorAttributeIR(FWD3_EUR_TENOR_3[FWD3_EUR_TENOR_3.length - 1]);
+    FWD3_EUR_ATTR_3[FWD3_EUR_TENOR_3.length - 1] = new GeneratorAttributeIROTC(FWD3_EUR_TENOR_3[FWD3_EUR_TENOR_3.length - 1]);
   }
 
   /** Market values for the dsc JPY curve */
@@ -348,7 +348,7 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final GeneratorAttribute[] DSC_JPY_ATTR = new GeneratorAttribute[DSC_JPY_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_JPY_ATTR[loopins] = new GeneratorAttributeIR(DSC_JPY_TENOR[loopins], Period.ZERO);
+      DSC_JPY_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_JPY_TENOR[loopins], Period.ZERO);
     }
     for (int loopins = 2; loopins < DSC_JPY_TENOR.length; loopins++) {
       DSC_JPY_ATTR[loopins] = new GeneratorAttributeFX(DSC_JPY_TENOR[loopins], FX_MATRIX);
@@ -364,10 +364,10 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   private static final Period[] FWD3_JPY_TENOR = new Period[] {Period.ofMonths(0), Period.ofMonths(6), Period.ofYears(1), Period.ofYears(2),
     Period.ofYears(3), Period.ofYears(4), Period.ofYears(5),
     Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD3_JPY_ATTR = new GeneratorAttributeIR[FWD3_JPY_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD3_JPY_ATTR = new GeneratorAttributeIROTC[FWD3_JPY_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_JPY_TENOR.length; loopins++) {
-      FWD3_JPY_ATTR[loopins] = new GeneratorAttributeIR(FWD3_JPY_TENOR[loopins]);
+      FWD3_JPY_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_JPY_TENOR[loopins]);
     }
   }
 
@@ -379,10 +379,10 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
   /** Tenors for the Fwd 6M JPY curve */
   private static final Period[] FWD6_JPY_TENOR = new Period[] {Period.ofMonths(0), Period.ofYears(1), Period.ofYears(2), Period.ofYears(3),
     Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD6_JPY_ATTR = new GeneratorAttributeIR[FWD6_JPY_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD6_JPY_ATTR = new GeneratorAttributeIROTC[FWD6_JPY_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD6_JPY_TENOR.length; loopins++) {
-      FWD6_JPY_ATTR[loopins] = new GeneratorAttributeIR(FWD6_JPY_TENOR[loopins]);
+      FWD6_JPY_ATTR[loopins] = new GeneratorAttributeIROTC(FWD6_JPY_TENOR[loopins]);
     }
   }
 

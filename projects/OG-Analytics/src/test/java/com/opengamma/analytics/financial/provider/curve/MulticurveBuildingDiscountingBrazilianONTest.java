@@ -21,7 +21,7 @@ import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorY
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedCompoundedONCompounded;
@@ -95,10 +95,10 @@ public class MulticurveBuildingDiscountingBrazilianONTest {
   private static final Period[] DSC_BRL_TENOR = new Period[] {Period.ofDays(0), Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3),
     Period.ofMonths(6), Period.ofMonths(9), Period.ofYears(1),
     Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_BRL_ATTR = new GeneratorAttributeIR[DSC_BRL_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_BRL_ATTR = new GeneratorAttributeIROTC[DSC_BRL_TENOR.length];
   static {
     for (int loopins = 0; loopins < DSC_BRL_TENOR.length; loopins++) {
-      DSC_BRL_ATTR[loopins] = new GeneratorAttributeIR(DSC_BRL_TENOR[loopins]);
+      DSC_BRL_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_BRL_TENOR[loopins]);
     }
   }
 

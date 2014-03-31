@@ -1275,7 +1275,7 @@ public class CurveNodeToDefinitionConverterTest {
     AnnuityCouponFixedDefinition fixedLeg = AnnuityDefinitionBuilder.couponFixed(Currency.USD, settlementDate, maturityDate, FIXED_LEG_PAY_LAG.getPaymentTenor().getPeriod(),
         CALENDAR, ACT_360, MODIFIED_FOLLOWING, false, 1, rate, true, StubType.SHORT_START, FIXED_LEG_PAY_LAG.getPaymentLag());
     AnnuityDefinition<CouponONSpreadSimplifiedDefinition> floatLeg = AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(settlementDate, maturityDate,
-        LEG_ON_CMP.getPaymentTenor().getPeriod(), 1.0d, 0.0, index, false, LEG_ON_CMP.getBusinessDayConvention(), LEG_ON_CMP.isIsEOM(), CALENDAR, LEG_ON_CMP.getStubType(), LEG_ON_CMP.getPaymentLag());
+        LEG_ON_CMP.getPaymentTenor().getPeriod(), 1.0d, 0.0, index, CALENDAR, false, LEG_ON_CMP.getBusinessDayConvention(), LEG_ON_CMP.isIsEOM(), LEG_ON_CMP.getStubType(), LEG_ON_CMP.getPaymentLag());
     assertEquals(new SwapDefinition(fixedLeg, floatLeg), definition);
     settlementDate = DateUtils.getUTCDate(2013, 3, 5);
     swapNode = new SwapNode(Tenor.of(Period.ZERO), Tenor.of(swapTenor), LEG_ON_CMP_ID, FIXED_LEG_PAY_LAG_ID, "Mapper");
@@ -1284,7 +1284,7 @@ public class CurveNodeToDefinitionConverterTest {
     fixedLeg = AnnuityDefinitionBuilder.couponFixed(Currency.USD, settlementDate, maturityDate, FIXED_LEG_PAY_LAG.getPaymentTenor().getPeriod(), CALENDAR, ACT_360,
         MODIFIED_FOLLOWING, false, 1, rate, false, StubType.SHORT_START, FIXED_LEG_PAY_LAG.getPaymentLag());
     floatLeg = AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(settlementDate, maturityDate,
-        LEG_ON_CMP.getPaymentTenor().getPeriod(), 1.0d, 0.0, index, true, LEG_ON_CMP.getBusinessDayConvention(), LEG_ON_CMP.isIsEOM(), CALENDAR, LEG_ON_CMP.getStubType(), LEG_ON_CMP.getPaymentLag());
+        LEG_ON_CMP.getPaymentTenor().getPeriod(), 1.0d, 0.0, index, CALENDAR, true, LEG_ON_CMP.getBusinessDayConvention(), LEG_ON_CMP.isIsEOM(), LEG_ON_CMP.getStubType(), LEG_ON_CMP.getPaymentLag());
     assertEquals(new SwapDefinition(floatLeg, fixedLeg), definition);
     settlementDate = DateUtils.getUTCDate(2013, 4, 5);
     swapNode = new SwapNode(Tenor.ONE_MONTH, Tenor.of(swapTenor), FIXED_LEG_PAY_LAG_ID, LEG_ON_CMP_ID, "Mapper");
@@ -1294,7 +1294,7 @@ public class CurveNodeToDefinitionConverterTest {
     fixedLeg = AnnuityDefinitionBuilder.couponFixed(Currency.USD, settlementDate, maturityDate, FIXED_LEG_PAY_LAG.getPaymentTenor().getPeriod(), CALENDAR, ACT_360,
         MODIFIED_FOLLOWING, false, 1, rate, true, StubType.SHORT_START, FIXED_LEG_PAY_LAG.getPaymentLag());
     floatLeg = AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(settlementDate, maturityDate,
-        LEG_ON_CMP.getPaymentTenor().getPeriod(), 1.0d, 0.0, index, false, LEG_ON_CMP.getBusinessDayConvention(), LEG_ON_CMP.isIsEOM(), CALENDAR, LEG_ON_CMP.getStubType(), LEG_ON_CMP.getPaymentLag());
+        LEG_ON_CMP.getPaymentTenor().getPeriod(), 1.0d, 0.0, index, CALENDAR, false, LEG_ON_CMP.getBusinessDayConvention(), LEG_ON_CMP.isIsEOM(), LEG_ON_CMP.getStubType(), LEG_ON_CMP.getPaymentLag());
     assertEquals(new SwapDefinition(fixedLeg, floatLeg), definition);
   }
 

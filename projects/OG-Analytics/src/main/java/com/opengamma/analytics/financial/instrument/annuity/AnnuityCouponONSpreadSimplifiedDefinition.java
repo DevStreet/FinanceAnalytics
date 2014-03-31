@@ -8,7 +8,7 @@ package com.opengamma.analytics.financial.instrument.annuity;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONSpreadSimplifiedDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
@@ -46,7 +46,7 @@ public class AnnuityCouponONSpreadSimplifiedDefinition extends AnnuityDefinition
    * @return The annuity.
    */
   public static AnnuityCouponONSpreadSimplifiedDefinition from(final ZonedDateTime settlementDate, final Period tenorAnnuity, final double notional, final double spread,
-      final GeneratorSwapFixedON generator,
+      final GeneratorSwapFixedONCompounding generator,
       final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(tenorAnnuity, "tenor annuity");
@@ -68,7 +68,7 @@ public class AnnuityCouponONSpreadSimplifiedDefinition extends AnnuityDefinition
    * @return The annuity.
    */
   public static AnnuityCouponONSpreadSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final double notional, final double spread,
-      final GeneratorSwapFixedON generator, final boolean isPayer) {
+      final GeneratorSwapFixedONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(maturityDate, "maturity date");
     ArgumentChecker.notNull(generator, "generator");
@@ -176,10 +176,10 @@ public class AnnuityCouponONSpreadSimplifiedDefinition extends AnnuityDefinition
     final double sign = isPayer ? -1.0 : 1.0;
     final double notionalSigned = sign * notional;
     final CouponONSpreadSimplifiedDefinition[] coupons = new CouponONSpreadSimplifiedDefinition[endFixingPeriodDate.length];
-    coupons[0] = CouponONSpreadSimplifiedDefinition.from(indexON, settlementDate, endFixingPeriodDate[0], notionalSigned, spread, paymentLag, indexCalendar);
+    coupons[0] = CouponONSpreadSimplifiedDefinition.from(indexON, settlementDate, endFixingPeriodDate[0], notionalSigned, paymentLag, indexCalendar, spread);
     for (int loopcpn = 1; loopcpn < endFixingPeriodDate.length; loopcpn++) {
-      coupons[loopcpn] = CouponONSpreadSimplifiedDefinition.from(indexON, endFixingPeriodDate[loopcpn - 1], endFixingPeriodDate[loopcpn], notionalSigned, spread, paymentLag,
-          indexCalendar);
+      coupons[loopcpn] = CouponONSpreadSimplifiedDefinition.from(indexON, endFixingPeriodDate[loopcpn - 1], endFixingPeriodDate[loopcpn], notionalSigned, paymentLag, indexCalendar,
+          spread);
     }
     return new AnnuityCouponONSpreadSimplifiedDefinition(coupons, indexON, indexCalendar);
   }

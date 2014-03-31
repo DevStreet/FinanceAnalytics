@@ -19,7 +19,7 @@ import com.opengamma.util.ArgumentChecker;
 /**
  * Class with the description of swap inflation year on year characteristics.
  */
-public class GeneratorSwapFixedInflationYearOnYear extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorSwapFixedInflationYearOnYear extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The fixed leg period of payments.
@@ -183,15 +183,15 @@ public class GeneratorSwapFixedInflationYearOnYear extends GeneratorInstrument<G
    * The effective date is spot+startTenor. The maturity date is effective date + endTenor
    */
   @Override
-  public SwapFixedInflationYearOnYearDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public SwapFixedInflationYearOnYearDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
     ArgumentChecker.notNull(attribute, "Attributes");
     final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _spotLag, _calendar);
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartPeriod(), this.getCalendar());
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartTenor().getPeriod(), this.getCalendar());
     if (this._isLinear) {
-      return SwapFixedInflationYearOnYearDefinition.fromGeneratorInterpolation(startDate, rate, notional, attribute.getEndPeriod(), this, true);
+      return SwapFixedInflationYearOnYearDefinition.fromGeneratorInterpolation(startDate, rate, notional, attribute.getEndTenor().getPeriod(), this, true);
     }
-    return SwapFixedInflationYearOnYearDefinition.fromGeneratorMonthly(startDate, rate, notional, attribute.getEndPeriod(), this, true);
+    return SwapFixedInflationYearOnYearDefinition.fromGeneratorMonthly(startDate, rate, notional, attribute.getEndTenor().getPeriod(), this, true);
   }
 
   @Override

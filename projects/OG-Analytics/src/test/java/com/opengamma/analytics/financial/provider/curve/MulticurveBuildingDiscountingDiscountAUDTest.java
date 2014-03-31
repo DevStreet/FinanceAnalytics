@@ -27,14 +27,14 @@ import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorFRA;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIborMaster;
@@ -88,7 +88,7 @@ public class MulticurveBuildingDiscountingDiscountAUDTest {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_AUD = GeneratorSwapFixedONMaster.getInstance().getGenerator("AUD1YRBAON", SYD);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_AUD = GeneratorSwapFixedONMaster.getInstance().getGenerator("AUD1YRBAON", SYD);
   private static final IndexON INDEX_ON_AUD = GENERATOR_OIS_AUD.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_AUD = new GeneratorDepositON("AUD Deposit ON", AUD, SYD, INDEX_ON_AUD.getDayCount());
   private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
@@ -160,10 +160,10 @@ public class MulticurveBuildingDiscountingDiscountAUDTest {
   /** Tenors for the dsc USD curve */
   private static final Period[] DSC_AUD_TENOR = new Period[] {Period.ofDays(0), Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9), Period.ofYears(1),
     Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_AUD_ATTR = new GeneratorAttributeIR[DSC_AUD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_AUD_ATTR = new GeneratorAttributeIROTC[DSC_AUD_TENOR.length];
   static {
     for (int loopins = 0; loopins < DSC_AUD_TENOR.length; loopins++) {
-      DSC_AUD_ATTR[loopins] = new GeneratorAttributeIR(DSC_AUD_TENOR[loopins]);
+      DSC_AUD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_AUD_TENOR[loopins]);
     }
   }
 
@@ -175,10 +175,10 @@ public class MulticurveBuildingDiscountingDiscountAUDTest {
   /** Tenors for the Fwd 3M USD curve */
   private static final Period[] FWD3_AUD_TENOR = new Period[] {Period.ofMonths(0), Period.ofMonths(6), Period.ofMonths(9), Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(5),
     Period.ofYears(7), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD3_AUD_ATTR = new GeneratorAttributeIR[FWD3_AUD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD3_AUD_ATTR = new GeneratorAttributeIROTC[FWD3_AUD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_AUD_TENOR.length; loopins++) {
-      FWD3_AUD_ATTR[loopins] = new GeneratorAttributeIR(FWD3_AUD_TENOR[loopins]);
+      FWD3_AUD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_AUD_TENOR[loopins]);
     }
   }
 
@@ -189,10 +189,10 @@ public class MulticurveBuildingDiscountingDiscountAUDTest {
     AUD6MBBSW6M, AUD6MBBSW6M, AUD6MBBSW6M };
   /** Tenors for the Fwd 3M USD curve */
   private static final Period[] FWD6_AUD_TENOR = new Period[] {Period.ofMonths(0), Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(5), Period.ofYears(7), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD6_AUD_ATTR = new GeneratorAttributeIR[FWD6_AUD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD6_AUD_ATTR = new GeneratorAttributeIROTC[FWD6_AUD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD6_AUD_TENOR.length; loopins++) {
-      FWD6_AUD_ATTR[loopins] = new GeneratorAttributeIR(FWD6_AUD_TENOR[loopins]);
+      FWD6_AUD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD6_AUD_TENOR[loopins]);
     }
   }
 

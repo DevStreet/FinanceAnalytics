@@ -11,6 +11,8 @@ import org.testng.annotations.Test;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
@@ -33,19 +35,15 @@ public class AnnuityCapFloorCMSSpreadDefinitionTest {
   // Ibor index
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.MODIFIED_FOLLOWING;
   private static final boolean IS_EOM = true;
-  private static final Period IBOR_TENOR = Period.ofMonths(3);
   private static final int IBOR_SETTLEMENT_DAYS = 2;
-  private static final DayCount IBOR_DAY_COUNT = DayCounts.ACT_360;
-  private static final IborIndex IBOR_INDEX = new IborIndex(CUR, IBOR_TENOR, IBOR_SETTLEMENT_DAYS, IBOR_DAY_COUNT, BUSINESS_DAY, IS_EOM, "Ibor");
   // CMS Index
-  private static final Period FIXED_PAYMENT_PERIOD = Period.ofMonths(6);
-  private static final DayCount FIXED_DAY_COUNT = DayCounts.THIRTY_U_360;
+  private static final GeneratorSwapFixedIbor EUR1YEURIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("EUR1YEURIBOR3M");
   //CMS 10Y
   private static final Period CMS_TENOR_10 = Period.ofYears(10);
-  private static final IndexSwap CMS_INDEX_10 = new IndexSwap(FIXED_PAYMENT_PERIOD, FIXED_DAY_COUNT, IBOR_INDEX, CMS_TENOR_10, CALENDAR);
-  //CMS 2Y
+  private static final IndexSwap CMS_INDEX_10 = new IndexSwap("Index",EUR1YEURIBOR3M, CMS_TENOR_10);
+   //CMS 2Y
   private static final Period CMS_TENOR_2 = Period.ofYears(2);
-  private static final IndexSwap CMS_INDEX_2 = new IndexSwap(FIXED_PAYMENT_PERIOD, FIXED_DAY_COUNT, IBOR_INDEX, CMS_TENOR_2, CALENDAR);
+  private static final IndexSwap CMS_INDEX_2 = new IndexSwap("Index",EUR1YEURIBOR3M, CMS_TENOR_2);
   // Annuity
   private static final ZonedDateTime START_DATE = DateUtils.getUTCDate(2011, 3, 17);
   private static final Period ANNUITY_TENOR = Period.ofYears(5);

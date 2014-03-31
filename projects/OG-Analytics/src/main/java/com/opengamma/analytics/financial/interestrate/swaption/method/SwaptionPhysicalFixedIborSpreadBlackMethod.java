@@ -5,11 +5,11 @@
  */
 package com.opengamma.analytics.financial.interestrate.swaption.method;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedCompoundedONCompounded;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.interestrate.method.PricingMethod;
@@ -69,15 +69,15 @@ public final class SwaptionPhysicalFixedIborSpreadBlackMethod implements Pricing
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
     Calendar calendar;
     DayCount dayCountModification;
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     if (generatorSwap instanceof GeneratorSwapFixedIbor) {
       final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-      calendar = fixedIborGenerator.getCalendar();
-      dayCountModification = fixedIborGenerator.getFixedLegDayCount();
-    } else if (generatorSwap instanceof GeneratorSwapFixedON) {
-      final GeneratorSwapFixedON fixedONGenerator = (GeneratorSwapFixedON) generatorSwap;
-      calendar = fixedONGenerator.getOvernightCalendar();
-      dayCountModification = fixedONGenerator.getFixedLegDayCount();
+      calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
+    } else if (generatorSwap instanceof GeneratorSwapFixedONCompounding) {
+      final GeneratorSwapFixedONCompounding fixedONGenerator = (GeneratorSwapFixedONCompounding) generatorSwap;
+      calendar = fixedONGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedONGenerator.getFixedLegGenerator().getDayCount();
     } else if (generatorSwap instanceof GeneratorSwapFixedCompoundedONCompounded) {
       final GeneratorSwapFixedCompoundedONCompounded fixedCompoundedON = (GeneratorSwapFixedCompoundedONCompounded) generatorSwap;
       calendar = fixedCompoundedON.getOvernightCalendar();

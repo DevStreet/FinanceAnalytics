@@ -966,7 +966,7 @@ public class AnnuityDefinitionBuilderTest {
     Period paymentPeriod = USDLIBOR3M.getTenor();
     final StubType stub = StubType.SHORT_START;
     AnnuityDefinition<CouponONSpreadSimplifiedDefinition> legONCmp = AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(settlementDate, maturityDate, paymentPeriod,
-        NOTIONAL, SPREAD, FED_FUND, true, USDLIBOR1M.getBusinessDayConvention(), USDLIBOR1M.isEndOfMonth(), NYC, stub, 0);
+        NYC, NOTIONAL, SPREAD, FED_FUND, NYC, true, USDLIBOR1M.getBusinessDayConvention(), USDLIBOR1M.isEndOfMonth(), stub, 0);
     AnnuityDefinition<CouponIborSpreadDefinition> legLibor3M = AnnuityDefinitionBuilder.couponIborSpread(settlementDate, maturityDate, paymentPeriod, NOTIONAL, SPREAD,
         USDLIBOR3M, true, USDLIBOR3M.getDayCount(), USDLIBOR3M.getBusinessDayConvention(), USDLIBOR3M.isEndOfMonth(), NYC, stub, 0);
     assertEquals("AnnuityDefinitionBuilder: couponONSimpleCompoundedSpreadSimplified", legLibor3M.getNumberOfPayments(), legONCmp.getNumberOfPayments());
@@ -989,7 +989,7 @@ public class AnnuityDefinitionBuilderTest {
     Period paymentPeriod = USDLIBOR3M.getTenor();
     final StubType stub = StubType.SHORT_START;
     AnnuityDefinition<CouponONSpreadSimplifiedDefinition> legONCmp = AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(settlementDate, maturityDate, paymentPeriod,
-        NOTIONAL, SPREAD, FED_FUND, true, USDLIBOR1M.getBusinessDayConvention(), USDLIBOR1M.isEndOfMonth(), NYC, stub, paymentLag);
+        NYC, NOTIONAL, SPREAD, FED_FUND, NYC, true, USDLIBOR1M.getBusinessDayConvention(), USDLIBOR1M.isEndOfMonth(), stub, paymentLag);
     AnnuityDefinition<CouponIborSpreadDefinition> legLibor3M = AnnuityDefinitionBuilder.couponIborSpread(settlementDate, maturityDate, paymentPeriod, NOTIONAL, SPREAD,
         USDLIBOR3M, true, USDLIBOR3M.getDayCount(), USDLIBOR3M.getBusinessDayConvention(), USDLIBOR3M.isEndOfMonth(), NYC, stub, paymentLag);
     assertEquals("AnnuityDefinitionBuilder: couponONSimpleCompoundedSpreadSimplified", legLibor3M.getNumberOfPayments(), legONCmp.getNumberOfPayments());

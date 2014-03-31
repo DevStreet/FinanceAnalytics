@@ -7,7 +7,7 @@ package com.opengamma.analytics.financial.model.option.parameters;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.model.volatility.VolatilityModel;
 import com.opengamma.analytics.math.surface.Surface;
@@ -26,14 +26,14 @@ public class BlackFlatSwaptionParameters implements VolatilityModel<double[]> {
   /**
    * The standard swap generator (in particular fixed leg convention and floating leg tenor) for which the volatility surface is valid.
    */
-  private final GeneratorInstrument<GeneratorAttributeIR> _generatorSwap;
+  private final GeneratorInstrument<GeneratorAttributeIROTC> _generatorSwap;
 
   /**
    * Constructor from the parameter surfaces.
    * @param volatility The Black volatility surface. The first dimension is the expiration and the second the underlying swap tenor.
    * @param generatorSwap The standard swap generator for which the volatility surface is valid.
    */
-  public BlackFlatSwaptionParameters(final Surface<Double, Double, Double> volatility, final GeneratorInstrument<GeneratorAttributeIR> generatorSwap) {
+  public BlackFlatSwaptionParameters(final Surface<Double, Double, Double> volatility, final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap) {
     ArgumentChecker.notNull(volatility, "volatility");
     ArgumentChecker.notNull(generatorSwap, "generatorSwap");
     _volatility = volatility;
@@ -75,7 +75,7 @@ public class BlackFlatSwaptionParameters implements VolatilityModel<double[]> {
    * Gets the standard swap generator for which the volatility surface is valid.
    * @return The swap generator.
    */
-  public GeneratorInstrument<GeneratorAttributeIR> getGeneratorSwap() {
+  public GeneratorInstrument<GeneratorAttributeIROTC> getGeneratorSwap() {
     return _generatorSwap;
   }
 

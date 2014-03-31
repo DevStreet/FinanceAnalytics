@@ -64,7 +64,7 @@ public final class SwaptionPhysicalFixedIborSABRMethod {
   public MultipleCurrencyAmount presentValue(final SwaptionPhysicalFixedIbor swaption, final SABRSwaptionProviderInterface sabrData) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(sabrData, "SABR swaption provider");
-    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegDayCount();
+    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegGenerator().getDayCount();
     final MulticurveProviderInterface multicurves = sabrData.getMulticurveProvider();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), dayCountModification, multicurves);
     final double forwardModified = PRDC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, multicurves);
@@ -90,7 +90,7 @@ public final class SwaptionPhysicalFixedIborSABRMethod {
   public MultipleCurrencyMulticurveSensitivity presentValueCurveSensitivity(final SwaptionPhysicalFixedIbor swaption, final SABRSwaptionProviderInterface sabrData) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(sabrData, "SABR swaption provider");
-    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegDayCount();
+    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), dayCountModification, sabrData.getMulticurveProvider());
     final double forwardModified = PRDC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, sabrData.getMulticurveProvider());
     final double strikeModified = METHOD_SWAP.couponEquivalent(swaption.getUnderlyingSwap(), pvbpModified, sabrData.getMulticurveProvider());
@@ -122,7 +122,7 @@ public final class SwaptionPhysicalFixedIborSABRMethod {
   public PresentValueSABRSensitivityDataBundle presentValueSABRSensitivity(final SwaptionPhysicalFixedIbor swaption, final SABRSwaptionProviderInterface sabrData) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(sabrData, "SABR swaption provider");
-    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegDayCount();
+    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), dayCountModification, sabrData.getMulticurveProvider());
     final double forwardModified = PRDC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, sabrData.getMulticurveProvider());
     final double strikeModified = METHOD_SWAP.couponEquivalent(swaption.getUnderlyingSwap(), pvbpModified, sabrData.getMulticurveProvider());
@@ -154,7 +154,7 @@ public final class SwaptionPhysicalFixedIborSABRMethod {
       final SABRSwaptionProviderInterface sabrData) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(sabrData, "SABR swaption provider");
-    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegDayCount();
+    final DayCount dayCountModification = sabrData.getSABRGenerator().getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), dayCountModification, sabrData.getMulticurveProvider());
     final double forwardModified = PRDC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, sabrData.getMulticurveProvider());
     final double strikeModified = METHOD_SWAP.couponEquivalent(swaption.getUnderlyingSwap(), pvbpModified, sabrData.getMulticurveProvider());

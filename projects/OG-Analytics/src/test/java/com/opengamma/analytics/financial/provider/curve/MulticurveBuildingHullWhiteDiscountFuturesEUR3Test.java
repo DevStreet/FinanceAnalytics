@@ -29,7 +29,7 @@ import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefi
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorFRA;
@@ -37,7 +37,7 @@ import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInterestRateFutures;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -92,7 +92,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesEUR3Test {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
   private static final IndexON INDEX_ON_EUR = GENERATOR_OIS_EUR.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_EUR = new GeneratorDepositON("EUR Deposit ON", EUR, TARGET, INDEX_ON_EUR.getDayCount());
   private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
@@ -142,13 +142,13 @@ public class MulticurveBuildingHullWhiteDiscountFuturesEUR3Test {
   /** Tenors for the dsc USD curve */
   private static final Period[] DSC_EUR_TENOR = new Period[] {Period.ofDays(0), Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9), Period.ofYears(1),
     Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_EUR_ATTR = new GeneratorAttributeIR[DSC_EUR_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_EUR_ATTR = new GeneratorAttributeIROTC[DSC_EUR_TENOR.length];
   static {
     for (int loopins = 0; loopins < 1; loopins++) {
-      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR[loopins], Period.ZERO);
+      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR[loopins], Period.ZERO);
     }
     for (int loopins = 1; loopins < DSC_EUR_TENOR.length; loopins++) {
-      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR[loopins]);
+      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_EUR_TENOR[loopins]);
     }
   }
 
@@ -170,12 +170,12 @@ public class MulticurveBuildingHullWhiteDiscountFuturesEUR3Test {
     Period.ofYears(7), Period.ofYears(10) };
   private static final GeneratorAttribute[] FWD3_EUR_ATTR = new GeneratorAttribute[FWD3_EUR_TENOR.length];
   static {
-    FWD3_EUR_ATTR[0] = new GeneratorAttributeIR(FWD3_EUR_TENOR[0], FWD3_EUR_TENOR[0]);
+    FWD3_EUR_ATTR[0] = new GeneratorAttributeIROTC(FWD3_EUR_TENOR[0], FWD3_EUR_TENOR[0]);
     for (int loopins = 1; loopins < 3; loopins++) {
       FWD3_EUR_ATTR[loopins] = new GeneratorAttribute();
     }
     for (int loopins = 1; loopins < FWD3_EUR_TENOR.length; loopins++) {
-      FWD3_EUR_ATTR[loopins] = new GeneratorAttributeIR(FWD3_EUR_TENOR[loopins]);
+      FWD3_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_EUR_TENOR[loopins]);
     }
   }
 
@@ -187,10 +187,10 @@ public class MulticurveBuildingHullWhiteDiscountFuturesEUR3Test {
   /** Tenors for the Fwd 3M USD curve */
   private static final Period[] FWD6_EUR_TENOR = new Period[] {Period.ofMonths(0), Period.ofMonths(9), Period.ofMonths(12), Period.ofYears(2), Period.ofYears(3), Period.ofYears(5), Period.ofYears(7),
     Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] FWD6_EUR_ATTR = new GeneratorAttributeIR[FWD6_EUR_TENOR.length];
+  private static final GeneratorAttributeIROTC[] FWD6_EUR_ATTR = new GeneratorAttributeIROTC[FWD6_EUR_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD6_EUR_TENOR.length; loopins++) {
-      FWD6_EUR_ATTR[loopins] = new GeneratorAttributeIR(FWD6_EUR_TENOR[loopins]);
+      FWD6_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(FWD6_EUR_TENOR[loopins]);
     }
   }
 

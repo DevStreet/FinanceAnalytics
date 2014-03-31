@@ -16,7 +16,7 @@ import com.opengamma.util.ArgumentChecker;
 /**
  * Class with the description of swap inflation zero coupon characteristics.
  */
-public class GeneratorSwapFixedInflationZeroCoupon extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorSwapFixedInflationZeroCoupon extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The Price index.
@@ -134,15 +134,15 @@ public class GeneratorSwapFixedInflationZeroCoupon extends GeneratorInstrument<G
    * The effective date is spot+startTenor. The maturity date is effective date + endTenor
    */
   @Override
-  public SwapFixedInflationZeroCouponDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public SwapFixedInflationZeroCouponDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
     ArgumentChecker.notNull(attribute, "Attributes");
     final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _spotLag, _calendar);
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartPeriod(), this.getCalendar());
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartTenor().getPeriod(), this.getCalendar());
     if (this._isLinear) {
-      return SwapFixedInflationZeroCouponDefinition.fromGeneratorInterpolation(startDate, rate, notional, attribute.getEndPeriod(), this, true);
+      return SwapFixedInflationZeroCouponDefinition.fromGeneratorInterpolation(startDate, rate, notional, attribute.getEndTenor().getPeriod(), this, true);
     }
-    return SwapFixedInflationZeroCouponDefinition.fromGeneratorMonthly(startDate, rate, notional, attribute.getEndPeriod(), this, true);
+    return SwapFixedInflationZeroCouponDefinition.fromGeneratorMonthly(startDate, rate, notional, attribute.getEndTenor().getPeriod(), this, true);
   }
 
   @Override

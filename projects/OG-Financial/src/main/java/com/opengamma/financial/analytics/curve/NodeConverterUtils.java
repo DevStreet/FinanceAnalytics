@@ -339,11 +339,11 @@ public class NodeConverterUtils {
           if (spread == null) {
             throw new OpenGammaRuntimeException("Could not get market data for " + dataId);
           }
-          return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(startDate, maturityDate, paymentPeriod, notional, spread, indexON, isPayer,
-              businessDayConvention, eomLeg, calendar, stub, paymentLag);
+          return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(startDate, maturityDate, paymentPeriod, notional, spread, indexON, calendar,
+              isPayer, businessDayConvention, eomLeg, stub, paymentLag);
         }
-        return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(startDate, maturityDate, paymentPeriod, notional, 0.0d, indexON, isPayer,
-            businessDayConvention, eomLeg, calendar, stub, paymentLag);
+        return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(startDate, maturityDate, paymentPeriod, notional, 0.0d, indexON, calendar,
+            isPayer, businessDayConvention, eomLeg, stub, paymentLag);
       }
 
       @Override
@@ -541,11 +541,11 @@ public class NodeConverterUtils {
           if (spread == null) {
             throw new OpenGammaRuntimeException("Could not get market data for " + dataId);
           }
-          return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(effectiveDate, maturityDate, paymentPeriod, 1.0d, spread, indexON, isPayer,
-              businessDayConvention, eomLeg, calendar, stub, paymentLag);
+          return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(effectiveDate, maturityDate, paymentPeriod, 1.0d, spread, indexON, calendar,
+              isPayer, businessDayConvention, eomLeg, stub, paymentLag);
         }
-        return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(effectiveDate, maturityDate, paymentPeriod, 1.0d, 0.0d, indexON, isPayer,
-            businessDayConvention, eomLeg, calendar, stub, paymentLag);
+        return AnnuityDefinitionBuilder.couponONSimpleCompoundedSpreadSimplified(effectiveDate, maturityDate, paymentPeriod, 1.0d, 0.0d, indexON, calendar,
+            isPayer, businessDayConvention, eomLeg, stub, paymentLag);
       }
 
       @SuppressWarnings("synthetic-access")

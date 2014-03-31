@@ -29,7 +29,7 @@ import java.util.Set;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateParameters;
@@ -210,7 +210,7 @@ public abstract class SABRDiscountingFunction extends DiscountingFunction {
       final SABRInterestRateParameters modelParameters = new SABRInterestRateParameters(alphaSurface, betaSurface, rhoSurface, nuSurface, dayCount,
           VolatilityFunctionFactory.HAGAN_FORMULA);
       final MulticurveProviderDiscount curves = getMergedProviders(inputs, fxMatrix);
-      final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = SwaptionUtils.getSwapGenerator(security, definition, securitySource);
+      final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = SwaptionUtils.getSwapGenerator(security, definition, securitySource);
       // TODO: [PLAT-6237]
       if (!(generatorSwap instanceof GeneratorSwapFixedIbor)) {
         throw new OpenGammaRuntimeException("Cannot handle swap generators of type " + generatorSwap.getClass());

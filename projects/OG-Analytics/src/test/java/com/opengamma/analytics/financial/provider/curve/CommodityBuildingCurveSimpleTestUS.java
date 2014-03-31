@@ -14,7 +14,7 @@ import org.threeten.bp.ZonedDateTime;
 import com.opengamma.analytics.financial.curve.inflation.generator.GeneratorPriceIndexCurve;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedInflationMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedInflationZeroCoupon;
@@ -73,10 +73,10 @@ public class CommodityBuildingCurveSimpleTestUS {
     Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(6), Period.ofYears(7),
     Period.ofYears(8), Period.ofYears(9), Period.ofYears(10), Period.ofYears(12), Period.ofYears(15), Period.ofYears(20),
     Period.ofYears(25), Period.ofYears(30) };
-  public static final GeneratorAttributeIR[] CPI_USD_ATTR = new GeneratorAttributeIR[CPI_USD_TENOR.length];
+  public static final GeneratorAttributeIROTC[] CPI_USD_ATTR = new GeneratorAttributeIROTC[CPI_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < CPI_USD_TENOR.length; loopins++) {
-      CPI_USD_ATTR[loopins] = new GeneratorAttributeIR(CPI_USD_TENOR[loopins]);
+      CPI_USD_ATTR[loopins] = new GeneratorAttributeIROTC(CPI_USD_TENOR[loopins]);
     }
   }
 

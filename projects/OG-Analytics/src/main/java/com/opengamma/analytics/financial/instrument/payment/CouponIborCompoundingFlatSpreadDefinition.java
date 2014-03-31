@@ -206,12 +206,13 @@ public class CouponIborCompoundingFlatSpreadDefinition extends CouponDefinition 
    * @param accrualEndDates The end dates of the accrual sub-periods.
    * @param paymentAccrualFactors The accrual factors (or year fraction) associated to the sub-periods.
    * @param spread The spread paid above the Ibor rate.
-   * @param calendar The holiday calendar for the ibor index.
+   * @param fixingCalendar The holiday calendar associated to the index (used to compute the fixing date).
+   * @param depositCalendar The holiday calendar associated to the index (used to compute the deposit underlying the index).
    * @return The compounded coupon.
    */
   public static CouponIborCompoundingFlatSpreadDefinition from(final ZonedDateTime paymentDate, final double notional, final IborIndex index,
       final ZonedDateTime[] accrualStartDates, final ZonedDateTime[] accrualEndDates, final double[] paymentAccrualFactors, final double spread,
-      final Calendar calendar) {
+      final Calendar fixingCalendar, final Calendar depositCalendar) {
     final int nbSubPeriod = accrualEndDates.length;
     final ZonedDateTime accrualStartDate = accrualStartDates[0];
     final ZonedDateTime accrualEndDate = accrualEndDates[nbSubPeriod - 1];
@@ -221,27 +222,70 @@ public class CouponIborCompoundingFlatSpreadDefinition extends CouponDefinition 
     final double[] fixingPeriodAccrualFactors = new double[nbSubPeriod];
     for (int loopsub = 0; loopsub < nbSubPeriod; loopsub++) {
       paymentAccrualFactor += paymentAccrualFactors[loopsub];
-      fixingDates[loopsub] = ScheduleCalculator.getAdjustedDate(accrualStartDates[loopsub], -index.getSpotLag(), calendar);
-      fixingPeriodEndDates[loopsub] = ScheduleCalculator.getAdjustedDate(accrualStartDates[loopsub], index, calendar);
-      fixingPeriodAccrualFactors[loopsub] = index.getDayCount().getDayCountFraction(accrualStartDates[loopsub], fixingPeriodEndDates[loopsub], calendar);
+      fixingDates[loopsub] = ScheduleCalculator.getAdjustedDate(accrualStartDates[loopsub], -index.getSpotLag(), fixingCalendar);
+      fixingPeriodEndDates[loopsub] = ScheduleCalculator.getAdjustedDate(accrualStartDates[loopsub], index, depositCalendar);
+      fixingPeriodAccrualFactors[loopsub] = index.getDayCount().getDayCountFraction(accrualStartDates[loopsub], fixingPeriodEndDates[loopsub], depositCalendar);
     }
-    return new CouponIborCompoundingFlatSpreadDefinition(
-        index.getCurrency(),
-        paymentDate,
-        accrualStartDate,
-        accrualEndDate,
-        paymentAccrualFactor,
-        notional,
-        index,
-        accrualStartDates,
-        accrualEndDates,
-        paymentAccrualFactors,
-        fixingDates,
-        accrualStartDates,
-        fixingPeriodEndDates,
-        fixingPeriodAccrualFactors,
-        spread,
-        Double.NaN);
+    return new CouponIborCompoundingFlatSpreadDefinition(index.getCurrency(), paymentDate, accrualStartDate, accrualEndDate, paymentAccrualFactor,
+        notional, index, accrualStartDates, accrualEndDates, paymentAccrualFactors, fixingDates, accrualStartDates, fixingPeriodEndDates,
+        fixingPeriodAccrualFactors, spread, Double.NaN);
+  }
+
+  /**
+   * Builds an Ibor compounded coupon from the accrual and payment details. The fixing dates and fixing accrual periods are computed from those dates using the index conventions.
+   * @param paymentDate The coupon payment date.
+   * @param notional The coupon notional.
+   * @param index The Ibor-like index on which the coupon fixes. The index currency should be the same as the coupon currency.
+   * @param accrualStartDates The start dates of the accrual sub-periods.
+   * @param accrualEndDates The end dates of the accrual sub-periods.
+   * @param paymentAccrualFactors The accrual factors (or year fraction) associated to the sub-periods.
+   * @param spread The spread paid above the Ibor rate.
+   * @param calendar The holiday calendar for the ibor index.
+   * @return The compounded coupon.
+   */
+  public static CouponIborCompoundingFlatSpreadDefinition from(final ZonedDateTime paymentDate, final double notional, final IborIndex index,
+      final ZonedDateTime[] accrualStartDates, final ZonedDateTime[] accrualEndDates, final double[] paymentAccrualFactors, final double spread,
+      final Calendar calendar) {
+    return from(paymentDate, notional, index, accrualStartDates, accrualEndDates, paymentAccrualFactors, spread, calendar, calendar);
+  }
+
+  /**
+   * Builds an Ibor compounded coupon from a total period and the Ibor index. The Ibor day count is used to compute the accrual factors.
+   * If required the stub of the sub-periods will be short and last. The payment date is the adjusted end accrual date.
+   * The payment accrual factors are in the day count of the index. 
+   * @param notional The coupon notional.
+   * @param accrualStartDate The first accrual date. 
+   * @param accrualEndDate The end accrual date.
+   * @param index The underlying Ibor index.
+   * @param spread The spread paid above the Ibor rate.
+   * @param stub The stub type used for the compounding sub-periods. Not null.
+   * @param businessDayConvention The leg business day convention.
+   * @param endOfMonth The leg end-of-month convention.
+   * @param fixingCalendar The holiday calendar associated to the index (used to compute the fixing date).
+   * @param depositCalendar The holiday calendar associated to the index (used to compute the deposit underlying the index).
+   * @return The compounded coupon.
+   */
+  public static CouponIborCompoundingFlatSpreadDefinition from(final double notional, final ZonedDateTime accrualStartDate, final ZonedDateTime accrualEndDate, final IborIndex index,
+      final double spread, final StubType stub, final BusinessDayConvention businessDayConvention, final boolean endOfMonth, final Calendar fixingCalendar, final Calendar depositCalendar) {
+    ArgumentChecker.notNull(accrualStartDate, "Accrual start date");
+    ArgumentChecker.notNull(accrualEndDate, "Accrual end date");
+    ArgumentChecker.notNull(index, "Index");
+    ArgumentChecker.notNull(stub, "Stub type");
+    ArgumentChecker.notNull(fixingCalendar, "fixing calendar");
+    ArgumentChecker.notNull(depositCalendar, "deposit  calendar");
+    final boolean isStubShort = stub.equals(StubType.SHORT_END) || stub.equals(StubType.SHORT_START);
+    final boolean isStubStart = stub.equals(StubType.LONG_START) || stub.equals(StubType.SHORT_START); // Implementation note: dates computed from the end.
+    final ZonedDateTime[] accrualEndDates = ScheduleCalculator.getAdjustedDateSchedule(accrualStartDate, accrualEndDate, index.getTenor(), isStubShort, isStubStart,
+        businessDayConvention, depositCalendar, endOfMonth);
+    final int nbSubPeriod = accrualEndDates.length;
+    final ZonedDateTime[] accrualStartDates = new ZonedDateTime[nbSubPeriod];
+    accrualStartDates[0] = accrualStartDate;
+    System.arraycopy(accrualEndDates, 0, accrualStartDates, 1, nbSubPeriod - 1);
+    final double[] paymentAccrualFactors = new double[nbSubPeriod];
+    for (int loopsub = 0; loopsub < nbSubPeriod; loopsub++) {
+      paymentAccrualFactors[loopsub] = index.getDayCount().getDayCountFraction(accrualStartDates[loopsub], accrualEndDates[loopsub], depositCalendar);
+    }
+    return from(accrualEndDates[nbSubPeriod - 1], notional, index, accrualStartDates, accrualEndDates, paymentAccrualFactors, spread, fixingCalendar, depositCalendar);
   }
 
   /**
@@ -298,7 +342,7 @@ public class CouponIborCompoundingFlatSpreadDefinition extends CouponDefinition 
    * @return The compounded coupon.
    */
   public static CouponIborCompoundingFlatSpreadDefinition from(final double notional, final ZonedDateTime accrualStartDate, final ZonedDateTime accrualEndDate, final IborIndex index,
-                                                               final double spread, final StubType stub, final BusinessDayConvention businessDayConvention, final boolean endOfMonth, final Calendar calendar, RollDateAdjuster adjuster) {
+    final double spread, final StubType stub, final BusinessDayConvention businessDayConvention, final boolean endOfMonth, final Calendar calendar, RollDateAdjuster adjuster) {
     ArgumentChecker.notNull(accrualStartDate, "Accrual start date");
     ArgumentChecker.notNull(accrualEndDate, "Accrual end date");
     ArgumentChecker.notNull(index, "Index");

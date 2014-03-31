@@ -8,7 +8,7 @@ package com.opengamma.analytics.financial.interestrate.swaption.method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.interestrate.InstrumentDerivative;
@@ -82,10 +82,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public CurrencyAmount presentValue(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), fixedLegDayCount,
         calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);
@@ -110,10 +110,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public double forward(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     return PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);
   }
 
@@ -149,10 +149,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public InterestRateCurveSensitivity presentValueCurveSensitivity(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount dayCountModification = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), dayCountModification, calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, curveBlack, calendar);
     final double strikeModified = METHOD_SWAP.couponEquivalent(swaption.getUnderlyingSwap(), pvbpModified, curveBlack);
@@ -184,10 +184,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public PresentValueBlackSwaptionSensitivity presentValueBlackSensitivity(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount dayCountModification = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), dayCountModification, calendar,
         curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, curveBlack, calendar);
@@ -214,10 +214,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public double forwardDeltaTheoretical(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), fixedLegDayCount,
         calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);
@@ -239,10 +239,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public CurrencyAmount delta(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curves) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curves, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curves.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curves.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount dayCountModification = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, curves, calendar);
     final double sign = swaption.isLong() ? 1.0 : -1.0;
     return CurrencyAmount.of(swaption.getCurrency(), forwardDeltaTheoretical(swaption, curves) * forwardModified * sign);
@@ -257,10 +257,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public CurrencyAmount gamma(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curves) {
     ArgumentChecker.notNull(curves, "Curves");
     final double gamma = forwardGammaTheoretical(swaption, curves);
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curves.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curves.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount dayCountModification = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), dayCountModification, curves, calendar);
     final double sign = swaption.isLong() ? 1.0 : -1.0;
     return CurrencyAmount.of(swaption.getCurrency(), gamma * forwardModified * forwardModified * sign);
@@ -288,10 +288,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public double forwardGammaTheoretical(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), fixedLegDayCount,
         calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);
@@ -313,10 +313,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public double driftlessThetaTheoretical(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), fixedLegDayCount,
         calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);
@@ -338,10 +338,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public double forwardThetaTheoretical(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), fixedLegDayCount,
         calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);
@@ -363,10 +363,10 @@ public final class SwaptionPhysicalFixedIborBlackMethod implements PricingMethod
   public double forwardVegaTheoretical(final SwaptionPhysicalFixedIbor swaption, final YieldCurveWithBlackSwaptionBundle curveBlack) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(curveBlack, "Curves with Black volatility");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = curveBlack.getBlackParameters().getGeneratorSwap();
     final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-    final Calendar calendar = fixedIborGenerator.getCalendar();
-    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegDayCount();
+    final Calendar calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+    final DayCount fixedLegDayCount = fixedIborGenerator.getFixedLegGenerator().getDayCount();
     final double pvbpModified = METHOD_SWAP.presentValueBasisPoint(swaption.getUnderlyingSwap(), fixedLegDayCount,
         calendar, curveBlack);
     final double forwardModified = PRC.visitFixedCouponSwap(swaption.getUnderlyingSwap(), fixedLegDayCount, curveBlack, calendar);

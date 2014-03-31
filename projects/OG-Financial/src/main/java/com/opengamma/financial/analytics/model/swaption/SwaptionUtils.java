@@ -11,11 +11,11 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponONDefinition;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedCompoundedONCompounded;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONCompoundedDefinition;
@@ -44,7 +44,7 @@ import com.opengamma.util.ArgumentChecker;
  */
 public class SwaptionUtils {
 
-  public static GeneratorInstrument<GeneratorAttributeIR> getSwapGenerator(final SwaptionSecurity security, final InstrumentDefinition<?> swaption, final SecuritySource securitySource) {
+  public static GeneratorInstrument<GeneratorAttributeIROTC> getSwapGenerator(final SwaptionSecurity security, final InstrumentDefinition<?> swaption, final SecuritySource securitySource) {
     ArgumentChecker.notNull(security, "security");
     ArgumentChecker.notNull(swaption, "swaption");
     ArgumentChecker.notNull(securitySource, "security source");
@@ -132,7 +132,7 @@ public class SwaptionUtils {
         if (FinancialSecurityUtils.getCurrency(underlyingSecurity).getCode().equals("BRL")) {
           return new GeneratorSwapFixedCompoundedONCompounded("Swap Generator", onIndex, fixedLegDayCount, businessDayConvention, isEOM, spotLag, calendar);
         }
-        return new GeneratorSwapFixedON("Swap Generator", onIndex, fixedLegPeriod, fixedLegDayCount, businessDayConvention, isEOM, spotLag, calendar);
+        return new GeneratorSwapFixedONCompounding("Swap Generator", onIndex, fixedLegPeriod, fixedLegDayCount, businessDayConvention, isEOM, spotLag, calendar);
       }
       default:
         throw new OpenGammaRuntimeException("Cannot handle floating leg type " + floatLeg.getFloatingRateType());

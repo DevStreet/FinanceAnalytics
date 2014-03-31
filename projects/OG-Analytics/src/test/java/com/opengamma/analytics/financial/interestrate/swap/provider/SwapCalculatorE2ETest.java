@@ -8,10 +8,10 @@ import org.testng.annotations.Test;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.swap.SwapDefinition;
@@ -70,35 +70,35 @@ public class SwapCalculatorE2ETest {
   private static final GeneratorSwapFixedONMaster GENERATOR_SWAP_FIXED_ONCMP_MASTER = GeneratorSwapFixedONMaster.getInstance();
   private static final GeneratorSwapFixedIbor USD6MLIBOR1M = GENERATOR_SWAP_FIXED_IBOR_MASTER.getGenerator("USD6MLIBOR1M", CALENDAR);
   private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_FIXED_IBOR_MASTER.getGenerator("USD6MLIBOR3M", CALENDAR);
-  private static final GeneratorSwapFixedON USD1YFEDFUND = GENERATOR_SWAP_FIXED_ONCMP_MASTER.getGenerator("USD1YFEDFUND", CALENDAR);
+  private static final GeneratorSwapFixedONCompounding USD1YFEDFUND = GENERATOR_SWAP_FIXED_ONCMP_MASTER.getGenerator("USD1YFEDFUND", CALENDAR);
 
   private static final double NOTIONAL = 100000000; //100m
   // Instrument description: Swap Fixed vs ON Cmp
   private static final ZonedDateTime START_DATE_ON = DateUtils.getUTCDate(2014, 2, 3);
   private static final Period TENOR_SWAP_ON = Period.ofMonths(2);
   private static final double FIXED_RATE_ON = 0.00123;
-  private static final GeneratorAttributeIR ATTRIBUTE_ON = new GeneratorAttributeIR(TENOR_SWAP_ON);
+  private static final GeneratorAttributeIROTC ATTRIBUTE_ON = new GeneratorAttributeIROTC(TENOR_SWAP_ON);
   private static final SwapDefinition SWAP_FIXED_ON_DEFINITION = USD1YFEDFUND.generateInstrument(START_DATE_ON, FIXED_RATE_ON, NOTIONAL, ATTRIBUTE_ON);
   private static final Swap<? extends Payment, ? extends Payment> SWAP_FIXED_ON = SWAP_FIXED_ON_DEFINITION.toDerivative(REFERENCE_DATE);
   // Instrument description: Swap Fixed vs Libor3M
   private static final ZonedDateTime START_DATE_3M = DateUtils.getUTCDate(2014, 9, 10);
   private static final Period TENOR_SWAP_3M = Period.ofYears(7);
   private static final double FIXED_RATE_3M = 0.0150;
-  private static final GeneratorAttributeIR ATTRIBUTE_3M = new GeneratorAttributeIR(TENOR_SWAP_3M);
+  private static final GeneratorAttributeIROTC ATTRIBUTE_3M = new GeneratorAttributeIROTC(TENOR_SWAP_3M);
   private static final SwapDefinition SWAP_FIXED_3M_DEFINITION = USD6MLIBOR3M.generateInstrument(START_DATE_3M, FIXED_RATE_3M, NOTIONAL, ATTRIBUTE_3M);
   private static final Swap<? extends Payment, ? extends Payment> SWAP_FIXED_3M = SWAP_FIXED_3M_DEFINITION.toDerivative(REFERENCE_DATE);
   // Instrument description: Swap Fixed vs Libor1M
   private static final ZonedDateTime START_DATE_1M = DateUtils.getUTCDate(2014, 9, 10);
   private static final Period TENOR_SWAP_1M = Period.ofYears(2);
   private static final double FIXED_RATE_1M = 0.0125;
-  private static final GeneratorAttributeIR ATTRIBUTE_1M = new GeneratorAttributeIR(TENOR_SWAP_1M);
+  private static final GeneratorAttributeIROTC ATTRIBUTE_1M = new GeneratorAttributeIROTC(TENOR_SWAP_1M);
   private static final SwapDefinition SWAP_FIXED_1M_DEFINITION = USD6MLIBOR1M.generateInstrument(START_DATE_1M, FIXED_RATE_1M, NOTIONAL, ATTRIBUTE_1M);
   private static final Swap<? extends Payment, ? extends Payment> SWAP_FIXED_1M = SWAP_FIXED_1M_DEFINITION.toDerivative(REFERENCE_DATE);
   // Instrument description: Swap Fixed vs Libor3M Already started (with fixing)
   private static final ZonedDateTime START_DATE_3M_S = DateUtils.getUTCDate(2013, 9, 10);
   private static final Period TENOR_SWAP_3M_S = Period.ofYears(7);
   private static final double FIXED_RATE_3M_S = 0.0150;
-  private static final GeneratorAttributeIR ATTRIBUTE_3M_S = new GeneratorAttributeIR(TENOR_SWAP_3M_S);
+  private static final GeneratorAttributeIROTC ATTRIBUTE_3M_S = new GeneratorAttributeIROTC(TENOR_SWAP_3M_S);
   private static final SwapFixedIborDefinition SWAP_FIXED_3M_S_DEFINITION = USD6MLIBOR3M.generateInstrument(START_DATE_3M_S, FIXED_RATE_3M_S, NOTIONAL, ATTRIBUTE_3M_S);
   private static final ZonedDateTimeDoubleTimeSeries TS_IBOR_USD3M = ImmutableZonedDateTimeDoubleTimeSeries.ofUTC(new ZonedDateTime[] {DateUtils.getUTCDate(2013, 12, 10),
       DateUtils.getUTCDate(2013, 12, 12) }, new double[] {0.0024185, 0.0100 });

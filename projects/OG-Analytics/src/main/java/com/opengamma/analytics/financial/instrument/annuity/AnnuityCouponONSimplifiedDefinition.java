@@ -8,7 +8,7 @@ package com.opengamma.analytics.financial.instrument.annuity;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONSimplifiedDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
@@ -46,8 +46,8 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @param isPayer The flag indicating if the annuity is paying (true) or receiving (false).
    * @return The annuity.
    */
-  public static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final Period tenorAnnuity, final double notional, final GeneratorSwapFixedON generator,
-      final boolean isPayer) {
+  public static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final Period tenorAnnuity, final double notional, 
+      final GeneratorSwapFixedONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(tenorAnnuity, "tenor annuity");
     ArgumentChecker.notNull(generator, "generator");
@@ -65,8 +65,8 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @param isPayer The flag indicating if the annuity is paying (true) or receiving (false).
    * @return The annuity.
    */
-  public static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final double notional, final GeneratorSwapFixedON generator,
-      final boolean isPayer) {
+  public static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final double notional, 
+      final GeneratorSwapFixedONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(maturityDate, "maturity date");
     ArgumentChecker.notNull(generator, "generator");
@@ -161,7 +161,7 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @param isPayer True if the annuity is paid
    * @return An overnight annuity
    */
-  private static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final double notional, final GeneratorSwapFixedON generator,
+  private static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final double notional, final GeneratorSwapFixedONCompounding generator,
       final boolean isPayer) {
     final double sign = isPayer ? -1.0 : 1.0;
     final double notionalSigned = sign * notional;

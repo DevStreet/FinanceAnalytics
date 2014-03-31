@@ -123,12 +123,12 @@ public class CapFloorCMSSpreadDefinition extends CouponFloatingDefinition implem
     ArgumentChecker.notNull(accrualStartDate, "Accrual start date.");
     ArgumentChecker.notNull(cmsIndex1, "CMS index");
     ArgumentChecker.notNull(cmsIndex2, "CMS index");
-    final ZonedDateTime fixingDate = ScheduleCalculator.getAdjustedDate(accrualStartDate, -cmsIndex1.getIborIndex().getSpotLag(), calendar1);
+    final ZonedDateTime fixingDate = ScheduleCalculator.getAdjustedDate(accrualStartDate, -cmsIndex1.getGenerator().getIborLegGenerator().getIborIndex().getSpotLag(), calendar1);
     // Implementation comment: the underlying swap is used for forward. The notional, rate and payer flag are irrelevant.
     final SwapFixedIborDefinition underlyingSwap1 = SwapFixedIborDefinition.from(accrualStartDate, cmsIndex1, 1.0, 1.0, true, calendar1);
     final SwapFixedIborDefinition underlyingSwap2 = SwapFixedIborDefinition.from(accrualStartDate, cmsIndex2, 1.0, 1.0, true, calendar2);
-    return new CapFloorCMSSpreadDefinition(cmsIndex1.getIborIndex().getCurrency(), paymentDate, accrualStartDate, accrualEndDate, accrualFactor, notional, fixingDate, underlyingSwap1, cmsIndex1,
-        underlyingSwap2, cmsIndex2, strike, isCap, calendar1, calendar2);
+    return new CapFloorCMSSpreadDefinition(cmsIndex1.getGenerator().getIborLegGenerator().getCurrency(), paymentDate, accrualStartDate, accrualEndDate, accrualFactor, 
+        notional, fixingDate, underlyingSwap1, cmsIndex1, underlyingSwap2, cmsIndex2, strike, isCap, calendar1, calendar2);
   }
 
   /**

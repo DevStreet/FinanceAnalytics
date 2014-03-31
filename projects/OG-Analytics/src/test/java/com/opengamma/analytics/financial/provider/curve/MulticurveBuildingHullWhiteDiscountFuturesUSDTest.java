@@ -27,14 +27,14 @@ import com.opengamma.analytics.financial.instrument.future.InterestRateFutureTra
 import com.opengamma.analytics.financial.instrument.future.SwapFuturesPriceDeliverableSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.future.SwapFuturesPriceDeliverableTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInterestRateFutures;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFuturesDeliverable;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
@@ -85,7 +85,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
 
   private static final double NOTIONAL = 1000000.0;
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
   private static final IndexON INDEX_ON_USD = GENERATOR_OIS_USD.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_USD = new GeneratorDepositON("USD Deposit ON", USD, NYC, INDEX_ON_USD.getDayCount());
   private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
@@ -144,13 +144,13 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
   /** Tenors for the dsc USD curve */
   private static final Period[] DSC_USD_TENOR = new Period[] {Period.ofDays(0), Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9), Period.ofYears(1),
       Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_USD_ATTR = new GeneratorAttributeIR[DSC_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_USD_ATTR = new GeneratorAttributeIROTC[DSC_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 1; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins], Period.ZERO);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_USD_TENOR[loopins], Period.ZERO);
     }
     for (int loopins = 1; loopins < DSC_USD_TENOR.length; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins]);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_USD_TENOR[loopins]);
     }
   }
   private static final double[] FWD3_USD_MARKET_QUOTES = new double[] {0.0027560, 0.99715, 0.99700, 0.99680, 0.99660, (100 + 7.0 / 32.0 + 3.0 / (32.0 * 4.0)) / 100.0, (100 + 17.0 / 32.0) / 100.0,
@@ -164,7 +164,7 @@ public class MulticurveBuildingHullWhiteDiscountFuturesUSDTest {
       Period.ofMonths(0), Period.ofMonths(0), Period.ofMonths(0) };
   private static final GeneratorAttribute[] FWD3_USD_ATTR = new GeneratorAttribute[FWD3_USD_TENOR.length];
   static {
-    FWD3_USD_ATTR[0] = new GeneratorAttributeIR(FWD3_USD_TENOR[0], FWD3_USD_TENOR[0]);
+    FWD3_USD_ATTR[0] = new GeneratorAttributeIROTC(FWD3_USD_TENOR[0], FWD3_USD_TENOR[0]);
     for (int loopins = 1; loopins < FWD3_USD_TENOR.length; loopins++) {
       FWD3_USD_ATTR[loopins] = new GeneratorAttribute();
     }

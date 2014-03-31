@@ -26,12 +26,12 @@ import com.opengamma.analytics.financial.instrument.bond.BillSecurityDefinition;
 import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorBill;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositONCounterpart;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -90,7 +90,7 @@ public class InflationBuildingCurveWithTIPSAndBILLSTestUS {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
   private static final IndexON INDEX_ON_USD = GENERATOR_OIS_USD.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_USD = new GeneratorDepositON("USD Deposit ON", USD, NYC, INDEX_ON_USD.getDayCount());
   private static final String NAME_COUNTERPART = "US GOVT";
@@ -130,10 +130,10 @@ public class InflationBuildingCurveWithTIPSAndBILLSTestUS {
   /** Tenors for the dsc USD curve */
   private static final Period[] DSC_USD_TENOR = new Period[] {Period.ofDays(0), Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9), Period.ofYears(1),
     Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_USD_ATTR = new GeneratorAttributeIR[DSC_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_USD_ATTR = new GeneratorAttributeIROTC[DSC_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < DSC_USD_TENOR.length; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins]);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_USD_TENOR[loopins]);
     }
   }
 
@@ -144,10 +144,10 @@ public class InflationBuildingCurveWithTIPSAndBILLSTestUS {
     GENERATOR_BILL[2] };
   /** Tenors for the govt USD curve */
   private static final Period[] GOVTUS_USD_TENOR = new Period[] {Period.ofDays(0), Period.ofDays(0), Period.ofDays(0), Period.ofDays(0) };
-  private static final GeneratorAttributeIR[] GOVTUS_USD_ATTR = new GeneratorAttributeIR[GOVTUS_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] GOVTUS_USD_ATTR = new GeneratorAttributeIROTC[GOVTUS_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < GOVTUS_USD_TENOR.length; loopins++) {
-      GOVTUS_USD_ATTR[loopins] = new GeneratorAttributeIR(GOVTUS_USD_TENOR[loopins]);
+      GOVTUS_USD_ATTR[loopins] = new GeneratorAttributeIROTC(GOVTUS_USD_TENOR[loopins]);
     }
   }
 

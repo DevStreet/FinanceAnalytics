@@ -11,6 +11,8 @@ import org.threeten.bp.ZonedDateTime;
 import com.opengamma.analytics.financial.instrument.InstrumentDefinitionVisitor;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborSpreadDefinition;
+import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinitionBuilder;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
 import com.opengamma.analytics.financial.interestrate.annuity.derivative.Annuity;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon;
@@ -64,9 +66,16 @@ public class SwapIborIborDefinition extends SwapDefinition {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(tenor, "Tenor");
     ArgumentChecker.notNull(generator, "Swap generator");
-    final AnnuityCouponIborSpreadDefinition firstLeg = AnnuityCouponIborSpreadDefinition.from(settlementDate, tenor, notional, generator.getIborIndex1(), spread, isPayer, generator.getCalendar1());
-    final AnnuityCouponIborSpreadDefinition secondLeg = AnnuityCouponIborSpreadDefinition.from(settlementDate, tenor, notional, generator.getIborIndex2(), 0.0, !isPayer, generator.getCalendar2());
-    return new SwapIborIborDefinition(firstLeg, secondLeg);
+    final ZonedDateTime maturityDate = settlementDate.plus(tenor);
+    final GeneratorLegIbor genIbor1 = generator.getFirstIborLegGenerator();
+    final GeneratorLegIbor genIbor2 = generator.getSecondIborLegGenerator();
+    final AnnuityCouponIborSpreadDefinition iborLeg1 = AnnuityDefinitionBuilder.couponIborSpread(settlementDate, maturityDate, genIbor1.getPaymentTenor().getPeriod(), 
+        notional, spread, genIbor1.getIborIndex(), isPayer, genIbor1.getDayCount(), genIbor1.getBusinessDayConvention(), genIbor1.isEndOfMonth(), genIbor1.getPaymentCalendar(), 
+        genIbor1.getFixingCalendar(), genIbor1.getDepositCalendar(), genIbor1.getStubType(), genIbor1.getPaymentLag());
+    final AnnuityCouponIborSpreadDefinition iborLeg2 = AnnuityDefinitionBuilder.couponIborSpread(settlementDate, maturityDate, genIbor2.getPaymentTenor().getPeriod(), 
+        notional, 0.0, genIbor2.getIborIndex(), isPayer, genIbor2.getDayCount(), genIbor2.getBusinessDayConvention(), genIbor2.isEndOfMonth(), genIbor2.getPaymentCalendar(), 
+        genIbor2.getFixingCalendar(), genIbor2.getDepositCalendar(), genIbor2.getStubType(), genIbor2.getPaymentLag());
+    return new SwapIborIborDefinition(iborLeg1, iborLeg2);
   }
 
   /**

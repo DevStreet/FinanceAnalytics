@@ -87,17 +87,17 @@ public class CouponONSpreadSimplifiedDefinition extends CouponDefinition {
    * @param settlementDate The coupon settlement date.
    * @param tenor The coupon tenor.
    * @param notional The notional.
-   * @param spread The spread.
    * @param settlementDays The number of days between last fixing and the payment (also called spot lag).
    * @param businessDayConvention The business day convention to compute the end date of the coupon.
    * @param isEOM The end-of-month convention to compute the end date of the coupon.
    * @param calendar The holiday calendar for the overnight index.
+   * @param spread The spread.
    * @return The OIS coupon.
    */
-  public static CouponONSpreadSimplifiedDefinition from(final IndexON index, final ZonedDateTime settlementDate, final Period tenor, final double notional, final double spread,
-      final int settlementDays, final BusinessDayConvention businessDayConvention, final boolean isEOM, final Calendar calendar) {
+  public static CouponONSpreadSimplifiedDefinition from(final IndexON index, final ZonedDateTime settlementDate, final Period tenor, final double notional, final int settlementDays,
+      final BusinessDayConvention businessDayConvention, final boolean isEOM, final Calendar calendar, final double spread) {
     final ZonedDateTime endFixingPeriodDate = ScheduleCalculator.getAdjustedDate(settlementDate, tenor, businessDayConvention, calendar, isEOM);
-    return CouponONSpreadSimplifiedDefinition.from(index, settlementDate, endFixingPeriodDate, notional, spread, settlementDays, calendar);
+    return CouponONSpreadSimplifiedDefinition.from(index, settlementDate, endFixingPeriodDate, notional, settlementDays, calendar, spread);
   }
 
   /**
@@ -107,13 +107,13 @@ public class CouponONSpreadSimplifiedDefinition extends CouponDefinition {
    * @param settlementDate The coupon settlement date.
    * @param endFixingPeriodDate The end date of the fixing period (also used for the end accrual date).
    * @param notional The notional.
-   * @param spread The spread.
    * @param settlementDays The number of days between last fixing date and the payment date (also called payment lag).
    * @param calendar The holiday calendar for the overnight index.
+   * @param spread The spread.
    * @return The OIS coupon.
    */
   public static CouponONSpreadSimplifiedDefinition from(final IndexON index, final ZonedDateTime settlementDate, final ZonedDateTime endFixingPeriodDate,
-      final double notional, final double spread, final int settlementDays, final Calendar calendar) {
+      final double notional, final int settlementDays, final Calendar calendar, final double spread) {
     ZonedDateTime lastFixingDate = ScheduleCalculator.getAdjustedDate(endFixingPeriodDate, -1, calendar); // Overnight
     lastFixingDate = ScheduleCalculator.getAdjustedDate(lastFixingDate, index.getPublicationLag(), calendar); // Lag
     final ZonedDateTime paymentDate = ScheduleCalculator.getAdjustedDate(lastFixingDate, settlementDays, calendar);

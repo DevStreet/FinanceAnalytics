@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONSpreadSimplifiedDefinition;
@@ -42,7 +42,7 @@ public class CouponONSpreadDiscountingMethodTest {
   private static final MulticurveProviderDiscount MULTICURVES = MulticurveProviderDiscountDataSets.createMulticurveEurUsd();
 
   private static final Calendar TARGET = new MondayToFridayCalendar("TARGET");
-  private static final GeneratorSwapFixedON GENERATOR_SWAP_EONIA = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_SWAP_EONIA = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
   private static final IndexON EONIA = MulticurveProviderDiscountDataSets.getIndexesON()[0];
   private static final Currency EUR = EONIA.getCurrency();
   private static final Calendar CALENDAR = MulticurveProviderDiscountDataSets.getEURCalendar();
@@ -50,8 +50,8 @@ public class CouponONSpreadDiscountingMethodTest {
   private static final Period TENOR = Period.ofMonths(3);
   private static final double NOTIONAL = 100000000; // 100m
   private static final double SPREAD = 0.0012;
-  private static final CouponONSpreadSimplifiedDefinition CPN_OIS_DEFINITION = CouponONSpreadSimplifiedDefinition.from(EONIA, EFFECTIVE_DATE, TENOR, NOTIONAL, SPREAD, 2,
-      GENERATOR_SWAP_EONIA.getBusinessDayConvention(), GENERATOR_SWAP_EONIA.isEndOfMonth(), CALENDAR);
+  private static final CouponONSpreadSimplifiedDefinition CPN_OIS_DEFINITION = CouponONSpreadSimplifiedDefinition.from(EONIA, EFFECTIVE_DATE, TENOR, NOTIONAL, 2, GENERATOR_SWAP_EONIA.getBusinessDayConvention(),
+      GENERATOR_SWAP_EONIA.isEndOfMonth(), CALENDAR, SPREAD);
   private static final double SPREAD_AMOUNT = SPREAD * NOTIONAL * CPN_OIS_DEFINITION.getPaymentYearFraction();
 
   private static final ZonedDateTime REFERENCE_DATE = DateUtils.getUTCDate(2010, 12, 27);

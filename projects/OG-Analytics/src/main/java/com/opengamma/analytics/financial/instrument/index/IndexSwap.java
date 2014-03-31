@@ -8,10 +8,7 @@ package com.opengamma.analytics.financial.instrument.index;
 import org.apache.commons.lang.ObjectUtils;
 import org.threeten.bp.Period;
 
-import com.opengamma.financial.convention.calendar.Calendar;
-import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.util.ArgumentChecker;
-import com.opengamma.util.money.Currency;
 
 /**
  * Class describing a swap index.
@@ -32,18 +29,17 @@ public class IndexSwap {
   private final Period _tenor;
 
   /**
-   * Constructor from all the Swap index details.
-   * @param fixedLegPeriod The swap fixed leg payment period.
-   * @param fixedLegDayCount The swap fixed leg day count convention.
-   * @param iborIndex The Ibor index of swap the floating leg.
+   * Constructor from a swap generator and the swap tenor.
+   * @param name The generator name.
+   * @param swapGenerator The underlying swap generator.
    * @param tenor The swap tenor.
-   * @param calendar The holiday calendar for the ibor index.
    */
-  public IndexSwap(final Period fixedLegPeriod, final DayCount fixedLegDayCount, final IborIndex iborIndex, final Period tenor, final Calendar calendar) {
-    ArgumentChecker.notNull(tenor, "Swap tenor");
-    _swapGenerator = new GeneratorSwapFixedIbor("Swap Generator", fixedLegPeriod, fixedLegDayCount, iborIndex, calendar);
+  public IndexSwap(final String name, final GeneratorSwapFixedIbor swapGenerator, final Period tenor) {
+    ArgumentChecker.notNull(swapGenerator, "swap generator");
+    ArgumentChecker.notNull(tenor, "tenor");
+    _swapGenerator = swapGenerator;
     _tenor = tenor;
-    _name = tenor.toString() + _swapGenerator.getName();
+    _name = name;
   }
 
   /**
@@ -68,30 +64,6 @@ public class IndexSwap {
   }
 
   /**
-   * Gets the swap fixed leg payment period.
-   * @return The swap fixed leg payment period.
-   */
-  public Period getFixedLegPeriod() {
-    return _swapGenerator.getFixedLegPeriod();
-  }
-
-  /**
-   * Gets the swap fixed leg day count convention.
-   * @return The swap fixed leg day count convention.
-   */
-  public DayCount getFixedLegDayCount() {
-    return _swapGenerator.getFixedLegDayCount();
-  }
-
-  /**
-   * Gets the Ibor index of swap the floating leg.
-   * @return The Ibor index of swap the floating leg.
-   */
-  public IborIndex getIborIndex() {
-    return _swapGenerator.getIborIndex();
-  }
-
-  /**
    * Gets the tenor of the swap index.
    * @return The tenor.
    */
@@ -100,11 +72,11 @@ public class IndexSwap {
   }
 
   /**
-   * Gets the index currency.
-   * @return The currency.
+   * Gets the generator/convention underlying the swap index.
+   * @return The generator.
    */
-  public Currency getCurrency() {
-    return _swapGenerator.getIborIndex().getCurrency();
+  public GeneratorSwapFixedIbor getGenerator() {
+    return _swapGenerator;
   }
 
   @Override
@@ -134,6 +106,9 @@ public class IndexSwap {
       return false;
     }
     final IndexSwap other = (IndexSwap) obj;
+    if (!ObjectUtils.equals(_name, other._name)) {
+      return false;
+    }
     if (!ObjectUtils.equals(_swapGenerator, other._swapGenerator)) {
       return false;
     }

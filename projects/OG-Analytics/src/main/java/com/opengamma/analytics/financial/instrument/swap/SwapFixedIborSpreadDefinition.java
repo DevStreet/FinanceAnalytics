@@ -13,6 +13,9 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDe
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborSpreadDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
+import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinitionBuilder;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegFixed;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
@@ -23,7 +26,6 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.payments.derivative.CouponFixed;
 import com.opengamma.analytics.financial.interestrate.payments.derivative.Payment;
 import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
-import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
@@ -62,7 +64,7 @@ public class SwapFixedIborSpreadDefinition extends SwapDefinition {
    * Swap with spread builder from the settlement date, a tenor, a swap generator and other details.
    * @param settlementDate The settlement date.
    * @param tenor The swap total tenor. The Ibor index conventions are used to compute the maturity date.
-   * @param generator The swap generator.
+   * @param generator The swap generator. The exchange of notional flag is ignored.
    * @param notional The swap notional. the same notional is used for both legs.
    * @param fixedRate The swap fixed rate.
    * @param spread The Ibor leg spread.
@@ -75,13 +77,8 @@ public class SwapFixedIborSpreadDefinition extends SwapDefinition {
     ArgumentChecker.notNull(settlementDate, "Settlement date");
     ArgumentChecker.notNull(tenor, "Tenor");
     ArgumentChecker.notNull(generator, "Swap generator");
-    final ZonedDateTime maturityDate = ScheduleCalculator.getAdjustedDate(settlementDate, tenor, generator.getIborIndex(), calendar);
-    final AnnuityCouponFixedDefinition fixedLeg = AnnuityCouponFixedDefinition.from(generator.getCurrency(), settlementDate, maturityDate, generator.getFixedLegPeriod(),
-        generator.getCalendar(), generator.getFixedLegDayCount(), generator.getIborIndex().getBusinessDayConvention(), generator.getIborIndex().isEndOfMonth(), notional,
-        fixedRate, isPayer);
-    final AnnuityCouponIborSpreadDefinition iborLeg = AnnuityCouponIborSpreadDefinition.from(settlementDate, maturityDate, notional, generator.getIborIndex(), spread,
-        !isPayer, calendar);
-    return new SwapFixedIborSpreadDefinition(fixedLeg, iborLeg);
+    final ZonedDateTime maturityDate = settlementDate.plus(tenor);
+    return from(settlementDate, maturityDate, generator, notional, notional, fixedRate, spread, isPayer);
   }
 
   /**
@@ -122,7 +119,7 @@ public class SwapFixedIborSpreadDefinition extends SwapDefinition {
    * Swap builder from the settlement date, a swap generator and other details of a swap.
    * @param settlementDate The settlement date.
    * @param maturityDate The swap maturity date.
-   * @param generator The swap generator.
+   * @param generator The swap generator. The exchange of notional flag is ignored.
    * @param notionalFixed The fixed leg notional.
    * @param notionalIbor The ibor leg notional.
    * @param fixedRate The swap fixed rate.
@@ -135,11 +132,13 @@ public class SwapFixedIborSpreadDefinition extends SwapDefinition {
     ArgumentChecker.notNull(settlementDate, "Settlement date");
     ArgumentChecker.notNull(maturityDate, "Maturity date");
     ArgumentChecker.notNull(generator, "Swap generator");
-    final AnnuityCouponFixedDefinition fixedLeg = AnnuityCouponFixedDefinition.from(generator.getCurrency(), settlementDate, maturityDate, generator.getFixedLegPeriod(),
-        generator.getCalendar(), generator.getFixedLegDayCount(), generator.getIborIndex().getBusinessDayConvention(), generator.getIborIndex().isEndOfMonth(),
-        notionalFixed, fixedRate, isPayer);
-    final AnnuityCouponIborSpreadDefinition iborLeg = AnnuityCouponIborSpreadDefinition.from(settlementDate, maturityDate, notionalIbor, generator.getIborIndex(),
-        spread, !isPayer, generator.getCalendar());
+    final GeneratorLegFixed genFix = generator.getFixedLegGenerator();
+    final GeneratorLegIbor genIbor = generator.getIborLegGenerator();
+    final AnnuityCouponFixedDefinition fixedLeg = AnnuityDefinitionBuilder.couponFixed(genFix.getCurrency(), settlementDate, maturityDate, genFix.getPaymentTenor().getPeriod(), 
+        genFix.getCalendar(), genFix.getDayCount(), genFix.getBusinessDayConvention(), genFix.isEndOfMonth(), notionalFixed, fixedRate, isPayer, genFix.getStubType(), genFix.getPaymentLag());
+    final AnnuityDefinition<CouponIborSpreadDefinition> iborLeg = AnnuityDefinitionBuilder.couponIborSpread(settlementDate, maturityDate, genIbor.getPaymentTenor().getPeriod(), 
+        notionalIbor, spread, genIbor.getIborIndex(), isPayer, genIbor.getDayCount(), genIbor.getBusinessDayConvention(), genIbor.isEndOfMonth(), genIbor.getPaymentCalendar(), 
+        genIbor.getFixingCalendar(), genIbor.getDepositCalendar(), genIbor.getStubType(), genIbor.getPaymentLag());
     return new SwapFixedIborSpreadDefinition(fixedLeg, iborLeg);
   }
 

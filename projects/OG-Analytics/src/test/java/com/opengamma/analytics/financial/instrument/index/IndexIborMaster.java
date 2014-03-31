@@ -44,13 +44,13 @@ public final class IndexIborMaster {
   private IndexIborMaster() {
     _ibor = new HashMap<>();
     _ibor.put(
-        "AUDBB3M",
+        "AUDBBSW3M",
         new IborIndex(Currency.AUD, Period.ofMonths(3), 1, DayCounts.ACT_365, BusinessDayConventions.MODIFIED_FOLLOWING,
-            true, "AUDBB3M"));
+            true, "AUDBBSW3M"));
     _ibor.put(
-        "AUDBB6M",
+        "AUDBBSW6M",
         new IborIndex(Currency.AUD, Period.ofMonths(6), 1, DayCounts.ACT_365, BusinessDayConventions.MODIFIED_FOLLOWING,
-            true, "AUDBB6M"));
+            true, "AUDBBSW6M"));
     _ibor.put(
         "CADCDOR3M",
         new IborIndex(Currency.CAD, Period.ofMonths(3), 0, DayCounts.ACT_365, BusinessDayConventions.MODIFIED_FOLLOWING,
@@ -87,6 +87,10 @@ public final class IndexIborMaster {
         "USDLIBOR12M",
         new IborIndex(Currency.USD, Period.ofMonths(12), 2, DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING,
             true, "USDLIBOR12M"));
+    _ibor.put(
+        "GBPLIBOR1M",
+        new IborIndex(Currency.GBP, Period.ofMonths(1), 0, DayCounts.ACT_365, BusinessDayConventions.MODIFIED_FOLLOWING,
+            true, "GBPLIBOR1M"));
     _ibor.put(
         "GBPLIBOR3M",
         new IborIndex(Currency.GBP, Period.ofMonths(3), 0, DayCounts.ACT_365, BusinessDayConventions.MODIFIED_FOLLOWING,

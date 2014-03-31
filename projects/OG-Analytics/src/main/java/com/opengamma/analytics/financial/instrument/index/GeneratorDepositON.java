@@ -10,6 +10,9 @@ import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
+import com.opengamma.analytics.util.time.TenorUtils;
+import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.financial.convention.businessday.BusinessDayConventions;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.util.ArgumentChecker;
@@ -18,7 +21,7 @@ import com.opengamma.util.money.Currency;
 /**
  * Class with the description of overnight deposit characteristics (conventions, calendar, ...).
  */
-public class GeneratorDepositON extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorDepositON extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The index currency. Not null.
@@ -33,6 +36,9 @@ public class GeneratorDepositON extends GeneratorInstrument<GeneratorAttributeIR
    */
   private final DayCount _dayCount;
 
+  /** The following business day convention used to adjust the start date. **/
+  private static final BusinessDayConvention FOLLOWING = BusinessDayConventions.FOLLOWING;
+  
   /**
    * Deposit generator from all the financial details.
    * @param name The generator name. Not null.
@@ -79,13 +85,13 @@ public class GeneratorDepositON extends GeneratorInstrument<GeneratorAttributeIR
    * @param date The reference date.
    * @param rate The deposit rate.
    * @param notional The deposit notional.
-   * @param attribute The ON deposit attributes. The deposit starts at today+start period. Only the start period is used.
+   * @param attribute The ON deposit attributes. The deposit starts at today+start period (following adjusted if required). Only the start period is used.
    * @return The overnight deposit.
    */
   @Override
-  public CashDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public CashDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(date, attribute.getStartPeriod(), _calendar);
+    final ZonedDateTime startDate = FOLLOWING.adjustDate(_calendar, TenorUtils.adjustDateByTenor(date, attribute.getStartTenor(), _calendar, 0));
     final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, 1, _calendar);
     final double accrualFactor = _dayCount.getDayCountFraction(startDate, endDate, _calendar);
     return new CashDefinition(_currency, startDate, endDate, notional, rate, accrualFactor);

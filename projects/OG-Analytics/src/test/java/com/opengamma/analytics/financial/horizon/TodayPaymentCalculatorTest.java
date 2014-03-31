@@ -20,8 +20,6 @@ import com.opengamma.analytics.financial.interestrate.payments.derivative.Coupon
 import com.opengamma.analytics.financial.interestrate.swap.derivative.SwapFixedCoupon;
 import com.opengamma.analytics.financial.provider.calculator.generic.TodayPaymentCalculator;
 import com.opengamma.analytics.util.time.TimeCalculator;
-import com.opengamma.financial.convention.calendar.Calendar;
-import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
 import com.opengamma.timeseries.precise.zdt.ImmutableZonedDateTimeDoubleTimeSeries;
 import com.opengamma.timeseries.precise.zdt.ZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.money.MultipleCurrencyAmount;
@@ -35,9 +33,8 @@ import com.opengamma.util.time.DateUtils;
 public class TodayPaymentCalculatorTest {
 
   // Swap Fixed-Ibor
-  private static final Calendar CALENDAR_USD = new MondayToFridayCalendar("USD Calendar");
   private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
-  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M", CALENDAR_USD);
+  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M");
   private static final Period SWAP_TENOR = Period.ofYears(5);
   private static final ZonedDateTime SETTLEMENT_DATE = DateUtils.getUTCDate(2012, 5, 17);
   private static final double NOTIONAL = 100000000; //100m
@@ -66,7 +63,7 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(horizon);
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   @Test
@@ -80,7 +77,7 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(horizon);
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   @Test
@@ -94,7 +91,7 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(horizon);
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   @Test
@@ -108,7 +105,7 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(TimeCalculator.getTimeBetween(referenceDate, horizonDate));
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   // BACKWARD LOOKING TESTS //////////////////////////////////////////
@@ -123,7 +120,7 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(horizon);
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   @Test
@@ -137,7 +134,7 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(horizon);
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", todayCash, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   @Test
@@ -155,8 +152,8 @@ public class TodayPaymentCalculatorTest {
     final TodayPaymentCalculator backwardCalculator = TodayPaymentCalculator.getInstance(backwardHorizon);
     final MultipleCurrencyAmount paymentIfLookingBackward = swapToday.accept(backwardCalculator);
 
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", paymentIfLookingForward.getAmount(USD6MLIBOR3M.getCurrency()), paymentIfLookingBackward.getAmount(USD6MLIBOR3M.getCurrency()),
-        TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", paymentIfLookingForward.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), 
+        paymentIfLookingBackward.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 
   @Test
@@ -170,6 +167,6 @@ public class TodayPaymentCalculatorTest {
     final double horizon = TimeCalculator.getTimeBetween(referenceDate, horizonDate); // !!! Negative horizon
     final TodayPaymentCalculator paymentCalculator = TodayPaymentCalculator.getInstance(horizon);
     final MultipleCurrencyAmount paymentToday = swapToday.accept(paymentCalculator);
-    assertEquals("TodayPaymentCalculator: fixed-coupon swap", 0.0, paymentToday.getAmount(USD6MLIBOR3M.getCurrency()), TOLERANCE_PV);
+    assertEquals("TodayPaymentCalculator: fixed-coupon swap", 0.0, paymentToday.getAmount(USD6MLIBOR3M.getFixedLegGenerator().getCurrency()), TOLERANCE_PV);
   }
 }

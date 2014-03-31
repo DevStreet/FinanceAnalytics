@@ -8,7 +8,6 @@ package com.opengamma.analytics.financial.instrument.annuity;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONCompoundedDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
@@ -34,45 +33,6 @@ public class AnnuityCouponONCompoundedDefinition extends AnnuityDefinition<Coupo
   public AnnuityCouponONCompoundedDefinition(final CouponONCompoundedDefinition[] payments, final IndexON index, final Calendar calendar) {
     super(payments, calendar);
     _index = index;
-  }
-
-  /**
-   * Annuity builder from the financial details.
-   * @param settlementDate The settlement date, not null
-   * @param tenorAnnuity The annuity tenor, not null
-   * @param notional The annuity notional.
-   * @param generator The overnight generator, not null
-   * @param isPayer The flag indicating if the annuity is paying (true) or receiving (false).
-   * @return The annuity.
-   */
-  public static AnnuityCouponONCompoundedDefinition from(final ZonedDateTime settlementDate, final Period tenorAnnuity, final double notional,
-      final GeneratorSwapFixedON generator, final boolean isPayer) {
-    ArgumentChecker.notNull(settlementDate, "settlement date");
-    ArgumentChecker.notNull(tenorAnnuity, "tenor annuity");
-    ArgumentChecker.notNull(generator, "generator");
-    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, tenorAnnuity, generator.getLegsPeriod(), generator.getBusinessDayConvention(),
-        generator.getOvernightCalendar(), generator.isEndOfMonth());
-    return AnnuityCouponONCompoundedDefinition.from(settlementDate, endFixingPeriodDate, notional, isPayer, generator.getIndex(), generator.getPaymentLag(), generator.getOvernightCalendar());
-  }
-
-  /**
-   * Annuity builder from the financial details.
-   * @param settlementDate The settlement date, not null
-   * @param maturityDate The maturity date. The maturity date is the end date of the last fixing period, not null
-   * @param notional The notional.
-   * @param generator The generator, not null.
-   * @param isPayer The flag indicating if the annuity is paying (true) or receiving (false).
-   * @return The annuity.
-   */
-  public static AnnuityCouponONCompoundedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final double notional,
-      final GeneratorSwapFixedON generator, final boolean isPayer) {
-    ArgumentChecker.notNull(settlementDate, "settlement date");
-    ArgumentChecker.notNull(maturityDate, "maturity date");
-    ArgumentChecker.notNull(generator, "generator");
-    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, maturityDate, generator.getLegsPeriod(), generator.getBusinessDayConvention(),
-        generator.getOvernightCalendar(), generator.isEndOfMonth());
-    return AnnuityCouponONCompoundedDefinition.from(settlementDate, endFixingPeriodDate, notional, isPayer, generator.getIndex(), generator.getPaymentLag(),
-        generator.getOvernightCalendar());
   }
 
   /**

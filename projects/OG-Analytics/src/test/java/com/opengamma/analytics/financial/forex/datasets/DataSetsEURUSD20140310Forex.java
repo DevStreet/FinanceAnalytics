@@ -22,11 +22,11 @@ import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefi
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeFX;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorDepositON;
 import com.opengamma.analytics.financial.instrument.index.GeneratorForexSwap;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -53,6 +53,7 @@ import com.opengamma.timeseries.precise.zdt.ImmutableZonedDateTimeDoubleTimeSeri
 import com.opengamma.timeseries.precise.zdt.ZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.DateUtils;
+import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -83,15 +84,15 @@ public class DataSetsEURUSD20140310Forex {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedON GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
-  private static final IndexON EUREONIA = GENERATOR_OIS_EUR.getIndex();
-  private static final GeneratorSwapFixedON GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
-  private static final IndexON USDFEDFUND = GENERATOR_OIS_USD.getIndex();
-  private static final IndexON INDEX_ON_EUR = GENERATOR_OIS_EUR.getIndex();
-  private static final IndexON INDEX_ON_USD = GENERATOR_OIS_USD.getIndex();
-  private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_EUR = new GeneratorDepositON("EUR Deposit ON", EUR, TARGET, INDEX_ON_EUR.getDayCount());
-  private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_USD = new GeneratorDepositON("USD Deposit ON", USD, TARGET, INDEX_ON_USD.getDayCount());
-  private static final GeneratorForexSwap GENERATOR_FX_EURUSD = new GeneratorForexSwap("EURUSD", EUR, USD, TARGET, 2, GENERATOR_OIS_EUR.getBusinessDayConvention(), true);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
+  private static final IndexON EUREONIA = GENERATOR_OIS_EUR.getONLegGenerator().getONIndex();
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final IndexON USDFEDFUND = GENERATOR_OIS_USD.getONLegGenerator().getONIndex();
+//  private static final IndexON INDEX_ON_EUR = GENERATOR_OIS_EUR.getIndex();
+//  private static final IndexON INDEX_ON_USD = GENERATOR_OIS_USD.getIndex();
+  private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_EUR = new GeneratorDepositON("EUR Deposit ON", EUR, TARGET, EUREONIA.getDayCount());
+  private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_USD = new GeneratorDepositON("USD Deposit ON", USD, TARGET, USDFEDFUND.getDayCount());
+  private static final GeneratorForexSwap GENERATOR_FX_EURUSD = new GeneratorForexSwap("EURUSD", EUR, USD, TARGET, 2, GENERATOR_OIS_EUR.getFixedLegGenerator().getBusinessDayConvention(), true);
 
 
   private static final ZonedDateTimeDoubleTimeSeries TS_EMPTY = ImmutableZonedDateTimeDoubleTimeSeries.ofEmptyUTC();
@@ -120,13 +121,13 @@ public class DataSetsEURUSD20140310Forex {
     Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), 
     Period.ofYears(6), Period.ofYears(7), Period.ofYears(8), Period.ofYears(9), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_USD_ATTR = new GeneratorAttributeIR[DSC_USD_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_USD_ATTR = new GeneratorAttributeIROTC[DSC_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins], Period.ZERO);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_USD_TENOR[loopins]), Tenor.of(Period.ZERO));
     }
     for (int loopins = 2; loopins < DSC_USD_TENOR.length; loopins++) {
-      DSC_USD_ATTR[loopins] = new GeneratorAttributeIR(DSC_USD_TENOR[loopins]);
+      DSC_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_USD_TENOR[loopins]));
     }
   }
 
@@ -145,13 +146,13 @@ public class DataSetsEURUSD20140310Forex {
     Period.ofMonths(1), Period.ofMonths(2), Period.ofMonths(3), Period.ofMonths(6), Period.ofMonths(9),
     Period.ofYears(1), Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), 
     Period.ofYears(7), Period.ofYears(10) };
-  private static final GeneratorAttributeIR[] DSC_EUR_ATTR = new GeneratorAttributeIR[DSC_EUR_TENOR.length];
+  private static final GeneratorAttributeIROTC[] DSC_EUR_ATTR = new GeneratorAttributeIROTC[DSC_EUR_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR[loopins], Period.ZERO);
+      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_EUR_TENOR[loopins]), Tenor.of(Period.ZERO));
     }
     for (int loopins = 2; loopins < DSC_EUR_TENOR.length; loopins++) {
-      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIR(DSC_EUR_TENOR[loopins]);
+      DSC_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_EUR_TENOR[loopins]));
     }
   }
 
@@ -240,8 +241,8 @@ public class DataSetsEURUSD20140310Forex {
     NAMES_UNITS[2][1] = new String[] {CURVE_NAME_DSC_USD };
     DSC_MAP.put(CURVE_NAME_DSC_USD, USD);
     DSC_MAP.put(CURVE_NAME_DSC_EUR, EUR);
-    FWD_ON_MAP.put(CURVE_NAME_DSC_USD, new IndexON[] {INDEX_ON_USD });
-    FWD_ON_MAP.put(CURVE_NAME_DSC_EUR, new IndexON[] {INDEX_ON_EUR });
+    FWD_ON_MAP.put(CURVE_NAME_DSC_USD, new IndexON[] {USDFEDFUND });
+    FWD_ON_MAP.put(CURVE_NAME_DSC_EUR, new IndexON[] {EUREONIA });
   }
 
   @SuppressWarnings("unchecked")

@@ -11,12 +11,13 @@ import org.testng.annotations.Test;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventions;
 import com.opengamma.financial.convention.calendar.Calendar;
-import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCounts;
 import com.opengamma.util.money.Currency;
@@ -29,20 +30,16 @@ import com.opengamma.util.time.DateUtils;
 @Test(groups = TestGroup.UNIT)
 public class AnnuityCapFloorCMSDefinitionTest {
   private static final Currency CUR = Currency.EUR;
-  private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
   // Ibor index
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.MODIFIED_FOLLOWING;
   private static final boolean IS_EOM = true;
-  private static final Period IBOR_TENOR = Period.ofMonths(3);
   private static final int IBOR_SETTLEMENT_DAYS = 2;
-  private static final DayCount IBOR_DAY_COUNT = DayCounts.ACT_360;
-  private static final IborIndex IBOR_INDEX = new IborIndex(CUR, IBOR_TENOR, IBOR_SETTLEMENT_DAYS, IBOR_DAY_COUNT, BUSINESS_DAY, IS_EOM, "Ibor");
   //CMS 10Y
   private static final Period CMS_TENOR = Period.ofYears(10);
-  private static final Period FIXED_PAYMENT_PERIOD = Period.ofMonths(6);
-  private static final DayCount FIXED_DAY_COUNT = DayCounts.THIRTY_U_360;
-  private static final IndexSwap CMS_INDEX = new IndexSwap(FIXED_PAYMENT_PERIOD, FIXED_DAY_COUNT, IBOR_INDEX, CMS_TENOR, CALENDAR);
+  private static final GeneratorSwapFixedIbor EUR1YEURIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("EUR1YEURIBOR3M");
+  private static final IndexSwap CMS_INDEX = new IndexSwap("Index",EUR1YEURIBOR3M, CMS_TENOR);
   // Annuity
+  private static final Calendar CALENDAR = EUR1YEURIBOR3M.getFixedLegGenerator().getCalendar();
   private static final ZonedDateTime START_DATE = DateUtils.getUTCDate(2011, 3, 17);
   private static final Period ANNUITY_TENOR = Period.ofYears(5);
   private static final ZonedDateTime MATURITY_DATE = START_DATE.plus(ANNUITY_TENOR);
@@ -53,7 +50,7 @@ public class AnnuityCapFloorCMSDefinitionTest {
   private static final double STRIKE = 0.04;
   private static final boolean IS_CAP = true;
   private static final AnnuityCapFloorCMSDefinition CMS_LEG = AnnuityCapFloorCMSDefinition.from(START_DATE, MATURITY_DATE, NOTIONAL, CMS_INDEX, LEG_PAYMENT_PERIOD, LEG_DAY_COUNT, IS_PAYER, STRIKE,
-      IS_CAP, CALENDAR);
+      IS_CAP, EUR1YEURIBOR3M.getFixedLegGenerator().getCalendar());
 
   @Test
   public void dates() {

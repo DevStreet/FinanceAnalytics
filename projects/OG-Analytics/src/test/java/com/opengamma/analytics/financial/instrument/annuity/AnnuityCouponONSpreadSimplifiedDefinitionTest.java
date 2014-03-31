@@ -16,7 +16,7 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.index.IndexONMaster;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
@@ -47,7 +47,7 @@ public class AnnuityCouponONSpreadSimplifiedDefinitionTest {
   private static final double NOTIONAL = 100000000;
   private static final double SPREAD = 0.0012;
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.FOLLOWING;
-  private static final GeneratorSwapFixedON GENERATOR = new GeneratorSwapFixedON("OIS", EONIA, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 2, CALENDAR);
+  private static final GeneratorSwapFixedONCompounding GENERATOR = new GeneratorSwapFixedONCompounding("OIS", EONIA, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 2, CALENDAR);
   private static final boolean IS_PAYER = true;
   private static final AnnuityCouponONSpreadSimplifiedDefinition DEFINITION = AnnuityCouponONSpreadSimplifiedDefinition.from(SETTLEMENT_DATE, END_FIXING_DATE, NOTIONAL, SPREAD, GENERATOR, IS_PAYER);
   private static final DoubleTimeSeries<ZonedDateTime> FIXING_TS;

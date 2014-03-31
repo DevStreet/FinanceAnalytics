@@ -20,6 +20,7 @@ import com.opengamma.financial.convention.daycount.DayCounts;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.test.TestGroup;
 import com.opengamma.util.time.DateUtils;
+import com.opengamma.util.time.Tenor;
 
 /**
  * Tests the constructor and method of GeneratorDepositON.
@@ -74,7 +75,7 @@ public class GeneratorDepositONCounterpartTest {
     final Period tenor = Period.ofDays(2);
     final double rate = 0.01;
     final double notional = 12345;
-    final GeneratorAttributeIR attribute = new GeneratorAttributeIR(tenor, tenor);
+    final GeneratorAttributeIROTC attribute = new GeneratorAttributeIROTC(Tenor.of(tenor), Tenor.of(tenor));
     final DepositCounterpartDefinition insGenerated = GENERATOR_DEPOSIT_ON_USD.generateInstrument(referenceDate, rate, notional, attribute);
     final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(referenceDate, tenor, CALENDAR);
     final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, 1, CALENDAR);

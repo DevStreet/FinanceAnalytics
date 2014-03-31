@@ -19,7 +19,7 @@ import com.opengamma.util.money.Currency;
 /**
  * Class with the description of deposit characteristics (conventions, calendar, ...).
  */
-public class GeneratorDeposit extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorDeposit extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The index currency. Not null.
@@ -124,12 +124,12 @@ public class GeneratorDeposit extends GeneratorInstrument<GeneratorAttributeIR> 
    * The deposit start at spot+start tenor and end at spot+end tenor.
    */
   @Override
-  public CashDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public CashDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
     ArgumentChecker.notNull(attribute, "Attributes");
     final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _spotLag, _calendar);
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartPeriod(), this);
-    final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, attribute.getEndPeriod(), this);
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartTenor(), _businessDayConvention, _calendar, _endOfMonth);
+    final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, attribute.getEndTenor(), _businessDayConvention, _calendar, _endOfMonth);
     final double accrualFactor = _dayCount.getDayCountFraction(startDate, endDate, _calendar);
     return new CashDefinition(_currency, startDate, endDate, notional, rate, accrualFactor);
   }

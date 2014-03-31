@@ -90,7 +90,7 @@ public class CouponCMSDefinition extends CouponFloatingDefinition {
    */
   public static CouponCMSDefinition from(final ZonedDateTime paymentDate, final ZonedDateTime accrualStartDate, final ZonedDateTime accrualEndDate, final double accrualFactor, final double notional,
       final IndexSwap cmsIndex, final Calendar iborCalendar) {
-    final ZonedDateTime fixingDate = ScheduleCalculator.getAdjustedDate(accrualStartDate, -cmsIndex.getIborIndex().getSpotLag(), iborCalendar);
+    final ZonedDateTime fixingDate = ScheduleCalculator.getAdjustedDate(accrualStartDate, -cmsIndex.getGenerator().getIborLegGenerator().getIborIndex().getSpotLag(), iborCalendar);
     // Implementation comment: the underlying swap is used for forward. The notional, rate and payer flag are irrelevant.
     final SwapFixedIborDefinition underlyingSwap = SwapFixedIborDefinition.from(accrualStartDate, cmsIndex, 1.0, 1.0, true, iborCalendar);
     return new CouponCMSDefinition(underlyingSwap.getCurrency(), paymentDate, accrualStartDate, accrualEndDate, accrualFactor, notional, fixingDate, underlyingSwap, cmsIndex);
@@ -120,7 +120,7 @@ public class CouponCMSDefinition extends CouponFloatingDefinition {
   public static CouponCMSDefinition from(final CouponFloatingDefinition coupon, final IndexSwap cmsIndex, final Calendar iborCalendar) {
     ArgumentChecker.notNull(coupon, "floating coupon");
     ArgumentChecker.notNull(cmsIndex, "CMS index");
-    final ZonedDateTime settlementDate = ScheduleCalculator.getAdjustedDate(coupon.getFixingDate(), cmsIndex.getIborIndex().getSpotLag(), iborCalendar);
+    final ZonedDateTime settlementDate = ScheduleCalculator.getAdjustedDate(coupon.getFixingDate(), cmsIndex.getGenerator().getIborLegGenerator().getIborIndex().getSpotLag(), iborCalendar);
     // Implementation comment: the underlying swap is used for forward. The notional, rate and payer flag are irrelevant.
     final SwapFixedIborDefinition underlyingSwap = SwapFixedIborDefinition.from(settlementDate, cmsIndex, 1.0, 1.0, true, iborCalendar);
     return new CouponCMSDefinition(coupon.getCurrency(), coupon.getPaymentDate(), coupon.getAccrualStartDate(), coupon.getAccrualEndDate(), coupon.getPaymentYearFraction(), coupon.getNotional(),

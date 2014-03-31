@@ -10,6 +10,9 @@ import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.cash.DepositCounterpartDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
+import com.opengamma.analytics.util.time.TenorUtils;
+import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.financial.convention.businessday.BusinessDayConventions;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.util.ArgumentChecker;
@@ -18,7 +21,7 @@ import com.opengamma.util.money.Currency;
 /**
  * Class with the description of overnight deposit characteristics (conventions, calendar, ...).
  */
-public class GeneratorDepositONCounterpart extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorDepositONCounterpart extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The index currency. Not null.
@@ -33,9 +36,12 @@ public class GeneratorDepositONCounterpart extends GeneratorInstrument<Generator
    */
   private final DayCount _dayCount;
   /**
-   * The counterpart name. Not null.
+   * The counterpart name. Not null. // TODO: Replace by LegalIntity
    */
   private final String _nameCounterpart;
+
+  /** The following business day convention used to adjust the start date. **/
+  private static final BusinessDayConvention FOLLOWING = BusinessDayConventions.FOLLOWING;
 
   /**
    * Deposit generator from all the financial details.
@@ -98,9 +104,9 @@ public class GeneratorDepositONCounterpart extends GeneratorInstrument<Generator
    * @return The overnight deposit.
    */
   @Override
-  public DepositCounterpartDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public DepositCounterpartDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(date, attribute.getStartPeriod(), _calendar);
+    final ZonedDateTime startDate = FOLLOWING.adjustDate(_calendar, TenorUtils.adjustDateByTenor(date, attribute.getStartTenor(), _calendar, 0));
     final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, 1, _calendar);
     final double accrualFactor = _dayCount.getDayCountFraction(startDate, endDate, _calendar);
     return new DepositCounterpartDefinition(_currency, startDate, endDate, notional, rate, accrualFactor, _nameCounterpart);

@@ -55,7 +55,7 @@ public class AnnuityCapFloorCMSSpreadDefinition extends AnnuityDefinition<CapFlo
     ArgumentChecker.isTrue(notional > 0, "notional <= 0");
     ArgumentChecker.notNull(paymentPeriod, "Payment period");
     final ZonedDateTime[] paymentDatesUnadjusted = ScheduleCalculator.getUnadjustedDateSchedule(settlementDate, maturityDate, paymentPeriod, true, false);
-    final ZonedDateTime[] paymentDates = ScheduleCalculator.getAdjustedDateSchedule(paymentDatesUnadjusted, index1.getIborIndex().getBusinessDayConvention(), calendar1,
+    final ZonedDateTime[] paymentDates = ScheduleCalculator.getAdjustedDateSchedule(paymentDatesUnadjusted, index1.getGenerator().getFixedLegGenerator().getBusinessDayConvention(), calendar1,
         false);
     final double sign = isPayer ? -1.0 : 1.0;
     final CapFloorCMSSpreadDefinition[] coupons = new CapFloorCMSSpreadDefinition[paymentDates.length];

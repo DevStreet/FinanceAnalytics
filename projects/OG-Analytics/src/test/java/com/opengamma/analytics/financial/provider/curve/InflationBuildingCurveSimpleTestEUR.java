@@ -22,7 +22,7 @@ import com.opengamma.analytics.financial.instrument.InstrumentDefinition;
 import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedInflationMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedInflationZeroCoupon;
@@ -98,10 +98,10 @@ public class InflationBuildingCurveSimpleTestEUR {
     Period.ofYears(2), Period.ofYears(3), Period.ofYears(4), Period.ofYears(5), Period.ofYears(6), Period.ofYears(7),
     Period.ofYears(8), Period.ofYears(9), Period.ofYears(10), Period.ofYears(12), Period.ofYears(15), Period.ofYears(20),
     Period.ofYears(25), Period.ofYears(30) };
-  private static final GeneratorAttributeIR[] HICP_EUR_ATTR = new GeneratorAttributeIR[HICP_EUR_TENOR.length];
+  private static final GeneratorAttributeIROTC[] HICP_EUR_ATTR = new GeneratorAttributeIROTC[HICP_EUR_TENOR.length];
   static {
     for (int loopins = 0; loopins < HICP_EUR_TENOR.length; loopins++) {
-      HICP_EUR_ATTR[loopins] = new GeneratorAttributeIR(HICP_EUR_TENOR[loopins]);
+      HICP_EUR_ATTR[loopins] = new GeneratorAttributeIROTC(HICP_EUR_TENOR[loopins]);
     }
   }
 

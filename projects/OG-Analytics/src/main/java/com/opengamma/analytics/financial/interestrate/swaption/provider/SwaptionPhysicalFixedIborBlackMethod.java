@@ -8,11 +8,11 @@ package com.opengamma.analytics.financial.interestrate.swaption.provider;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIR;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttributeIROTC;
 import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedCompoundedONCompounded;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.interestrate.PresentValueBlackSwaptionSensitivity;
 import com.opengamma.analytics.financial.interestrate.swap.provider.SwapFixedCouponDiscountingMethod;
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
@@ -75,17 +75,17 @@ public final class SwaptionPhysicalFixedIborBlackMethod {
   public MultipleCurrencyAmount presentValue(final SwaptionPhysicalFixedIbor swaption, final BlackSwaptionFlatProviderInterface blackMulticurves) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(blackMulticurves, "Black volatility for swaption and multicurve");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
     Calendar calendar;
     DayCount dayCountModification;
     if (generatorSwap instanceof GeneratorSwapFixedIbor) {
       final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-      calendar = fixedIborGenerator.getCalendar();
-      dayCountModification = fixedIborGenerator.getFixedLegDayCount();
-    } else if (generatorSwap instanceof GeneratorSwapFixedON) {
-      final GeneratorSwapFixedON fixedONGenerator = (GeneratorSwapFixedON) generatorSwap;
-      calendar = fixedONGenerator.getOvernightCalendar();
-      dayCountModification = fixedONGenerator.getFixedLegDayCount();
+      calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
+    } else if (generatorSwap instanceof GeneratorSwapFixedONCompounding) {
+      final GeneratorSwapFixedONCompounding fixedONGenerator = (GeneratorSwapFixedONCompounding) generatorSwap;
+      calendar = fixedONGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedONGenerator.getFixedLegGenerator().getDayCount();
     } else if (generatorSwap instanceof GeneratorSwapFixedCompoundedONCompounded) {
       final GeneratorSwapFixedCompoundedONCompounded fixedCompoundedON = (GeneratorSwapFixedCompoundedONCompounded) generatorSwap;
       calendar = fixedCompoundedON.getOvernightCalendar();
@@ -132,17 +132,17 @@ public final class SwaptionPhysicalFixedIborBlackMethod {
   public MultipleCurrencyMulticurveSensitivity presentValueCurveSensitivity(final SwaptionPhysicalFixedIbor swaption, final BlackSwaptionFlatProviderInterface blackMulticurves) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(blackMulticurves, "Black volatility for swaption and multicurve");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
     Calendar calendar;
     DayCount dayCountModification;
     if (generatorSwap instanceof GeneratorSwapFixedIbor) {
       final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-      calendar = fixedIborGenerator.getCalendar();
-      dayCountModification = fixedIborGenerator.getFixedLegDayCount();
-    } else if (generatorSwap instanceof GeneratorSwapFixedON) {
-      final GeneratorSwapFixedON fixedONGenerator = (GeneratorSwapFixedON) generatorSwap;
-      calendar = fixedONGenerator.getOvernightCalendar();
-      dayCountModification = fixedONGenerator.getFixedLegDayCount();
+      calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
+    } else if (generatorSwap instanceof GeneratorSwapFixedONCompounding) {
+      final GeneratorSwapFixedONCompounding fixedONGenerator = (GeneratorSwapFixedONCompounding) generatorSwap;
+      calendar = fixedONGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedONGenerator.getFixedLegGenerator().getDayCount();
     } else if (generatorSwap instanceof GeneratorSwapFixedCompoundedONCompounded) {
       final GeneratorSwapFixedCompoundedONCompounded fixedCompoundedON = (GeneratorSwapFixedCompoundedONCompounded) generatorSwap;
       calendar = fixedCompoundedON.getOvernightCalendar();
@@ -183,17 +183,17 @@ public final class SwaptionPhysicalFixedIborBlackMethod {
   public MultipleCurrencyMulticurveSensitivity presentValueSecondOrderCurveSensitivity(final SwaptionPhysicalFixedIbor swaption, final BlackSwaptionFlatProviderInterface blackMulticurves) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(blackMulticurves, "Black volatility for swaption and multicurve");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
     Calendar calendar;
     DayCount dayCountModification;
     if (generatorSwap instanceof GeneratorSwapFixedIbor) {
       final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-      calendar = fixedIborGenerator.getCalendar();
-      dayCountModification = fixedIborGenerator.getFixedLegDayCount();
-    } else if (generatorSwap instanceof GeneratorSwapFixedON) {
-      final GeneratorSwapFixedON fixedONGenerator = (GeneratorSwapFixedON) generatorSwap;
-      calendar = fixedONGenerator.getOvernightCalendar();
-      dayCountModification = fixedONGenerator.getFixedLegDayCount();
+      calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
+    } else if (generatorSwap instanceof GeneratorSwapFixedONCompounding) {
+      final GeneratorSwapFixedONCompounding fixedONGenerator = (GeneratorSwapFixedONCompounding) generatorSwap;
+      calendar = fixedONGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedONGenerator.getFixedLegGenerator().getDayCount();
     } else if (generatorSwap instanceof GeneratorSwapFixedCompoundedONCompounded) {
       final GeneratorSwapFixedCompoundedONCompounded fixedCompoundedON = (GeneratorSwapFixedCompoundedONCompounded) generatorSwap;
       calendar = fixedCompoundedON.getOvernightCalendar();
@@ -239,17 +239,17 @@ public final class SwaptionPhysicalFixedIborBlackMethod {
   public PresentValueBlackSwaptionSensitivity presentValueBlackSensitivity(final SwaptionPhysicalFixedIbor swaption, final BlackSwaptionFlatProviderInterface blackMulticurves) {
     ArgumentChecker.notNull(swaption, "Swaption");
     ArgumentChecker.notNull(blackMulticurves, "Black volatility for swaption and multicurve");
-    final GeneratorInstrument<GeneratorAttributeIR> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
+    final GeneratorInstrument<GeneratorAttributeIROTC> generatorSwap = blackMulticurves.getBlackParameters().getGeneratorSwap();
     Calendar calendar;
     DayCount dayCountModification;
     if (generatorSwap instanceof GeneratorSwapFixedIbor) {
       final GeneratorSwapFixedIbor fixedIborGenerator = (GeneratorSwapFixedIbor) generatorSwap;
-      calendar = fixedIborGenerator.getCalendar();
-      dayCountModification = fixedIborGenerator.getFixedLegDayCount();
-    } else if (generatorSwap instanceof GeneratorSwapFixedON) {
-      final GeneratorSwapFixedON fixedONGenerator = (GeneratorSwapFixedON) generatorSwap;
-      calendar = fixedONGenerator.getOvernightCalendar();
-      dayCountModification = fixedONGenerator.getFixedLegDayCount();
+      calendar = fixedIborGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedIborGenerator.getFixedLegGenerator().getDayCount();
+    } else if (generatorSwap instanceof GeneratorSwapFixedONCompounding) {
+      final GeneratorSwapFixedONCompounding fixedONGenerator = (GeneratorSwapFixedONCompounding) generatorSwap;
+      calendar = fixedONGenerator.getFixedLegGenerator().getCalendar();
+      dayCountModification = fixedONGenerator.getFixedLegGenerator().getDayCount();
     } else if (generatorSwap instanceof GeneratorSwapFixedCompoundedONCompounded) {
       final GeneratorSwapFixedCompoundedONCompounded fixedCompoundedON = (GeneratorSwapFixedCompoundedONCompounded) generatorSwap;
       calendar = fixedCompoundedON.getOvernightCalendar();

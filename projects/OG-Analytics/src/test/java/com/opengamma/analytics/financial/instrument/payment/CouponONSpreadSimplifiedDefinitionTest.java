@@ -99,8 +99,8 @@ public class CouponONSpreadSimplifiedDefinitionTest {
    * Tests the builder from financial details.
    */
   public void from1() {
-    final CouponONSpreadSimplifiedDefinition cpnFrom = CouponONSpreadSimplifiedDefinition.from(EUR_OIS, SPOT_DATE, EUR_CPN_TENOR, NOTIONAL, SPREAD, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_IS_EOM,
-        EUR_CALENDAR);
+    final CouponONSpreadSimplifiedDefinition cpnFrom = CouponONSpreadSimplifiedDefinition.from(EUR_OIS, SPOT_DATE, EUR_CPN_TENOR, NOTIONAL, EUR_SETTLEMENT_DAYS, EUR_BUSINESS_DAY, EUR_IS_EOM, EUR_CALENDAR,
+        SPREAD);
     assertEquals("CouponOISSimplified definition: from", cpnFrom, EONIA_COUPON_DEFINITION);
   }
 
@@ -109,7 +109,7 @@ public class CouponONSpreadSimplifiedDefinitionTest {
    * Tests the builder from financial details.
    */
   public void from2() {
-    final CouponONSpreadSimplifiedDefinition cpnFrom = CouponONSpreadSimplifiedDefinition.from(EUR_OIS, SPOT_DATE, END_ACCRUAL_DATE, NOTIONAL, SPREAD, EUR_SETTLEMENT_DAYS, EUR_CALENDAR);
+    final CouponONSpreadSimplifiedDefinition cpnFrom = CouponONSpreadSimplifiedDefinition.from(EUR_OIS, SPOT_DATE, END_ACCRUAL_DATE, NOTIONAL, EUR_SETTLEMENT_DAYS, EUR_CALENDAR, SPREAD);
     assertEquals("CouponOISSimplified definition: from", cpnFrom, EONIA_COUPON_DEFINITION);
   }
 

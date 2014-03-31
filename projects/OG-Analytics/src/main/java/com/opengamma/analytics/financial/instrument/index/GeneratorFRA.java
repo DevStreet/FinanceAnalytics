@@ -6,10 +6,10 @@
 package com.opengamma.analytics.financial.instrument.index;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
+import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
@@ -17,7 +17,7 @@ import com.opengamma.util.money.Currency;
 /**
  * Class with the description of swap characteristics.
  */
-public class GeneratorFRA extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorFRA extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
    * The Ibor index underlying the FRA.
@@ -68,14 +68,16 @@ public class GeneratorFRA extends GeneratorInstrument<GeneratorAttributeIR> {
 
   /**
    * {@inheritDoc}
-   * The FRA is from spot+(endtenor-_iborIndex.getTenor()) to spot + endtenor. The start period is not used.
+   * The FRA is from spot+startTenor to spot + endTenor.
    */
   @Override
-  public ForwardRateAgreementDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIR attribute) {
+  public ForwardRateAgreementDefinition generateInstrument(final ZonedDateTime date, final double rate, final double notional, final GeneratorAttributeIROTC attribute) {
     ArgumentChecker.notNull(date, "Reference date");
     ArgumentChecker.notNull(attribute, "Attributes");
-    final Period startPeriod = attribute.getEndPeriod().minus(_iborIndex.getTenor());
-    return ForwardRateAgreementDefinition.fromTrade(date, startPeriod, notional, _iborIndex, rate, _calendar);
+    final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _iborIndex.getSpotLag(), _calendar);
+    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartTenor(), _iborIndex.getBusinessDayConvention(), _calendar, _iborIndex.isEndOfMonth());
+    final ZonedDateTime endDate = ScheduleCalculator.getAdjustedDate(startDate, attribute.getEndTenor(), _iborIndex.getBusinessDayConvention(), _calendar, _iborIndex.isEndOfMonth());
+    return ForwardRateAgreementDefinition.from(startDate, endDate, notional, _iborIndex, rate, _calendar);
   }
 
   @Override

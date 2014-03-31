@@ -6,217 +6,81 @@
 package com.opengamma.analytics.financial.instrument.index;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
-import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinitionBuilder;
-import com.opengamma.analytics.financial.instrument.payment.CouponIborCompoundingFlatSpreadDefinition;
-import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
+import com.opengamma.analytics.financial.instrument.payment.CouponDefinition;
 import com.opengamma.analytics.financial.instrument.swap.SwapDefinition;
-import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
-import com.opengamma.financial.convention.StubType;
-import com.opengamma.financial.convention.businessday.BusinessDayConvention;
-import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.util.ArgumentChecker;
 
 /**
- * Class with the description of swap characteristics.
+ * Class with the description of Ibor compounding vs Ibors.
  */
-public class GeneratorSwapIborCompoundingIbor extends GeneratorInstrument<GeneratorAttributeIR> {
+public class GeneratorSwapIborCompoundingIbor extends GeneratorInstrument<GeneratorAttributeIROTC> {
 
   /**
-   * The Ibor index of the first leg.
+   * The Ibor leg with compounding generator. Not null.
    */
-  private final IborIndex _iborIndex1;
+  private final GeneratorLegIborCompounding _iborCmpLegGenerator;
   /**
-   * The period on which the first leg is compounded. 
+   * The second Ibor leg generator. Not null.
    */
-  private final Period _compoundingPeriod1;
-  /**
-   * The Ibor index of the second leg. The two index should be related to the same currency.
-   */
-  private final IborIndex _iborIndex2;
-  /**
-   * The business day convention associated to the swap.
-   */
-  private final BusinessDayConvention _businessDayConvention;
-  /**
-   * The flag indicating if the end-of-month rule is used for the swap.
-   */
-  private final boolean _endOfMonth;
-  /**
-   * The index spot lag in days between trade and settlement date (usually 2 or 0).
-   */
-  private final int _spotLag;
-  /**
-   * The holiday calendar for the first ibor leg.
-   */
-  private final Calendar _calendar1;
-  /**
-   * The holiday calendar for the second ibor leg.
-   */
-  private final Calendar _calendar2;
-
-  // REVIEW: Do we need stubShort and stubFirst flags?
-
-  /**
-   * Constructor from the details. The business day conventions, end-of-month and spot lag are from the first Ibor index.
-   * @param name The generator name. Not null.
-   * @param iborIndex1 The Ibor index of the first leg.
-   * @param compoundingPeriod1 The compounding period.
-   * @param iborIndex2 The Ibor index of the second leg.
-   * @param calendar1 The holiday calendar for the first ibor leg.
-   * @param calendar2 The holiday calendar for the second ibor leg.
-   */
-  public GeneratorSwapIborCompoundingIbor(final String name, final IborIndex iborIndex1, Period compoundingPeriod1, final IborIndex iborIndex2, final Calendar calendar1, final Calendar calendar2) {
+  private final GeneratorLegIbor _iborLegGenerator;
+  
+ /**
+  * Constructor from two legs.
+  * @param name The generator name.
+  * @param iborCmpLegGenerator The Ibor leg with compounding generator.
+  * @param iborLegGenerator The second Ibor leg generator.
+  */
+  public GeneratorSwapIborCompoundingIbor(final String name, final GeneratorLegIborCompounding iborCmpLegGenerator, final GeneratorLegIbor iborLegGenerator) {
     super(name);
-    ArgumentChecker.notNull(iborIndex1, "ibor index 1");
-    ArgumentChecker.notNull(compoundingPeriod1, "compounding period 1");
-    ArgumentChecker.notNull(iborIndex2, "ibor index 2");
-    ArgumentChecker.notNull(calendar1, "calendar 1");
-    ArgumentChecker.notNull(calendar2, "calendar 2");
-    ArgumentChecker.isTrue(iborIndex1.getCurrency().equals(iborIndex2.getCurrency()), "Currencies of both index should be identical");
-    _iborIndex1 = iborIndex1;
-    _compoundingPeriod1 = compoundingPeriod1;
-    _iborIndex2 = iborIndex2;
-    _businessDayConvention = iborIndex1.getBusinessDayConvention();
-    _endOfMonth = iborIndex1.isEndOfMonth();
-    _spotLag = iborIndex1.getSpotLag();
-    _calendar1 = calendar1;
-    _calendar2 = calendar2;
+    ArgumentChecker.notNull(iborCmpLegGenerator, "first ibor leg generator");
+    ArgumentChecker.notNull(iborLegGenerator, "second ibor leg generator");
+    _iborCmpLegGenerator = iborCmpLegGenerator;
+    _iborLegGenerator = iborLegGenerator;
   }
 
+ /**
+  * Returns the swap generator for the Ibor leg with compounding.
+  * @return The generator.
+  */
+  public GeneratorLegIborCompounding getIborCompoundingLegGenerator() {
+    return _iborCmpLegGenerator;
+  }
+
+ /**
+  * Returns the swap generator for the Ibor leg.
+  * @return The generator.
+  */
+  public GeneratorLegIbor getSecondIborLegGenerator() {
+    return _iborLegGenerator;
+  }
+  
   /**
-   * Constructor from the details. The business day conventions, end-of-month and spot lag are from the Ibor index.
-   * @param name The generator name. Not null.
-   * @param iborIndex1 The Ibor index of the first leg.
-   * @param compoundingPeriod1 The compounding period.
-   * @param iborIndex2 The Ibor index of the second leg.
-   * @param businessDayConvention The business day convention associated to the index.
-   * @param endOfMonth The end-of-month flag.
-   * @param spotLag The swap spot lag (usually 2 or 0).
-   * @param calendar1 The holiday calendar for the first ibor leg.
-   * @param calendar2 The holiday calendar for the second ibor leg.
+   * {@inheritDoc}
+   * Swap with each leg generated by the respective leg generators. The spread is on the first leg, which is a payer leg.
    */
-  public GeneratorSwapIborCompoundingIbor(final String name, final IborIndex iborIndex1, Period compoundingPeriod1, final IborIndex iborIndex2, final BusinessDayConvention businessDayConvention,
-      final boolean endOfMonth, final int spotLag, final Calendar calendar1, final Calendar calendar2) {
-    super(name);
-    ArgumentChecker.notNull(iborIndex1, "ibor index 1");
-    ArgumentChecker.notNull(compoundingPeriod1, "compounding period 1");
-    ArgumentChecker.notNull(iborIndex2, "ibor index 2");
-    ArgumentChecker.notNull(calendar1, "calendar 1");
-    ArgumentChecker.notNull(calendar2, "calendar 2");
-    ArgumentChecker.isTrue(iborIndex1.getCurrency().equals(iborIndex2.getCurrency()), "Currencies of both index should be identical");
-    _iborIndex1 = iborIndex1;
-    _compoundingPeriod1 = compoundingPeriod1;
-    _iborIndex2 = iborIndex2;
-    _businessDayConvention = businessDayConvention;
-    _endOfMonth = endOfMonth;
-    _spotLag = spotLag;
-    _calendar1 = calendar1;
-    _calendar2 = calendar2;
-  }
-
-  /**
-   * Gets the Ibor index of the first leg.
-   * @return The index.
-   */
-  public IborIndex getIborIndex1() {
-    return _iborIndex1;
-  }
-
-  /**
-   * Returns the compounding period of the first leg.
-   * @return The period.
-   */
-  public Period getCompoundingPeriod1() {
-    return _compoundingPeriod1;
-  }
-
-  /**
-   * Gets the Ibor index of the second leg.
-   * @return The index.
-   */
-  public IborIndex getIborIndex2() {
-    return _iborIndex2;
-  }
-
-  /**
-   * Gets the swap generator business day convention.
-   * @return The convention.
-   */
-  public BusinessDayConvention getBusinessDayConvention() {
-    return _businessDayConvention;
-  }
-
-  /**
-   * Gets the swap generator spot lag.
-   * @return The lag (in days).
-   */
-  public int getSpotLag() {
-    return _spotLag;
-  }
-
-  /**
-   * Gets the swap generator end-of-month rule.
-   * @return The EOM.
-   */
-  public Boolean isEndOfMonth() {
-    return _endOfMonth;
-  }
-
-  /**
-   * Gets the holiday calendar for the first leg.
-   * @return The holiday calendar
-   */
-  public Calendar getCalendar1() {
-    return _calendar1;
-  }
-
-  /**
-   * Gets the holiday calendar for the second leg.
-   * @return The holiday calendar
-   */
-  public Calendar getCalendar2() {
-    return _calendar2;
-  }
-
   @Override
-  public SwapDefinition generateInstrument(final ZonedDateTime date, final double spread, final double notional, final GeneratorAttributeIR attribute) {
-    ArgumentChecker.notNull(date, "Reference date");
+  public SwapDefinition generateInstrument(final ZonedDateTime tradeDate, final double spread, final double notional, final GeneratorAttributeIROTC attribute) {
+    ArgumentChecker.notNull(tradeDate, "Reference date");
     ArgumentChecker.notNull(attribute, "Attributes");
-    final ZonedDateTime spot = ScheduleCalculator.getAdjustedDate(date, _spotLag, _calendar1);
-    final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spot, attribute.getStartPeriod(), _iborIndex1, _calendar1);
-    final ZonedDateTime maturityDate = startDate.plus(attribute.getEndPeriod());
-    final AnnuityDefinition<CouponIborCompoundingFlatSpreadDefinition> leg1 = AnnuityDefinitionBuilder.couponIborCompoundingFlatSpread(startDate, maturityDate,
-        _compoundingPeriod1, notional, spread, _iborIndex1, StubType.SHORT_START, true, _businessDayConvention, _endOfMonth, _calendar1, StubType.SHORT_START);
-    final AnnuityDefinition<CouponIborDefinition> leg2 = AnnuityDefinitionBuilder.couponIbor(startDate, maturityDate, _iborIndex2.getTenor(), notional, _iborIndex2, false,
-        _iborIndex2.getDayCount(), _businessDayConvention, _endOfMonth, _calendar2, StubType.SHORT_START, 0);
-    return new SwapDefinition(leg1, leg2);
-  }
-
-  @Override
-  public String toString() {
-    return getName();
+    final AnnuityDefinition<? extends CouponDefinition> iborLeg1 = _iborCmpLegGenerator.generateInstrument(tradeDate, spread, notional, attribute, true);
+    final AnnuityDefinition<? extends CouponDefinition> iborLeg2 = _iborLegGenerator.generateInstrument(tradeDate, notional, attribute, false);
+    return new SwapDefinition(iborLeg1, iborLeg2);
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + _businessDayConvention.hashCode();
-    result = prime * result + (_endOfMonth ? 1231 : 1237);
-    result = prime * result + _iborIndex1.hashCode();
-    result = prime * result + _iborIndex2.hashCode();
-    result = prime * result + _spotLag;
-    result = prime * result + _calendar1.hashCode();
-    result = prime * result + _calendar2.hashCode();
+    result = prime * result + _iborCmpLegGenerator.hashCode();
+    result = prime * result + _iborLegGenerator.hashCode();
     return result;
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public boolean equals(Object obj) {
     if (this == obj) {
       return true;
     }
@@ -226,26 +90,11 @@ public class GeneratorSwapIborCompoundingIbor extends GeneratorInstrument<Genera
     if (getClass() != obj.getClass()) {
       return false;
     }
-    final GeneratorSwapIborCompoundingIbor other = (GeneratorSwapIborCompoundingIbor) obj;
-    if (!ObjectUtils.equals(_businessDayConvention, other._businessDayConvention)) {
+    GeneratorSwapIborCompoundingIbor other = (GeneratorSwapIborCompoundingIbor) obj;
+    if (!ObjectUtils.equals(_iborCmpLegGenerator, other._iborCmpLegGenerator)) {
       return false;
     }
-    if (_endOfMonth != other._endOfMonth) {
-      return false;
-    }
-    if (!ObjectUtils.equals(_iborIndex2, other._iborIndex2)) {
-      return false;
-    }
-    if (!ObjectUtils.equals(_iborIndex1, other._iborIndex1)) {
-      return false;
-    }
-    if (_spotLag != other._spotLag) {
-      return false;
-    }
-    if (!ObjectUtils.equals(_calendar1, other._calendar1)) {
-      return false;
-    }
-    if (!ObjectUtils.equals(_calendar2, other._calendar2)) {
+    if (!ObjectUtils.equals(_iborLegGenerator, other._iborLegGenerator)) {
       return false;
     }
     return true;

@@ -23,7 +23,7 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponONDefin
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponONSpreadDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinitionBuilder;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedON;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
@@ -73,6 +73,7 @@ import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
+import com.opengamma.util.time.Tenor;
 
 /**
  *
@@ -238,15 +239,15 @@ public class SwapSecurityConverter extends FinancialSecurityVisitorAdapter<Instr
     final OvernightIndexConvention indexConvention = _conventionSource.getSingle(overnightIndex.getConventionId(), OvernightIndexConvention.class);
     final IndexON index = ConverterUtils.indexON(overnightIndex.getName(), indexConvention);
     final Calendar calendar = CalendarUtils.getCalendar(_regionSource, _holidaySource, indexConvention.getRegionCalendar());
-    final String currencyString = currency.getCode();
-    final Integer publicationLag = indexConvention.getPublicationLag();
     final Period paymentFrequency = getTenor(floatLeg.getFrequency());
     final int paymentLag = 0; // TODO: this should be pass through the security [PLAT-5956]
-    final GeneratorSwapFixedON generator = new GeneratorSwapFixedON(currencyString + "_OIS_Convention", index, paymentFrequency, fixedLeg.getDayCount(), fixedLeg.getBusinessDayConvention(),
-        fixedLeg.isEom(), paymentLag, 1 - publicationLag, calendar);
     final double notionalFixed = ((InterestRateNotional) fixedLeg.getNotional()).getAmount();
     final double notionalOIS = ((InterestRateNotional) floatLeg.getNotional()).getAmount();
-    return SwapFixedONDefinition.from(effectiveDate, maturityDate, notionalFixed, notionalOIS, generator, fixedLeg.getRate(), payFixed);
+    final AnnuityCouponFixedDefinition legFixed = AnnuityDefinitionBuilder.couponFixed(currency, effectiveDate, maturityDate, paymentFrequency, calendar, 
+        fixedLeg.getDayCount(), fixedLeg.getBusinessDayConvention(), fixedLeg.isEom(), notionalFixed, fixedLeg.getRate(), payFixed, StubType.SHORT_START, paymentLag);
+    final AnnuityCouponONDefinition legON = AnnuityDefinitionBuilder.couponONSimpleCompounded(effectiveDate, maturityDate, paymentFrequency, calendar, 
+        notionalOIS, index, calendar, !payFixed, floatLeg.getBusinessDayConvention(), floatLeg.isEom(), StubType.SHORT_START, paymentLag);
+    return new SwapFixedONDefinition(legFixed, legON);
   }
 
   private static Period getTenor(final Frequency freq) {
@@ -410,12 +411,10 @@ public class SwapSecurityConverter extends FinancialSecurityVisitorAdapter<Instr
       //TODO: [PLAT-5879] Refactor this method.
       private AnnuityDefinition<? extends PaymentDefinition> getCMSAnnuity(final FloatingInterestRateLeg swapLeg, final InterestRateNotional interestRateNotional,
           final Currency currency, final Calendar calendar) {
-        // TODO: Create Swap index
         if (swapLeg instanceof FloatingSpreadIRLeg) {
           throw new OpenGammaRuntimeException("Cannot create an annuity for a CMS leg with a spread");
         }
         final String tenorString = getTenorString(swapLeg.getFrequency());
-        final String iborLegConventionName = getConventionName(currency, tenorString, IRS_IBOR_LEG);
         final VanillaIborLegConvention iborLegConvention = _conventionSource.getSingle(ExternalId.of(SCHEME_NAME, getConventionName(currency, tenorString, IRS_IBOR_LEG)),
             VanillaIborLegConvention.class);
         final IborIndexConvention iborIndexConvention = _conventionSource.getSingle(iborLegConvention.getIborIndexConvention(), IborIndexConvention.class);
@@ -426,16 +425,12 @@ public class SwapSecurityConverter extends FinancialSecurityVisitorAdapter<Instr
         final VanillaIborLegConvention receiveLegConvention = _conventionSource.getSingle(underlyingSwapConvention.getReceiveLegConvention(), VanillaIborLegConvention.class);
         final Frequency freqIbor = swapLeg.getFrequency();
         final Period tenorIbor = getTenor(freqIbor);
-        final int spotLag = iborIndexConvention.getSettlementDays();
         final DayCount dayCount = swapLeg.getDayCount();
-        final BusinessDayConvention businessDayConvention = swapLeg.getBusinessDayConvention();
         final double notional = interestRateNotional.getAmount();
-        final IborIndex iborIndex = new IborIndex(currency, tenorIbor, spotLag, iborIndexConvention.getDayCount(), iborIndexConvention.getBusinessDayConvention(),
-            iborIndexConvention.isIsEOM(), iborIndexConvention.getName());
-        final Period fixedLegPaymentPeriod = payLegConvention.getPaymentTenor().getPeriod();
-        final DayCount fixedLegDayCount = payLegConvention.getDayCount();
-        final Period period = Period.ofYears(10); // TODO why is a variable field like this in IndexSwap? It's only used in one place in the entire analytics library.
-        final IndexSwap swapIndex = new IndexSwap(fixedLegPaymentPeriod, fixedLegDayCount, iborIndex, period, calendar);
+        final IborIndex iborIndex = ConverterUtils.indexIbor(iborIndexConvention.getName(), iborIndexConvention, Tenor.of(tenorIbor));
+        final GeneratorSwapFixedIbor generatorSwap = ConverterUtils.generatorSwapFixedIbor(swapIndexConventionName, payLegConvention, receiveLegConvention, iborIndex, calendar);
+        final Period period = Period.ofYears(10); // TODO [PLAT-5879] Take the tenor from the index.
+        final IndexSwap swapIndex = new IndexSwap(generatorSwap, period);
         return AnnuityCouponCMSDefinition.from(effectiveDate, maturityDate, notional, swapIndex, tenorIbor, dayCount, isPayer, calendar);
       }
 
