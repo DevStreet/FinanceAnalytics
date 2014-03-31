@@ -60,7 +60,7 @@ public final class GeneratorSwapFixedIborMaster {
     final boolean IS_EOM = true;
     // London
     final Calendar LON = new MondayToFridayCalendar("LON");
-    // TODO: AUD
+    // AUD
     final int SPOT_LAG_AUD = 0;
     final Calendar SYD = new CalendarTarget("SYD");
     final Currency AUD = Currency.AUD;
@@ -82,9 +82,9 @@ public final class GeneratorSwapFixedIborMaster {
     final int SPOT_LAG_EUR = 2;
     final Calendar TARGET = new CalendarTarget("TARGET");
     final Currency EUR = Currency.EUR;
-    final IborIndex EUREURIBOR1M = MASTER_IBOR.getIndex("EURIBOR1M");
-    final IborIndex EUREURIBOR3M = MASTER_IBOR.getIndex("EURIBOR3M");
-    final IborIndex EUREURIBOR6M = MASTER_IBOR.getIndex("EURIBOR6M");
+    final IborIndex EUREURIBOR1M = MASTER_IBOR.getIndex("EUREURIBOR1M");
+    final IborIndex EUREURIBOR3M = MASTER_IBOR.getIndex("EUREURIBOR3M");
+    final IborIndex EUREURIBOR6M = MASTER_IBOR.getIndex("EUREURIBOR6M");
     final  String NAME_EUR1YFixed = "EUR1YFixed";
     final GeneratorLegFixed EUR1YFixed = new GeneratorLegFixed(NAME_EUR1YFixed, Tenor.ONE_YEAR, DC30U_360, MOD_FOL, EUR, IS_EOM, 
         SPOT_LAG_EUR, TARGET, STUB, false, PAY_LAG);

@@ -6,15 +6,16 @@
 package com.opengamma.analytics.financial.instrument.index;
 
 import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
-import org.threeten.bp.Period;
 
-import com.opengamma.financial.convention.businessday.BusinessDayConventions;
+import com.opengamma.analytics.financial.interestrate.CompoundingType;
+import com.opengamma.financial.convention.StubType;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
+import com.opengamma.util.money.Currency;
 import com.opengamma.util.test.TestGroup;
+import com.opengamma.util.time.Tenor;
 
 /**
  * Test.
@@ -26,39 +27,31 @@ public class GeneratorSwapIborCompoundedIborTest {
   private static final IndexIborMaster IBOR_MASTER = IndexIborMaster.getInstance();
   private static final IborIndex USDLIBOR3M = IBOR_MASTER.getIndex("USDLIBOR3M");
   private static final IborIndex USDLIBOR6M = IBOR_MASTER.getIndex("USDLIBOR6M");
-  private static final Period CMP_PERIOD = Period.ofMonths(6);
-  private static final String NAME = "USD6MLIBOR3MLIBOR6M";
-  private static final GeneratorSwapIborCompoundingIbor USD6MLIBOR3MLIBOR6M = new GeneratorSwapIborCompoundingIbor(NAME, USDLIBOR3M,
-      CMP_PERIOD, USDLIBOR6M, NYC, NYC);
+  private static final boolean IS_EOM = true;
+  private static final Currency USD = Currency.USD;
+  private static final StubType STUB = StubType.SHORT_START;
+  private static final StubType STUB_CMP = StubType.SHORT_START;
+  private static final int SPOT_LAG = 2;
+  private static final int PAY_LAG = 0;
+  private static final  String NAME_LEG_USDLIBOR3M = "USDLIBOR3MLeg";
+  private static final GeneratorLegIborCompounding USDLIBOR3MCmp6M_LEG = new GeneratorLegIborCompounding(NAME_LEG_USDLIBOR3M, USDLIBOR3M, NYC, NYC, 
+      Tenor.of(USDLIBOR6M.getTenor()), CompoundingType.FLAT_COMPOUNDING, Tenor.of(USDLIBOR3M.getTenor()), STUB_CMP, USDLIBOR3M.getDayCount(), 
+      USDLIBOR3M.getBusinessDayConvention(), USD, IS_EOM, SPOT_LAG, NYC, STUB, false, PAY_LAG);
+  private static final  String NAME_LEG_USDLIBOR6M = "USDLIBOR6MLeg";
+  private static final GeneratorLegIbor USDLIBOR6M_LEG = new GeneratorLegIbor(NAME_LEG_USDLIBOR6M, USDLIBOR6M, NYC, NYC, Tenor.of(USDLIBOR6M.getTenor()), 
+      USDLIBOR6M.getDayCount(), USDLIBOR6M.getBusinessDayConvention(), USD, IS_EOM, SPOT_LAG, NYC, STUB, false, PAY_LAG);
+  
+  private static final  String NAME_LEG_SWAP_GEN = "USDLIBOR3MCmp6MLIBOR6M";
+  private static final GeneratorSwapIborCompoundingIbor USDLIBOR3MCmp6MLIBOR6M = new GeneratorSwapIborCompoundingIbor(NAME_LEG_SWAP_GEN, USDLIBOR3MCmp6M_LEG, USDLIBOR6M_LEG);
 
   @Test
   /**
    * Tests the getter for the swap generator.
    */
   public void getter() {
-    assertEquals("GeneratorSwapIborIbor: getter", USDLIBOR3M, USD6MLIBOR3MLIBOR6M.getIborIndex1());
-    assertEquals("GeneratorSwapIborIbor: getter", USDLIBOR6M, USD6MLIBOR3MLIBOR6M.getIborIndex2());
-    assertTrue("GeneratorSwapIborIbor: getter", USD6MLIBOR3MLIBOR6M.getName().equals(NAME));
-    assertEquals("GeneratorSwapIborIbor: getter", USDLIBOR6M.getBusinessDayConvention(), USD6MLIBOR3MLIBOR6M.getBusinessDayConvention());
-    assertEquals("GeneratorSwapIborIbor: getter", USDLIBOR6M.getSpotLag(), USD6MLIBOR3MLIBOR6M.getSpotLag());
-    assertTrue("GeneratorSwapIborIbor: getter", USDLIBOR6M.isEndOfMonth() == USD6MLIBOR3MLIBOR6M.isEndOfMonth());
-    assertEquals("GeneratorSwapIborIbor: getter", CMP_PERIOD, USD6MLIBOR3MLIBOR6M.getCompoundingPeriod1());
-  }
-
-  @Test
-  /**
-   * Tests the constructor with business day convention and end-of-month.
-   */
-  public void constructor() {
-    final GeneratorSwapIborCompoundingIbor generator2 = new GeneratorSwapIborCompoundingIbor("Generator 2", USDLIBOR3M, CMP_PERIOD, USDLIBOR6M,
-        BusinessDayConventions.FOLLOWING, false, 1, NYC, NYC);
-    assertEquals("GeneratorSwapIborIbor: getter", USDLIBOR3M, generator2.getIborIndex1());
-    assertEquals("GeneratorSwapIborIbor: getter", USDLIBOR6M, generator2.getIborIndex2());
-    assertTrue("GeneratorSwapIborIbor: getter", generator2.getName().equals("Generator 2"));
-    assertEquals("GeneratorSwapIborIbor: getter", BusinessDayConventions.FOLLOWING, generator2.getBusinessDayConvention());
-    assertTrue("GeneratorSwapIborIbor: getter", generator2.isEndOfMonth() == false);
-    assertEquals("GeneratorSwapIborIbor: getter", generator2.getSpotLag(), 1);
-    assertEquals("GeneratorSwapIborIbor: getter", CMP_PERIOD, generator2.getCompoundingPeriod1());
+    assertEquals("GeneratorSwapIborCompoundedIbor: getter", NAME_LEG_SWAP_GEN, USDLIBOR3MCmp6MLIBOR6M.getName());
+    assertEquals("GeneratorSwapIborCompoundedIbor: getter", USDLIBOR3MCmp6M_LEG, USDLIBOR3MCmp6MLIBOR6M.getIborCompoundingLegGenerator());
+    assertEquals("GeneratorSwapIborCompoundedIbor: getter", USDLIBOR6M_LEG, USDLIBOR3MCmp6MLIBOR6M.getIborLegGenerator());
   }
 
 }

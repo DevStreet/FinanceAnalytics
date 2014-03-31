@@ -176,8 +176,8 @@ public class AnnuityCouponONDefinition extends AnnuityCouponDefinition<CouponOND
    * @param isPayer True if the annuity is paid
    * @return An overnight annuity
    */
-  private static AnnuityCouponONDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final NotionalProvider notional, final GeneratorSwapONCompoundingIbor generator,
-                                                final boolean isPayer) {
+  private static AnnuityCouponONDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final NotionalProvider notional, 
+      final GeneratorSwapONCompoundingIbor generator, final boolean isPayer) {
     final double sign = isPayer ? -1.0 : 1.0;
     final CouponONDefinition[] coupons = new CouponONDefinition[endFixingPeriodDates.length];
     coupons[0] = CouponONDefinition.from(generator.getIndexON(), settlementDate, endFixingPeriodDates[0], sign * notional.getAmount(settlementDate.toLocalDate()), generator.getPaymentLag(), generator.getOvernightCalendar());

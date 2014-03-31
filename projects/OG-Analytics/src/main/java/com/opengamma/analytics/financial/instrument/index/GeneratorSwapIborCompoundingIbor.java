@@ -53,7 +53,7 @@ public class GeneratorSwapIborCompoundingIbor extends GeneratorInstrument<Genera
   * Returns the swap generator for the Ibor leg.
   * @return The generator.
   */
-  public GeneratorLegIbor getSecondIborLegGenerator() {
+  public GeneratorLegIbor getIborLegGenerator() {
     return _iborLegGenerator;
   }
   

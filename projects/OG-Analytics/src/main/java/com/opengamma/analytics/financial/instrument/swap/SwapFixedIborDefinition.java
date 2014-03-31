@@ -130,7 +130,7 @@ public class SwapFixedIborDefinition extends SwapDefinition {
     final AnnuityCouponFixedDefinition fixedLeg = AnnuityDefinitionBuilder.couponFixed(genFix.getCurrency(), settlementDate, maturityDate, genFix.getPaymentTenor().getPeriod(), 
         genFix.getCalendar(), genFix.getDayCount(), genFix.getBusinessDayConvention(), genFix.isEndOfMonth(), notionalFixed, fixedRate, isPayer, genFix.getStubType(), genFix.getPaymentLag());
     final AnnuityCouponIborDefinition iborLeg = AnnuityDefinitionBuilder.couponIbor(settlementDate, maturityDate, genIbor.getPaymentTenor().getPeriod(), notionalIbor, 
-        genIbor.getIborIndex(), isPayer, genIbor.getDayCount(), genIbor.getBusinessDayConvention(), genIbor.isEndOfMonth(), genIbor.getPaymentCalendar(), genIbor.getFixingCalendar(), 
+        genIbor.getIborIndex(), !isPayer, genIbor.getDayCount(), genIbor.getBusinessDayConvention(), genIbor.isEndOfMonth(), genIbor.getPaymentCalendar(), genIbor.getFixingCalendar(), 
         genIbor.getDepositCalendar(), genIbor.getStubType(), genIbor.getPaymentLag());
     return new SwapFixedIborDefinition(fixedLeg, iborLeg);
   }

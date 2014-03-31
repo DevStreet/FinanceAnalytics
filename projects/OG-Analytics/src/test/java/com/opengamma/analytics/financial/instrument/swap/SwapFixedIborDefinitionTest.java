@@ -11,9 +11,13 @@ import org.testng.annotations.Test;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
+import com.opengamma.analytics.financial.datasets.CalendarTarget;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponIborDefinition;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
+import com.opengamma.analytics.financial.instrument.index.IndexIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IndexSwap;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
@@ -36,7 +40,7 @@ import com.opengamma.util.time.DateUtils;
 public class SwapFixedIborDefinitionTest {
 
   // Swap 2Y
-  private static final Calendar CALENDAR = new MondayToFridayCalendar("A");
+  private static final Calendar CALENDAR = new CalendarTarget("TARGET");
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.MODIFIED_FOLLOWING;
   private static final boolean IS_EOM = true;
   private static final Period ANNUITY_TENOR = Period.ofYears(2);
@@ -44,19 +48,18 @@ public class SwapFixedIborDefinitionTest {
   private static final double NOTIONAL = 1000000;
   private static final ZonedDateTime MATURITY_DATE = ScheduleCalculator.getAdjustedDate(SETTLEMENT_DATE, ANNUITY_TENOR, BUSINESS_DAY, CALENDAR, IS_EOM);
   //Fixed leg: Semi-annual bond
-  private static final PeriodFrequency FIXED_PAYMENT_FREQUENCY = PeriodFrequency.SEMI_ANNUAL;
+  private static final PeriodFrequency FIXED_PAYMENT_FREQUENCY = PeriodFrequency.ANNUAL;
   private static final DayCount FIXED_DAY_COUNT = DayCounts.THIRTY_U_360;
   private static final double RATE = 0.0325;
   private static final boolean FIXED_IS_PAYER = true;
   private static final ZonedDateTime[] FIXED_PAYMENT_DATES_UNADJUSTED = ScheduleCalculator.getUnadjustedDateSchedule(SETTLEMENT_DATE, MATURITY_DATE, FIXED_PAYMENT_FREQUENCY);
   private static final ZonedDateTime[] FIXED_PAYMENT_DATES = ScheduleCalculator.getAdjustedDateSchedule(FIXED_PAYMENT_DATES_UNADJUSTED, BUSINESS_DAY, CALENDAR);
   //Ibor leg: quarterly money
-  private static final Period INDEX_TENOR = Period.ofMonths(3);
   private static final PeriodFrequency INDEX_FREQUENCY = PeriodFrequency.QUARTERLY;
   private static final int SETTLEMENT_DAYS = 2;
   private static final DayCount DAY_COUNT = DayCounts.ACT_360;
   private static final Currency CUR = Currency.EUR;
-  private static final IborIndex IBOR_INDEX = new IborIndex(CUR, INDEX_TENOR, SETTLEMENT_DAYS, DAY_COUNT, BUSINESS_DAY, IS_EOM, "Ibor");
+  private static final IborIndex IBOR_INDEX = IndexIborMaster.getInstance().getIndex("EUREURIBOR3M");
   private static final ZonedDateTime[] IBOR_PAYMENT_DATES_UNADJUSTED = ScheduleCalculator.getUnadjustedDateSchedule(SETTLEMENT_DATE, MATURITY_DATE, INDEX_FREQUENCY);
   private static final ZonedDateTime[] IBOR_PAYMENT_DATES = ScheduleCalculator.getAdjustedDateSchedule(IBOR_PAYMENT_DATES_UNADJUSTED, BUSINESS_DAY, CALENDAR);
 
@@ -95,7 +98,8 @@ public class SwapFixedIborDefinitionTest {
     assertEquals(swap.getSecondLeg(), iborAnnuity);
 
     // CMS index builder
-    final IndexSwap cmsIndex = new IndexSwap(FIXED_PAYMENT_FREQUENCY.getPeriod(), FIXED_DAY_COUNT, IBOR_INDEX, ANNUITY_TENOR, CALENDAR);
+    final GeneratorSwapFixedIbor genSwap = GeneratorSwapFixedIborMaster.getInstance().getGenerator("EUR1YEURIBOR3M");
+    final IndexSwap cmsIndex = new IndexSwap("SwapIndex", genSwap, ANNUITY_TENOR);
     final SwapFixedIborDefinition swapFromCMSIndex = SwapFixedIborDefinition.from(SETTLEMENT_DATE, cmsIndex, NOTIONAL, RATE, FIXED_IS_PAYER, CALENDAR);
     assertEquals(swap, swapFromCMSIndex);
   }

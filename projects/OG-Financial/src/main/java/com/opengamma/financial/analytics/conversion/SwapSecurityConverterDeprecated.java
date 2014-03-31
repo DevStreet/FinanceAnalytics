@@ -22,7 +22,10 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponONDefin
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponONSimplifiedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinitionBuilder;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegFixed;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedCompoundedONCompounded;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -63,6 +66,7 @@ import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
+import com.opengamma.util.time.Tenor;
 
 /**
  * Converts swaps from {@link SwapSecurity} to the {@link InstrumentDefinition}s.
@@ -448,8 +452,13 @@ public class SwapSecurityConverterDeprecated extends FinancialSecurityVisitorAda
     }
     final IborIndex iborIndex = new IborIndex(currency, tenorPayment, iborIndexConvention.getSettlementDays(), iborIndexConvention.getDayCount(),
         iborIndexConvention.getBusinessDayConvention(), iborIndexConvention.isEOMConvention(), iborIndexConvention.getName());
-    final Period fixedLegPaymentPeriod = getTenor(swapIndexConvention.getSwapFixedLegFrequency());
-    final IndexSwap swapIndex = new IndexSwap(fixedLegPaymentPeriod, swapIndexConvention.getSwapFixedLegDayCount(), iborIndex, swapIndexConvention.getPeriod(), calendar);
+    final Tenor swapFixedLegPaymentTenor = Tenor.of(getTenor(swapIndexConvention.getSwapFixedLegFrequency()));
+    final GeneratorLegFixed generatorFixed = new GeneratorLegFixed("Fixed", swapFixedLegPaymentTenor, swapIndexConvention.getSwapFixedLegDayCount(), 
+        swapIndexConvention.getSwapFixedLegBusinessDayConvention(), currency, true, swapIndexConvention.getSwapFixedLegSettlementDays(), calendar, StubType.SHORT_START, false, 0);
+    final GeneratorLegIbor generatorIbor = new GeneratorLegIbor("Ibor", iborIndex, calendar, calendar, Tenor.of(iborIndex.getTenor()), swapIndexConvention.getSwapFloatingLegDayCount(), 
+        swapIndexConvention.getSwapFloatingLegBusinessDayConvention(), currency, true, swapIndexConvention.getSwapFloatingLegSettlementDays(), calendar, StubType.SHORT_START, false, 0);
+    final GeneratorSwapFixedIbor generatorSwap = new GeneratorSwapFixedIbor("SwapGenerator", generatorFixed, generatorIbor);
+    final IndexSwap swapIndex = new IndexSwap(floatLeg.getFloatingReferenceRateId().toString(), generatorSwap, swapIndexConvention.getPeriod());
     return AnnuityCouponCMSDefinition.from(effectiveDate, maturityDate, notional, swapIndex, tenorPayment, floatLeg.getDayCount(), isPayer, calendar);
   }
 

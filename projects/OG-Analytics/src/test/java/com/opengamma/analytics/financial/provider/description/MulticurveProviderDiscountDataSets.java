@@ -138,8 +138,8 @@ public class MulticurveProviderDiscountDataSets {
   private static final IborIndex EURIBOR3M = MASTER_IBOR_INDEX.getIndex("EURIBOR3M");
   private static final IborIndex EURIBOR6M = MASTER_IBOR_INDEX.getIndex("EURIBOR6M");
   private static final IborIndex CADCDOR3M = MASTER_IBOR_INDEX.getIndex("CADCDOR3M");
-  private static final IborIndex AUDBB3M = MASTER_IBOR_INDEX.getIndex("AUDBB3M");
-  private static final IborIndex AUDBB6M = MASTER_IBOR_INDEX.getIndex("AUDBB6M");
+  private static final IborIndex AUDBBSW3M = MASTER_IBOR_INDEX.getIndex("AUDBBSW3M");
+  private static final IborIndex AUDBBSW6M = MASTER_IBOR_INDEX.getIndex("AUDBBSW6M");
   private static final IndexON EONIA = IndexONMaster.getInstance().getIndex("EONIA");
   private static final IndexON FEDFUND = IndexONMaster.getInstance().getIndex("FED FUND");
   private static final IndexON BRAZIL_CDI = IndexONMaster.getInstance().getIndex("CDI");
@@ -183,8 +183,8 @@ public class MulticurveProviderDiscountDataSets {
   private static final InflationIssuerProviderDiscount MARKET_1 = new InflationIssuerProviderDiscount();
   static {
     MARKET_1.setCurve(Currency.AUD, AUD_DSC);
-    MARKET_1.setCurve(AUDBB3M, AUD_FWD3);
-    MARKET_1.setCurve(AUDBB6M, AUD_FWD6);
+    MARKET_1.setCurve(AUDBBSW3M, AUD_FWD3);
+    MARKET_1.setCurve(AUDBBSW6M, AUD_FWD6);
     MARKET_1.setCurve(Currency.USD, USD_DSC);
     MARKET_1.setCurve(Currency.EUR, EUR_DSC);
     MARKET_1.setCurve(Currency.GBP, CURVE_GBP_35);
@@ -380,8 +380,8 @@ public class MulticurveProviderDiscountDataSets {
     market.setCurve(USDLIBOR3M, USD_FWD3);
     market.setCurve(EURIBOR3M, EUR_FWD3);
     market.setCurve(EURIBOR6M, EUR_FWD6);
-    market.setCurve(AUDBB3M, AUD_FWD3);
-    market.setCurve(AUDBB6M, AUD_FWD6);
+    market.setCurve(AUDBBSW3M, AUD_FWD3);
+    market.setCurve(AUDBBSW6M, AUD_FWD6);
     market.setCurve(PRICE_INDEX_EUR, PRICE_INDEX_CURVE_EUR);
     market.setCurve(PRICE_INDEX_GBP, PRICE_INDEX_CURVE_GBP);
     market.setCurve(ISSUER_UK_GOVT, CURVE_GBP_30);

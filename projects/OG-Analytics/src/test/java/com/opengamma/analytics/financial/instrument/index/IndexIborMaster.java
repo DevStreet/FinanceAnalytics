@@ -56,21 +56,21 @@ public final class IndexIborMaster {
         new IborIndex(Currency.CAD, Period.ofMonths(3), 0, DayCounts.ACT_365, BusinessDayConventions.MODIFIED_FOLLOWING,
             true, "CADCDOR3M"));
     _ibor.put(
-        "EURIBOR1M",
+        "EUREURIBOR1M",
         new IborIndex(Currency.EUR, Period.ofMonths(1), 2, DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING,
-            true, "EURIBOR1M"));
+            true, "EUREURIBOR1M"));
     _ibor.put(
-        "EURIBOR3M",
+        "EUREURIBOR3M",
         new IborIndex(Currency.EUR, Period.ofMonths(3), 2, DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING,
-            true, "EURIBOR3M"));
+            true, "EUREURIBOR3M"));
     _ibor.put(
-        "EURIBOR6M",
+        "EUREURIBOR6M",
         new IborIndex(Currency.EUR, Period.ofMonths(6), 2, DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING,
-            true, "EURIBOR6M"));
+            true, "EUREURIBOR6M"));
     _ibor.put(
-        "EURIBOR12M",
+        "EUREURIBOR12M",
         new IborIndex(Currency.EUR, Period.ofMonths(12), 2, DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING,
-            true, "EURIBOR12M"));
+            true, "EUREURIBOR12M"));
     _ibor.put(
         "USDLIBOR1M",
         new IborIndex(Currency.USD, Period.ofMonths(1), 2, DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING,
