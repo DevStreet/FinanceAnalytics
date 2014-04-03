@@ -17,6 +17,8 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
 
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegONCompounding;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
@@ -36,18 +38,11 @@ import com.opengamma.util.time.DateUtils;
  */
 @Test(groups = TestGroup.UNIT)
 public class AnnuityCouponONSimplifiedDefinitionTest {
-  private static final Currency CCY = Currency.EUR;
-  private static final Period PAYMENT_PERIOD = Period.ofMonths(6);
-  private static final Calendar CALENDAR = new MondayToFridayCalendar("Weekend");
-  private static final DayCount DAY_COUNT = DayCounts.ACT_360;
-  private static final boolean IS_EOM = true;
   private static final ZonedDateTime SETTLEMENT_DATE = DateUtils.getUTCDate(2012, 2, 1);
   private static final ZonedDateTime MATURITY_DATE = DateUtils.getUTCDate(2022, 2, 1);
   private static final Period MATURITY_TENOR = Period.ofYears(10);
   private static final double NOTIONAL = 100000000;
-  private static final IndexON INDEX = new IndexON("O/N", CCY, DAY_COUNT, 1);
-  private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.FOLLOWING;
-  private static final GeneratorSwapFixedONCompounding GENERATOR = new GeneratorSwapFixedONCompounding("OIS", INDEX, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 1, CALENDAR);
+  private static final GeneratorLegONCompounding GENERATOR = GeneratorLegONCompoundingMaster.getInstance().getGenerator("EUR1YEONIACmpLeg");
   private static final boolean IS_PAYER = true;
   private static final AnnuityCouponONSimplifiedDefinition DEFINITION = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, GENERATOR, IS_PAYER);
   private static final DoubleTimeSeries<ZonedDateTime> FIXING_TS;
@@ -70,7 +65,7 @@ public class AnnuityCouponONSimplifiedDefinitionTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullCoupons() {
-    new AnnuityCouponONSimplifiedDefinition(null, GENERATOR.getIndex(), null);
+    new AnnuityCouponONSimplifiedDefinition(null, GENERATOR.getONIndex(), null);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -155,9 +150,6 @@ public class AnnuityCouponONSimplifiedDefinitionTest {
     definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE.plusDays(1), NOTIONAL, GENERATOR, IS_PAYER);
     assertFalse(DEFINITION.equals(definition));
     definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL / 2, GENERATOR, IS_PAYER);
-    assertFalse(DEFINITION.equals(definition));
-    definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, new GeneratorSwapFixedONCompounding("OIS", INDEX, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 0, CALENDAR),
-        IS_PAYER);
     assertFalse(DEFINITION.equals(definition));
     definition = AnnuityCouponONSimplifiedDefinition.from(SETTLEMENT_DATE, MATURITY_DATE, NOTIONAL, GENERATOR, !IS_PAYER);
     assertFalse(DEFINITION.equals(definition));

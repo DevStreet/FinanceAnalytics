@@ -19,7 +19,7 @@ import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDe
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.swap.SwapFixedIborDefinition;
@@ -58,9 +58,9 @@ import com.opengamma.util.time.DateUtils;
 public class ParameterSensitivityProviderCalculatorTest {
 
   private static final Calendar NYC = new MondayToFridayCalendar("NYC");
-  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M", NYC);
-  private static final IborIndex USDLIBOR3M = USD6MLIBOR3M.getIborIndex();
-  private static final Currency USD = USD6MLIBOR3M.getCurrency();
+  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M");
+  private static final IborIndex USDLIBOR3M = USD6MLIBOR3M.getIborLegGenerator().getIborIndex();
+  private static final Currency USD = USD6MLIBOR3M.getFixedLegGenerator().getCurrency();
   private static final ZonedDateTime EFFECTIVE_DATE = DateUtils.getUTCDate(2012, 10, 29);
   private static final double NOTIONAL = 100000000;
 
@@ -70,8 +70,8 @@ public class ParameterSensitivityProviderCalculatorTest {
   private static final SwapFixedCoupon<Coupon> SWAP = SWAP_DEFINITION.toDerivative(REFERENCE_DATE);
   private static final AnnuityCouponFixed ANNUITY = ANNUITY_DEFINITION.toDerivative(REFERENCE_DATE);
 
-  private static final GeneratorSwapFixedONCompounding USD1YFEDFUND = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
-  private static final IndexON FEDFUND = USD1YFEDFUND.getIndex();
+  private static final GeneratorSwapFixedONCompounding USD1YFEDFUND = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final IndexON FEDFUND = USD1YFEDFUND.getONLegGenerator().getONIndex();
   private static final SwapFixedONDefinition OIS_DEFINITION = SwapFixedONDefinition.from(EFFECTIVE_DATE, Period.ofMonths(6), NOTIONAL, USD1YFEDFUND, 0.02, false);
   private static final SwapFixedCoupon<Coupon> OIS = OIS_DEFINITION.toDerivative(REFERENCE_DATE);
 

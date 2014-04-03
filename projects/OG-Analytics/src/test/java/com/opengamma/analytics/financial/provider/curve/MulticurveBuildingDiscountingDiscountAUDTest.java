@@ -35,7 +35,7 @@ import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
@@ -88,7 +88,7 @@ public class MulticurveBuildingDiscountingDiscountAUDTest {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_AUD = GeneratorSwapFixedONMaster.getInstance().getGenerator("AUD1YRBAON", SYD);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_AUD = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("AUD1YRBAON", SYD);
   private static final IndexON INDEX_ON_AUD = GENERATOR_OIS_AUD.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_AUD = new GeneratorDepositON("AUD Deposit ON", AUD, SYD, INDEX_ON_AUD.getDayCount());
   private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();

@@ -71,7 +71,7 @@ public final class GeneratorSwapIborIborMaster {
     _generatorSwap.put("AUDBBSW3MBBSW6M", new GeneratorSwapIborIbor("AUDBBSW3MBBSW6M", AUDBBSW3MLeg, AUDBBSW6MLeg));
   }
 
-  public GeneratorSwapIborIbor getGenerator(final String name, final Calendar cal) {
+  public GeneratorSwapIborIbor getGenerator(final String name) {
     final GeneratorSwapIborIbor generator = _generatorSwap.get(name);
     if (generator == null) {
       throw new OpenGammaRuntimeException("Could not get Ibor index for " + name);

@@ -12,7 +12,7 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -53,7 +53,7 @@ public class CouponONArithmeticAverageDiscountingMethodTest {
   private static final Currency USD = FEDFUND.getCurrency();
   private static final Calendar NYC = MulticurveProviderDiscountDataSets.getUSDCalendar();
 
-  private static final GeneratorSwapFixedONCompounding GENERATOR_SWAP_EONIA = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_SWAP_EONIA = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
   private static final IborIndex USDLIBOR3M = IndexIborMaster.getInstance().getIndex("USDLIBOR3M");
 
   private static final ZonedDateTime REFERENCE_DATE = DateUtils.getUTCDate(2011, 5, 23);

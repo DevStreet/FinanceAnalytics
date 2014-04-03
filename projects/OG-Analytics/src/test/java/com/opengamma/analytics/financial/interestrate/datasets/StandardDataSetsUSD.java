@@ -28,7 +28,7 @@ import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborCompoundingIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexIborMaster;
@@ -56,6 +56,7 @@ import com.opengamma.timeseries.precise.zdt.ImmutableZonedDateTimeDoubleTimeSeri
 import com.opengamma.timeseries.precise.zdt.ZonedDateTimeDoubleTimeSeries;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.DateUtils;
+import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -86,14 +87,14 @@ public class StandardDataSetsUSD {
   private static final double NOTIONAL = 1.0;
 
   private static final IndexIborMaster IBOR_MASTER = IndexIborMaster.getInstance();
-  private static final GeneratorSwapFixedONMaster GENERATOR_OIS_MASTER = GeneratorSwapFixedONMaster.getInstance();
+  private static final GeneratorSwapFixedONCompoundingMaster GENERATOR_OIS_MASTER = GeneratorSwapFixedONCompoundingMaster.getInstance();
   private static final GeneratorSwapFixedIborMaster GENERATOR_IRS_MASTER = GeneratorSwapFixedIborMaster.getInstance();
 
   private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = GENERATOR_OIS_MASTER.getGenerator("USD1YFEDFUND", NYC);
-  private static final IndexON USDFEDFUND = GENERATOR_OIS_USD.getIndex();
+  private static final IndexON USDFEDFUND = GENERATOR_OIS_USD.getONLegGenerator().getONIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_USD = new GeneratorDepositON("USD Deposit ON", USD, NYC, USDFEDFUND.getDayCount());
-  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_IRS_MASTER.getGenerator("USD6MLIBOR3M", NYC);
-  private static final IborIndex USDLIBOR3M = USD6MLIBOR3M.getIborIndex();
+  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_IRS_MASTER.getGenerator("USD6MLIBOR3M");
+  private static final IborIndex USDLIBOR3M = USD6MLIBOR3M.getIborLegGenerator().getIborIndex();
   private static final IborIndex USDLIBOR1M = IBOR_MASTER.getIndex("USDLIBOR1M");
   private static final IborIndex USDLIBOR6M = IBOR_MASTER.getIndex("USDLIBOR6M");
   private static final GeneratorDepositIbor GENERATOR_USDLIBOR1M = new GeneratorDepositIbor("GENERATOR_USDLIBOR1M", USDLIBOR1M, NYC);
@@ -148,10 +149,10 @@ public class StandardDataSetsUSD {
   private static final GeneratorAttributeIROTC[] DSC_1_USD_ATTR = new GeneratorAttributeIROTC[DSC_1_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_1_USD_TENOR[loopins], Period.ofDays(0));
+      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_1_USD_TENOR[loopins]), Tenor.of(Period.ofDays(0)));
     }
     for (int loopins = 2; loopins < DSC_1_USD_TENOR.length; loopins++) {
-      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_1_USD_TENOR[loopins]);
+      DSC_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_1_USD_TENOR[loopins]));
     }
   }
 
@@ -173,7 +174,7 @@ public class StandardDataSetsUSD {
   private static final GeneratorAttributeIROTC[] FWD3_1_USD_ATTR = new GeneratorAttributeIROTC[FWD3_1_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_1_USD_TENOR.length; loopins++) {
-      FWD3_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_1_USD_TENOR[loopins]);
+      FWD3_1_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(FWD3_1_USD_TENOR[loopins]));
     }
   }
 
@@ -196,10 +197,10 @@ public class StandardDataSetsUSD {
   private static final GeneratorAttributeIROTC[] DSC_2_USD_ATTR = new GeneratorAttributeIROTC[DSC_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < 2; loopins++) {
-      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_2_USD_TENOR[loopins], Period.ofDays(0));
+      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_2_USD_TENOR[loopins]), Tenor.of(Period.ofDays(0)));
     }
     for (int loopins = 2; loopins < DSC_2_USD_TENOR.length; loopins++) {
-      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(DSC_2_USD_TENOR[loopins]);
+      DSC_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(DSC_2_USD_TENOR[loopins]));
     }
   }
 
@@ -221,7 +222,7 @@ public class StandardDataSetsUSD {
   private static final GeneratorAttributeIROTC[] FWD3_2_USD_ATTR = new GeneratorAttributeIROTC[FWD3_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD3_2_USD_TENOR.length; loopins++) {
-      FWD3_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD3_2_USD_TENOR[loopins]);
+      FWD3_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(FWD3_2_USD_TENOR[loopins]));
     }
   }
 
@@ -243,7 +244,7 @@ public class StandardDataSetsUSD {
   private static final GeneratorAttributeIROTC[] FWD1_2_USD_ATTR = new GeneratorAttributeIROTC[FWD1_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD1_2_USD_TENOR.length; loopins++) {
-      FWD1_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD1_2_USD_TENOR[loopins]);
+      FWD1_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(FWD1_2_USD_TENOR[loopins]));
     }
   }
 
@@ -265,7 +266,7 @@ public class StandardDataSetsUSD {
   private static final GeneratorAttributeIROTC[] FWD6_2_USD_ATTR = new GeneratorAttributeIROTC[FWD6_2_USD_TENOR.length];
   static {
     for (int loopins = 0; loopins < FWD6_2_USD_TENOR.length; loopins++) {
-      FWD6_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(FWD6_2_USD_TENOR[loopins]);
+      FWD6_2_USD_ATTR[loopins] = new GeneratorAttributeIROTC(Tenor.of(FWD6_2_USD_TENOR[loopins]));
     }
   }
 

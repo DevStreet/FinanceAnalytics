@@ -58,7 +58,7 @@ public class PV01CurveParametersCalculatorTest {
   /** Generates fixed / ibor swaps */
   private static final GeneratorSwapFixedIborMaster GENERATOR_SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
   /** Generates standard USD swaps */
-  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M", NYC);
+  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GENERATOR_SWAP_MASTER.getGenerator("USD6MLIBOR3M");
   /** The swap tenor */
   private static final Period SWAP_TENOR = Period.ofYears(10);
   /** The settlement date */

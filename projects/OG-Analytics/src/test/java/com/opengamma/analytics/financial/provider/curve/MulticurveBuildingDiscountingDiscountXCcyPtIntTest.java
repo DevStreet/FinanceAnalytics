@@ -38,7 +38,7 @@ import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapXCcyIborIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
@@ -110,12 +110,12 @@ public class MulticurveBuildingDiscountingDiscountXCcyPtIntTest {
 
   private static final double NOTIONAL = 1.0;
 
-  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_EUR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
-  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD_1 = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_EUR = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("EUR1YEONIA", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD_1 = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("USD1YFEDFUND", TARGET);
   private static final IndexON INDEX_ON_USD = GENERATOR_OIS_USD_1.getIndex();
   private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_USD = new GeneratorSwapFixedONCompounding("USD1YFEDFUND", INDEX_ON_USD, Period.ofMonths(12),
       GENERATOR_OIS_USD_1.getFixedLegDayCount(), GENERATOR_OIS_USD_1.getBusinessDayConvention(), true, 2, 2, NYC); // To avoid mat discrepancy: 0 pay lag
-  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_JPY = GeneratorSwapFixedONMaster.getInstance().getGenerator("JPY1YTONAR", TARGET);
+  private static final GeneratorSwapFixedONCompounding GENERATOR_OIS_JPY = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("JPY1YTONAR", TARGET);
   private static final IndexON INDEX_ON_EUR = GENERATOR_OIS_EUR.getIndex();
   private static final IndexON INDEX_ON_JPY = GENERATOR_OIS_JPY.getIndex();
   private static final GeneratorDepositON GENERATOR_DEPOSIT_ON_EUR = new GeneratorDepositON("EUR Deposit ON", EUR, TARGET, INDEX_ON_EUR.getDayCount());

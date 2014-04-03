@@ -21,7 +21,9 @@ import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.cash.DepositIborDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIborMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIbor;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapIborIborMaster;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.payment.CouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
@@ -71,7 +73,7 @@ public class InstrumentTestHelper {
   public static final double FRA_RATE = 0.004;
   public static final ZonedDateTime SWAP_START = zdt(2001, 1, 1, 11, 0, 0, 0, ZoneOffset.UTC);
   public static final ZonedDateTime SWAP_MATURITY = zdt(2031, 1, 1, 11, 0, 0, 0, ZoneOffset.UTC);
-  public static final GeneratorSwapFixedIbor SWAP_GENERATOR = new GeneratorSwapFixedIbor("a", Period.ofMonths(6), SEMI_ANNUAL_DAY_COUNT, USD_IBOR_INDEX1, NO_HOLIDAY);
+  public static final GeneratorSwapFixedIbor SWAP_GENERATOR = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M");
   public static final double SWAP_NOTIONAL = 789000;
   public static final double SWAP_FIXED_RATE = 0.04;
   public static final double IBOR_SPREAD = 0.01;
@@ -80,7 +82,7 @@ public class InstrumentTestHelper {
   public static final ZonedDateTime FX_MATURITY = DateUtils.getUTCDate(2013, 1, 1);
   public static final double FX_PAY_AMOUNT = -12345;
   public static final double FX_RECEIVE_AMOUNT = 23456;
-  public static final GeneratorSwapIborIbor IBOR_IBOR_GENERATOR = new GeneratorSwapIborIbor("s", USD_IBOR_INDEX1, USD_IBOR_INDEX2, NO_HOLIDAY, NO_HOLIDAY);
+  public static final GeneratorSwapIborIbor IBOR_IBOR_GENERATOR = GeneratorSwapIborIborMaster.getInstance().getGenerator("AUDBBSW3MBBSW6M");
   public static final ZonedDateTime DEPOSIT_START = zdt(2012, 1, 1, 11, 0, 0, 0, ZoneOffset.UTC);
   public static final double DEPOSIT_NOTIONAL = -12300;
   public static final double DEPOSIT_RATE = 0.002;

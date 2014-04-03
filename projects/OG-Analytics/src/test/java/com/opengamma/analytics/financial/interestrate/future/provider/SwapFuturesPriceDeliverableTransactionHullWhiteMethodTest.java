@@ -47,9 +47,9 @@ public class SwapFuturesPriceDeliverableTransactionHullWhiteMethodTest {
   private static final IborIndex USDLIBOR3M = INDEX_LIST[2];
   private static final Currency USD = USDLIBOR3M.getCurrency();
   private static final Calendar NYC = MulticurveProviderDiscountDataSets.getUSDCalendar();
-  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M", NYC);
+  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M");
   private static final ZonedDateTime EFFECTIVE_DATE = DateUtils.getUTCDate(2013, 6, 19);
-  private static final ZonedDateTime LAST_TRADING_DATE = ScheduleCalculator.getAdjustedDate(EFFECTIVE_DATE, -USD6MLIBOR3M.getSpotLag(), NYC);
+  private static final ZonedDateTime LAST_TRADING_DATE = ScheduleCalculator.getAdjustedDate(EFFECTIVE_DATE, -USD6MLIBOR3M.getFixedLegGenerator().getSpotLag(), NYC);
   private static final Period TENOR = Period.ofYears(10);
   private static final double NOTIONAL = 100000;
   private static final double RATE = 0.0175;

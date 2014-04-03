@@ -13,7 +13,7 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.calendar.MondayToFridayCalendar;
@@ -30,12 +30,12 @@ public class SwapFixedOISDefinitionTest {
 
   // EONIA tests
   private static final Calendar EUR_CALENDAR = new MondayToFridayCalendar("TARGET");
-  private static final GeneratorSwapFixedONCompounding EONIA_GENERATOR = GeneratorSwapFixedONMaster.getInstance().getGenerator("EUR1YEONIA", EUR_CALENDAR);
+  private static final GeneratorSwapFixedONCompounding EONIA_GENERATOR = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("EUR1YEONIA", EUR_CALENDAR);
 
   private static final double NOTIONAL = 100000000;
   private static final double FIXED_RATE = 0.01;
   private static final boolean IS_PAYER = true;
-  private static final ZonedDateTime SPOT_DATE = ScheduleCalculator.getAdjustedDate(TRADE_DATE, EONIA_GENERATOR.getSpotLag(), EUR_CALENDAR);
+  private static final ZonedDateTime SPOT_DATE = ScheduleCalculator.getAdjustedDate(TRADE_DATE, EONIA_GENERATOR.getFixedLegGenerator().getSpotLag(), EUR_CALENDAR);
   // Swap EONIA 3M
   private static final Period EUR_SWAP_3M_TENOR = Period.ofMonths(3);
   private static final SwapFixedONDefinition EONIA_SWAP_3M_DEFINITION = SwapFixedONDefinition.from(SPOT_DATE, EUR_SWAP_3M_TENOR, NOTIONAL, EONIA_GENERATOR, FIXED_RATE, IS_PAYER);
@@ -54,8 +54,8 @@ public class SwapFixedOISDefinitionTest {
     assertEquals("Swap OIS definition: constructor", EONIA_SWAP_3M_DEFINITION.getFixedLeg().getNthPayment(0).getAccrualEndDate(), EONIA_SWAP_3M_DEFINITION.getOISLeg().getNthPayment(0)
         .getAccrualEndDate());
     ZonedDateTime paymentDate = ScheduleCalculator.getAdjustedDate(EONIA_SWAP_3M_DEFINITION.getFixedLeg().getNthPayment(0).getAccrualEndDate(), -1, EUR_CALENDAR); // Overnight
-    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, EONIA_GENERATOR.getIndex().getPublicationLag(), EUR_CALENDAR);
-    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, EONIA_GENERATOR.getPaymentLag(), EUR_CALENDAR);
+    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, EONIA_GENERATOR.getONLegGenerator().getONIndex().getPublicationLag(), EUR_CALENDAR);
+    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, EONIA_GENERATOR.getONLegGenerator().getPaymentLag(), EUR_CALENDAR);
     assertEquals("Swap OIS definition: constructor", paymentDate, EONIA_SWAP_3M_DEFINITION.getFirstLeg().getNthPayment(0).getPaymentDate());
   }
 
@@ -73,7 +73,7 @@ public class SwapFixedOISDefinitionTest {
       assertEquals(
           "Swap OIS definition: constructor",
           EONIA_GENERATOR
-              .getIndex()
+              .getONLegGenerator().getONIndex()
               .getDayCount()
               .getDayCountFraction(EONIA_SWAP_3Y_DEFINITION.getFixedLeg().getNthPayment(loopcpn).getAccrualStartDate(),
                   EONIA_SWAP_3Y_DEFINITION.getFixedLeg().getNthPayment(loopcpn).getAccrualEndDate()), EONIA_SWAP_3Y_DEFINITION.getFixedLeg().getNthPayment(loopcpn).getPaymentYearFraction(), 1.0E-10);
@@ -88,12 +88,12 @@ public class SwapFixedOISDefinitionTest {
 
   // EONIA tests
   private static final Calendar AUD_CALENDAR = new MondayToFridayCalendar("SYDNEY");
-  private static final GeneratorSwapFixedONCompounding RBAON_GENERATOR = GeneratorSwapFixedONMaster.getInstance().getGenerator("AUD1YRBAON", AUD_CALENDAR);
+  private static final GeneratorSwapFixedONCompounding RBAON_GENERATOR = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("AUD1YRBAON", AUD_CALENDAR);
 
   private static final double AUD_NOTIONAL = 100000000;
   private static final double AUD_FIXED_RATE = 0.01;
   private static final boolean AUD_IS_PAYER = true;
-  private static final ZonedDateTime AUD_SPOT_DATE = ScheduleCalculator.getAdjustedDate(TRADE_DATE, RBAON_GENERATOR.getSpotLag(), AUD_CALENDAR);
+  private static final ZonedDateTime AUD_SPOT_DATE = ScheduleCalculator.getAdjustedDate(TRADE_DATE, RBAON_GENERATOR.getONLegGenerator().getSpotLag(), AUD_CALENDAR);
   // Swap EONIA 3M
   private static final Period AUD_SWAP_3M_TENOR = Period.ofMonths(3);
   private static final SwapFixedONDefinition RBAON_SWAP_3M_DEFINITION = SwapFixedONDefinition.from(AUD_SPOT_DATE, AUD_SWAP_3M_TENOR, AUD_NOTIONAL, RBAON_GENERATOR, AUD_FIXED_RATE, AUD_IS_PAYER);
@@ -112,8 +112,8 @@ public class SwapFixedOISDefinitionTest {
     assertEquals("Swap OIS definition: constructor", RBAON_SWAP_3M_DEFINITION.getFixedLeg().getNthPayment(0).getAccrualEndDate(), RBAON_SWAP_3M_DEFINITION.getOISLeg().getNthPayment(0)
         .getAccrualEndDate());
     ZonedDateTime paymentDate = ScheduleCalculator.getAdjustedDate(RBAON_SWAP_3M_DEFINITION.getFixedLeg().getNthPayment(0).getAccrualEndDate(), -1, AUD_CALENDAR); // Overnight
-    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, RBAON_GENERATOR.getIndex().getPublicationLag(), AUD_CALENDAR);
-    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, RBAON_GENERATOR.getPaymentLag(), AUD_CALENDAR);
+    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, RBAON_GENERATOR.getONLegGenerator().getONIndex().getPublicationLag(), AUD_CALENDAR);
+    paymentDate = ScheduleCalculator.getAdjustedDate(paymentDate, RBAON_GENERATOR.getONLegGenerator().getPaymentLag(), AUD_CALENDAR);
     assertEquals("Swap OIS definition: constructor", paymentDate, RBAON_SWAP_3M_DEFINITION.getFirstLeg().getNthPayment(0).getPaymentDate());
   }
 
@@ -131,7 +131,7 @@ public class SwapFixedOISDefinitionTest {
       assertEquals(
           "Swap OIS definition: constructor",
           RBAON_GENERATOR
-              .getIndex()
+          .getONLegGenerator().getONIndex()
               .getDayCount()
               .getDayCountFraction(RBAON_SWAP_3Y_DEFINITION.getFixedLeg().getNthPayment(loopcpn).getAccrualStartDate(),
                   RBAON_SWAP_3Y_DEFINITION.getFixedLeg().getNthPayment(loopcpn).getAccrualEndDate()), RBAON_SWAP_3Y_DEFINITION.getFixedLeg().getNthPayment(loopcpn).getPaymentYearFraction(), 1.0E-10);

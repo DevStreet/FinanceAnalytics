@@ -135,8 +135,8 @@ public class MulticurveProviderDiscountDataSets {
   private static final IndexIborMaster MASTER_IBOR_INDEX = IndexIborMaster.getInstance();
   private static final IborIndex USDLIBOR3M = MASTER_IBOR_INDEX.getIndex("USDLIBOR3M");
   private static final IborIndex USDLIBOR6M = MASTER_IBOR_INDEX.getIndex("USDLIBOR6M");
-  private static final IborIndex EURIBOR3M = MASTER_IBOR_INDEX.getIndex("EURIBOR3M");
-  private static final IborIndex EURIBOR6M = MASTER_IBOR_INDEX.getIndex("EURIBOR6M");
+  private static final IborIndex EURIBOR3M = MASTER_IBOR_INDEX.getIndex("EUREURIBOR3M");
+  private static final IborIndex EURIBOR6M = MASTER_IBOR_INDEX.getIndex("EUREURIBOR6M");
   private static final IborIndex CADCDOR3M = MASTER_IBOR_INDEX.getIndex("CADCDOR3M");
   private static final IborIndex AUDBBSW3M = MASTER_IBOR_INDEX.getIndex("AUDBBSW3M");
   private static final IborIndex AUDBBSW6M = MASTER_IBOR_INDEX.getIndex("AUDBBSW6M");

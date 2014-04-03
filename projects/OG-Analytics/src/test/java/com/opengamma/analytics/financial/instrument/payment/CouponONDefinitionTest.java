@@ -15,7 +15,7 @@ import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONMaster;
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.interestrate.TestsDataSetsSABR;
 import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
@@ -590,18 +590,19 @@ public class CouponONDefinitionTest {
   }
 
   private static final Calendar NYC = new MondayToFridayCalendar("NYC");
-  private static final GeneratorSwapFixedONCompounding USD_GENERATOR = GeneratorSwapFixedONMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
-  private static final IndexON USD_FEDFUND = USD_GENERATOR.getIndex();
+  private static final GeneratorSwapFixedONCompounding USD_GENERATOR = GeneratorSwapFixedONCompoundingMaster.getInstance().getGenerator("USD1YFEDFUND", NYC);
+  private static final IndexON USD_FEDFUND = USD_GENERATOR.getONLegGenerator().getONIndex();
 
-  private static final ZonedDateTime USD_END_ACCRUAL_DATE = ScheduleCalculator.getAdjustedDate(START_ACCRUAL_DATE, CPN_TENOR, USD_GENERATOR.getBusinessDayConvention(), NYC,
-      USD_GENERATOR.isEndOfMonth());
+  private static final ZonedDateTime USD_END_ACCRUAL_DATE = ScheduleCalculator.getAdjustedDate(START_ACCRUAL_DATE, CPN_TENOR, 
+      USD_GENERATOR.getFixedLegGenerator().getBusinessDayConvention(), NYC,
+      USD_GENERATOR.getFixedLegGenerator().isEndOfMonth());
   private static ZonedDateTime USD_LAST_FIXING_DATE = ScheduleCalculator.getAdjustedDate(USD_END_ACCRUAL_DATE, -1, NYC); // Overnight
   static {
-    USD_LAST_FIXING_DATE = ScheduleCalculator.getAdjustedDate(USD_LAST_FIXING_DATE, USD_GENERATOR.getIndex().getPublicationLag(), NYC); // Lag
+    USD_LAST_FIXING_DATE = ScheduleCalculator.getAdjustedDate(USD_LAST_FIXING_DATE, USD_GENERATOR.getONLegGenerator().getONIndex().getPublicationLag(), NYC); // Lag
   }
-  private static final ZonedDateTime USD_PAYMENT_DATE = ScheduleCalculator.getAdjustedDate(USD_LAST_FIXING_DATE, USD_GENERATOR.getSpotLag(), NYC);
-  private static final double USD_PAYMENT_YEAR_FRACTION = USD_GENERATOR.getFixedLegDayCount().getDayCountFraction(START_ACCRUAL_DATE, USD_END_ACCRUAL_DATE);
-  private static final double USD_FIXING_YEAR_FRACTION = USD_GENERATOR.getFixedLegDayCount().getDayCountFraction(START_ACCRUAL_DATE, USD_END_ACCRUAL_DATE);
+  private static final ZonedDateTime USD_PAYMENT_DATE = ScheduleCalculator.getAdjustedDate(USD_LAST_FIXING_DATE, USD_GENERATOR.getFixedLegGenerator().getSpotLag(), NYC);
+  private static final double USD_PAYMENT_YEAR_FRACTION = USD_GENERATOR.getFixedLegGenerator().getDayCount().getDayCountFraction(START_ACCRUAL_DATE, USD_END_ACCRUAL_DATE);
+  private static final double USD_FIXING_YEAR_FRACTION = USD_GENERATOR.getFixedLegGenerator().getDayCount().getDayCountFraction(START_ACCRUAL_DATE, USD_END_ACCRUAL_DATE);
 
   private static final CouponONDefinition OIS_COUPON_DEFINITION = new CouponONDefinition(USD_FEDFUND.getCurrency(), USD_PAYMENT_DATE, START_ACCRUAL_DATE, USD_END_ACCRUAL_DATE,
       USD_PAYMENT_YEAR_FRACTION, NOTIONAL, USD_FEDFUND, START_ACCRUAL_DATE, USD_END_ACCRUAL_DATE, EUR_CALENDAR);

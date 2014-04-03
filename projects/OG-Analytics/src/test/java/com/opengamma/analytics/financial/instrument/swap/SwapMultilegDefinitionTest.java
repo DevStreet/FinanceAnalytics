@@ -43,7 +43,7 @@ public class SwapMultilegDefinitionTest {
   private static final IborIndex EURIBOR3M = INDEX_MASTER.getIndex("EURIBOR3M");
   private static final IborIndex EURIBOR6M = INDEX_MASTER.getIndex("EURIBOR6M");
   private static final GeneratorSwapFixedIborMaster SWAP_MASTER = GeneratorSwapFixedIborMaster.getInstance();
-  private static final GeneratorSwapFixedIbor EUR1YEURIBOR6M = SWAP_MASTER.getGenerator("EUR1YEURIBOR6M", TARGET);
+  private static final GeneratorSwapFixedIbor EUR1YEURIBOR6M = SWAP_MASTER.getGenerator("EUR1YEURIBOR6M");
   private static final Period ANNUITY_TENOR = Period.ofYears(2);
   private static final Currency EUR = EURIBOR3M.getCurrency();
 
@@ -60,8 +60,9 @@ public class SwapMultilegDefinitionTest {
   @SuppressWarnings("rawtypes")
   private static final AnnuityDefinition[] LEGS_DEFINITION = new AnnuityDefinition[NB_LEGS];
   static {
-    LEGS_DEFINITION[0] = AnnuityDefinitionBuilder.couponFixed(EUR, SETTLEMENT_DATE, MATURITY_DATE, EUR1YEURIBOR6M.getFixedLegPeriod(), TARGET,
-        EUR1YEURIBOR6M.getFixedLegDayCount(), EUR1YEURIBOR6M.getBusinessDayConvention(), EUR1YEURIBOR6M.isEndOfMonth(), NOTIONAL, SPREAD, IS_PAYER_SPREAD, STUB, 0);
+    LEGS_DEFINITION[0] = AnnuityDefinitionBuilder.couponFixed(EUR, SETTLEMENT_DATE, MATURITY_DATE, EUR1YEURIBOR6M.getFixedLegGenerator().getPaymentTenor().getPeriod(), TARGET,
+        EUR1YEURIBOR6M.getFixedLegGenerator().getDayCount(), EUR1YEURIBOR6M.getFixedLegGenerator().getBusinessDayConvention(), EUR1YEURIBOR6M.getFixedLegGenerator().isEndOfMonth(), 
+        NOTIONAL, SPREAD, IS_PAYER_SPREAD, STUB, 0);
     LEGS_DEFINITION[1] = AnnuityDefinitionBuilder.couponIbor(SETTLEMENT_DATE, MATURITY_DATE, EURIBOR3M.getTenor(), NOTIONAL, EURIBOR3M,
         IS_PAYER_SPREAD, EURIBOR3M.getDayCount(), EURIBOR3M.getBusinessDayConvention(), EURIBOR3M.isEndOfMonth(), TARGET, STUB, 0);
     LEGS_DEFINITION[2] = AnnuityDefinitionBuilder.couponIbor(SETTLEMENT_DATE, MATURITY_DATE, EURIBOR6M.getTenor(), NOTIONAL, EURIBOR6M,

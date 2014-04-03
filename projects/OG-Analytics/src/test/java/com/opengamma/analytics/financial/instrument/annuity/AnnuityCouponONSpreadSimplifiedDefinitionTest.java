@@ -16,6 +16,8 @@ import org.threeten.bp.Period;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
 
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegONCompounding;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegONCompoundingMaster;
 import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.index.IndexONMaster;
@@ -39,7 +41,6 @@ public class AnnuityCouponONSpreadSimplifiedDefinitionTest {
   private static final IndexON EONIA = IndexONMaster.getInstance().getIndex("EONIA");
   private static final Period PAYMENT_PERIOD = Period.ofMonths(6);
   private static final Calendar CALENDAR = new MondayToFridayCalendar("Weekend");
-  private static final DayCount DAY_COUNT = DayCounts.ACT_360;
   private static final boolean IS_EOM = true;
   private static final ZonedDateTime SETTLEMENT_DATE = DateUtils.getUTCDate(2012, 2, 1);
   private static final ZonedDateTime END_FIXING_DATE = DateUtils.getUTCDate(2022, 2, 1);
@@ -47,7 +48,7 @@ public class AnnuityCouponONSpreadSimplifiedDefinitionTest {
   private static final double NOTIONAL = 100000000;
   private static final double SPREAD = 0.0012;
   private static final BusinessDayConvention BUSINESS_DAY = BusinessDayConventions.FOLLOWING;
-  private static final GeneratorSwapFixedONCompounding GENERATOR = new GeneratorSwapFixedONCompounding("OIS", EONIA, PAYMENT_PERIOD, DAY_COUNT, BUSINESS_DAY, IS_EOM, 2, CALENDAR);
+  private static final GeneratorLegONCompounding GENERATOR = GeneratorLegONCompoundingMaster.getInstance().getGenerator("EUR1YEONIACmpLeg");
   private static final boolean IS_PAYER = true;
   private static final AnnuityCouponONSpreadSimplifiedDefinition DEFINITION = AnnuityCouponONSpreadSimplifiedDefinition.from(SETTLEMENT_DATE, END_FIXING_DATE, NOTIONAL, SPREAD, GENERATOR, IS_PAYER);
   private static final DoubleTimeSeries<ZonedDateTime> FIXING_TS;
@@ -70,7 +71,7 @@ public class AnnuityCouponONSpreadSimplifiedDefinitionTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullCoupons() {
-    new AnnuityCouponONSimplifiedDefinition(null, GENERATOR.getIndex(), null);
+    new AnnuityCouponONSimplifiedDefinition(null, GENERATOR.getONIndex(), null);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)

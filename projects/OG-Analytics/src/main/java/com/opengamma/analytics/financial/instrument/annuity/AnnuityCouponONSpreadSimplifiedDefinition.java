@@ -8,7 +8,7 @@ package com.opengamma.analytics.financial.instrument.annuity;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONSpreadSimplifiedDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
@@ -46,15 +46,13 @@ public class AnnuityCouponONSpreadSimplifiedDefinition extends AnnuityDefinition
    * @return The annuity.
    */
   public static AnnuityCouponONSpreadSimplifiedDefinition from(final ZonedDateTime settlementDate, final Period tenorAnnuity, final double notional, final double spread,
-      final GeneratorSwapFixedONCompounding generator,
-      final boolean isPayer) {
+      final GeneratorLegONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(tenorAnnuity, "tenor annuity");
     ArgumentChecker.notNull(generator, "generator");
-    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, tenorAnnuity, generator.getLegsPeriod(), generator.getBusinessDayConvention(),
-        generator.getOvernightCalendar(), generator.isEndOfMonth());
-    return AnnuityCouponONSpreadSimplifiedDefinition.from(settlementDate, endFixingPeriodDate, notional, spread, isPayer, generator.getIndex(), generator.getPaymentLag(),
-        generator.getOvernightCalendar());
+    final ZonedDateTime maturityDate = ScheduleCalculator.getAdjustedDate(settlementDate, tenorAnnuity, generator.getBusinessDayConvention(), 
+        generator.getPaymentCalendar(), generator.isEndOfMonth());
+    return from(settlementDate, maturityDate, notional, spread, generator, isPayer);
   }
 
   /**
@@ -68,14 +66,14 @@ public class AnnuityCouponONSpreadSimplifiedDefinition extends AnnuityDefinition
    * @return The annuity.
    */
   public static AnnuityCouponONSpreadSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final double notional, final double spread,
-      final GeneratorSwapFixedONCompounding generator, final boolean isPayer) {
+      final GeneratorLegONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(maturityDate, "maturity date");
     ArgumentChecker.notNull(generator, "generator");
-    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, maturityDate, generator.getLegsPeriod(), generator.getBusinessDayConvention(),
-        generator.getOvernightCalendar(), generator.isEndOfMonth());
-    return AnnuityCouponONSpreadSimplifiedDefinition.from(settlementDate, endFixingPeriodDate, notional, spread, isPayer, generator.getIndex(), generator.getPaymentLag(),
-        generator.getOvernightCalendar());
+    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, maturityDate, generator.getPaymentTenor().getPeriod(), 
+        generator.getBusinessDayConvention(), generator.getIndexCalendar(), generator.isEndOfMonth());
+    return AnnuityCouponONSpreadSimplifiedDefinition.from(settlementDate, endFixingPeriodDate, notional, spread, isPayer, generator.getONIndex(), generator.getPaymentLag(),
+        generator.getIndexCalendar());
   }
 
   /**
@@ -171,8 +169,8 @@ public class AnnuityCouponONSpreadSimplifiedDefinition extends AnnuityDefinition
    * @param indexCalendar The index calendar
    * @return An overnight annuity
    */
-  private static AnnuityCouponONSpreadSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDate, final double notional, final double spread,
-      final boolean isPayer, final IndexON indexON, final int paymentLag, final Calendar indexCalendar) {
+  private static AnnuityCouponONSpreadSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDate, final double notional, 
+      final double spread, final boolean isPayer, final IndexON indexON, final int paymentLag, final Calendar indexCalendar) {
     final double sign = isPayer ? -1.0 : 1.0;
     final double notionalSigned = sign * notional;
     final CouponONSpreadSimplifiedDefinition[] coupons = new CouponONSpreadSimplifiedDefinition[endFixingPeriodDate.length];

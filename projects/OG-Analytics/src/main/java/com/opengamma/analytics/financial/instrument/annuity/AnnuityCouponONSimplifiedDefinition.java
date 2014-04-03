@@ -8,7 +8,7 @@ package com.opengamma.analytics.financial.instrument.annuity;
 import org.threeten.bp.Period;
 import org.threeten.bp.ZonedDateTime;
 
-import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedONCompounding;
+import com.opengamma.analytics.financial.instrument.index.GeneratorLegONCompounding;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponONSimplifiedDefinition;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
@@ -47,13 +47,13 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @return The annuity.
    */
   public static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final Period tenorAnnuity, final double notional, 
-      final GeneratorSwapFixedONCompounding generator, final boolean isPayer) {
+      final GeneratorLegONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(tenorAnnuity, "tenor annuity");
     ArgumentChecker.notNull(generator, "generator");
-    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, tenorAnnuity, generator.getLegsPeriod(), generator.getBusinessDayConvention(),
-        generator.getOvernightCalendar(), generator.isEndOfMonth());
-    return AnnuityCouponONSimplifiedDefinition.from(settlementDate, endFixingPeriodDate, notional, generator, isPayer);
+    final ZonedDateTime maturityDate = ScheduleCalculator.getAdjustedDate(settlementDate, tenorAnnuity, generator.getBusinessDayConvention(), 
+        generator.getPaymentCalendar(), generator.isEndOfMonth());
+    return from(settlementDate, maturityDate, notional, generator, isPayer);
   }
 
   /**
@@ -66,12 +66,12 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @return The annuity.
    */
   public static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime maturityDate, final double notional, 
-      final GeneratorSwapFixedONCompounding generator, final boolean isPayer) {
+      final GeneratorLegONCompounding generator, final boolean isPayer) {
     ArgumentChecker.notNull(settlementDate, "settlement date");
     ArgumentChecker.notNull(maturityDate, "maturity date");
     ArgumentChecker.notNull(generator, "generator");
-    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, maturityDate, generator.getLegsPeriod(), generator.getBusinessDayConvention(),
-        generator.getOvernightCalendar(), generator.isEndOfMonth());
+    final ZonedDateTime[] endFixingPeriodDate = ScheduleCalculator.getAdjustedDateSchedule(settlementDate, maturityDate, generator.getPaymentTenor().getPeriod(), 
+        generator.getBusinessDayConvention(), generator.getIndexCalendar(), generator.isEndOfMonth());
     return AnnuityCouponONSimplifiedDefinition.from(settlementDate, endFixingPeriodDate, notional, generator, isPayer);
   }
 
@@ -161,17 +161,18 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @param isPayer True if the annuity is paid
    * @return An overnight annuity
    */
-  private static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final double notional, final GeneratorSwapFixedONCompounding generator,
-      final boolean isPayer) {
+  private static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final double notional, 
+      final GeneratorLegONCompounding generator, final boolean isPayer) {
     final double sign = isPayer ? -1.0 : 1.0;
     final double notionalSigned = sign * notional;
     final CouponONSimplifiedDefinition[] coupons = new CouponONSimplifiedDefinition[endFixingPeriodDates.length];
-    coupons[0] = CouponONSimplifiedDefinition.from(generator.getIndex(), settlementDate, endFixingPeriodDates[0], notionalSigned, generator.getPaymentLag(), generator.getOvernightCalendar());
+    coupons[0] = CouponONSimplifiedDefinition.from(generator.getONIndex(), settlementDate, endFixingPeriodDates[0], notionalSigned, generator.getPaymentLag(), 
+        generator.getIndexCalendar());
     for (int loopcpn = 1; loopcpn < endFixingPeriodDates.length; loopcpn++) {
-      coupons[loopcpn] = CouponONSimplifiedDefinition.from(generator.getIndex(), endFixingPeriodDates[loopcpn - 1], endFixingPeriodDates[loopcpn], notionalSigned, generator.getPaymentLag(),
-          generator.getOvernightCalendar());
+      coupons[loopcpn] = CouponONSimplifiedDefinition.from(generator.getONIndex(), endFixingPeriodDates[loopcpn - 1], endFixingPeriodDates[loopcpn], notionalSigned, generator.getPaymentLag(),
+          generator.getIndexCalendar());
     }
-    return new AnnuityCouponONSimplifiedDefinition(coupons, generator.getIndex(), generator.getOvernightCalendar());
+    return new AnnuityCouponONSimplifiedDefinition(coupons, generator.getONIndex(), generator.getIndexCalendar());
   }
 
   /**
@@ -185,8 +186,8 @@ public class AnnuityCouponONSimplifiedDefinition extends AnnuityDefinition<Coupo
    * @param indexCalendar The index calendar
    * @return An overnight annuity
    */
-  private static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final double notional, final boolean isPayer,
-      final IndexON indexON, final int paymentLag, final Calendar indexCalendar) {
+  private static AnnuityCouponONSimplifiedDefinition from(final ZonedDateTime settlementDate, final ZonedDateTime[] endFixingPeriodDates, final double notional, 
+      final boolean isPayer, final IndexON indexON, final int paymentLag, final Calendar indexCalendar) {
     final double sign = isPayer ? -1.0 : 1.0;
     final double notionalSigned = sign * notional;
     final CouponONSimplifiedDefinition[] coupons = new CouponONSimplifiedDefinition[endFixingPeriodDates.length];

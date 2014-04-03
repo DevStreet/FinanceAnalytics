@@ -29,9 +29,9 @@ import com.opengamma.util.time.DateUtils;
 public class SwapFuturesPriceDeliverableTransactionTest {
 
   private static final Calendar NYC = new MondayToFridayCalendar("NYC");
-  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M", NYC);
+  private static final GeneratorSwapFixedIbor USD6MLIBOR3M = GeneratorSwapFixedIborMaster.getInstance().getGenerator("USD6MLIBOR3M");
   private static final ZonedDateTime EFFECTIVE_DATE = DateUtils.getUTCDate(2013, 6, 19);
-  private static final ZonedDateTime LAST_TRADING_DATE = ScheduleCalculator.getAdjustedDate(EFFECTIVE_DATE, -USD6MLIBOR3M.getSpotLag(), NYC);
+  private static final ZonedDateTime LAST_TRADING_DATE = ScheduleCalculator.getAdjustedDate(EFFECTIVE_DATE, -USD6MLIBOR3M.getFixedLegGenerator().getSpotLag(), NYC);
   private static final Period TENOR = Period.ofYears(10);
   private static final double NOTIONAL = 100000;
   private static final double RATE = 0.0200;
@@ -62,7 +62,7 @@ public class SwapFuturesPriceDeliverableTransactionTest {
     assertEquals("DeliverableSwapFuturesTransaction: getter", SWAP_FUTURES_SECURITY, SWAP_FUTURES_TRANSACTION.getUnderlyingFuture());
     assertEquals("DeliverableSwapFuturesTransaction: getter", REF_PRICE, SWAP_FUTURES_TRANSACTION.getReferencePrice());
     assertEquals("DeliverableSwapFuturesTransaction: getter", QUANTITY, SWAP_FUTURES_TRANSACTION.getQuantity());
-    assertEquals("DeliverableSwapFuturesTransaction: getter", USD6MLIBOR3M.getCurrency(), SWAP_FUTURES_TRANSACTION.getCurrency());
+    assertEquals("DeliverableSwapFuturesTransaction: getter", USD6MLIBOR3M.getFixedLegGenerator().getCurrency(), SWAP_FUTURES_TRANSACTION.getCurrency());
   }
 
   @Test
