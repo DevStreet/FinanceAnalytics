@@ -39,6 +39,8 @@ import com.opengamma.financial.convention.SwapFixedLegConvention;
 import com.opengamma.financial.convention.VanillaIborLegConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventions;
+import com.opengamma.financial.convention.businessday.ModifiedFollowingBusinessDayConvention;
+import com.opengamma.financial.convention.daycount.ActualThreeSixtyFive;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCounts;
 import com.opengamma.financial.convention.expirycalc.ExchangeTradedInstrumentExpiryCalculator;
@@ -165,6 +167,47 @@ public class GBConventions extends ConventionMasterInitializer {
         serialFutureConventionName, ExternalIdBundle.of(ExternalId.of(SCHEME_NAME, serialFutureConventionName)),
         ExternalId.of(ExchangeTradedInstrumentExpiryCalculator.SCHEME, IMMFutureAndFutureOptionMonthlyExpiryCalculator.NAME), GB, liborConventionId);
 
+
+    // Ibor Index
+
+    final IborIndexConvention gbpliborIndexConvention = new IborIndexConvention("GBPLIBOR",
+                                                                                ExternalIdBundle.of(ExternalId.of(
+                                                                                                        "BLOOMBERG_CONVENTION_NAME",
+                                                                                                        "ICE LIBOR GBP"),
+                                                                                                    ExternalId.of(
+                                                                                                        "CONVENTION",
+                                                                                                        "GBPLIBOR")
+                                                                                ),
+                                                                                new ActualThreeSixtyFive(),
+                                                                                new ModifiedFollowingBusinessDayConvention(),
+                                                                                0,
+                                                                                true,
+                                                                                Currency.GBP,
+                                                                                LocalTime.of(11, 0),
+                                                                                "GB",
+                                                                                ExternalId.of("FINANCIAL_REGION", "GB"),
+                                                                                ExternalId.of("FINANCIAL_REGION", "GB"),
+                                                                                ""
+    );
+
+
+    final OvernightIndexConvention gbpSoniaOvernightIndexConvention = new OvernightIndexConvention("GBPSONIA",
+                                                                                                   ExternalIdBundle.of(
+                                                                                                       ExternalId.of(
+                                                                                                           "BLOOMBERG_CONVENTION_NAME",
+                                                                                                           "S"),
+                                                                                                       ExternalId.of(
+                                                                                                           "CONVENTION",
+                                                                                                           "GBPSONIA")
+                                                                                                   ),
+                                                                                                   new ActualThreeSixtyFive(),
+                                                                                                   0,
+                                                                                                   Currency.GBP,
+                                                                                                   ExternalId.of(
+                                                                                                       "FINANCIAL_REGION",
+                                                                                                       "GB")
+    );
+
     addConvention(master, liborIndex);
     addConvention(master, onIndex);
     addConvention(master, depositONConvention);
@@ -182,6 +225,8 @@ public class GBConventions extends ConventionMasterInitializer {
     addConvention(master, irsLibor1MLegConvention2);
     addConvention(master, quarterlySTIRFutureConvention);
     addConvention(master, serialSTIRFutureConvention);
+    addConvention(master, gbpliborIndexConvention);
+    addConvention(master, gbpSoniaOvernightIndexConvention);
   }
 
 }

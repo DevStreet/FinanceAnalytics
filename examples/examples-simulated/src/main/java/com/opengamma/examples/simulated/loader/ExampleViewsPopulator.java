@@ -5,12 +5,15 @@
  */
 package com.opengamma.examples.simulated.loader;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static com.opengamma.engine.value.ValuePropertyNames.CALCULATION_METHOD;
 import static com.opengamma.engine.value.ValuePropertyNames.CURRENCY;
 import static com.opengamma.engine.value.ValuePropertyNames.CURVE;
 import static com.opengamma.engine.value.ValuePropertyNames.CURVE_CALCULATION_CONFIG;
 import static com.opengamma.engine.value.ValuePropertyNames.CURVE_CALCULATION_METHOD;
 import static com.opengamma.engine.value.ValuePropertyNames.CURVE_CURRENCY;
+import static com.opengamma.engine.value.ValuePropertyNames.CURVE_EXPOSURES;
+import static com.opengamma.engine.value.ValuePropertyNames.CURVE_TYPE;
 import static com.opengamma.engine.value.ValuePropertyNames.SURFACE;
 import static com.opengamma.engine.value.ValueRequirementNames.BUCKETED_PV01;
 import static com.opengamma.engine.value.ValueRequirementNames.CLEAN_PRICE;
@@ -59,6 +62,7 @@ import static com.opengamma.examples.simulated.tool.ExampleDatabasePopulator.MUL
 import static com.opengamma.examples.simulated.tool.ExampleDatabasePopulator.MULTI_CURRENCY_SWAP_PORTFOLIO_NAME;
 import static com.opengamma.examples.simulated.tool.ExampleDatabasePopulator.SWAPTION_PORTFOLIO_NAME;
 import static com.opengamma.examples.simulated.tool.ExampleDatabasePopulator.US_GOVERNMENT_BOND_PORTFOLIO_NAME;
+import static com.opengamma.examples.simulated.tool.ExampleDatabasePopulator.SWAP_DESK_USD_PORTFOLIO_NAME;
 import static com.opengamma.examples.simulated.tool.ExampleDatabasePopulator.VANILLA_FX_OPTION_PORTFOLIO_NAME;
 import static com.opengamma.financial.analytics.model.curve.interestrate.MultiYieldCurvePropertiesAndDefaults.PAR_RATE_STRING;
 
@@ -74,6 +78,8 @@ import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.component.tool.AbstractTool;
 import com.opengamma.core.config.impl.ConfigItem;
 import com.opengamma.engine.ComputationTargetSpecification;
+import com.opengamma.engine.function.resolver.IdentityResolutionRuleTransform;
+import com.opengamma.engine.target.ComputationTargetType;
 import com.opengamma.engine.value.ValueProperties;
 import com.opengamma.engine.value.ValuePropertyNames;
 import com.opengamma.engine.value.ValueRequirement;
@@ -92,6 +98,7 @@ import com.opengamma.financial.security.bond.BondSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorCMSSpreadSecurity;
 import com.opengamma.financial.security.capfloor.CapFloorSecurity;
 import com.opengamma.financial.security.equity.EquitySecurity;
+import com.opengamma.financial.security.fra.FRASecurity;
 import com.opengamma.financial.security.future.FutureSecurity;
 import com.opengamma.financial.security.future.IndexFutureSecurity;
 import com.opengamma.financial.security.fx.FXForwardSecurity;
@@ -100,6 +107,7 @@ import com.opengamma.financial.security.option.FXOptionSecurity;
 import com.opengamma.financial.security.option.SwaptionSecurity;
 import com.opengamma.financial.security.swap.SwapSecurity;
 import com.opengamma.financial.tool.ToolContext;
+import com.opengamma.id.ExternalId;
 import com.opengamma.id.UniqueId;
 import com.opengamma.livedata.UserPrincipal;
 import com.opengamma.master.config.ConfigMasterUtils;
@@ -186,6 +194,7 @@ public class ExampleViewsPopulator extends AbstractTool<ToolContext> {
     storeViewDefinition(getEquityOptionViewDefinition(EQUITY_OPTION_PORTFOLIO_NAME, "Equity Option View"));
     storeViewDefinition(getFutureViewDefinition(FUTURE_PORTFOLIO_NAME, "Futures View"));
     storeViewDefinition(getBondViewDefinition(US_GOVERNMENT_BOND_PORTFOLIO_NAME, "Government Bond View"));
+    storeViewDefinition(getSwapDeskView(SWAP_DESK_USD_PORTFOLIO_NAME, "Swap Desk USD 1 / pv - bpv01 / ois-irs"));
   }
 
   private ViewDefinition getEquityViewDefinition(final String portfolioName) {
@@ -678,6 +687,118 @@ public class ExampleViewsPopulator extends AbstractTool<ToolContext> {
     config.addPortfolioRequirement(BondSecurity.SECURITY_TYPE, PRESENT_VALUE, ValueProperties.with(CALCULATION_METHOD, BondFunction.FROM_YIELD_METHOD).get());
     config.addPortfolioRequirement(BondSecurity.SECURITY_TYPE, YTM, ValueProperties.with(CALCULATION_METHOD, BondFunction.FROM_YIELD_METHOD).get());
     viewDefinition.addViewCalculationConfiguration(config);
+    return viewDefinition;
+  }
+
+  private ViewDefinition getSwapDeskView(final String portfolioName, final String viewName) {
+    final UniqueId portfolioId = getPortfolioId(portfolioName).toLatest();
+    final ViewDefinition viewDefinition = new ViewDefinition(viewName, portfolioId, UserPrincipal.getTestUser());
+
+
+    viewDefinition.setDefaultCurrency(Currency.USD);
+    viewDefinition.setMaxDeltaCalculationPeriod(500L);
+    viewDefinition.setMaxFullCalculationPeriod(500L);
+    viewDefinition.setMinDeltaCalculationPeriod(500L);
+    viewDefinition.setMinFullCalculationPeriod(500L);
+
+    ViewCalculationConfiguration config = new ViewCalculationConfiguration(viewDefinition, "1. OIS-IRS");
+
+    config.addPortfolioRequirements(FRASecurity.SECURITY_TYPE, newHashSet(
+        Pairs.of(PRESENT_VALUE,
+                 ValueProperties.with(CURVE_EXPOSURES, "USD_ON-OIS_LIBOR3M-FRAIRS").with(CURVE_TYPE,
+                                                                                         "Discounting").get()
+        ),
+        Pairs.of(BUCKETED_PV01,
+                 ValueProperties.with(CURVE, "USD-LIBOR3M-FRAIRS").with(CURVE_EXPOSURES,
+                                                                        "USD_ON-OIS_LIBOR3M-FRAIRS").with(
+                     CURVE_TYPE,
+                     "Discounting").get()
+        ),
+        Pairs.of(BUCKETED_PV01,
+                 ValueProperties.with(CURVE, "USD-ON-OIS").with(CURVE_EXPOSURES, "USD_ON-OIS_LIBOR3M-FRAIRS").with(
+                     CURVE_TYPE,
+                     "Discounting").get()
+        )
+    ));
+
+    config.addPortfolioRequirements(FutureSecurity.SECURITY_TYPE, newHashSet(
+        Pairs.of(PRESENT_VALUE,
+                 ValueProperties.with(CURVE_EXPOSURES, "USD_ON-OIS_LIBOR3M-FRAIRS").with(CURVE_TYPE,
+                                                                                         "Discounting").get()
+        ),
+        Pairs.of(BUCKETED_PV01,
+                 ValueProperties.with(CURVE, "USD-LIBOR3M-FRAIRS").with(CURVE_EXPOSURES,
+                                                                        "USD_ON-OIS_LIBOR3M-FRAIRS").with(
+                     CURVE_TYPE,
+                     "Discounting").get()
+        ),
+        Pairs.of(BUCKETED_PV01,
+                 ValueProperties.with(CURVE, "USD-ON-OIS").with(CURVE_EXPOSURES, "USD_ON-OIS_LIBOR3M-FRAIRS").with(
+                     CURVE_TYPE,
+                     "Discounting").get()
+        )
+    ));
+
+    config.addPortfolioRequirements(SwapSecurity.SECURITY_TYPE, newHashSet(
+        Pairs.of(PRESENT_VALUE,
+                 ValueProperties.with(CURVE_EXPOSURES, "USD_ON-OIS_LIBOR3M-FRAIRS").with(CURVE_TYPE,
+                                                                                         "Discounting").get()
+        ),
+        Pairs.of(BUCKETED_PV01,
+                 ValueProperties.with(CURVE, "USD-LIBOR3M-FRAIRS").with(CURVE_EXPOSURES,
+                                                                        "USD_ON-OIS_LIBOR3M-FRAIRS").with(
+                     CURVE_TYPE,
+                     "Discounting").get()
+        ),
+        Pairs.of(BUCKETED_PV01,
+                 ValueProperties.with(CURVE, "USD-ON-OIS").with(CURVE_EXPOSURES, "USD_ON-OIS_LIBOR3M-FRAIRS").with(
+                     CURVE_TYPE,
+                     "Discounting").get()
+        )
+    ));
+
+
+    config.addSpecificRequirements(newHashSet(new ValueRequirement(YIELD_CURVE,
+                                                                   ComputationTargetType.CURRENCY,
+                                                                   ExternalId.of("CurrencyISO", "EUR"),
+                                                                   ValueProperties.with(CURVE, "Forward6M")
+                                                                       .with(CURVE_CALCULATION_CONFIG,
+                                                                             "EUR-OIS-3M-6M").get()
+                                              ),
+
+                                              new ValueRequirement(YIELD_CURVE,
+                                                                   ComputationTargetType.CURRENCY,
+                                                                   ExternalId.of("CurrencyISO", "EUR"),
+                                                                   ValueProperties.with(CURVE, "Forward6M")
+                                                                       .with(CURVE_CALCULATION_CONFIG,
+                                                                             "EUR-OIS-3M-6M").with(
+                                                                       CURVE_CALCULATION_METHOD,
+                                                                       "ParRate").get()
+                                              ),
+
+                                              new ValueRequirement(YIELD_CURVE,
+                                                                   ComputationTargetType.CURRENCY,
+                                                                   ExternalId.of("CurrencyISO", "EUR"),
+                                                                   ValueProperties.with(CURVE, "OIS")
+                                                                       .with(CURVE_CALCULATION_CONFIG,
+                                                                             "EUR-OIS-3M-6M").with(
+                                                                       CURVE_CALCULATION_METHOD,
+                                                                       "ParRate").get()
+                                              ),
+
+                                              new ValueRequirement(YIELD_CURVE_JACOBIAN,
+                                                                   ComputationTargetType.CURRENCY,
+                                                                   ExternalId.of("CurrencyISO", "EUR"),
+                                                                   ValueProperties.with(CURVE, "OIS")
+                                                                       .with(CURVE_CALCULATION_CONFIG,
+                                                                             "EUR-OIS-3M-6M").get()
+                                              )
+    ));
+
+    config.setResolutionRuleTransform(IdentityResolutionRuleTransform.INSTANCE);
+
+    viewDefinition.addViewCalculationConfiguration(config);
+
     return viewDefinition;
   }
 

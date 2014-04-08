@@ -64,7 +64,7 @@ public class CurveGroupConfiguration extends DirectBean implements Serializable 
    * @param order The order of this configuration, not negative
    * @param curveTypes The curve types for a name, not null
    */
-  public CurveGroupConfiguration(final int order, final Map<String, List<? extends CurveTypeConfiguration>> curveTypes) {
+  public <T extends Map<String, List<? extends CurveTypeConfiguration>>> CurveGroupConfiguration(final int order, final T curveTypes) {
     ArgumentChecker.notNegative(order, "order");
     setOrder(order);
     setTypesForCurves(curveTypes);

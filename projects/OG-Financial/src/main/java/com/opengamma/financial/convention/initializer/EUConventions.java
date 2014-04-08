@@ -55,6 +55,8 @@ import com.opengamma.financial.convention.VanillaIborLegConvention;
 import com.opengamma.financial.convention.VanillaIborLegRollDateConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConventions;
+import com.opengamma.financial.convention.businessday.ModifiedFollowingBusinessDayConvention;
+import com.opengamma.financial.convention.daycount.ActualThreeSixty;
 import com.opengamma.financial.convention.daycount.DayCount;
 import com.opengamma.financial.convention.daycount.DayCounts;
 import com.opengamma.financial.convention.expirycalc.ExchangeTradedInstrumentExpiryCalculator;
@@ -256,7 +258,46 @@ public class EUConventions extends ConventionMasterInitializer {
     final OISLegConvention oisXCcyUSDLegConvention = new OISLegConvention(
         OIS_USD_EUR_ON_LEG, getIds(OIS_USD_EUR_ON_LEG), onIndexId,
         Tenor.THREE_MONTHS, MODIFIED_FOLLOWING, 2, true, StubType.NONE, false, 2);
-    
+
+
+    // Ibor Index
+
+    final IborIndexConvention euriborIndexConvention = new IborIndexConvention("EUREURIBOR",
+                                                                            ExternalIdBundle.of(ExternalId.of(
+                                                                                "BLOOMBERG_CONVENTION_NAME",
+                                                                                "Euribor"),
+                                                                                                ExternalId.of(
+                                                                                                    "CONVENTION",
+                                                                                                    "EUREURIBOR")),
+                                                                            new ActualThreeSixty(),
+                                                                            new ModifiedFollowingBusinessDayConvention(),
+                                                                            2,
+                                                                            true,
+                                                                            Currency.EUR,
+                                                                            LocalTime.of(11, 0),
+                                                                            "EU",
+                                                                            ExternalId.of("FINANCIAL_REGION", "EU"),
+                                                                            ExternalId.of("FINANCIAL_REGION", "EU"),
+                                                                            ""
+    );
+
+    // Overnight Index
+
+    final OvernightIndexConvention eurOniaConvention = new OvernightIndexConvention("EUREONIA",
+                                                                                    ExternalIdBundle.of(ExternalId.of(
+                                                                                                            "BLOOMBERG_CONVENTION_NAME",
+                                                                                                            "Effective"),
+                                                                                                        ExternalId.of(
+                                                                                                            "CONVENTION",
+                                                                                                            "EUREONIA")
+                                                                                    ),
+                                                                                    new ActualThreeSixty(),
+                                                                                    1,
+                                                                                    Currency.EUR,
+                                                                                    ExternalId.of("FINANCIAL_REGION",
+                                                                                                  "EU")
+    );
+
     // Convention add
     addConvention(master, onIndex);
     addConvention(master, liborIndex);
@@ -289,6 +330,8 @@ public class EUConventions extends ConventionMasterInitializer {
     addConvention(master, fxSpotEURUSD);
     addConvention(master, fxForwardEURUSD);
     addConvention(master, oisXCcyUSDLegConvention);
+    addConvention(master, euriborIndexConvention);
+    addConvention(master, eurOniaConvention);
   }
 
 }

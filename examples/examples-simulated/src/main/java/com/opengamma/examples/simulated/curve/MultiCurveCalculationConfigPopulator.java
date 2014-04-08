@@ -3,10 +3,11 @@
  *
  * Please see distribution for license.
  */
-package com.opengamma.financial.analytics.ircurve.calcconfig;
+package com.opengamma.examples.simulated.curve;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.opengamma.core.id.ExternalSchemes.OG_SYNTHETIC_TICKER;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import com.opengamma.financial.analytics.ircurve.BloombergFutureCurveInstrumentP
 import com.opengamma.financial.analytics.ircurve.CurveInstrumentProvider;
 import com.opengamma.financial.analytics.ircurve.StaticCurveInstrumentProvider;
 import com.opengamma.financial.analytics.ircurve.StripInstrumentType;
+import com.opengamma.financial.analytics.ircurve.calcconfig.CurveInstrumentConfig;
+import com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfig;
 import com.opengamma.financial.analytics.ircurve.strips.CashNode;
 import com.opengamma.financial.analytics.ircurve.strips.CurveNode;
 import com.opengamma.financial.analytics.ircurve.strips.DataFieldType;
@@ -382,7 +385,7 @@ public class MultiCurveCalculationConfigPopulator {
                                                           newArrayList(new DiscountingCurveTypeConfiguration(
                                                                            "USD"),
                                                                        new OvernightCurveTypeConfiguration(ExternalId.of(
-                                                                           "BLOOMBERG_TICKER",
+                                                                           OG_SYNTHETIC_TICKER,
                                                                            "FEDL01 Index"))
                                                           )
                                     )
@@ -390,8 +393,8 @@ public class MultiCurveCalculationConfigPopulator {
         new CurveGroupConfiguration(1,
                                     (Map) ImmutableMap.of("USD-LIBOR3M-FRAIRS",
                                                           newArrayList(new IborCurveTypeConfiguration(ExternalId.of(
-                                                              "BLOOMBERG_TICKER",
-                                                              "US0003M Index"), Tenor.parse("P3M")))
+                                                              OG_SYNTHETIC_TICKER,
+                                                              "USDLIBORP3M"), Tenor.parse("P3M")))
                                     )
         )
     );
@@ -401,9 +404,9 @@ public class MultiCurveCalculationConfigPopulator {
 
   private static InterpolatedCurveDefinition getInterpolatedCurveDefinition() {
     Set<CurveNode> nodes = newHashSet(
-        new CashNode(Tenor.parse("P0D"), Tenor.parse("P3M"), ExternalId.of("BLOOMBERG_TICKER", "US0003M Index"), "USD LIBOR3M BBG Mapper"),
-        new FRANode(Tenor.parse("P3M"), Tenor.parse("P6M"), ExternalId.of("BLOOMBERG_TICKER", "US0003M Index"), "USD LIBOR3M BBG Mapper"),
-        new FRANode(Tenor.parse("P6M"), Tenor.parse("P9M"), ExternalId.of("BLOOMBERG_TICKER", "US0003M Index"), "USD LIBOR3M BBG Mapper"),
+        new CashNode(Tenor.parse("P0D"), Tenor.parse("P3M"), ExternalId.of(OG_SYNTHETIC_TICKER, "USDLIBORP3M"), "USD LIBOR3M BBG Mapper"),
+        new FRANode(Tenor.parse("P3M"), Tenor.parse("P6M"), ExternalId.of(OG_SYNTHETIC_TICKER, "USDLIBORP3M"), "USD LIBOR3M BBG Mapper"),
+        new FRANode(Tenor.parse("P6M"), Tenor.parse("P9M"), ExternalId.of(OG_SYNTHETIC_TICKER, "USDLIBORP3M"), "USD LIBOR3M BBG Mapper"),
         new SwapNode(Tenor.parse("P0D"), Tenor.parse("P1Y"), ExternalId.of("CONVENTION", "USD 6M Govt Fixed Leg"), ExternalId.of("CONVENTION", "USD 3M Govt Ibor Leg"), true, "USD LIBOR3M BBG Mapper"),
         new SwapNode(Tenor.parse("P0D"), Tenor.parse("P2Y"), ExternalId.of("CONVENTION", "USD 6M Govt Fixed Leg"), ExternalId.of("CONVENTION", "USD 3M Govt Ibor Leg"), true, "USD LIBOR3M BBG Mapper"),
         new SwapNode(Tenor.parse("P0D"), Tenor.parse("P3Y"), ExternalId.of("CONVENTION", "USD 6M Govt Fixed Leg"), ExternalId.of("CONVENTION", "USD 3M Govt Ibor Leg"), true, "USD LIBOR3M BBG Mapper"),
@@ -449,7 +452,7 @@ public class MultiCurveCalculationConfigPopulator {
         .cashNodeIds(
             ImmutableMap.<Tenor, CurveInstrumentProvider>of(
                 Tenor.parse("OVERNIGHT"),
-                new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USDR2T Curncy"),
+                new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USDR2T Curncy"),
                                                   "Market_Value",
                                                   DataFieldType.OUTRIGHT)
             )
@@ -464,7 +467,7 @@ public class MultiCurveCalculationConfigPopulator {
         .cashNodeIds(
             ImmutableMap.<Tenor, CurveInstrumentProvider>of(
                 Tenor.parse("P3M"),
-                new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "US0003M Index"),
+                new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USDLIBORP3M"),
                                                   "Market_Value",
                                                   DataFieldType.OUTRIGHT)
             )
@@ -473,37 +476,37 @@ public class MultiCurveCalculationConfigPopulator {
             new HashMap<Tenor, CurveInstrumentProvider>() {{
               put(
                   Tenor.parse("P24M"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USFR1I2 Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USFR1I2 Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
               );
               put(
                   Tenor.parse("P9M"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "SFR0FI Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "SFR0FI Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
               );
               put(
                   Tenor.parse("P18M"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USFR1C1F Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USFR1C1F Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
               );
               put(
                   Tenor.parse("P27M"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USFR02C Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USFR02C Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
               );
               put(
                   Tenor.parse("P21M"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USFR1F1I Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USFR1F1I Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
               );
               put(
                   Tenor.parse("P6M"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USFR0CF Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USFR0CF Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
               );
@@ -543,73 +546,73 @@ public class MultiCurveCalculationConfigPopulator {
               {
                 put(
                     Tenor.parse("P1Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW1 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW1 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P2Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW2 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW2 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P3Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW3 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW3 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P4Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW4 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW4 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P5Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW5 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW5 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P7Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW7 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW7 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P10Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW10 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW10 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P15Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW12 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW12 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P12Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW15 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW15 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P20Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW20 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW20 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );
                 put(
                   Tenor.parse("P25Y"),
-                  new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW25 Curncy"),
+                  new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW25 Curncy"),
                                                     "Market_Value",
                                                     DataFieldType.OUTRIGHT)
                 );
                 put(
                     Tenor.parse("P30Y"),
-                    new StaticCurveInstrumentProvider(ExternalId.of("BLOOMBERG_TICKER", "USSW30 Curncy"),
+                    new StaticCurveInstrumentProvider(ExternalId.of(OG_SYNTHETIC_TICKER, "USSW30 Curncy"),
                                                       "Market_Value",
                                                       DataFieldType.OUTRIGHT)
                 );

@@ -329,6 +329,11 @@ public final class ValuePropertyNames {
   public static final String CURVE_EXPOSURES = "CurveExposures";
 
   /**
+   * The name of a property representing the curve type
+   */
+  public static final String CURVE_TYPE = "CurveType";
+
+  /**
    * The name of the conversion method.
    */
   public static final String CONVERSION_METHOD = "ConversionMethod";

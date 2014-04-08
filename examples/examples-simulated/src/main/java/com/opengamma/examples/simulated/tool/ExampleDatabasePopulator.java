@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.component.tool.AbstractTool;
 import com.opengamma.examples.simulated.generator.SyntheticPortfolioGeneratorTool;
+import com.opengamma.examples.simulated.loader.ExampleConventionsLoader;
 import com.opengamma.examples.simulated.loader.ExampleCurrencyConfigurationLoader;
 import com.opengamma.examples.simulated.loader.ExampleCurveAndSurfaceDefinitionLoader;
 import com.opengamma.examples.simulated.loader.ExampleCurveConfigurationLoader;
@@ -110,6 +111,10 @@ public class ExampleDatabasePopulator extends AbstractTool<ToolContext> {
    * The name of a US Government bond portfolio.
    */
   public static final String US_GOVERNMENT_BOND_PORTFOLIO_NAME = "Government Bonds";
+  /**
+   * The name of a US Government bond portfolio.
+   */
+  public static final String SWAP_DESK_USD_PORTFOLIO_NAME = "Swap Desk USD";
   /** Logger. */
   private static final Logger s_logger = LoggerFactory.getLogger(ExampleDatabasePopulator.class);
   /**
@@ -148,7 +153,13 @@ public class ExampleDatabasePopulator extends AbstractTool<ToolContext> {
     loadEquityOptionPortfolio();
     loadFuturePortfolio();
     loadBondPortfolio();
-    loadLiborRawSecurities();
+    loadSwapPortfolio();
+    //loadLiborRawSecurities();
+
+    loadIborIndexSecurities();
+    loadOvernightIndexSecurities();
+    loadExposureFunctions();
+
     loadSwaptionPortfolio();
     loadEURFixedIncomePortfolio();
     loadFXForwardPortfolio();
@@ -416,10 +427,62 @@ public class ExampleDatabasePopulator extends AbstractTool<ToolContext> {
     }
   }
 
-  private void loadLiborRawSecurities() {
-    final Log log = new Log("Creating libor raw securities");
+  private void loadSwapPortfolio() {
+    final Log log = new Log("Creating example bond portfolio");
     try {
-      PortfolioLoaderHelper.persistLiborRawSecurities(getAllCurrencies(), getToolContext());
+      portfolioGeneratorTool().run(getToolContext(), SWAP_DESK_USD_PORTFOLIO_NAME, "Swap", true, new Currency[]{Currency.USD});
+      log.done();
+    } catch (final RuntimeException t) {
+      log.fail(t);
+    }
+  }
+
+  //private void loadLiborRawSecurities() {
+  //  final Log log = new Log("Creating libor raw securities");
+  //  try {
+  //    PortfolioLoaderHelper.persistLiborRawSecurities(getAllCurrencies(), getToolContext());
+  //    log.done();
+  //  } catch (final RuntimeException t) {
+  //    log.fail(t);
+  //  }
+  //}
+
+  private void loadIborIndexSecurities() {
+    final Log log = new Log("Creating ibor index securities");
+    try {
+      PortfolioLoaderHelper.persistIborIndexSecurities(getAllCurrencies(), getToolContext());
+      log.done();
+    } catch (final RuntimeException t) {
+      log.fail(t);
+    }
+  }
+
+  private void loadOvernightIndexSecurities() {
+    final Log log = new Log("Creating ibor index securities");
+    try {
+      PortfolioLoaderHelper.persistOvernightIndexSecurities(getAllCurrencies(), getToolContext());
+      log.done();
+    } catch (final RuntimeException t) {
+      log.fail(t);
+    }
+  }
+
+  private void loadExposureFunctions() {
+    final Log log = new Log("Creating exposure functions");
+    try {
+      final ExampleCurveAndSurfaceDefinitionLoader curveLoader = new ExampleCurveAndSurfaceDefinitionLoader();
+      curveLoader.run(getToolContext());
+      log.done();
+    } catch (final RuntimeException t) {
+      log.fail(t);
+    }
+  }
+
+  private void loadNewConventions() {
+    final Log log = new Log("Creating new conventions");
+    try {
+      final ExampleConventionsLoader loader = new ExampleConventionsLoader();
+      loader.run(getToolContext());
       log.done();
     } catch (final RuntimeException t) {
       log.fail(t);

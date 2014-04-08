@@ -6,7 +6,7 @@
 package com.opengamma.examples.simulated.loader;
 
 import com.opengamma.component.tool.AbstractTool;
-import com.opengamma.financial.analytics.ircurve.calcconfig.MultiCurveCalculationConfigPopulator;
+import com.opengamma.examples.simulated.curve.MultiCurveCalculationConfigPopulator;
 import com.opengamma.financial.tool.ToolContext;
 import com.opengamma.master.config.ConfigMaster;
 
