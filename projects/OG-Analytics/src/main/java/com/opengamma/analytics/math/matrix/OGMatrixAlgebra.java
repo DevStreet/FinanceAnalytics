@@ -12,6 +12,7 @@ import com.opengamma.analytics.math.linearalgebra.TridiagonalMatrix;
 import com.opengamma.maths.datacontainers.OGNumeric;
 import com.opengamma.maths.datacontainers.OGTerminal;
 import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
+import com.opengamma.maths.datacontainers.scalar.OGRealScalar;
 import com.opengamma.maths.materialisers.Materialisers;
 import com.opengamma.maths.nodes.MTIMES;
 import com.opengamma.maths.nodes.NORM2;
@@ -184,6 +185,23 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
     throw new IllegalArgumentException("Can only take transpose of DoubleMatrix2D; have " + m.getClass());
   }
 
+  @Override
+  public Matrix<?> scale(final Matrix<?> m, final double scale) {
+    Validate.notNull(m, "m");
+    OGNumeric node;
+    OGRealScalar lscale = new OGRealScalar(scale);
+    if (m instanceof DoubleMatrix1D) {
+      final double[] x = ((DoubleMatrix1D) m).getData();
+      node = new MTIMES(new OGRealDenseMatrix(x), lscale);
+      return new DoubleMatrix1D(Materialisers.toOGTerminal(node).getData());
+    } else if (m instanceof DoubleMatrix2D) {
+      final double[][] x = ((DoubleMatrix2D) m).getData();
+      node = new MTIMES(new OGRealDenseMatrix(x), lscale);
+      return new DoubleMatrix2D(Materialisers.toDoubleArrayOfArrays(node));
+    }
+    throw new NotImplementedException();
+  };
+
   /**
    * {@inheritDoc}
    * The following combinations of input matrices m1 and m2 are allowed:
@@ -241,48 +259,6 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
     throw new NotImplementedException();
   }
 
-  private DoubleMatrix2D multiply(final DoubleMatrix2D m1, final DoubleMatrix2D m2) {
-    final double[][] a = m1.getData();
-    final double[][] b = m2.getData();
-    final int p = b.length;
-    Validate.isTrue(a[0].length == p, "Matrix size mismatch. m1 is " + m1.getNumberOfRows() + " by "
-        + m1.getNumberOfColumns() + ", but m2 is " + m2.getNumberOfRows() + " by " + m2.getNumberOfColumns());
-    final int m = a.length;
-    final int n = b[0].length;
-    double sum;
-    final double[][] res = new double[m][n];
-    int i, j, k;
-    for (i = 0; i < m; i++) {
-      for (j = 0; j < n; j++) {
-        sum = 0.0;
-        for (k = 0; k < p; k++) {
-          sum += a[i][k] * b[k][j];
-        }
-        res[i][j] = sum;
-      }
-    }
-    return new DoubleMatrix2D(res);
-  }
-
-  private DoubleMatrix1D multiply(final DoubleMatrix2D matrix, final DoubleMatrix1D vector) {
-    final double[][] a = matrix.getData();
-    final double[] b = vector.getData();
-    final int n = b.length;
-    Validate.isTrue(a[0].length == n, "Matrix/vector size mismatch");
-    final int m = a.length;
-    final double[] res = new double[m];
-    int i, j;
-    double sum;
-    for (i = 0; i < m; i++) {
-      sum = 0.0;
-      for (j = 0; j < n; j++) {
-        sum += a[i][j] * b[j];
-      }
-      res[i] = sum;
-    }
-    return new DoubleMatrix1D(res);
-  }
-
   private DoubleMatrix1D multiply(final TridiagonalMatrix matrix, final DoubleMatrix1D vector) {
     final double[] a = matrix.getLowerSubDiagonalData();
     final double[] b = matrix.getDiagonalData();
@@ -296,25 +272,6 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
     res[n - 1] = b[n - 1] * x[n - 1] + a[n - 2] * x[n - 2];
     for (i = 1; i < n - 1; i++) {
       res[i] = a[i - 1] * x[i - 1] + b[i] * x[i] + c[i] * x[i + 1];
-    }
-    return new DoubleMatrix1D(res);
-  }
-
-  private DoubleMatrix1D multiply(final DoubleMatrix1D vector, final DoubleMatrix2D matrix) {
-    final double[] a = vector.getData();
-    final double[][] b = matrix.getData();
-    final int n = a.length;
-    Validate.isTrue(b.length == n, "Matrix/vector size mismatch");
-    final int m = b[0].length;
-    final double[] res = new double[m];
-    int i, j;
-    double sum;
-    for (i = 0; i < m; i++) {
-      sum = 0.0;
-      for (j = 0; j < n; j++) {
-        sum += a[j] * b[j][i];
-      }
-      res[i] = sum;
     }
     return new DoubleMatrix1D(res);
   }

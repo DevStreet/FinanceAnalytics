@@ -83,6 +83,27 @@ public class OGMatrixAlgebraTest {
   }
 
   @Test
+  public void testScale() {
+    final double[] scales = new double[] { 1, 0, -1, 10, -3.4 };
+    for (int k = 0; k < scales.length; k++) {
+      double scale = scales[k];
+      // test scale a vector
+      final DoubleMatrix1D Es = (DoubleMatrix1D) ALGEBRA.scale(E, scale);
+      for (int i = 0; i < Es.getNumberOfElements(); i++) {
+        assertTrue(Es.getEntry(i) == scale * E.getEntry(i));
+      }
+
+      // test scale a matrix
+      final DoubleMatrix2D As = (DoubleMatrix2D) ALGEBRA.scale(A, scale);
+      for (int i = 0; i < As.getNumberOfRows(); i++) {
+        for (int j = 0; j < As.getNumberOfColumns(); j++) {
+          assertTrue(As.getEntry(i, j) == scale * A.getEntry(i, j));
+        }
+      }
+    }
+  }
+
+  @Test
   public void testMultiply() {
     // test dgemm
     final DoubleMatrix2D c = (DoubleMatrix2D) ALGEBRA.multiply(A, B);
