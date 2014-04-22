@@ -14,17 +14,13 @@ import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.Matrix;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 
 /**
  * 
  */
 public class DeltaCovarianceMatrixStandardDeviationCalculator extends Function1D<Map<Integer, ParametricVaRDataBundle>, Double> {
-  private final MatrixAlgebra _algebra;
-
-  public DeltaCovarianceMatrixStandardDeviationCalculator(final MatrixAlgebra algebra) {
-    Validate.notNull(algebra, "algebra");
-    _algebra = algebra;
-  }
+  private final MatrixAlgebra _algebra = MatrixAlgebraFactory.getDefaultAlgebra();
 
   @Override
   public Double evaluate(final Map<Integer, ParametricVaRDataBundle> data) {

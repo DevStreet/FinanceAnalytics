@@ -8,9 +8,10 @@ package com.opengamma.analytics.example.curveconstruction;
 // @export "imports"
 import java.io.PrintStream;
 
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 
 /**
  * Example for matrix.
@@ -33,12 +34,12 @@ public class MatrixExample {
 
   // @export "matrixAlgebraDemo"
   public static void matrixAlgebraDemo(PrintStream out) {
-    ColtMatrixAlgebra colt = new ColtMatrixAlgebra();
+    MatrixAlgebra algebra = MatrixAlgebraFactory.getDefaultAlgebra();
     DoubleMatrix1D v = new DoubleMatrix1D(ARRAY_1D);
     DoubleMatrix2D m = new DoubleMatrix2D(ARRAY_2D);
 
-    out.println(colt.getTranspose(m));
-    out.println(colt.multiply(m, v));
+    out.println(algebra.getTranspose(m));
+    out.println(algebra.multiply(m, v));
   }
 
   public static void main(String[] args) {

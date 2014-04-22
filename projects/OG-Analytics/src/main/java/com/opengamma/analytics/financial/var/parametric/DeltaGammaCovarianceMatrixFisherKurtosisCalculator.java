@@ -15,18 +15,17 @@ import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.Matrix;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 
 /**
  * 
  */
 public class DeltaGammaCovarianceMatrixFisherKurtosisCalculator extends Function1D<Map<Integer, ParametricVaRDataBundle>, Double> {
-  private final MatrixAlgebra _algebra;
+  private final MatrixAlgebra _algebra = MatrixAlgebraFactory.getDefaultAlgebra();
   private final Function1D<Map<Integer, ParametricVaRDataBundle>, Double> _std;
 
-  public DeltaGammaCovarianceMatrixFisherKurtosisCalculator(final MatrixAlgebra algebra) {
-    Validate.notNull(algebra, "algebra");
-    _algebra = algebra;
-    _std = new DeltaGammaCovarianceMatrixStandardDeviationCalculator(algebra);
+  public DeltaGammaCovarianceMatrixFisherKurtosisCalculator() {
+    _std = new DeltaGammaCovarianceMatrixStandardDeviationCalculator();
   }
 
   @Override

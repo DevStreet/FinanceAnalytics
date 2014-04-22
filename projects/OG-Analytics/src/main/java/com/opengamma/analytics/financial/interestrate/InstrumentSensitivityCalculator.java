@@ -8,18 +8,18 @@ package com.opengamma.analytics.financial.interestrate;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.financial.provider.description.interestrate.ParameterProviderInterface;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 
 /**
  * @deprecated Use the calculators that reference {@link ParameterProviderInterface}
  */
 @Deprecated
 public final class InstrumentSensitivityCalculator {
-
-  private static final MatrixAlgebra MATRIX_ALGEBRA = new ColtMatrixAlgebra(); //TODO make choice of algebra a parameter (also available: CommonsMatrixAlgebra)
+  
+  private static final MatrixAlgebra MATRIX_ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
   private static final InstrumentSensitivityCalculator INSTANCE = new InstrumentSensitivityCalculator();
 
   public static InstrumentSensitivityCalculator getInstance() {

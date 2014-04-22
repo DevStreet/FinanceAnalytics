@@ -47,10 +47,10 @@ import com.opengamma.analytics.math.interpolation.GridInterpolator2D;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.analytics.math.interpolation.PSplineFitter;
 import com.opengamma.analytics.math.interpolation.data.Interpolator1DDataBundle;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.minimization.ParameterLimitsTransform;
 import com.opengamma.analytics.math.minimization.ParameterLimitsTransform.LimitType;
 import com.opengamma.analytics.math.minimization.SingleRangeLimitTransform;
@@ -68,7 +68,7 @@ import com.opengamma.util.tuple.DoublesPair;
  */
 @Test(groups = TestGroup.UNIT)
 public class LocalVolFittingTest {
-  private final MatrixAlgebra _algebra = new ColtMatrixAlgebra();
+  private final MatrixAlgebra _algebra = MatrixAlgebraFactory.getDefaultAlgebra();
   private static ParameterLimitsTransform TRANSFORM = new SingleRangeLimitTransform(0.0, LimitType.GREATER_THAN);
   private static NonLinearLeastSquareWithPenalty NLLS = new NonLinearLeastSquareWithPenalty();
   //  private static ScalarMinimizer LINE_MINIMIZER = new BrentMinimizer1D();
@@ -85,10 +85,10 @@ public class LocalVolFittingTest {
   private final BasisFunctionGenerator _generator = new BasisFunctionGenerator();
 
   private static final double IMP_VOL = 0.4;
-  private static final double[] EXPIRIES = new double[] {0.1, 0.2, 0.3, 0.5, 0.75, 1, 1.25, 1.5, 2 };
-  private static final double[][] STRIKES = new double[][] { {0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 }, {0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 }, {0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 },
-      {0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 }, {0.6, 0.8, 1.0, 1.2, 1.4 }, {0.5, 0.75, 1.0, 1.25, 1.5 }, {0.5, 0.75, 1.0, 1.25, 1.5 }, {0.5, 0.75, 1.0, 1.25, 1.5 },
-      {0.4, 0.7, 1.0, 1.3, 1.6 } };
+  private static final double[] EXPIRIES = new double[] { 0.1, 0.2, 0.3, 0.5, 0.75, 1, 1.25, 1.5, 2 };
+  private static final double[][] STRIKES = new double[][] { { 0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 }, { 0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 }, { 0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 },
+    { 0.7, 0.8, 0.8, 1.0, 1.1, 1.2, 1.3 }, { 0.6, 0.8, 1.0, 1.2, 1.4 }, { 0.5, 0.75, 1.0, 1.25, 1.5 }, { 0.5, 0.75, 1.0, 1.25, 1.5 }, { 0.5, 0.75, 1.0, 1.25, 1.5 },
+    { 0.4, 0.7, 1.0, 1.3, 1.6 } };
 
   @Test
       (enabled = false)
@@ -109,12 +109,12 @@ public class LocalVolFittingTest {
     final MeshingFunction timeMesh = new ExponentialMeshing(0, 2.0, 30, 0.2);
     final PDEGrid1D pdeGrid = new PDEGrid1D(timeMesh, spaceMesh);
     final Function1D<Double, Double> initialCond = INITIAL_COND_PROVIDER.getForwardCallPut(true);
-    final double[] xa = new double[] {0, 0 };
-    final double[] xb = new double[] {2.0, xH };
-    final int[] nKnots = new int[] {3, 10 };
-    final int[] degree = new int[] {3, 3 };
-    final double[] lambda = new double[] {1e-8, 1e-5 };
-    final int[] differenceOrder = new int[] {2, 2 };
+    final double[] xa = new double[] { 0, 0 };
+    final double[] xb = new double[] { 2.0, xH };
+    final int[] nKnots = new int[] { 3, 10 };
+    final int[] degree = new int[] { 3, 3 };
+    final double[] lambda = new double[] { 1e-8, 1e-5 };
+    final int[] differenceOrder = new int[] { 2, 2 };
     final int dim = xa.length;
     final int[] sizes = new int[dim];
     for (int i = 0; i < dim; i++) {
@@ -273,8 +273,8 @@ public class LocalVolFittingTest {
     final double fwd = 1.0;
 
     final int n = 3;
-    final double[] sigma = new double[] {0.2, 0.5, 2.0 };
-    final double[] w = new double[] {0.8, 0.15, 0.05 };
+    final double[] sigma = new double[] { 0.2, 0.5, 2.0 };
+    final double[] w = new double[] { 0.8, 0.15, 0.05 };
     final double[] f = new double[n];
     f[0] = 1.05 * fwd;
     f[1] = 0.9 * fwd;
@@ -316,20 +316,20 @@ public class LocalVolFittingTest {
     for (int i = 0; i < nExp; i++) {
       final double t = EXPIRIES[i];
       for (int j = 0; j < STRIKES[i].length; j++) {
-        final double[] a = new double[] {t, STRIKES[i][j] };
+        final double[] a = new double[] { t, STRIKES[i][j] };
         tk.add(a);
         vols.add(surfaceStrike.getVolatility(t, STRIKES[i][j]));
         sigmas.add(1.0);
       }
     }
 
-    final int[] nKnots = new int[] {8, 20 };
-    final int[] degree = new int[] {3, 3 };
-    final int[] diff = new int[] {2, 2 };
-    final double[] lambda = new double[] {0.1, 0.3 };
+    final int[] nKnots = new int[] { 8, 20 };
+    final int[] degree = new int[] { 3, 3 };
+    final int[] diff = new int[] { 2, 2 };
+    final double[] lambda = new double[] { 0.1, 0.3 };
 
     final PSplineFitter splineFitter = new PSplineFitter();
-    final GeneralizedLeastSquareResults<double[]> res = splineFitter.solve(tk, vols, sigmas, new double[] {0.0, 0.0 }, new double[] {2.0, 3.0 }, nKnots, degree, lambda, diff);
+    final GeneralizedLeastSquareResults<double[]> res = splineFitter.solve(tk, vols, sigmas, new double[] { 0.0, 0.0 }, new double[] { 2.0, 3.0 }, nKnots, degree, lambda, diff);
 
     System.out.println(res.getChiSq());
     final Function1D<double[], Double> func = res.getFunction();
@@ -337,7 +337,7 @@ public class LocalVolFittingTest {
     final Function<Double, Double> temp2 = new Function<Double, Double>() {
       @Override
       public Double evaluate(final Double... tk) {
-        return func.evaluate(new double[] {tk[0], tk[1] });
+        return func.evaluate(new double[] { tk[0], tk[1] });
       }
     };
 
@@ -379,7 +379,7 @@ public class LocalVolFittingTest {
 
       @Override
       public Double evaluate(final Double... x) {
-        return func.evaluate(new double[] {x[0], x[1] });
+        return func.evaluate(new double[] { x[0], x[1] });
       }
 
     };

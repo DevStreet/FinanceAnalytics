@@ -40,10 +40,10 @@ import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolat
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.linearalgebra.Decomposition;
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.rootfinding.newton.BroydenVectorRootFinder;
 import com.opengamma.analytics.math.rootfinding.newton.NewtonVectorRootFinder;
 import com.opengamma.analytics.util.time.TimeCalculator;
@@ -106,7 +106,7 @@ public class FXImpliedYieldCurveFunction extends AbstractFunction.NonCompiledInv
   /** Calculates the sensitivity of the par rate to the curves */
   private static final ParRateCurveSensitivityCalculator PAR_RATE_SENSITIVITY_CALCULATOR = ParRateCurveSensitivityCalculator.getInstance();
   /** The matrix algebra used for matrix inversion. */
-  private static final MatrixAlgebra MATRIX_ALGEBRA = new ColtMatrixAlgebra();
+  private static final MatrixAlgebra MATRIX_ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
   /** The business day convention used for FX forward dates computation **/
   private static final BusinessDayConvention MOD_FOL = BusinessDayConventions.MODIFIED_FOLLOWING;
   /** The curve calculation configuration source */

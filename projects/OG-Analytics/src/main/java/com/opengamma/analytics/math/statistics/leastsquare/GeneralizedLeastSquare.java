@@ -17,11 +17,11 @@ import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.linearalgebra.Decomposition;
 import com.opengamma.analytics.math.linearalgebra.DecompositionResult;
 import com.opengamma.analytics.math.linearalgebra.SVDecompositionOG;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -34,7 +34,7 @@ public class GeneralizedLeastSquare {
 
   public GeneralizedLeastSquare() {
     _decomposition = new SVDecompositionOG();
-    _algebra = new ColtMatrixAlgebra();
+    _algebra = MatrixAlgebraFactory.getDefaultAlgebra();
 
   }
 

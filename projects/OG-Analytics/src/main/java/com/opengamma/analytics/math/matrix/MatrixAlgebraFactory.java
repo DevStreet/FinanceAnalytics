@@ -66,4 +66,12 @@ public final class MatrixAlgebraFactory {
     }
     return s_instanceNames.get(algebra.getClass());
   }
+
+  /**
+   * Gets the default algebra.
+   * @return the default algebra.
+   */
+  public static MatrixAlgebra getDefaultAlgebra() {
+    return OG_ALGEBRA;
+  }
 }

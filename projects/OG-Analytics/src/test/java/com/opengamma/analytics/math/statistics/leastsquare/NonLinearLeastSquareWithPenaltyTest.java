@@ -26,10 +26,10 @@ import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolat
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.analytics.math.interpolation.PSplineFitter;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.rootfinding.newton.NewtonDefaultVectorRootFinder;
 import com.opengamma.util.test.TestGroup;
 
@@ -38,7 +38,7 @@ import com.opengamma.util.test.TestGroup;
  */
 @Test(groups = TestGroup.UNIT)
 public class NonLinearLeastSquareWithPenaltyTest {
-  private static final MatrixAlgebra MA = new ColtMatrixAlgebra();
+  private static final MatrixAlgebra MA = MatrixAlgebraFactory.getDefaultAlgebra();
 
   private static BasisFunctionGenerator GEN = new BasisFunctionGenerator();
   private static NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty();

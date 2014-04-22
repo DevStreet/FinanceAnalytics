@@ -12,10 +12,10 @@ import java.util.List;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.statistics.leastsquare.GeneralizedLeastSquare;
 import com.opengamma.analytics.math.statistics.leastsquare.GeneralizedLeastSquareResults;
 
@@ -23,7 +23,7 @@ import com.opengamma.analytics.math.statistics.leastsquare.GeneralizedLeastSquar
  * 
  */
 public class PSplineFitter {
-  private final MatrixAlgebra _algebra = new ColtMatrixAlgebra();
+  private final MatrixAlgebra _algebra = MatrixAlgebraFactory.getDefaultAlgebra();
   private final BasisFunctionGenerator _generator = new BasisFunctionGenerator();
   private final GeneralizedLeastSquare _gls = new GeneralizedLeastSquare();
 

@@ -13,10 +13,8 @@ import java.util.Map;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
-import com.opengamma.analytics.math.matrix.MatrixAlgebra;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -24,16 +22,10 @@ import com.opengamma.util.test.TestGroup;
  */
 @Test(groups = TestGroup.UNIT)
 public class DeltaGammaCovarianceMatrixSkewnessCalculatorTest {
-  private static final MatrixAlgebra ALGEBRA = new ColtMatrixAlgebra();
-  private static final DeltaGammaCovarianceMatrixSkewnessCalculator F = new DeltaGammaCovarianceMatrixSkewnessCalculator(ALGEBRA);
-  private static final DoubleMatrix1D DELTA_VECTOR = new DoubleMatrix1D(new double[] {1, 5});
-  private static final DoubleMatrix2D GAMMA_MATRIX = new DoubleMatrix2D(new double[][] {new double[] {25, -7.5}, new double[] {-7.5, 125}});
-  private static final DoubleMatrix2D COVARIANCE_MATRIX = new DoubleMatrix2D(new double[][] {new double[] {0.0036, -0.0006}, new double[] {-0.0006, 0.0016}});
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testNullAlgebra() {
-    new DeltaGammaCovarianceMatrixSkewnessCalculator(null);
-  }
+  private static final DeltaGammaCovarianceMatrixSkewnessCalculator F = new DeltaGammaCovarianceMatrixSkewnessCalculator();
+  private static final DoubleMatrix1D DELTA_VECTOR = new DoubleMatrix1D(new double[] { 1, 5 });
+  private static final DoubleMatrix2D GAMMA_MATRIX = new DoubleMatrix2D(new double[][] { new double[] { 25, -7.5 }, new double[] { -7.5, 125 } });
+  private static final DoubleMatrix2D COVARIANCE_MATRIX = new DoubleMatrix2D(new double[][] { new double[] { 0.0036, -0.0006 }, new double[] { -0.0006, 0.0016 } });
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullData() {
@@ -43,8 +35,8 @@ public class DeltaGammaCovarianceMatrixSkewnessCalculatorTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testGammaMatrixSize() {
     final ParametricVaRDataBundle deltaData = new ParametricVaRDataBundle(DELTA_VECTOR, COVARIANCE_MATRIX, 1);
-    final ParametricVaRDataBundle gammaData = new ParametricVaRDataBundle(new DoubleMatrix2D(new double[][] {new double[] {1, 2, 3}, new double[] {4, 5, 6}, new double[] {7, 8, 9}}),
-        new DoubleMatrix2D(new double[][] {new double[] {1, 2, 3}, new double[] {4, 5, 6}, new double[] {7, 8, 9}}), 2);
+    final ParametricVaRDataBundle gammaData = new ParametricVaRDataBundle(new DoubleMatrix2D(new double[][] { new double[] { 1, 2, 3 }, new double[] { 4, 5, 6 }, new double[] { 7, 8, 9 } }),
+        new DoubleMatrix2D(new double[][] { new double[] { 1, 2, 3 }, new double[] { 4, 5, 6 }, new double[] { 7, 8, 9 } }), 2);
     final Map<Integer, ParametricVaRDataBundle> m = new HashMap<>();
     m.put(1, deltaData);
     m.put(2, gammaData);
@@ -53,8 +45,8 @@ public class DeltaGammaCovarianceMatrixSkewnessCalculatorTest {
 
   @Test
   public void testEqualsAndHashCode() {
-    final DeltaGammaCovarianceMatrixSkewnessCalculator f1 = new DeltaGammaCovarianceMatrixSkewnessCalculator(ALGEBRA);
-    final DeltaGammaCovarianceMatrixSkewnessCalculator f2 = new DeltaGammaCovarianceMatrixSkewnessCalculator(new ColtMatrixAlgebra());
+    final DeltaGammaCovarianceMatrixSkewnessCalculator f1 = new DeltaGammaCovarianceMatrixSkewnessCalculator();
+    final DeltaGammaCovarianceMatrixSkewnessCalculator f2 = new DeltaGammaCovarianceMatrixSkewnessCalculator();
     assertEquals(f1, F);
     assertEquals(f1.hashCode(), F.hashCode());
     assertFalse(f1.equals(f2));

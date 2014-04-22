@@ -17,10 +17,10 @@ import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolat
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.analytics.math.interpolation.PSplineFitter;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.statistics.leastsquare.LeastSquareResults;
 import com.opengamma.analytics.math.statistics.leastsquare.NonLinearLeastSquareWithPenalty;
 
@@ -30,7 +30,7 @@ import com.opengamma.analytics.math.statistics.leastsquare.NonLinearLeastSquareW
 @Deprecated
 public class CapletStrippingSingleStrikeDirect extends CapletStrippingAbsoluteStrike {
 
-  private static final MatrixAlgebra MA = new ColtMatrixAlgebra();
+  private static final MatrixAlgebra MA = MatrixAlgebraFactory.getDefaultAlgebra();
   private static final Interpolator1D DEFAULT_INTERPOLATOR = CombinedInterpolatorExtrapolatorFactory.getInterpolator(Interpolator1DFactory.DOUBLE_QUADRATIC, Interpolator1DFactory.FLAT_EXTRAPOLATOR);
   private static final NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty();
   private static final int DIFFERENCE_ORDER = 2;

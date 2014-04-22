@@ -13,10 +13,10 @@ import com.opengamma.analytics.financial.model.volatility.VolatilityTermStructur
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.interpolation.BasisFunctionGenerator;
 import com.opengamma.analytics.math.interpolation.PSplineFitter;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.statistics.leastsquare.LeastSquareResults;
 import com.opengamma.analytics.math.statistics.leastsquare.NonLinearLeastSquareWithPenalty;
 
@@ -25,7 +25,7 @@ import com.opengamma.analytics.math.statistics.leastsquare.NonLinearLeastSquareW
  */
 @Deprecated
 public class CapletStrippingAbsoluteStrikePSpline extends CapletStrippingAbsoluteStrike {
-  private static final MatrixAlgebra MA = new ColtMatrixAlgebra();
+  private static final MatrixAlgebra MA = MatrixAlgebraFactory.getDefaultAlgebra();
   private static final BasisFunctionGenerator GEN = new BasisFunctionGenerator();
   private static final NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty();
   private static final int DIFFERENCE_ORDER = 2;

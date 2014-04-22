@@ -10,9 +10,10 @@ import org.apache.commons.lang.Validate;
 import com.opengamma.analytics.financial.model.volatility.smile.function.SABRFormulaData;
 import com.opengamma.analytics.financial.model.volatility.smile.function.SABRHaganVolatilityFunction;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.matrix.OGMatrixAlgebra;
 import com.opengamma.analytics.math.rootfinding.BracketRoot;
 import com.opengamma.analytics.math.rootfinding.RidderSingleRootFinder;
@@ -89,6 +90,9 @@ public class SABRExtrapolationRightFunction {
   private static final double SMALL_EXPIRY = 1.0E-6;
   private static final double SMALL_PARAMETER = -1.0E4;
 
+  // matrix algebra
+  private final MatrixAlgebra _algebra = MatrixAlgebraFactory.getDefaultAlgebra();
+
   /**
    * Constructor.
    * @param forward The forward (rate or price).
@@ -108,7 +112,7 @@ public class SABRExtrapolationRightFunction {
     if (timeToExpiry > SMALL_EXPIRY) {
       _parameter = computesFittingParameters();
     } else { // Implementation note: when time to expiry is very small, the price above the cut-off strike and its derivatives should be 0 (or at least very small).
-      _parameter = new double[] {SMALL_PARAMETER, 0.0, 0.0};
+      _parameter = new double[] {SMALL_PARAMETER, 0.0, 0.0 };
       _parameterDerivativeForward = new double[3];
       _parameterDerivativeForwardComputed = true;
       _parameterDerivativeSABR = new double[4][3];
@@ -315,7 +319,7 @@ public class SABRExtrapolationRightFunction {
     double eps = 1.0E-15;
     if (Math.abs(_priceK[0]) < eps && Math.abs(_priceK[1]) < eps && Math.abs(_priceK[2]) < eps) {
       // Implementation note: If value and its derivatives is too small, then parameters are such that the extrapolated price is "very small".
-      return new double[] {-100.0, 0, 0};
+      return new double[] {-100.0, 0, 0 };
     }
     final CFunction toSolveC = new CFunction(_priceK, _cutOffStrike, _mu);
     final BracketRoot bracketer = new BracketRoot();
@@ -338,7 +342,7 @@ public class SABRExtrapolationRightFunction {
     double eps = 1.0E-15;
     if (Math.abs(_priceK[0]) < eps && Math.abs(_priceK[1]) < eps && Math.abs(_priceK[2]) < eps) {
       // Implementation note: If value and its derivatives is too small, then parameters are such that the extrapolated price is "very small".
-      return new double[] {0.0, 0.0, 0.0};
+      return new double[] {0.0, 0.0, 0.0 };
     }
     // Derivative of price with respect to forward.
     final double[] pDF = new double[3];
@@ -390,8 +394,7 @@ public class SABRExtrapolationRightFunction {
     fD[2][2] = (fpp + fD[0][2] * (2 * (2 * _mu + 3) + 4 * _parameter[1] / _cutOffStrike + 8 * _parameter[2] / (_cutOffStrike * _cutOffStrike))) / (_cutOffStrike * _cutOffStrike);
     final DoubleMatrix2D fDmatrix = new DoubleMatrix2D(fD);
     // Derivative of abc with respect to forward
-    final ColtMatrixAlgebra algebra = new ColtMatrixAlgebra();
-    final DoubleMatrix2D fDInverse = algebra.getInverse(fDmatrix);
+    final DoubleMatrix2D fDInverse = _algebra.getInverse(fDmatrix);
     final OGMatrixAlgebra algebraOG = new OGMatrixAlgebra();
     final DoubleMatrix1D derivativeF = (DoubleMatrix1D) algebraOG.multiply(fDInverse, pDFvector);
     return derivativeF.getData();
@@ -481,8 +484,7 @@ public class SABRExtrapolationRightFunction {
     fD[2][2] = (fpp + fD[0][2] * (2 * (2 * _mu + 3) + 4 * _parameter[1] / _cutOffStrike + 8 * _parameter[2] / (_cutOffStrike * _cutOffStrike))) / (_cutOffStrike * _cutOffStrike);
     final DoubleMatrix2D fDmatrix = new DoubleMatrix2D(fD);
     // Derivative of abc with respect to forward
-    final ColtMatrixAlgebra algebra = new ColtMatrixAlgebra();
-    final DoubleMatrix2D fDInverse = algebra.getInverse(fDmatrix);
+    final DoubleMatrix2D fDInverse = _algebra.getInverse(fDmatrix);
     final OGMatrixAlgebra algebraOG = new OGMatrixAlgebra();
     for (int loopparam = 0; loopparam < 4; loopparam++) {
       final DoubleMatrix1D pDSABRvector = new DoubleMatrix1D(pDSABR[loopparam]);

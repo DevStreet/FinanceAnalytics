@@ -20,11 +20,11 @@ import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.analytics.math.interpolation.TransformedInterpolator1D;
 import com.opengamma.analytics.math.interpolation.data.Interpolator1DDataBundle;
-import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.minimization.ParameterLimitsTransform;
 import com.opengamma.analytics.math.minimization.ParameterLimitsTransform.LimitType;
 import com.opengamma.analytics.math.minimization.SingleRangeLimitTransform;
@@ -43,7 +43,7 @@ import com.opengamma.util.ArgumentChecker;
  */
 @Deprecated
 public class CapletStrippingAbsoluteStrikeInterpolation extends CapletStrippingAbsoluteStrike {
-  private static final MatrixAlgebra MA = new ColtMatrixAlgebra();
+  private static final MatrixAlgebra MA = MatrixAlgebraFactory.getDefaultAlgebra();
   // TODO option on root finder
   private static final NewtonVectorRootFinder ROOTFINDER = new NewtonDefaultVectorRootFinder();  // new BroydenVectorRootFinder();
 
