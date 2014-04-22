@@ -10,9 +10,9 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -21,7 +21,7 @@ import com.opengamma.util.test.TestGroup;
 @Test(groups = TestGroup.UNIT)
 public class CholeskyDecompositionCommonsTest {
 
-  private static final MatrixAlgebra ALGEBRA = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
   private static final Decomposition<CholeskyDecompositionResult> CH = new CholeskyDecompositionCommons();
   private static final DoubleMatrix2D A = new DoubleMatrix2D(new double[][] {new double[] {10.0, 2.0, -1.0}, new double[] {2.0, 5.0, -2.0}, new double[] {-1.0, -2.0, 15.0}});
   private static final double EPS = 1e-9;

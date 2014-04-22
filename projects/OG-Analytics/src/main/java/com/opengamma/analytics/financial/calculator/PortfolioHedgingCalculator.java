@@ -13,9 +13,10 @@ import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.provider.sensitivity.multicurve.MultipleCurrencyParameterSensitivity;
 import com.opengamma.analytics.math.linearalgebra.SVDecompositionOG;
 import com.opengamma.analytics.math.linearalgebra.SVDecompositionResult;
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
@@ -29,7 +30,7 @@ public class PortfolioHedgingCalculator {
   /**
    * The matrix algebra used (mainly multiplying matrices and solving systems).
    */
-  private static final CommonsMatrixAlgebra MATRIX = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra MATRIX_ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();;
   /**
    * The decomposition method used.
    */
@@ -62,10 +63,10 @@ public class PortfolioHedgingCalculator {
       rsArray[loopref] = toMatrix(rsConverted[loopref], order).getData();
     }
     final DoubleMatrix2D r = new DoubleMatrix2D(rsArray);
-    final DoubleMatrix2D wtW = (DoubleMatrix2D) MATRIX.multiply(MATRIX.getTranspose(w), w);
-    final DoubleMatrix2D rWtW = (DoubleMatrix2D) MATRIX.multiply(r, wtW);
-    final DoubleMatrix2D rWtWRt = (DoubleMatrix2D) MATRIX.multiply(rWtW, MATRIX.getTranspose(r));
-    final DoubleMatrix1D rWtWP = ((DoubleMatrix2D) MATRIX.scale(MATRIX.multiply(rWtW, p), -1.0)).getColumnVector(0);
+    final DoubleMatrix2D wtW = (DoubleMatrix2D) MATRIX_ALGEBRA.multiply(MATRIX_ALGEBRA.getTranspose(w), w);
+    final DoubleMatrix2D rWtW = (DoubleMatrix2D) MATRIX_ALGEBRA.multiply(r, wtW);
+    final DoubleMatrix2D rWtWRt = (DoubleMatrix2D) MATRIX_ALGEBRA.multiply(rWtW, MATRIX_ALGEBRA.getTranspose(r));
+    final DoubleMatrix1D rWtWP = ((DoubleMatrix2D) MATRIX_ALGEBRA.scale(MATRIX_ALGEBRA.multiply(rWtW, p), -1.0)).getColumnVector(0);
     final SVDecompositionResult dec = DECOMPOSITION.evaluate(rWtWRt);
     final DoubleMatrix1D q = dec.solve(rWtWP);
     return q.getData();

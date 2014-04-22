@@ -18,9 +18,10 @@ import com.opengamma.analytics.financial.interestrate.swaption.provider.Swaption
 import com.opengamma.analytics.financial.model.interestrate.definition.LiborMarketModelDisplacedDiffusionDataBundle;
 import com.opengamma.analytics.financial.model.interestrate.definition.LiborMarketModelDisplacedDiffusionParameters;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.tuple.DoublesPair;
@@ -50,9 +51,9 @@ public class SwaptionPhysicalFixedIborSABRLMMAtBestMethod implements PricingMeth
   /**
    * The matrix algebra used.
    */
-  private static final CommonsMatrixAlgebra ALGEBRA = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
   /**
-   * The noneyness of strikes used in the calibration basket. Difference between the swaption rate and the basket rates.
+   * The moneyness of strikes used in the calibration basket. Difference between the swaption rate and the basket rates.
    */
   private final double[] _strikeMoneyness;
   /**

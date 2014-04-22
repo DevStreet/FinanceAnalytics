@@ -18,8 +18,7 @@ import com.opengamma.maths.nodes.MTIMES;
 import com.opengamma.maths.nodes.NORM2;
 
 /**
- * An absolutely minimal implementation of matrix algebra - only various multiplications covered. For more advanced stuff (e.g. calculating the inverse) use {@link ColtMatrixAlgebra} or
- * {@link CommonsMatrixAlgebra}
+ * An absolutely minimal implementation of matrix algebra - only various multiplications covered.
  */
 public class OGMatrixAlgebra extends MatrixAlgebra {
 

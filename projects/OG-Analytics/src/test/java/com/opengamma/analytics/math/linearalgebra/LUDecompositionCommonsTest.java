@@ -10,9 +10,9 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -20,7 +20,7 @@ import com.opengamma.util.test.TestGroup;
  */
 @Test(groups = TestGroup.UNIT)
 public class LUDecompositionCommonsTest {
-  private static final MatrixAlgebra ALGEBRA = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
   private static final Decomposition<LUDecompositionResult> LU = new LUDecompositionCommons();
   private static final DoubleMatrix2D A = new DoubleMatrix2D(new double[][] {new double[] {1, 2, -1}, new double[] {4, 3, 1}, new double[] {2, 2, 3}});
   private static final double EPS = 1e-9;

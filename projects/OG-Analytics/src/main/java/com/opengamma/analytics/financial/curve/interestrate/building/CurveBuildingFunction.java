@@ -27,6 +27,7 @@ import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.rootfinding.newton.BroydenVectorRootFinder;
 import com.opengamma.util.tuple.Pair;
 import com.opengamma.util.tuple.Pairs;
@@ -58,7 +59,7 @@ public class CurveBuildingFunction {
   /**
    * The matrix algebra used for matrix inversion.
    */
-  private static final MatrixAlgebra MATRIX_ALGEBRA = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra MATRIX_ALGEBRA =  MatrixAlgebraFactory.getDefaultAlgebra();;
 
   /**
    * Constructor.

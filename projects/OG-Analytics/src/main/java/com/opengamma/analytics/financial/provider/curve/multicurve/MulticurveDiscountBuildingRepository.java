@@ -27,10 +27,10 @@ import com.opengamma.analytics.financial.provider.sensitivity.multicurve.Multicu
 import com.opengamma.analytics.financial.provider.sensitivity.multicurve.ParameterSensitivityMulticurveUnderlyingMatrixCalculator;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.rootfinding.newton.BroydenVectorRootFinder;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
@@ -62,7 +62,7 @@ public class MulticurveDiscountBuildingRepository {
   /**
    * The matrix algebra used for matrix inversion.
    */
-  private static final MatrixAlgebra MATRIX_ALGEBRA = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra MATRIX_ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
 
   /**
    * Constructor.

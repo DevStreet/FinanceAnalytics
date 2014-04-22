@@ -20,9 +20,10 @@ import com.opengamma.analytics.financial.model.interestrate.definition.LiborMark
 import com.opengamma.analytics.financial.model.interestrate.definition.LiborMarketModelDisplacedDiffusionParameters;
 import com.opengamma.analytics.financial.model.option.definition.SABRInterestRateDataBundle;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.CurrencyAmount;
 import com.opengamma.util.tuple.DoublesPair;
@@ -62,6 +63,11 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
   private static final SwaptionPhysicalFixedIborBasketMethod METHOD_BASKET = SwaptionPhysicalFixedIborBasketMethod.getInstance();
 
   /**
+   * The matrix algebra
+   */
+  private static final MatrixAlgebra ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
+
+  /**
    * The method calibrates a LMM on a set of vanilla swaption priced with SABR. The set of vanilla swaptions is given by the CalibrationType.
    * The original swaption is priced with the calibrated LMM.
    * This should not be used for vanilla swaptions (the price is equal to the SABR price with a longer computation type and some approximation).
@@ -74,8 +80,9 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
     ArgumentChecker.notNull(swaption, "swaption");
     ArgumentChecker.notNull(curves, "curves");
     //TODO: Create a way to chose the LMM base parameters (displacement, mean reversion, volatility).
-    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION, new VolatilityLMMAngle(
-        DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
+    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION,
+        new VolatilityLMMAngle(
+            DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective objective = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective(lmmParameters);
     final SuccessiveRootFinderCalibrationEngine calibrationEngine = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine(objective);
     //TODO: Create a way to chose the calibration type.
@@ -104,8 +111,9 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
     ArgumentChecker.notNull(swaption, "swaption");
     ArgumentChecker.notNull(curves, "curves");
     //TODO: Create a way to chose the LMM base parameters (displacement, mean reversion, volatility).
-    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION, new VolatilityLMMAngle(
-        DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
+    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION,
+        new VolatilityLMMAngle(
+            DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective objective = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective(lmmParameters);
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine calibrationEngine = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine(objective);
     //TODO: Create a way to chose the calibration type.
@@ -142,9 +150,8 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
         }
       }
     }
-    final CommonsMatrixAlgebra matrix = new CommonsMatrixAlgebra();
     final DoubleMatrix2D dPvCaldLambdaMatrix = new DoubleMatrix2D(dPvCaldLambda);
-    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = matrix.getInverse(dPvCaldLambdaMatrix);
+    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getInverse(dPvCaldLambdaMatrix);
     // SABR sensitivity
     final double[][] dPvCaldAlpha = new double[nbCal][nbCal];
     final double[][] dPvCaldRho = new double[nbCal][nbCal];
@@ -159,17 +166,17 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
     }
     final DoubleMatrix1D dPvAmdLambdaMatrix = new DoubleMatrix1D(dPvAmdLambda);
     final DoubleMatrix2D dPvCaldAlphaMatrix = new DoubleMatrix2D(dPvCaldAlpha);
-    final DoubleMatrix2D dLambdadAlphaMatrix = (DoubleMatrix2D) matrix.multiply(dPvCaldLambdaMatrixInverse, dPvCaldAlphaMatrix);
-    final DoubleMatrix2D dPvAmdAlphaMatrix = (DoubleMatrix2D) matrix.multiply(matrix.getTranspose(dLambdadAlphaMatrix), dPvAmdLambdaMatrix);
+    final DoubleMatrix2D dLambdadAlphaMatrix = (DoubleMatrix2D) ALGEBRA.multiply(dPvCaldLambdaMatrixInverse, dPvCaldAlphaMatrix);
+    final DoubleMatrix2D dPvAmdAlphaMatrix = (DoubleMatrix2D) ALGEBRA.multiply(ALGEBRA.getTranspose(dLambdadAlphaMatrix), dPvAmdLambdaMatrix);
     final DoubleMatrix2D dPvCaldRhoMatrix = new DoubleMatrix2D(dPvCaldRho);
-    final DoubleMatrix2D dLambdadRhoMatrix = (DoubleMatrix2D) matrix.multiply(dPvCaldLambdaMatrixInverse, dPvCaldRhoMatrix);
-    final DoubleMatrix2D dPvAmdRhoMatrix = (DoubleMatrix2D) matrix.multiply(matrix.getTranspose(dLambdadRhoMatrix), dPvAmdLambdaMatrix);
+    final DoubleMatrix2D dLambdadRhoMatrix = (DoubleMatrix2D) ALGEBRA.multiply(dPvCaldLambdaMatrixInverse, dPvCaldRhoMatrix);
+    final DoubleMatrix2D dPvAmdRhoMatrix = (DoubleMatrix2D) ALGEBRA.multiply(ALGEBRA.getTranspose(dLambdadRhoMatrix), dPvAmdLambdaMatrix);
     final DoubleMatrix2D dPvCaldNuMatrix = new DoubleMatrix2D(dPvCaldNu);
-    final DoubleMatrix2D dLambdadNuMatrix = (DoubleMatrix2D) matrix.multiply(dPvCaldLambdaMatrixInverse, dPvCaldNuMatrix);
-    final DoubleMatrix2D dPvAmdNuMatrix = (DoubleMatrix2D) matrix.multiply(matrix.getTranspose(dLambdadNuMatrix), dPvAmdLambdaMatrix);
-    final double[] dPvAmdAlpha = matrix.getTranspose(dPvAmdAlphaMatrix).getData()[0];
-    final double[] dPvAmdRho = matrix.getTranspose(dPvAmdRhoMatrix).getData()[0];
-    final double[] dPvAmdNu = matrix.getTranspose(dPvAmdNuMatrix).getData()[0];
+    final DoubleMatrix2D dLambdadNuMatrix = (DoubleMatrix2D) ALGEBRA.multiply(dPvCaldLambdaMatrixInverse, dPvCaldNuMatrix);
+    final DoubleMatrix2D dPvAmdNuMatrix = (DoubleMatrix2D) ALGEBRA.multiply(ALGEBRA.getTranspose(dLambdadNuMatrix), dPvAmdLambdaMatrix);
+    final double[] dPvAmdAlpha = ALGEBRA.getTranspose(dPvAmdAlphaMatrix).getData()[0];
+    final double[] dPvAmdRho = ALGEBRA.getTranspose(dPvAmdRhoMatrix).getData()[0];
+    final double[] dPvAmdNu = ALGEBRA.getTranspose(dPvAmdNuMatrix).getData()[0];
     // Storage in PresentValueSABRSensitivityDataBundle
     final PresentValueSABRSensitivityDataBundle sensi = new PresentValueSABRSensitivityDataBundle();
     for (int loopcal = 0; loopcal < nbCal; loopcal++) {
@@ -192,8 +199,9 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
     ArgumentChecker.notNull(swaption, "swaption");
     ArgumentChecker.notNull(curves, "curves");
     //TODO: Create a way to chose the LMM base parameters (displacement, mean reversion, volatility).
-    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION, new VolatilityLMMAngle(
-        DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
+    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION,
+        new VolatilityLMMAngle(
+            DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective objective = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective(lmmParameters);
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine calibrationEngine = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine(objective);
     final SwaptionPhysicalFixedIbor[] swaptionCalibration = METHOD_BASKET.calibrationBasketFixedLegPeriod(swaption);
@@ -241,9 +249,8 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
       pvcsCalDiff[loopcal] = pvcsCalBase[loopcal].plus(pvcsCalCal[loopcal].multipliedBy(-1));
       pvcsCalDiff[loopcal] = pvcsCalDiff[loopcal].cleaned();
     }
-    final CommonsMatrixAlgebra matrix = new CommonsMatrixAlgebra();
     final DoubleMatrix2D dPvCaldLambdaMatrix = new DoubleMatrix2D(dPvCaldLambda);
-    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = matrix.getInverse(dPvCaldLambdaMatrix);
+    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getInverse(dPvCaldLambdaMatrix);
     // Curve sensitivity
     final InterestRateCurveSensitivity[] dLambdadC = new InterestRateCurveSensitivity[nbCal];
     for (int loopcal1 = 0; loopcal1 < nbCal; loopcal1++) {
@@ -297,8 +304,9 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
     ArgumentChecker.notNull(swaption, "swaption");
     ArgumentChecker.notNull(curves, "curves");
     //TODO: Create a way to chose the LMM base parameters (displacement, mean reversion, volatility).
-    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION, new VolatilityLMMAngle(
-        DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
+    final LiborMarketModelDisplacedDiffusionParameters lmmParameters = LiborMarketModelDisplacedDiffusionParameters.from(swaption, DEFAULT_DISPLACEMENT, DEFAULT_MEAN_REVERSION,
+        new VolatilityLMMAngle(
+            DEFAULT_ANGLE, DEFAULT_DISPLACEMENT));
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective objective = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationObjective(lmmParameters);
     final SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine calibrationEngine = new SwaptionPhysicalLMMDDSuccessiveRootFinderCalibrationEngine(objective);
     final SwaptionPhysicalFixedIbor[] swaptionCalibration = METHOD_BASKET.calibrationBasketFixedLegPeriod(swaption);
@@ -347,9 +355,8 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
       pvcsCalDiff[loopcal] = pvcsCalBase[loopcal].plus(pvcsCalCal[loopcal].multipliedBy(-1));
       pvcsCalDiff[loopcal] = pvcsCalDiff[loopcal].cleaned();
     }
-    final CommonsMatrixAlgebra matrix = new CommonsMatrixAlgebra();
     final DoubleMatrix2D dPvCaldLambdaMatrix = new DoubleMatrix2D(dPvCaldLambda);
-    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = matrix.getInverse(dPvCaldLambdaMatrix);
+    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getInverse(dPvCaldLambdaMatrix);
     // SABR sensitivity
     final double[][] dPvCaldAlpha = new double[nbCal][nbCal];
     final double[][] dPvCaldRho = new double[nbCal][nbCal];
@@ -364,17 +371,17 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod implements PricingMetho
     }
     final DoubleMatrix1D dPvAmdLambdaMatrix = new DoubleMatrix1D(dPvAmdLambda);
     final DoubleMatrix2D dPvCaldAlphaMatrix = new DoubleMatrix2D(dPvCaldAlpha);
-    final DoubleMatrix2D dLambdadAlphaMatrix = (DoubleMatrix2D) matrix.multiply(dPvCaldLambdaMatrixInverse, dPvCaldAlphaMatrix);
-    final DoubleMatrix2D dPvAmdAlphaMatrix = (DoubleMatrix2D) matrix.multiply(matrix.getTranspose(dLambdadAlphaMatrix), dPvAmdLambdaMatrix);
+    final DoubleMatrix2D dLambdadAlphaMatrix = (DoubleMatrix2D) ALGEBRA.multiply(dPvCaldLambdaMatrixInverse, dPvCaldAlphaMatrix);
+    final DoubleMatrix2D dPvAmdAlphaMatrix = (DoubleMatrix2D) ALGEBRA.multiply(ALGEBRA.getTranspose(dLambdadAlphaMatrix), dPvAmdLambdaMatrix);
     final DoubleMatrix2D dPvCaldRhoMatrix = new DoubleMatrix2D(dPvCaldRho);
-    final DoubleMatrix2D dLambdadRhoMatrix = (DoubleMatrix2D) matrix.multiply(dPvCaldLambdaMatrixInverse, dPvCaldRhoMatrix);
-    final DoubleMatrix2D dPvAmdRhoMatrix = (DoubleMatrix2D) matrix.multiply(matrix.getTranspose(dLambdadRhoMatrix), dPvAmdLambdaMatrix);
+    final DoubleMatrix2D dLambdadRhoMatrix = (DoubleMatrix2D) ALGEBRA.multiply(dPvCaldLambdaMatrixInverse, dPvCaldRhoMatrix);
+    final DoubleMatrix2D dPvAmdRhoMatrix = (DoubleMatrix2D) ALGEBRA.multiply(ALGEBRA.getTranspose(dLambdadRhoMatrix), dPvAmdLambdaMatrix);
     final DoubleMatrix2D dPvCaldNuMatrix = new DoubleMatrix2D(dPvCaldNu);
-    final DoubleMatrix2D dLambdadNuMatrix = (DoubleMatrix2D) matrix.multiply(dPvCaldLambdaMatrixInverse, dPvCaldNuMatrix);
-    final DoubleMatrix2D dPvAmdNuMatrix = (DoubleMatrix2D) matrix.multiply(matrix.getTranspose(dLambdadNuMatrix), dPvAmdLambdaMatrix);
-    final double[] dPvAmdAlpha = matrix.getTranspose(dPvAmdAlphaMatrix).getData()[0];
-    final double[] dPvAmdRho = matrix.getTranspose(dPvAmdRhoMatrix).getData()[0];
-    final double[] dPvAmdNu = matrix.getTranspose(dPvAmdNuMatrix).getData()[0];
+    final DoubleMatrix2D dLambdadNuMatrix = (DoubleMatrix2D) ALGEBRA.multiply(dPvCaldLambdaMatrixInverse, dPvCaldNuMatrix);
+    final DoubleMatrix2D dPvAmdNuMatrix = (DoubleMatrix2D) ALGEBRA.multiply(ALGEBRA.getTranspose(dLambdadNuMatrix), dPvAmdLambdaMatrix);
+    final double[] dPvAmdAlpha = ALGEBRA.getTranspose(dPvAmdAlphaMatrix).getData()[0];
+    final double[] dPvAmdRho = ALGEBRA.getTranspose(dPvAmdRhoMatrix).getData()[0];
+    final double[] dPvAmdNu = ALGEBRA.getTranspose(dPvAmdNuMatrix).getData()[0];
     // Storage in PresentValueSABRSensitivityDataBundle
     final PresentValueSABRSensitivityDataBundle pvss = new PresentValueSABRSensitivityDataBundle();
     for (int loopcal = 0; loopcal < nbCal; loopcal++) {

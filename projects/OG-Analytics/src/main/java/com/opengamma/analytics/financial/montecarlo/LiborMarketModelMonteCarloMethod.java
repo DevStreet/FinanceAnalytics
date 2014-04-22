@@ -12,9 +12,9 @@ import com.opengamma.analytics.financial.interestrate.YieldCurveBundle;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
 import com.opengamma.analytics.financial.model.interestrate.definition.LiborMarketModelDisplacedDiffusionDataBundle;
 import com.opengamma.analytics.financial.model.interestrate.definition.LiborMarketModelDisplacedDiffusionParameters;
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.random.RandomNumberGenerator;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.CurrencyAmount;
@@ -48,6 +48,11 @@ public class LiborMarketModelMonteCarloMethod extends MonteCarloMethod {
    */
   private static final double MAX_JUMP_DEFAULT = 1.0;
 
+  /**
+   * The algebra
+   */
+  private static  final MatrixAlgebra ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
+  
   /**
    * Constructor.
    * @param numberGenerator The random number generator. Generate Normally distributed numbers.
@@ -135,8 +140,7 @@ public class LiborMarketModelMonteCarloMethod extends MonteCarloMethod {
     final double[] almm = lmm.getDisplacement();
     final double[] deltalmm = lmm.getAccrualFactor();
     final DoubleMatrix2D gammaLMM = new DoubleMatrix2D(lmm.getVolatility());
-    final MatrixAlgebra algebra = new CommonsMatrixAlgebra();
-    final DoubleMatrix2D s = (DoubleMatrix2D) algebra.multiply(gammaLMM, algebra.getTranspose(gammaLMM));
+    final DoubleMatrix2D s = (DoubleMatrix2D) ALGEBRA.multiply(gammaLMM, ALGEBRA.getTranspose(gammaLMM));
     final int nbJump = jumpTime.length - 1;
     final int nbPath = initIbor[0].length;
     final int nbPeriodLMM = lmm.getNbPeriod();

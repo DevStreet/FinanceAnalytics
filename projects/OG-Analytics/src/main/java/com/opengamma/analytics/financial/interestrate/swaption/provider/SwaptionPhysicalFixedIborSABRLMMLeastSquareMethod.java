@@ -21,9 +21,10 @@ import com.opengamma.analytics.financial.provider.description.interestrate.SABRS
 import com.opengamma.analytics.financial.provider.method.SuccessiveLeastSquareLMMDDCalibrationEngine;
 import com.opengamma.analytics.financial.provider.method.SuccessiveLeastSquareLMMDDCalibrationObjective;
 import com.opengamma.analytics.financial.provider.sensitivity.multicurve.MultipleCurrencyMulticurveSensitivity;
-import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.money.MultipleCurrencyAmount;
@@ -54,7 +55,7 @@ public class SwaptionPhysicalFixedIborSABRLMMLeastSquareMethod {
   /**
    * The matrix algebra used.
    */
-  private static final CommonsMatrixAlgebra ALGEBRA = new CommonsMatrixAlgebra();
+  private static final MatrixAlgebra ALGEBRA = MatrixAlgebraFactory.getDefaultAlgebra();
   /**
    * The moneyness of strikes used in the calibration basket. Difference between the swaption rate and the basket rates.
    */
