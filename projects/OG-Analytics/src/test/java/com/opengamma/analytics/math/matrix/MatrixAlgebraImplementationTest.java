@@ -94,17 +94,17 @@ public class MatrixAlgebraImplementationTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testCommonsInverse() {
-    COMMONS.getInverse(M1);
+    COMMONS.getPseudoInverse(M1);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testColtInverse() {
-    COLT.getInverse(M1);
+    COLT.getPseudoInverse(M1);
   }
 
   @Test(expectedExceptions = NotImplementedException.class)
   public void testOGInverse() {
-    OG.getInverse(M1);
+    OG.getPseudoInverse(M1);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -311,7 +311,7 @@ public class MatrixAlgebraImplementationTest {
 
   @Test
   public void testInverse() {
-    assertMatrixEquals(COMMONS.getInverse(M3), COLT.getInverse(M3));
+    assertMatrixEquals(COMMONS.getPseudoInverse(M3), COLT.getPseudoInverse(M3));
   }
 
   @Test

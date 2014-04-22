@@ -132,7 +132,7 @@ public class MulticurveDiscountBuildingRepository {
     final Function1D<DoubleMatrix1D, DoubleMatrix2D> jacobianCalculator = new MulticurveDiscountFinderJacobian(new ParameterSensitivityMulticurveUnderlyingMatrixCalculator(sensitivityCalculator),
         data);
     final DoubleMatrix2D jacobian = jacobianCalculator.evaluate(new DoubleMatrix1D(parameters));
-    final DoubleMatrix2D inverseJacobian = MATRIX_ALGEBRA.getInverse(jacobian);
+    final DoubleMatrix2D inverseJacobian = MATRIX_ALGEBRA.getPseudoInverse(jacobian);
     final double[][] matrixTotal = inverseJacobian.getData();
     final DoubleMatrix2D[] result = new DoubleMatrix2D[nbParameters.length];
     int startCurve = 0;

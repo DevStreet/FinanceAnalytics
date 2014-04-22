@@ -70,7 +70,7 @@ public abstract class MatrixAlgebra {
     Validate.notNull(m2, "m2");
     Validate.isTrue(m1 instanceof DoubleMatrix2D, "Can only divide a 2D matrix");
     Validate.isTrue(m2 instanceof DoubleMatrix2D, "Can only perform division with a 2D matrix");
-    return multiply(m1, getInverse(m2));
+    return multiply(m1, getPseudoInverse(m2));
   }
 
   /**
@@ -230,11 +230,20 @@ public abstract class MatrixAlgebra {
   public abstract double getDeterminant(final Matrix<?> m);
 
   /** 
-   * Returns the inverse (or pseudo-inverse) of the matrix.
+   * Returns the pseudo-inverse of the matrix.
+   * @param m A matrix, not null
+   * @return The pseudo-inverse matrix
+   */
+  public abstract DoubleMatrix2D getPseudoInverse(final Matrix<?> m);
+
+  /** 
+   * Returns the inverse of the matrix.
    * @param m A matrix, not null
    * @return The inverse matrix
    */
-  public abstract DoubleMatrix2D getInverse(final Matrix<?> m);
+  public DoubleMatrix2D getInverse(final Matrix<?> m) {
+    throw new NotImplementedException();
+  }
 
   /**
    * Returns the inner (or dot) product.

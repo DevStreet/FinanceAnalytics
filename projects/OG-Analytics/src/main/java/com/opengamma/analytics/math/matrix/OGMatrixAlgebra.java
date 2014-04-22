@@ -66,7 +66,16 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
    * @throws NotImplementedException
    */
   @Override
-  public DoubleMatrix2D getInverse(final Matrix<?> m) {
+  public DoubleMatrix2D getInverse(Matrix<?> m) {
+    throw new NotImplementedException();
+  }
+  
+  /**
+   * {@inheritDoc}
+   * @throws NotImplementedException
+   */
+  @Override
+  public DoubleMatrix2D getPseudoInverse(final Matrix<?> m) {
     throw new NotImplementedException();
   }
 

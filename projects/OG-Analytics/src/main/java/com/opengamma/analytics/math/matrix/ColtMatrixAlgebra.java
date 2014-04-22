@@ -46,7 +46,7 @@ public class ColtMatrixAlgebra extends MatrixAlgebra {
    * {@inheritDoc}
    */
   @Override
-  public DoubleMatrix2D getInverse(final Matrix<?> m) {
+  public DoubleMatrix2D getPseudoInverse(final Matrix<?> m) {
     Validate.notNull(m, "m");
     if (m instanceof DoubleMatrix2D) {
       return new DoubleMatrix2D(ALGEBRA.inverse(DoubleFactory2D.dense.make(((DoubleMatrix2D) m).getData())).toArray());

@@ -189,7 +189,7 @@ public class SwaptionPhysicalFixedIborSABRLMMLeastSquareMethod {
 
     final DoubleMatrix2D dfdThetaMat = new DoubleMatrix2D(dfdTheta);
     final DoubleMatrix2D dfdPhiMat = new DoubleMatrix2D(dfdPhi);
-    final DoubleMatrix2D dPhidThetaMat = (DoubleMatrix2D) ALGEBRA.scale(ALGEBRA.multiply(ALGEBRA.getInverse(dfdPhiMat), dfdThetaMat), -1.0);
+    final DoubleMatrix2D dPhidThetaMat = (DoubleMatrix2D) ALGEBRA.scale(ALGEBRA.multiply(ALGEBRA.getPseudoInverse(dfdPhiMat), dfdThetaMat), -1.0);
     final DoubleMatrix1D dPvdPhiMat = new DoubleMatrix1D(dPvdPhi);
     final DoubleMatrix2D dPvdThetaMat = ALGEBRA.getTranspose(ALGEBRA.multiply(ALGEBRA.getTranspose(dPhidThetaMat), dPvdPhiMat));
     final double[] dPvdTheta = dPvdThetaMat.getData()[0];
@@ -299,7 +299,7 @@ public class SwaptionPhysicalFixedIborSABRLMMLeastSquareMethod {
 
     final DoubleMatrix2D dfdThetaMat = new DoubleMatrix2D(dfdTheta);
     final DoubleMatrix2D dfdPhiMat = new DoubleMatrix2D(dfdPhi);
-    final DoubleMatrix2D dfdPhiInvMat = ALGEBRA.getInverse(dfdPhiMat);
+    final DoubleMatrix2D dfdPhiInvMat = ALGEBRA.getPseudoInverse(dfdPhiMat);
     final DoubleMatrix2D dPhidThetaMat = (DoubleMatrix2D) ALGEBRA.scale(ALGEBRA.multiply(dfdPhiInvMat, dfdThetaMat), -1.0);
     final DoubleMatrix1D dPvdPhiMat = new DoubleMatrix1D(dPvdPhi);
     final DoubleMatrix2D dPvdThetaMat = ALGEBRA.getTranspose(ALGEBRA.multiply(ALGEBRA.getTranspose(dPhidThetaMat), dPvdPhiMat));

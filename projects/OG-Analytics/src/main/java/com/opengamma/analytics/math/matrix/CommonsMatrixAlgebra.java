@@ -71,7 +71,7 @@ public class CommonsMatrixAlgebra extends MatrixAlgebra {
    * {@inheritDoc}
    */
   @Override
-  public DoubleMatrix2D getInverse(final Matrix<?> m) {
+  public DoubleMatrix2D getPseudoInverse(final Matrix<?> m) {
     Validate.notNull(m, "matrix was null");
     if (m instanceof DoubleMatrix2D) {
       final RealMatrix temp = CommonsMathWrapper.wrap((DoubleMatrix2D) m);

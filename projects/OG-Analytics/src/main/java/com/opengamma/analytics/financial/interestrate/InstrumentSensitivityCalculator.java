@@ -48,7 +48,7 @@ public final class InstrumentSensitivityCalculator {
     Validate.isTrue(n == couponSensitivity.getNumberOfElements());
     Validate.isTrue(n == pvJacobian.getNumberOfColumns());
     Validate.isTrue(n == pvJacobian.getNumberOfRows());
-    final DoubleMatrix2D invJac = MATRIX_ALGEBRA.getInverse(pvJacobian);
+    final DoubleMatrix2D invJac = MATRIX_ALGEBRA.getPseudoInverse(pvJacobian);
     // TODO: REVIEW: do we need to inverse the Jacobian each time?
 
     final double[] res = new double[n];
@@ -81,7 +81,7 @@ public final class InstrumentSensitivityCalculator {
     Validate.isTrue(n == parRateJacobian.getNumberOfColumns(), "Have " + n + " node sensitivities but " + parRateJacobian.getNumberOfColumns() + " columns in Jacobian");
     Validate.isTrue(n == parRateJacobian.getNumberOfRows(), "Have " + n + " node sensitivities but " + parRateJacobian.getNumberOfRows() + " rows in Jacobian");
 
-    final DoubleMatrix2D invJac = MATRIX_ALGEBRA.getInverse(parRateJacobian);
+    final DoubleMatrix2D invJac = MATRIX_ALGEBRA.getPseudoInverse(parRateJacobian);
 
     final double[] res = new double[n];
     for (int i = 0; i < n; i++) {

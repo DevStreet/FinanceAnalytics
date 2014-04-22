@@ -43,7 +43,7 @@ public class MatrixAlgebraFactoryTest {
       }
 
       @Override
-      public DoubleMatrix2D getInverse(final Matrix<?> m) {
+      public DoubleMatrix2D getPseudoInverse(final Matrix<?> m) {
         return null;
       }
 

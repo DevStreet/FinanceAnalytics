@@ -151,7 +151,7 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod {
       }
     }
     final DoubleMatrix2D dPvCaldLambdaMatrix = new DoubleMatrix2D(dPvCaldLambda);
-    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getInverse(dPvCaldLambdaMatrix);
+    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getPseudoInverse(dPvCaldLambdaMatrix);
     // SABR sensitivity
     final double[][] dPvCaldAlpha = new double[nbCal][nbCal];
     final double[][] dPvCaldRho = new double[nbCal][nbCal];
@@ -251,7 +251,7 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod {
       pvcsCalDiff[loopcal] = pvcsCalDiff[loopcal].cleaned();
     }
     final DoubleMatrix2D dPvCaldLambdaMatrix = new DoubleMatrix2D(dPvCaldLambda);
-    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getInverse(dPvCaldLambdaMatrix);
+    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getPseudoInverse(dPvCaldLambdaMatrix);
     // Curve sensitivity
     final MultipleCurrencyMulticurveSensitivity[] dLambdadC = new MultipleCurrencyMulticurveSensitivity[nbCal];
     for (int loopcal1 = 0; loopcal1 < nbCal; loopcal1++) {
@@ -358,7 +358,7 @@ public class SwaptionPhysicalFixedIborSABRLMMExactMethod {
       pvcsCalDiff[loopcal] = pvcsCalDiff[loopcal].cleaned();
     }
     final DoubleMatrix2D dPvCaldLambdaMatrix = new DoubleMatrix2D(dPvCaldLambda);
-    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getInverse(dPvCaldLambdaMatrix);
+    final DoubleMatrix2D dPvCaldLambdaMatrixInverse = ALGEBRA.getPseudoInverse(dPvCaldLambdaMatrix);
     // SABR sensitivity
     final double[][] dPvCaldAlpha = new double[nbCal][nbCal];
     final double[][] dPvCaldRho = new double[nbCal][nbCal];

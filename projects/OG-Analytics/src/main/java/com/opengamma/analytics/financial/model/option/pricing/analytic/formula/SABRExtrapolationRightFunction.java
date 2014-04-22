@@ -394,7 +394,7 @@ public class SABRExtrapolationRightFunction {
     fD[2][2] = (fpp + fD[0][2] * (2 * (2 * _mu + 3) + 4 * _parameter[1] / _cutOffStrike + 8 * _parameter[2] / (_cutOffStrike * _cutOffStrike))) / (_cutOffStrike * _cutOffStrike);
     final DoubleMatrix2D fDmatrix = new DoubleMatrix2D(fD);
     // Derivative of abc with respect to forward
-    final DoubleMatrix2D fDInverse = _algebra.getInverse(fDmatrix);
+    final DoubleMatrix2D fDInverse = _algebra.getPseudoInverse(fDmatrix);
     final OGMatrixAlgebra algebraOG = new OGMatrixAlgebra();
     final DoubleMatrix1D derivativeF = (DoubleMatrix1D) algebraOG.multiply(fDInverse, pDFvector);
     return derivativeF.getData();
@@ -484,7 +484,7 @@ public class SABRExtrapolationRightFunction {
     fD[2][2] = (fpp + fD[0][2] * (2 * (2 * _mu + 3) + 4 * _parameter[1] / _cutOffStrike + 8 * _parameter[2] / (_cutOffStrike * _cutOffStrike))) / (_cutOffStrike * _cutOffStrike);
     final DoubleMatrix2D fDmatrix = new DoubleMatrix2D(fD);
     // Derivative of abc with respect to forward
-    final DoubleMatrix2D fDInverse = _algebra.getInverse(fDmatrix);
+    final DoubleMatrix2D fDInverse = _algebra.getPseudoInverse(fDmatrix);
     final OGMatrixAlgebra algebraOG = new OGMatrixAlgebra();
     for (int loopparam = 0; loopparam < 4; loopparam++) {
       final DoubleMatrix1D pDSABRvector = new DoubleMatrix1D(pDSABR[loopparam]);
