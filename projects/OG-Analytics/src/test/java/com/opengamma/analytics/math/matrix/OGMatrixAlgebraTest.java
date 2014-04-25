@@ -37,6 +37,14 @@ public class OGMatrixAlgebraTest {
   }
 
   @Test
+  public void testPseudoInversion() {
+    DoubleMatrix2D res = ALGEBRA.getPseudoInverse(A);
+    double[][] expected = new double[][] { { 0.6666666666666666, -2.3333333333333335, 0.9999999999999997 }, { 0.6666666666666665, -1.3333333333333328, 0.9999999999999993 },
+      { -0.3333333333333328, 1.6666666666666652, -0.9999999999999987 } };
+    assertTrue(FuzzyEquals.ArrayFuzzyEquals(res.asDoubleAoA(), expected));
+  }
+
+  @Test
   public void testDotProduct() {
     double res = ALGEBRA.getInnerProduct(E, F);
     assertEquals(-3.0, res, 1e-15);

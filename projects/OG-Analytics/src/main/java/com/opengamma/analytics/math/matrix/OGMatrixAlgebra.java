@@ -16,6 +16,7 @@ import com.opengamma.maths.datacontainers.scalar.OGRealScalar;
 import com.opengamma.maths.materialisers.Materialisers;
 import com.opengamma.maths.nodes.MTIMES;
 import com.opengamma.maths.nodes.NORM2;
+import com.opengamma.maths.nodes.PINV;
 
 /**
  * An absolutely minimal implementation of matrix algebra - only various multiplications covered.
@@ -76,7 +77,9 @@ public class OGMatrixAlgebra extends MatrixAlgebra {
    */
   @Override
   public DoubleMatrix2D getPseudoInverse(final Matrix<?> m) {
-    throw new NotImplementedException();
+    DoubleMatrix2D deref = (DoubleMatrix2D) m;
+    PINV  inv = new PINV(new OGRealDenseMatrix(deref.asDoubleAoA()));
+    return new DoubleMatrix2D(Materialisers.toDoubleArrayOfArrays(inv));
   }
 
   /**
