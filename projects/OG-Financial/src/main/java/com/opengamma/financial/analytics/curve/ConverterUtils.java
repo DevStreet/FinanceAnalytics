@@ -5,14 +5,18 @@
  */
 package com.opengamma.financial.analytics.curve;
 
+import com.opengamma.analytics.financial.instrument.index.GeneratorSwapFixedIbor;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.index.IndexPrice;
 import com.opengamma.financial.convention.IborIndexConvention;
 import com.opengamma.financial.convention.OvernightIndexConvention;
 import com.opengamma.financial.convention.PriceIndexConvention;
+import com.opengamma.financial.convention.SwapFixedLegConvention;
 import com.opengamma.financial.convention.businessday.BusinessDayConvention;
+import com.opengamma.financial.convention.calendar.Calendar;
 import com.opengamma.financial.convention.daycount.DayCount;
+import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.time.Tenor;
 
@@ -61,6 +65,21 @@ public class ConverterUtils {
   public static IndexPrice indexPrice(final String name, final PriceIndexConvention indexConvention) {
     final IndexPrice priceIndex = new IndexPrice(name, indexConvention.getCurrency());
     return priceIndex;
+  }
+  
+  /**
+   * Create a GeneratorSwapFixedIbor from the fixed leg convention and the ibor index.
+   * @param name The generator name.
+   * @param conventionLegFixed The convention of the fixed leg.
+   * @param indexIbor The ibor index underlying the Ibor leg.
+   * @param calendar The calendar (for payment and fixing)
+   * @return The generator.
+   */
+  public static GeneratorSwapFixedIbor generatorSwapFixedIbor(final String name, final SwapFixedLegConvention conventionLegFixed, final IborIndex indexIbor, final Calendar calendar) {
+    ArgumentChecker.notNull(conventionLegFixed, "fixed leg convention");
+    ArgumentChecker.notNull(indexIbor, "indexIbor");
+    return new GeneratorSwapFixedIbor(name, conventionLegFixed.getPaymentTenor().getPeriod(), conventionLegFixed.getDayCount(), 
+        indexIbor, conventionLegFixed.getBusinessDayConvention(), conventionLegFixed.isIsEOM(), conventionLegFixed.getSettlementDays(), calendar);
   }
 
 }
