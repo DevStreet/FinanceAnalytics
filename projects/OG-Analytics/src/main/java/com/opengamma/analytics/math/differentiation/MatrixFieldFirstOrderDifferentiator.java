@@ -14,6 +14,12 @@ import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
 import com.opengamma.analytics.math.matrix.OGMatrixAlgebra;
 import com.opengamma.util.ArgumentChecker;
+import static com.opengamma.maths.DOGMA.D;
+import static com.opengamma.maths.DOGMA.mtimes;
+import static com.opengamma.maths.DOGMA.minus;
+import static com.opengamma.maths.DOGMA.plus;
+import static com.opengamma.maths.DOGMA.toDoubleArrayOfArrays;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
 
 /**
  * 
@@ -60,7 +66,15 @@ public class MatrixFieldFirstOrderDifferentiator implements Differentiator<Doubl
           final DoubleMatrix2D up = function.evaluate(x);
           xData[i] -= _twoEps;
           final DoubleMatrix2D down = function.evaluate(x);
-          res[i] = (DoubleMatrix2D) MA.scale(MA.subtract(up, down), _oneOverTwpEps); //TODO have this in one operation
+          // Old code
+          // res[i] = (DoubleMatrix2D) MA.scale(MA.subtract(up, down), _oneOverTwpEps);
+          // DOGMA Code below.
+          // Notes:
+          // mtimes() is a bit like "*" in matlab. (ideally we'd use times() in this case instead of mtimes(), but its not generated as yet!).
+          // minus() is a bit like "-" in matlab.
+          // D() is a shortcut to wrap a java double into a DOGMA double type (OGRealScalar).
+          // DoubleMatrix2D::asDoubleAoA() creates a copy of the DoubleMatrix2D data and returns it in the form of a double[][].
+          res[i] = new DoubleMatrix2D(toDoubleArrayOfArrays(mtimes(minus(new OGRealDenseMatrix(up.asDoubleAoA()), new OGRealDenseMatrix(down.asDoubleAoA())), D(_oneOverTwpEps))));
           xData[i] = oldValue;
         }
         return res;
@@ -122,9 +136,15 @@ public class MatrixFieldFirstOrderDifferentiator implements Differentiator<Doubl
               w = wCent;
             }
           }
-          res[i] = (DoubleMatrix2D) MA.add(MA.scale(y[0], w[0]), MA.scale(y[2], w[2]));
+          // Old code
+          // res[i] = (DoubleMatrix2D) MA.add(MA.scale(y[0], w[0]), MA.scale(y[2], w[2]));
+          // DOGMA (ideally we'd use times() instead of mtimes(), but its not generated as yet!).
+          res[i] = new DoubleMatrix2D(toDoubleArrayOfArrays(plus(mtimes(new OGRealDenseMatrix(y[0].asDoubleAoA()), D(w[0])), mtimes(new OGRealDenseMatrix(y[2].asDoubleAoA()), D(w[2])))));
           if (w[1] != 0) {
+            // Old code
             res[i] = (DoubleMatrix2D) MA.add(res[i], MA.scale(y[1], w[1]));
+            // DOGMA (ideally we'd use times() instead of mtimes(), but its not generated as yet!).
+            res[i] = new DoubleMatrix2D(toDoubleArrayOfArrays(plus(new OGRealDenseMatrix(res[i].asDoubleAoA()), mtimes(new OGRealDenseMatrix(y[1].asDoubleAoA()), D(w[1])))));
           }
           xData[i] = oldValue;
         }
@@ -133,5 +153,4 @@ public class MatrixFieldFirstOrderDifferentiator implements Differentiator<Doubl
     };
 
   }
-
 }
