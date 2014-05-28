@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.beans.Bean;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.ImmutableBean;
-import org.joda.beans.ImmutableConstructor;
 import org.joda.beans.JodaBeanUtils;
 import org.joda.beans.MetaProperty;
 import org.joda.beans.Property;
@@ -23,6 +22,7 @@ import org.joda.beans.impl.direct.DirectMetaBean;
 import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
+import com.google.common.base.Throwables;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -46,12 +46,25 @@ public final class Failure implements ImmutableBean {
    */
   @PropertyDefinition
   private final ThrowableDetails _causeDetails;
+  /**
+   * Stack trace where the failure occurred.
+   * If the failure was caused by a {@code Throwable} this field is null as the stack trace is already available.
+   * Otherwise it's the location where the failure was created.
+   */
+  @PropertyDefinition
+  private final String _stackTrace;
 
-  @ImmutableConstructor
   private Failure(FailureStatus status, String message, ThrowableDetails causeDetails) {
     _status = ArgumentChecker.notNull(status, "status");
     _message = ArgumentChecker.notEmpty(message, "message");
     _causeDetails = causeDetails;
+
+    if (causeDetails == null) {
+      Exception exception = new Exception();
+      _stackTrace = Throwables.getStackTraceAsString(exception);
+    } else {
+      _stackTrace = null;
+    }
   }
 
   Failure(FailureStatus status, String message, Exception cause) {
@@ -107,6 +120,19 @@ public final class Failure implements ImmutableBean {
     return new Failure.Builder();
   }
 
+  private Failure(
+      FailureStatus status,
+      String message,
+      ThrowableDetails causeDetails,
+      String stackTrace) {
+    JodaBeanUtils.notNull(status, "status");
+    JodaBeanUtils.notNull(message, "message");
+    this._status = status;
+    this._message = message;
+    this._causeDetails = causeDetails;
+    this._stackTrace = stackTrace;
+  }
+
   @Override
   public Failure.Meta metaBean() {
     return Failure.Meta.INSTANCE;
@@ -151,6 +177,17 @@ public final class Failure implements ImmutableBean {
 
   //-----------------------------------------------------------------------
   /**
+   * Gets stack trace where the failure occurred.
+   * If the failure was caused by a {@code Throwable} this field is null as the stack trace is already available.
+   * Otherwise it's the location where the failure was created.
+   * @return the value of the property
+   */
+  public String getStackTrace() {
+    return _stackTrace;
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * Returns a builder that allows this bean to be mutated.
    * @return the mutable builder, not null
    */
@@ -172,7 +209,8 @@ public final class Failure implements ImmutableBean {
       Failure other = (Failure) obj;
       return JodaBeanUtils.equal(getStatus(), other.getStatus()) &&
           JodaBeanUtils.equal(getMessage(), other.getMessage()) &&
-          JodaBeanUtils.equal(getCauseDetails(), other.getCauseDetails());
+          JodaBeanUtils.equal(getCauseDetails(), other.getCauseDetails()) &&
+          JodaBeanUtils.equal(getStackTrace(), other.getStackTrace());
     }
     return false;
   }
@@ -183,16 +221,18 @@ public final class Failure implements ImmutableBean {
     hash += hash * 31 + JodaBeanUtils.hashCode(getStatus());
     hash += hash * 31 + JodaBeanUtils.hashCode(getMessage());
     hash += hash * 31 + JodaBeanUtils.hashCode(getCauseDetails());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getStackTrace());
     return hash;
   }
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder(128);
+    StringBuilder buf = new StringBuilder(160);
     buf.append("Failure{");
     buf.append("status").append('=').append(getStatus()).append(',').append(' ');
     buf.append("message").append('=').append(getMessage()).append(',').append(' ');
-    buf.append("causeDetails").append('=').append(JodaBeanUtils.toString(getCauseDetails()));
+    buf.append("causeDetails").append('=').append(getCauseDetails()).append(',').append(' ');
+    buf.append("stackTrace").append('=').append(JodaBeanUtils.toString(getStackTrace()));
     buf.append('}');
     return buf.toString();
   }
@@ -223,13 +263,19 @@ public final class Failure implements ImmutableBean {
     private final MetaProperty<ThrowableDetails> _causeDetails = DirectMetaProperty.ofImmutable(
         this, "causeDetails", Failure.class, ThrowableDetails.class);
     /**
+     * The meta-property for the {@code stackTrace} property.
+     */
+    private final MetaProperty<String> _stackTrace = DirectMetaProperty.ofImmutable(
+        this, "stackTrace", Failure.class, String.class);
+    /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> _metaPropertyMap$ = new DirectMetaPropertyMap(
         this, null,
         "status",
         "message",
-        "causeDetails");
+        "causeDetails",
+        "stackTrace");
 
     /**
      * Restricted constructor.
@@ -246,6 +292,8 @@ public final class Failure implements ImmutableBean {
           return _message;
         case 1620147609:  // causeDetails
           return _causeDetails;
+        case 2026279837:  // stackTrace
+          return _stackTrace;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -290,6 +338,14 @@ public final class Failure implements ImmutableBean {
       return _causeDetails;
     }
 
+    /**
+     * The meta-property for the {@code stackTrace} property.
+     * @return the meta-property, not null
+     */
+    public MetaProperty<String> stackTrace() {
+      return _stackTrace;
+    }
+
     //-----------------------------------------------------------------------
     @Override
     protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
@@ -300,6 +356,8 @@ public final class Failure implements ImmutableBean {
           return ((Failure) bean).getMessage();
         case 1620147609:  // causeDetails
           return ((Failure) bean).getCauseDetails();
+        case 2026279837:  // stackTrace
+          return ((Failure) bean).getStackTrace();
       }
       return super.propertyGet(bean, propertyName, quiet);
     }
@@ -324,6 +382,7 @@ public final class Failure implements ImmutableBean {
     private FailureStatus _status;
     private String _message;
     private ThrowableDetails _causeDetails;
+    private String _stackTrace;
 
     /**
      * Restricted constructor.
@@ -339,6 +398,7 @@ public final class Failure implements ImmutableBean {
       this._status = beanToCopy.getStatus();
       this._message = beanToCopy.getMessage();
       this._causeDetails = beanToCopy.getCauseDetails();
+      this._stackTrace = beanToCopy.getStackTrace();
     }
 
     //-----------------------------------------------------------------------
@@ -351,6 +411,8 @@ public final class Failure implements ImmutableBean {
           return _message;
         case 1620147609:  // causeDetails
           return _causeDetails;
+        case 2026279837:  // stackTrace
+          return _stackTrace;
         default:
           throw new NoSuchElementException("Unknown property: " + propertyName);
       }
@@ -367,6 +429,9 @@ public final class Failure implements ImmutableBean {
           break;
         case 1620147609:  // causeDetails
           this._causeDetails = (ThrowableDetails) newValue;
+          break;
+        case 2026279837:  // stackTrace
+          this._stackTrace = (String) newValue;
           break;
         default:
           throw new NoSuchElementException("Unknown property: " + propertyName);
@@ -403,7 +468,8 @@ public final class Failure implements ImmutableBean {
       return new Failure(
           _status,
           _message,
-          _causeDetails);
+          _causeDetails,
+          _stackTrace);
     }
 
     //-----------------------------------------------------------------------
@@ -439,14 +505,25 @@ public final class Failure implements ImmutableBean {
       return this;
     }
 
+    /**
+     * Sets the {@code stackTrace} property in the builder.
+     * @param stackTrace  the new value
+     * @return this, for chaining, not null
+     */
+    public Builder stackTrace(String stackTrace) {
+      this._stackTrace = stackTrace;
+      return this;
+    }
+
     //-----------------------------------------------------------------------
     @Override
     public String toString() {
-      StringBuilder buf = new StringBuilder(128);
+      StringBuilder buf = new StringBuilder(160);
       buf.append("Failure.Builder{");
       buf.append("status").append('=').append(JodaBeanUtils.toString(_status)).append(',').append(' ');
       buf.append("message").append('=').append(JodaBeanUtils.toString(_message)).append(',').append(' ');
-      buf.append("causeDetails").append('=').append(JodaBeanUtils.toString(_causeDetails));
+      buf.append("causeDetails").append('=').append(JodaBeanUtils.toString(_causeDetails)).append(',').append(' ');
+      buf.append("stackTrace").append('=').append(JodaBeanUtils.toString(_stackTrace));
       buf.append('}');
       return buf.toString();
     }
