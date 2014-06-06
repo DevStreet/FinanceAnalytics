@@ -6,6 +6,70 @@ These release notes cover changes from v2.1 to v2.2.
 Upgrading from 2.1.0
 ====================
 
+To 2.2.0-M26
+------------
+
+* Bug
+
+    * [PLAT-6554] - Accrued interest for inflation bonds is not scaled
+    * [PLAT-6563] - CurveNodeCurrencyVisitor.visitCashNode catches Exception which leads to strange behaviour
+    * [PLAT-6576] - Index shifts can't be applied to black volatility surfaces
+    * [PLAT-6580] - BondCapitalIndexedSecurityDefinition generates flows with adjusted periodic rate rather than actual rate
+    * [PLAT-6581] - BondCapitalIndexedSecurityDiscountingMethod uses wrong price to calculate yield for government inflation bonds
+
+* Improvement
+
+    * [PLAT-6550] - Enhance and tidy tuple library
+    * [PLAT-6557] - Add object for holding bucketed pv01 results
+    * [PLAT-6558] - Regression test report entries should be ordered
+    * [PLAT-6568] - Add factory for FloatingIndex
+    * [PLAT-6574] - Add validation of swap objects
+    * [PLAT-6579] - Exclude aggregate values from regression test results
+
+* Task
+
+    * [PLAT-6553] - Convert IndexCDSSecurity to use SecurityLink
+    * [PLAT-6569] - Fix jenkins CI build
+
+
+To 2.2.0-M25
+------------
+
+* Bug
+    * [PLAT-6534] - Handle user session timeout
+    * [PLAT-6535] - NonVersionedRedisConfigSource does not add unique id on results collection
+* Improvement
+    * [PLAT-6510] - Bulk permission checks
+    * [PLAT-6543] - Move cashflows to Platform
+    * [PLAT-6544] - Include stack trace in Failure even if it wasn't caused by an exception
+    * [PLAT-6545] - MultiplecurrencyAmount: Reduce redundant map copies
+    * [PLAT-6546] - Speed up curve lookup by optimising curve type hashCode
+    * [PLAT-6547] - Speed up annuity pricing by avoiding intermediate objects
+* Task
+    * [PLAT-6549] - Implement all NonVersionedRedisHistoricalTimeSeriesSource methods 
+    * [PLAT-6551] - Increase ZSpread test tolerance
+
+
+To 2.2.0-M24
+------------
+
+* Bug
+    * [PLAT-6481] - CsvSnapshotWriter prints the same X axis label in Y column
+    * [PLAT-6497] - Assertion message is incorrect for CouponFloatingDefinition constructor
+    * [PLAT-6511] - VolatilitySurfaceSelector does not support value requirement name 'BlackVolatilitySurface'
+    * [PLAT-6522] - Class conversion issue occurs where no curve exposure exists for Bond PV01s
+    * [PLAT-6523] - Useless error is thrown by ConfigDBInstrumentExposuresProvider when exposure can't be resolved
+    * [PLAT-6528] - Failure constructor loses underlying exception
+* Improvement
+    * [PLAT-6525] - Add multimap support to fudge/joda conversion
+    * [PLAT-6530] - Provide mechanism to avoid security warning on startup
+* New Feature
+    * [PLAT-6514] - Add BucketedPV01 for BondTRS
+    * [PLAT-6515] - Add currency exposure for BondTRS
+* Sub-task
+    * [PLAT-6496] - OG-Analytics: Coupon Ibor Compounding with Spread Simple Interest - updating floating annuity definition builder
+
+
 To 2.2.0-M23
 ------------
 

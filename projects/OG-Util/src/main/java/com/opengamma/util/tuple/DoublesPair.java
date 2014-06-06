@@ -33,7 +33,9 @@ import com.opengamma.util.ArgumentChecker;
  * <p>
  * This class is immutable and thread-safe.
  */
-public final class DoublesPair extends Pair<Double, Double> implements Double2DoubleMap.Entry {
+public final class DoublesPair
+    extends Pair<Double, Double>
+    implements Double2DoubleMap.Entry {
   // this ImmutableBean is not auto-generated
 
   /** Serialization version. */
@@ -224,6 +226,31 @@ public final class DoublesPair extends Pair<Double, Double> implements Double2Do
   @Override
   public DoublesPair clone() {
     return this;
+  }
+
+  //-------------------------------------------------------------------------
+  @Override
+  public int compareTo(Pair<Double, Double> other) {
+    if (other instanceof DoublesPair) {
+      return compareTo((DoublesPair) other);
+    }
+    return super.compareTo(other);
+  }
+
+  /**
+   * Compares this pair to another.
+   * <p>
+   * This compares the first elements, then the second elements.
+   * 
+   * @param other  the other pair
+   * @return negative if this is less, zero if equal, positive if greater
+   */
+  public int compareTo(DoublesPair other) {
+    int cmp = Double.compare(first, other.first);
+    if (cmp == 0) {
+      cmp = Double.compare(second, other.second);
+    }
+    return cmp;
   }
 
   //-------------------------------------------------------------------------

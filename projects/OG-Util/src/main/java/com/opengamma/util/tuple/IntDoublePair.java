@@ -33,7 +33,9 @@ import com.opengamma.util.ArgumentChecker;
  * <p>
  * This class is immutable and thread-safe.
  */
-public class IntDoublePair extends Pair<Integer, Double> implements Int2DoubleMap.Entry {
+public class IntDoublePair
+    extends Pair<Integer, Double>
+    implements Int2DoubleMap.Entry {
   // this ImmutableBean is not auto-generated
 
   /** Serialization version. */
@@ -192,6 +194,31 @@ public class IntDoublePair extends Pair<Integer, Double> implements Int2DoubleMa
   @Override
   public IntDoublePair clone() {
     return this;
+  }
+
+  //-------------------------------------------------------------------------
+  @Override
+  public int compareTo(Pair<Integer, Double> other) {
+    if (other instanceof IntDoublePair) {
+      return compareTo((IntDoublePair) other);
+    }
+    return super.compareTo(other);
+  }
+
+  /**
+   * Compares this pair to another.
+   * <p>
+   * This compares the first elements, then the second elements.
+   * 
+   * @param other  the other pair
+   * @return negative if this is less, zero if equal, positive if greater
+   */
+  public int compareTo(IntDoublePair other) {
+    int cmp = Integer.compare(first, other.first);
+    if (cmp == 0) {
+      cmp = Double.compare(second, other.second);
+    }
+    return cmp;
   }
 
   //-------------------------------------------------------------------------

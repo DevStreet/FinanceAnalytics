@@ -33,7 +33,10 @@ import com.opengamma.util.ArgumentChecker;
  * <p>
  * This class is immutable and thread-safe.
  */
-public class LongDoublePair extends Pair<Long, Double> implements Long2DoubleMap.Entry {
+public class LongDoublePair
+    extends Pair<Long, Double>
+    implements Long2DoubleMap.Entry {
+  // this ImmutableBean is not auto-generated
 
   /** Serialization version. */
   private static final long serialVersionUID = 1L;
@@ -191,6 +194,31 @@ public class LongDoublePair extends Pair<Long, Double> implements Long2DoubleMap
   @Override
   public LongDoublePair clone() {
     return this;
+  }
+
+  //-------------------------------------------------------------------------
+  @Override
+  public int compareTo(Pair<Long, Double> other) {
+    if (other instanceof LongDoublePair) {
+      return compareTo((LongDoublePair) other);
+    }
+    return super.compareTo(other);
+  }
+
+  /**
+   * Compares this pair to another.
+   * <p>
+   * This compares the first elements, then the second elements.
+   * 
+   * @param other  the other pair
+   * @return negative if this is less, zero if equal, positive if greater
+   */
+  public int compareTo(LongDoublePair other) {
+    int cmp = Long.compare(first, other.first);
+    if (cmp == 0) {
+      cmp = Double.compare(second, other.second);
+    }
+    return cmp;
   }
 
   //-------------------------------------------------------------------------
