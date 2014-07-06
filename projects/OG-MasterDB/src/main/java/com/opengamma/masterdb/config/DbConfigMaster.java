@@ -5,6 +5,8 @@
  */
 package com.opengamma.masterdb.config;
 
+import javax.inject.Inject;
+
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.util.db.DbConnector;
 
@@ -33,6 +35,7 @@ public class DbConfigMaster extends DbConfigWorker implements ConfigMaster {
    *
    * @param dbConnector  the database connector, not null
    */
+  @Inject
   public DbConfigMaster(DbConnector dbConnector) {
     super(dbConnector, IDENTIFIER_SCHEME_DEFAULT);
   }

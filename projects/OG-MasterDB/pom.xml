@@ -36,6 +36,11 @@
       <artifactId>hsqldb</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
     <!--dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
