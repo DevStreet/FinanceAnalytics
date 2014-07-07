@@ -7,6 +7,7 @@ package com.opengamma.master.config.impl;
 
 import java.net.URI;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
@@ -46,6 +47,7 @@ public class DataConfigMasterResource extends AbstractDataResource {
    * 
    * @param configMaster  the underlying config master, not null
    */
+  @Inject
   public DataConfigMasterResource(final ConfigMaster configMaster) {
     ArgumentChecker.notNull(configMaster, "configMaster");
     _cfgMaster = configMaster;

@@ -31,6 +31,11 @@
       <artifactId>og-region-data</artifactId>
       <version>1.0.0.v20110908a</version>
     </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
   </dependencies>
 
   <properties>
