@@ -25,6 +25,7 @@ import org.fudgemsg.wire.xml.FudgeXMLStreamWriter;
 import org.joda.beans.Bean;
 
 import com.google.common.base.Charsets;
+import com.opengamma.util.xml.FormattingXmlStreamWriter;
 
 /**
  * A JAX-RS provider to convert RESTful responses to Fudge XML encoded messages.
@@ -79,8 +80,8 @@ public class FudgeObjectXMLProducer extends FudgeBase implements MessageBodyWrit
     }
     
     OutputStreamWriter entityWriter = new OutputStreamWriter(entityStream, Charsets.UTF_8);
-    @SuppressWarnings("resource")
-    final FudgeMsgWriter writer = new FudgeMsgWriter(new FudgeXMLStreamWriter(getFudgeContext(), entityWriter));
+    FormattingXmlStreamWriter formattingWriter = FormattingXmlStreamWriter.builder(entityWriter).indent(true).build();
+    FudgeMsgWriter writer = new FudgeMsgWriter(new FudgeXMLStreamWriter(getFudgeContext(), formattingWriter));
     writer.writeMessageEnvelope(msg, getFudgeTaxonomyId());
     writer.flush();
   }
