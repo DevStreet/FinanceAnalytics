@@ -7,6 +7,7 @@ package com.opengamma.master.historicaltimeseries.impl;
 
 import java.net.URI;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
@@ -18,6 +19,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.opengamma.id.ObjectId;
+import com.opengamma.master.ComponentResource;
+import com.opengamma.master.RemoteComponentInfo;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoDocument;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoMetaDataRequest;
 import com.opengamma.master.historicaltimeseries.HistoricalTimeSeriesInfoMetaDataResult;
@@ -34,7 +37,9 @@ import com.opengamma.util.rest.RestUtils;
  * The time-series resource receives and processes RESTful calls to the time-series master.
  */
 @Path("htsMaster")
-public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource {
+public class DataHistoricalTimeSeriesMasterResource
+    extends AbstractDataResource
+    implements ComponentResource<HistoricalTimeSeriesMaster> {
 
   /**
    * The info master.
@@ -44,9 +49,10 @@ public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource
   /**
    * Creates the resource, exposing the underlying master over REST.
    *
-   * @param infoMaster  the underlying info master, not null
+   * @param infoMaster the underlying info master, not null
    */
-  public DataHistoricalTimeSeriesMasterResource(final HistoricalTimeSeriesMaster infoMaster) {
+  @Inject
+  public DataHistoricalTimeSeriesMasterResource(HistoricalTimeSeriesMaster infoMaster) {
     ArgumentChecker.notNull(infoMaster, "infoMaster");
     _htsMaster = infoMaster;
   }
@@ -78,7 +84,8 @@ public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource
   @GET
   @Path("metaData")
   public Response metaData(@Context UriInfo uriInfo) {
-    HistoricalTimeSeriesInfoMetaDataRequest request = RestUtils.decodeQueryParams(uriInfo, HistoricalTimeSeriesInfoMetaDataRequest.class);
+    HistoricalTimeSeriesInfoMetaDataRequest request = RestUtils.decodeQueryParams(uriInfo,
+                                                                                  HistoricalTimeSeriesInfoMetaDataRequest.class);
     HistoricalTimeSeriesInfoMetaDataResult result = getHistoricalTimeSeriesMaster().metaData(request);
     return responseOkObject(result);
   }
@@ -116,8 +123,8 @@ public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource
   /**
    * Builds a URI for info meta-data.
    *
-   * @param baseUri  the base URI, not null
-   * @param request  the request, may be null
+   * @param baseUri the base URI, not null
+   * @param request the request, may be null
    * @return the URI, not null
    */
   public static URI uriMetaData(URI baseUri, HistoricalTimeSeriesInfoMetaDataRequest request) {
@@ -131,7 +138,7 @@ public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource
   /**
    * Builds a URI.
    *
-   * @param baseUri  the base URI, not null
+   * @param baseUri the base URI, not null
    * @return the URI, not null
    */
   public static URI uriSearch(URI baseUri) {
@@ -142,7 +149,7 @@ public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource
   /**
    * Builds a URI.
    *
-   * @param baseUri  the base URI, not null
+   * @param baseUri the base URI, not null
    * @return the URI, not null
    */
   public static URI uriAdd(URI baseUri) {
@@ -150,4 +157,11 @@ public class DataHistoricalTimeSeriesMasterResource extends AbstractDataResource
     return bld.build();
   }
 
+  @Override
+  public RemoteComponentInfo<HistoricalTimeSeriesMaster> getComponentInfo() {
+    // TODO get the URI from a helper method
+    return new RemoteComponentInfo<>(HistoricalTimeSeriesMaster.class,
+                                     RemoteHistoricalTimeSeriesMaster.class,
+                                     URI.create("/components/" + HistoricalTimeSeriesMaster.class.getSimpleName()));
+  }
 }

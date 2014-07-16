@@ -19,6 +19,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.opengamma.id.ObjectId;
+import com.opengamma.master.ComponentResource;
+import com.opengamma.master.RemoteComponentInfo;
 import com.opengamma.master.config.ConfigDocument;
 import com.opengamma.master.config.ConfigMaster;
 import com.opengamma.master.config.ConfigMetaDataRequest;
@@ -35,7 +37,7 @@ import com.opengamma.util.rest.RestUtils;
  * The configs resource receives and processes RESTful calls to the config master.
  */
 @Path("configMaster")
-public class DataConfigMasterResource extends AbstractDataResource {
+public class DataConfigMasterResource extends AbstractDataResource implements ComponentResource<ConfigMaster> {
 
   /**
    * The config master.
@@ -48,7 +50,7 @@ public class DataConfigMasterResource extends AbstractDataResource {
    * @param configMaster  the underlying config master, not null
    */
   @Inject
-  public DataConfigMasterResource(final ConfigMaster configMaster) {
+  public DataConfigMasterResource(ConfigMaster configMaster) {
     ArgumentChecker.notNull(configMaster, "configMaster");
     _cfgMaster = configMaster;
   }
@@ -145,4 +147,10 @@ public class DataConfigMasterResource extends AbstractDataResource {
     return bld.build();
   }
 
+  @Override
+  public RemoteComponentInfo<ConfigMaster> getComponentInfo() {
+    // TODO get from a helper method
+    URI uri = URI.create("/components/" + ConfigMaster.class.getSimpleName());
+    return new RemoteComponentInfo<>(ConfigMaster.class, RemoteConfigMaster.class, uri);
+  }
 }
