@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +130,7 @@ public class DbHistoricalTimeSeriesMaster extends AbstractDocumentDbMaster<Histo
    *
    * @param dbConnector  the database connector, not null
    */
+  @Inject
   public DbHistoricalTimeSeriesMaster(final DbConnector dbConnector) {
     super(dbConnector, IDENTIFIER_SCHEME_DEFAULT);
     setElSqlBundle(ElSqlBundle.of(dbConnector.getDialect().getElSqlConfig(), DbHistoricalTimeSeriesMaster.class));
