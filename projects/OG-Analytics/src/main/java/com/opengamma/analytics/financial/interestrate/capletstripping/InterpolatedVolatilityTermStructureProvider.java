@@ -5,17 +5,22 @@
  */
 package com.opengamma.analytics.financial.interestrate.capletstripping;
 
-import com.opengamma.analytics.financial.model.volatility.VolatilityTermStructure;
-import com.opengamma.analytics.financial.model.volatility.VolatilityTermStructureProvider;
+import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurface;
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
+import com.opengamma.analytics.math.function.Function;
+import com.opengamma.analytics.math.function.Function2D;
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
+import com.opengamma.analytics.math.surface.FunctionalDoublesSurface;
+import com.opengamma.analytics.math.surface.FunctionalSurface;
+import com.opengamma.analytics.math.surface.Surface;
 import com.opengamma.util.ArgumentChecker;
 
 /**
- *
+ *Produces a volatility surface that is backed by a single interpolated curve in the expiry dimension, i.e. there is no 
+ *strike variation 
  */
-public class InterpolatedVolatilityTermStructureProvider implements VolatilityTermStructureProvider<DoubleMatrix1D> {
+public class InterpolatedVolatilityTermStructureProvider implements VolatilitySurfaceProvider {
 
   private final double[] _knots;
   private final Interpolator1D _interpolator;
@@ -32,16 +37,48 @@ public class InterpolatedVolatilityTermStructureProvider implements VolatilityTe
     _interpolator = interpolator;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public VolatilityTermStructure evaluate(final DoubleMatrix1D data) {
-    final InterpolatedDoublesCurve curve = new InterpolatedDoublesCurve(_knots, data.getData(), _interpolator, true);
-    return new VolatilityTermStructure() {
+  public VolatilitySurface getVolSurface(final DoubleMatrix1D modelParameters) {
+    final InterpolatedDoublesCurve curve = new InterpolatedDoublesCurve(_knots, modelParameters.getData(), _interpolator, true);
 
+    final Function<Double, Double> function = new Function<Double, Double>() {
       @Override
-      public Double getVolatility(final Double t) {
-        return curve.getYValue(t);
+      public Double evaluate(final Double... tk) {
+        return curve.getYValue(tk[0]);
       }
     };
+
+    final FunctionalDoublesSurface surface = new FunctionalDoublesSurface(function);
+    return new VolatilitySurface(surface);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Surface<Double, Double, DoubleMatrix1D> getVolSurfaceAdjoint(final DoubleMatrix1D modelParameters) {
+
+    final InterpolatedDoublesCurve curve = new InterpolatedDoublesCurve(_knots, modelParameters.getData(), _interpolator, true);
+    final Function2D<Double, DoubleMatrix1D> func = new Function2D<Double, DoubleMatrix1D>() {
+      @Override
+      public DoubleMatrix1D evaluate(final Double t, final Double k) {
+        final Double[] sense = curve.getYValueParameterSensitivity(t);
+        return new DoubleMatrix1D(sense);
+      }
+    };
+
+    return new FunctionalSurface<>(func);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getNumModelParameters() {
+    return _knots.length;
   }
 
 }
