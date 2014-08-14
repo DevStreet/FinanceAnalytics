@@ -19,48 +19,47 @@ import com.opengamma.analytics.math.surface.Surface;
 import com.opengamma.util.ArgumentChecker;
 
 /**
- * Represent a volatility term structure (in this context a volatility surface with no strike dependence) using
- * 1D basis-splines  
+ * Represent a volatility surface using 2D basis-splines  
  */
-public class BasisSplineVolatilityTermStructureProvider implements VolatilitySurfaceProvider {
+public class BasisSplineVolatilitySurfaceProvider implements VolatilitySurfaceProvider {
 
-  private final List<Function1D<Double, Double>> _bSplines;
+  private final List<Function1D<double[], Double>> _bSplines;
 
-  /**
-   * Represent a volatility term structure (in this context a volatility surface with no strike dependence) using
-  * 1D basis-splines 
-   * @param bSlines List of 1D functions (of time-to-expiry)  - the basis functions 
-   */
-  public BasisSplineVolatilityTermStructureProvider(final List<Function1D<Double, Double>> bSlines) {
+  public BasisSplineVolatilitySurfaceProvider(final List<Function1D<double[], Double>> bSlines) {
     ArgumentChecker.noNulls(bSlines, "null bSplines");
     _bSplines = bSlines;
   }
 
   /**
-   *  Represent a volatility term structure (in this context a volatility surface with no strike dependence) using
-  * 1D basis-splines 
-   * @param t1 The lower time
+   * Set up a volatility surface represented by weighted basis-splines 
+   * @param k1 The low strike value
+   * @param k2 The upper strike value
+   * @param nStrikeKnots Number of knots in strike direction
+   * @param strikeDegree The degree of the basis-spline in the strike direction
+   * @param t1 The low time
    * @param t2 The upper time
-   * @param nKnots Number of knots
-   * @param degree The degree of the spline
+   * @param nTimeKnots Number of knots in time direction
+   * @param timeDegree The degree of the basis-spline in the strike direction
    */
-  public BasisSplineVolatilityTermStructureProvider(final double t1, final double t2, final int nKnots, final int degree) {
+  public BasisSplineVolatilitySurfaceProvider(final double k1, final double k2, final int nStrikeKnots, final int strikeDegree, final double t1, final double t2, final int nTimeKnots,
+      final int timeDegree) {
     final BasisFunctionGenerator gen = new BasisFunctionGenerator();
-    _bSplines = gen.generateSet(t1, t2, nKnots, degree);
+    _bSplines = gen.generateSet(new double[] {t1, k1 }, new double[] {t2, k2 }, new int[] {nTimeKnots, nStrikeKnots }, new int[] {timeDegree, strikeDegree });
+
   }
 
   /**
    * {@inheritDoc}
-   * The model parameters in this case are the weights of the basis functions 
+   * The model parameters in this case are the weights of the basis-splines 
    */
   @Override
   public VolatilitySurface getVolSurface(final DoubleMatrix1D modelParameters) {
-    final Function1D<Double, Double> func = new BasisFunctionAggregation<>(_bSplines, modelParameters.getData());
+    final Function1D<double[], Double> func = new BasisFunctionAggregation<>(_bSplines, modelParameters.getData());
 
     final Function2D<Double, Double> func2D = new Function2D<Double, Double>() {
       @Override
       public Double evaluate(final Double t, final Double k) {
-        return func.evaluate(t);
+        return func.evaluate(new double[] {t, k });
       }
     };
 
@@ -70,16 +69,16 @@ public class BasisSplineVolatilityTermStructureProvider implements VolatilitySur
 
   /**
    * {@inheritDoc}
-   * The model parameters in this case are the weights of the basis functions 
+   * The model parameters in this case are the weights of the basis-splines 
    */
   @Override
   public Surface<Double, Double, DoubleMatrix1D> getVolSurfaceAdjoint(final DoubleMatrix1D modelParameters) {
-    final BasisFunctionAggregation<Double> bSpline = new BasisFunctionAggregation<>(_bSplines, modelParameters.getData());
+    final BasisFunctionAggregation<double[]> bSpline = new BasisFunctionAggregation<>(_bSplines, modelParameters.getData());
 
     final Function2D<Double, DoubleMatrix1D> func = new Function2D<Double, DoubleMatrix1D>() {
       @Override
       public DoubleMatrix1D evaluate(final Double t, final Double k) {
-        return bSpline.weightSensitivity(t);
+        return bSpline.weightSensitivity(new double[] {t, k });
       }
     };
 
@@ -88,10 +87,12 @@ public class BasisSplineVolatilityTermStructureProvider implements VolatilitySur
 
   /**
    * {@inheritDoc}
-   * The number of parameters is the number of basis functions, which is #knots + degree - 1 
+   * The number of parameters is the number of basis functions, which is #knots + degree - 1 in each dimension, so the 
+   * total is the product of this for strikes and times  
    */
   @Override
   public int getNumModelParameters() {
     return _bSplines.size();
   }
+
 }

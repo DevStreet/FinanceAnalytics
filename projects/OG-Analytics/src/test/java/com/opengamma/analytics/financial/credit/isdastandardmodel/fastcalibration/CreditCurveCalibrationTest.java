@@ -91,16 +91,15 @@ public class CreditCurveCalibrationTest extends com.opengamma.analytics.financia
         final ISDACompliantCreditCurve cc1a = calibrator1.calibrate(spreads);
       }
       long t1 = System.nanoTime();
-      //      System.out.println("time of new calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
+      System.out.println("time of new calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
 
       t0 = System.nanoTime();
       for (int i = 0; i < hotspots; i++) {
         final ISDACompliantCreditCurve cc2a = calibrator2.calibrateCreditCurve(cds, spreads, yieldCurve);
       }
       t1 = System.nanoTime();
-      //      System.out.println("time of old calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
+      System.out.println("time of old calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
     }
-
   }
 
   @SuppressWarnings("unused")
@@ -151,7 +150,7 @@ public class CreditCurveCalibrationTest extends com.opengamma.analytics.financia
         final ISDACompliantCreditCurve cc1a = calibrator1.calibrate(spreads);
       }
       long t1 = System.nanoTime();
-      //      System.out.println("time of new calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
+      System.out.println("time of new calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
 
       t0 = System.nanoTime();
       for (int i = 0; i < hotspots; i++) {
@@ -159,7 +158,7 @@ public class CreditCurveCalibrationTest extends com.opengamma.analytics.financia
         final ISDACompliantCreditCurve cc2a = calibrator2.calibrateCreditCurve(cds, spreads, yieldCurve);
       }
       t1 = System.nanoTime();
-      //      System.out.println("time of old calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
+      System.out.println("time of old calibration: " + (t1 - t0) / hotspots / 1e6 + "ms");
     }
   }
 
