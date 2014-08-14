@@ -23,7 +23,7 @@ public abstract class ParameterizedCurve extends ParameterizedFunction<Double, D
    * The default calculation is performed using finite difference (via {@link ScalarFieldFirstOrderDifferentiator}) but
    * it is expended that this will be overridden by concrete subclasses.  
    * @param params The value of the parameters ($\boldsymbol{\theta}$) at which the sensitivity is calculated 
-   * @return The sensitivity as a function with a Double (x) as its single argument and a vector as its return value
+   * @return The sensitivity as a function with a Double (x) as its single argument and a vector as its return value.
    */
   public Function1D<Double, DoubleMatrix1D> getYParameterSensitivity(final DoubleMatrix1D params) {
 
