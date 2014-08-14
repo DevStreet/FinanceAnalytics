@@ -572,7 +572,7 @@ public class MulticurveBuildingDiscountingDiscountXCcyTest {
         jump);
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void performance() {
     long startTime, endTime;
     final int nbTest = 100;
