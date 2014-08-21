@@ -147,59 +147,59 @@ public final class StubCalculationMethod implements ImmutableBean {
         ArgumentChecker.notNull(getFirstStubEndDate(), "Dual stub must have a first stub period end date");
         ArgumentChecker.notNull(getLastStubEndDate(), "Dual stub must have a last stub period end date");
         
-        if (hasFirstStubStartReferenceRateId() && !hasFirstStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a first stub start reference rate identifier without a stub end reference rate");
-        } else if (hasFirstStubEndReferenceRateId() && !hasFirstStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a first stub end reference rate identifier without a stub start reference rate");
-        }
-        
-        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a last stub start reference rate identifier without a stub end reference rate");
-        } else if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a last stub end reference rate identifier without a stub start reference rate");
-        }        
+//        if (hasFirstStubStartReferenceRateId() && !hasFirstStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a first stub start reference rate identifier without a stub end reference rate");
+//        } else if (hasFirstStubEndReferenceRateId() && !hasFirstStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a first stub end reference rate identifier without a stub start reference rate");
+//        }
+//        
+//        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a last stub start reference rate identifier without a stub end reference rate");
+//        } else if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a last stub end reference rate identifier without a stub start reference rate");
+//        }        
         break;
         
       case SHORT_START:
-        if (hasFirstStubStartReferenceRateId() && !hasFirstStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a first stub start reference rate identifier without a stub end reference rate");
-        }
-        if (hasFirstStubEndReferenceRateId() && !hasFirstStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a first stub end reference rate identifier without a stub start reference rate");
-        }
+//        if (hasFirstStubStartReferenceRateId() && !hasFirstStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a first stub start reference rate identifier without a stub end reference rate");
+//        }
+//        if (hasFirstStubEndReferenceRateId() && !hasFirstStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a first stub end reference rate identifier without a stub start reference rate");
+//        }
         break;
         
       case LONG_START:
-        if (hasFirstStubStartReferenceRateId() && !hasFirstStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a first stub start reference rate identifier without a stub end reference rate");
-        }
-        if (hasFirstStubEndReferenceRateId() && !hasFirstStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a first stub end reference rate identifier without a stub start reference rate");
-        }
+//        if (hasFirstStubStartReferenceRateId() && !hasFirstStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a first stub start reference rate identifier without a stub end reference rate");
+//        }
+//        if (hasFirstStubEndReferenceRateId() && !hasFirstStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a first stub end reference rate identifier without a stub start reference rate");
+//        }
         break;
         
       case SHORT_END:
-        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a last stub start reference rate identifier without a stub end reference rate");
-        }
-        if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a last stub end reference rate identifier without a stub start reference rate");
-        }
+//        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a last stub start reference rate identifier without a stub end reference rate");
+//        }
+//        if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a last stub end reference rate identifier without a stub start reference rate");
+//        }
         break;
         
       case LONG_END:
-        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a last stub start reference rate identifier without a stub end reference rate");
-        }
-        if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Stub has a last stub end reference rate identifier without a stub start reference rate");
-        }
-        
-        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a last stub start reference rate identifier without a stub end reference rate");
-        } else if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
-          throw new OpenGammaRuntimeException("Dual stub has a last stub end reference rate identifier without a stub start reference rate");
-        }        
+//        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a last stub start reference rate identifier without a stub end reference rate");
+//        }
+//        if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Stub has a last stub end reference rate identifier without a stub start reference rate");
+//        }
+//        
+//        if (hasLastStubStartReferenceRateId() && !hasLastStubEndReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a last stub start reference rate identifier without a stub end reference rate");
+//        } else if (hasLastStubEndReferenceRateId() && !hasLastStubStartReferenceRateId()) {
+//          throw new OpenGammaRuntimeException("Dual stub has a last stub end reference rate identifier without a stub start reference rate");
+//        }        
         break;         
     }
     return this;

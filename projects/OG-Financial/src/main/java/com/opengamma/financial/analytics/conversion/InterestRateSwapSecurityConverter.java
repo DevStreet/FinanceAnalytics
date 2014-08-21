@@ -213,7 +213,7 @@ public class InterestRateSwapSecurityConverter extends FinancialSecurityVisitorA
         compoundingMethod = com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod.SPREAD_EXCLUSIVE;
         break;
       case NONE:
-        compoundingMethod = null;
+        compoundingMethod = com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod.NONE;
         break;
       default:
         throw new OpenGammaRuntimeException("Unsupported compounding method");
@@ -507,18 +507,14 @@ public class InterestRateSwapSecurityConverter extends FinancialSecurityVisitorA
       } else if (StubType.LONG_START == stubType || StubType.SHORT_START == stubType) {
         if (!Double.isNaN(firstStubRate)) {
           startStub = new CouponStub(stubType, firstStubDate, firstStubRate);
-        } else if (firstStubStartIndex != null && firstStubEndIndex != null) {
-          startStub = new CouponStub(stubType, firstStubStartIndex, firstStubEndIndex);
         } else {
-          startStub = new CouponStub(stubType);
+          startStub = new CouponStub(stubType, firstStubStartIndex, firstStubEndIndex);
         }
       } else if (StubType.LONG_END == stubType || StubType.SHORT_END == stubType) {
         if (!Double.isNaN(finalStubRate)) {
           endStub = new CouponStub(stubType, finalStubDate, finalStubRate);
-        } else if (lastStubStartIndex != null && lastStubEndIndex != null) {
-          endStub = new CouponStub(stubType, lastStubStartIndex, lastStubEndIndex);
         } else {
-          endStub = new CouponStub(stubType);
+          endStub = new CouponStub(stubType, lastStubStartIndex, lastStubEndIndex);
         }
       } else if (stubType != null) {
         startStub = new CouponStub(stubType);
