@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.apache.commons.collections.functors.NonePredicate;
 import org.joda.beans.Bean;
 import org.joda.beans.BeanDefinition;
 import org.joda.beans.ImmutableBean;
@@ -23,7 +22,6 @@ import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import org.threeten.bp.LocalDate;
 
-import com.opengamma.OpenGammaRuntimeException;
 import com.opengamma.financial.convention.StubType;
 import com.opengamma.id.ExternalId;
 import com.opengamma.util.ArgumentChecker;
