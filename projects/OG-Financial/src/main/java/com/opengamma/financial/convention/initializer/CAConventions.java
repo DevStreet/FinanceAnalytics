@@ -23,7 +23,7 @@ import static com.opengamma.financial.convention.initializer.PerCurrencyConventi
 
 import org.threeten.bp.LocalTime;
 
-import com.opengamma.analytics.financial.interestrate.CompoundingType;
+import com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.convention.CompoundingIborLegConvention;
@@ -166,7 +166,7 @@ public class CAConventions extends ConventionMasterInitializer {
   protected CompoundingIborLegConvention createCompoundingIborLegConvention(final String cdorLegConventionName, final ExternalId cdorConventionId, 
       final String resetTenorString, final Tenor resetTenor, final String paymentTenorString,  final Tenor paymentTenor) {
     return new CompoundingIborLegConvention(cdorLegConventionName, getIds(CCY, resetTenorString + paymentTenorString, CDOR_CMP_LEG), cdorConventionId, 
-        paymentTenor, CompoundingType.FLAT_COMPOUNDING, resetTenor, StubType.SHORT_START, 0, true, StubType.SHORT_START, false, 0);
+        paymentTenor, CompoundingMethod.FLAT, resetTenor, StubType.SHORT_START, 0, true, StubType.SHORT_START, false, 0);
   }
 
   protected OISLegConvention createOISLegConvention(final String onLegConventionName, final ExternalId onIndexId, 

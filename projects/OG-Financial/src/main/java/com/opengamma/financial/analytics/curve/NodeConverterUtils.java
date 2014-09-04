@@ -18,11 +18,11 @@ import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityCouponFixedDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinition;
 import com.opengamma.analytics.financial.instrument.annuity.AnnuityDefinitionBuilder;
+import com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.PaymentDefinition;
 import com.opengamma.analytics.financial.instrument.swap.SwapDefinition;
-import com.opengamma.analytics.financial.interestrate.CompoundingType;
 import com.opengamma.analytics.financial.schedule.ScheduleCalculator;
 import com.opengamma.core.DateSet;
 import com.opengamma.core.convention.Convention;
@@ -284,7 +284,7 @@ public class NodeConverterUtils {
         final ZonedDateTime startDate = ScheduleCalculator.getAdjustedDate(spotDateLeg, startTenor, index.getBusinessDayConvention(), calendar, eomLeg);
         final StubType stubLeg = convention.getStubTypeLeg();
         final StubType stubComp = convention.getStubTypeCompound();
-        final CompoundingType compound = convention.getCompoundingType();
+        final CompoundingMethod compound = convention.getCompoundingType();
         final boolean eom = convention.isIsEOM();
         final ZonedDateTime maturityDate = startDate.plus(maturityTenor);
         if (isPayer && isMarketDataSpread) { // Implementation note: Market data is used as spread on pay leg
@@ -293,10 +293,10 @@ public class NodeConverterUtils {
             throw new OpenGammaRuntimeException("Could not get market data for " + dataId);
           }
           switch (compound) {
-            case COMPOUNDING:
+            case STRAIGHT:
               return AnnuityDefinitionBuilder.couponIborCompoundingSpread(startDate, maturityDate, paymentTenor, notional, spread, index, stubComp, isPayer,
                   index.getBusinessDayConvention(), eom, calendar, stubLeg);
-            case FLAT_COMPOUNDING:
+            case FLAT:
               return AnnuityDefinitionBuilder.couponIborCompoundingFlatSpread(startDate, maturityDate, paymentTenor, notional, spread, index, stubComp, isPayer,
                   index.getBusinessDayConvention(), eom, calendar, stubLeg);
             default:
@@ -304,10 +304,10 @@ public class NodeConverterUtils {
           }
         }
         switch (compound) {
-          case COMPOUNDING:
+          case STRAIGHT:
             return AnnuityDefinitionBuilder.couponIborCompounding(startDate, maturityDate, paymentTenor, notional, index, stubComp, isPayer,
               index.getBusinessDayConvention(), eom, calendar, stubLeg);
-          case FLAT_COMPOUNDING:
+          case FLAT:
             return AnnuityDefinitionBuilder.couponIborCompoundingFlatSpread(startDate, maturityDate, paymentTenor, notional, 0.0, index, stubComp, isPayer,
                 index.getBusinessDayConvention(), eom, calendar, stubLeg);
           default:

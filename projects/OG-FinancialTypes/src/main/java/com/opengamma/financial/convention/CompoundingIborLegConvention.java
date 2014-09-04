@@ -18,7 +18,7 @@ import org.joda.beans.impl.direct.DirectBeanBuilder;
 import org.joda.beans.impl.direct.DirectMetaProperty;
 import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 
-import com.opengamma.analytics.financial.interestrate.CompoundingType;
+import com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod;
 import com.opengamma.core.convention.ConventionType;
 import com.opengamma.id.ExternalId;
 import com.opengamma.id.ExternalIdBundle;
@@ -53,7 +53,7 @@ public class CompoundingIborLegConvention extends FinancialConvention {
    * The compounding type.
    */
   @PropertyDefinition(validate = "notNull")
-  private CompoundingType _compoundingType;
+  private CompoundingMethod _compoundingMethod;
   /**
    * The composition tenor.
    * This is the tenor of the sub-periods compounded into the payment tenor.
@@ -115,13 +115,13 @@ public class CompoundingIborLegConvention extends FinancialConvention {
    */
   public CompoundingIborLegConvention(
       final String name, final ExternalIdBundle externalIdBundle, final ExternalId iborIndexConvention,
-      final Tenor paymentTenor, final CompoundingType compoundingType, final Tenor compositionTenor,
+      final Tenor paymentTenor, final CompoundingMethod compoundingType, final Tenor compositionTenor,
       final StubType stubTypeCompound, final int settlementDays, final boolean isEOM,
       final StubType stubTypeLeg, final boolean isExchangeNotional, final int paymentLag) {
     super(name, externalIdBundle);
     setIborIndexConvention(iborIndexConvention);
     setPaymentTenor(paymentTenor);
-    setCompoundingType(compoundingType);
+    setCompoundingMethod(compoundingType);
     setCompositionTenor(compositionTenor);
     setStubTypeCompound(stubTypeCompound);
     setSettlementDays(settlementDays);
@@ -231,24 +231,24 @@ public class CompoundingIborLegConvention extends FinancialConvention {
    * Gets the compounding type.
    * @return the value of the property, not null
    */
-  public CompoundingType getCompoundingType() {
-    return _compoundingType;
+  public CompoundingMethod getCompoundingType() {
+    return _compoundingMethod;
   }
 
   /**
    * Sets the compounding type.
    * @param compoundingType  the new value of the property, not null
    */
-  public void setCompoundingType(CompoundingType compoundingType) {
+  public void setCompoundingMethod(CompoundingMethod compoundingType) {
     JodaBeanUtils.notNull(compoundingType, "compoundingType");
-    this._compoundingType = compoundingType;
+    this._compoundingMethod = compoundingType;
   }
 
   /**
    * Gets the the {@code compoundingType} property.
    * @return the property, not null
    */
-  public final Property<CompoundingType> compoundingType() {
+  public final Property<CompoundingMethod> compoundingType() {
     return metaBean().compoundingType().createProperty(this);
   }
 
@@ -528,8 +528,8 @@ public class CompoundingIborLegConvention extends FinancialConvention {
     /**
      * The meta-property for the {@code compoundingType} property.
      */
-    private final MetaProperty<CompoundingType> _compoundingType = DirectMetaProperty.ofReadWrite(
-        this, "compoundingType", CompoundingIborLegConvention.class, CompoundingType.class);
+    private final MetaProperty<CompoundingMethod> _compoundingMethod = DirectMetaProperty.ofReadWrite(
+        this, "compoundingType", CompoundingIborLegConvention.class, CompoundingMethod.class);
     /**
      * The meta-property for the {@code compositionTenor} property.
      */
@@ -595,7 +595,7 @@ public class CompoundingIborLegConvention extends FinancialConvention {
         case -507548582:  // paymentTenor
           return _paymentTenor;
         case -1936397775:  // compoundingType
-          return _compoundingType;
+          return _compoundingMethod;
         case -1679443146:  // compositionTenor
           return _compositionTenor;
         case -1172460845:  // stubTypeCompound
@@ -650,8 +650,8 @@ public class CompoundingIborLegConvention extends FinancialConvention {
      * The meta-property for the {@code compoundingType} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<CompoundingType> compoundingType() {
-      return _compoundingType;
+    public final MetaProperty<CompoundingMethod> compoundingType() {
+      return _compoundingMethod;
     }
 
     /**
@@ -748,7 +748,7 @@ public class CompoundingIborLegConvention extends FinancialConvention {
           ((CompoundingIborLegConvention) bean).setPaymentTenor((Tenor) newValue);
           return;
         case -1936397775:  // compoundingType
-          ((CompoundingIborLegConvention) bean).setCompoundingType((CompoundingType) newValue);
+          ((CompoundingIborLegConvention) bean).setCompoundingMethod((CompoundingMethod) newValue);
           return;
         case -1679443146:  // compositionTenor
           ((CompoundingIborLegConvention) bean).setCompositionTenor((Tenor) newValue);
@@ -779,7 +779,7 @@ public class CompoundingIborLegConvention extends FinancialConvention {
     protected void validate(Bean bean) {
       JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._iborIndexConvention, "iborIndexConvention");
       JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._paymentTenor, "paymentTenor");
-      JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._compoundingType, "compoundingType");
+      JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._compoundingMethod, "compoundingMethod");
       JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._compositionTenor, "compositionTenor");
       JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._stubTypeCompound, "stubTypeCompound");
       JodaBeanUtils.notNull(((CompoundingIborLegConvention) bean)._stubTypeLeg, "stubTypeLeg");

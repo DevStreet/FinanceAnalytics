@@ -6,7 +6,7 @@
 package com.opengamma.analytics.financial.instrument.annuity;
 
 /**
- * Compounding methods.
+ * Compounding methods for Ibor-like coupons in swaps.
  */
 public enum CompoundingMethod {
   
@@ -16,17 +16,17 @@ public enum CompoundingMethod {
   NONE,
   
   /**
-   * Flat.
+   * Flat. Corresponds to "Flat Compounding" in the ISDA definitions.
    */
   FLAT,
   
   /**
-   * Straight.
+   * Straight. Corresponds to "Compounding" in the ISDA definitions.
    */
   STRAIGHT,
   
   /**
-   * Spread exclusive.
+   * Spread exclusive. Corresponds to "Compounding treating Spread as simple interest" in the ISDA definitions.
    */
   SPREAD_EXCLUSIVE
 }

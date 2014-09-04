@@ -46,7 +46,7 @@ import static com.opengamma.financial.convention.initializer.PerCurrencyConventi
 
 import org.threeten.bp.LocalTime;
 
-import com.opengamma.analytics.financial.interestrate.CompoundingType;
+import com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod;
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
 import com.opengamma.core.id.ExternalSchemes;
 import com.opengamma.financial.convention.CompoundingIborLegConvention;
@@ -219,7 +219,7 @@ public class USConventions extends ConventionMasterInitializer {
     final String liborLeg1MComp3MConventionName = getConventionName(Currency.USD, TENOR_STR_1M + " x " + TENOR_STR_3M, IBOR_CMP_FLAT_LEG); // "USD 1M x 3M Comp Ibor Leg"  
     final CompoundingIborLegConvention liborLeg1MComp3MConvention = new CompoundingIborLegConvention(
         liborLeg1MComp3MConventionName, getIds(Currency.USD, TENOR_STR_1M + " x " + TENOR_STR_3M, IBOR_CMP_FLAT_LEG), 
-        liborConventionId, Tenor.THREE_MONTHS, CompoundingType.FLAT_COMPOUNDING, Tenor.ONE_MONTH, StubType.SHORT_START, 2, false, StubType.LONG_START, false, 0);
+        liborConventionId, Tenor.THREE_MONTHS, CompoundingMethod.FLAT, Tenor.ONE_MONTH, StubType.SHORT_START, 2, false, StubType.LONG_START, false, 0);
  
     // Ibor legs - IMM
     final String legIbor3MIMMQConventionName = getConventionName(Currency.USD, TENOR_STR_3M, IBOR_LEG + " " + IMM + " " + QUARTERLY);

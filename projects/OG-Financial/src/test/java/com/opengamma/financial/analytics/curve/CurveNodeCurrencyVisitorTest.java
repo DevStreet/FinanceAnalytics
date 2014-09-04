@@ -18,7 +18,7 @@ import org.threeten.bp.LocalTime;
 
 import com.google.common.collect.Sets;
 import com.opengamma.OpenGammaRuntimeException;
-import com.opengamma.analytics.financial.interestrate.CompoundingType;
+import com.opengamma.analytics.financial.instrument.annuity.CompoundingMethod;
 import com.opengamma.core.change.ChangeManager;
 import com.opengamma.core.convention.Convention;
 import com.opengamma.core.convention.ConventionSource;
@@ -93,7 +93,8 @@ public class CurveNodeCurrencyVisitorTest {
   private static final ExternalId SWAP_INDEX_ID = ExternalId.of(SCHEME, "3M Swap Index");
   private static final ExternalId CMS_SWAP_ID = ExternalId.of(SCHEME, "USD CMS");
   private static final ExternalId COMPOUNDING_IBOR_ID = ExternalId.of(SCHEME, "USD Compounding Libor");
-  private static final ExternalId IMM_3M_EXPIRY_CONVENTION = ExternalId.of(SCHEME, RollDateAdjusterFactory.QUARTERLY_IMM_ROLL_STRING);
+  private static final ExternalId IMM_3M_EXPIRY_CONVENTION = 
+      ExternalId.of(SCHEME, RollDateAdjusterFactory.QUARTERLY_IMM_ROLL_STRING);
   private static final ExternalId PRICE_INDEX_US_CONVENTION_ID = ExternalId.of(SCHEME, "USD CPI");
   private static final ExternalId ZERO_COUPON_INFLATION_ID = ExternalId.of(SCHEME, "ZCI");
   private static final ExternalId IMM_SWAP_ID = ExternalId.of(SCHEME, "USD IMM Swap");
@@ -103,8 +104,9 @@ public class CurveNodeCurrencyVisitorTest {
   private static final ExternalId USD_OVERNIGHT_ID = ExternalId.of("BLOOMBERG_TICKER", "FEDL1 Index");
   
   private static final ExternalId USDLIBOR_CONVENTION_ID = ExternalId.of(SCHEME, USDLIBOR_CONVENTION_NAME);
-  private static final IborIndexConvention USDLIBOR_CONVENTION = new IborIndexConvention(USDLIBOR_CONVENTION_NAME, ExternalIdBundle.of(USDLIBOR_CONVENTION_ID),
-      ACT_360, MODIFIED_FOLLOWING, 2, false, Currency.USD, LocalTime.of(11, 0), "US", US, US, "Page");
+  private static final IborIndexConvention USDLIBOR_CONVENTION = new IborIndexConvention(USDLIBOR_CONVENTION_NAME, 
+      ExternalIdBundle.of(USDLIBOR_CONVENTION_ID), ACT_360, MODIFIED_FOLLOWING, 2, false, Currency.USD, 
+      LocalTime.of(11, 0), "US", US, US, "Page");
   private static final String USDLIBOR1M_NAME = "USDLIBOR1M";
   private static final com.opengamma.financial.security.index.IborIndex USDLIBOR1M = 
       new com.opengamma.financial.security.index.IborIndex(USDLIBOR1M_NAME, "ICE LIBOR 1M - USD", Tenor.ONE_MONTH, USDLIBOR_CONVENTION_ID);
@@ -153,8 +155,10 @@ public class CurveNodeCurrencyVisitorTest {
       ACT_360, 1, Currency.USD, NYLON);
   private static final SwapIndexConvention SWAP_INDEX = new SwapIndexConvention("3M Swap Index", ExternalId.of(SCHEME, "3M Swap Index").toBundle(), LocalTime.of(11, 0),
       SWAP_3M_IBOR_ID);
-  private static final CompoundingIborLegConvention COMPOUNDING_IBOR = new CompoundingIborLegConvention("USD Compounding Libor", ExternalId.of(SCHEME, "USD Compounding Libor").toBundle(),
-      USDLIBOR3M_ID, Tenor.THREE_MONTHS, CompoundingType.COMPOUNDING, Tenor.ONE_MONTH, StubType.SHORT_START, 2, false, StubType.LONG_START, true, 1);
+  private static final CompoundingIborLegConvention COMPOUNDING_IBOR = 
+      new CompoundingIborLegConvention("USD Compounding Libor", ExternalId.of(SCHEME, "USD Compounding Libor").toBundle(),
+      USDLIBOR3M_ID, Tenor.THREE_MONTHS, CompoundingMethod.STRAIGHT, Tenor.ONE_MONTH, StubType.SHORT_START, 2, 
+      false, StubType.LONG_START, true, 1);
   private static final PriceIndexConvention PRICE_INDEX_CONVENTION = new PriceIndexConvention("USD CPI", ExternalId.of(SCHEME, "USD CPI").toBundle(), Currency.USD, US,
       ExternalId.of("TS", "CPI"));
   private static final String PRICE_INDEX_US_NAME = "US CPI Urban Consumers NSA";
@@ -307,8 +311,9 @@ public class CurveNodeCurrencyVisitorTest {
   @Test(expectedExceptions = OpenGammaRuntimeException.class)
   public void testNullCompoundingIborLegConvention() {
     final Map<ExternalId, Convention> map = new HashMap<>();
-    final CompoundingIborLegConvention compoundingIbor = new CompoundingIborLegConvention("USD Compounding Libor", ExternalId.of(SCHEME, "USD Compounding Libor").toBundle(),
-        USDLIBOR3M_ID, Tenor.THREE_MONTHS, CompoundingType.COMPOUNDING, Tenor.ONE_MONTH, StubType.SHORT_START, 2, false, StubType.LONG_START, true, 1);
+    final CompoundingIborLegConvention compoundingIbor = new CompoundingIborLegConvention("USD Compounding Libor", 
+        ExternalId.of(SCHEME, "USD Compounding Libor").toBundle(), USDLIBOR3M_ID, Tenor.THREE_MONTHS, 
+        CompoundingMethod.STRAIGHT, Tenor.ONE_MONTH, StubType.SHORT_START, 2, false, StubType.LONG_START, true, 1);
     map.put(FIXED_LEG_ID, FIXED_LEG);
     map.put(COMPOUNDING_IBOR_ID, compoundingIbor);
     final CurveNodeCurrencyVisitor visitor = new CurveNodeCurrencyVisitor(new TestConventionSource(map), SECURITY_SOURCE);
@@ -328,7 +333,8 @@ public class CurveNodeCurrencyVisitorTest {
 
   @Test(expectedExceptions = OpenGammaRuntimeException.class)
   public void testNullZeroCouponInflationConvention() {
-    final ZeroCouponInflationNode node = new ZeroCouponInflationNode(Tenor.EIGHT_MONTHS, ZERO_COUPON_INFLATION_ID, FIXED_LEG_ID, InflationNodeType.INTERPOLATED, "TEST");
+    final ZeroCouponInflationNode node = new ZeroCouponInflationNode(Tenor.EIGHT_MONTHS, ZERO_COUPON_INFLATION_ID, 
+        FIXED_LEG_ID, InflationNodeType.INTERPOLATED, "TEST");
     node.accept(EMPTY_CONVENTIONS);
   }
 
@@ -337,13 +343,15 @@ public class CurveNodeCurrencyVisitorTest {
     final Map<ExternalId, Convention> map = new HashMap<>();
     map.put(ZERO_COUPON_INFLATION_ID, INFLATION_LEG);
     final CurveNodeCurrencyVisitor visitor = new CurveNodeCurrencyVisitor(new TestConventionSource(map), SECURITY_SOURCE);
-    final ZeroCouponInflationNode node = new ZeroCouponInflationNode(Tenor.EIGHT_MONTHS, ZERO_COUPON_INFLATION_ID, FIXED_LEG_ID, InflationNodeType.MONTHLY, "TEST");
+    final ZeroCouponInflationNode node = new ZeroCouponInflationNode(Tenor.EIGHT_MONTHS, ZERO_COUPON_INFLATION_ID, 
+        FIXED_LEG_ID, InflationNodeType.MONTHLY, "TEST");
     node.accept(visitor);
   }
 
   @Test(expectedExceptions = OpenGammaRuntimeException.class)
   public void testWrongTypeZeroCouponInflationConvention() {
-    final ZeroCouponInflationNode node = new ZeroCouponInflationNode(Tenor.EIGHT_MONTHS, SWAP_3M_IBOR_ID, FIXED_LEG_ID, InflationNodeType.INTERPOLATED, "TEST");
+    final ZeroCouponInflationNode node = new ZeroCouponInflationNode(Tenor.EIGHT_MONTHS, SWAP_3M_IBOR_ID, FIXED_LEG_ID, 
+        InflationNodeType.INTERPOLATED, "TEST");
     node.accept(VISITOR);
   }
 
