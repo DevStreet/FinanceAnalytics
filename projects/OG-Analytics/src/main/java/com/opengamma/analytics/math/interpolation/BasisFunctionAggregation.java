@@ -7,8 +7,6 @@ package com.opengamma.analytics.math.interpolation;
 
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.util.ArgumentChecker;
@@ -17,16 +15,17 @@ import com.opengamma.util.tuple.Pair;
 
 /**
  * 
- * @param <T> The domain type of the function (e.g. Double, double[], DoubleMatrix1D etc) 
+ * @param <T> The domain type of the function (e.g. Double, double[], DoubleMatrix1D etc)
  */
 public class BasisFunctionAggregation<T> extends Function1D<T, Double> {
   private final List<Function1D<T, Double>> _f;
   private final double[] _w;
 
   public BasisFunctionAggregation(final List<Function1D<T, Double>> functions, final double[] weights) {
-    Validate.notEmpty(functions, "no functions");
-    Validate.notNull(weights, "no weights");
-    Validate.isTrue(functions.size() == weights.length);
+    ArgumentChecker.notEmpty(functions, "no functions");
+    ArgumentChecker.notNull(weights, "no weights");
+    ArgumentChecker.isTrue(functions.size() == weights.length, "Number of functions ({}) does not mach number of weights ({})", 
+        functions.size(), weights.length);
     _f = functions;
     _w = weights.clone();
   }
@@ -46,8 +45,8 @@ public class BasisFunctionAggregation<T> extends Function1D<T, Double> {
   }
 
   /**
-   * The sensitivity of the value at a point x to the weights of the basis functions 
-   * @param x value to be evaluated 
+   * The sensitivity of the value at a point x to the weights of the basis functions
+   * @param x value to be evaluated
    * @return sensitivity w
    */
   public DoubleMatrix1D weightSensitivity(final T x) {
@@ -63,8 +62,8 @@ public class BasisFunctionAggregation<T> extends Function1D<T, Double> {
 
   /**
    * The value of the function at the given point and its sensitivity to the weights of the basis functions
-   * @param x value to be evaluated 
-   * @return value and weight sensitivity 
+   * @param x value to be evaluated
+   * @return value and weight sensitivity
    */
   public Pair<Double, DoubleMatrix1D> valueAndWeightSensitivity(final T x) {
     ArgumentChecker.notNull(x, "x");

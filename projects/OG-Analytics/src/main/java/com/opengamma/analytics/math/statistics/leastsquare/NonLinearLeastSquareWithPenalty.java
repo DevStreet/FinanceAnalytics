@@ -87,9 +87,9 @@ public class NonLinearLeastSquareWithPenalty {
   }
 
   /**
-   * General constructor 
+   * General constructor
    * @param decomposition Matrix decomposition (see {@link DecompositionFactory} for list)
-   * @param algebra  The matrix algebra (see {@link MatrixAlgebraFactory} for list)
+   * @param algebra The matrix algebra (see {@link MatrixAlgebraFactory} for list)
    * @param eps Convergence tolerance
    */
   public NonLinearLeastSquareWithPenalty(final Decomposition<?> decomposition, final MatrixAlgebra algebra, final double eps) {
@@ -191,14 +191,19 @@ public class NonLinearLeastSquareWithPenalty {
   public LeastSquareWithPenaltyResults solve(final DoubleMatrix1D observedValues, final DoubleMatrix1D sigma, final Function1D<DoubleMatrix1D, DoubleMatrix1D> func,
       final Function1D<DoubleMatrix1D, DoubleMatrix2D> jac, final DoubleMatrix1D startPos, final DoubleMatrix2D penalty, final Function1D<DoubleMatrix1D, Boolean> allowedValue) {
 
-    Validate.notNull(observedValues, "observedValues");
-    Validate.notNull(sigma, " sigma");
-    Validate.notNull(func, " func");
-    Validate.notNull(jac, " jac");
-    Validate.notNull(startPos, "startPos");
+    ArgumentChecker.notNull(observedValues, "observedValues");
+    ArgumentChecker.notNull(sigma, " sigma");
+    ArgumentChecker.notNull(func, " func");
+    ArgumentChecker.notNull(jac, " jac");
+    ArgumentChecker.notNull(startPos, "startPos");
     final int nObs = observedValues.getNumberOfElements();
-    Validate.isTrue(nObs == sigma.getNumberOfElements(), "observedValues and sigma must be same length");
+    ArgumentChecker.isTrue(nObs == sigma.getNumberOfElements(), "observedValues and sigma must be same length");
+    ArgumentChecker.notNull(allowedValue, "allowedValue");
     ArgumentChecker.isTrue(allowedValue.evaluate(startPos), "The start position {} is not valid for this model. Please choose a valid start position", startPos);
+    ArgumentChecker.notNull(penalty, "penalty");
+    ArgumentChecker.isTrue(penalty.getNumberOfRows() == penalty.getNumberOfColumns(), "penalty must be square");
+    ArgumentChecker.isTrue(startPos.getNumberOfElements() == penalty.getNumberOfRows(),
+        "size of startPos ({}) does not mach size of penalty ({})", startPos.getNumberOfElements(), penalty.getNumberOfRows());
 
     DoubleMatrix2D alpha;
     DecompositionResult decmp;
@@ -214,7 +219,6 @@ public class NonLinearLeastSquareWithPenalty {
     oldChiSqr = getChiSqr(error);
     double p = getANorm(penalty, theta);
     oldChiSqr += p;
-
 
     DoubleMatrix1D beta = getChiSqrGrad(error, jacobian);
     DoubleMatrix1D temp = (DoubleMatrix1D) _algebra.multiply(penalty, theta);
@@ -283,7 +287,6 @@ public class NonLinearLeastSquareWithPenalty {
     }
     return lambda * 10;
   }
-
 
   private LeastSquareWithPenaltyResults finish(final DoubleMatrix2D alpha, final DecompositionResult decmp, final double chiSqr, final double penalty, final DoubleMatrix2D jacobian,
       final DoubleMatrix1D newTheta, final DoubleMatrix1D sigma) {

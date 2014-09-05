@@ -85,7 +85,7 @@ public class CapletStripperPSplineSurface implements CapletStripper {
     if (type == MarketDataType.PRICE) {
       return _imp.solveForCapPrices(marketValues, errors, guess, _penalty, POSITIVE);
     } else if (type == MarketDataType.VOL) {
-      return _imp.solveForCapVols(marketValues, errors, guess, _penalty, POSITIVE);
+      return _imp.solveForCapVols(marketValues, errors, guess, _penalty);
     }
     throw new IllegalArgumentException("Unknown MarketDataType " + type.toString());
   }

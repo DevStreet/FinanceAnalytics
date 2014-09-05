@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2013 - present by OpenGamma Inc. and the OpenGamma group of companies
- *
+ * 
  * Please see distribution for license.
  */
 package com.opengamma.analytics.financial.interestrate.capletstripping;
@@ -21,14 +21,14 @@ import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository
 import com.opengamma.analytics.financial.model.volatility.SimpleOptionData;
 import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurface;
 import com.opengamma.analytics.financial.provider.description.interestrate.MulticurveProviderInterface;
+import com.opengamma.analytics.math.MathException;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.tuple.DoublesPair;
 
 /**
- * This decomposes a set of caps or floors to the unique set of underlying caplets (or floorlets) to allow 
- * efficient simultaneous pricing of the caps. 
- * {@link CapFloorPricer}
+ * This decomposes a set of caps or floors to the unique set of underlying caplets (or floorlets) to allow
+ * efficient simultaneous pricing of the caps. {@link CapFloorPricer}
  */
 public class MultiCapFloorPricer {
 
@@ -42,19 +42,19 @@ public class MultiCapFloorPricer {
   private final double[] _capStartTimes;
   private final double[] _capEndTimes;
 
-  //maps
-  //this maps from a cap to the position of an option in _capletsArray
+  // maps
+  // this maps from a cap to the position of an option in _capletsArray
   private final int[][] _capToCapletsMap;
-  //this maps from a cap to a set of SimpleOptionData - the same thing can be achieved by using _capToCapletsMap on _capletsArray
+  // this maps from a cap to a set of SimpleOptionData - the same thing can be achieved by using _capToCapletsMap on _capletsArray
   private final SimpleOptionData[][] _capToOptionsMap;
 
   /**
    * 
    * @param caps List of cap or floors (as {@link CapFloor}). The order is not important and will be retained by methods
-   * returning cap values. 
-   * @param curves The discount and index curves 
+   * returning cap values.
+   * @param curves The discount and index curves
    */
-  public MultiCapFloorPricer(List<CapFloor> caps,  MulticurveProviderInterface curves) {
+  public MultiCapFloorPricer(List<CapFloor> caps, MulticurveProviderInterface curves) {
     ArgumentChecker.noNulls(caps, "null caps");
     ArgumentChecker.notNull(curves, "null curve");
 
@@ -94,7 +94,7 @@ public class MultiCapFloorPricer {
     _strikes = ArrayUtils.toPrimitive(strikes.toArray(new Double[0]));
     _capletExp = ArrayUtils.toPrimitive(expiries.toArray(new Double[0]));
 
-    //represent the unique set of caplets as SimpleOptionData
+    // represent the unique set of caplets as SimpleOptionData
     _capletsArray = CapFloorDecomposer.toOptions(capletSet.toArray(new CapFloorIbor[0]), curves);
     _nCaplets = _capletsArray.length;
 
@@ -118,7 +118,7 @@ public class MultiCapFloorPricer {
    */
   private class CapletsComparator implements Comparator<CapFloorIbor> {
     @Override
-    public int compare(CapFloorIbor o1,  CapFloorIbor o2) {
+    public int compare(CapFloorIbor o1, CapFloorIbor o2) {
       int a = Doubles.compare(o1.getStrike(), o2.getStrike());
       if (a != 0) {
         return a;
@@ -130,9 +130,9 @@ public class MultiCapFloorPricer {
 
   /**
    * get the volatility of the underlying caplets (ordered by expiry then strike), picked off a (caplet)
-   * volatility surface 
+   * volatility surface
    * @param volSurface A volatility surface
-   * @return caplet volatilities 
+   * @return caplet volatilities
    */
   public double[] getCapletVols(VolatilitySurface volSurface) {
     int nCaplets = _capletsArray.length;
@@ -156,10 +156,10 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * Price a set of caps/floors from the (Black) volatility of caplets on a strike-expiry grid. 
+   * Price a set of caps/floors from the (Black) volatility of caplets on a strike-expiry grid.
    * This is mainly used to calibrate to cap prices by directly setting the individual caplet vols
    * @param capletVols The (Black) volatility of caplets. These <b>must</b> be order by (ascending) order of fixing time,
-   *  then by (ascending) order of strike.
+   * then by (ascending) order of strike.
    * @return The cap/floor prices (in the same order the caps were given in the constructor)
    */
   public double[] priceFromCapletVols(double[] capletVols) {
@@ -190,9 +190,9 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   *  Price a set of caps/floors from the (Black) prices of the (unique set of) underlying caplets.
+   * Price a set of caps/floors from the (Black) prices of the (unique set of) underlying caplets.
    * @param capletPrices These <b>must</b> be order by (ascending) order of fixing time,
-   *  then by (ascending) order of strike.
+   * then by (ascending) order of strike.
    * @return The cap/floor prices (in the same order the caps were given in the constructor)
    */
   protected double[] priceFromCapletPrices(double[] capletPrices) {
@@ -253,7 +253,7 @@ public class MultiCapFloorPricer {
    * This vega matrix gives the sensitivity of the ith cap to the volatility of the jth caplet (where the caplets are order by their expiry). of course
    * if a cap does not contain a particular caplet, that entry will be zero.
    * @param capletVols The volatilities of all the caplets that make up the set of caps
-   * @return  vega matrix
+   * @return vega matrix
    */
   public DoubleMatrix2D vegaFromCapletVols(double[] capletVols) {
     ArgumentChecker.notEmpty(capletVols, "null caplet volatilities");
@@ -276,19 +276,19 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * This vega matrix gives the sensitivity of the implied volatility of the ith cap to the volatility of the jth 
+   * This vega matrix gives the sensitivity of the implied volatility of the ith cap to the volatility of the jth
    * caplet. of course if a cap does not contain a particular caplet, that entry will be zero.
    * @param capletVols The volatilities of all the caplets that make up the set of caps
-   * @return  cap volatility-vega matrix
+   * @return cap volatility-vega matrix
    */
   public DoubleMatrix2D capVolVega(double[] capletVols) {
 
-    //cap vega matrix - sensitivity of cap prices to the volatilities of the caplets 
+    // cap vega matrix - sensitivity of cap prices to the volatilities of the caplets
     DoubleMatrix2D vega = vegaFromCapletVols(capletVols);
     double[] capPrices = priceFromCapletVols(capletVols);
     double[] capVols = impliedVols(capPrices);
 
-    //sensitivity of the cap prices to their volatilities 
+    // sensitivity of the cap prices to their volatilities
     double[] capVega = vega(capVols);
 
     int nCaplets = capletVols.length;
@@ -297,6 +297,9 @@ public class MultiCapFloorPricer {
       double[] temp = capVolVega.getData()[i];
       double[] vegaRow = vega.getData()[i];
       double invVega = 1.0 / capVega[i];
+      if (!Doubles.isFinite(invVega)) {
+        throw new MathException("cap vega for the " + (i + 1) + "th cap is " + capVega[i] + ". Cannot compute a capVolVega");
+      }
       for (int j = 0; j < nCaplets; j++) {
         temp[j] = invVega * vegaRow[j];
       }
@@ -306,7 +309,7 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   *  get the sorted array of unique caplet expiry times from the set of caps supplied
+   * get the sorted array of unique caplet expiry times from the set of caps supplied
    * @return caplet expiry times
    */
   public double[] getCapletExpiries() {
@@ -314,7 +317,7 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   *  get the sorted array of unique strikes from the set of caps supplied
+   * get the sorted array of unique strikes from the set of caps supplied
    * @return caplet expiry times
    */
   public double[] getStrikes() {
@@ -322,7 +325,7 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * get the intrinsic (i.e. minimum) value of the caps - this is the cap price for zero volatility. 
+   * get the intrinsic (i.e. minimum) value of the caps - this is the cap price for zero volatility.
    * @return The intrinsic values
    */
   public double[] getIntrinsicCapValues() {
@@ -356,7 +359,7 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * The ordered set of cap start times 
+   * The ordered set of cap start times
    * @return cap start times
    */
   public double[] getCapStartTimes() {
@@ -364,7 +367,7 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * The ordered set of cap end times 
+   * The ordered set of cap end times
    * @return cap end times
    */
   public double[] getCapEndTimes() {
@@ -374,7 +377,7 @@ public class MultiCapFloorPricer {
   /**
    * get an array of expiry-strike values (as a {@link DoublesPair} of the underlying caplets. These are order by
    * (ascending) order of fixing time, then by (ascending) order of strike.
-   * @return DoublesPair of caplet expiry and strike 
+   * @return DoublesPair of caplet expiry and strike
    */
   public DoublesPair[] getExpiryStrikeArray() {
     DoublesPair[] res = new DoublesPair[_nCaplets];
@@ -386,26 +389,26 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * Gets number of caps 
-   * @return the number of caps 
+   * Gets number of caps
+   * @return the number of caps
    */
   public int getNumCaps() {
     return _nCaps;
   }
 
   /**
-   * Gets the number of unique caplets 
-   * @return the the number of unique caplets 
+   * Gets the number of unique caplets
+   * @return the the number of unique caplets
    */
   public int getNumCaplets() {
     return _nCaplets;
   }
 
   /**
-   * for a particular cap (given by index), this gives the indices of its underlying caplets in the master caplet list 
+   * for a particular cap (given by index), this gives the indices of its underlying caplets in the master caplet list
    * (which is ordered by fixing time, then strike)
    * @param index The index of the cap (using the same order as the constructor)
-   * @return indices of the caplets belonging to the cap 
+   * @return indices of the caplets belonging to the cap
    */
   protected int[] getCapToCapletMap(int index) {
     return _capToCapletsMap[index];
@@ -413,7 +416,7 @@ public class MultiCapFloorPricer {
 
   /**
    * get the caplet at a particular index (where the caplets are order by fixing time, then strike) as a {@link SimpleOptionData}
-   * @param index the caplet index 
+   * @param index the caplet index
    * @return caplet as a {@link SimpleOptionData}
    */
   protected SimpleOptionData getOption(int index) {
@@ -429,7 +432,7 @@ public class MultiCapFloorPricer {
   }
 
   /**
-   * Get the forward rates for the period covered by the caplets. 
+   * Get the forward rates for the period covered by the caplets.
    * @return the forward rates - these are order by (caplet) fixing time, then strike.
    */
   public double[] getCapletForwardRates() {
