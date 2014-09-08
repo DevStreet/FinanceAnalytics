@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
- *
+ * 
  * Please see distribution for license.
  */
 package com.opengamma.analytics.math.interpolation;
@@ -17,6 +17,7 @@ import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.MersenneTwister64;
 
 import com.opengamma.analytics.math.function.Function1D;
+import com.opengamma.analytics.math.interpolation.BasisFunctionGenerator.KnotsAndDegree;
 import com.opengamma.analytics.math.statistics.distribution.NormalDistribution;
 import com.opengamma.util.test.TestGroup;
 
@@ -42,27 +43,30 @@ public class BasisFunctionGeneratorTest {
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullKnots() {
-    GENERATOR.generate(null, 2, 4);
+    new BasisFunctionGenerator.KnotsAndDegree(null, 2);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNegDegree() {
-    GENERATOR.generate(KNOTS, -1, 4);
+    new BasisFunctionGenerator.KnotsAndDegree(KNOTS, -1);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testFunctionIndexOutOfRange1() {
-    GENERATOR.generate(KNOTS, 2, -1);
+    KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 2);
+    GENERATOR.generate(knots, -1);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testFunctionIndexOutOfRange2() {
-    GENERATOR.generate(KNOTS, 5, KNOTS.length - 5);
+    KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 5);
+    GENERATOR.generate(knots, KNOTS.length + 10);
   }
 
   @Test
   public void testZeroOrder() {
-    final Function1D<Double, Double> func = GENERATOR.generate(KNOTS, 0, 4);
+    KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 0);
+    final Function1D<Double, Double> func = GENERATOR.generate(knots, 4);
     assertEquals(0.0, func.evaluate(3.5), 0.0);
     assertEquals(1.0, func.evaluate(4.78), 0.0);
     assertEquals(1.0, func.evaluate(4.0), 0.0);
@@ -71,31 +75,34 @@ public class BasisFunctionGeneratorTest {
 
   @Test
   public void testFirstOrder() {
-    final Function1D<Double, Double> func = GENERATOR.generate(KNOTS, 1, 3);
+    KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 1);
+    final Function1D<Double, Double> func = GENERATOR.generate(knots, 3);
     assertEquals(0.0, func.evaluate(1.76), 0.0);
-    assertEquals(1.0, func.evaluate(4.0), 0.0);
-    assertEquals(0, func.evaluate(5.0), 0.0);
-    assertEquals(0.5, func.evaluate(3.5), 0.0);
+    assertEquals(1.0, func.evaluate(3.0), 0.0);
+    assertEquals(0, func.evaluate(4.0), 0.0);
+    assertEquals(0.5, func.evaluate(2.5), 0.0);
   }
 
   @Test
   public void testSecondOrder() {
-    final Function1D<Double, Double> func = GENERATOR.generate(KNOTS, 2, 3);
-    assertEquals(0.0, func.evaluate(1.76), 0.0);
-    assertEquals(0.125, func.evaluate(3.5), 0.0);
-    assertEquals(0.5, func.evaluate(4.0), 0.0);
-    assertEquals(0.75, func.evaluate(4.5), 0.0);
-    assertEquals(0.0, func.evaluate(6.0), 0.0);
+    KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 2);
+    final Function1D<Double, Double> func = GENERATOR.generate(knots, 3);
+    assertEquals(0.0, func.evaluate(0.76), 0.0);
+    assertEquals(0.125, func.evaluate(1.5), 0.0);
+    assertEquals(0.5, func.evaluate(2.0), 0.0);
+    assertEquals(0.75, func.evaluate(2.5), 0.0);
+    assertEquals(0.0, func.evaluate(4.0), 0.0);
   }
 
   @Test
   public void testThirdOrder() {
-    final Function1D<Double, Double> func = GENERATOR.generate(KNOTS, 3, 3);
-    assertEquals(0.0, func.evaluate(1.76), 0.0);
-    assertEquals(1. / 6., func.evaluate(4.0), 0.0);
-    assertEquals(2. / 3., func.evaluate(5.0), 0.0);
-    assertEquals(1 / 48., func.evaluate(6.5), 0.0);
-    assertEquals(0.0, func.evaluate(7.0), 0.0);
+    KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 3);
+    final Function1D<Double, Double> func = GENERATOR.generate(knots, 3);
+    assertEquals(0.0, func.evaluate(-0.1), 0.0);
+    assertEquals(1. / 6., func.evaluate(1.0), 0.0);
+    assertEquals(2. / 3., func.evaluate(2.0), 0.0);
+    assertEquals(1 / 48., func.evaluate(3.5), 0.0);
+    assertEquals(0.0, func.evaluate(4.0), 0.0);
   }
 
   @Test
@@ -104,7 +111,7 @@ public class BasisFunctionGeneratorTest {
     final double[][] knots = new double[2][];
     knots[0] = KNOTS;
     knots[1] = KNOTS;
-    final Function1D<double[], Double> func = GENERATOR.generate(knots, new int[] {2, 3}, new int[] {4, 4});
+    final Function1D<double[], Double> func = GENERATOR.generate(knots, new int[] {2, 3 }, new int[] {4, 4 });
     final double[] x = new double[2];
 
     if (PRINT) {
@@ -149,7 +156,7 @@ public class BasisFunctionGeneratorTest {
   @Test
   public void testSet2() {
 
-    final double[] iKnots = new double[] {0, 0.25, 0.75, 1, 2, 5, 7, 10, 15, 20, 30};
+    final double[] iKnots = new double[] {0, 0.25, 0.75, 1, 2, 5, 7, 10, 15, 20, 30 };
     // for (int i = 0; i < 11; i++) {
     // iKnots[i] = i / 10.0;
     // }
@@ -175,10 +182,10 @@ public class BasisFunctionGeneratorTest {
 
   @Test
   public void testSet3() {
-    final double[] xa = new double[] {0.0, 0.0};
-    final double[] xb = new double[] {1.0, 1.0};
-    final int[] nknots = new int[] {10, 15};
-    final int[] degree = new int[] {3, 4};
+    final double[] xa = new double[] {0.0, 0.0 };
+    final double[] xb = new double[] {1.0, 1.0 };
+    final int[] nknots = new int[] {10, 15 };
+    final int[] degree = new int[] {3, 4 };
     final List<Function1D<double[], Double>> functions = GENERATOR.generateSet(xa, xb, nknots, degree);
     final int n = functions.size();
     final double[] w = new double[n];
