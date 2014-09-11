@@ -32,8 +32,8 @@ public class VarianceSwapStaticReplication {
   private final ExpectedVarianceStaticReplicationCalculator _cal;
 
   /**
-   * Constructor that uses the default values for expected variance calculations.
-   */
+//   * Constructor that uses the default values for expected variance calculations.
+//   */
   public VarianceSwapStaticReplication() {
     _cal = new ExpectedVarianceStaticReplicationCalculator();
   }
