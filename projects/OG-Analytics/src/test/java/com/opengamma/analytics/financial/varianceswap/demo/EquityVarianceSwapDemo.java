@@ -1,10 +1,11 @@
 /**
- /**
+ * /**
  * Copyright (C) 2014 - present by OpenGamma Inc. and the OpenGamma group of companies
  * 
  * Please see distribution for license.
  */
 package com.opengamma.analytics.financial.varianceswap.demo;
+
 import static com.opengamma.financial.convention.businessday.BusinessDayDateUtils.getWorkingDaysInclusive;
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -55,7 +56,7 @@ public class EquityVarianceSwapDemo {
   private static final YieldAndDiscountCurve s_DiscountCurve = new YieldCurve("Discount", ConstantDoublesCurve.from(s_Drift));
   private static final BlackVolatilitySurfaceStrike s_FlatVolSurf = new BlackVolatilitySurfaceStrike(ConstantDoublesSurface.from(s_Vol));
 
-  private static final ZonedDateTime s_ObsStartTime =ZonedDateTime.of(2013, 12, 16, 12, 0, 0, 0, UTC) ;//ZonedDateTime.of(2013, 7, 27, 12, 0, 0, 0, UTC); // Saturday
+  private static final ZonedDateTime s_ObsStartTime = ZonedDateTime.of(2013, 12, 16, 12, 0, 0, 0, UTC);// ZonedDateTime.of(2013, 7, 27, 12, 0, 0, 0, UTC); // Saturday
   private static final ZonedDateTime s_ObsEndTime = ZonedDateTime.of(2015, 7, 30, 12, 0, 0, 0, UTC); // Thursday
   private static final ZonedDateTime s_SettlementTime = ZonedDateTime.of(2015, 8, 3, 12, 0, 0, 0, UTC);// Monday
   private static final Currency s_Ccy = Currency.EUR;
@@ -70,8 +71,7 @@ public class EquityVarianceSwapDemo {
    */
   @Test
   public void buildSwap() {
-    EquityVarianceSwapDefinition def = new EquityVarianceSwapDefinition(s_ObsStartTime, s_ObsEndTime, s_SettlementTime, s_Ccy, s_Calendar, s_AnnualizationFactor, s_VolStrike,
-        s_VolNotional, false);
+    EquityVarianceSwapDefinition def = new EquityVarianceSwapDefinition(s_ObsStartTime, s_ObsEndTime, s_SettlementTime, s_Ccy, s_Calendar, s_AnnualizationFactor, s_VolStrike, s_VolNotional, false);
 
     ZonedDateTime obsDate = ZonedDateTime.of(2014, 8, 11, 12, 0, 0, 0, UTC);
     EquityVarianceSwap varSwap = def.toDerivative(obsDate);
@@ -137,7 +137,7 @@ public class EquityVarianceSwapDemo {
   /**
    * The expected variance is computed by static replication - integration over vanilla option prices. These prices are
    * derived from a volatility surface which is flat at 30% - hence we should recover (up to some numerical tolerance)
-   * 0.3^2 for the expected variance.  
+   * 0.3^2 for the expected variance.
    */
   @Test
   public void flatVolPrice() {
@@ -150,11 +150,11 @@ public class EquityVarianceSwapDemo {
     StaticReplicationDataBundle market = new StaticReplicationDataBundle(s_FlatVolSurf, s_DiscountCurve, s_FwdCurve);
     assertEquals(s_Vol * s_Vol, PRICER.expectedVariance(varSwap, market), 1e-10);
 
-    //now look at a seasoned swap
-    valueDate = ZonedDateTime.of(2013, 12, 25, 12, 0, 0, 0, UTC); //not a working day
+    // now look at a seasoned swap
+    valueDate = ZonedDateTime.of(2014, 1, 28, 12, 0, 0, 0, UTC); // Tue
 
-    //don't include the valueDate in the observations
-    int observationDays = getWorkingDaysInclusive(s_ObsStartTime, valueDate, s_Calendar);
+    // Don't include the valueDate in the observations
+    int observationDays = BusinessDayDateUtils.getDaysBetween(s_ObsStartTime, valueDate, s_Calendar);
 
     System.out.println("\nObsevations added: " + observationDays);
     LocalDate[] dates = new LocalDate[observationDays];
@@ -179,10 +179,16 @@ public class EquityVarianceSwapDemo {
     LocalDateDoubleTimeSeries ts = ImmutableLocalDateDoubleTimeSeries.of(dates, Prices);
     varSwap = def.toDerivative(valueDate, ts);
 
-    System.out.println("Observations disrupted: " + varSwap.getObsDisrupted());
-    System.out.println("Observations expected: " + varSwap.getObsExpected());
-    double[] obs = varSwap.getObservations();
-    System.out.println("Observations: " + obs.length);
+    double relVar = (observationDays - 1) / s_AnnualizationFactor * REALIZED_VOL_CAL.evaluate(varSwap);
+    assertEquals(relVar, sum2, 1e-14);
+
+    //Compute the price using the observations we have and the knowledge that volatility surface is flat (at 30%), and
+    //compare this with the result of the calculator (which integrates over the vanilla option prices)
+    double df = market.getDiscountCurve().getDiscountFactor(varSwap.getTimeToSettlement());
+    double expVar = (s_AnnualizationFactor * sum2 + s_Vol * s_Vol * (varSwap.getObsExpected() - observationDays)) / (varSwap.getObsExpected() - 1);
+    double expPV = df * s_VolNotional / 2 / s_VolStrike * (expVar - s_VolStrike * s_VolStrike);
+    double pv = PRICER.presentValue(varSwap, market);
+    assertEquals(expPV, pv, 1e-5);
   }
 
 }
