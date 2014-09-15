@@ -36,13 +36,20 @@ public class BusinessDayDateUtilTest {
     ZonedDateTime d4 = ZonedDateTime.of(2014, 8, 1, 12, 0, 0, 0, UTC); // Friday
     ZonedDateTime d5 = ZonedDateTime.of(2014, 7, 22, 12, 0, 0, 0, UTC); // Tuesday
 
-    assertEquals(1, getDaysBetween(d1, d5, WEEKEND_CALENDAR));
-    assertEquals(4, getDaysBetween(d1, d2, WEEKEND_CALENDAR));
-    assertEquals(5, getDaysBetween(d1, d3, WEEKEND_CALENDAR));
-    assertEquals(0, getDaysBetween(d2, d3, WEEKEND_CALENDAR));
-    assertEquals(4, getDaysBetween(d2, d4, WEEKEND_CALENDAR));
-    assertEquals(3, getDaysBetween(d2, d4, HOLIDAY_CALENDAR));
+    //same day
+    assertEquals(0, getDaysBetween(d0, d0, WEEKEND_CALENDAR)); 
 
+    assertEquals(1, getDaysBetween(d1, d5, WEEKEND_CALENDAR)); //Monday to Tuesday 
+    assertEquals(5, getDaysBetween(d1, d2, WEEKEND_CALENDAR)); //Monday to Saturday
+    assertEquals(5, getDaysBetween(d1, d3, WEEKEND_CALENDAR)); //Monday to following Monday
+    assertEquals(0, getDaysBetween(d2, d3, WEEKEND_CALENDAR)); //Saturday to Monday
+    assertEquals(4, getDaysBetween(d2, d4, WEEKEND_CALENDAR)); //Saturday to Friday
+    assertEquals(3, getDaysBetween(d2, d4, HOLIDAY_CALENDAR)); //Saturday to Friday (with Wednesday a holiday) 
+
+    //additive over a weekend 
+    assertEquals(getDaysBetween(d1, d3, HOLIDAY_CALENDAR), getDaysBetween(d1, d2, HOLIDAY_CALENDAR) + getDaysBetween(d2, d3, HOLIDAY_CALENDAR));
+
+    //long periods 
     assertEquals(261, getDaysBetween(d0, d4, WEEKEND_CALENDAR));
     assertEquals(259, getDaysBetween(d0, d4, HOLIDAY_CALENDAR));
   }
