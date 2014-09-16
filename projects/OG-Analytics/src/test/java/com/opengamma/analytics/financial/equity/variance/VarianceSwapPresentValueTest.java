@@ -27,7 +27,6 @@ import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscou
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
 import com.opengamma.analytics.financial.model.volatility.surface.BlackVolatilitySurfaceStrike;
 import com.opengamma.analytics.financial.varianceswap.VarianceSwap;
-import com.opengamma.analytics.math.FunctionUtils;
 import com.opengamma.analytics.math.curve.ConstantDoublesCurve;
 import com.opengamma.analytics.math.interpolation.CombinedInterpolatorExtrapolator;
 import com.opengamma.analytics.math.interpolation.GridInterpolator2D;
@@ -188,18 +187,7 @@ public class VarianceSwapPresentValueTest {
     avgSquareReturn /= (nObs - 1);
   }
 
-  @Test
-  /**
-   * Simply test the machinery: the average of squared log returns of a lognormal distribution
-   * will return the standard deviation used to generate the random observations
-   */
-  public void testAvgSquareReturn() {
-    final double sampleDailyVariance = avgSquareReturn - FunctionUtils.square(avgReturn);
-    final double sampleAnnualVariance = sampleDailyVariance * annualization;
-    final double annualVolatilityEstimate = Math.sqrt(sampleAnnualVariance);
-    assertEquals(volAnnual, annualVolatilityEstimate, 0.01);
-    assertEquals(0.27710025417636447, annualVolatilityEstimate, TOLERATED);
-  }
+
 
   @Test
   /**
