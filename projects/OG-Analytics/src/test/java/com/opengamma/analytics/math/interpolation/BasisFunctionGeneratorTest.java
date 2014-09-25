@@ -9,15 +9,10 @@ import static org.testng.AssertJUnit.assertEquals;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import cern.jet.random.engine.MersenneTwister;
-import cern.jet.random.engine.MersenneTwister64;
-
+import com.opengamma.analytics.math.FunctionUtils;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.statistics.distribution.NormalDistribution;
 import com.opengamma.util.test.TestGroup;
 
 /**
@@ -25,9 +20,6 @@ import com.opengamma.util.test.TestGroup;
  */
 @Test(groups = TestGroup.UNIT)
 public class BasisFunctionGeneratorTest {
-  private static final Logger s_logger = LoggerFactory.getLogger(BasisFunctionGeneratorTest.class);
-  private static final Boolean PRINT = true;
-  private static final NormalDistribution NORMAL = new NormalDistribution(0, 1.0, new MersenneTwister64(MersenneTwister.DEFAULT_SEED));
   private static final BasisFunctionGenerator GENERATOR = new BasisFunctionGenerator();
   private static final double[] KNOTS;
 
@@ -40,27 +32,18 @@ public class BasisFunctionGeneratorTest {
 
   }
 
-  // @Test(expectedExceptions = IllegalArgumentException.class)
-  // public void testNullKnots() {
-  // new BasisFunctionGenerator.KnotsAndDegree(null, 2);
-  // }
-  //
-  // @Test(expectedExceptions = IllegalArgumentException.class)
-  // public void testNegDegree() {
-  // new BasisFunctionGenerator.KnotsAndDegree(KNOTS, -1);
-  // }
-  //
-  // @Test(expectedExceptions = IllegalArgumentException.class)
-  // public void testFunctionIndexOutOfRange1() {
-  // KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 2);
-  // GENERATOR.generate(knots, -1);
-  // }
-  //
-  // @Test(expectedExceptions = IllegalArgumentException.class)
-  // public void testFunctionIndexOutOfRange2() {
-  // KnotsAndDegree knots = new BasisFunctionGenerator.KnotsAndDegree(KNOTS, 5);
-  // GENERATOR.generate(knots, KNOTS.length + 10);
-  // }
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testFunctionIndexOutOfRange1() {
+    BasisFunctionKnots k = BasisFunctionKnots.fromKnots(KNOTS, 2);
+    GENERATOR.generate(k, -1);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testFunctionIndexOutOfRange2() {
+    BasisFunctionKnots k = BasisFunctionKnots.fromKnots(KNOTS, 5);
+    int nS = k.getNumSplines();
+    GENERATOR.generate(k,nS);
+  }
 
   @Test
   public void testZeroOrder() {
@@ -105,163 +88,34 @@ public class BasisFunctionGeneratorTest {
   }
 
   @Test
-  public void genTest() {
-    BasisFunctionKnots knots = BasisFunctionKnots.fromInternalKnots(KNOTS, 10);
+  public void testTwoD() {
 
-    List<Function1D<Double, Double>> set1 = GENERATOR.generateSet(knots);
-    List<Function1D<Double, Double>> set2 = GENERATOR.generateSetNew(knots);
-
-    Function1D<Double, Double> f1 = set1.get(4);
-    Function1D<Double, Double> f2 = set2.get(4);
-
-    int samples = 123;
-    double[] x = new double[samples];
-    for (int i = 0; i < samples; i++) {
-      x[i] = 3.0 + 3.0 * i / (samples - 1.0);
-    }
-
-    int warmpup = 200;
-    int hotspots = 1000;
-
-    for (int count = 0; count < warmpup; count++) {
-      for (int i = 0; i < samples; i++) {
-        f1.evaluate(x[i]);
-      }
-    }
-    long t = System.nanoTime();
-    for (int count = 0; count < hotspots; count++) {
-      for (int i = 0; i < samples; i++) {
-        f1.evaluate(x[i]);
-      }
-    }
-    System.out.println("time: " + (System.nanoTime() -t)*1.0/(hotspots*samples) +"ns");
-
-    for (int count = 0; count < warmpup; count++) {
-      for (int i = 0; i < samples; i++) {
-        f2.evaluate(x[i]);
-      }
-    }
-    t = System.nanoTime();
-    for (int count = 0; count < hotspots; count++) {
-      for (int i = 0; i < samples; i++) {
-        f2.evaluate(x[i]);
-      }
-    }
-    System.out.println("time: " + (System.nanoTime() -t)*1.0/(hotspots*samples) +"ns");
-
-  }
-
-  @Test
-  public void test2D() {
-
-    final double[][] knots = new double[2][];
-    knots[0] = KNOTS;
-    knots[1] = KNOTS;
     BasisFunctionKnots knots1 = BasisFunctionKnots.fromInternalKnots(KNOTS, 2);
     BasisFunctionKnots knots2 = BasisFunctionKnots.fromInternalKnots(KNOTS, 3);
-    final Function1D<double[], Double> func = GENERATOR.generate(new BasisFunctionKnots[] {knots1, knots2 }, new int[] {4, 4 });
-    final double[] x = new double[2];
+    List<Function1D<double[], Double>> set = GENERATOR.generateSet(new BasisFunctionKnots[] {knots1,knots2});
 
-    if (PRINT) {
-      for (int i = 0; i < 101; i++) {
-        x[0] = 0 + i * 10.0 / 100.0;
-        System.out.print("\t" + x[0]);
-      }
-      System.out.print("\n");
-      for (int i = 0; i < 101; i++) {
-        x[0] = 0 + i * 10.0 / 100.0;
-        System.out.print(x[0]);
-        for (int j = 0; j < 101; j++) {
-          x[1] = 0 + j * 10.0 / 100.0;
-          final double y = func.evaluate(x);
-          System.out.print("\t" + y);
-        }
-        System.out.print("\n");
-      }
-    }
-
-  }
-
-  @SuppressWarnings("unused")
-  @Test
-  public void testSet() {
-    final java.util.List<Function1D<Double, Double>> functions = GENERATOR.generateSet(-3, 5, 17, 3);
-    final int n = functions.size();
-    final double[] w = new double[n];
-    for (int i = 0; i < n; i++) {
-      w[i] = 1 + 0.1 * NORMAL.nextRandom();
-    }
-    final Function1D<Double, Double> fun = new BasisFunctionAggregation<Double>(functions, w);
-
-    for (int i = 0; i < 101; i++) {
-      final double x = -3 + i * 8.0 / 100.0;
-      final double y = fun.evaluate(x);
-      // System.out.println(x + "\t" + y);
-    }
-  }
-
-  @SuppressWarnings("unused")
-  @Test
-  public void testSet2() {
-
-    final double[] iKnots = new double[] {0, 0.25, 0.75, 1, 2, 5, 7, 10, 15, 20, 30 };
-    // for (int i = 0; i < 11; i++) {
-    // iKnots[i] = i / 10.0;
-    // }
-    final List<Function1D<Double, Double>> functions = GENERATOR.generateSet(iKnots, 3);
-    final int n = functions.size();
-    final double[] w = new double[n];
-    for (int i = 0; i < n; i++) {
-      w[i] = 1 + 0.1 * NORMAL.nextRandom();
-    }
-    final Function1D<Double, Double> fun = new BasisFunctionAggregation<Double>(functions, w);
-
-    for (int i = 0; i < 100; i++) {
-      final double x = -1 + i * 6 / 100.0;
-      final double y = fun.evaluate(x);
-      // System.out.println(x + "\t" + y);
-    }
-    for (int i = 0; i < 101; i++) {
-      final double x = 6 + i * 54 / 100.0;
-      final double y = fun.evaluate(x);
-      // System.out.println(x + "\t" + y);
-    }
+    //pick of one of the basis functions for testing 
+    int index = FunctionUtils.toTensorIndex(new int[] {3,3}, new int[] {knots1.getNumSplines(),knots2.getNumSplines()});
+    Function1D<double[], Double> func = set.get(index);
+    assertEquals(1. / 3., func.evaluate(new double[] {2.0,2.0}), 0.0);
+    assertEquals(1. / 2., func.evaluate(new double[] {2.5,2.0}), 0.0);
+    assertEquals(1. / 8./48., func.evaluate(new double[] {1.5,3.5}), 0.0);
+    assertEquals(0.0, func.evaluate(new double[] {4.0,2.5}), 0.0);
   }
 
   @Test
-  public void testSet3() {
-    final double[] xa = new double[] {0.0, 0.0 };
-    final double[] xb = new double[] {1.0, 1.0 };
-    final int[] nknots = new int[] {10, 15 };
-    final int[] degree = new int[] {3, 4 };
-    final List<Function1D<double[], Double>> functions = GENERATOR.generateSet(xa, xb, nknots, degree);
-    final int n = functions.size();
-    final double[] w = new double[n];
-    for (int i = 0; i < n; i++) {
-      w[i] = 1 + 0.1 * NORMAL.nextRandom();
-    }
-    final Function1D<double[], Double> fun = new BasisFunctionAggregation<>(functions, w);
+  public void testThreeD() {
+    BasisFunctionKnots knots1 = BasisFunctionKnots.fromInternalKnots(KNOTS, 2);
+    BasisFunctionKnots knots2 = BasisFunctionKnots.fromInternalKnots(KNOTS, 3);
+    BasisFunctionKnots knots3 = BasisFunctionKnots.fromInternalKnots(KNOTS, 1);
+    List<Function1D<double[], Double>> set = GENERATOR.generateSet(new BasisFunctionKnots[] {knots1,knots2,knots3});
 
-    final double[] x = new double[2];
-
-    if (PRINT) {
-
-      for (int i = 0; i < 101; i++) {
-        x[0] = -0.4 + i * 1.8 / 100.0;
-        System.out.print("\t" + x[0]);
-      }
-      System.out.print("\n");
-      for (int i = 0; i < 101; i++) {
-        x[0] = -0.4 + i * 1.8 / 100.0;
-        System.out.print(x[0]);
-        for (int j = 0; j < 101; j++) {
-          x[1] = -0.4 + j * 1.8 / 100.0;
-          final double y = fun.evaluate(x);
-          System.out.print("\t" + y);
-        }
-        System.out.print("\n");
-      }
-    }
+    //pick of one of the basis functions for testing 
+    int index = FunctionUtils.toTensorIndex(new int[] {3,3,3}, new int[] {knots1.getNumSplines(),knots2.getNumSplines(),
+      knots3.getNumSplines()});
+    Function1D<double[], Double> func = set.get(index);
+    assertEquals(1. / 3., func.evaluate(new double[] {2.0,2.0,3.0}), 0.0);
   }
+
 
 }

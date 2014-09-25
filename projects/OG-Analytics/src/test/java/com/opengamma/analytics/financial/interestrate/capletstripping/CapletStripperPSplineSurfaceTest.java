@@ -44,8 +44,7 @@ public class CapletStripperPSplineSurfaceTest extends CapletStrippingSetup {
   private static final MatrixAlgebra MA = new OGMatrixAlgebra();
 
   @SuppressWarnings("deprecation")
-  @Test
-  // (enabled = false)
+  @Test (enabled = false)
   public void test() {
 
     MultiCapFloorPricer pricer = new MultiCapFloorPricer(getAllCaps(), getYieldCurves());
