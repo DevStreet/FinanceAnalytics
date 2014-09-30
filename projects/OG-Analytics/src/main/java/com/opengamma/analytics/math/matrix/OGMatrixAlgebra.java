@@ -9,15 +9,11 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
 
 import com.opengamma.analytics.math.linearalgebra.TridiagonalMatrix;
-
-import com.opengamma.util.ArgumentChecker;
-
-import com.opengamma.maths.datacontainers.OGNumeric;
 import com.opengamma.maths.datacontainers.OGTerminal;
 import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
 import com.opengamma.maths.materialisers.Materialisers;
 import com.opengamma.maths.nodes.MTIMES;
-import com.opengamma.maths.nodes.NORM2;
+import com.opengamma.util.ArgumentChecker;
 
 /**
  * An absolutely minimal implementation of matrix algebra - only various multiplications covered. For more advanced
