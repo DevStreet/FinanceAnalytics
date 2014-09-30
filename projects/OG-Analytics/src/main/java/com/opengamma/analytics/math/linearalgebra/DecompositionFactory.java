@@ -16,10 +16,6 @@ public final class DecompositionFactory {
   public static final String LU_COMMONS_NAME = "LU_COMMONS";
   /** Commons QR decomposition */
   public static final String QR_COMMONS_NAME = "QR_COMMONS";
-  /** Colt SV decomposition */
-  public static final String SV_COLT_NAME = "SV_COLT";
-  /** Commons SV decomposition */
-  public static final String SV_COMMONS_NAME = "SV_COMMONS";
   /** {@link LUDecompositionCommons} */
   public static final Decomposition<?> LU_COMMONS = new LUDecompositionCommons();
   /** {@link QRDecompositionCommons} */
