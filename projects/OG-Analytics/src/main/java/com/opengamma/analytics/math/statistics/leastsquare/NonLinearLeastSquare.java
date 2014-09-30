@@ -47,7 +47,7 @@ public class NonLinearLeastSquare {
   private final MatrixAlgebra _algebra;
 
   public NonLinearLeastSquare() {
-    this(DecompositionFactory.SV_COMMONS, MatrixAlgebraFactory.OG_ALGEBRA, 1e-8);
+    this(new SVDecompositionOG(), MatrixAlgebraFactory.OG_ALGEBRA, 1e-8);
   }
 
   public NonLinearLeastSquare(final Decomposition<?> decomposition, final MatrixAlgebra algebra, final double eps) {

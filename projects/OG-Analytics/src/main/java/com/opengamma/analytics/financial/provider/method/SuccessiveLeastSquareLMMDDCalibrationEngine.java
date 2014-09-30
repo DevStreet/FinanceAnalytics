@@ -14,6 +14,7 @@ import com.opengamma.analytics.financial.interestrate.InstrumentDerivativeVisito
 import com.opengamma.analytics.financial.interestrate.swaption.derivative.SwaptionPhysicalFixedIbor;
 import com.opengamma.analytics.financial.provider.description.interestrate.ParameterProviderInterface;
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
+import com.opengamma.analytics.math.linearalgebra.SVDecompositionOG;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.statistics.leastsquare.LeastSquareResults;
@@ -92,7 +93,7 @@ public class SuccessiveLeastSquareLMMDDCalibrationEngine<DATA_TYPE extends Param
     computeCalibrationPrice(data);
     _calibrationObjective.setMulticurves(data.getMulticurveProvider());
     final SuccessiveLeastSquareLMMDDCalibrationObjective objective = (SuccessiveLeastSquareLMMDDCalibrationObjective) _calibrationObjective;
-    final NonLinearLeastSquare ls = new NonLinearLeastSquare(DecompositionFactory.SV_COMMONS, MatrixAlgebraFactory.OG_ALGEBRA, DEFAULT_PRECISION);
+    final NonLinearLeastSquare ls = new NonLinearLeastSquare(new SVDecompositionOG(), MatrixAlgebraFactory.OG_ALGEBRA, DEFAULT_PRECISION);
     //    final NonLinearLeastSquare ls = new NonLinearLeastSquare();
     for (int loopblock = 0; loopblock < nbBlocks; loopblock++) {
       final InstrumentDerivative[] instruments = new InstrumentDerivative[_nbInstrumentsBlock];

@@ -13,6 +13,7 @@ import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.linearalgebra.Decomposition;
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.linearalgebra.DecompositionResult;
+import com.opengamma.analytics.math.linearalgebra.SVDecompositionOG;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
@@ -36,7 +37,7 @@ public class NonLinearLeastSquareWithPenalty {
   private static final int MAX_ATTEMPTS = 100000;
 
   // Review should we use Cholesky as default
-  private static final Decomposition<?> DEFAULT_DECOMP = DecompositionFactory.SV_COLT;
+  private static final Decomposition<?> DEFAULT_DECOMP = new SVDecompositionOG();
   private static final OGMatrixAlgebra MA = new OGMatrixAlgebra();
   private static final double EPS = 1e-8; // Default convergence tolerance on the relative change in chi2
 

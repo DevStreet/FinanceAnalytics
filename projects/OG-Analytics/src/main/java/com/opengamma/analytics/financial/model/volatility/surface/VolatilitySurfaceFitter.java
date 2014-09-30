@@ -20,6 +20,7 @@ import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.analytics.math.interpolation.TransformedInterpolator1D;
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
+import com.opengamma.analytics.math.linearalgebra.SVDecompositionOG;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
@@ -37,7 +38,7 @@ import com.opengamma.util.ArgumentChecker;
 public abstract class VolatilitySurfaceFitter<T extends SmileModelData> {
 
   private static final MatrixAlgebra MA = new OGMatrixAlgebra();
-  private static final NonLinearLeastSquare SOLVER = new NonLinearLeastSquare(DecompositionFactory.SV_COLT, MA, 1e-6);
+  private static final NonLinearLeastSquare SOLVER = new NonLinearLeastSquare(new SVDecompositionOG(), MA, 1e-6);
 
   private final InterpolatedCurveBuildingFunction _curveBuilder;
   private final double[] _expiries;

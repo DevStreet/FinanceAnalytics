@@ -16,6 +16,7 @@ import com.opengamma.analytics.math.interpolation.DistanceCalculator;
 import com.opengamma.analytics.math.linearalgebra.Decomposition;
 import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.linearalgebra.DecompositionResult;
+import com.opengamma.analytics.math.linearalgebra.SVDecompositionOG;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.util.tuple.Pair;
@@ -116,7 +117,7 @@ public class KrigingInterpolatorDataBundle extends InterpolatorNDDataBundle {
     try {
       res = solve(v, y, _decomp);
     } catch (final IllegalArgumentException e) {
-      final Decomposition<?> decomp = DecompositionFactory.SV_COMMONS;
+      final Decomposition<?> decomp = new SVDecompositionOG();
       res = solve(v, y, decomp);
     }
 
