@@ -26,7 +26,6 @@ import com.opengamma.analytics.financial.provider.sensitivity.inflation.Inflatio
 import com.opengamma.analytics.financial.provider.sensitivity.inflationissuer.ParameterSensitivityInflationIssuerMatrixCalculator;
 import com.opengamma.analytics.financial.provider.sensitivity.inflationissuer.ParameterSensitivityInflationIssuerUnderlyingMatrixCalculator;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
@@ -74,7 +73,7 @@ public class InflationIssuerDiscountBuildingRepository {
     _toleranceAbs = toleranceAbs;
     _toleranceRel = toleranceRel;
     _stepMaximum = stepMaximum;
-    _rootFinder = new BroydenVectorRootFinder(_toleranceAbs, _toleranceRel, _stepMaximum, DecompositionFactory.getDecomposition(DecompositionFactory.SV_COLT_NAME));
+    _rootFinder = new BroydenVectorRootFinder(_toleranceAbs, _toleranceRel, _stepMaximum);
     // TODO: make the root finder flexible.
     // TODO: create a way to select the SensitivityMatrixMulticurve calculator (with underlying curve or not)
   }
