@@ -19,6 +19,9 @@ import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
 import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.matrix.OGMatrixAlgebra;
+import com.opengamma.maths.DOGMA;
+import com.opengamma.maths.datacontainers.OGTerminal;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -35,8 +38,6 @@ public class NonLinearLeastSquareWithPenalty {
   // private static final Logger LOGGER = LoggerFactory.getLogger(NonLinearLeastSquareWithPenalty.class);
   private static final int MAX_ATTEMPTS = 100000;
 
-  // Review should we use Cholesky as default
-  private static final Decomposition<?> DEFAULT_DECOMP = DecompositionFactory.SV_COLT;
   private static final OGMatrixAlgebra MA = new OGMatrixAlgebra();
   private static final double EPS = 1e-8; // Default convergence tolerance on the relative change in chi2
 
@@ -51,52 +52,31 @@ public class NonLinearLeastSquareWithPenalty {
   };
 
   private final double _eps;
-  private final Decomposition<?> _decomposition;
   private final MatrixAlgebra _algebra;
 
   /**
-   * Default constructor. This uses SVD (Colt), {@link OGMatrixAlgebra} and a convergence tolerance of 1e-8
+   * Default constructor. This uses {@link OGMatrixAlgebra} and a convergence tolerance of 1e-8
    */
   public NonLinearLeastSquareWithPenalty() {
-    this(DEFAULT_DECOMP, MA, EPS);
+    this(MA, EPS);
   }
 
   /**
-   * Constructor allowing matrix decomposition to be set. This uses {@link OGMatrixAlgebra} and a convergence tolerance of 1e-8
-   * @param decomposition Matrix decomposition (see {@link DecompositionFactory} for list)
-   */
-  public NonLinearLeastSquareWithPenalty(final Decomposition<?> decomposition) {
-    this(decomposition, MA, EPS);
-  }
-
-  /**
-   * Constructor allowing convergence tolerance to be set. This uses SVD (Colt) and {@link OGMatrixAlgebra}
-   * @param eps Convergence tolerance
-   */
+    * Constructor allowing convergence tolerance to be set. This uses SVD (Colt) and {@link OGMatrixAlgebra}
+    * @param eps Convergence tolerance
+    */
   public NonLinearLeastSquareWithPenalty(final double eps) {
-    this(DEFAULT_DECOMP, MA, eps);
-  }
-
-  /**
-   * Constructor allowing matrix decomposition and convergence tolerance to be set. This uses {@link OGMatrixAlgebra}
-   * @param decomposition Matrix decomposition (see {@link DecompositionFactory} for list)
-   * @param eps Convergence tolerance
-   */
-  public NonLinearLeastSquareWithPenalty(final Decomposition<?> decomposition, final double eps) {
-    this(decomposition, MA, eps);
+    this(MA, eps);
   }
 
   /**
    * General constructor 
-   * @param decomposition Matrix decomposition (see {@link DecompositionFactory} for list)
    * @param algebra  The matrix algebra (see {@link MatrixAlgebraFactory} for list)
    * @param eps Convergence tolerance
    */
-  public NonLinearLeastSquareWithPenalty(final Decomposition<?> decomposition, final MatrixAlgebra algebra, final double eps) {
-    ArgumentChecker.notNull(decomposition, "decomposition");
+  public NonLinearLeastSquareWithPenalty(final MatrixAlgebra algebra, final double eps) {
     ArgumentChecker.notNull(algebra, "algebra");
     ArgumentChecker.isTrue(eps > 0, "must have positive eps");
-    _decomposition = decomposition;
     _algebra = algebra;
     _eps = eps;
   }
@@ -215,7 +195,6 @@ public class NonLinearLeastSquareWithPenalty {
     double p = getANorm(penalty, theta);
     oldChiSqr += p;
 
-
     DoubleMatrix1D beta = getChiSqrGrad(error, jacobian);
     DoubleMatrix1D temp = (DoubleMatrix1D) _algebra.multiply(penalty, theta);
     beta = (DoubleMatrix1D) _algebra.subtract(beta, temp);
@@ -226,8 +205,7 @@ public class NonLinearLeastSquareWithPenalty {
       DoubleMatrix1D deltaTheta;
 
       try {
-        decmp = _decomposition.evaluate(alpha);
-        deltaTheta = decmp.solve(beta);
+        deltaTheta = new DoubleMatrix1D(DOGMA.toOGTerminal(DOGMA.mldivide(new OGRealDenseMatrix(alpha.getData()), new OGRealDenseMatrix(beta.getData(), beta.getNumberOfElements(), 1))).getData());
       } catch (final Exception e) {
         throw new MathException(e);
       }
@@ -249,11 +227,7 @@ public class NonLinearLeastSquareWithPenalty {
       if (Math.abs(newChiSqr - oldChiSqr) / (1 + oldChiSqr) < _eps) {
 
         final DoubleMatrix2D alpha0 = lambda == 0.0 ? alpha : getModifiedCurvatureMatrix(jacobian, 0.0, penalty);
-
-        if (lambda > 0.0) {
-          decmp = _decomposition.evaluate(alpha0);
-        }
-        return finish(alpha0, decmp, newChiSqr - p, p, jacobian, trialTheta, sigma);
+        return finish(alpha0, newChiSqr - p, p, jacobian, trialTheta, sigma);
       }
 
       if (newChiSqr < oldChiSqr) {
@@ -284,12 +258,12 @@ public class NonLinearLeastSquareWithPenalty {
     return lambda * 10;
   }
 
-
-  private LeastSquareWithPenaltyResults finish(final DoubleMatrix2D alpha, final DecompositionResult decmp, final double chiSqr, final double penalty, final DoubleMatrix2D jacobian,
+  private LeastSquareWithPenaltyResults finish(final DoubleMatrix2D alpha, final double chiSqr, final double penalty, final DoubleMatrix2D jacobian,
       final DoubleMatrix1D newTheta, final DoubleMatrix1D sigma) {
-    final DoubleMatrix2D covariance = decmp.solve(DoubleMatrixUtils.getIdentityMatrix2D(alpha.getNumberOfRows()));
     final DoubleMatrix2D bT = getBTranspose(jacobian, sigma);
-    final DoubleMatrix2D inverseJacobian = decmp.solve(bT);
+    OGTerminal A = new OGRealDenseMatrix(alpha.getData());
+    DoubleMatrix2D covariance = new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.inv(A)));
+    DoubleMatrix2D inverseJacobian = new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.mldivide(A, new OGRealDenseMatrix(bT.getData()))));
     return new LeastSquareWithPenaltyResults(chiSqr, penalty, newTheta, covariance, inverseJacobian);
   }
 

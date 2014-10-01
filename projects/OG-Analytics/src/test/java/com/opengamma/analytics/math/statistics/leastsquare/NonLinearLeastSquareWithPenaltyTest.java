@@ -48,8 +48,8 @@ public class NonLinearLeastSquareWithPenaltyTest {
 
   private static BasisFunctionGenerator GEN = new BasisFunctionGenerator();
   private static NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty();
-  private static double[] TENORS = new double[] {1, 2, 3, 5, 7, 10, 15, 20 };
-  private static double[] RATES = new double[] {0.02, 0.025, 0.03, 0.031, 0.028, 0.032, 0.035, 0.04 };
+  private static double[] TENORS = new double[] { 1, 2, 3, 5, 7, 10, 15, 20 };
+  private static double[] RATES = new double[] { 0.02, 0.025, 0.03, 0.031, 0.028, 0.032, 0.035, 0.04 };
   private static int FREQ = 2;
   static int N_SWAPS = 8;
   private static Function1D<Curve<Double, Double>, DoubleMatrix1D> swapRateFunction;
@@ -115,8 +115,8 @@ public class NonLinearLeastSquareWithPenaltyTest {
     final double lambda = 100.0;
     final DoubleMatrix2D penalty = (DoubleMatrix2D) MA.scale(getPenaltyMatrix(nWeights, diffOrder), lambda);
     // final boolean[] on = new boolean[nWeights];
-    final int[] onIndex = new int[] {1, 4, 11, 12, 15, 17 };
-    final double[] obs = new double[] {0, 1.0, 1.0, 1.0, 0.0, 0.0 };
+    final int[] onIndex = new int[] { 1, 4, 11, 12, 15, 17 };
+    final double[] obs = new double[] { 0, 1.0, 1.0, 1.0, 0.0, 0.0 };
     final int n = onIndex.length;
 
     final Function1D<DoubleMatrix1D, DoubleMatrix1D> func = new Function1D<DoubleMatrix1D, DoubleMatrix1D>() {
@@ -177,7 +177,7 @@ public class NonLinearLeastSquareWithPenaltyTest {
     double nu = 0.5;
     SABRFormulaData sabr = new SABRFormulaData(alpha, beta, rho, nu);
 
-    final double[] strikes = new double[] {0.002, 0.004, 0.006, 0.01, 0.02, 0.03, 0.05 };
+    final double[] strikes = new double[] { 0.002, 0.004, 0.006, 0.01, 0.02, 0.03, 0.05 };
     SABRHaganVolatilityFunction volFunc = new SABRHaganVolatilityFunction();
     double[] vols = volFunc.getVolatilityFunction(fwd, strikes, t).evaluate(sabr);
     final int nStrikes = strikes.length;
@@ -250,26 +250,8 @@ public class NonLinearLeastSquareWithPenaltyTest {
     //Change tolerance (default is 1e-8)
     NonLinearLeastSquareWithPenalty nllswp = new NonLinearLeastSquareWithPenalty(1e-6);
     res = nllswp.solve(new DoubleMatrix1D(prices), sigma, priceFunc, priceJac, start, p);
-    assertEquals(expChi2, res.getChiSq(),  1e-8);
-
-
-    //default decomposition is SVD (colt) - try some others; they all end up at slightly different solutions  
-    nllswp = new NonLinearLeastSquareWithPenalty(DecompositionFactory.LU_COMMONS);
-    res = nllswp.solve(new DoubleMatrix1D(prices), sigma, priceFunc, priceJac, start, p);
-    assertEquals(expChi2, res.getChiSq(),  2e-8);
-
-    nllswp = new NonLinearLeastSquareWithPenalty(DecompositionFactory.QR_COMMONS);
-    res = nllswp.solve(new DoubleMatrix1D(prices), sigma, priceFunc, priceJac, start, p);
-    assertEquals(expChi2, res.getChiSq(),  2e-8);
-
-    nllswp = new NonLinearLeastSquareWithPenalty(new CholeskyDecompositionCommons()); //TODO why isn't this in DecompositionFactory?
-    res = nllswp.solve(new DoubleMatrix1D(prices), sigma, priceFunc, priceJac, start, p);
-    assertEquals(expChi2, res.getChiSq(),  2e-8);
-
-    nllswp = new NonLinearLeastSquareWithPenalty(new CholeskyDecompositionCommons(), 1e-4);
-    assertEquals(expChi2, res.getChiSq(),  2e-8);
+    assertEquals(expChi2, res.getChiSq(), 1e-8);
   }
-
 
   /**
    * This simply prints out all the basis functions
@@ -278,7 +260,7 @@ public class NonLinearLeastSquareWithPenaltyTest {
   public void printTest() {
     System.out.println("NonLinearLeastSquareWithPenaltyTest");
 
-    final List<Function1D<Double, Double>> bSplines = GEN.generateSet(new double[] {0, 1.0, 2.0, 3.5, 5.0, 7.0, 10., 15, 20 }, 5);
+    final List<Function1D<Double, Double>> bSplines = GEN.generateSet(new double[] { 0, 1.0, 2.0, 3.5, 5.0, 7.0, 10., 15, 20 }, 5);
     final int n = bSplines.size();
 
     final double[] weights = new double[n];
