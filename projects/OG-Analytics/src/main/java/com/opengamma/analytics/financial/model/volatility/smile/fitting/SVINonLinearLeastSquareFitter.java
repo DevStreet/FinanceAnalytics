@@ -14,7 +14,6 @@ import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.E
 import com.opengamma.analytics.financial.model.volatility.smile.function.SVIFormulaData;
 import com.opengamma.analytics.financial.model.volatility.smile.function.SVIVolatilityFunction;
 import com.opengamma.analytics.math.function.ParameterizedFunction;
-import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.minimization.DoubleRangeLimitTransform;
@@ -48,7 +47,7 @@ public class SVINonLinearLeastSquareFitter extends LeastSquareSmileFitter {
   }
 
   public SVINonLinearLeastSquareFitter() {
-    this(new NonLinearLeastSquare(DecompositionFactory.SV_COLT, MatrixAlgebraFactory.OG_ALGEBRA, 1e-4));
+    this(new NonLinearLeastSquare(MatrixAlgebraFactory.OG_ALGEBRA, 1e-4));
   }
 
   public SVINonLinearLeastSquareFitter(final NonLinearLeastSquare solver) {

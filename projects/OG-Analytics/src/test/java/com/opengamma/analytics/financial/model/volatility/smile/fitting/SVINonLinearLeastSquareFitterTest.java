@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 import com.opengamma.analytics.financial.model.option.pricing.analytic.formula.BlackFunctionData;
 import com.opengamma.analytics.financial.model.volatility.smile.function.SVIFormulaData;
 import com.opengamma.analytics.financial.model.volatility.smile.function.SVIVolatilityFunction;
-import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
 import com.opengamma.analytics.math.statistics.leastsquare.LeastSquareResultsWithTransform;
@@ -28,7 +27,7 @@ public class SVINonLinearLeastSquareFitterTest extends LeastSquareSmileFitterTes
   private static final BlackFunctionData[] SMILE_DATA;
   private static final SVIVolatilityFunction SVI_VOL_FUNCTION = new SVIVolatilityFunction();
   private static final SVIFormulaData SVI_DATA = new SVIFormulaData(0.1, 0.3, -0.5, 0.3, 0.2);
-  private static final SVINonLinearLeastSquareFitter FITTER = new SVINonLinearLeastSquareFitter(new NonLinearLeastSquare(DecompositionFactory.SV_COMMONS, MatrixAlgebraFactory.OG_ALGEBRA, 1e-9));
+  private static final SVINonLinearLeastSquareFitter FITTER = new SVINonLinearLeastSquareFitter(new NonLinearLeastSquare(MatrixAlgebraFactory.OG_ALGEBRA, 1e-9));
   static final double[] INITIAL_VALUES;
 
   static {
