@@ -435,7 +435,6 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_ROOT_FINDER_ABSOLUTE_TOLERANCE, "0.0001")
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_ROOT_FINDER_RELATIVE_TOLERANCE, "0.0001")
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_ROOT_FINDER_MAX_ITERATIONS, "1000")
-        .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_DECOMPOSITION, DecompositionFactory.SV_COLT_NAME)
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_USE_FINITE_DIFFERENCE, "false")
         .get()), payCurveSpec,
         payCurveMarketData, payHtsConversion);
@@ -462,7 +461,6 @@ public abstract class SecurityGenerator<T extends ManageableSecurity> {
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_ROOT_FINDER_ABSOLUTE_TOLERANCE, "0.0001")
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_ROOT_FINDER_RELATIVE_TOLERANCE, "0.0001")
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_ROOT_FINDER_MAX_ITERATIONS, "1000")
-        .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_DECOMPOSITION, DecompositionFactory.SV_COLT_NAME)
         .with(MultiYieldCurvePropertiesAndDefaults.PROPERTY_USE_FINITE_DIFFERENCE, "false")
         .get()), receiveCurveSpec,
         receiveCurveMarketData, receiveHtsConversion);

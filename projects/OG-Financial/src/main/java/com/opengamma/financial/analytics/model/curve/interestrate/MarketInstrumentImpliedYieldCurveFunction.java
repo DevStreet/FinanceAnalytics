@@ -40,7 +40,6 @@ import com.opengamma.analytics.financial.provider.calculator.generic.LastTimeCal
 import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.interpolation.Interpolator1D;
-import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.rootfinding.newton.BroydenVectorRootFinder;
@@ -458,13 +457,13 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
     double[] yields = null;
     try {
       // TODO have the decomposition as an optional input [FIN-146]
-      rootFinder = new BroydenVectorRootFinder(1e-7, 1e-7, 100, DecompositionFactory.getDecomposition(DecompositionFactory.SV_COLT_NAME));
+      rootFinder = new BroydenVectorRootFinder(1e-7, 1e-7, 100);
       final DoubleMatrix1D result = rootFinder.getRoot(curveCalculator, jacobianCalculator, new DoubleMatrix1D(initialRatesGuess));
       yields = result.getData();
     } catch (final Exception eLU) {
       try {
         s_logger.warn("Could not find root using LU decomposition and present value method for curve " + curveName + "; trying SV. Error was: " + eLU.getMessage());
-        rootFinder = new BroydenVectorRootFinder(1e-7, 1e-7, 100, DecompositionFactory.getDecomposition(DecompositionFactory.SV_COMMONS_NAME));
+        rootFinder = new BroydenVectorRootFinder(1e-7, 1e-7, 100);
         yields = rootFinder.getRoot(curveCalculator, jacobianCalculator, new DoubleMatrix1D(initialRatesGuess)).getData();
       } catch (final Exception eSV) {
         s_logger.warn("Could not find root using SV decomposition and present value method for curve " + curveName + ". Error was: " + eSV.getMessage());
@@ -602,7 +601,7 @@ public class MarketInstrumentImpliedYieldCurveFunction extends AbstractFunction.
     double[] yields = null;
     // TODO have the decomposition as an optional input [FIN-146]
     try {
-      rootFinder = new BroydenVectorRootFinder(1e-4, 1e-4, 10000, DecompositionFactory.getDecomposition(DecompositionFactory.SV_COLT_NAME));
+      rootFinder = new BroydenVectorRootFinder(1e-4, 1e-4, 10000);
       yields = rootFinder.getRoot(curveCalculator, jacobianCalculator, new DoubleMatrix1D(initialRatesGuess)).getData();
     } catch (final Exception eSV) {
       s_logger.warn("Could not find root using SV decomposition and " + _calculationType + " method for curves " + fundingCurveName + " and " + forwardCurveName + ". Error was: " + eSV.getMessage());

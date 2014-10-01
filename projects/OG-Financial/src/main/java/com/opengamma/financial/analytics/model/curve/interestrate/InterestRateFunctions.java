@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.opengamma.analytics.math.interpolation.Interpolator1DFactory;
-import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.engine.function.config.AbstractFunctionConfigurationBean;
 import com.opengamma.engine.function.config.FunctionConfiguration;
 import com.opengamma.engine.function.config.FunctionConfigurationSource;
@@ -42,8 +41,6 @@ public class InterestRateFunctions extends AbstractFunctionConfigurationBean {
     private double _relativeTolerance = 0.0001;
     /** The maximum number of iterations used by the root-finder */
     private int _maxIterations = 1000;
-    /** The matrix decomposition method used by the root-finder */
-    private String _decomposition = DecompositionFactory.SV_COLT_NAME;
     /** True if finite difference is used to calculate derivatives */
     private boolean _useFiniteDifference; /* = false;*/
     /** The interpolator name */
@@ -119,22 +116,6 @@ public class InterestRateFunctions extends AbstractFunctionConfigurationBean {
     }
 
     /**
-     * Gets the matrix decomposition used by the root-finder.
-     * @return The matrix decomposition
-     */
-    public String getDecomposition() {
-      return _decomposition;
-    }
-
-    /**
-     * Sets the matrix decomposition used by the root-finder.
-     * @param decomposition The matrix decomposition
-     */
-    public void setDecomposition(final String decomposition) {
-      _decomposition = decomposition;
-    }
-
-    /**
      * Does the root-finder use finite difference to calculate derivatives.
      * @return True if the root-finder uses finite difference
      */
@@ -200,7 +181,6 @@ public class InterestRateFunctions extends AbstractFunctionConfigurationBean {
 
     @Override
     public void afterPropertiesSet() {
-      ArgumentChecker.notNullInjected(getDecomposition(), "decomposition");
       ArgumentChecker.notNullInjected(getInterpolatorName(), "interpolatorName");
       ArgumentChecker.notNullInjected(getLeftExtrapolatorName(), "leftExtrapolatorName");
       ArgumentChecker.notNullInjected(getRightExtrapolatorName(), "rightExtrapolatorName");
@@ -212,12 +192,11 @@ public class InterestRateFunctions extends AbstractFunctionConfigurationBean {
      * @param functions A list of function configurations
      */
     protected void addFXImpliedYieldCurveDefaults(final List<FunctionConfiguration> functions) {
-      final String[] args = new String[8 + getApplicableCurrencies().size()];
+      final String[] args = new String[7 + getApplicableCurrencies().size()];
       int i = 0;
       args[i++] = Double.toString(getAbsoluteTolerance());
       args[i++] = Double.toString(getRelativeTolerance());
       args[i++] = Integer.toString(getMaxIterations());
-      args[i++] = getDecomposition();
       args[i++] = Boolean.toString(isUseFiniteDifference());
       args[i++] = getInterpolatorName();
       args[i++] = getLeftExtrapolatorName();
@@ -233,12 +212,11 @@ public class InterestRateFunctions extends AbstractFunctionConfigurationBean {
      * @param functions A list of function configurations
      */
     protected void addYieldCurveDefaults(final List<FunctionConfiguration> functions) {
-      final String[] args = new String[5 + getApplicableCurrencies().size()];
+      final String[] args = new String[4 + getApplicableCurrencies().size()];
       int i = 0;
       args[i++] = Double.toString(getAbsoluteTolerance());
       args[i++] = Double.toString(getRelativeTolerance());
       args[i++] = Integer.toString(getMaxIterations());
-      args[i++] = getDecomposition();
       args[i++] = Boolean.toString(isUseFiniteDifference());
       for (final String currency : getApplicableCurrencies()) {
         args[i++] = currency;
