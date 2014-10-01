@@ -18,6 +18,10 @@ import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
 import com.opengamma.analytics.math.linearalgebra.DecompositionResult;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.maths.DOGMA;
+import com.opengamma.maths.datacontainers.OGTerminal;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
+import com.opengamma.maths.materialisers.Materialisers;
 import com.opengamma.util.tuple.Pair;
 
 /**
@@ -112,21 +116,9 @@ public class KrigingInterpolatorDataBundle extends InterpolatorNDDataBundle {
     v[n][n] = 0;
     y[n] = 0;
 
-    double[] res;
-    try {
-      res = solve(v, y, _decomp);
-    } catch (final IllegalArgumentException e) {
-      final Decomposition<?> decomp = DecompositionFactory.SV_COMMONS;
-      res = solve(v, y, decomp);
-    }
-
-    return res;
-  }
-
-  private double[] solve(final double[][] v, final double[] y, final Decomposition<?> decomp) {
-    final DecompositionResult decompRes = decomp.evaluate(new DoubleMatrix2D(v));
-    final DoubleMatrix1D res = decompRes.solve(new DoubleMatrix1D(y));
-    return res.getData();
+    OGTerminal x = Materialisers.toOGTerminal(DOGMA.mldivide(new OGRealDenseMatrix(v), new OGRealDenseMatrix(y, y.length, 1)));
+    
+    return x.getData();
   }
 
   @Override
