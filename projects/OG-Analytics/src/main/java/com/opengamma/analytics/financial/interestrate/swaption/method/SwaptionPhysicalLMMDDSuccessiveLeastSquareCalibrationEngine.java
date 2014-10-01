@@ -89,7 +89,7 @@ public class SwaptionPhysicalLMMDDSuccessiveLeastSquareCalibrationEngine extends
     computeCalibrationPrice(curves);
     getCalibrationObjective().setCurves(curves);
     final SwaptionPhysicalLMMDDSuccessiveLeastSquareCalibrationObjective objective = (SwaptionPhysicalLMMDDSuccessiveLeastSquareCalibrationObjective) getCalibrationObjective();
-    final NonLinearLeastSquare ls = new NonLinearLeastSquare(DecompositionFactory.SV_COMMONS, MatrixAlgebraFactory.OG_ALGEBRA, DEFAULT_PRECISION);
+    final NonLinearLeastSquare ls = new NonLinearLeastSquare(MatrixAlgebraFactory.OG_ALGEBRA, DEFAULT_PRECISION);
     //    final NonLinearLeastSquare ls = new NonLinearLeastSquare();
     for (int loopblock = 0; loopblock < nbBlocks; loopblock++) {
       final InstrumentDerivative[] instruments = new InstrumentDerivative[_nbInstrumentsBlock];
