@@ -10,8 +10,6 @@ import static org.testng.AssertJUnit.assertEquals;
 import org.testng.annotations.Test;
 
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.linearalgebra.Decomposition;
-import com.opengamma.analytics.math.linearalgebra.SVDecompositionColt;
 import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
@@ -25,8 +23,7 @@ import com.opengamma.util.test.TestGroup;
 @Test(groups = TestGroup.UNIT)
 public class InverseJacobianEstimateInitializationFunctionTest {
   private static final MatrixAlgebra ALGEBRA = new CommonsMatrixAlgebra();
-  private static final Decomposition<?> SV = new SVDecompositionColt();
-  private static final InverseJacobianEstimateInitializationFunction ESTIMATE = new InverseJacobianEstimateInitializationFunction(SV);
+  private static final InverseJacobianEstimateInitializationFunction ESTIMATE = new InverseJacobianEstimateInitializationFunction();
   private static final Function1D<DoubleMatrix1D, DoubleMatrix2D> J = new Function1D<DoubleMatrix1D, DoubleMatrix2D>() {
 
     @Override
@@ -38,11 +35,6 @@ public class InverseJacobianEstimateInitializationFunctionTest {
   };
 
   private static final DoubleMatrix1D X = new DoubleMatrix1D(new double[] {3, 4});
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testNullDecomposition() {
-    new InverseJacobianEstimateInitializationFunction(null);
-  }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testNullFunction() {
