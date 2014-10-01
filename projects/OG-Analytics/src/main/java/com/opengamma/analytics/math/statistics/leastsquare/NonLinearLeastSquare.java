@@ -17,16 +17,15 @@ import com.opengamma.analytics.math.differentiation.VectorFieldFirstOrderDiffere
 import com.opengamma.analytics.math.differentiation.VectorFieldSecondOrderDifferentiator;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.function.ParameterizedFunction;
-import com.opengamma.analytics.math.linearalgebra.Decomposition;
-import com.opengamma.analytics.math.linearalgebra.DecompositionFactory;
-import com.opengamma.analytics.math.linearalgebra.DecompositionResult;
-import com.opengamma.analytics.math.linearalgebra.SVDecompositionCommons;
-import com.opengamma.analytics.math.linearalgebra.SVDecompositionResult;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
-import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
 import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
+import com.opengamma.maths.DOGMA;
+import com.opengamma.maths.datacontainers.OGNumeric;
+import com.opengamma.maths.datacontainers.OGTerminal;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
+import com.opengamma.maths.datacontainers.other.OGSVDResult;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -43,15 +42,13 @@ public class NonLinearLeastSquare {
   };
 
   private final double _eps;
-  private final Decomposition<?> _decomposition;
   private final MatrixAlgebra _algebra;
 
   public NonLinearLeastSquare() {
-    this(DecompositionFactory.SV_COMMONS, MatrixAlgebraFactory.OG_ALGEBRA, 1e-8);
+    this(MatrixAlgebraFactory.OG_ALGEBRA, 1e-8);
   }
 
-  public NonLinearLeastSquare(final Decomposition<?> decomposition, final MatrixAlgebra algebra, final double eps) {
-    _decomposition = decomposition;
+  public NonLinearLeastSquare(final MatrixAlgebra algebra, final double eps) {
     _algebra = algebra;
     _eps = eps;
   }
@@ -348,7 +345,6 @@ public class NonLinearLeastSquare {
     ArgumentChecker.isTrue(nObs >= nParms, "must have data points greater or equal to number of parameters. #date points = {}, #parameters = {}", nObs, nParms);
     ArgumentChecker.isTrue(constraints.evaluate(startPos), "The inital value of the parameters (startPos) is {} - this is not an allowed value", startPos);
     DoubleMatrix2D alpha;
-    DecompositionResult decmp;
     DoubleMatrix1D theta = startPos;
 
     double lambda = 0.0; // TODO debug if the model is linear, it will be solved in 1 step
@@ -371,8 +367,7 @@ public class NonLinearLeastSquare {
 
       DoubleMatrix1D deltaTheta;
       try {
-        decmp = _decomposition.evaluate(alpha);
-        deltaTheta = decmp.solve(beta);
+        deltaTheta = new DoubleMatrix1D(DOGMA.toOGTerminal(DOGMA.mldivide(new OGRealDenseMatrix(alpha.getData()), new OGRealDenseMatrix(beta.getData(), beta.getNumberOfElements(), 1))).getData());
       } catch (final Exception e) {
         throw new MathException(e);
       }
@@ -397,12 +392,9 @@ public class NonLinearLeastSquare {
         // if the model is an exact fit to the data, then no more improvement is possible
         if (newChiSqr < _eps) {
           if (lambda > 0.0) {
-            decmp = _decomposition.evaluate(alpha0);
+            return finish(alpha0, newChiSqr, jacobian, trialTheta, sigma);
           }
-          return finish(alpha0, decmp, newChiSqr, jacobian, trialTheta, sigma);
         }
-
-        final SVDecompositionCommons svd = (SVDecompositionCommons) DecompositionFactory.SV_COMMONS;
 
         // add the second derivative information to the Hessian matrix to check we are not at a local maximum or saddle
         // point
@@ -419,10 +411,15 @@ public class NonLinearLeastSquare {
         }
         final DoubleMatrix2D newAlpha = (DoubleMatrix2D) _algebra.add(alpha0, new DoubleMatrix2D(temp));
 
-        final SVDecompositionResult svdRes = svd.evaluate(newAlpha);
-        final double[] w = svdRes.getSingularValues();
-        final DoubleMatrix2D u = svdRes.getU();
-        final DoubleMatrix2D v = svdRes.getV();
+        //        final SVDecompositionResult svdRes = svd.evaluate(newAlpha);
+        OGSVDResult svdRes = DOGMA.svd(new OGRealDenseMatrix(newAlpha.getData()));
+        OGNumeric nmat_w = svdRes.getS();
+        OGNumeric nmat_u = svdRes.getU();
+        OGNumeric nmat_v = DOGMA.transpose(svdRes.getVT());
+
+        double[][] u = DOGMA.toDoubleArrayOfArrays(nmat_u);
+        double[][] v = DOGMA.toDoubleArrayOfArrays(nmat_v);
+        double[] w = DOGMA.toOGTerminal(nmat_w).getData();
 
         final double[] p = new double[nParms];
         boolean saddle = false;
@@ -431,7 +428,7 @@ public class NonLinearLeastSquare {
         for (int i = 0; i < nParms; i++) {
           double a = 0.0;
           for (int j = 0; j < nParms; j++) {
-            a += u.getEntry(j, i) * v.getEntry(j, i);
+            a += u[j][i] * v[j][i];
           }
           final int sign = a > 0.0 ? 1 : -1;
           if (w[i] * sign < 0.0) {
@@ -450,7 +447,7 @@ public class NonLinearLeastSquare {
             if (w[i] < 0.0) {
               final double scale = 0.5 * Math.sqrt(-oldChiSqr * w[i]) / sum;
               for (int j = 0; j < nParms; j++) {
-                p[j] += scale * u.getEntry(j, i);
+                p[j] += scale * u[j][i];
               }
             }
           }
@@ -477,7 +474,7 @@ public class NonLinearLeastSquare {
             // if even a tiny move along the negative eigenvalue cannot improve chiSqr, then exit
             if (counter > 10 || Math.abs(newChiSqr - oldChiSqr) / (1 + oldChiSqr) < _eps) {
               LOGGER.warn("Saddle point detected, but no improvement to chi^2 possible by moving away. It is recommended that a different starting point is used.");
-              return finish(newAlpha, decmp, oldChiSqr, jacobian, theta, sigma);
+              return finish(newAlpha, oldChiSqr, jacobian, theta, sigma);
             }
             scale /= 2.0;
             deltaTheta = (DoubleMatrix1D) _algebra.scale(direction, scale);
@@ -489,7 +486,7 @@ public class NonLinearLeastSquare {
         } else {
           // this should be the normal finish - i.e. no improvement in chiSqr and at a true minimum (although there is
           // no guarantee it is not a local minimum)
-          return finish(newAlpha, decmp, newChiSqr, jacobian, trialTheta, sigma);
+          return finish(newAlpha, newChiSqr, jacobian, trialTheta, sigma);
         }
       }
 
@@ -541,26 +538,25 @@ public class NonLinearLeastSquare {
    * @param originalSolution The value of the parameters at a converged solution
    * @return inverse-Jacobian
    */
-  public DoubleMatrix2D calInverseJacobian(final DoubleMatrix1D sigma, final Function1D<DoubleMatrix1D, DoubleMatrix1D> func, final Function1D<DoubleMatrix1D, DoubleMatrix2D> jac,
+  public DoubleMatrix2D calcInverseJacobian(final DoubleMatrix1D sigma, final Function1D<DoubleMatrix1D, DoubleMatrix1D> func, final Function1D<DoubleMatrix1D, DoubleMatrix2D> jac,
       final DoubleMatrix1D originalSolution) {
     final DoubleMatrix2D jacobian = getJacobian(jac, sigma, originalSolution);
     final DoubleMatrix2D a = getModifiedCurvatureMatrix(jacobian, 0.0);
     final DoubleMatrix2D bT = getBTranspose(jacobian, sigma);
-    final DecompositionResult decRes = _decomposition.evaluate(a);
-    return decRes.solve(bT);
+    return new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.mldivide(new OGRealDenseMatrix(a.getData()), new OGRealDenseMatrix(bT.getData()))));
   }
 
   private LeastSquareResults finish(final double newChiSqr, final DoubleMatrix2D jacobian, final DoubleMatrix1D newTheta, final DoubleMatrix1D sigma) {
     final DoubleMatrix2D alpha = getModifiedCurvatureMatrix(jacobian, 0.0);
-    final DecompositionResult decmp = _decomposition.evaluate(alpha);
-    return finish(alpha, decmp, newChiSqr, jacobian, newTheta, sigma);
+    return finish(alpha, newChiSqr, jacobian, newTheta, sigma);
   }
 
-  private LeastSquareResults finish(final DoubleMatrix2D alpha, final DecompositionResult decmp, final double newChiSqr, final DoubleMatrix2D jacobian, final DoubleMatrix1D newTheta,
+  private LeastSquareResults finish(final DoubleMatrix2D alpha, final double newChiSqr, final DoubleMatrix2D jacobian, final DoubleMatrix1D newTheta,
       final DoubleMatrix1D sigma) {
-    final DoubleMatrix2D covariance = decmp.solve(DoubleMatrixUtils.getIdentityMatrix2D(alpha.getNumberOfRows()));
     final DoubleMatrix2D bT = getBTranspose(jacobian, sigma);
-    final DoubleMatrix2D inverseJacobian = decmp.solve(bT);
+    OGTerminal A = new OGRealDenseMatrix(alpha.getData());
+    DoubleMatrix2D covariance = new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.inv(A)));
+    DoubleMatrix2D inverseJacobian = new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.mldivide(A, new OGRealDenseMatrix(bT.getData()))));
     return new LeastSquareResults(newChiSqr, newTheta, covariance, inverseJacobian);
   }
 

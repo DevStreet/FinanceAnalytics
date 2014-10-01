@@ -269,7 +269,7 @@ public class NonLinearLeastSquareTest {
     final DoubleMatrix1D deltaY = new DoubleMatrix1D(dy);
     final DoubleMatrix1D solution = new DoubleMatrix1D(new double[] {1.0, 1.0, 0.0, 0.0 });
     final NonLinearLeastSquare ls = new NonLinearLeastSquare();
-    final DoubleMatrix2D res = ls.calInverseJacobian(SIGMA, FUNCTION, GRAD, solution);
+    final DoubleMatrix2D res = ls.calcInverseJacobian(SIGMA, FUNCTION, GRAD, solution);
     //  System.out.println("invese Jac: " + res);
 
     final DoubleMatrix1D deltaParms = (DoubleMatrix1D) ma.multiply(res, deltaY);
