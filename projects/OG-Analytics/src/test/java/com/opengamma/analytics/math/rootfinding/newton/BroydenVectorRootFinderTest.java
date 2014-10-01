@@ -18,6 +18,16 @@ public class BroydenVectorRootFinderTest extends VectorRootFinderTest {
   private static final NewtonVectorRootFinder DEFAULT_JACOBIAN_2D = new BroydenVectorRootFinder(TOLERANCE, TOLERANCE, MAXSTEPS);
   private static final NewtonVectorRootFinder DEFAULT_JACOBIAN_3D = new BroydenVectorRootFinder(TOLERANCE, TOLERANCE, MAXSTEPS);
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testSingular1() {
+    assertFunction2D(DEFAULT, EPS);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testSingular2() {
+    assertFunction2D(DEFAULT_JACOBIAN_2D, EPS);
+  }
+
   @Test
   public void test() {
     assertLinear(DEFAULT, EPS);
