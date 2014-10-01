@@ -30,7 +30,7 @@ public class ShermanMorrisonVectorRootFinder extends NewtonVectorRootFinder {
   }
 
   public ShermanMorrisonVectorRootFinder(final double absoluteTol, final double relativeTol, final int maxSteps, final Decomposition<?> decomp, MatrixAlgebra algebra) {
-    super(absoluteTol, relativeTol, maxSteps, new InverseJacobianDirectionFunction(algebra), new InverseJacobianEstimateInitializationFunction(decomp),
+    super(absoluteTol, relativeTol, maxSteps, new InverseJacobianDirectionFunction(algebra), new InverseJacobianEstimateInitializationFunction(),
         new ShermanMorrisonMatrixUpdateFunction(algebra));
   }
 
