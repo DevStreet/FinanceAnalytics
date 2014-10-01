@@ -24,6 +24,6 @@ public class BroydenVectorRootFinder extends NewtonVectorRootFinder {
   }
 
   public BroydenVectorRootFinder(final double absoluteTol, final double relativeTol, final int maxSteps, final Decomposition<?> decomp) {
-    super(absoluteTol, relativeTol, maxSteps, new JacobianDirectionFunction(decomp), new JacobianEstimateInitializationFunction(), new BroydenMatrixUpdateFunction());
+    super(absoluteTol, relativeTol, maxSteps, new JacobianDirectionFunction(), new JacobianEstimateInitializationFunction(), new BroydenMatrixUpdateFunction());
   }
 }
