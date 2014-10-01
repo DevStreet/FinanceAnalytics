@@ -13,7 +13,6 @@ import com.google.common.primitives.Doubles;
 import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
 import com.opengamma.analytics.financial.provider.description.interestrate.MulticurveProviderInterface;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.linearalgebra.CholeskyDecompositionCommons;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.MatrixAlgebraFactory;
@@ -30,7 +29,7 @@ public class CapletStrippingDirectGlobalWithPenalty {
   private final CapletVolatilityNodalSurfaceProvider _nodalSurfaceProvider;
   private final int _nCapsTotal;
 
-  private static final NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty(new CholeskyDecompositionCommons(), MatrixAlgebraFactory.OG_ALGEBRA, 1e-8);
+  private static final NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty(MatrixAlgebraFactory.OG_ALGEBRA, 1e-8);
   private static final double DEFAULT_LAMBDA_STRIKE = 0.001;
   private static final double DEFAULT_LAMBDA_TIME = 10.0;
   private static final double DEFAULT_ERROR = 1.0e-4;

@@ -16,7 +16,6 @@ import com.opengamma.analytics.financial.model.volatility.discrete.DiscreteVolat
 import com.opengamma.analytics.financial.model.volatility.surface.VolatilitySurfaceProvider;
 import com.opengamma.analytics.math.MathException;
 import com.opengamma.analytics.math.function.Function1D;
-import com.opengamma.analytics.math.linearalgebra.CholeskyDecompositionCommons;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.OGMatrixAlgebra;
@@ -40,7 +39,7 @@ public class CapletStrippingCore {
 
   private static final NonLinearLeastSquare NLLS = new NonLinearLeastSquare();
   private static final NewtonVectorRootFinder ROOTFINDER = new NewtonDefaultVectorRootFinder();
-  private static final NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty(new CholeskyDecompositionCommons());
+  private static final NonLinearLeastSquareWithPenalty NLLSWP = new NonLinearLeastSquareWithPenalty();
 
   private final MultiCapFloorPricer _pricer;
   private final int _nModelParms;
