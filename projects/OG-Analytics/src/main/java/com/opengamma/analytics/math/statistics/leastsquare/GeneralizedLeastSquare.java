@@ -16,12 +16,14 @@ import com.opengamma.analytics.math.FunctionUtils;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.analytics.math.linearalgebra.Decomposition;
 import com.opengamma.analytics.math.linearalgebra.DecompositionResult;
-import com.opengamma.analytics.math.linearalgebra.SVDecompositionCommons;
 import com.opengamma.analytics.math.matrix.ColtMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
 import com.opengamma.analytics.math.matrix.DoubleMatrixUtils;
 import com.opengamma.analytics.math.matrix.MatrixAlgebra;
+import com.opengamma.maths.DOGMA;
+import com.opengamma.maths.datacontainers.OGNumeric;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
 import com.opengamma.util.ArgumentChecker;
 
 /**
@@ -29,11 +31,9 @@ import com.opengamma.util.ArgumentChecker;
  */
 public class GeneralizedLeastSquare {
 
-  private final Decomposition<?> _decomposition;
   private final MatrixAlgebra _algebra;
 
   public GeneralizedLeastSquare() {
-    _decomposition = new SVDecompositionCommons();
     _algebra = new ColtMatrixAlgebra();
 
   }
@@ -208,9 +208,13 @@ public class GeneralizedLeastSquare {
       ma = (DoubleMatrix2D) _algebra.add(ma, _algebra.scale(d, lambda));
     }
 
-    final DecompositionResult decmp = _decomposition.evaluate(ma);
-    final DoubleMatrix1D w = decmp.solve(mb);
-    final DoubleMatrix2D covar = decmp.solve(DoubleMatrixUtils.getIdentityMatrix2D(m));
+    //    final DecompositionResult decmp = _decomposition.evaluate(ma);
+    //    final DoubleMatrix1D w = decmp.solve(mb);
+    //    final DoubleMatrix2D covar = decmp.solve(DoubleMatrixUtils.getIdentityMatrix2D(m));
+
+    OGNumeric A = new OGRealDenseMatrix(ma.getData());
+    DoubleMatrix1D w = new DoubleMatrix1D(DOGMA.toOGTerminal(DOGMA.mldivide(A, new OGRealDenseMatrix(b, b.length, 1))).getData());
+    DoubleMatrix2D covar = new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.pinv(A)));
 
     double chiSq = 0;
     for (i = 0; i < n; i++) {
@@ -271,10 +275,14 @@ public class GeneralizedLeastSquare {
       }
     }
 
-    final DecompositionResult decmp = _decomposition.evaluate(ma);
-    final DoubleMatrix1D w = decmp.solve(mb);
-    final DoubleMatrix2D covar = decmp.solve(DoubleMatrixUtils.getIdentityMatrix2D(m));
+//    final DecompositionResult decmp = _decomposition.evaluate(ma);
+//    final DoubleMatrix1D w = decmp.solve(mb);
+//    final DoubleMatrix2D covar = decmp.solve(DoubleMatrixUtils.getIdentityMatrix2D(m));
 
+    OGNumeric A = new OGRealDenseMatrix(ma.getData());
+    DoubleMatrix1D w = new DoubleMatrix1D(DOGMA.toOGTerminal(DOGMA.mldivide(A, new OGRealDenseMatrix(b, b.length, 1))).getData());
+    DoubleMatrix2D covar = new DoubleMatrix2D(DOGMA.toDoubleArrayOfArrays(DOGMA.pinv(A)));
+    
     double chiSq = 0;
     for (i = 0; i < n; i++) {
       double temp = 0;
