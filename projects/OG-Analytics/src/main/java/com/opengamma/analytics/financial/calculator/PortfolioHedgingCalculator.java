@@ -11,11 +11,12 @@ import org.apache.commons.lang.ArrayUtils;
 
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.provider.sensitivity.multicurve.MultipleCurrencyParameterSensitivity;
-import com.opengamma.analytics.math.linearalgebra.SVDecompositionCommons;
-import com.opengamma.analytics.math.linearalgebra.SVDecompositionResult;
 import com.opengamma.analytics.math.matrix.CommonsMatrixAlgebra;
 import com.opengamma.analytics.math.matrix.DoubleMatrix1D;
 import com.opengamma.analytics.math.matrix.DoubleMatrix2D;
+import com.opengamma.maths.DOGMA;
+import com.opengamma.maths.datacontainers.matrix.OGRealDenseMatrix;
+import com.opengamma.maths.nodes.MLDIVIDE;
 import com.opengamma.util.money.Currency;
 import com.opengamma.util.tuple.ObjectsPair;
 import com.opengamma.util.tuple.Pair;
@@ -30,10 +31,6 @@ public class PortfolioHedgingCalculator {
    * The matrix algebra used (mainly multiplying matrices and solving systems).
    */
   private static final CommonsMatrixAlgebra MATRIX = new CommonsMatrixAlgebra();
-  /**
-   * The decomposition method used.
-   */
-  private static final SVDecompositionCommons DECOMPOSITION = new SVDecompositionCommons();
 
   /**
    * Computes the quantity of each reference instrument that optimally hedge a given sensitivity.
@@ -66,9 +63,9 @@ public class PortfolioHedgingCalculator {
     final DoubleMatrix2D rWtW = (DoubleMatrix2D) MATRIX.multiply(r, wtW);
     final DoubleMatrix2D rWtWRt = (DoubleMatrix2D) MATRIX.multiply(rWtW, MATRIX.getTranspose(r));
     final DoubleMatrix1D rWtWP = ((DoubleMatrix2D) MATRIX.scale(MATRIX.multiply(rWtW, p), -1.0)).getColumnVector(0);
-    final SVDecompositionResult dec = DECOMPOSITION.evaluate(rWtWRt);
-    final DoubleMatrix1D q = dec.solve(rWtWP);
-    return q.getData();
+
+    return DOGMA.toOGTerminal(DOGMA.mldivide(new OGRealDenseMatrix(rWtWRt.getData()), new OGRealDenseMatrix(rWtWP.getData(), rWtWP.getNumberOfElements(), 1))).getData();
+
   }
 
   /**
