@@ -242,15 +242,15 @@ public class EquityVarianceSwapDemo {
     final double sigma2 = 1.0;
     final double w = 0.9;
 
-    final Function<Double, Double> surf = new Function<Double, Double>() {
+    Function<Double, Double> surf = new Function<Double, Double>() {
       @Override
-      public Double evaluate(final Double... x) {
-        final double t = x[0];
-        final double k = x[1];
+      public Double evaluate(Double... x) {
+        double t = x[0];
+        double k = x[1];
         @SuppressWarnings("synthetic-access")
-        final double fwd = s_FwdCurve.getForward(t);
-        final boolean isCall = k > fwd;
-        final double price = w * BlackFormulaRepository.price(fwd, k, t, sigma1, isCall) + (1 - w) * BlackFormulaRepository.price(fwd, k, t, sigma2, isCall);
+        double fwd = s_FwdCurve.getForward(t);
+        boolean isCall = k > fwd;
+        double price = w * BlackFormulaRepository.price(fwd, k, t, sigma1, isCall) + (1 - w) * BlackFormulaRepository.price(fwd, k, t, sigma2, isCall);
         if (price < 1e-100) {
           return sigma2;
         }
@@ -259,17 +259,17 @@ public class EquityVarianceSwapDemo {
     };
 
     // with a mixed log-normal, the expected variance is trivial
-    final double expected = w * sigma1 * sigma1 + (1 - w) * sigma2 * sigma2;
+    double expected = w * sigma1 * sigma1 + (1 - w) * sigma2 * sigma2;
 
     VarianceSwapDefinition def = new VarianceSwapDefinition(s_ObsStartTime, s_ObsEndTime, s_SettlementTime, s_Ccy, s_Calendar, s_AnnualizationFactor, s_VolStrike, s_VolNotional);
     VarianceSwap varSwap = def.toDerivative(s_ObsStartTime);
 
-    final BlackVolatilitySurfaceStrike surfaceStrike = new BlackVolatilitySurfaceStrike(FunctionalDoublesSurface.from(surf));
-    final double strikeVal = PRICER.expectedVariance(varSwap, new StaticReplicationDataBundle(surfaceStrike, s_DiscountCurve, s_FwdCurve));
+    BlackVolatilitySurfaceStrike surfaceStrike = new BlackVolatilitySurfaceStrike(FunctionalDoublesSurface.from(surf));
+    double strikeVal = PRICER.expectedVariance(varSwap, new StaticReplicationDataBundle(surfaceStrike, s_DiscountCurve, s_FwdCurve));
     assertEquals("strike", expected, strikeVal, 5e-12);
 
     // convert the vol surface to one parameterised by delta
-    final BlackVolatilitySurfaceDelta surfaceDelta = BlackVolatilitySurfaceConverter.toDeltaSurface(surfaceStrike, s_FwdCurve);
+    BlackVolatilitySurfaceDelta surfaceDelta = BlackVolatilitySurfaceConverter.toDeltaSurface(surfaceStrike, s_FwdCurve);
     double deltaVal = PRICER.expectedVariance(varSwap, new StaticReplicationDataBundle(surfaceDelta, s_DiscountCurve, s_FwdCurve));
     assertEquals("delta", expected, deltaVal, 5e-8);
     // comment - convection to the delta surface involves root-finding, so the delta surface is less accurate, not the method using
