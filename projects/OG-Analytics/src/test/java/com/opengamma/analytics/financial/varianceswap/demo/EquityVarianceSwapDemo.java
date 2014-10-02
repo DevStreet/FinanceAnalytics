@@ -109,7 +109,7 @@ public class EquityVarianceSwapDemo {
    * Demonstrate building an equity variance swap and adding time series of observations. Check that the realized variance
    * and present value of the swap are as expected when all the observations are known
    */
-  @Test
+  @Test(description = "Demo")
   public void buildSwap() {
     EquityVarianceSwapDefinition def = new EquityVarianceSwapDefinition(s_ObsStartTime, s_ObsEndTime, s_SettlementTime, s_Ccy, s_Calendar, s_AnnualizationFactor, s_VolStrike, s_VolNotional, false);
 
@@ -179,7 +179,7 @@ public class EquityVarianceSwapDemo {
    * derived from a volatility surface which is flat at 30% - hence we should recover (up to some numerical tolerance)
    * 0.3^2 for the expected variance.
    */
-  @Test
+  @Test(description = "Demo")
   public void flatVolPrice() {
     VarianceSwapDefinition def = new VarianceSwapDefinition(s_ObsStartTime, s_ObsEndTime, s_SettlementTime, s_Ccy, s_Calendar, s_AnnualizationFactor, s_VolStrike, s_VolNotional);
     ZonedDateTime valueDate = ZonedDateTime.of(2013, 7, 25, 12, 0, 0, 0, UTC); // before first observation
@@ -235,7 +235,7 @@ public class EquityVarianceSwapDemo {
    * A mixed log-normal model can give realistic looking smiles. It also allows a very simple analytic calculation of the
    * expected variance. This can be compared with the calculator that just 'sees' a volatility surface
    */
-  @Test
+  @Test(description = "Demo")
   public void testMixedLogNormalVolSurface() {
 
     final double sigma1 = 0.2;
@@ -281,7 +281,7 @@ public class EquityVarianceSwapDemo {
    * will have a finite set of vanilla option prices. Assume initially that the expiry of these options coincides with the
    * expiry of the variance swap.
    */
-  @Test
+  @Test(description = "Demo")
   public void discreteOptionPricesTest() {
 
     VarianceSwapDefinition def = new VarianceSwapDefinition(s_ObsStartTime, s_ObsEndTime, s_SettlementTime, s_Ccy, s_Calendar, s_AnnualizationFactor, s_VolStrike, s_VolNotional);
