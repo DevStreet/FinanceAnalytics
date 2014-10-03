@@ -18,6 +18,8 @@ import com.opengamma.analytics.financial.instrument.cash.CashDefinition;
 import com.opengamma.analytics.financial.instrument.fra.ForwardRateAgreementDefinition;
 import com.opengamma.analytics.financial.instrument.future.InterestRateFutureTransactionDefinition;
 import com.opengamma.analytics.financial.instrument.future.SwapFuturesPriceDeliverableTransactionDefinition;
+import com.opengamma.analytics.financial.instrument.index.GeneratorAttribute;
+import com.opengamma.analytics.financial.instrument.index.GeneratorInstrument;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.instrument.payment.CouponIborDefinition;
@@ -283,6 +285,16 @@ public class CurveCalibrationTestsUtils {
   public static ZonedDateTimeDoubleTimeSeries[] getTSSwapFixedIbor(final Boolean withToday,
       ZonedDateTimeDoubleTimeSeries[] htsWithToday, ZonedDateTimeDoubleTimeSeries[] htsWithoutToday) {
     return withToday ? htsWithToday : htsWithoutToday;
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes" })
+  public static InstrumentDefinition<?>[] getDefinitions(double[] marketQuotes, double notional, 
+      GeneratorInstrument[] generators, GeneratorAttribute[] attribute, ZonedDateTime referenceDate) {
+    final InstrumentDefinition<?>[] definitions = new InstrumentDefinition<?>[marketQuotes.length];
+    for (int loopmv = 0; loopmv < marketQuotes.length; loopmv++) {
+      definitions[loopmv] = generators[loopmv].generateInstrument(referenceDate, marketQuotes[loopmv], notional, attribute[loopmv]);
+    }
+    return definitions;
   }
 
 }
