@@ -327,7 +327,7 @@ public class BjerksundStenslandModel {
         final double expbt = Math.exp(b * t);
         res[1] = expbt * df * BlackFormulaRepository.delta(fwd, k, t, sigma, isCall);
         res[2] = df * BlackFormulaRepository.dualDelta(fwd, k, t, sigma, isCall);
-        res[3] = -t * minPrice;
+        res[3] = BlackScholesFormulaRepository.rho(s0, k, t, sigma, r, b, isCall);
         res[4] = BlackScholesFormulaRepository.carryRho(s0, k, t, sigma, r, b, isCall);
         res[5] = -BlackScholesFormulaRepository.theta(s0, k, t, sigma, r, b, isCall);
         res[6] = df * BlackFormulaRepository.vega(fwd, k, t, sigma);
