@@ -11,8 +11,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Multimap;
 import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorYDCurve;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -265,6 +267,43 @@ public class MulticurveDiscountBuildingRepository {
       final InstrumentDerivativeVisitor<MulticurveProviderInterface, Double> calculator,
       final InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
     return makeCurvesFromDerivatives(curveBundles, knownData, new CurveBuildingBlockBundle(), discountingMap, forwardIborMap, forwardONMap, calculator, sensitivityCalculator);
+  }
+
+  /**
+   * Build a block of curves without a known CurveBuildingBlockBundle.
+   * <p>
+   * This method only exists to provide expose a more sensible set of parameter types - {@code List} instead of arrays,
+   * {@code Map} instead of {@code LinkedHashMap}, {@code Multimap} instead of a map with arrays as values etc.
+   *
+   * @param curveBundles The bundles of curve data used in construction.
+   * @param knownData The known data (fx rates, other curves, model parameters, ...)
+   * @param discountingMap The discounting curves names map.
+   * @param forwardIborMap The forward curves names map.
+   * @param forwardONMap The forward curves names map.
+   * @param calculator The calculator of the value on which the calibration is done (usually ParSpreadMarketQuoteCalculator (recommended) or converted present value).
+   * @param sensitivityCalculator The parameter sensitivity calculator.
+   * @return A pair with the calibrated yield curve bundle (including the known data) and the CurveBuildingBlockBundle with the relevant inverse Jacobian Matrix.
+   */
+
+  public Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> makeCurvesFromDerivatives(
+      List<MultiCurveBundle<GeneratorYDCurve>> curveBundles,
+      MulticurveProviderDiscount knownData,
+      Map<String, Currency> discountingMap,
+      Multimap<String, IborIndex> forwardIborMap,
+      Multimap<String, IndexON> forwardONMap,
+      InstrumentDerivativeVisitor<MulticurveProviderInterface, Double> calculator,
+      InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
+
+    // TODO adapt arguments
+
+    return makeCurvesFromDerivatives(curveBundles,
+                                     knownData,
+                                     new CurveBuildingBlockBundle(),
+                                     discountingMap,
+                                     forwardIborMap,
+                                     forwardONMap,
+                                     calculator,
+                                     sensitivityCalculator);
   }
 
   /**
