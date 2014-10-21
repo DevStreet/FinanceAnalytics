@@ -8,11 +8,8 @@ package com.opengamma.analytics.financial.equity.option.demo;
 import java.io.PrintStream;
 
 import org.testng.annotations.Test;
-import org.threeten.bp.ZoneId;
-import org.threeten.bp.ZonedDateTime;
 
 import com.opengamma.analytics.financial.model.option.pricing.analytic.BjerksundStenslandModel;
-import com.opengamma.analytics.financial.model.volatility.BlackFormulaRepository;
 import com.opengamma.analytics.financial.model.volatility.BlackScholesFormulaRepository;
 import com.opengamma.analytics.math.function.Function1D;
 import com.opengamma.financial.convention.daycount.DayCount;
@@ -52,7 +49,7 @@ public class EquityStressDemo {
   private static double[] YIELD = new double[] {0.01446, 0.01439, 0.01437, 0.02803, 0.00095, 0.01163, 0.02562, 0.02048, Double.NaN, 0.02063, 0.02561, Double.NaN, 0.02798 };
   private static double[] PRICE = new double[] {6.3, 4.3, 6.7, 3.52, 0.01, 2.07, 5.45, 5.6, 0.05, 6.8, 0.47, 0.15, 0.19 };
   private static double[] STRIKE = new double[] {1995, 2010, 2000, 185, 205, 60, 180, 2010, 13, 2050, 215, 14, 209 };
-  private static String[] EXERCISE = new String[] {"European", "European", "European", "American", "American", "American", "American", "European", "European", "European", "American", "European",
+  private static String[] EXERCISE = new String[] {"European", "European", "European","European"/*"American"*/, "American", "American", "American", "European", "European", "European", "American", "European",
   "American" };
   private static String[] CALL_PUT = new String[] {"Call", "Call", "Call", "Put", "Call", "Call", "Put", "Call", "Put", "Call", "Call", "Put", "Call" };
   private static int[] DAYS_TO_EXPIRY = new int[] {28, 28, 28, 70, 7, 462, 161, 42, 12, 82, 161, 12, 70 };
@@ -67,13 +64,13 @@ public class EquityStressDemo {
   public void test() {
 
     OptionData data = new OptionData();
-    double spot = 6734.4;
-    double vol = 0.248;
-    data.k = 6500.0;
-    data.t = 0.35;
-    data.r = 0.005; // The risk free rate
-    double y = 0.08; // dividend yield
-    data.isCall = true;
+    double spot = 192.085;
+    double vol = 0.18535;
+    data.k = 185;
+    data.t = (70+TIME_OFFSET) * ONE_DAY;
+    data.r = 0.00229; // The risk free rate
+    double y = 0.02803; // dividend yield
+    data.isCall = false;
     // cost-of-carry - the forward price is S*exp(b*t). For a dividend yield, y, b = r - y, and for a foreign risk
     // free rate, r_f, b = r - r_f
     data.b = data.r - y;
@@ -92,49 +89,27 @@ public class EquityStressDemo {
   @Test
   public void printPortfolioPriceAndGreeks() {
     int n = SECURITY_DES.length;
-    System.out.println("price\tdelta\tgammaP\tvega\ttheta\trho");
-    for (int i = 0; i < n; i++) {
-      double t = (DAYS_TO_EXPIRY[i] + TIME_OFFSET) * ONE_DAY;
-      double r = RATE[i];
-      double b = r - YIELD[i];
-
-      double s0 = UNDERLYING_PRICE[i];
-      double k = STRIKE[i];
-      boolean isCall = CALL_PUT[i].equals("Call");
+    System.out.println("price\tdelta\tgammaP\tvega\trho\ttheta");
+    for (int i = 0; i < n; i++) {          
+      boolean useBlackModel = EXERCISE[i].equals(EUROPEAN) && Double.isNaN(YIELD[i]);
+      OptionPricingModel model = EXERCISE[i].equals(EUROPEAN) ? new BlackScholesMertonPricingModel() : new BjerksundStenslandPricingModel();
+      OptionData data = new OptionData();
+      double spot = useBlackModel ? FORWARD[i] : UNDERLYING_PRICE[i];
       double vol = IMP_VOL[i];
-      if (EXERCISE[i].equals(EUROPEAN)) {
-        if (!Double.isNaN(YIELD[i])) {
-          double price = BlackScholesFormulaRepository.price(s0, k, t, vol, r, b, isCall);
-          double delta = ONE_HUNDRED * BlackScholesFormulaRepository.delta(s0, k, t, vol, r, b, isCall);
-          double gammaP = s0 * BlackScholesFormulaRepository.gamma(s0, k, t, vol, r, b);
-          double vega = BlackScholesFormulaRepository.vega(s0, k, t, vol, r, b);
-          double theta = ONE_DAY * ONE_HUNDRED * BlackScholesFormulaRepository.theta(s0, k, t, vol, r, b, isCall);
-          double rho = ONE_PC * BlackScholesFormulaRepository.rho(s0, k, t, vol, r, b, isCall);
-          System.out.println(price + "\t" + delta + "\t" + gammaP + "\t" + vega + "\t" + theta + "\t" + rho);
-        } else {
-          double df = Math.exp(-t * r);
-          double fwd = FORWARD[i];
-          double price = df * BlackFormulaRepository.price(fwd, k, t, vol, isCall);
-          double delta = df * ONE_HUNDRED * BlackFormulaRepository.delta(fwd, k, t, vol, isCall);
-          double gammaP = df * fwd * BlackFormulaRepository.gamma(fwd, k, t, vol);
-          double vega = df * BlackFormulaRepository.vega(fwd, k, t, vol);
-          double theta = df * ONE_DAY * ONE_HUNDRED * BlackFormulaRepository.driftlessTheta(fwd, k, t, vol);
-          double rho = 0.0;
-          System.out.println((price + "\t" + delta + "\t" + gammaP + "\t" + vega + "\t" + theta + "\t" + rho));
-        }
-      } else if (EXERCISE[i].equals(AMERICAN)) {
-        double[] greeks = BJERKSUND_STENSLAND.getPriceAdjoint(s0, k, r, b, t, vol, isCall);
-        double price = greeks[0];
-        double delta = ONE_HUNDRED * greeks[1];
-        double gammaP = s0 * BJERKSUND_STENSLAND.getPriceDeltaGamma(s0, k, r, b, t, vol, isCall)[2];
-        double vega = greeks[6];
-        double theta = -ONE_DAY * ONE_HUNDRED * greeks[5];
-        double rho = ONE_PC * (greeks[3] + greeks[4]);
-        System.out.println(price + "\t" + delta + "\t" + gammaP + "\t" + vega + "\t" + theta + "\t" + rho);
-      } else {
-        throw new IllegalArgumentException("Unknown exercise type: " + EXERCISE[i]);
-      }
+      data.k = STRIKE[i];
+      data.t = (DAYS_TO_EXPIRY[i] + TIME_OFFSET) * ONE_DAY;
+      data.r = RATE[i]; // The risk free rate
+      double y = YIELD[i]; // dividend yield
+      data.isCall = CALL_PUT[i].equals("Call");
+      // cost-of-carry - the forward price is S*exp(b*t). For a dividend yield, y, b = r - y, and for a foreign risk
+      // free rate, r_f, b = r - r_f
+      data.b = useBlackModel ? 0.0 : data.r - y;
+      Function1D<double[], Double> pvFunc = model.getPVFunc(data); 
+      Function1D<Double, double[]> greeksFunc = model.getGreeksFunc(data, vol);
 
+      double price = pvFunc.evaluate(new double[] {spot, vol});
+      double[] greeks = greeksFunc.evaluate(spot);
+      System.out.println((price + "\t" + greeks[0] + "\t" + greeks[1] + "\t" +greeks[2]+ "\t" + greeks[3] + "\t" + greeks[4]));   
     }
   }
 
@@ -149,41 +124,6 @@ public class EquityStressDemo {
     System.out.println("Total time: " + (System.nanoTime()-tic)*1e-9+"s");
   }
 
-  @Test
-  public void singleOptionPrice() {
-    // CALL- SPXW $1995 EXP 11/07/2014 STANDARD & POORS 500 INDEX - snapped on 9-Oct-2014
-    ZonedDateTime trade = ZonedDateTime.of(2014, 10, 10, 10, 40, 0, 0, ZoneId.of("UTC"));
-    ZonedDateTime expiry = ZonedDateTime.of(2014, 11, 7, 21, 15, 0, 0, ZoneId.of("UTC"));
-
-    double s0 = 1860.55;
-    double strike = 3000;
-    double r = 1.0;
-    double y = 0;
-    double b = r - y;
-    double t = 0.247212709;
-    System.out.println("debug: " + t * 365);
-    boolean isCall = true;
-    double fwd = 2377.2939;
-    double df = 0.782633579;
-
-    double impVol = 0.2;
-
-    double price = BlackScholesFormulaRepository.price(s0, strike, t, impVol, r, b, isCall);
-    double price2 = df * BlackFormulaRepository.price(fwd, strike, t, impVol, isCall);
-    double delta = BlackScholesFormulaRepository.delta(s0, strike, t, impVol, r, b, isCall);
-    double gammaP = s0 * ONE_PC * BlackScholesFormulaRepository.gamma(s0, strike, t, impVol, r, b);
-    double vega = ONE_PC * BlackScholesFormulaRepository.vega(s0, strike, t, impVol, r, b);
-    double theta = ONE_DAY * BlackScholesFormulaRepository.theta(s0, strike, t, impVol, r, b, isCall);
-    double rho = ONE_BP * BlackScholesFormulaRepository.rho(s0, strike, t, impVol, r, b, isCall);
-    double rhoDiscount = -ONE_BP * t * price;
-
-    System.out.println("Price:\t" + price + "\t" + price2);
-    System.out.println("Delta:\t" + delta);
-    System.out.println("Gamma:\t" + gammaP);
-    System.out.println("Vega:\t" + vega);
-    System.out.println("theta:\t" + theta);
-    System.out.println("rho:\t" + rho + "\t" + rhoDiscount);
-  }
 
   private void printTable(int index) {
     PrintStream out = System.out;
@@ -319,7 +259,7 @@ public class EquityStressDemo {
 
   class BjerksundStenslandPricingModel implements OptionPricingModel {
 
-    private final BjerksundStenslandModel _model = new BjerksundStenslandModel();
+
 
     @Override
     public Function1D<Double, double[]> getGreeksFunc(final OptionData optionData, final double vol) {
@@ -328,8 +268,8 @@ public class EquityStressDemo {
         @Override
         public double[] evaluate(Double s) {
           // TODO this is wasteful - should have one function to produce the Greeks
-          double[] temp = _model.getPriceAdjoint(s, optionData.k, optionData.r, optionData.b, optionData.t, vol, optionData.isCall);
-          double[] dng = _model.getPriceDeltaGamma(s, optionData.k, optionData.r, optionData.b, optionData.t, vol, optionData.isCall);
+          double[] temp = BJERKSUND_STENSLAND.getPriceAdjoint(s, optionData.k, optionData.r, optionData.b, optionData.t, vol, optionData.isCall);
+          double[] dng = BJERKSUND_STENSLAND.getPriceDeltaGamma(s, optionData.k, optionData.r, optionData.b, optionData.t, vol, optionData.isCall);
           double[] res = new double[5];
           res[0] = ONE_HUNDRED * dng[1]; // delta
           res[1] = s * dng[2]; // gamma
@@ -349,7 +289,7 @@ public class EquityStressDemo {
         public Double evaluate(double[] x) {
           double s = x[0];
           double vol = x[1];
-          return _model.price(s, optionData.k, optionData.r, optionData.b, optionData.t, vol, optionData.isCall);
+          return BJERKSUND_STENSLAND.price(s, optionData.k, optionData.r, optionData.b, optionData.t, vol, optionData.isCall);
         }
       };
     }
