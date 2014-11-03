@@ -91,7 +91,6 @@ public class BlackFunctions extends AbstractFunctionConfigurationBean {
     functions.add(functionConfiguration(FXOptionBlackPresentValueCurveSensitivityFunction.class));
     functions.add(functionConfiguration(FXOptionBlackPresentValueFunction.class));
     functions.add(functionConfiguration(FXOptionBlackPV01Function.class));
-    functions.add(functionConfiguration(FXOptionBlackTermStructureCurrencyExposureFunction.class));
     functions.add(functionConfiguration(FXOptionBlackThetaFunction.class));
     functions.add(functionConfiguration(FXOptionBlackVannaFunction.class));
     functions.add(functionConfiguration(FXOptionBlackVegaFunction.class));
