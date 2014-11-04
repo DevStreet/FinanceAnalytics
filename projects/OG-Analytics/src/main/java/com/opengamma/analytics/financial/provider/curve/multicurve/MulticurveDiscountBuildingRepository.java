@@ -7,15 +7,12 @@ package com.opengamma.analytics.financial.provider.curve.multicurve;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Multimap;
 import com.opengamma.analytics.financial.curve.interestrate.generator.GeneratorYDCurve;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
@@ -26,7 +23,7 @@ import com.opengamma.analytics.financial.provider.curve.CurveBuildingBlockBundle
 import com.opengamma.analytics.financial.provider.curve.MultiCurveBundle;
 import com.opengamma.analytics.financial.provider.curve.SingleCurveBundle;
 import com.opengamma.analytics.financial.provider.description.interestrate.MulticurveProviderDiscount;
-import com.opengamma.analytics.financial.provider.description.interestrate.MulticurveProviderInterface;
+import com.opengamma.analytics.financial.provider.description.interestrate.ParameterProviderInterface;
 import com.opengamma.analytics.financial.provider.sensitivity.multicurve.MulticurveSensitivity;
 import com.opengamma.analytics.financial.provider.sensitivity.multicurve.ParameterSensitivityMulticurveUnderlyingMatrixCalculator;
 import com.opengamma.analytics.math.function.Function1D;
@@ -101,8 +98,8 @@ public class MulticurveDiscountBuildingRepository {
       final MulticurveProviderDiscount knownData,
       final LinkedHashMap<String, Currency> discountingMap, final LinkedHashMap<String, IborIndex[]> forwardIborMap, 
       final LinkedHashMap<String, IndexON[]> forwardONMap,
-      final LinkedHashMap<String, GeneratorYDCurve> generatorsMap, final InstrumentDerivativeVisitor<MulticurveProviderInterface, Double> calculator,
-      final InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
+      final LinkedHashMap<String, GeneratorYDCurve> generatorsMap, final InstrumentDerivativeVisitor<ParameterProviderInterface, Double> calculator,
+      final InstrumentDerivativeVisitor<ParameterProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
     final GeneratorMulticurveProviderDiscount generator = new GeneratorMulticurveProviderDiscount(knownData, discountingMap, forwardIborMap, forwardONMap, generatorsMap);
     final MulticurveDiscountBuildingData data = new MulticurveDiscountBuildingData(instruments, generator);
     final Function1D<DoubleMatrix1D, DoubleMatrix1D> curveCalculator = new MulticurveDiscountFinderFunction(calculator, data);
@@ -125,7 +122,7 @@ public class MulticurveDiscountBuildingRepository {
    * The Jacobian matrix is the transition matrix between the curve parameters and the par spread.
    */
   private void updateBlockBundle(final InstrumentDerivative[] instruments, final MulticurveProviderDiscount multicurves, final List<String> currentCurvesList,
-      final CurveBuildingBlockBundle blockBundle, final InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
+      final CurveBuildingBlockBundle blockBundle, final InstrumentDerivativeVisitor<ParameterProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
     // Sensitivity calculator
     final ParameterSensitivityMulticurveUnderlyingMatrixCalculator parameterSensitivityCalculator = new ParameterSensitivityMulticurveUnderlyingMatrixCalculator(sensitivityCalculator);
     int loopc;
@@ -267,68 +264,9 @@ public class MulticurveDiscountBuildingRepository {
   public Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> makeCurvesFromDerivatives(final MultiCurveBundle<GeneratorYDCurve>[] curveBundles,
       final MulticurveProviderDiscount knownData,
       final LinkedHashMap<String, Currency> discountingMap, final LinkedHashMap<String, IborIndex[]> forwardIborMap, final LinkedHashMap<String, IndexON[]> forwardONMap,
-      final InstrumentDerivativeVisitor<MulticurveProviderInterface, Double> calculator,
-      final InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
+      final InstrumentDerivativeVisitor<ParameterProviderInterface, Double> calculator,
+      final InstrumentDerivativeVisitor<ParameterProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
     return makeCurvesFromDerivatives(curveBundles, knownData, new CurveBuildingBlockBundle(), discountingMap, forwardIborMap, forwardONMap, calculator, sensitivityCalculator);
-  }
-
-  /**
-   * Build a block of curves without a known CurveBuildingBlockBundle.
-   * <p>
-   * This method only exists to provide expose a more sensible set of parameter types - {@code List} instead of arrays,
-   * {@code Map} instead of {@code LinkedHashMap}, {@code Multimap} instead of a map with arrays as values etc.
-   *
-   * @param curveBundleList The bundles of curve data used in construction.
-   * @param knownData The known data (fx rates, other curves, model parameters, ...)
-   * @param currenciesByCurveName The discounting curves names map.
-   * @param iborIndicesByCurveName The forward curves names map.
-   * @param onIndicesByCurveName The forward curves names map.
-   * @param calculator The calculator of the value on which the calibration is done (usually ParSpreadMarketQuoteCalculator (recommended) or converted present value).
-   * @param sensitivityCalculator The parameter sensitivity calculator.
-   * @return A pair with the calibrated yield curve bundle (including the known data) and the CurveBuildingBlockBundle with the relevant inverse Jacobian Matrix.
-   */
-  @SuppressWarnings("unchecked")
-  public Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> makeCurvesFromDerivatives(
-      List<MultiCurveBundle<GeneratorYDCurve>> curveBundleList,
-      MulticurveProviderDiscount knownData,
-      Map<String, Currency> currenciesByCurveName,
-      Multimap<String, IborIndex> iborIndicesByCurveName,
-      Multimap<String, IndexON> onIndicesByCurveName,
-      InstrumentDerivativeVisitor<MulticurveProviderInterface, Double> calculator,
-      InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
-
-
-    // adapt arguments for the legacy version
-    MultiCurveBundle<GeneratorYDCurve>[] curveBundles =
-        curveBundleList.toArray(new MultiCurveBundle[curveBundleList.size()]);
-    LinkedHashMap<String, Currency> discountingMap = new LinkedHashMap<>(currenciesByCurveName);
-    LinkedHashMap<String, IborIndex[]> forwardIborMap = new LinkedHashMap<>();
-    LinkedHashMap<String, IndexON[]> forwardONMap = new LinkedHashMap<>();
-
-    Map<String, Collection<IborIndex>> iborMap = iborIndicesByCurveName.asMap();
-
-    for (Map.Entry<String, Collection<IborIndex>> entry : iborMap.entrySet()) {
-      String curveName = entry.getKey();
-      Collection<IborIndex> iborIndices = entry.getValue();
-      forwardIborMap.put(curveName, iborIndices.toArray(new IborIndex[iborIndices.size()]));
-    }
-
-    Map<String, Collection<IndexON>> onMap = onIndicesByCurveName.asMap();
-
-    for (Map.Entry<String, Collection<IndexON>> entry : onMap.entrySet()) {
-      String curveName = entry.getKey();
-      Collection<IndexON> onIndices = entry.getValue();
-      forwardONMap.put(curveName, onIndices.toArray(new IndexON[onIndices.size()]));
-    }
-
-    return makeCurvesFromDerivatives(curveBundles,
-                                     knownData,
-                                     new CurveBuildingBlockBundle(),
-                                     discountingMap,
-                                     forwardIborMap,
-                                     forwardONMap,
-                                     calculator,
-                                     sensitivityCalculator);
   }
 
   /**
@@ -343,15 +281,11 @@ public class MulticurveDiscountBuildingRepository {
    * @param sensitivityCalculator The parameter sensitivity calculator.
    * @return A pair with the calibrated yield curve bundle (including the known data) and the CurveBuildingBlockBundle with the relevant inverse Jacobian Matrix.
    */
-  public Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> makeCurvesFromDerivatives(
-      MultiCurveBundle<GeneratorYDCurve>[] curveBundles,
-      MulticurveProviderDiscount knownData,
-      CurveBuildingBlockBundle knownBlockBundle,
-      LinkedHashMap<String, Currency> discountingMap,
-      LinkedHashMap<String, IborIndex[]> forwardIborMap,
-      LinkedHashMap<String, IndexON[]> forwardONMap,
-      InstrumentDerivativeVisitor<MulticurveProviderInterface, Double> calculator,
-      InstrumentDerivativeVisitor<MulticurveProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
+  public Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> makeCurvesFromDerivatives(final MultiCurveBundle<GeneratorYDCurve>[] curveBundles,
+      final MulticurveProviderDiscount knownData, final CurveBuildingBlockBundle knownBlockBundle,
+      final LinkedHashMap<String, Currency> discountingMap, final LinkedHashMap<String, IborIndex[]> forwardIborMap, final LinkedHashMap<String, IndexON[]> forwardONMap,
+      final InstrumentDerivativeVisitor<ParameterProviderInterface, Double> calculator,
+      final InstrumentDerivativeVisitor<ParameterProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
     ArgumentChecker.notNull(curveBundles, "curve bundles");
     ArgumentChecker.notNull(knownData, "known data");
     ArgumentChecker.notNull(discountingMap, "discounting map");
