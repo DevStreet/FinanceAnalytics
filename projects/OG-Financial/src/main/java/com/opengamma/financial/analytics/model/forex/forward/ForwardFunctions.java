@@ -29,11 +29,7 @@ public class ForwardFunctions extends AbstractFunctionConfigurationBean {
 
   @Override
   protected void addAllConfigurations(final List<FunctionConfiguration> functions) {
-    functions.add(functionConfiguration(FXForwardPV01Function.class));
     functions.add(functionConfiguration(FXForwardPresentValueFunction.class));
-    functions.add(functionConfiguration(FXForwardPointsMethodPresentValueFunction.class));
-    functions.add(functionConfiguration(FXForwardPointsMethodCurrencyExposureFunction.class));
-    functions.add(functionConfiguration(FXForwardPointsMethodFCNSFunction.class));
   }
 
 }

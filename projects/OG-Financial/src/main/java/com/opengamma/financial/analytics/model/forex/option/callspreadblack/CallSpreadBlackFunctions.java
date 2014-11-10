@@ -52,17 +52,12 @@ public class CallSpreadBlackFunctions extends AbstractFunctionConfigurationBean 
   protected void addAllConfigurations(final List<FunctionConfiguration> functions) {
     //    functions.add(functionConfiguration(FXDigitalCallSpreadBlackFXPresentValueFunction.class));
     //    functions.add(functionConfiguration(FXDigitalCallSpreadBlackDeltaFunction.class));
-    functions.add(functionConfiguration(FXDigitalCallSpreadBlackGammaFunction.class));
-    functions.add(functionConfiguration(FXDigitalCallSpreadBlackGammaSpotFunction.class));
-    //functions.add(functionConfiguration(FXDigitalCallSpreadBlackImpliedVolatilityFunction.class));
+   //functions.add(functionConfiguration(FXDigitalCallSpreadBlackImpliedVolatilityFunction.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackPresentValueCurveSensitivityFunction.class));
-    functions.add(functionConfiguration(FXDigitalCallSpreadBlackPV01Function.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackTermStructureCurrencyExposureFunction.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackThetaFunction.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackVannaFunction.class));
-    functions.add(functionConfiguration(FXDigitalCallSpreadBlackVegaFunction.class));
-    functions.add(functionConfiguration(FXDigitalCallSpreadBlackVegaMatrixFunction.class));
-    //functions.add(functionConfiguration(FXDigitalCallSpreadBlackVegaQuoteMatrixFunction.class));
+   //functions.add(functionConfiguration(FXDigitalCallSpreadBlackVegaQuoteMatrixFunction.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackVolatilitySurfaceConstantSpreadThetaFunction.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackVolatilitySurfaceForwardSlideThetaFunction.class));
     //functions.add(functionConfiguration(FXDigitalCallSpreadBlackVommaFunction.class));

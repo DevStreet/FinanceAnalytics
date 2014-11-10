@@ -10,7 +10,6 @@ import java.util.List;
 import com.opengamma.engine.function.config.AbstractFunctionConfigurationBean;
 import com.opengamma.engine.function.config.FunctionConfiguration;
 import com.opengamma.engine.function.config.FunctionConfigurationSource;
-import com.opengamma.financial.analytics.model.forex.option.vannavolga.FXOptionVannaVolgaPresentValueFunction;
 
 /**
  * Function repository configuration source for the functions contained in this package.
@@ -61,27 +60,8 @@ public class BlackFunctions extends AbstractFunctionConfigurationBean {
 
   @Override
   protected void addAllConfigurations(final List<FunctionConfiguration> functions) {
-    functions.add(functionConfiguration(FXOptionBlackForwardDeltaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackSpotDeltaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackForwardGammaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackSpotGammaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackForwardVegaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackForwardDriftlessThetaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackForwardThetaTheoreticalFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackValueDeltaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackValueGammaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackValueGammaSpotFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackImpliedVolatilityFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackPV01Function.class));
-    functions.add(functionConfiguration(FXOptionBlackThetaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackVannaFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackVegaFunction.class));
     functions.add(functionConfiguration(FXOptionBlackValuePhiFunction.class));
     functions.add(functionConfiguration(FXOptionBlackValueRhoFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackVegaMatrixFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackVegaQuoteMatrixFunction.class));
-    functions.add(functionConfiguration(FXOptionBlackVommaFunction.class));
-    functions.add(functionConfiguration(FXOptionVannaVolgaPresentValueFunction.class));
   }
 
 }
