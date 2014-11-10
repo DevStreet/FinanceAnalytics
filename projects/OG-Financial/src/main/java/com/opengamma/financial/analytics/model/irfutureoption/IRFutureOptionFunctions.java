@@ -218,9 +218,7 @@ public class IRFutureOptionFunctions extends AbstractFunctionConfigurationBean {
   protected void addAllConfigurations(final List<FunctionConfiguration> functions) {
     functions.add(functionConfiguration(InterestRateFutureOptionMarketUnderlyingPriceFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionBlackVolatilitySensitivityFunction.class));
-    functions.add(functionConfiguration(InterestRateFutureOptionBlackImpliedVolatilityFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionBlackGammaFunction.class));
-    functions.add(functionConfiguration(InterestRateFutureOptionBlackPriceFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionBlackDeltaFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionBlackVegaFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionBlackThetaFunction.class));
@@ -232,9 +230,6 @@ public class IRFutureOptionFunctions extends AbstractFunctionConfigurationBean {
     functions.add(functionConfiguration(InterestRateFutureOptionBlackValueGammaPFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionBlackValueThetaFunction.class));
     functions.add(functionConfiguration(InterestRateFutureOptionHestonPresentValueFunction.class));
-    functions.add(functionConfiguration(IRFutureOptionSABRPresentValueFunction.class));
-    functions.add(functionConfiguration(IRFutureOptionSABRSensitivitiesFunction.class));
-    functions.add(functionConfiguration(IRFutureOptionSABRYCNSFunction.class));
   }
 
 }

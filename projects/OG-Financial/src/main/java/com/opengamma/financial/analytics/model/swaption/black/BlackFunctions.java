@@ -133,17 +133,6 @@ public class BlackFunctions extends AbstractFunctionConfigurationBean {
 
   @Override
   protected void addAllConfigurations(final List<FunctionConfiguration> functions) {
-    functions.add(functionConfiguration(SwaptionBlackVolatilitySensitivityFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackImpliedVolatilityFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackTheoreticaForwardDeltaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackTheoreticalForwardGammaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackDriftlessThetaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackTheoreticalForwardThetaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackTheoreticalForwardVegaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackValueDeltaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackValueGammaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackValueThetaFunction.class));
-    functions.add(functionConfiguration(SwaptionBlackForwardFunction.class));
   }
 
 }
