@@ -34,7 +34,6 @@ import com.opengamma.financial.analytics.model.fx.FXForwardPricingFunctions;
 import com.opengamma.financial.analytics.model.g2ppdiscounting.G2ppPricingFunctions;
 import com.opengamma.financial.analytics.model.hullwhitediscounting.HullWhitePricingFunctions;
 import com.opengamma.financial.analytics.model.irfutureoption.IRFutureOptionFunctions;
-import com.opengamma.financial.analytics.model.option.OptionFunctions;
 import com.opengamma.financial.analytics.model.pnl.PNLFunctions;
 import com.opengamma.financial.analytics.model.sabr.SABRDiscountingPricingFunctions;
 import com.opengamma.financial.analytics.model.sabrcube.SABRCubeFunctions;
@@ -229,16 +228,6 @@ public class ModelFunctions extends AbstractFunctionConfigurationBean {
     return IRFutureOptionFunctions.instance();
   }
 
-  /**
-   * Adds general option functions.
-   * @return A configuration source containing option functions
-   * @deprecated The underlying-specific functions should be used
-   */
-  @Deprecated
-  protected FunctionConfigurationSource optionFunctionConfiguration() {
-    return OptionFunctions.instance();
-  }
-
   protected FunctionConfigurationSource pnlFunctionConfiguration() {
     return PNLFunctions.instance();
   }
@@ -315,7 +304,6 @@ public class ModelFunctions extends AbstractFunctionConfigurationBean {
         futureFunctionConfiguration(),
         futureOptionFunctionConfiguration(),
         irFutureOptionFunctionConfiguration(),
-        optionFunctionConfiguration(),
         pnlFunctionConfiguration(),
         riskFactorFunctionConfiguration(),
         sabrCubeFunctionConfiguration(),
