@@ -22,7 +22,6 @@ import com.opengamma.financial.expression.UserExpression;
 import com.opengamma.financial.expression.UserExpression.DynamicAttributes;
 import com.opengamma.financial.expression.UserExpression.DynamicVariables;
 import com.opengamma.financial.expression.UserExpression.Evaluator;
-import com.opengamma.financial.expression.deprecated.ExpressionParser;
 import com.opengamma.id.UniqueId;
 import com.opengamma.util.money.Currency;
 
@@ -32,17 +31,6 @@ import com.opengamma.util.money.Currency;
 public class ExpressionPortfolioFilter extends AbstractFilteringFunction {
 
   private final UserExpression _expression;
-
-  /**
-   * Creates a new filter from a string expression (in the Expr.g form)
-   * 
-   * @param expression string expression
-   * @deprecated Use the alternative constructor so that the parsing dialect is explicit
-   */
-  @Deprecated
-  public ExpressionPortfolioFilter(final String expression) {
-    this(new ExpressionParser().parse(expression));
-  }
 
   /**
    * Creates a new filter from an arbitrary user expression
