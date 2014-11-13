@@ -50,11 +50,6 @@ public class ScheduleFactoryTest {
     final Frequency frequency = new Frequency() {
 
       @Override
-      public String getConventionName() {
-        return null;
-      }
-
-      @Override
       public String getName() {
         return null;
       }
@@ -95,11 +90,6 @@ public class ScheduleFactoryTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void testBadFrequency2() {
     final Frequency frequency = new Frequency() {
-
-      @Override
-      public String getConventionName() {
-        return null;
-      }
 
       @Override
       public String getName() {

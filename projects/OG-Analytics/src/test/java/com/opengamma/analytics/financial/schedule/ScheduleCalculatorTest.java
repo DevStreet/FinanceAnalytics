@@ -626,11 +626,6 @@ public class ScheduleCalculatorTest {
     ScheduleCalculator.getUnadjustedDateSchedule(DateUtils.getUTCDate(2010, 6, 1), DateUtils.getUTCDate(2010, 7, 1), DateUtils.getUTCDate(2010, 8, 1), new Frequency() {
 
       @Override
-      public String getConventionName() {
-        return null;
-      }
-
-      @Override
       public String getName() {
         return null;
       }
