@@ -267,7 +267,6 @@ public class MulticurveDiscountBuildingRepository {
    * @param sensitivityCalculator The parameter sensitivity calculator.
    * @return A pair with the calibrated yield curve bundle (including the known data) and the CurveBuildingBlockBundle with the relevant inverse Jacobian Matrix.
    */
-  @SuppressWarnings("unchecked")
   public Pair<MulticurveProviderDiscount, CurveBuildingBlockBundle> makeCurvesFromDerivatives(
       List<MultiCurveBundle<GeneratorYDCurve>> curveBundleList,
       MulticurveProviderDiscount knownData,
@@ -277,8 +276,8 @@ public class MulticurveDiscountBuildingRepository {
       InstrumentDerivativeVisitor<ParameterProviderInterface, Double> calculator,
       InstrumentDerivativeVisitor<ParameterProviderInterface, MulticurveSensitivity> sensitivityCalculator) {
 
-
     // adapt arguments for the legacy version
+    @SuppressWarnings("unchecked")
     MultiCurveBundle<GeneratorYDCurve>[] curveBundles =
         curveBundleList.toArray(new MultiCurveBundle[curveBundleList.size()]);
     LinkedHashMap<String, Currency> discountingMap = new LinkedHashMap<>(currenciesByCurveName);
@@ -301,14 +300,8 @@ public class MulticurveDiscountBuildingRepository {
       forwardONMap.put(curveName, onIndices.toArray(new IndexON[onIndices.size()]));
     }
 
-    return makeCurvesFromDerivatives(curveBundles,
-                                     knownData,
-                                     new CurveBuildingBlockBundle(),
-                                     discountingMap,
-                                     forwardIborMap,
-                                     forwardONMap,
-                                     calculator,
-                                     sensitivityCalculator);
+    return makeCurvesFromDerivatives(curveBundles, knownData, new CurveBuildingBlockBundle(), discountingMap,
+                                     forwardIborMap, forwardONMap, calculator, sensitivityCalculator);
   }
 
   /**
