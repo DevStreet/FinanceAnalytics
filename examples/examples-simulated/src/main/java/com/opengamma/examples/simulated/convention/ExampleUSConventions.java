@@ -67,22 +67,20 @@ public class ExampleUSConventions extends ConventionMasterInitializer {
         depositONConventionName, getIds(Currency.USD, DEPOSIT_ON), DayCounts.ACT_360, BusinessDayConventions.FOLLOWING, 0, false, Currency.USD, US);
 
     // Ibor conventions
-    final String iborTicker = "USDLIBORP3M";
+    final String iborTicker = "USDLIBOR";
+    final String ibor3mTicker = "USDLIBORP3M";
     final ExternalId liborConventionId = ExternalSchemes.syntheticSecurityId(iborTicker);
+    final ExternalId libor3mConventionId = ExternalSchemes.syntheticSecurityId(ibor3mTicker);
     final IborIndexConvention liborIndexConvention = new IborIndexConvention(iborTicker, liborConventionId.toBundle(),
-        DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING, 2, false, Currency.USD, LocalTime.of(11, 00), "US", NYLON, US, "");
+        DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING, 2, false, Currency.USD, LocalTime.of(11, 0), "US", NYLON, US, "");
     final String liborLeg3MConventionName = getConventionName(Currency.USD, TENOR_STR_3M, IRS_IBOR_LEG);
     final VanillaIborLegConvention liborLeg3MConvention = new VanillaIborLegConvention(
         liborLeg3MConventionName, getIds(Currency.USD, TENOR_STR_3M, IRS_IBOR_LEG),
-        liborConventionId, true, Interpolator1DFactory.LINEAR, Tenor.THREE_MONTHS, 2, false, StubType.SHORT_START, false, 0);
+        libor3mConventionId, true, Interpolator1DFactory.LINEAR, Tenor.THREE_MONTHS, 2, false, StubType.SHORT_START, false, 0);
     final String irsFixedLegConventionName = getConventionName(Currency.USD, IRS_FIXED_LEG);
     final SwapFixedLegConvention irsFixedLegConvention = new SwapFixedLegConvention(
         irsFixedLegConventionName, getIds(Currency.USD, IRS_FIXED_LEG),
         Tenor.SIX_MONTHS, DayCounts.THIRTY_360, BusinessDayConventions.MODIFIED_FOLLOWING, Currency.USD, NYLON, 2, false, StubType.SHORT_START, false, 0);
-    final String iborTicker6m = "USDLIBORP6M";
-    final ExternalId liborConventionId6m = ExternalSchemes.syntheticSecurityId(iborTicker6m);
-    final IborIndexConvention liborIndexConvention6m = new IborIndexConvention(iborTicker6m, liborConventionId6m.toBundle(),
-        DayCounts.ACT_360, BusinessDayConventions.MODIFIED_FOLLOWING, 2, true, Currency.USD, LocalTime.of(11, 00), "US", NYLON, US, "");
 
     // Overnight conventions
     final String overnightTicker = "USDFF";
@@ -110,7 +108,6 @@ public class ExampleUSConventions extends ConventionMasterInitializer {
     addConvention(master, depositConvention);
     addConvention(master, depositONConvention);
     addConvention(master, liborIndexConvention);
-    addConvention(master, liborIndexConvention6m);
     addConvention(master, liborLeg3MConvention);
     addConvention(master, irsFixedLegConvention);
     addConvention(master, overnightConvention);

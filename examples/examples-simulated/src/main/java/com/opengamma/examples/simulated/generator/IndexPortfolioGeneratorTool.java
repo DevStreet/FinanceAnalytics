@@ -28,7 +28,6 @@ import com.opengamma.util.time.Tenor;
 /**
  * Creates a portfolio of indices. 
  */
-// TODO what is the best way to do load these index securities? There is no need to create the portfolio 
 public class IndexPortfolioGeneratorTool extends AbstractPortfolioGeneratorTool {
   /** The indices */
   private static final List<ManageableSecurity> INDICES = new ArrayList<>();
@@ -42,10 +41,12 @@ public class IndexPortfolioGeneratorTool extends AbstractPortfolioGeneratorTool 
       final String overnightTicker = overnightTickers[i];
       for (final Tenor tenor : tenors) {
         final String iborTicker = currency + "LIBOR" + tenor.toFormattedString();
+        final String conventionTicker = currency + "LIBOR";
         final String referenceRateTicker = currency + " LIBOR " + tenor.toFormattedString().substring(1).toLowerCase();
         final ExternalId iborIndexId = ExternalSchemes.syntheticSecurityId(iborTicker);
+        final ExternalId conventionId = ExternalSchemes.syntheticSecurityId(conventionTicker);
         final ExternalId iborIndexReferenceRateId = ExternalId.of(InMemoryConventionBundleMaster.SIMPLE_NAME_SCHEME, referenceRateTicker);
-        final IborIndex iborIndex = new IborIndex(iborTicker, tenor, iborIndexId);
+        final IborIndex iborIndex = new IborIndex(iborTicker, tenor, conventionId);
         iborIndex.setExternalIdBundle(ExternalIdBundle.of(iborIndexId, iborIndexReferenceRateId));
         INDICES.add(iborIndex);
         final ExternalId overnightIndexId = ExternalSchemes.syntheticSecurityId(overnightTickers[i]);
