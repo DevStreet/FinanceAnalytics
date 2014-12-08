@@ -108,8 +108,6 @@ public class FixedIncomeConverterDataProvider {
   // TODO: [PLAT-5966] Remove this convention source
   private final ConventionBundleSource _conventionSource;
 
-  private final HistoricalTimeSeriesResolver _timeSeriesResolver;
-
   /** The first fixing date of a swap is not stored at the security level.
    * One needs to estimate how far before the effective date the fixing time-series is required. **/
   private static final int DAYS_BEFORE_EFFECTIVE = 180;
@@ -120,11 +118,10 @@ public class FixedIncomeConverterDataProvider {
     ArgumentChecker.notNull(timeSeriesResolver, "timeSeriesResolver");
     _conventionSource = conventionSource;
     _securitySource = securitySource;
-    _timeSeriesResolver = timeSeriesResolver;
   }
 
   public HistoricalTimeSeriesResolver getHistoricalTimeSeriesResolver() {
-    return _timeSeriesResolver;
+    throw new UnsupportedOperationException();
   }
 
   //TODO: [PLAT-5966] Add java doc
@@ -272,7 +269,7 @@ public class FixedIncomeConverterDataProvider {
   }
 
   protected HistoricalTimeSeriesResolver getTimeSeriesResolver() {
-    return _timeSeriesResolver;
+    throw new UnsupportedOperationException();
   }
 
   private final Converter<SwaptionSecurity, InstrumentDefinition<?>> _swaptionSecurity = new Converter<SwaptionSecurity, InstrumentDefinition<?>>() {
