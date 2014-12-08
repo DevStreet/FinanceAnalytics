@@ -112,10 +112,9 @@ public class FixedIncomeConverterDataProvider {
    * One needs to estimate how far before the effective date the fixing time-series is required. **/
   private static final int DAYS_BEFORE_EFFECTIVE = 180;
 
-  public FixedIncomeConverterDataProvider(final ConventionBundleSource conventionSource, final SecuritySource securitySource, final HistoricalTimeSeriesResolver timeSeriesResolver) {
+  public FixedIncomeConverterDataProvider(ConventionBundleSource conventionSource, SecuritySource securitySource) {
     ArgumentChecker.notNull(conventionSource, "conventionSource");
     ArgumentChecker.notNull(securitySource, "securitySource");
-    ArgumentChecker.notNull(timeSeriesResolver, "timeSeriesResolver");
     _conventionSource = conventionSource;
     _securitySource = securitySource;
   }
