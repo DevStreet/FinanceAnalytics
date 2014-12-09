@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,9 +114,20 @@ public class FixedIncomeConverterDataProvider {
    * One needs to estimate how far before the effective date the fixing time-series is required. **/
   private static final int DAYS_BEFORE_EFFECTIVE = 180;
 
+  @Inject
   public FixedIncomeConverterDataProvider(ConventionBundleSource conventionSource, SecuritySource securitySource) {
     ArgumentChecker.notNull(conventionSource, "conventionSource");
     ArgumentChecker.notNull(securitySource, "securitySource");
+    _conventionSource = conventionSource;
+    _securitySource = securitySource;
+  }
+
+  public FixedIncomeConverterDataProvider(ConventionBundleSource conventionSource,
+                                          SecuritySource securitySource,
+                                          HistoricalTimeSeriesResolver timeSeriesResolver) {
+    ArgumentChecker.notNull(conventionSource, "conventionSource");
+    ArgumentChecker.notNull(securitySource, "securitySource");
+    ArgumentChecker.notNull(timeSeriesResolver, "timeSeriesResolver");
     _conventionSource = conventionSource;
     _securitySource = securitySource;
   }
