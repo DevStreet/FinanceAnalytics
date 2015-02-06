@@ -5,8 +5,13 @@
  */
 package com.opengamma.analytics.financial.model.volatility.surface;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.ObjectUtils;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.opengamma.analytics.financial.model.volatility.VolatilityModel;
 import com.opengamma.analytics.financial.model.volatility.curve.VolatilityCurve;
 import com.opengamma.analytics.math.Axis;
@@ -16,6 +21,7 @@ import com.opengamma.analytics.math.surface.Surface;
 import com.opengamma.analytics.math.surface.SurfaceShiftFunctionFactory;
 import com.opengamma.analytics.math.surface.SurfaceSliceFunction;
 import com.opengamma.util.ArgumentChecker;
+import com.opengamma.util.time.Tenor;
 import com.opengamma.util.tuple.DoublesPair;
 
 /**
@@ -28,9 +34,62 @@ public class VolatilitySurface implements VolatilityModel<DoublesPair> {
   /** y-axis */
   public static final Axis STRIKE_AXIS = Axis.Y;
 
-  public VolatilitySurface(final Surface<Double, Double, Double> surface) {
+  /**
+   * Map of tenor to the index of the corresponding point on the x axis.
+   * This isn't guaranteed to be populated for all surfaces.
+   */
+  private final Map<Tenor, Integer> _expiryIndices;
+
+  /**
+   * Creates a new volatility surface backed by the specified surface.
+   *
+   * @param surface  a surface containing the volatility data with expiries on the x-axis, strikes on the y-axis
+   */
+  public VolatilitySurface(Surface<Double, Double, Double> surface) {
+    _surface = ArgumentChecker.notNull(surface, "surface");
+    _expiryIndices = ImmutableMap.of();
+  }
+
+  /**
+   * Creates a new volatility surface backed by the specified surface and with the specified tenors on the x-axis.
+   *
+   * @param surface  a surface containing the volatility data with expiries on the x-axis, strikes on the y-axis
+   * @param expiryTenors  the tenors corresponding to the points on the x-axis. This must be the same length
+   *   as the x-axis data in the surface
+   */
+  public VolatilitySurface(Surface<Double, Double, Double> surface, List<Tenor> expiryTenors) {
     ArgumentChecker.notNull(surface, "surface");
+    ArgumentChecker.notNull(expiryTenors, "expiryTenors");
+
+    if (surface.getXData().length != expiryTenors.size()) {
+      throw new IllegalArgumentException("Surface x-axis length must equal the number of expiry tenors");
+    }
+    ImmutableMap.Builder<Tenor, Integer> indexBuilder = ImmutableMap.builder();
+
+    for (int i = 0; i < expiryTenors.size(); i++) {
+      indexBuilder.put(expiryTenors.get(i), i);
+    }
+    _expiryIndices = indexBuilder.build();
     _surface = surface;
+  }
+
+  /**
+   * Returns the year fraction of the surface x-axis point corresponding to the expiry.
+   * <p>
+   * {@code Optional.absent()} will be returned if there is no point matching the specified expiry or
+   * if this surface doesn't contain expiry data.
+   *
+   * @param expiry  an expiry
+   * @return the year fraction of the surface x-axis point corresponding to the expiry if there is one
+   */
+  public Optional<Double> getExpiryYearFraction(Tenor expiry) {
+    Integer index = _expiryIndices.get(expiry);
+
+    if (index == null) {
+      return Optional.absent();
+    } else {
+      return Optional.of(_surface.getXData()[index]);
+    }
   }
 
   @Override
