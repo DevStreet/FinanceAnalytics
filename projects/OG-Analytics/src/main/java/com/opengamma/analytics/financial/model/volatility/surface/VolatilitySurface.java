@@ -6,12 +6,10 @@
 package com.opengamma.analytics.financial.model.volatility.surface;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.opengamma.analytics.financial.model.volatility.VolatilityModel;
 import com.opengamma.analytics.financial.model.volatility.curve.VolatilityCurve;
 import com.opengamma.analytics.math.Axis;
@@ -35,10 +33,11 @@ public class VolatilitySurface implements VolatilityModel<DoublesPair> {
   public static final Axis STRIKE_AXIS = Axis.Y;
 
   /**
-   * Map of tenor to the index of the corresponding point on the x axis.
-   * This isn't guaranteed to be populated for all surfaces.
+   * The tenor of the expiry values of the surface. This isn't guaranteed to be
+   * populated for all surfaces. If it is populated it is guaranteed to have the same size as
+   * the surface, otherwise it will be empty.
    */
-  private final Map<Tenor, Integer> _expiryIndices;
+  private final List<Tenor> _expiryTenors;
 
   /**
    * Creates a new volatility surface backed by the specified surface.
@@ -47,49 +46,36 @@ public class VolatilitySurface implements VolatilityModel<DoublesPair> {
    */
   public VolatilitySurface(Surface<Double, Double, Double> surface) {
     _surface = ArgumentChecker.notNull(surface, "surface");
-    _expiryIndices = ImmutableMap.of();
+    _expiryTenors = ImmutableList.of();
   }
 
   /**
    * Creates a new volatility surface backed by the specified surface and with the specified tenors on the x-axis.
    *
    * @param surface  a surface containing the volatility data with expiries on the x-axis, strikes on the y-axis
-   * @param expiryTenors  the tenors corresponding to the points on the x-axis. This must be the same length
-   *   as the x-axis data in the surface
+   * @param expiryTenors  the expiry tenor of each point. This size of this list must be the same as the size
+   *   of the surface
    */
   public VolatilitySurface(Surface<Double, Double, Double> surface, List<Tenor> expiryTenors) {
-    ArgumentChecker.notNull(surface, "surface");
+    _surface = ArgumentChecker.notNull(surface, "surface");
     ArgumentChecker.notNull(expiryTenors, "expiryTenors");
 
-    if (surface.getXData().length != expiryTenors.size()) {
-      throw new IllegalArgumentException("Surface x-axis length must equal the number of expiry tenors");
+    if (expiryTenors.size() != surface.size()) {
+      throw new IllegalArgumentException(
+          "The number of tenors (" + expiryTenors.size() + ") doesn't match " +
+              "the size of the surface(" + surface.size() + ")");
     }
-    ImmutableMap.Builder<Tenor, Integer> indexBuilder = ImmutableMap.builder();
-
-    for (int i = 0; i < expiryTenors.size(); i++) {
-      indexBuilder.put(expiryTenors.get(i), i);
-    }
-    _expiryIndices = indexBuilder.build();
-    _surface = surface;
+    _expiryTenors = ImmutableList.copyOf(expiryTenors);
   }
 
   /**
-   * Returns the year fraction of the surface x-axis point corresponding to the expiry.
-   * <p>
-   * {@code Optional.absent()} will be returned if there is no point matching the specified expiry or
-   * if this surface doesn't contain expiry data.
+   * Returns the expiry tenors of the points in the surface. This can be empty if the data wasn't provided when
+   * the surface was constructed. If it is not empty it is guaranteed to be the same size as the surface.
    *
-   * @param expiry  an expiry
-   * @return the year fraction of the surface x-axis point corresponding to the expiry if there is one
+   * @return the expiry tenors of the points in the surface
    */
-  public Optional<Double> getExpiryYearFraction(Tenor expiry) {
-    Integer index = _expiryIndices.get(expiry);
-
-    if (index == null) {
-      return Optional.absent();
-    } else {
-      return Optional.of(_surface.getXData()[index]);
-    }
+  public List<Tenor> getExpiryTenors() {
+    return _expiryTenors;
   }
 
   @Override
