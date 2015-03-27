@@ -7,13 +7,18 @@ package com.opengamma.analytics.financial.provider.description.interestrate;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.opengamma.analytics.financial.forex.method.FXMatrix;
 import com.opengamma.analytics.financial.forex.method.FXMatrixUtils;
 import com.opengamma.analytics.financial.instrument.index.IborIndex;
 import com.opengamma.analytics.financial.instrument.index.IndexON;
 import com.opengamma.analytics.financial.model.interestrate.curve.YieldAndDiscountCurve;
+import com.opengamma.analytics.financial.model.interestrate.curve.YieldCurve;
+import com.opengamma.analytics.math.curve.InterpolatedDoublesCurve;
+import com.opengamma.analytics.math.interpolation.Interpolator1D;
 import com.opengamma.util.ArgumentChecker;
 import com.opengamma.util.money.Currency;
 
@@ -22,6 +27,11 @@ import com.opengamma.util.money.Currency;
  * This is a temporary class and will be removed when the providers have been refactored.
  */
 public class ProviderUtils {
+
+  /* The minimal node level below which a special treatment is used to avoid dividing by 0. */
+  private static final double MIN_NODE = 1.0E-4;
+  /* The small increment used to compute the time derivative of the curves. */
+  private static final double DT = 1.0E-5;
 
   /**
    * Merges discounting curve providers. 
@@ -156,6 +166,54 @@ public class ProviderUtils {
     final FXMatrix fxMatrix = FXMatrixUtils.merge(provider.getMulticurveProvider().getFxRates(), matrix);
     result.getMulticurveProvider().setForexMatrix(fxMatrix);
     return result;
+  }
+  
+  /**
+   * Construct a multi-curve provider based on an existing one and a future time T. The new provider is, up to the 
+   * interpolation, composed of the forward curves at the given time.
+   * The (pseudo-)discount factors are given by the ratios 
+   *   forward-multicurve.discountFactor(t) = base-multicurve.discountFactor(t+T) / base-multicurve.discountFactor(T).
+   * @param base The base multi-curve provider. 
+   * @param time The future time. Time should be positive.
+   * @param nodes The nodes for the curves at the future date. The nodes should be positive and in increasing order.
+   * @param interpolator The interpolator for the curves at the future date.
+   * @return The multi-curve provider.
+   */
+  public static MulticurveProviderDiscount multicurveFutureTime(MulticurveProviderDiscount base, double time,
+      double[] nodes, Interpolator1D interpolator) {
+    ArgumentChecker.isTrue(nodes[0] >= 0, "nodes should be positive.");
+    ArgumentChecker.isTrue(time >= 0, "future time should be positive.");
+    int nbNodes = nodes.length;
+    Set<String> names = base.getAllNames();
+    MulticurveProviderDiscount multicurveForward = new MulticurveProviderDiscount(base.getFxRates());
+    for (String name : names) {
+      YieldAndDiscountCurve curve = base.getCurve(name);
+      double[] zr = new double[nbNodes];
+      for (int i = 0; i < nbNodes; i++) {
+        if (nodes[i] < MIN_NODE) {
+          double r0T = curve.getInterestRate(time);
+          double drdT = (curve.getInterestRate(time + DT) - r0T) / DT;
+          zr[i] = drdT * time + r0T;
+        } else {
+          zr[i] = (curve.getInterestRate(nodes[i] + time) * (nodes[i] + time) - curve.getInterestRate(time) * time)
+              / nodes[i];
+        }
+      }
+      YieldCurve curveForward = new YieldCurve(name, new InterpolatedDoublesCurve(nodes, zr, interpolator, true));
+      List<Currency> nameCcys = base.getCurrencyForName(name);
+      List<IborIndex> nameIbors = base.getIborIndexForName(name);
+      List<IndexON> nameOns = base.getOvernightIndexForName(name);
+      for (Currency ccy : nameCcys) {
+        multicurveForward.setCurve(ccy, curveForward);
+      }
+      for (IborIndex index : nameIbors) {
+        multicurveForward.setCurve(index, curveForward);
+      }
+      for (IndexON index : nameOns) {
+        multicurveForward.setCurve(index, curveForward);
+      }
+    }
+    return multicurveForward;
   }
 
 }
