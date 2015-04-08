@@ -5,6 +5,8 @@
  */
 package com.opengamma.analytics.math.statistics.descriptive;
 
+import com.opengamma.util.ArgumentChecker;
+
 /**
  * Implementation of a quantile estimator.
  * The estimation is one of the sorted sample data. It's index is given by the smallest integer above (Math.ceil) the 
@@ -15,6 +17,8 @@ public abstract class DiscreteQuantileMethod implements QuantileCalculationMetho
 
   @Override
   public double quantileFromSorted(double quantile, double[] sortedSample) {
+    ArgumentChecker.isTrue(quantile > 0, "Quantile should be above 0.");
+    ArgumentChecker.isTrue(quantile < 1, "Quantile should be below 1.");
     int sampleSize = sortedSample.length;
     int index = index(quantile * sampleSize);
     return sortedSample[index - 1];

@@ -17,12 +17,12 @@ package com.opengamma.analytics.math.statistics.descriptive;
 public abstract class InterpolationQuantileMethod implements QuantileCalculationMethod {
 
   @Override
-  public double quantileFromSorted(double quantile, double[] sortedSample) {
+  public double quantileFromSorted(double level, double[] sortedSample) {
     int sampleSize = sortedSample.length;
-    double adjustedQuantile = quantile * sampleSize + indexCorrection();
-    int lowerIndex = (int) Math.floor(adjustedQuantile);
-    int upperIndex = (int) Math.ceil(adjustedQuantile);
-    double lowerWeight = adjustedQuantile - lowerIndex;
+    double adjustedLevel = level * sampleSize + indexCorrection();
+    int lowerIndex = (int) Math.floor(adjustedLevel);
+    int upperIndex = (int) Math.ceil(adjustedLevel);
+    double lowerWeight = upperIndex - adjustedLevel;
     double upperWeight = 1.0d - lowerWeight;
     return lowerWeight * sortedSample[lowerIndex - 1] + upperWeight * sortedSample[upperIndex - 1];
   }

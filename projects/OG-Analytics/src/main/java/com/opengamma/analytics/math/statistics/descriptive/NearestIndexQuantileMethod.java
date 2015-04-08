@@ -18,7 +18,8 @@ public class NearestIndexQuantileMethod extends DiscreteQuantileMethod {
 
   @Override
   int index(double quantileSize) {
-    return (int) Math.round(quantileSize);
+    int index1 = (int) Math.round(quantileSize);
+    return (index1 > 0) ? index1 : 1;
   }
 
 }
