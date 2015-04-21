@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import org.fudgemsg.AnnotationReflector;
 import org.fudgemsg.FudgeContext;
 import org.fudgemsg.FudgeTypeDictionary;
@@ -88,8 +90,19 @@ public final class OpenGammaFudgeContext {
       } catch (Exception ex) {
         // ignore
       }
+
+      // Have to filter the classpath entries here to stop Vfs throwing exceptions when it encounters POMs as classpath
+      // entries
+      Iterable<URL> classpath = Iterables.filter(ClasspathHelper.forJavaClassPath(), new Predicate<URL>()
+      {
+        @Override
+        public boolean apply(URL input)
+        {
+          return ! input.getFile().endsWith(".pom");
+        }
+      });
       Configuration config = new ConfigurationBuilder()
-        .setUrls(ClasspathHelper.forManifest(ClasspathHelper.forJavaClassPath()))
+        .setUrls(ClasspathHelper.forManifest(classpath))
         .setScanners(new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new SubTypesScanner(false))
         .filterInputsBy(FilterBuilder.parse(AnnotationReflector.DEFAULT_ANNOTATION_REFLECTOR_FILTER))
         .addClassLoaders(loaders)
