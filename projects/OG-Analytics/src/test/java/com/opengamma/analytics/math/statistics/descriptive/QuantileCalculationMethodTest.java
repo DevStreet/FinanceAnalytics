@@ -58,6 +58,16 @@ public class QuantileCalculationMethodTest {
     QUANTILE_INDEX_ABOVE.quantileFromSorted(0.0, SAMPLE_SORTED_100);
   }
   
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void interpolation_wrong_quantile_large() {
+    QUANTILE_SAMPLE_INTERPOLATION.quantileFromSorted(1.01, SAMPLE_SORTED_100);
+  }
+  
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void interpolation_wrong_quantile_0() {
+    QUANTILE_SAMPLE_INTERPOLATION.quantileFromSorted(0.0, SAMPLE_SORTED_100);
+  }
+  
   @Test
   public void index_above_095_100() {
     double indexDouble = LEVEL * SAMPLE_SIZE_100;
@@ -93,7 +103,13 @@ public class QuantileCalculationMethodTest {
     assertEquals(quantileComputed, quantileExpected, TOLERANCE_QUANTILE);
   }
   
-  // TODO extreme
+  @Test
+  public void index_nearest_0001_100() {
+    double level = 0.001;
+    double quantileExpected = SAMPLE_SORTED_100[0];
+    double quantileComputed = QUANTILE_NEAREST_INDEX.quantileFromSorted(level, SAMPLE_SORTED_100);
+    assertEquals(quantileComputed, quantileExpected, TOLERANCE_QUANTILE);
+  }
 
   /** On sample points, different methods match. */
   @Test
