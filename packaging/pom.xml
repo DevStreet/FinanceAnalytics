@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+		xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.opengamma.platform</groupId>
+		<artifactId>og-platform</artifactId>
+		<version>2.13.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<artifactId>og-platform-packaging</artifactId>
+	<packaging>pom</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.opengamma.platform</groupId>
+			<artifactId>og-platform</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>com.opengamma.platform</groupId>
+			<artifactId>og-platform-public</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.opengamma.platform</groupId>-->
+			<!--<artifactId>og-timeseries</artifactId>-->
+			<!--<version>${project.version}</version>-->
+		<!--</dependency>-->
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>gmaven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>prepareAndPackageMavenRepoArchives</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<providerSelection>1.8</providerSelection>
+							<source>
+								println "[!!] Before allRepos (p bd is ${project.basedir})"
+								def allRepos = ant.dirset(dir: "${project.basedir}/../") {
+									include(name: "maven_deploy/")
+								}
+
+								println "[!!] ${allRepos}"
+
+								String fullArchiveName = "${project.basedir}/../ogp-${project.version}_full_maven-repo"
+								String fullFileName = "${fullArchiveName}.zip"
+								ant.zip(destfile: fullFileName) {
+									allRepos.each { r ->
+										println "[!!] Repo for zip: ${r}"
+										zipfileset(prefix: "ogp-${project.version}", dir: r)
+										zipfileset(prefix: "ogp-${project.version}", dir: "target/dependencies")
+									}
+
+								}
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

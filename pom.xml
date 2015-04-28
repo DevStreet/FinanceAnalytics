@@ -57,6 +57,7 @@
   <!-- ==================================================================== -->
   <modules>
     <module>projects</module>
+    <module>packaging</module>
   </modules>
 
   <!-- ==================================================================== -->
@@ -213,47 +214,10 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <outputDirectory>target/dependencies</outputDirectory>
+              <outputDirectory>${session.executionRootDirectory}/target/dependencies</outputDirectory>
               <copyPom>true</copyPom>
               <useRepositoryLayout>true</useRepositoryLayout>
               <includeGroupIds>com.opengamma</includeGroupIds>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.gmaven</groupId>
-        <artifactId>gmaven-plugin</artifactId>
-        <version>1.5</version>
-        <executions>
-          <execution>
-            <id>prepareAndPackageMavenRepoArchives</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <providerSelection>1.8</providerSelection>
-              <source>
-                if(project.artifactId == "og-platform")
-                {
-                  def allRepos = ant.dirset(dir: "${project.basedir}") {
-                    println "[!!] ${project.basedir}"
-                    include(name: "maven_deploy/")
-                  }
-
-                  String fullArchiveName = "${project.basedir}/ogp-${project.version}_full_maven-repo"
-                  String fullFileName = "${fullArchiveName}.zip"
-                  ant.zip(destfile: fullFileName) {
-                    allRepos.each { r ->
-                      zipfileset(prefix: "ogp-${project.version}", dir: r)
-                      zipfileset(prefix: "ogp-${project.version}", dir: "./target/dependencies")
-                    }
-
-                  }
-                }
-              </source>
             </configuration>
           </execution>
         </executions>
