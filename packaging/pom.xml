@@ -27,6 +27,71 @@
             <version>${project.version}</version>
             <type>pom</type>
         </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-timeseries</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-component</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-financial</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-analytics</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-livedata</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-master</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-masterdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-integration</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma.platform</groupId>
+            <artifactId>og-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opengamma</groupId>
+            <artifactId>og-region-data</artifactId>
+            <version>1.0.0.v20110908a</version>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -46,7 +111,7 @@
 				<executions>
 					<execution>
 						<id>prepareAndPackageMavenRepoArchives</id>
-						<phase>compile</phase>
+						<phase>deploy</phase>
 						<goals>
 							<goal>execute</goal>
 						</goals>
