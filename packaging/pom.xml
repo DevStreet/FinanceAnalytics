@@ -46,7 +46,7 @@
 				<executions>
 					<execution>
 						<id>prepareAndPackageMavenRepoArchives</id>
-						<phase>deploy</phase>
+						<phase>compile</phase>
 						<goals>
 							<goal>execute</goal>
 						</goals>
