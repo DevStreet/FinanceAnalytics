@@ -21,17 +21,6 @@
 			<version>${project.version}</version>
 			<type>pom</type>
 		</dependency>
-		<dependency>
-			<groupId>com.opengamma.platform</groupId>
-			<artifactId>og-platform-public</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type>
-		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.opengamma.platform</groupId>-->
-			<!--<artifactId>og-timeseries</artifactId>-->
-			<!--<version>${project.version}</version>-->
-		<!--</dependency>-->
 	</dependencies>
 
 	<build>
@@ -50,22 +39,10 @@
 						<configuration>
 							<providerSelection>1.8</providerSelection>
 							<source>
-								println "[!!] Before allRepos (p bd is ${project.basedir})"
-								def allRepos = ant.dirset(dir: "${project.basedir}/../") {
-									include(name: "maven_deploy/")
-								}
-
-								println "[!!] ${allRepos}"
-
-								String fullArchiveName = "${project.basedir}/../ogp-${project.version}_full_maven-repo"
+                                String fullArchiveName = "${project.basedir}/../ogp-${project.version}_full_maven-repo"
 								String fullFileName = "${fullArchiveName}.zip"
 								ant.zip(destfile: fullFileName) {
-									allRepos.each { r ->
-										println "[!!] Repo for zip: ${r}"
-										zipfileset(prefix: "ogp-${project.version}", dir: r)
-										zipfileset(prefix: "ogp-${project.version}", dir: "target/dependencies")
-									}
-
+									zipfileset(prefix: "ogp-${project.version}", dir: "${project.basedir}/../maven_deploy")
 								}
 							</source>
 						</configuration>
