@@ -6,6 +6,7 @@
 package com.opengamma.sesame;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ import com.opengamma.util.ArgumentChecker;
  * Simple wrapper class holding the results of a multicurve calibration.
  */
 @BeanDefinition
-public final class MulticurveBundle implements ImmutableBean {
+public final class MulticurveBundle implements ImmutableBean, Serializable {
 
   /** The calibrated multicurves. */
   @PropertyDefinition(validate = "notNull")

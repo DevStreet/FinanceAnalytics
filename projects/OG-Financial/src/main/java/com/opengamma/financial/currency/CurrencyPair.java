@@ -5,6 +5,7 @@
  */
 package com.opengamma.financial.currency;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -39,7 +40,7 @@ import com.opengamma.util.money.Currency;
  * This class is immutable and thread-safe.
  */
 @BeanDefinition(builderScope = "private")
-public final class CurrencyPair implements ImmutableBean, UniqueIdentifiable {
+public final class CurrencyPair implements ImmutableBean, UniqueIdentifiable, Serializable {
 
   /**
    * The scheme to use.

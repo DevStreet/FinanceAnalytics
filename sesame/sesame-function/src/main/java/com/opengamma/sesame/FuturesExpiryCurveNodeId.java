@@ -5,6 +5,7 @@
  */
 package com.opengamma.sesame;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -31,7 +32,7 @@ import com.google.common.collect.ImmutableList;
  * The node is identified by the year and month of the futures expiry.
  */
 @BeanDefinition
-public final class FuturesExpiryCurveNodeId implements CurveNodeId, ImmutableBean {
+public final class FuturesExpiryCurveNodeId implements CurveNodeId, ImmutableBean, Serializable {
 
   /** The year and month of the futures expiry date. */
   @PropertyDefinition(validate = "notNull")
