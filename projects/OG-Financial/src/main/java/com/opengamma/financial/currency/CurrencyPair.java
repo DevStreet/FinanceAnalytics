@@ -213,6 +213,11 @@ public final class CurrencyPair implements ImmutableBean, UniqueIdentifiable, Se
     JodaBeanUtils.registerMetaBean(CurrencyPair.Meta.INSTANCE);
   }
 
+  /**
+   * The serialization version id.
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public CurrencyPair.Meta metaBean() {
     return CurrencyPair.Meta.INSTANCE;

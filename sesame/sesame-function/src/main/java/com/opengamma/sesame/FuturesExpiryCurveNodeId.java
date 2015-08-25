@@ -80,6 +80,11 @@ public final class FuturesExpiryCurveNodeId implements CurveNodeId, ImmutableBea
   }
 
   /**
+   * The serialization version id.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Returns a builder used to create an instance of the bean.
    * @return the builder, not null
    */

@@ -66,6 +66,11 @@ public abstract class DoublesCurve extends Curve<Double, Double> implements Seri
     JodaBeanUtils.registerMetaBean(DoublesCurve.Meta.INSTANCE);
   }
 
+  /**
+   * The serialization version id.
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public DoublesCurve.Meta metaBean() {
     return DoublesCurve.Meta.INSTANCE;
