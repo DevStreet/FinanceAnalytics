@@ -1,5 +1,7 @@
-Welcome to the OpenGamma Platform!
+This is a Fork of OpenGamma Platform! 
 ----------------------------------
+The intent is to enahnce the library to support custom finanical instruments based on the requirements of our end customer.
+
 OpenGamma's flagship technology for financial institutions, the OpenGamma
 Platform, is a comprehensive solution for financial analytics capable of
 satisfying the full range of front-office and risk requirements.
